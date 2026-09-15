@@ -16,7 +16,13 @@ For non-trivial work:
 3. load only the methodology/Skill/contract files required by the explicit task;
 4. load `docs/plans/active/README.md` only when continuing Harness repository work.
 
-When working **through Harness on a target project**, recover target-project state from that target repository. Do not treat Harness conversation history as project state.
+When working **through Harness on a target project**, recover target-project state from that target repository only when the requested task depends on current execution, gate or authorization state. Do not inherit a target project's active workstream merely because one exists, and do not treat Harness conversation history as project state.
+
+## Task precedence
+
+The explicit user request selects the target project, task, scope and desired output. Harness methodology and target-project truth constrain how that task is performed; they must not redirect an unrelated request into an active plan.
+
+A Skill or protocol may broaden context, reroute work or stop execution only for a concrete target-project invariant, blocking unknown/conflict, or dependency of the requested task. Make that reason explicit rather than following workflow prose mechanically.
 
 ## Source map
 
@@ -46,8 +52,13 @@ From now on:
 - A target project must remain the durable source of its own truth and execution state.
 - Generic methodology must not mention a specific product unless used as an explicit example.
 - Project-specific extensions may refine Harness behavior but must not silently fork generic rules.
+- Progressive disclosure is the default: load the smallest relevant method/Skill/context; do not preload lifecycle or active-plan state for unrelated work.
+- Shared policy has one canonical owner. Routing maps and Skills reference it instead of restating its state machine.
+- Orchestration Skills coordinate; they do not become duplicate lifecycle, decision or implementation methodologies.
+- Validators enforce deterministic ownership/schema/reference invariants, not synchronized copies of policy prose.
+- Static routing-corpus validation is not evidence that a model routed correctly; observed model-routing evaluation is separate.
+- Measure context overhead before adding scaffolding. Useful signals include files read, Skills loaded, tool calls before first useful action and premature stops.
 - Keep runtime orchestration small; do not turn methodology into a workflow engine without demonstrated need.
-- Progressive disclosure is the default: load the smallest relevant method/Skill/context.
 - Validators enforce deterministic invariants; Skills carry judgement-heavy reusable guidance.
 
 ## Current compatibility principle
