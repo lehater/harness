@@ -11,7 +11,8 @@ Create a reusable Harness repository that can operate on multiple engineering re
 ### Move to external Harness
 
 1. **Core operating model**
-   - task-first routing and progressive disclosure;
+   - task-first routing and explicit task precedence;
+   - progressive disclosure and conditional active-state loading;
    - context loading/rollover and recoverability;
    - decision/no-invention protocol;
    - branch/checkpoint/PR/CI working discipline;
@@ -44,7 +45,8 @@ Create a reusable Harness repository that can operate on multiple engineering re
    - Harness structure validation;
    - project-contract validation;
    - Skill routing corpus validation;
-   - model-routing result scoring;
+   - observed model-routing result scoring;
+   - context-overhead metrics;
    - lifecycle-transition corpus machinery.
 
 7. **Bootstrap/templates**
@@ -69,6 +71,21 @@ Create a reusable Harness repository that can operate on multiple engineering re
 - project-specific Skills;
 - source/build/test/deployment commands and CI workflows;
 - validators/eval cases that encode project-specific invariants.
+
+## Lessons adopted from NAPMS Harness simplification
+
+NAPMS PR #127 established several rules that should become generic Harness design constraints rather than remain NAPMS-local:
+
+- the explicit task is primary; an existing active plan must not capture unrelated work;
+- target-project active state is loaded only when current execution, lifecycle/gate state or authorization matters;
+- lifecycle/process protocols are loaded on demand, not as a mandatory startup stack;
+- `execute-work-package` is orchestration only and delegates lifecycle/lease semantics to canonical protocol owners;
+- one policy has one owner; validators should check structure/references/invariants instead of forcing repeated policy phrases into root maps, Skills and protocols;
+- static routing-corpus validation proves corpus structure only, not actual model routing;
+- actual model-routing evaluation should record behavior and cost signals such as files read, Skills loaded, tool calls before first useful action and premature stops;
+- mechanically checkable rules belong in deterministic checks where practical rather than bloating agent instructions.
+
+These constraints apply to the extracted Harness unless a later measured experiment demonstrates a better alternative.
 
 ## Target shape
 
@@ -117,6 +134,7 @@ Acceptance:
 - one canonical project manifest schema;
 - deterministic Harness revision pin;
 - clear behavior when Harness is unavailable or the pin is invalid;
+- target active-state location is discoverable but not automatically loaded for unrelated tasks;
 - no requirement to preserve conversation history.
 
 ### WP2 — Extract core methodology
@@ -124,9 +142,12 @@ Acceptance:
 Rewrite NAPMS reusable process material into repository-independent core/software-product/DDD profiles. Do not copy NAPMS paths or product assumptions.
 
 Acceptance:
+- explicit user task selects task/scope/output; methodology constrains execution but does not silently redirect unrelated work;
 - each protocol has one owner;
+- active state and lifecycle protocols are loaded only when the current task depends on them;
 - optional profiles are explicit rather than globally forced;
-- project state is referenced through the project contract, not hard-coded paths except contract defaults.
+- project state is referenced through the project contract, not hard-coded paths except contract defaults;
+- lifecycle/authorization state machines are not duplicated into routing maps or unrelated Skills.
 
 ### WP3 — Extract reusable Skills
 
@@ -134,6 +155,9 @@ Move only Skills whose trigger/responsibility is project-independent. Generalize
 
 Acceptance:
 - concise trigger descriptions;
+- `execute-work-package` remains orchestration only: recover current state, identify owner/gate, route to the smallest Skill/protocol, persist material execution-state changes;
+- isolated audit/review/research/implementation tasks do not load current-plan orchestration unless they depend on it;
+- neighboring Skills are not preloaded speculatively;
 - no product truth in Skill bodies;
 - project-local extension/override boundary documented;
 - routing eval cases cover confusable neighboring Skills.
@@ -144,7 +168,9 @@ Generalize NAPMS Harness validators into reusable Harness and project-contract v
 
 Acceptance:
 - deterministic checks validate ownership/schema/reference invariants rather than duplicated policy prose;
-- static corpus validation is clearly separated from observed model-routing evaluation;
+- static routing-corpus validation explicitly states that no model was executed;
+- observed model-routing evaluation is a separate surface;
+- observed evaluations can compare at least `files_read`, `skills_loaded`, `tool_calls_before_first_action` and `stopped_early` against a baseline;
 - lifecycle/eval machinery supports enabled profiles only.
 
 ### WP5 — NAPMS dual-run migration
@@ -154,6 +180,7 @@ Bind NAPMS to a pinned Harness revision while retaining its current local Harnes
 Acceptance:
 - existing NAPMS hosted gates stay green;
 - current NAPMS project state remains repository-local;
+- representative tasks preserve correct routing while not increasing unnecessary files/Skills/tool calls or premature stops;
 - no generic methodology exists in two authoritative locations after cutover.
 
 ### WP6 — Nutrition Management bootstrap
@@ -170,11 +197,12 @@ Acceptance:
 - no multi-agent scheduler;
 - no universal workflow/BPMN engine;
 - no automatic cross-project prioritization;
-- no removal of NAPMS local Harness before dual-run parity is demonstrated.
+- no removal of NAPMS local Harness before dual-run parity is demonstrated;
+- no weakening or fast-path bypass of implementation authorization until measurements show that authorization itself, rather than context/routing duplication, is the remaining material overhead.
 
 ## Exit criteria
 
-The external Harness is proven when both NAPMS and Nutrition Management can use the same pinned methodology/runtime, preserve all durable state locally, and recover correctly after project switching without relying on prior conversation context.
+The external Harness is proven when both NAPMS and Nutrition Management can use the same pinned methodology/runtime, preserve all durable state locally, recover correctly after project switching without relying on prior conversation context, and retain task-routing quality without reintroducing unnecessary context fan-out.
 
 ## Next
 
