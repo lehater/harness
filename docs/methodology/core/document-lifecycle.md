@@ -16,4 +16,4 @@ Knowledge is fixed enough for downstream reliance when its owner is identified, 
 
 When accepted truth changes, update the highest affected canonical owner first, revalidate only dependent artifacts, supersede changed ADR decisions explicitly, and avoid copying the same invariant into every downstream document.
 
-Do not persist full chat transcripts, rejected brainstorming, duplicated canonical explanations, obsolete temporary analysis, or completed plans solely for history.
+Do not persist full chat transcripts, rejected brainstorming, duplicated canonical explanations, obsolete temporary analysis or completed plans solely for history.
