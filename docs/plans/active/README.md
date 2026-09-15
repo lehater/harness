@@ -4,16 +4,17 @@ Current: `bootstrap-core-operating-model.md`
 
 Goal: establish a repository-independent Harness that contains reusable methodology and generic Skills while target projects remain fully independent owners of their own truth and execution state.
 
-Current task: extract generic methodology/Skills from the Nutrition Management bootstrap and remove all generic Harness material from that project branch.
+Current task: extraction from Nutrition Management is complete; validate the external Harness surface and project/local separation.
 
-State: implementation
+State: validation
 
 ## Working set
 
 - `AGENTS.md`
 - `README.md`
-- `docs/plans/active/bootstrap-core-operating-model.md`
 - `docs/methodology/`
+- `skills/`
+- `validators/validate_harness.py`
 - Nutrition Management PR #1 branch
 
 ## Blockers
@@ -22,4 +23,4 @@ None.
 
 ## Next
 
-Complete generic methodology/Skill extraction, then validate that Nutrition Management contains only project-local instructions, product knowledge and durable project state.
+Run the hosted Harness gate, inspect the result, and keep Nutrition Management free of generic Harness implementation.
