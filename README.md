@@ -2,7 +2,7 @@
 
 Repository-independent operating model for AI-assisted engineering work.
 
-Harness defines reusable methodology, routing, Skills, project contracts, validation and evaluation mechanics. Product/domain truth and durable execution state remain in each target project repository.
+Harness defines reusable methodology and generic Skills. Target project repositories independently own product/domain truth, architecture, decisions, implementation constraints and durable execution state.
 
 Core boundary:
 
@@ -11,8 +11,6 @@ Harness = how work is performed
 Project = what is true, what is active, and what is authorized
 ```
 
-A target project should be recoverable from its own repository plus a pinned Harness revision; conversational state is never required for recovery.
+There is no required binding, manifest, pin or runtime coupling between Harness and a target project. In a chat/session, the user may instruct the agent to use this Harness while working on any repository. The agent reads only the relevant Harness material and the relevant target-project material for that task.
 
-## Bootstrap
-
-This commit only establishes the repository and ownership boundary. Further Harness development is performed on branches and integrated through pull requests with squash merge.
+Conversation history is not durable project state; resumable project state remains in the target repository.
