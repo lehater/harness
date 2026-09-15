@@ -2,24 +2,24 @@
 
 Current: `bootstrap-core-operating-model.md`
 
-Goal: establish the repository-independent Harness boundary, migration plan, and target-project integration contract before extracting reusable implementation from NAPMS.
+Goal: establish a repository-independent Harness that contains reusable methodology and generic Skills while target projects remain fully independent owners of their own truth and execution state.
 
-Current task: incorporate the latest NAPMS Harness simplification constraints into the extraction criteria, then select the project-to-Harness loading/pinning mechanism.
+Current task: extract generic methodology/Skills from the Nutrition Management bootstrap and remove all generic Harness material from that project branch.
 
-State: planning
+State: implementation
 
 ## Working set
 
 - `AGENTS.md`
 - `README.md`
 - `docs/plans/active/bootstrap-core-operating-model.md`
-- NAPMS PR #127 and current root `AGENTS.md`, `.agents/skills/`, `docs/process/`, validators/evals
-- Nutrition Management repository bootstrap state
+- `docs/methodology/`
+- Nutrition Management PR #1 branch
 
 ## Blockers
 
-- Select the initial project-to-Harness loading/pinning mechanism before removing generic Harness material from NAPMS.
+None.
 
 ## Next
 
-Execute WP1 in `bootstrap-core-operating-model.md`: choose and specify the project manifest plus deterministic Harness revision loading model.
+Complete generic methodology/Skill extraction, then validate that Nutrition Management contains only project-local instructions, product knowledge and durable project state.
