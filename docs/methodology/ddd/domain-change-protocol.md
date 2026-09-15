@@ -1,18 +1,18 @@
 # Domain-change re-entry protocol
 
-Use when new requirements, architecture/implementation findings or stakeholder clarification may change accepted domain semantics.
+Use when new requirements, architecture/implementation findings or stakeholder clarification may change accepted target-project domain semantics.
 
-Classify the highest affected layer:
+## Classify the highest affected layer
 
 ```text
-implementation detail only -> S4 / code
-observable behavior or quality expectation changes -> S1 Requirements
-identity/lifecycle/invariant changes inside one accepted BC -> S2 Tactical DDD
-language/responsibility/authority/context relationship changes -> S2 Strategic DDD
+implementation detail only -> implementation/readiness
+observable behavior or quality changes -> Requirements -> revalidate dependent Domain/Architecture/Implementation
+tactical identity/lifecycle/invariant changes -> Tactical DDD -> revalidate dependent Architecture/Implementation
+language/responsibility/authority/context relationship changes -> Strategic DDD -> revalidate affected Tactical DDD and downstream work
 ```
 
-Revalidate only dependent downstream layers. Do not let a lower layer solve an upstream semantic unknown.
+Do not let a lower layer solve an upstream semantic unknown.
 
-Revisit Strategic DDD only when evidence materially changes at least one of: ubiquitous-language boundary; responsibility or decision ownership; independent lifecycle/invariants; authority boundary; context relationship/public semantic contract.
+Revisit Strategic DDD only when evidence materially changes a ubiquitous-language boundary, responsibility/decision ownership, independent lifecycle/invariants, authority boundary, or context relationship/public semantic contract.
 
 A new class, table, endpoint, service or deployment unit is not by itself a Strategic DDD trigger.
