@@ -1,0 +1,70 @@
+version: 1
+kind: harness-core-acceptance
+id: CORE-V0-CROSS-AUTHORITY-CHANGE
+
+model:
+  authorities:
+    - id: POLICY
+    - id: ARCHITECTURE
+    - id: IMPLEMENTATION
+    - id: VERIFICATION
+
+  artifacts:
+    - id: POLICY-DOMAIN
+      authority: POLICY
+      path: docs/policy-domain.yaml
+      provides: [policy.withdrawal-semantics]
+      depends_on: []
+
+    - id: POLICY-API
+      authority: ARCHITECTURE
+      path: docs/policy-api.yaml
+      provides: [policy.withdrawal-http-contract]
+      depends_on: [POLICY-DOMAIN]
+
+    - id: POLICY-PERSISTENCE
+      authority: ARCHITECTURE
+      path: docs/policy-persistence.yaml
+      provides: [policy.withdrawal-persistence]
+      depends_on: [POLICY-DOMAIN]
+
+    - id: POLICY-IMPLEMENTATION
+      authority: IMPLEMENTATION
+      path: src/policy.py
+      provides: [policy.withdrawal-implementation]
+      depends_on: [POLICY-DOMAIN, POLICY-API, POLICY-PERSISTENCE]
+
+    - id: POLICY-VERIFICATION
+      authority: VERIFICATION
+      path: tests/test_policy_withdrawal.py
+      provides: [policy.withdrawal-verification]
+      depends_on: [POLICY-IMPLEMENTATION]
+
+  questions:
+    - id: Q-POLICY-WITHDRAWAL
+      authority: POLICY
+      text: Must withdrawal preserve the accepted policy history?
+      blocks: [POLICY-IMPLEMENTATION]
+
+expect:
+  affected:
+    artifact: POLICY-DOMAIN
+    contains: [POLICY-API, POLICY-PERSISTENCE, POLICY-IMPLEMENTATION, POLICY-VERIFICATION]
+
+  capability:
+    id: policy.withdrawal-semantics
+    providers: [POLICY-DOMAIN]
+    owner: POLICY
+
+  questions:
+    unresolved: [Q-POLICY-WITHDRAWAL]
+
+  blocked:
+    artifact: POLICY-IMPLEMENTATION
+    by: [Q-POLICY-WITHDRAWAL]
+
+  resolution:
+    question: Q-POLICY-WITHDRAWAL
+    artifact: POLICY-DOMAIN
+    unresolved_after: []
+    blocked_after: []
