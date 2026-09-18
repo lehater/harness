@@ -43,8 +43,11 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `harness.py` — Core v0 structural operations.
+- `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
+- `spec/adapter-acceptance/**` — executable adapter integration cases.
 - `validators/validate_core.py` — Core validator/acceptance runner.
+- `validators/validate_adapters.py` — adapter acceptance runner.
 - `docs/methodology/**` and `skills/**` — retained pre-Core material; not part of Core v0 consumer semantics.
 
 ## Repository workflow
