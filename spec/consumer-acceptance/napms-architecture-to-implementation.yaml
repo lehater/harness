@@ -1,0 +1,169 @@
+version: 1
+kind: harness-consumer-acceptance
+id: NAPMS-ARCHITECTURE-TO-IMPLEMENTATION
+
+failure:
+  consumer_attempt: Build a self-contained implementation package from accepted NAPMS design truth.
+  available_canonical_truth:
+    - domain semantics and use cases
+    - runtime and deployment architecture
+    - persistence and HTTP contracts
+    - security and quality constraints
+    - acceptance criteria
+    - explicit evidence that asynchronous messaging is not applicable
+  missing_mechanism: Core v0 can resolve each capability independently, but cannot express and verify one consumer-specific completeness contract or project a package plan from it.
+  incorrect_workaround: A NAPMS-specific script would have to duplicate capability resolution, ownership checks, DESIGN_GAP handling and NOT_APPLICABLE evidence rules.
+  hypothesis: Core v0 remains unchanged; a consumer contract composes existing Core operations.
+
+model:
+  authorities:
+    - id: DOMAIN
+    - id: ARCHITECTURE
+    - id: VERIFICATION
+
+  artifacts:
+    - id: FIRST-MVP-JOURNEY
+      authority: DOMAIN
+      path: docs/model/use-cases/first-mvp-policy-export.yaml
+      provides: [napms.use-cases]
+      depends_on: []
+
+    - id: RC-DOMAIN
+      authority: DOMAIN
+      path: docs/model/contexts/resource-catalogue/domain-model.yaml
+      provides: [napms.domain-semantics]
+      depends_on: []
+
+    - id: ACC-DOMAIN
+      authority: DOMAIN
+      path: docs/model/contexts/application-communication-catalogue/domain-model.yaml
+      provides: [napms.domain-semantics]
+      depends_on: []
+
+    - id: C4-STRUCTURE
+      authority: ARCHITECTURE
+      path: docs/architecture/structurizr/workspace.dsl
+      provides: [napms.runtime-architecture, napms.deployment]
+      depends_on: [FIRST-MVP-JOURNEY]
+
+    - id: SYSTEM-RULES
+      authority: ARCHITECTURE
+      path: docs/architecture/mvp-system-rules.yaml
+      provides: [napms.security-constraints]
+      depends_on: [C4-STRUCTURE, FIRST-MVP-JOURNEY]
+
+    - id: TECH-REPRESENTATION
+      authority: ARCHITECTURE
+      path: docs/architecture/mvp-technical-representation.yaml
+      provides: [napms.async-messaging.not-applicable]
+      depends_on: [SYSTEM-RULES]
+
+    - id: OPENAPI
+      authority: ARCHITECTURE
+      path: docs/contracts/http/napms.openapi.yaml
+      provides: [napms.http-contract]
+      depends_on: [SYSTEM-RULES, TECH-REPRESENTATION]
+
+    - id: PERSISTENCE
+      authority: ARCHITECTURE
+      path: docs/architecture/persistence/mvp-persistence.yaml
+      provides: [napms.persistence]
+      depends_on: [SYSTEM-RULES, TECH-REPRESENTATION, RC-DOMAIN, ACC-DOMAIN]
+
+    - id: QUALITY-REQUIREMENTS
+      authority: ARCHITECTURE
+      path: docs/architecture/mvp-quality-requirements.yaml
+      provides: [napms.quality-requirements]
+      depends_on: [SYSTEM-RULES, TECH-REPRESENTATION]
+
+    - id: MVP-TEST-INTENT
+      authority: VERIFICATION
+      path: docs/plans/first-mvp-test-intent.yaml
+      provides: [napms.acceptance-criteria]
+      depends_on: [C4-STRUCTURE, OPENAPI, PERSISTENCE, QUALITY-REQUIREMENTS]
+
+  questions: []
+
+contract:
+  id: NAPMS-IMPLEMENTATION-CONSUMER
+  consumer: implementation
+  requirements:
+    - id: domain-semantics
+      capability: napms.domain-semantics
+      expected_authority: DOMAIN
+      representation: {practice: DDD, format: markdown}
+
+    - id: use-cases
+      capability: napms.use-cases
+      expected_authority: DOMAIN
+      representation: {practice: use-case, format: markdown}
+
+    - id: runtime-architecture
+      capability: napms.runtime-architecture
+      expected_authority: ARCHITECTURE
+      representation: {standard: C4, level: component, format: svg}
+
+    - id: deployment
+      capability: napms.deployment
+      expected_authority: ARCHITECTURE
+      representation: {standard: C4, level: deployment, format: svg}
+
+    - id: persistence
+      capability: napms.persistence
+      expected_authority: ARCHITECTURE
+      representation: {practice: ERD, format: svg}
+
+    - id: http-contract
+      capability: napms.http-contract
+      expected_authority: ARCHITECTURE
+      representation: {standard: OpenAPI, format: yaml}
+
+    - id: security-constraints
+      capability: napms.security-constraints
+      expected_authority: ARCHITECTURE
+      representation: {practice: security-model, format: markdown}
+
+    - id: quality-requirements
+      capability: napms.quality-requirements
+      expected_authority: ARCHITECTURE
+      representation: {practice: quality-scenarios, format: markdown}
+
+    - id: acceptance-criteria
+      capability: napms.acceptance-criteria
+      expected_authority: VERIFICATION
+      representation: {practice: BDD, format: markdown}
+
+    - id: asynchronous-external-contract
+      capability: napms.async-external-contract
+      expected_authority: ARCHITECTURE
+      representation: {standard: AsyncAPI, format: yaml}
+      not_applicable:
+        evidence_capability: napms.async-messaging.not-applicable
+
+expect:
+  satisfied: true
+  statuses:
+    domain-semantics: PROVIDED
+    use-cases: PROVIDED
+    runtime-architecture: PROVIDED
+    deployment: PROVIDED
+    persistence: PROVIDED
+    http-contract: PROVIDED
+    security-constraints: PROVIDED
+    quality-requirements: PROVIDED
+    acceptance-criteria: PROVIDED
+    asynchronous-external-contract: NOT_APPLICABLE
+  package_sources:
+    domain-semantics: [ACC-DOMAIN, RC-DOMAIN]
+    asynchronous-external-contract: [TECH-REPRESENTATION]
+
+regression:
+  remove_capability:
+    artifact: SYSTEM-RULES
+    capability: napms.security-constraints
+  expect:
+    satisfied: false
+    requirement: security-constraints
+    status: DESIGN_GAP
+    question_authority: ARCHITECTURE
+    package_projection_blocked: true
