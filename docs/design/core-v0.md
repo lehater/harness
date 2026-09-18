@@ -56,7 +56,6 @@ questions:
 
 Core validates declared ownership, references, dependencies and capability ownership. It does not interpret arbitrary artifact semantics.
 
-
 ## Pilot evidence
 
 Core v0 has been exercised against two independent target repositories.
@@ -100,4 +99,9 @@ Observed usage guidance:
 - Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.
 - a future Core extension still requires a concrete consumer failure and an acceptance fixture reproducing it before behavior changes.
 
-Still unproven are consumer ergonomics for deriving/projecting Core declarations from existing repository metadata and whether additional consumers expose a structural case that the current four entities cannot express. These are validation targets, not new Core concepts.
+Consumer integration ergonomics have now been exercised in two repository shapes:
+
+- when a repository already owns machine-readable routing/dependencies, a selected projection can reuse that graph and add only Authority/Capability/Question metadata;
+- when a repository has canonical artifacts but no machine-readable graph, a small direct scenario model is sufficient and should not be replaced by a prose-mining or universal graph-inference layer.
+
+Still unproven are larger-scale capability catalogs, many simultaneous unresolved Questions, and additional consumer graph shapes. Those remain validation targets, not reasons to add Core concepts.
