@@ -6,6 +6,8 @@ Harness Core manages engineering-knowledge ownership boundaries for target repos
 
 Harness Core v0 owns only the structural model and derived operations described in `docs/design/core-v0.md`. Target repositories own all product/domain/architecture semantics, canonical artifact contents, implementation constraints and durable project state.
 
+Consumer contracts and package projections are an application layer over Core. They may require capabilities and representations for a specific downstream consumer, but they do not become new Core entities or semantic owners.
+
 ## Consumer startup
 
 When Harness is used with another repository:
@@ -44,10 +46,14 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `harness.py` — Core v0 structural operations.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
+- `consumers/contract.py` — non-Core consumer completeness evaluation and package projection planning.
+- `docs/design/consumer-contract-v0.md` — boundary and semantics of the consumer layer.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/adapter-acceptance/**` — executable adapter integration cases.
+- `spec/consumer-acceptance/**` — executable downstream-consumer cases.
 - `validators/validate_core.py` — Core validator/acceptance runner.
 - `validators/validate_adapters.py` — adapter acceptance runner.
+- `validators/validate_consumers.py` — consumer-contract acceptance runner.
 - `docs/methodology/**` and `skills/**` — retained pre-Core material; not part of Core v0 consumer semantics.
 
 ## Repository workflow

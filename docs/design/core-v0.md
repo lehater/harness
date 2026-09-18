@@ -58,7 +58,7 @@ Core validates declared ownership, references, dependencies and capability owner
 
 ## Pilot evidence
 
-Core v0 has been exercised against two independent target repositories.
+Core v0 has been exercised in three pilots across two independent target repositories.
 
 ### Pilot 1 — NAPMS
 
@@ -87,15 +87,33 @@ The pilot confirmed that Core can:
 
 The canonical repair merged through the target repository's normal PR/CI path, and the synchronized downstream implementation remained green. No Core behavior change was required.
 
+### Pilot 3 — NAPMS Architecture to Implementation
+
+NAPMS requires an implementation consumer to receive a self-contained set of accepted knowledge: domain semantics, use cases, runtime/deployment architecture, persistence, HTTP contracts, security/quality constraints and acceptance criteria. Conditional aspects must be explicitly `NOT_APPLICABLE` from canonical evidence rather than silently absent.
+
+Core v0 already had enough primitives to identify providers, ownership and unresolved blockers. The missing operation was consumer-specific composition: verifying one required set of capabilities and requested representations, detecting `DESIGN_GAP`, and projecting the selected canonical sources into a package plan.
+
+The acceptance case in `spec/consumer-acceptance/napms-architecture-to-implementation.yaml` confirmed that this belongs above Core:
+
+- a consumer contract composes existing CapabilityId resolution and ownership;
+- `NOT_APPLICABLE` is accepted only when a canonical evidence capability resolves;
+- missing knowledge becomes `DESIGN_GAP` and yields a Question draft addressed to the expected Authority;
+- unresolved Questions blocking selected providers keep the contract unsatisfied;
+- package projection is refused until the contract is satisfied;
+- the package projection contains source references and opaque representation requests, not copied semantics.
+
+No Core model or `harness.py` behavior change was required.
+
 ### Current conclusion
 
-The two pilots do not justify a Core v0.1 model extension.
+The three pilots do not justify a Core v0.1 model extension.
 
 Observed usage guidance:
 
 - `Question` is exceptional, not a mandatory work item.
 - `affected` is a dependency-impact closure, not a mandatory file-change list.
 - target repositories remain authoritative for semantic and dependency truth; a Core model should project existing project truth rather than create a second canonical graph.
+- consumer completeness and package projection can be composed above Core without introducing Handoff, Readiness or workflow state.
 - Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.
 - a future Core extension still requires a concrete consumer failure and an acceptance fixture reproducing it before behavior changes.
 
@@ -104,4 +122,4 @@ Consumer integration ergonomics have now been exercised in two repository shapes
 - when a repository already owns machine-readable routing/dependencies, a selected projection can reuse that graph and add only Authority/Capability/Question metadata;
 - when a repository has canonical artifacts but no machine-readable graph, a small direct scenario model is sufficient and should not be replaced by a prose-mining or universal graph-inference layer.
 
-Still unproven are larger-scale capability catalogs, many simultaneous unresolved Questions, and additional consumer graph shapes. Those remain validation targets, not reasons to add Core concepts.
+Still unproven are larger-scale capability catalogs, many simultaneous unresolved Questions, consumer contracts for substantially different downstream responsibilities, and package materialization/rendering. Those remain validation targets, not reasons to add Core concepts.

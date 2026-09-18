@@ -18,6 +18,23 @@ Start with `docs/design/core-v0.md`.
 
 There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
 
+## Consumer contracts above Core
+
+When a downstream consumer needs a specific, self-contained set of engineering knowledge, `consumers/contract.py` can evaluate a consumer-specific contract on top of an ordinary Core v0 model.
+
+A requirement names:
+
+- the required `CapabilityId`;
+- the Authority expected to own that capability;
+- an opaque target representation requested by the consumer;
+- optionally, a capability that is canonical evidence for `NOT_APPLICABLE`.
+
+Evaluation yields only `PROVIDED`, `NOT_APPLICABLE`, or `DESIGN_GAP`, plus unresolved blocking Questions affecting the selected providers. A missing requirement yields a Core-compatible Question draft addressed to the expected Authority. The final answer still belongs in that Authority's canonical artifact.
+
+`project_package` runs only for a satisfied contract. It emits a projection plan containing source artifact IDs, source paths and requested representations. It does not render, copy or reinterpret target semantics.
+
+This layer is intentionally not Harness Core. See `docs/design/consumer-contract-v0.md`.
+
 ## Existing canonical graphs
 
 When a target repository already owns artifact paths and dependency routing in a canonical graph, do not copy that graph into Harness metadata.
