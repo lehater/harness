@@ -2,61 +2,50 @@
 
 ## Purpose
 
-This repository owns reusable methodology and generic Skills for AI-assisted engineering across multiple target repositories.
+Harness Core manages engineering-knowledge ownership boundaries for target repositories.
 
-Harness owns **how work is performed**. A target project owns **what is true, what is active, and what is authorized**.
+Harness Core v0 owns only the structural model and derived operations described in `docs/design/core-v0.md`. Target repositories own all product/domain/architecture semantics, canonical artifact contents, implementation constraints and durable project state.
 
-Do not move product/domain truth, project-specific architecture, active project state, project-local gates or implementation authorization into this repository.
+## Consumer startup
 
-## Task-first startup
+When Harness is used with another repository:
 
-For Harness repository work:
-1. read this file;
-2. read only the methodology/Skill files required by the explicit task;
-3. load `docs/plans/active/README.md` only when continuing development of this Harness repository.
+1. read `docs/design/core-v0.md`;
+2. read the target repository's own instructions;
+3. locate only the target canonical artifacts required by the task;
+4. use the target's declared Core model, when present, to navigate ownership, capabilities, dependencies and unresolved Questions.
 
-When a user asks to use this Harness while working on another repository, treat the two repositories independently:
-- read the smallest relevant Harness method/Skill;
-- read the target project's own instructions and canonical artifacts required by the task;
-- load target-project active state only when current execution, lifecycle/gate state or authorization matters.
+No manifest, pin, submodule or repository-to-repository runtime binding is required.
 
-No manifest, pin, submodule or repository-to-repository binding is required.
+## Core rules
 
-## Task precedence
-
-The explicit user request selects the target project, task, scope and desired output. Harness methodology and target-project truth constrain execution; they must not redirect an unrelated request into an active plan.
-
-A Skill or protocol may broaden context, reroute work or stop execution only for a concrete target-project invariant, blocking unknown/conflict, or dependency of the requested task.
-
-## Source map
-
-- `docs/methodology/core/` — repository-independent working/decision/knowledge protocols.
-- `docs/methodology/software-product/` — reusable software-product lifecycle methodology.
-- `docs/methodology/ddd/` — reusable Strategic/Tactical DDD methodology.
-- `skills/` — reusable judgement-heavy workflows.
-- `validators/` and `evals/` — generic deterministic checks/evaluation machinery when implemented.
-- `templates/` — optional examples/bootstrap material when useful.
-- `docs/plans/active/` — execution state for development of this Harness repository itself.
+- One `CanonicalArtifact` belongs to exactly one `Authority`.
+- A `CapabilityId` may have several providers only when every canonical provider belongs to the same `Authority`.
+- `depends_on` expresses declared canonical-artifact dependency.
+- A `Question` is addressed to the `Authority` that may decide the missing semantics.
+- A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
+- Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
 ## Change discipline
 
-- do not commit directly to `main`;
-- work on a branch;
-- use one coherent change per PR;
-- integrate through squash merge.
+Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a universal semantic DSL without a concrete consumer failure.
 
-## Design rules
+A Core extension requires a failure case that states:
+- what the consumer attempted;
+- which canonical truth was available;
+- what was missing;
+- why Authority / CanonicalArtifact / CapabilityId / Question / dependency were insufficient;
+- what incorrect workaround would otherwise be required.
 
-- Keep target projects independent from Harness implementation details.
-- Generic methodology must not mention a specific product except as an explicit example.
-- Project-specific rules, truth and durable state stay in the project repository.
-- Progressive disclosure is the default: load the smallest relevant method/Skill/context.
-- Shared policy has one canonical owner; Skills reference it instead of restating its state machine.
-- Orchestration Skills coordinate; they do not duplicate lifecycle, decision or implementation methodologies.
-- Validators enforce deterministic ownership/schema/reference invariants rather than synchronized policy prose.
-- Static routing-corpus validation is not evidence that a model routed correctly; observed model-routing evaluation is separate.
-- Measure context overhead before adding scaffolding.
-- Do not turn methodology into a workflow engine without demonstrated need.
+Add an acceptance fixture reproducing that failure before changing Core behavior.
+
+## Source map
+
+- `docs/design/core-v0.md` — current Core boundary and model.
+- `harness.py` — Core v0 structural operations.
+- `spec/acceptance/**` — executable Core acceptance cases.
+- `validators/validate_core.py` — Core validator/acceptance runner.
+- `docs/methodology/**` and `skills/**` — retained pre-Core material; not part of Core v0 consumer semantics.
 
 ## Repository workflow
 

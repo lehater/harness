@@ -1,17 +1,23 @@
 # Harness
 
-Repository-independent operating model for AI-assisted engineering work.
+Repository-independent Core for engineering-knowledge ownership.
 
-Harness defines reusable methodology and generic Skills. Target project repositories independently own product/domain truth, architecture, decisions, implementation constraints and durable execution state.
+Harness Core v0 models only:
 
-Core boundary:
+- `Authority`;
+- `CanonicalArtifact`;
+- `Question`;
+- `CapabilityId`;
+- canonical-artifact dependencies.
 
-```text
-Harness = how work is performed
-Project = what is true, what is active, and what is authorized
-```
+From that declared structure it derives `affected`, unresolved `questions`, capability `resolve` / `owner`, `blocked`, and `resolve-question`.
 
-There is no required binding, manifest, pin or runtime coupling between Harness and a target project. In a chat/session, the user may instruct the agent to use this Harness while working on any repository. The agent reads only the relevant Harness material and the relevant target-project material for that task.
+Target repositories remain the source of product/domain/architecture truth. Harness validates ownership, references, dependencies and capability ownership; it does not copy or interpret arbitrary engineering semantics.
 
-Conversation history is not durable project state; resumable project state remains in the target repository.
+Start with `docs/design/core-v0.md`.
 
+There is no required project binding, manifest, pin, submodule or runtime coupling. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
+
+Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
+
+The older `docs/methodology/**` and `skills/**` content is retained pre-Core material and does not define Core v0.
