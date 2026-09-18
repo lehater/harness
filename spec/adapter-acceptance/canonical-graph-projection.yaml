@@ -1,0 +1,59 @@
+version: 1
+kind: harness-adapter-acceptance
+id: CANONICAL-GRAPH-PROJECTION
+
+source_graph:
+  version: 1
+  kind: canonical-design-graph
+  nodes:
+    - {id: DOMAIN, path: docs/domain.yaml, depends_on: []}
+    - {id: ARCH, path: docs/architecture.yaml, depends_on: [DOMAIN]}
+    - {id: INTERNAL, path: docs/internal-routing.yaml, depends_on: [ARCH]}
+    - {id: VERIFY, path: docs/test-intent.yaml, depends_on: [INTERNAL]}
+
+projection:
+  authorities:
+    - id: DOMAIN-AUTHORITY
+    - id: ARCHITECTURE-AUTHORITY
+    - id: VERIFICATION-AUTHORITY
+
+  bindings:
+    - artifact: DOMAIN
+      authority: DOMAIN-AUTHORITY
+      provides: [example.domain-semantics]
+    - artifact: ARCH
+      authority: ARCHITECTURE-AUTHORITY
+      provides: [example.architecture-contract]
+    - artifact: VERIFY
+      authority: VERIFICATION-AUTHORITY
+      provides: [example.verification-intent]
+
+  questions:
+    - id: Q-EXAMPLE
+      authority: DOMAIN-AUTHORITY
+      text: Which semantic choice is authoritative?
+      blocks: [VERIFY]
+
+expect:
+  artifacts:
+    DOMAIN:
+      path: docs/domain.yaml
+      depends_on: []
+    ARCH:
+      path: docs/architecture.yaml
+      depends_on: [DOMAIN]
+    VERIFY:
+      path: docs/test-intent.yaml
+      depends_on: [ARCH]
+
+  capability:
+    id: example.domain-semantics
+    providers: [DOMAIN]
+    owner: DOMAIN-AUTHORITY
+
+  questions:
+    unresolved: [Q-EXAMPLE]
+
+  blocked:
+    artifact: VERIFY
+    by: [Q-EXAMPLE]
