@@ -1,15 +1,15 @@
-name: harness gate
+name: harness core
 
 on:
   workflow_dispatch:
   pull_request:
-    types: [ready_for_review]
     paths:
       - "AGENTS.md"
       - "README.md"
-      - "docs/methodology/**"
-      - "skills/**"
-      - "validators/**"
+      - "docs/design/**"
+      - "spec/**"
+      - "validators/validate_core.py"
+      - "harness.py"
       - "Makefile"
       - ".github/workflows/harness.yml"
 
@@ -21,4 +21,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+      - run: pip install PyYAML
       - run: make harness-check
