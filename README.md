@@ -54,6 +54,16 @@ python adapters/canonical_graph.py /path/to/project/docs/harness-core.yaml
 
 The emitted YAML is an ordinary Core v0 model and can be passed to `harness.py`. Projection metadata is integration metadata, not a second source of product/domain/architecture truth.
 
+## Projects without a canonical graph
+
+Do not build a generic parser that tries to infer engineering ownership and dependencies from arbitrary prose.
+
+For a consumer scenario, declare the smallest direct Core model that names only the canonical artifacts needed for that scenario. `path` and `depends_on` may be declared directly because no other machine-readable routing owner exists.
+
+The model may stay ephemeral. Persist it only when the target repository benefits from maintaining that integration metadata. Do not create a full-repository Harness inventory merely for completeness.
+
+If the target repository later gains its own canonical graph, prefer projecting that graph instead of maintaining duplicated routing metadata.
+
 Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
 
 The older `docs/methodology/**` and `skills/**` content is retained pre-Core material and does not define Core v0.
