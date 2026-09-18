@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Validate Harness Core v0 and its acceptance fixtures."""
+from __future__ import annotations
+
+import copy
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from harness import (  # noqa: E402
+    CoreError,
+    affected,
+    blocked,
+    capability_owner,
+    capability_resolve,
+    resolve_question,
+    unresolved_questions,
+    validate_model,
+)
+
+
+def main() -> int:
+    errors: list[str] = []
+    required = [ROOT / "harness.py", ROOT / "docs/design/core-v0.md"]
+    for path in required:
+        if not path.is_file():
+            errors.append(f"missing Core v0 file: {path.relative_to(ROOT)}")
+
+    fixtures = sorted((ROOT / "spec/acceptance").glob("*.yaml"))
+    if not fixtures:
+        errors.append("no Core v0 acceptance fixtures found")
+
+    for path in fixtures:
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+            if doc.get("kind") != "harness-core-acceptance":
+                raise CoreError("unexpected acceptance fixture kind")
+            model = doc["model"]
+            expect = doc["expect"]
+            validate_model(model)
+
+            affected_expect = expect["affected"]
+            actual = affected(model, affected_expect["artifact"])
+            missing = sorted(set(affected_expect.get("contains", [])) - set(actual))
+            if missing:
+                raise CoreError(f"affected missing expected artifacts: {missing}")
+
+            cap = expect["capability"]
+            if capability_resolve(model, cap["id"]) != sorted(cap["providers"]):
+                raise CoreError("capability resolve mismatch")
+            if capability_owner(model, cap["id"]) != cap["owner"]:
+                raise CoreError("capability owner mismatch")
+
+            if unresolved_questions(model) != sorted(expect["questions"]["unresolved"]):
+                raise CoreError("questions mismatch")
+
+            block = expect["blocked"]
+            if blocked(model, block["artifact"]) != sorted(block["by"]):
+                raise CoreError("blocked mismatch")
+
+            resolution = expect["resolution"]
+            resolved = resolve_question(copy.deepcopy(model), resolution["question"], resolution["artifact"])
+            if unresolved_questions(resolved) != sorted(resolution["unresolved_after"]):
+                raise CoreError("resolve-question did not clear unresolved question")
+            if blocked(resolved, block["artifact"]) != sorted(resolution["blocked_after"]):
+                raise CoreError("resolve-question did not clear blocking")
+        except Exception as exc:
+            errors.append(f"{path.relative_to(ROOT)}: {exc}")
+
+    if errors:
+        print("Harness Core validation failed:", file=sys.stderr)
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+
+    print(f"Harness Core validation passed ({len(fixtures)} acceptance fixture(s))")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
