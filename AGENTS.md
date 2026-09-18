@@ -57,3 +57,11 @@ A Skill or protocol may broaden context, reroute work or stop execution only for
 - Static routing-corpus validation is not evidence that a model routed correctly; observed model-routing evaluation is separate.
 - Measure context overhead before adding scaffolding.
 - Do not turn methodology into a workflow engine without demonstrated need.
+
+## Repository workflow
+
+- Never push or commit changes directly to `main`.
+- Every task is implemented on a dedicated non-main branch.
+- Run validation and tests on that branch before integration.
+- Integrate completed work into `main` only through a pull request using squash merge.
+- Treat `main` as the reviewed, integrated baseline, not as a working branch.
