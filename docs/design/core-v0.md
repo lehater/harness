@@ -55,3 +55,49 @@ questions:
 - `resolve-question MODEL QUESTION ARTIFACT [--write]`
 
 Core validates declared ownership, references, dependencies and capability ownership. It does not interpret arbitrary artifact semantics.
+
+
+## Pilot evidence
+
+Core v0 has been exercised against two independent target repositories.
+
+### Pilot 1 — NAPMS
+
+A real Application Communication Catalogue change enforced the already-canonical invariant that one directed Component pair may have at most one Interaction inside one Application Definition.
+
+The pilot confirmed that Core can:
+
+- locate the semantic owner and canonical providers through CapabilityId;
+- separate semantic, persistence, runtime and verification capabilities without inventing workflow state;
+- use `affected` to identify potential downstream impact;
+- leave `Question` absent when upstream semantics are already sufficient.
+
+The consumer issues discovered during the pilot were CI/integration problems in NAPMS, not missing Core concepts.
+
+### Pilot 2 — Nutrition Management
+
+A draft BLS 4.0 Food Knowledge implementation exposed a real semantic gap around source-value precision/provenance and also revealed disagreement between accepted ADRs and living domain artifacts.
+
+The pilot confirmed that Core can:
+
+- address the unresolved semantic question to the Food Knowledge Authority;
+- block the XLSX normalization boundary and downstream verification while the question is unresolved;
+- resolve the question only by changing an artifact owned by that Authority;
+- remove the downstream block after canonical truth is repaired;
+- continue implementation without introducing Stage, Gate, Approval, Handoff or workflow machinery.
+
+The canonical repair merged through the target repository's normal PR/CI path, and the synchronized downstream implementation remained green. No Core behavior change was required.
+
+### Current conclusion
+
+The two pilots do not justify a Core v0.1 model extension.
+
+Observed usage guidance:
+
+- `Question` is exceptional, not a mandatory work item.
+- `affected` is a dependency-impact closure, not a mandatory file-change list.
+- target repositories remain authoritative for semantic and dependency truth; a Core model should project existing project truth rather than create a second canonical graph.
+- Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.
+- a future Core extension still requires a concrete consumer failure and an acceptance fixture reproducing it before behavior changes.
+
+Still unproven are consumer ergonomics for deriving/projecting Core declarations from existing repository metadata and whether additional consumers expose a structural case that the current four entities cannot express. These are validation targets, not new Core concepts.
