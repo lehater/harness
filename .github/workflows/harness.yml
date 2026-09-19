@@ -16,6 +16,7 @@ on:
       - "target_state.py"
       - "workspace.py"
       - "Makefile"
+      - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/harness.yml"
 
 jobs:
@@ -28,3 +29,9 @@ jobs:
           python-version: "3.10"
       - run: pip install PyYAML
       - run: make harness-check
+      - name: Evaluate greenfield implementation frontier
+        run: |
+          python engineering_graph.py evaluate \
+            examples/greenfield-csv-deduplicator/engineering-graph.yaml \
+            IMPLEMENTATION \
+            examples/greenfield-csv-deduplicator/core-state.yaml

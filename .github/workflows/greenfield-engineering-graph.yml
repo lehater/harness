@@ -1,0 +1,241 @@
+name: Greenfield Engineering Graph
+
+on:
+  pull_request:
+    paths:
+      - "examples/greenfield-csv-deduplicator/**"
+      - ".github/workflows/greenfield-engineering-graph.yml"
+      - "engineering_graph.py"
+  push:
+    paths:
+      - "examples/greenfield-csv-deduplicator/**"
+      - ".github/workflows/greenfield-engineering-graph.yml"
+      - "engineering_graph.py"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install PyYAML
+      - name: Validate graph
+        run: python engineering_graph.py validate examples/greenfield-csv-deduplicator/engineering-graph.yaml
+      - name: Evaluate implementation target
+        run: |
+          python engineering_graph.py evaluate             examples/greenfield-csv-deduplicator/engineering-graph.yaml             IMPLEMENTATION             examples/greenfield-csv-deduplicator/core-state.yaml
+
+      - name: Verify semantic skill routing
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/core-state.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          missing = copy.deepcopy(model)
+          for artifact in missing["artifacts"]:
+              artifact["provides"] = [
+                  capability
+                  for capability in artifact.get("provides", [])
+                  if capability != "csv-deduplicator.verification-strategy"
+              ]
+
+          routed = route_create_work(graph, "IMPLEMENTATION", missing, registry)
+          assert routed["target_status"] == "READY", routed
+          assert routed["unrouted"] == [], routed
+          assert len(routed["routed"]) == 1, routed
+          item = routed["routed"][0]
+          assert item["capabilities"] == ["csv-deduplicator.verification-strategy"], item
+          assert item["knowledge_kind"] == "verification-strategy", item
+          assert item["skill"] == "skills/artifacts/verification-strategy/SKILL.md", item
+          PY
+
+      - name: Verify compatible CREATE capabilities group into one artifact work item
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/core-state.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          missing = copy.deepcopy(model)
+          for artifact in missing["artifacts"]:
+              artifact["provides"] = [
+                  capability
+                  for capability in artifact.get("provides", [])
+                  if capability not in {
+                      "csv-deduplicator.product-intent",
+                      "csv-deduplicator.acceptance",
+                  }
+              ]
+
+          routed = route_create_work(graph, "IMPLEMENTATION", missing, registry)
+          assert routed["unrouted"] == [], routed
+          product_work = [
+              item
+              for item in routed["routed"]
+              if item.get("knowledge_kind") == "product-requirements"
+          ]
+          assert len(product_work) == 1, routed
+          item = product_work[0]
+          assert item["skill"] == "skills/artifacts/product-requirements/SKILL.md", item
+          assert item["capabilities"] == [
+              "csv-deduplicator.acceptance",
+              "csv-deduplicator.product-intent",
+          ], item
+          PY
+
+      - name: Verify empty greenfield root routes to Problem Evidence skill
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+          empty = {"artifacts": [], "questions": []}
+
+          routed = route_create_work(
+              graph,
+              "IMPLEMENTATION",
+              empty,
+              registry,
+          )
+          assert routed["target_status"] == "READY", routed
+          assert routed["unrouted"] == [], routed
+          assert len(routed["routed"]) == 1, routed
+          item = routed["routed"][0]
+          assert item["knowledge_kind"] == "problem-evidence", item
+          assert item["capabilities"] == ["csv-deduplicator.problem-evidence"], item
+          assert item["skill"] == "skills/artifacts/problem-evidence/SKILL.md", item
+          PY
+
+      - name: Verify every greenfield frontier has a registered skill
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+          from engineering_graph import derive_profile, production_index
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/core-state.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          productions = production_index(graph)
+          profile = derive_profile(graph, "IMPLEMENTATION")
+          for expectation in profile["expectations"]:
+              production = productions[expectation["capability"]]
+              assert production.get("knowledge_kind"), production
+
+          cases = [
+              (
+                  {"csv-deduplicator.problem-evidence"},
+                  "problem-evidence",
+                  "skills/artifacts/problem-evidence/SKILL.md",
+              ),
+              (
+                  {
+                      "csv-deduplicator.product-intent",
+                      "csv-deduplicator.acceptance",
+                  },
+                  "product-requirements",
+                  "skills/artifacts/product-requirements/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.architecture"},
+                  "system-architecture",
+                  "skills/artifacts/system-architecture/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.cli-contract"},
+                  "interface-contract",
+                  "skills/artifacts/interface-contract/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.implementation-plan"},
+                  "implementation-design",
+                  "skills/artifacts/implementation-design/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.completion-criteria"},
+                  "implementation-design",
+                  "skills/artifacts/implementation-design/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.verification-strategy"},
+                  "verification-strategy",
+                  "skills/artifacts/verification-strategy/SKILL.md",
+              ),
+              (
+                  {"csv-deduplicator.acceptance-scenarios"},
+                  "acceptance-scenarios",
+                  "skills/artifacts/acceptance-scenarios/SKILL.md",
+              ),
+          ]
+
+          for removed, expected_kind, expected_skill in cases:
+              state = copy.deepcopy(model)
+              for artifact in state["artifacts"]:
+                  artifact["provides"] = [
+                      capability
+                      for capability in artifact.get("provides", [])
+                      if capability not in removed
+                  ]
+
+              routed = route_create_work(
+                  graph,
+                  "IMPLEMENTATION",
+                  state,
+                  registry,
+              )
+              assert routed["target_status"] == "READY", (removed, routed)
+              assert routed["unrouted"] == [], (removed, routed)
+              assert len(routed["routed"]) == 1, (removed, routed)
+              item = routed["routed"][0]
+              assert item["knowledge_kind"] == expected_kind, (removed, item)
+              assert item["skill"] == expected_skill, (removed, item)
+              assert set(item["capabilities"]) == removed, (removed, item)
+          PY

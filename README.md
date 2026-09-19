@@ -18,6 +18,27 @@ Start with `docs/design/core-v0.md`.
 
 There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
 
+## Engineering Graph v0
+
+The experimental `pilot/engineering-graph-v0` branch adds a normative producer/consumer layer above Core.
+
+Core remains the accepted knowledge state. The Engineering Graph declares:
+
+- atomic engineering Authorities;
+- each Authority's required upstream capabilities;
+- the capabilities each Authority is uniquely allowed to produce;
+- terminal consumers such as `IMPLEMENTATION`.
+
+Selecting a consumer recursively derives the Design Profile needed to satisfy that consumer. The profile is therefore a view of producer/consumer policy rather than a second manually maintained policy list.
+
+```sh
+python engineering_graph.py validate /path/to/engineering-graph.yaml
+python engineering_graph.py profile /path/to/engineering-graph.yaml IMPLEMENTATION
+python engineering_graph.py evaluate /path/to/engineering-graph.yaml IMPLEMENTATION /path/to/core-model.yaml
+```
+
+See `docs/design/engineering-graph-v0.md`. This model is branch-only until it passes real Nutrition Management and NAPMS consumer tests.
+
 ## Design target state
 
 A Design Profile can declare the engineering knowledge required for a selected scope as stable expectations of `subject + CapabilityId + Authority`.

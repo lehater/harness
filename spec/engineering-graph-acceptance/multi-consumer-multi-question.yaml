@@ -1,0 +1,170 @@
+version: 1
+kind: harness-engineering-graph-acceptance
+id: MULTI-CONSUMER-MULTI-QUESTION
+target: RELEASE-AUDIT
+
+graph:
+  version: 1
+  kind: harness-engineering-graph
+  id: MULTI-CONSUMER
+  default_subject: APPLICATION
+  authorities:
+    - id: PRODUCT
+      responsibility: Own accepted product intent.
+      boundary:
+        semantic_cohesion: Product behavior decisions.
+        independent_change: Product intent can change independently of realization design.
+        public_contract: Produces accepted product intent.
+      produces:
+        - capability: example.intent
+          requires: []
+
+    - id: ARCHITECTURE
+      responsibility: Own structural realization decisions.
+      boundary:
+        semantic_cohesion: Structural system decisions.
+        independent_change: Architecture can evolve behind stable product intent.
+        public_contract: Produces accepted architecture.
+      produces:
+        - capability: example.architecture
+          requires:
+            - capability: example.intent
+
+    - id: INTERFACE
+      responsibility: Own external interaction contracts.
+      boundary:
+        semantic_cohesion: External representation and interaction decisions.
+        independent_change: Interface contracts can evolve behind stable product intent.
+        public_contract: Produces accepted interface contracts.
+      produces:
+        - capability: example.interface
+          requires:
+            - capability: example.intent
+
+    - id: VERIFICATION
+      responsibility: Own verification evidence design.
+      boundary:
+        semantic_cohesion: Verification strategy decisions.
+        independent_change: Verification design can evolve without owning product or architecture truth.
+        public_contract: Produces accepted verification strategy.
+      produces:
+        - capability: example.verification
+          requires:
+            - capability: example.architecture
+            - capability: example.interface
+
+  consumers:
+    - id: IMPLEMENTATION
+      purpose: Implement accepted product behavior.
+      requires:
+        - capability: example.architecture
+        - capability: example.interface
+
+    - id: RELEASE-AUDIT
+      purpose: Verify release evidence without redefining implementation scope.
+      requires:
+        - capability: example.verification
+
+expect_profile:
+  capabilities:
+    - example.intent
+    - example.architecture
+    - example.interface
+    - example.verification
+  dependencies:
+    example.intent: []
+    example.architecture: [example.intent]
+    example.interface: [example.intent]
+    example.verification: [example.architecture, example.interface]
+
+cases:
+  parallel_frontier:
+    model:
+      artifacts:
+        - id: INTENT
+          authority: PRODUCT
+          path: docs/intent.yaml
+          provides: [example.intent]
+          depends_on: []
+      questions: []
+    expect:
+      status: READY
+      satisfied: [example.intent]
+      create: [example.architecture, example.interface]
+      wait: []
+      pending: [example.verification]
+
+  two_independent_questions:
+    model:
+      artifacts:
+        - id: INTENT
+          authority: PRODUCT
+          path: docs/intent.yaml
+          provides: [example.intent]
+          depends_on: []
+      questions:
+        - id: Q-ARCH
+          authority: ARCHITECTURE
+          text: Which architecture is accepted?
+          blocks_capabilities: [example.architecture]
+        - id: Q-INTERFACE
+          authority: INTERFACE
+          text: Which interface contract is accepted?
+          blocks_capabilities: [example.interface]
+    expect:
+      status: BLOCKED
+      satisfied: [example.intent]
+      create: []
+      wait: [example.architecture, example.interface]
+      pending: [example.verification]
+
+  mixed_wait_and_create:
+    model:
+      artifacts:
+        - id: INTENT
+          authority: PRODUCT
+          path: docs/intent.yaml
+          provides: [example.intent]
+          depends_on: []
+      questions:
+        - id: Q-ARCH
+          authority: ARCHITECTURE
+          text: Which architecture is accepted?
+          blocks_capabilities: [example.architecture]
+    expect:
+      status: READY
+      satisfied: [example.intent]
+      create: [example.interface]
+      wait: [example.architecture]
+      pending: [example.verification]
+
+  complete:
+    model:
+      artifacts:
+        - id: INTENT
+          authority: PRODUCT
+          path: docs/intent.yaml
+          provides: [example.intent]
+          depends_on: []
+        - id: ARCHITECTURE
+          authority: ARCHITECTURE
+          path: docs/architecture.yaml
+          provides: [example.architecture]
+          depends_on: [INTENT]
+        - id: INTERFACE
+          authority: INTERFACE
+          path: docs/interface.yaml
+          provides: [example.interface]
+          depends_on: [INTENT]
+        - id: VERIFICATION
+          authority: VERIFICATION
+          path: docs/verification.yaml
+          provides: [example.verification]
+          depends_on: [ARCHITECTURE, INTERFACE]
+      questions: []
+    expect:
+      status: COMPLETE
+      satisfied: [example.intent, example.architecture, example.interface, example.verification]
+      create: []
+      wait: []
+      pending: []

@@ -1,0 +1,72 @@
+artifacts:
+  - id: PROBLEM-EVIDENCE
+    authority: DISCOVERY
+    path: examples/greenfield-csv-deduplicator/artifacts/problem.md
+    provides:
+      - csv-deduplicator.problem-evidence
+    depends_on: []
+
+  - id: PRODUCT-REQUIREMENTS
+    authority: PRODUCT-REQUIREMENTS
+    path: examples/greenfield-csv-deduplicator/artifacts/product-requirements.md
+    provides:
+      - csv-deduplicator.product-intent
+      - csv-deduplicator.acceptance
+    depends_on:
+      - PROBLEM-EVIDENCE
+
+  - id: SYSTEM-ARCHITECTURE
+    authority: SYSTEM-ARCHITECTURE
+    path: examples/greenfield-csv-deduplicator/artifacts/system-architecture.md
+    provides:
+      - csv-deduplicator.architecture
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+
+  - id: CLI-CONTRACT
+    authority: INTERFACE-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
+    provides:
+      - csv-deduplicator.cli-contract
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+      - SYSTEM-ARCHITECTURE
+
+  - id: IMPLEMENTATION-PLAN
+    authority: IMPLEMENTATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/implementation-plan.md
+    provides:
+      - csv-deduplicator.implementation-plan
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+      - SYSTEM-ARCHITECTURE
+      - CLI-CONTRACT
+
+  - id: COMPLETION-CRITERIA
+    authority: IMPLEMENTATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/completion-criteria.md
+    provides:
+      - csv-deduplicator.completion-criteria
+    depends_on:
+      - IMPLEMENTATION-PLAN
+
+  - id: VERIFICATION-STRATEGY
+    authority: VERIFICATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/verification-strategy.md
+    provides:
+      - csv-deduplicator.verification-strategy
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+      - SYSTEM-ARCHITECTURE
+      - CLI-CONTRACT
+      - IMPLEMENTATION-PLAN
+
+  - id: ACCEPTANCE-SCENARIOS
+    authority: VERIFICATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/acceptance-scenarios.md
+    provides:
+      - csv-deduplicator.acceptance-scenarios
+    depends_on:
+      - VERIFICATION-STRATEGY
+
+questions: []
