@@ -140,6 +140,26 @@ authorities:
       independent_change: Operability design can evolve without redefining product/domain/interface semantics.
       public_contract: Provides runtime evidence requirements to implementation and verification.
 
+  - id: ENGINEERING-POLICY
+    class: conditional
+    applies_when: The project selects cross-cutting engineering principles, architecture discipline or implementation-design constraints that must be normative across multiple design Authorities.
+    responsibility: Own project-selected engineering design obligations and explicit anti-pattern constraints without owning the project semantics to which they apply.
+    boundary:
+      semantic_cohesion: Normative cross-cutting rules for how accepted engineering knowledge may be realized.
+      independent_change: Engineering discipline can be refined without redefining product/domain semantics, while downstream realization may require reevaluation.
+      public_contract: Provides reviewable engineering obligations to applicable design and implementation consumers.
+    merge_guidance: May remain inside SYSTEM-ARCHITECTURE or organizational policy when the constraints have no independent project lifecycle. Principle names alone are not sufficient; accepted policy should state observable obligations.
+
+  - id: COMPONENT-DESIGN
+    class: conditional
+    applies_when: Coding must be constrained by explicit component responsibilities, ports/contracts, dependency ownership, composition or mapping boundaries beyond system/application architecture.
+    responsibility: Own implementation-facing component decomposition and dependency contracts without deciding implementation sequencing or private code structure.
+    boundary:
+      semantic_cohesion: Public component responsibilities, consumer/provider contracts, dependency direction, abstraction ownership and composition/mapping boundaries.
+      independent_change: Component realization can evolve behind accepted architecture/application/interface contracts without changing their semantics.
+      public_contract: Provides code-design boundaries sufficient for implementation agents to avoid inventing architecturally significant structure.
+    merge_guidance: May remain inside APPLICATION-DESIGN or IMPLEMENTATION-DESIGN for simple systems where component structure has no independently valuable contract.
+
   - id: IMPLEMENTATION-DESIGN
     class: baseline
     responsibility: Own implementation slicing, sequencing, migration concerns and completion criteria after upstream engineering decisions are available.
