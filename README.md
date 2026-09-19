@@ -18,6 +18,18 @@ Start with `docs/design/core-v0.md`.
 
 There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
 
+## Design target state
+
+A Design Profile can declare the engineering knowledge required for a selected scope as stable expectations of `subject + CapabilityId + Authority`.
+
+`target_state.py` evaluates that target against a Core model:
+
+- missing canonical provider -> `CREATE`;
+- provider blocked by unresolved Questions -> `WAIT`;
+- every expectation has an unblocked provider under the expected Authority -> `COMPLETE`.
+
+This is structural design completeness, not semantic interpretation of arbitrary document prose. See `docs/design/target-state-v0.md`.
+
 ## Existing canonical graphs
 
 When a target repository already owns artifact paths and dependency routing in a canonical graph, do not copy that graph into Harness metadata.

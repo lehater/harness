@@ -1,0 +1,124 @@
+version: 1
+kind: harness-target-state-acceptance
+id: TARGET-STATE-V0
+
+profile:
+  version: 1
+  kind: harness-design-profile
+  id: APPLICATION-DESIGN
+  expectations:
+    - id: APPLICATION-DOMAIN
+      subject: APPLICATION
+      capability: application.domain-semantics
+      authority: DOMAIN
+    - id: APPLICATION-ARCHITECTURE
+      subject: APPLICATION
+      capability: application.architecture
+      authority: ARCHITECTURE
+    - id: APPLICATION-VERIFICATION
+      subject: APPLICATION
+      capability: application.verification
+      authority: VERIFICATION
+
+empty_model:
+  authorities:
+    - id: DOMAIN
+    - id: ARCHITECTURE
+    - id: VERIFICATION
+  artifacts: []
+  questions: []
+
+partial_model:
+  authorities:
+    - id: DOMAIN
+    - id: ARCHITECTURE
+    - id: VERIFICATION
+  artifacts:
+    - id: APPLICATION-DOMAIN
+      authority: DOMAIN
+      path: docs/domain/application.yaml
+      provides: [application.domain-semantics]
+      depends_on: []
+    - id: APPLICATION-ARCHITECTURE
+      authority: ARCHITECTURE
+      path: docs/architecture/application.yaml
+      provides: [application.architecture]
+      depends_on: [APPLICATION-DOMAIN]
+  questions:
+    - id: Q-APPLICATION-BOUNDARY
+      authority: DOMAIN
+      text: Which lifecycle boundary is authoritative?
+      answer_from: [APPLICATION-DOMAIN]
+      blocks: [APPLICATION-ARCHITECTURE]
+
+complete_model:
+  authorities:
+    - id: DOMAIN
+    - id: ARCHITECTURE
+    - id: VERIFICATION
+  artifacts:
+    - id: APPLICATION-DOMAIN
+      authority: DOMAIN
+      path: docs/domain/application.yaml
+      provides: [application.domain-semantics]
+      depends_on: []
+    - id: APPLICATION-ARCHITECTURE
+      authority: ARCHITECTURE
+      path: docs/architecture/application.yaml
+      provides: [application.architecture]
+      depends_on: [APPLICATION-DOMAIN]
+    - id: APPLICATION-VERIFICATION
+      authority: VERIFICATION
+      path: docs/verification/application.yaml
+      provides: [application.verification]
+      depends_on: [APPLICATION-ARCHITECTURE]
+  questions: []
+
+expect:
+  empty:
+    status: READY
+    satisfied: []
+    create:
+      - action: CREATE
+        expectation: APPLICATION-ARCHITECTURE
+        subject: APPLICATION
+        capability: application.architecture
+        authority: ARCHITECTURE
+      - action: CREATE
+        expectation: APPLICATION-DOMAIN
+        subject: APPLICATION
+        capability: application.domain-semantics
+        authority: DOMAIN
+      - action: CREATE
+        expectation: APPLICATION-VERIFICATION
+        subject: APPLICATION
+        capability: application.verification
+        authority: VERIFICATION
+    wait: []
+
+  partial:
+    status: READY
+    satisfied: [APPLICATION-DOMAIN]
+    create:
+      - action: CREATE
+        expectation: APPLICATION-VERIFICATION
+        subject: APPLICATION
+        capability: application.verification
+        authority: VERIFICATION
+    wait:
+      - action: WAIT
+        expectation: APPLICATION-ARCHITECTURE
+        subject: APPLICATION
+        capability: application.architecture
+        authority: ARCHITECTURE
+        providers: [APPLICATION-ARCHITECTURE]
+        questions: [Q-APPLICATION-BOUNDARY]
+
+  complete:
+    status: COMPLETE
+    satisfied:
+      - APPLICATION-ARCHITECTURE
+      - APPLICATION-DOMAIN
+      - APPLICATION-VERIFICATION
+    create: []
+    wait: []

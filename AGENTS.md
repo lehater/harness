@@ -6,6 +6,8 @@ Harness Core manages engineering-knowledge ownership boundaries for target repos
 
 Harness Core v0 owns only the structural model and derived operations described in `docs/design/core-v0.md`. Target repositories own all product/domain/architecture semantics, canonical artifact contents, implementation constraints and durable project state.
 
+The Design Profile layer in `docs/design/target-state-v0.md` declares what engineering knowledge a selected scope must contain before it is structurally design-complete. It does not add workflow semantics to Core.
+
 ## Consumer startup
 
 When Harness is used with another repository:
@@ -13,7 +15,8 @@ When Harness is used with another repository:
 1. read `docs/design/core-v0.md`;
 2. read the target repository's own instructions;
 3. locate only the target canonical artifacts required by the task;
-4. use the target's declared Core model, when present, to navigate ownership, capabilities, dependencies and unresolved Questions.
+4. use the target's declared Core model, when present, to navigate ownership, capabilities, dependencies and unresolved Questions;
+5. when a Design Profile is present, use it to evaluate the target state without inventing missing knowledge.
 
 No manifest, pin, submodule or repository-to-repository runtime binding is required.
 
@@ -42,12 +45,16 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 ## Source map
 
 - `docs/design/core-v0.md` — current Core boundary and model.
+- `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `harness.py` — Core v0 structural operations.
+- `target_state.py` — target-state evaluator above Core.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/adapter-acceptance/**` — executable adapter integration cases.
+- `spec/target-state-acceptance/**` — executable Design Profile target-state cases.
 - `validators/validate_core.py` — Core validator/acceptance runner.
 - `validators/validate_adapters.py` — adapter acceptance runner.
+- `validators/validate_target_state.py` — target-state acceptance runner.
 - `docs/methodology/**` and `skills/**` — retained pre-Core material; not part of Core v0 consumer semantics.
 
 ## Repository workflow
