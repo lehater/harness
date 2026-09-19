@@ -229,6 +229,21 @@ Feedback is expressed through Questions and canonical repair, not static product
 
 Authority atomicity is about semantic responsibility, independent change and public contract—not about forcing every output to share identical prerequisites.
 
+## Core realization
+
+Engineering Graph is the normative owner of Authority definitions for the selected engineering model.
+
+A Core realization therefore does not need to duplicate the Authority list merely to evaluate current knowledge state. During Engineering Graph evaluation, missing Authority declarations are projected into the Core model in memory before Core validation.
+
+Existing repositories may continue to declare Authorities in their Core/projection metadata; those declarations remain compatible. This projection rule mainly matters for new or partially bootstrapped projects:
+
+```yaml
+artifacts: []
+questions: []
+```
+
+is enough realization state for a valid Engineering Graph to expose the first root `CREATE`.
+
 ## Relationship to project artifacts
 
 The Engineering Graph does not prescribe repository layout.
