@@ -16,6 +16,12 @@ model:
       provides: [policy.withdrawal-semantics]
       depends_on: []
 
+    - id: POLICY-RETENTION-DECISION
+      authority: POLICY
+      path: docs/policy-retention-decision.yaml
+      provides: [policy.retention-decision]
+      depends_on: []
+
     - id: POLICY-API
       authority: ARCHITECTURE
       path: docs/policy-api.yaml
@@ -44,7 +50,13 @@ model:
     - id: Q-POLICY-WITHDRAWAL
       authority: POLICY
       text: Must withdrawal preserve the accepted policy history?
+      answer_from: [POLICY-DOMAIN]
       blocks: [POLICY-IMPLEMENTATION]
+
+    - id: Q-POLICY-RETENTION
+      authority: POLICY
+      text: What retention period does the stakeholder require?
+      blocks: [POLICY-API]
 
 expect:
   affected:
@@ -57,14 +69,99 @@ expect:
     owner: POLICY
 
   questions:
-    unresolved: [Q-POLICY-WITHDRAWAL]
+    unresolved: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
 
+  next_action:
+    capability: policy.withdrawal-implementation
+    action: WAIT
+    authority: IMPLEMENTATION
+    providers: [POLICY-IMPLEMENTATION]
+    questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
+
+  completeness:
+    expectations:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-verification
+    coverage:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+    complete_coverage:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-verification
+    missing:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-verification
+    frontier:
+      status: BLOCKED
+      design: []
+      wait:
+        - action: WAIT
+          capability: policy.withdrawal-implementation
+          authority: IMPLEMENTATION
+          providers: [POLICY-IMPLEMENTATION]
+          questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-implementation
+        - action: WAIT
+          capability: policy.withdrawal-verification
+          authority: VERIFICATION
+          providers: [POLICY-VERIFICATION]
+          questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-verification
+    question_frontier:
+      - action: ASK
+        question: Q-POLICY-RETENTION
+        authority: POLICY
+        text: What retention period does the stakeholder require?
+      - action: RESOLVE
+        question: Q-POLICY-WITHDRAWAL
+        authority: POLICY
+        text: Must withdrawal preserve the accepted policy history?
+        answer_from: [POLICY-DOMAIN]
   blocked:
     artifact: POLICY-IMPLEMENTATION
-    by: [Q-POLICY-WITHDRAWAL]
+    by: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
 
   resolution:
     question: Q-POLICY-WITHDRAWAL
     artifact: POLICY-DOMAIN
-    unresolved_after: []
-    blocked_after: []
+    unresolved_after: [Q-POLICY-RETENTION]
+    blocked_after: [Q-POLICY-RETENTION]
+
+  external_resolution:
+    question: Q-POLICY-RETENTION
+    artifact: POLICY-RETENTION-DECISION
+    unresolved_after: [Q-POLICY-WITHDRAWAL]
+    frontier_after:
+      status: BLOCKED
+      design: []
+      wait:
+        - action: WAIT
+          capability: policy.withdrawal-implementation
+          authority: IMPLEMENTATION
+          providers: [POLICY-IMPLEMENTATION]
+          questions: [Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-implementation
+        - action: WAIT
+          capability: policy.withdrawal-verification
+          authority: VERIFICATION
+          providers: [POLICY-VERIFICATION]
+          questions: [Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-verification

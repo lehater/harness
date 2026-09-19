@@ -16,7 +16,11 @@ from harness import (  # noqa: E402
     affected,
     blocked,
     capability_owner,
+    next_action,
     capability_resolve,
+    completeness,
+    design_frontier,
+    question_frontier,
     resolve_question,
     unresolved_questions,
     validate_model,
@@ -55,6 +59,55 @@ def main() -> int:
             if capability_owner(model, cap["id"]) != cap["owner"]:
                 raise CoreError("capability owner mismatch")
 
+            completeness_expect = expect.get("completeness")
+            if completeness_expect:
+                expectations = completeness_expect["expectations"]
+                coverage = completeness_expect["coverage"]
+                actual_missing = completeness(expectations, coverage)
+                if actual_missing != completeness_expect["missing"]:
+                    raise CoreError(
+                        f"completeness mismatch: {actual_missing!r} != {completeness_expect['missing']!r}"
+                    )
+                frontier_expect = completeness_expect.get("frontier")
+                if frontier_expect is not None:
+                    actual_frontier = design_frontier(model, expectations, coverage)
+                    if actual_frontier != frontier_expect:
+                        raise CoreError(
+                            f"design frontier mismatch: {actual_frontier!r} != {frontier_expect!r}"
+                        )
+                    question_expect = completeness_expect.get("question_frontier")
+                    if question_expect is not None:
+                        blocker_ids = [
+                            question
+                            for item in actual_frontier["wait"]
+                            for question in item.get("questions", [])
+                        ]
+                        actual_questions = question_frontier(model, blocker_ids)
+                        if actual_questions != question_expect:
+                            raise CoreError(
+                                f"question frontier mismatch: {actual_questions!r} != {question_expect!r}"
+                            )
+
+                complete_coverage = completeness_expect.get("complete_coverage")
+                if complete_coverage is not None:
+                    actual_complete = design_frontier(model, expectations, complete_coverage)
+                    expected_complete = {"status": "COMPLETE", "design": [], "wait": []}
+                    if actual_complete != expected_complete:
+                        raise CoreError(
+                            f"complete frontier mismatch: {actual_complete!r} != {expected_complete!r}"
+                        )
+
+            action = expect.get("next_action")
+            if action:
+                actual_action = next_action(model, action["capability"])
+                for key, value in action.items():
+                    if key == "capability":
+                        continue
+                    if actual_action.get(key) != value:
+                        raise CoreError(
+                            f"next-action {key} mismatch: {actual_action.get(key)!r} != {value!r}"
+                        )
+
             if unresolved_questions(model) != sorted(expect["questions"]["unresolved"]):
                 raise CoreError("questions mismatch")
 
@@ -64,10 +117,42 @@ def main() -> int:
 
             resolution = expect["resolution"]
             resolved = resolve_question(copy.deepcopy(model), resolution["question"], resolution["artifact"])
+            after_action = resolution.get("next_action")
+            if after_action:
+                actual_after = next_action(resolved, after_action["capability"])
+                for key, value in after_action.items():
+                    if key == "capability":
+                        continue
+                    if actual_after.get(key) != value:
+                        raise CoreError(
+                            f"resolved next-action {key} mismatch: {actual_after.get(key)!r} != {value!r}"
+                        )
             if unresolved_questions(resolved) != sorted(resolution["unresolved_after"]):
                 raise CoreError("resolve-question did not clear unresolved question")
             if blocked(resolved, block["artifact"]) != sorted(resolution["blocked_after"]):
                 raise CoreError("resolve-question did not clear blocking")
+
+            external_resolution = expect.get("external_resolution")
+            if external_resolution:
+                externally_resolved = resolve_question(
+                    copy.deepcopy(model),
+                    external_resolution["question"],
+                    external_resolution["artifact"],
+                )
+                if unresolved_questions(externally_resolved) != sorted(
+                    external_resolution["unresolved_after"]
+                ):
+                    raise CoreError("external resolution did not clear expected question")
+                actual_frontier = design_frontier(
+                    externally_resolved,
+                    completeness_expect["expectations"],
+                    completeness_expect["coverage"],
+                )
+                if actual_frontier != external_resolution["frontier_after"]:
+                    raise CoreError(
+                        f"external resolution frontier mismatch: {actual_frontier!r} != "
+                        f"{external_resolution['frontier_after']!r}"
+                    )
         except Exception as exc:
             errors.append(f"{path.relative_to(ROOT)}: {exc}")
 

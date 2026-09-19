@@ -84,6 +84,13 @@ def validate_model(model: dict[str, Any]) -> None:
         for blocked_id in question.get("blocks", []) or []:
             if blocked_id not in artifacts:
                 raise CoreError(f"question {question_id} blocks unknown artifact: {blocked_id}")
+        for source_id in question.get("answer_from", []) or []:
+            if source_id not in artifacts:
+                raise CoreError(f"question {question_id} answers from unknown artifact: {source_id}")
+            if artifacts[source_id]["authority"] != authority:
+                raise CoreError(
+                    f"question {question_id} answer source must belong to addressed authority {authority}"
+                )
         resolution = question.get("resolution")
         if resolution is not None:
             if resolution not in artifacts:
@@ -159,6 +166,94 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     return sorted(result)
 
 
+def question_frontier(model: dict[str, Any], question_ids: list[str]) -> list[dict[str, Any]]:
+    """Route unresolved blockers to their addressed authorities without guessing external escalation."""
+    validate_model(model)
+    questions = _by_id(model.get("questions", []), "question")
+    result: list[dict[str, Any]] = []
+    for question_id in sorted(set(question_ids)):
+        question = questions.get(question_id)
+        if question is None:
+            raise CoreError(f"unknown question: {question_id}")
+        if question.get("resolution") is not None:
+            continue
+        sources = question.get("answer_from", []) or []
+        result.append({
+            "action": "RESOLVE" if sources else "ASK",
+            "question": question_id,
+            "authority": question["authority"],
+            "text": question["text"],
+            **({"answer_from": sources} if sources else {}),
+        })
+    return result
+
+
+
+def completeness(expectations: list[dict[str, str]], coverage: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Derive missing subject/capability expectations from declared coverage."""
+    covered = {
+        (item.get("subject"), item.get("capability"))
+        for item in coverage
+        if item.get("subject") and item.get("capability")
+    }
+    missing: list[dict[str, str]] = []
+    for expectation in expectations:
+        subject = expectation.get("subject")
+        capability = expectation.get("capability")
+        if not subject or not capability:
+            raise CoreError("expectation subject and capability are required")
+        if (subject, capability) not in covered:
+            missing.append({"subject": subject, "capability": capability})
+    return missing
+
+
+def design_frontier(
+    model: dict[str, Any],
+    expectations: list[dict[str, str]],
+    coverage: list[dict[str, str]],
+) -> dict[str, Any]:
+    """Return all immediately designable missing expectations, or their blockers."""
+    missing = completeness(expectations, coverage)
+    if not missing:
+        return {"status": "COMPLETE", "design": [], "wait": []}
+    design: list[dict[str, Any]] = []
+    wait: list[dict[str, Any]] = []
+    for expectation in missing:
+        action = next_action(model, expectation["capability"])
+        item = {**action, "expectation": expectation}
+        if action["action"] == "DESIGN":
+            design.append(item)
+        else:
+            wait.append(item)
+    return {
+        "status": "READY" if design else "BLOCKED",
+        "design": design,
+        "wait": wait,
+    }
+
+
+def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
+    """Return the next Core action for a required capability."""
+    validate_model(model)
+    providers = capability_resolve(model, capability_id)
+    owner = capability_owner(model, capability_id)
+    blockers = sorted({q for artifact_id in providers for q in blocked(model, artifact_id)})
+    if blockers:
+        return {
+            "action": "WAIT",
+            "capability": capability_id,
+            "authority": owner,
+            "providers": providers,
+            "questions": blockers,
+        }
+    return {
+        "action": "DESIGN",
+        "capability": capability_id,
+        "authority": owner,
+        "providers": providers,
+    }
+
+
 def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) -> dict[str, Any]:
     validate_model(model)
     result = copy.deepcopy(model)
@@ -194,12 +289,12 @@ def _emit(value: Any) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Harness Core v0")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("validate", "affected", "questions", "resolve", "owner", "blocked", "resolve-question"):
+    for name in ("validate", "affected", "questions", "resolve", "owner", "blocked", "next-action", "resolve-question"):
         command = sub.add_parser(name)
         command.add_argument("model")
         if name in ("affected", "blocked"):
             command.add_argument("artifact")
-        elif name in ("resolve", "owner"):
+        elif name in ("resolve", "owner", "next-action"):
             command.add_argument("capability")
         elif name == "questions":
             command.add_argument("--authority")
@@ -222,6 +317,8 @@ def main() -> int:
         _emit(capability_owner(model, args.capability))
     elif args.command == "blocked":
         _emit(blocked(model, args.artifact))
+    elif args.command == "next-action":
+        _emit(next_action(model, args.capability))
     elif args.command == "resolve-question":
         resolved = resolve_question(model, args.question, args.artifact)
         if args.write:
