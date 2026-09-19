@@ -70,7 +70,7 @@ expect:
     action: WAIT
     authority: IMPLEMENTATION
     providers: [POLICY-IMPLEMENTATION]
-    questions: [Q-POLICY-WITHDRAWAL]
+    questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
 
   completeness:
     expectations:
@@ -103,7 +103,7 @@ expect:
           capability: policy.withdrawal-implementation
           authority: IMPLEMENTATION
           providers: [POLICY-IMPLEMENTATION]
-          questions: [Q-POLICY-WITHDRAWAL]
+          questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
           expectation:
             subject: POLICY-WITHDRAWAL
             capability: policy.withdrawal-implementation
@@ -111,7 +111,7 @@ expect:
           capability: policy.withdrawal-verification
           authority: VERIFICATION
           providers: [POLICY-VERIFICATION]
-          questions: [Q-POLICY-WITHDRAWAL]
+          questions: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
           expectation:
             subject: POLICY-WITHDRAWAL
             capability: policy.withdrawal-verification
