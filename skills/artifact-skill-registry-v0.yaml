@@ -15,6 +15,9 @@ routes:
   - knowledge_kind: interface-contract
     skill: skills/artifacts/interface-contract/SKILL.md
 
+  - knowledge_kind: engineering-policy
+    skill: skills/artifacts/engineering-policy/SKILL.md
+
   - knowledge_kind: component-design
     skill: skills/artifacts/component-design/SKILL.md
 
