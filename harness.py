@@ -159,6 +159,28 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     return sorted(result)
 
 
+def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
+    """Return the next Core action for a required capability."""
+    validate_model(model)
+    providers = capability_resolve(model, capability_id)
+    owner = capability_owner(model, capability_id)
+    blockers = sorted({q for artifact_id in providers for q in blocked(model, artifact_id)})
+    if blockers:
+        return {
+            "action": "WAIT",
+            "capability": capability_id,
+            "authority": owner,
+            "providers": providers,
+            "questions": blockers,
+        }
+    return {
+        "action": "DESIGN",
+        "capability": capability_id,
+        "authority": owner,
+        "providers": providers,
+    }
+
+
 def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) -> dict[str, Any]:
     validate_model(model)
     result = copy.deepcopy(model)
@@ -194,12 +216,12 @@ def _emit(value: Any) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Harness Core v0")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("validate", "affected", "questions", "resolve", "owner", "blocked", "resolve-question"):
+    for name in ("validate", "affected", "questions", "resolve", "owner", "blocked", "next-action", "resolve-question"):
         command = sub.add_parser(name)
         command.add_argument("model")
         if name in ("affected", "blocked"):
             command.add_argument("artifact")
-        elif name in ("resolve", "owner"):
+        elif name in ("resolve", "owner", "next-action"):
             command.add_argument("capability")
         elif name == "questions":
             command.add_argument("--authority")
@@ -222,6 +244,8 @@ def main() -> int:
         _emit(capability_owner(model, args.capability))
     elif args.command == "blocked":
         _emit(blocked(model, args.artifact))
+    elif args.command == "next-action":
+        _emit(next_action(model, args.capability))
     elif args.command == "resolve-question":
         resolved = resolve_question(model, args.question, args.artifact)
         if args.write:
