@@ -1,0 +1,16 @@
+version: 1
+kind: harness-artifact-skill-registry
+id: CORE-ARTIFACT-SKILLS-V0
+
+routes:
+  - knowledge_kind: domain-model
+    skill: skills/artifacts/domain-model/SKILL.md
+
+  - knowledge_kind: verification-strategy
+    skill: skills/artifacts/verification-strategy/SKILL.md
+
+  - knowledge_kind: pinned-source-entity-set
+    skill: skills/artifacts/pinned-source-entity-set/SKILL.md
+
+  - knowledge_kind: source-classification-registry
+    skill: skills/artifacts/source-classification-registry/SKILL.md
