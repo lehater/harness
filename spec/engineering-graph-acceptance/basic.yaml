@@ -14,8 +14,9 @@ graph:
         semantic_cohesion: One class of knowledge about observed problems and evidence.
         independent_change: Problem evidence can change before product decisions change.
         public_contract: Produces accepted problem evidence for Product Requirements.
-      requires: []
-      produces: [example.problem]
+      produces:
+        - capability: example.problem
+          requires: []
 
     - id: PRODUCT
       responsibility: Own product intent and acceptance semantics.
@@ -23,9 +24,10 @@ graph:
         semantic_cohesion: One class of decisions about desired product behavior.
         independent_change: Product intent can change without changing system architecture directly.
         public_contract: Consumes problem evidence and produces accepted requirements.
-      requires:
-        - capability: example.problem
-      produces: [example.requirements]
+      produces:
+        - capability: example.requirements
+          requires:
+            - capability: example.problem
 
     - id: ARCHITECTURE
       responsibility: Own system architecture decisions.
@@ -33,9 +35,10 @@ graph:
         semantic_cohesion: One class of structural system decisions.
         independent_change: Architecture can change while accepted product intent remains stable.
         public_contract: Consumes requirements and produces accepted architecture.
-      requires:
-        - capability: example.requirements
-      produces: [example.architecture]
+      produces:
+        - capability: example.architecture
+          requires:
+            - capability: example.requirements
 
     - id: VERIFICATION
       responsibility: Own verification strategy.
@@ -43,10 +46,11 @@ graph:
         semantic_cohesion: One class of decisions about executable correctness evidence.
         independent_change: Verification evidence design can change without changing product semantics.
         public_contract: Consumes requirements and architecture and produces verification strategy.
-      requires:
-        - capability: example.requirements
-        - capability: example.architecture
-      produces: [example.verification]
+      produces:
+        - capability: example.verification
+          requires:
+            - capability: example.requirements
+            - capability: example.architecture
 
   consumers:
     - id: IMPLEMENTATION
