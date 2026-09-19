@@ -1,0 +1,31 @@
+name: Greenfield Engineering Graph
+
+on:
+  pull_request:
+    paths:
+      - "examples/greenfield-csv-deduplicator/**"
+      - ".github/workflows/greenfield-engineering-graph.yml"
+      - "engineering_graph.py"
+  push:
+    paths:
+      - "examples/greenfield-csv-deduplicator/**"
+      - ".github/workflows/greenfield-engineering-graph.yml"
+      - "engineering_graph.py"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install PyYAML
+      - name: Validate graph
+        run: python engineering_graph.py validate examples/greenfield-csv-deduplicator/engineering-graph.yaml
+      - name: Evaluate implementation target
+        run: |
+          python engineering_graph.py evaluate             examples/greenfield-csv-deduplicator/engineering-graph.yaml             IMPLEMENTATION             examples/greenfield-csv-deduplicator/core-state.yaml
