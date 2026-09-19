@@ -24,14 +24,15 @@ Use when actionable CREATE work has `knowledge_kind: component-design`.
 3. Inventory public components by architecture/module boundary.
 4. Give each public component one coherent responsibility/change reason.
 5. Define narrow ports/interfaces only where an accepted boundary, external technology, substitution need or known variation requires a seam.
-6. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
-7. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
-8. Define representation/mapping boundaries and composition/construction relationships.
-9. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
-10. Identify forbidden dependencies and structural verification that can enforce them.
-11. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
-12. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
-13. Produce project-native Component Design, semantically accept/register, then reevaluate.
+6. Specify responsibility, ownership, dependency and behavioral/failure contracts before choosing class/function representation. Preserve an existing simple callable/value representation when it satisfies the contract; require a class only when construction, lifetime, state or substitutability makes that representation semantically relevant.
+7. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
+8. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
+9. Define representation/mapping boundaries and composition/construction relationships.
+10. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
+11. Identify forbidden dependencies and structural verification that can enforce them.
+12. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
+13. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
+14. Produce project-native Component Design, semantically accept/register, then reevaluate.
 
 ## Applicability discipline
 
