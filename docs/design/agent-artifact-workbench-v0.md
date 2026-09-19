@@ -139,6 +139,34 @@ When a skill cannot produce the requested knowledge without choosing an unresolv
 
 The final semantic answer belongs in an Authority-owned canonical artifact, not in the Question itself. Resolving a capability-blocking Question does not itself provide the capability: after resolution, target state normally returns `CREATE` so the artifact skill can form the requested knowledge from the accepted decision.
 
+## Implementation feedback
+
+A `COMPLETE` Design Profile means that the declared knowledge is structurally available and unblocked at that moment. It is not irreversible.
+
+When implementation exposes a semantic case that the accepted provider does not actually decide:
+
+1. stop only the affected implementation slice;
+2. identify the highest owning Authority;
+3. create a Core `Question` blocking the affected canonical provider, or the missing capability when no provider exists;
+4. re-evaluate target state;
+5. expect previously downstream expectations to become `WAIT` / `PENDING`;
+6. resolve the Question only through Authority-owned canonical truth;
+7. re-evaluate and resume implementation when the required knowledge is unblocked.
+
+This feedback loop is a desired Harness behavior:
+
+```text
+COMPLETE
+→ implementation discovers real semantic gap
+→ Question
+→ BLOCKED / WAIT
+→ canonical decision
+→ COMPLETE
+→ resume implementation
+```
+
+Do not preserve a green `COMPLETE` state by silently choosing an implementation convention for an unresolved domain/architecture decision.
+
 ## Skill contract
 
 Every artifact skill should state:
