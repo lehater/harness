@@ -223,20 +223,6 @@ def design_frontier(
     }
 
 
-def next_missing_action(
-    model: dict[str, Any],
-    expectations: list[dict[str, str]],
-    coverage: list[dict[str, str]],
-) -> dict[str, Any]:
-    """Resolve the first missing expectation into the next Core action."""
-    missing = completeness(expectations, coverage)
-    if not missing:
-        return {"action": "COMPLETE"}
-    expectation = missing[0]
-    action = next_action(model, expectation["capability"])
-    return {**action, "expectation": expectation}
-
-
 def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     """Return the next Core action for a required capability."""
     validate_model(model)
