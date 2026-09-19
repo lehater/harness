@@ -159,3 +159,46 @@ Do not canonicalize Harness changes until both pilots show:
 - external security frameworks improve coverage without becoming unconditional project requirements.
 
 If these criteria fail, revise/split/merge Authorities according to the atomicity test rather than preserving the current catalog by convention.
+
+## Two-case validation result
+
+The first validation pass is now materially informative.
+
+### Nutrition: negative architecture case
+
+The accepted local/single-operator CLI has personal data and untrusted imports but no remote identity/admission boundary. Security Analysis remains applicable while a separate Security Architecture instance is not. This disproves any model where SECURITY-ARCHITECTURE is mandatory whenever security concerns exist.
+
+The analysis also confirms that generic controls must not be manufactured: application-managed encryption, secret stores, authentication/session infrastructure and supply-chain governance are not project requirements merely because a security checklist mentions them.
+
+### NAPMS: positive architecture case and gap discovery
+
+The long-running browser/HTTP case validates Security Architecture as an independent contract for trusted actor identity, session/authentication boundary and protected-action admission while Product/Domain retains entitlement semantics and Interface retains public representation.
+
+A deeper Security Analysis also found that the current accepted design's `security_questions_remaining: []` is premature. Cookie-authenticated mutations leave request-origin/CSRF trust unresolved; session validity/rotation/invalidation is not defined; password-verifier protection is not defined; security-sensitive secret lifecycle/source is incomplete; and TLS/secure-cookie applicability depends on deployment trust boundary.
+
+This is strong evidence for the distinction between the two Authorities: SECURITY-ANALYSIS discovered gaps but did not own their resolution. Existing Harness Question mechanics are sufficient to route them back to SECURITY-ARCHITECTURE and its Interface/System/Data consumers.
+
+## Refined ownership result
+
+SECURITY-ARCHITECTURE should be understood as conditional ownership of **security-specific trust, identity, admission, protection and enforcement structure**. It is not a catch-all owner for all security-related facts.
+
+SECURITY-ANALYSIS owns **threat/control/applicability coverage against accepted design and gap routing**. It may exist without a separate Security Architecture instance.
+
+Cross-cutting secure-development constraints such as dependency provenance policy belong to ENGINEERING-POLICY/organizational policy unless a project-specific architectural threat creates a narrower decision.
+
+## Security closure before implementation
+
+Security closure is not "a threat model file exists". For every applicable material threat/control concern, one of these states must be explicit:
+
+- COVERED: accepted owner/artifact provides the required decision;
+- NOT_APPLICABLE: accepted architecture makes the concern absent;
+- DEFERRED_NONBLOCKING: outside the authorized implementation/deployment boundary with a stated reopening condition;
+- QUESTION: unresolved material decision routed to its owning Authority and therefore blocks dependent implementation.
+
+An implementation consumer is incomplete when an applicable security Question would force coding to choose trust, identity, admission, credential/session lifecycle, protection boundary, fail-open/fail-closed behavior or externally meaningful disclosure semantics.
+
+## Canonicalization assessment
+
+Evidence is now sufficient for the **Authority boundary**, but not yet for immediate canonicalization of all project security artifacts. The Harness catalog can be refined without adding Core entities. Before merging, reusable artifact-production skills should encode the demonstrated routing/applicability discipline and Harness CI should validate their agent-layer contract.
+
+No evidence supports new Core entities for Threat, Risk, Asset or Control. These remain knowledge inside ordinary project artifacts unless a future case demonstrates independent graph semantics that cannot be represented by Capability/Artifact/Question.
