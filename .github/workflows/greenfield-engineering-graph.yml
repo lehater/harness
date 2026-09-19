@@ -98,16 +98,48 @@ jobs:
               ]
 
           routed = route_create_work(graph, "IMPLEMENTATION", missing, registry)
+          assert routed["unrouted"] == [], routed
           product_work = [
               item
-              for item in routed["unrouted"]
+              for item in routed["routed"]
               if item.get("knowledge_kind") == "product-requirements"
           ]
           assert len(product_work) == 1, routed
           item = product_work[0]
-          assert item["reason"] == "NO_REGISTERED_SKILL", item
+          assert item["skill"] == "skills/artifacts/product-requirements/SKILL.md", item
           assert item["capabilities"] == [
               "csv-deduplicator.acceptance",
               "csv-deduplicator.product-intent",
           ], item
+          PY
+
+      - name: Verify empty greenfield root routes to Problem Evidence skill
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+          empty = {"artifacts": [], "questions": []}
+
+          routed = route_create_work(
+              graph,
+              "IMPLEMENTATION",
+              empty,
+              registry,
+          )
+          assert routed["target_status"] == "READY", routed
+          assert routed["unrouted"] == [], routed
+          assert len(routed["routed"]) == 1, routed
+          item = routed["routed"][0]
+          assert item["knowledge_kind"] == "problem-evidence", item
+          assert item["capabilities"] == ["csv-deduplicator.problem-evidence"], item
+          assert item["skill"] == "skills/artifacts/problem-evidence/SKILL.md", item
           PY
