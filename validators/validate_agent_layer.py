@@ -44,6 +44,14 @@ REQUIRED_SKILLS = {
         "## Output schema",
         "verification-plan/v1",
     ),
+    "skills/artifacts/source-classification-registry/SKILL.md": (
+        "# Source Classification Registry",
+        "## Trigger",
+        "## Inputs",
+        "## Procedure",
+        "## Output contract",
+        "project-native canonical artifact",
+    ),
 }
 
 
