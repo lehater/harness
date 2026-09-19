@@ -9,8 +9,6 @@ description: "Use for an actionable CREATE requiring the exact identity set cont
 
 Use when a downstream artifact requires the exact entities present in a pinned external data source and source identity/version alone is insufficient.
 
-The Nutrition Management BLS 4.0 food-code set is the acceptance consumer for this skill.
-
 ## Inputs
 
 - actionable `CREATE` expectation and owning Authority;
@@ -56,9 +54,9 @@ Example shape:
 
 ```json
 {
-  "source_version": "4.0",
+  "source_version": "v1",
   "source_sha256": "...",
-  "source_codes": ["A000001", "A000002"]
+  "entity_ids": ["entity-001", "entity-002"]
 }
 ```
 
