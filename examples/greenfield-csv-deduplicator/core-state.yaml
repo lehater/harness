@@ -15,4 +15,12 @@ artifacts:
     depends_on:
       - PROBLEM-EVIDENCE
 
+  - id: SYSTEM-ARCHITECTURE
+    authority: SYSTEM-ARCHITECTURE
+    path: examples/greenfield-csv-deduplicator/artifacts/system-architecture.md
+    provides:
+      - csv-deduplicator.architecture
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+
 questions: []
