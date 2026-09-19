@@ -34,6 +34,7 @@ No manifest, pin, submodule or repository-to-repository runtime binding is requi
 - A `CapabilityId` may have several providers only when every canonical provider belongs to the same `Authority`.
 - `depends_on` expresses declared canonical-artifact dependency.
 - A `Question` is addressed to the `Authority` that may decide the missing semantics.
+- A Question may block an existing artifact with `blocks` or prevent formation of a not-yet-provided capability with `blocks_capabilities`.
 - A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
