@@ -149,11 +149,11 @@ def main() -> int:
             empty_model,
             registry,
         )
-        assert result["routed"] == [], result
-        assert len(result["unrouted"]) == 1, result
-        work = result["unrouted"][0]
+        assert result["unrouted"] == [], result
+        assert len(result["routed"]) == 1, result
+        work = result["routed"][0]
         assert work["knowledge_kind"] == "product-requirements", work
-        assert work["reason"] == "NO_REGISTERED_SKILL", work
+        assert work["skill"] == "skills/artifacts/product-requirements/SKILL.md", work
         assert work["capabilities"] == [
             "example.acceptance",
             "example.product-intent",
