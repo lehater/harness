@@ -133,3 +133,4 @@ No new Core entity is required. Test Design is an ordinary optional Capability/A
 ## Research conclusion
 
 Two materially different projects support the same independent boundary. Evidence is sufficient to propose TEST-DESIGN as a conditional reference Authority, while keeping TDD optional and project-owned.
+
