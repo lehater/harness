@@ -22,9 +22,11 @@ authorities:
       public_contract: Produces product intent and acceptance semantics.
     produces:
       - capability: csv-deduplicator.product-intent
+        knowledge_kind: product-requirements
         requires:
           - capability: csv-deduplicator.problem-evidence
       - capability: csv-deduplicator.acceptance
+        knowledge_kind: product-requirements
         requires:
           - capability: csv-deduplicator.problem-evidence
 
