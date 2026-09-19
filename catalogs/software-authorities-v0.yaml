@@ -85,13 +85,13 @@ authorities:
 
   - id: SECURITY-ARCHITECTURE
     class: conditional
-    applies_when: Authentication, identity, authorization boundaries, protected actions or trust zones require design decisions independent of general architecture.
-    responsibility: Own security architecture boundaries and admission/control structure.
+    applies_when: Security-specific trust, identity, admission, protection or enforcement structure requires decisions independent of general architecture or product/domain semantics.
+    responsibility: Own security-specific trust, identity, admission, protection and enforcement structure derived from accepted product, domain and system truth.
     boundary:
-      semantic_cohesion: Decisions about trust, identity and security enforcement structure.
-      independent_change: Security architecture can evolve independently from domain semantics and later threat analysis.
-      public_contract: Provides security architecture constraints to interfaces, quality, data and implementation.
-    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when security decisions are simple and have no independent public contract.
+      semantic_cohesion: Decisions about security trust boundaries, trusted identity, credential/session protection, admission and enforcement structure.
+      independent_change: Security architecture can evolve independently from product/domain entitlement semantics, interface representation and later threat analysis.
+      public_contract: Provides accepted security constraints to system/interface/data/component/operability/verification/implementation consumers without re-owning their semantics.
+    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when security decisions are simple and have no independent lifecycle or public consumers. Security concerns alone do not require this Authority; a local/trusted runtime may need SECURITY-ANALYSIS without a separate SECURITY-ARCHITECTURE instance.
 
   - id: INTERFACE-DESIGN
     class: conditional
@@ -124,12 +124,12 @@ authorities:
 
   - id: SECURITY-ANALYSIS
     class: conditional
-    applies_when: Threat/control analysis is materially different from selecting security architecture.
-    responsibility: Own threat analysis and control coverage against accepted design.
+    applies_when: Threat/control/applicability analysis is needed to establish security coverage or discover gaps against accepted design, including cases with no separate SECURITY-ARCHITECTURE instance.
+    responsibility: Own threat, control and applicability coverage against accepted design and route material gaps to the Authority that owns their resolution.
     boundary:
-      semantic_cohesion: Analysis of threats and mitigations against an already selected design baseline.
-      independent_change: Threat analysis can evolve without itself owning security architecture decisions.
-      public_contract: Provides threat/control evidence and routes missing design decisions upstream.
+      semantic_cohesion: Analysis of applicable threats, accepted controls, not-applicable/deferred concerns and unresolved security gaps against an accepted design baseline.
+      independent_change: Threat knowledge and coverage can evolve without itself owning product/domain/security/system/interface/data decisions.
+      public_contract: Provides security coverage evidence, verification obligations and blocking Questions; it never silently repairs missing upstream design.
 
   - id: OPERABILITY-DESIGN
     class: conditional
