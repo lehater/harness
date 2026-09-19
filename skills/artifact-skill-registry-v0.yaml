@@ -21,6 +21,9 @@ routes:
   - knowledge_kind: component-design
     skill: skills/artifacts/component-design/SKILL.md
 
+  - knowledge_kind: test-design
+    skill: skills/artifacts/test-design/SKILL.md
+
   - knowledge_kind: implementation-design
     skill: skills/artifacts/implementation-design/SKILL.md
 

@@ -102,6 +102,26 @@ Projects that intend to hand implementation to coding agents with little archite
 
 This pattern requires no new Core entity and does not change Integration Contract v0.
 
+## Verification, Test Design and implementation boundary
+
+Projects that need executable test semantics before coding may model Test Design as an ordinary conditional capability. The recommended dependency direction is:
+
+```text
+accepted semantic/design capabilities
+        ↓
+verification-design capability
+        ↓
+test-design capability
+        ↓
+implementation-design / coding consumer
+```
+
+Verification Design owns what evidence must prove accepted engineering knowledge. Test Design, when independently valuable, refines that obligation into executable preconditions, operations, observable oracles, invariants and property/state-machine obligations. Concrete test code remains implementation evidence rather than becoming semantic authority merely because it is written first.
+
+Harness does not make TDD universal. RED/GREEN/refactor or another test-first sequence is project engineering/process policy. Existing projects may project legacy artifacts into these capabilities without mechanically reordering files; a legacy artifact that mixes verification and implementation-readiness concerns may need semantic splitting during migration.
+
+This pattern requires no new Core entity.
+
 ## Non-contract pilot material
 
 Names such as `*-pilot`, experimental mutation workflows, research findings and branch-specific pinning are evidence used to establish this contract. They are not required parts of an integrated project's permanent repository.
