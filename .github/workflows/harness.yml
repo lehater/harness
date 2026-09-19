@@ -7,6 +7,8 @@ on:
       - "AGENTS.md"
       - "README.md"
       - "docs/design/**"
+      - "profiles/**"
+      - "skills/**"
       - "adapters/**"
       - "spec/**"
       - "validators/**"

@@ -84,6 +84,16 @@ def validate_model(model: dict[str, Any]) -> None:
         for blocked_id in question.get("blocks", []) or []:
             if blocked_id not in artifacts:
                 raise CoreError(f"question {question_id} blocks unknown artifact: {blocked_id}")
+        blocked_capabilities = question.get("blocks_capabilities", []) or []
+        if not isinstance(blocked_capabilities, list) or any(
+            not isinstance(capability, str) or not capability
+            for capability in blocked_capabilities
+        ):
+            raise CoreError(
+                f"question {question_id} blocks_capabilities must contain capability ids"
+            )
+        if len(blocked_capabilities) != len(set(blocked_capabilities)):
+            raise CoreError(f"question {question_id} has duplicate blocked capabilities")
         for source_id in question.get("answer_from", []) or []:
             if source_id not in artifacts:
                 raise CoreError(f"question {question_id} answers from unknown artifact: {source_id}")
@@ -151,6 +161,17 @@ def unresolved_questions(model: dict[str, Any], authority_id: str | None = None)
     return sorted(result)
 
 
+def capability_blockers(model: dict[str, Any], capability_id: str) -> list[str]:
+    """Return unresolved Questions that directly block forming or using a capability."""
+    validate_model(model)
+    return sorted(
+        question["id"]
+        for question in model.get("questions", [])
+        if question.get("resolution") is None
+        and capability_id in (question.get("blocks_capabilities", []) or [])
+    )
+
+
 def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     validate_model(model)
     artifacts = _by_id(model.get("artifacts", []), "artifact")
@@ -163,6 +184,15 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
         for seed in question.get("blocks", []) or []:
             if artifact_id == seed or artifact_id in affected(model, seed):
                 result.add(question["id"])
+        for capability in question.get("blocks_capabilities", []) or []:
+            providers = [
+                artifact["id"]
+                for artifact in model.get("artifacts", [])
+                if capability in (artifact.get("provides", []) or [])
+            ]
+            for provider in providers:
+                if artifact_id == provider or artifact_id in affected(model, provider):
+                    result.add(question["id"])
     return sorted(result)
 
 

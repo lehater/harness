@@ -1,0 +1,83 @@
+version: 1
+kind: harness-adapter-acceptance
+id: RICH-PROJECT-PROJECTION-COMPATIBILITY
+
+source_graph:
+  version: 1
+  kind: canonical-design-graph
+  nodes:
+    - {id: REQUIREMENTS, path: docs/requirements.yaml, depends_on: []}
+    - {id: QUALITY-TARGETS, path: docs/quality-targets.yaml, depends_on: [REQUIREMENTS]}
+    - {id: ARCHITECTURE, path: docs/architecture.yaml, depends_on: [REQUIREMENTS, QUALITY-TARGETS]}
+    - {id: PLAN, path: docs/implementation-plan.yaml, depends_on: [ARCHITECTURE]}
+
+projection:
+  kind: harness-canonical-graph-projection
+  authorities:
+    - id: PRODUCT-REQUIREMENTS
+    - id: SYSTEM-ARCHITECTURE
+    - id: IMPLEMENTATION-DESIGN
+
+  consumers:
+    - id: IMPLEMENTATION
+
+  bindings:
+    - artifact: REQUIREMENTS
+      authority: PRODUCT-REQUIREMENTS
+      provides: [example.requirements]
+    - artifact: QUALITY-TARGETS
+      authority: PRODUCT-REQUIREMENTS
+      provides: [example.quality-targets]
+    - artifact: ARCHITECTURE
+      authority: SYSTEM-ARCHITECTURE
+      provides: [example.architecture]
+    - artifact: PLAN
+      authority: IMPLEMENTATION-DESIGN
+      provides: [example.implementation-plan]
+
+  questions:
+    - id: Q-RESOLVED-QUALITY
+      authority: PRODUCT-REQUIREMENTS
+      text: Are numeric quality targets required?
+      resolution: QUALITY-TARGETS
+    - id: Q-OPEN-ARCHITECTURE
+      authority: SYSTEM-ARCHITECTURE
+      text: Which architecture decision is authoritative?
+      blocks: [ARCHITECTURE]
+
+  contracts:
+    - id: IMPLEMENTATION-CONSUMER
+      consumer: IMPLEMENTATION
+      requires:
+        - {id: requirements, capability: example.requirements, authority: PRODUCT-REQUIREMENTS}
+        - {id: architecture, capability: example.architecture, authority: SYSTEM-ARCHITECTURE}
+        - {id: plan, capability: example.implementation-plan, authority: IMPLEMENTATION-DESIGN}
+
+  terminal_capabilities: []
+
+expect:
+  artifacts:
+    REQUIREMENTS:
+      path: docs/requirements.yaml
+      depends_on: []
+    QUALITY-TARGETS:
+      path: docs/quality-targets.yaml
+      depends_on: [REQUIREMENTS]
+    ARCHITECTURE:
+      path: docs/architecture.yaml
+      depends_on: [QUALITY-TARGETS, REQUIREMENTS]
+    PLAN:
+      path: docs/implementation-plan.yaml
+      depends_on: [ARCHITECTURE]
+
+  capability:
+    id: example.quality-targets
+    providers: [QUALITY-TARGETS]
+    owner: PRODUCT-REQUIREMENTS
+
+  questions:
+    unresolved: [Q-OPEN-ARCHITECTURE]
+
+  blocked:
+    artifact: PLAN
+    by: [Q-OPEN-ARCHITECTURE]

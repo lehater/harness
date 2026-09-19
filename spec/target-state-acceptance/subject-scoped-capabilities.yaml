@@ -1,0 +1,87 @@
+version: 1
+kind: harness-target-state-acceptance
+id: TARGET-STATE-SUBJECT-SCOPED-CAPABILITIES
+
+profile:
+  version: 1
+  kind: harness-design-profile
+  id: TACTICAL-COVERAGE
+  expectations:
+    - id: CONTEXT-A-TACTICAL
+      subject: CONTEXT-A
+      capability: domain.tactical-model.context-a
+      authority: DOMAIN
+    - id: CONTEXT-B-TACTICAL
+      subject: CONTEXT-B
+      capability: domain.tactical-model.context-b
+      authority: DOMAIN
+
+empty_model:
+  authorities:
+    - id: DOMAIN
+  artifacts: []
+  questions: []
+
+partial_model:
+  authorities:
+    - id: DOMAIN
+  artifacts:
+    - id: CONTEXT-A-DOMAIN
+      authority: DOMAIN
+      path: docs/domain/context-a.yaml
+      provides: [domain.tactical-model.context-a]
+      depends_on: []
+  questions: []
+
+complete_model:
+  authorities:
+    - id: DOMAIN
+  artifacts:
+    - id: CONTEXT-A-DOMAIN
+      authority: DOMAIN
+      path: docs/domain/context-a.yaml
+      provides: [domain.tactical-model.context-a]
+      depends_on: []
+    - id: CONTEXT-B-DOMAIN
+      authority: DOMAIN
+      path: docs/domain/context-b.yaml
+      provides: [domain.tactical-model.context-b]
+      depends_on: []
+  questions: []
+
+expect:
+  empty:
+    status: READY
+    satisfied: []
+    create:
+      - action: CREATE
+        expectation: CONTEXT-A-TACTICAL
+        subject: CONTEXT-A
+        capability: domain.tactical-model.context-a
+        authority: DOMAIN
+      - action: CREATE
+        expectation: CONTEXT-B-TACTICAL
+        subject: CONTEXT-B
+        capability: domain.tactical-model.context-b
+        authority: DOMAIN
+    wait: []
+    pending: []
+
+  partial:
+    status: READY
+    satisfied: [CONTEXT-A-TACTICAL]
+    create:
+      - action: CREATE
+        expectation: CONTEXT-B-TACTICAL
+        subject: CONTEXT-B
+        capability: domain.tactical-model.context-b
+        authority: DOMAIN
+    wait: []
+    pending: []
+
+  complete:
+    status: COMPLETE
+    satisfied: [CONTEXT-A-TACTICAL, CONTEXT-B-TACTICAL]
+    create: []
+    wait: []
+    pending: []
