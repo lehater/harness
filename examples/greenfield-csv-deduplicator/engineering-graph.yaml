@@ -12,6 +12,7 @@ authorities:
       public_contract: Produces accepted problem evidence for product requirements.
     produces:
       - capability: csv-deduplicator.problem-evidence
+        knowledge_kind: problem-evidence
         requires: []
 
   - id: PRODUCT-REQUIREMENTS
