@@ -17,14 +17,15 @@ The current operating model is agent-driven. `docs/design/agent-artifact-workben
 When Harness is used with another repository:
 
 1. read `docs/design/core-v0.md`;
-2. read the target repository's own instructions;
-3. locate only the target canonical artifacts required by the task;
-4. use the target's declared Core model, when present, to navigate ownership, capabilities, dependencies and unresolved Questions;
-5. when a Design Profile is present, use it to evaluate the target state without inventing missing knowledge;
+2. read the target repository's own instructions and identify the selected task/scope;
+3. choose or adapt the smallest justified Design Profile, using `skills/agent/design-profile/SKILL.md` when needed;
+4. use the target's declared Core model when present; otherwise use `skills/agent/bootstrap-existing-project/SKILL.md` to locate only the canonical artifacts required by that profile/scope;
+5. evaluate target state without inventing missing knowledge;
 6. obey expectation `depends_on`: act only on `CREATE`; do not design `PENDING` knowledge early;
 7. for a `CREATE`, load the matching artifact skill under `skills/artifacts/**` when one exists;
 8. validate the artifact candidate, perform semantic acceptance, and only then register `provides` in the Core graph;
-9. when the project opts into a managed `.harness/` workspace, render and verify generated documentation.
+9. when the project opts into a managed `.harness/` workspace, render and verify generated documentation;
+10. if implementation exposes an unresolved semantic case, reopen the owning knowledge through a Core `Question` instead of choosing an implementation convention silently.
 
 No manifest, pin, submodule or repository-to-repository runtime binding is required. The managed workspace is a target-project-local opt-in format.
 
