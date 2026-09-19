@@ -24,15 +24,16 @@ Use when actionable CREATE work has `knowledge_kind: component-design`.
 3. Inventory public components by architecture/module boundary.
 4. Give each public component one coherent responsibility/change reason.
 5. Define narrow ports/interfaces only where an accepted boundary, external technology, substitution need or known variation requires a seam.
-6. Specify responsibility, ownership, dependency and behavioral/failure contracts before choosing class/function representation. Preserve an existing simple callable/value representation when it satisfies the contract; require a class only when construction, lifetime, state or substitutability makes that representation semantically relevant.
-7. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
-8. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
-9. Define representation/mapping boundaries and composition/construction relationships.
-10. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
-11. Identify forbidden dependencies and structural verification that can enforce them.
-12. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
-13. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
-14. Produce project-native Component Design, semantically accept/register, then reevaluate.
+6. Shape ports from the consuming use case: expose only operations that consumer needs. A single concrete provider may satisfy several narrow consumer-owned contracts; do not introduce wrappers merely to obtain one runtime object per port.
+8. Specify responsibility, ownership, dependency and behavioral/failure contracts before choosing language representation. Preserve an existing simple callable/value representation when it satisfies the contract; require a class only when construction, lifetime, state or substitutability makes that representation semantically relevant.
+8. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
+9. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
+10. Define representation/mapping boundaries and composition/construction relationships.
+11. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
+12. Identify forbidden dependencies and structural verification that can enforce them.
+13. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
+14. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
+15. Produce project-native Component Design, semantically accept/register, then reevaluate.
 
 ## Applicability discipline
 
@@ -41,7 +42,7 @@ Do not introduce a pattern merely because it is common.
 Examples:
 
 - CQRS requires a real accepted reason to separate command/query models or infrastructure.
-- generic repositories are not a default abstraction;
+- generic repositories are not a default abstraction; prefer use-case/consumer-shaped contracts when persistence needs differ;
 - event bus/mediator/DI frameworks require a current need;
 - REST/HATEOAS rules do not apply to non-REST interfaces;
 - inheritance requires substitutability, otherwise prefer composition;
@@ -74,7 +75,7 @@ A useful Component Design normally includes:
 - structural verification obligations;
 - intentionally unconstrained implementation details.
 
-A class diagram is optional. Classes are not mandatory when a function/value module better satisfies the accepted responsibility.
+A class diagram is optional. Classes are not mandatory when a function/value module better satisfies the accepted responsibility. Likewise, do not mandate a language-specific interface construct: Protocols, interfaces, small Go interfaces, function contracts or equivalent forms may realize the same semantic boundary.
 
 ## Acceptance checks
 
