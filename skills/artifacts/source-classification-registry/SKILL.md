@@ -9,8 +9,6 @@ description: "Use for an actionable CREATE that requires exhaustive explicit cla
 
 Use when a target-state `CREATE` requires a complete mapping from a pinned external/source identity set to one controlled project classification and the mapping itself is canonical project data.
 
-The Nutrition Management BLS 4.0 category registry is the acceptance consumer for this skill.
-
 ## Inputs
 
 - the actionable `CREATE` expectation and owning Authority;
@@ -70,21 +68,21 @@ The output contract must specify:
 - candidate-frontier/report mode when the registry is review-heavy;
 - deterministic ordering/serialization where relevant.
 
-For the Nutrition Management BLS consumer, the project-native registry may compact repeated accepted decisions into explicit prefix rules with exact overrides:
+When source identifiers have an accepted hierarchical structure, a project-native registry may compact repeated decisions into explicit rules with exact overrides. For example:
 
 ```json
 {
-  "source_version": "4.0",
+  "source_version": "v1",
   "rules": [
-    {"prefix": "B", "category": "grains_cereal_products_potatoes"}
+    {"prefix": "A", "category": "category-a"}
   ],
   "overrides": [
-    {"source_code": "B999999", "category": "other_or_composite"}
+    {"source_id": "A-EXCEPTION", "category": "category-b"}
   ]
 }
 ```
 
-The validator must resolve this representation against the complete pinned source set and prove exact-one coverage. A compact rule is canonical only because it is explicitly reviewed project data; it must never be an undocumented parser heuristic.
+The exact fields and rule language belong to the target project. The validator must resolve the representation against the complete pinned source set and prove exact-one coverage. A compact rule is canonical only because it is explicitly reviewed project data; it must never be an undocumented parser heuristic.
 
 ## Acceptance checks
 
