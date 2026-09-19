@@ -13,6 +13,8 @@ principles:
     - Catalog entries are reference boundaries. A project instantiates only applicable Authorities and must justify merges or splits with the same atomicity test.
     - Applicability changes the graph shape; it does not create workflow stages.
     - A project-specific Authority is valid when its decision boundary cannot be represented coherently by the reference catalog.
+    - Failure-path semantics remain owned by the Authority that owns the affected outcome, authoritative state or runtime boundary; reliability mechanisms do not create a generic RELIABILITY-DESIGN owner.
+    - Timeout or lost acknowledgement is not by itself proof of operation failure; state-changing retry, reconciliation, degradation and cancellation semantics must be accepted upstream when material.
 
 authorities:
   - id: DISCOVERY
