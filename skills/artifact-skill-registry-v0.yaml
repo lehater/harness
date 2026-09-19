@@ -3,6 +3,12 @@ kind: harness-artifact-skill-registry
 id: CORE-ARTIFACT-SKILLS-V0
 
 routes:
+  - knowledge_kind: problem-evidence
+    skill: skills/artifacts/problem-evidence/SKILL.md
+
+  - knowledge_kind: product-requirements
+    skill: skills/artifacts/product-requirements/SKILL.md
+
   - knowledge_kind: domain-model
     skill: skills/artifacts/domain-model/SKILL.md
 
