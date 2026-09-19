@@ -78,6 +78,7 @@ def main() -> int:
         assert len(result["routed"]) == 1, result
         routed = result["routed"][0]
         assert routed["knowledge_kind"] == "verification-strategy", routed
+        assert routed["capabilities"] == ["example.verification"], routed
         assert routed["skill"] == "skills/artifacts/verification-strategy/SKILL.md", routed
     except Exception as exc:
         errors.append(f"registered route: {exc}")
@@ -105,6 +106,60 @@ def main() -> int:
         assert result["unrouted"][0]["reason"] == "NO_KNOWLEDGE_KIND", result
     except Exception as exc:
         errors.append(f"missing kind: {exc}")
+
+
+    try:
+        grouped_graph = {
+            "version": 1,
+            "kind": "harness-engineering-graph",
+            "id": "GROUPED-ROUTER-PILOT",
+            "authorities": [
+                {
+                    "id": "PRODUCT",
+                    "responsibility": "Own product requirements.",
+                    "boundary": boundary("Product"),
+                    "produces": [
+                        {
+                            "capability": "example.product-intent",
+                            "knowledge_kind": "product-requirements",
+                            "requires": [],
+                        },
+                        {
+                            "capability": "example.acceptance",
+                            "knowledge_kind": "product-requirements",
+                            "requires": [],
+                        },
+                    ],
+                }
+            ],
+            "consumers": [
+                {
+                    "id": "IMPLEMENTATION",
+                    "purpose": "Build",
+                    "requires": [
+                        "example.product-intent",
+                        "example.acceptance",
+                    ],
+                }
+            ],
+        }
+        result = route_create_work(
+            grouped_graph,
+            "IMPLEMENTATION",
+            empty_model,
+            registry,
+        )
+        assert result["routed"] == [], result
+        assert len(result["unrouted"]) == 1, result
+        work = result["unrouted"][0]
+        assert work["knowledge_kind"] == "product-requirements", work
+        assert work["reason"] == "NO_REGISTERED_SKILL", work
+        assert work["capabilities"] == [
+            "example.acceptance",
+            "example.product-intent",
+        ], work
+    except Exception as exc:
+        errors.append(f"grouped artifact work: {exc}")
 
     try:
         blocked_model = {
