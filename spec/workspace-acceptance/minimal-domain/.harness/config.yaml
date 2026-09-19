@@ -1,0 +1,4 @@
+version: 1
+kind: harness-workspace-config
+generated:
+  output: docs/generated

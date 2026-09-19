@@ -1,0 +1,21 @@
+version: 1
+kind: harness-knowledge-artifact
+artifact: APPLICATION-DOMAIN
+schema: domain-model/v1
+title: Application Domain Model
+
+content:
+  purpose: Define the semantic meaning and invariants of an Application.
+  terms:
+    - term: Application
+      meaning: A user-managed definition of one software application.
+    - term: Component
+      meaning: A uniquely named participant inside an Application.
+  concepts:
+    - name: Application
+      identity: Stable application identifier.
+      responsibilities:
+        - Own its component membership.
+  invariants:
+    - id: APPLICATION-COMPONENT-UNIQUE
+      statement: A Component may occur at most once inside one Application.

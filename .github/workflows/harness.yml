@@ -12,6 +12,7 @@ on:
       - "validators/**"
       - "harness.py"
       - "target_state.py"
+      - "workspace.py"
       - "Makefile"
       - ".github/workflows/harness.yml"
 

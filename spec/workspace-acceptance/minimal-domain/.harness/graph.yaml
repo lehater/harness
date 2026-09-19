@@ -1,0 +1,11 @@
+authorities:
+  - id: DOMAIN
+
+artifacts:
+  - id: APPLICATION-DOMAIN
+    authority: DOMAIN
+    path: .harness/knowledge/application-domain.yaml
+    provides: [application.domain-semantics]
+    depends_on: []
+
+questions: []

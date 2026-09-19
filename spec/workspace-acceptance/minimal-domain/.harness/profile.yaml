@@ -1,0 +1,9 @@
+version: 1
+kind: harness-design-profile
+id: APPLICATION-DESIGN
+
+expectations:
+  - id: APPLICATION-DOMAIN
+    subject: APPLICATION
+    capability: application.domain-semantics
+    authority: DOMAIN
