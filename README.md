@@ -28,7 +28,7 @@ A Design Profile can declare the engineering knowledge required for a selected s
 - provider blocked by unresolved Questions -> `WAIT`;
 - every expectation has an unblocked provider under the expected Authority -> `COMPLETE`.
 
-This is structural design completeness, not semantic interpretation of arbitrary document prose. See `docs/design/target-state-v0.md`.
+This is structural design completeness, not semantic interpretation of arbitrary document prose. Expectations may declare prerequisite expectations; downstream knowledge remains `PENDING` until those prerequisites are satisfied. See `docs/design/target-state-v0.md`.
 
 ## Managed knowledge workspace
 
@@ -45,9 +45,22 @@ docs/generated/**
 
 `.harness/graph.yaml` owns topology, `.harness/knowledge/**` owns typed canonical content, and `docs/generated/**` contains disposable human-readable projections.
 
-`workspace.py validate PROJECT` validates the workspace. `workspace.py render PROJECT` validates it and regenerates documentation.
+`workspace.py validate PROJECT` validates the workspace. `workspace.py validate-artifact CANDIDATE.yaml` validates a candidate before acceptance. `workspace.py render PROJECT` validates accepted managed knowledge and regenerates documentation.
 
-The first accepted knowledge schema is `domain-model/v1`. Additional schemas are intentionally added one at a time instead of introducing a universal semantic DSL. See `docs/design/managed-knowledge-v0.md`.
+Current typed knowledge schemas are `domain-model/v1` and the consumer-piloted `verification-plan/v1`. Additional schemas are intentionally added one at a time instead of introducing a universal semantic DSL. See `docs/design/managed-knowledge-v0.md`.
+
+## Agent-driven use
+
+Harness is currently designed to be operated by an engineering agent rather than to autonomously design a repository.
+
+The reusable agent loop is documented in `docs/design/agent-artifact-workbench-v0.md`. It uses:
+
+- `skills/core/design-profile/SKILL.md` to define/review the target knowledge;
+- `skills/core/bootstrap-existing-project/SKILL.md` to reuse existing canonical project truth;
+- artifact-specific skills under `skills/artifacts/**` for actionable `CREATE` expectations;
+- starter profiles under `profiles/**` as adaptable checklists, not universal completeness proofs.
+
+Schema validation does not itself accept semantics. The agent registers `provides` only after the artifact passes semantic acceptance.
 
 ## Existing canonical graphs
 
@@ -97,4 +110,4 @@ If the target repository later gains its own canonical graph, prefer projecting 
 
 Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
 
-The older `docs/methodology/**` and `skills/**` content is retained pre-Core material and does not define Core v0.
+`docs/methodology/**` remains retained pre-Core material. Agent-facing skills explicitly referenced by `docs/design/agent-artifact-workbench-v0.md` are part of the current agent operating layer above Core; they do not extend Core entities.
