@@ -40,7 +40,16 @@ Do not treat a performance benchmark, lint check or test count as useful evidenc
 7. Draft `verification-plan/v1`.
 8. Run `workspace.py validate-artifact`.
 9. Apply common semantic acceptance.
-10. Register, render and re-evaluate target state.
+10. After acceptance, register, render and re-evaluate target state.
+
+## Stop conditions
+
+Stop and create or preserve a Core `Question` when:
+
+- a verification objective depends on upstream behavior or semantics that are not accepted;
+- available evidence cannot distinguish the required correctness claim from a diagnostic or incidental check;
+- a proposed check would introduce a new product/domain requirement rather than verify an accepted one;
+- the selected scope lacks an Authority-owned contract that defines what success means.
 
 ## Output schema
 
@@ -62,6 +71,12 @@ Optional `out_of_scope` makes non-gates explicit.
 - diagnostic performance evidence is not mislabeled as correctness;
 - the strategy does not introduce new product requirements;
 - test implementation details do not become domain truth.
+
+## Registration
+
+Register the accepted managed artifact as a Core `CanonicalArtifact`.
+
+Its dependencies should identify the accepted Requirements, Domain and Architecture providers whose behavior/constraints the strategy verifies. Its `provides` entry must be the verification capability from the actionable expectation.
 
 ## Human projection
 
