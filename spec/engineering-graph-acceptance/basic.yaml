@@ -1,0 +1,160 @@
+version: 1
+kind: harness-engineering-graph-acceptance
+id: BASIC-PRODUCER-CONSUMER-CLOSURE
+
+graph:
+  version: 1
+  kind: harness-engineering-graph
+  id: BASIC-SOFTWARE
+  default_subject: APPLICATION
+  authorities:
+    - id: DISCOVERY
+      responsibility: Own accepted problem evidence.
+      boundary:
+        semantic_cohesion: One class of knowledge about observed problems and evidence.
+        independent_change: Problem evidence can change before product decisions change.
+        public_contract: Produces accepted problem evidence for Product Requirements.
+      produces:
+        - capability: example.problem
+          requires: []
+
+    - id: PRODUCT
+      responsibility: Own product intent and acceptance semantics.
+      boundary:
+        semantic_cohesion: One class of decisions about desired product behavior.
+        independent_change: Product intent can change without changing system architecture directly.
+        public_contract: Consumes problem evidence and produces accepted requirements.
+      produces:
+        - capability: example.requirements
+          requires:
+            - capability: example.problem
+
+    - id: ARCHITECTURE
+      responsibility: Own system architecture decisions.
+      boundary:
+        semantic_cohesion: One class of structural system decisions.
+        independent_change: Architecture can change while accepted product intent remains stable.
+        public_contract: Consumes requirements and produces accepted architecture.
+      produces:
+        - capability: example.architecture
+          requires:
+            - capability: example.requirements
+
+    - id: VERIFICATION
+      responsibility: Own verification strategy.
+      boundary:
+        semantic_cohesion: One class of decisions about executable correctness evidence.
+        independent_change: Verification evidence design can change without changing product semantics.
+        public_contract: Consumes requirements and architecture and produces verification strategy.
+      produces:
+        - capability: example.verification
+          requires:
+            - capability: example.requirements
+            - capability: example.architecture
+
+  consumers:
+    - id: IMPLEMENTATION
+      purpose: Implement accepted behavior without inventing upstream engineering decisions.
+      requires:
+        - capability: example.architecture
+        - capability: example.verification
+
+expect_profile:
+  capabilities:
+    - example.problem
+    - example.requirements
+    - example.architecture
+    - example.verification
+  dependencies:
+    example.problem: []
+    example.requirements: [example.problem]
+    example.architecture: [example.requirements]
+    example.verification: [example.architecture, example.requirements]
+
+cases:
+  empty:
+    model:
+      artifacts: []
+      questions: []
+    expect:
+      status: READY
+      satisfied: []
+      create: [example.problem]
+      wait: []
+      pending: [example.architecture, example.requirements, example.verification]
+
+  partial:
+    model:
+      artifacts:
+        - id: PROBLEM
+          authority: DISCOVERY
+          path: docs/problem.yaml
+          provides: [example.problem]
+          depends_on: []
+      questions: []
+    expect:
+      status: READY
+      satisfied: [example.problem]
+      create: [example.requirements]
+      wait: []
+      pending: [example.architecture, example.verification]
+
+  semantic_block:
+    model:
+      artifacts:
+        - id: PROBLEM
+          authority: DISCOVERY
+          path: docs/problem.yaml
+          provides: [example.problem]
+          depends_on: []
+        - id: REQUIREMENTS
+          authority: PRODUCT
+          path: docs/requirements.yaml
+          provides: [example.requirements]
+          depends_on: [PROBLEM]
+      questions:
+        - id: Q-ARCHITECTURE
+          authority: ARCHITECTURE
+          text: Which accepted architecture satisfies the product constraints?
+          blocks_capabilities: [example.architecture]
+    expect:
+      status: BLOCKED
+      satisfied: [example.problem, example.requirements]
+      create: []
+      wait: [example.architecture]
+      pending: [example.verification]
+
+  complete:
+    model:
+      artifacts:
+        - id: PROBLEM
+          authority: DISCOVERY
+          path: docs/problem.yaml
+          provides: [example.problem]
+          depends_on: []
+        - id: REQUIREMENTS
+          authority: PRODUCT
+          path: docs/requirements.yaml
+          provides: [example.requirements]
+          depends_on: [PROBLEM]
+        - id: ARCHITECTURE
+          authority: ARCHITECTURE
+          path: docs/architecture.yaml
+          provides: [example.architecture]
+          depends_on: [REQUIREMENTS]
+        - id: VERIFICATION
+          authority: VERIFICATION
+          path: docs/verification.yaml
+          provides: [example.verification]
+          depends_on: [REQUIREMENTS, ARCHITECTURE]
+      questions: []
+    expect:
+      status: COMPLETE
+      satisfied:
+        - example.problem
+        - example.requirements
+        - example.architecture
+        - example.verification
+      create: []
+      wait: []
+      pending: []

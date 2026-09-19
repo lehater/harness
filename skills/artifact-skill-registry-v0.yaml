@@ -1,0 +1,34 @@
+version: 1
+kind: harness-artifact-skill-registry
+id: CORE-ARTIFACT-SKILLS-V0
+
+routes:
+  - knowledge_kind: problem-evidence
+    skill: skills/artifacts/problem-evidence/SKILL.md
+
+  - knowledge_kind: product-requirements
+    skill: skills/artifacts/product-requirements/SKILL.md
+
+  - knowledge_kind: system-architecture
+    skill: skills/artifacts/system-architecture/SKILL.md
+
+  - knowledge_kind: interface-contract
+    skill: skills/artifacts/interface-contract/SKILL.md
+
+  - knowledge_kind: implementation-design
+    skill: skills/artifacts/implementation-design/SKILL.md
+
+  - knowledge_kind: acceptance-scenarios
+    skill: skills/artifacts/acceptance-scenarios/SKILL.md
+
+  - knowledge_kind: domain-model
+    skill: skills/artifacts/domain-model/SKILL.md
+
+  - knowledge_kind: verification-strategy
+    skill: skills/artifacts/verification-strategy/SKILL.md
+
+  - knowledge_kind: pinned-source-entity-set
+    skill: skills/artifacts/pinned-source-entity-set/SKILL.md
+
+  - knowledge_kind: source-classification-registry
+    skill: skills/artifacts/source-classification-registry/SKILL.md
