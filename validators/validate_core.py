@@ -131,6 +131,28 @@ def main() -> int:
                 raise CoreError("resolve-question did not clear unresolved question")
             if blocked(resolved, block["artifact"]) != sorted(resolution["blocked_after"]):
                 raise CoreError("resolve-question did not clear blocking")
+
+            external_resolution = expect.get("external_resolution")
+            if external_resolution:
+                externally_resolved = resolve_question(
+                    copy.deepcopy(model),
+                    external_resolution["question"],
+                    external_resolution["artifact"],
+                )
+                if unresolved_questions(externally_resolved) != sorted(
+                    external_resolution["unresolved_after"]
+                ):
+                    raise CoreError("external resolution did not clear expected question")
+                actual_frontier = design_frontier(
+                    externally_resolved,
+                    completeness_expect["expectations"],
+                    completeness_expect["coverage"],
+                )
+                if actual_frontier != external_resolution["frontier_after"]:
+                    raise CoreError(
+                        f"external resolution frontier mismatch: {actual_frontier!r} != "
+                        f"{external_resolution['frontier_after']!r}"
+                    )
         except Exception as exc:
             errors.append(f"{path.relative_to(ROOT)}: {exc}")
 
