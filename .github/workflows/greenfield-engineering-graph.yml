@@ -62,7 +62,52 @@ jobs:
           assert routed["unrouted"] == [], routed
           assert len(routed["routed"]) == 1, routed
           item = routed["routed"][0]
-          assert item["capability"] == "csv-deduplicator.verification-strategy", item
+          assert item["capabilities"] == ["csv-deduplicator.verification-strategy"], item
           assert item["knowledge_kind"] == "verification-strategy", item
           assert item["skill"] == "skills/artifacts/verification-strategy/SKILL.md", item
+          PY
+
+      - name: Verify compatible CREATE capabilities group into one artifact work item
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/core-state.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          missing = copy.deepcopy(model)
+          for artifact in missing["artifacts"]:
+              artifact["provides"] = [
+                  capability
+                  for capability in artifact.get("provides", [])
+                  if capability not in {
+                      "csv-deduplicator.product-intent",
+                      "csv-deduplicator.acceptance",
+                  }
+              ]
+
+          routed = route_create_work(graph, "IMPLEMENTATION", missing, registry)
+          product_work = [
+              item
+              for item in routed["unrouted"]
+              if item.get("knowledge_kind") == "product-requirements"
+          ]
+          assert len(product_work) == 1, routed
+          item = product_work[0]
+          assert item["reason"] == "NO_REGISTERED_SKILL", item
+          assert item["capabilities"] == [
+              "csv-deduplicator.acceptance",
+              "csv-deduplicator.product-intent",
+          ], item
           PY
