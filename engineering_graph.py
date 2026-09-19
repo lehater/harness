@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 from pathlib import Path
@@ -316,19 +317,46 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
     return profile
 
 
-def validate_realization(graph: dict[str, Any], model: dict[str, Any]) -> None:
+def realize_core_model(
+    graph: dict[str, Any],
+    model: dict[str, Any],
+) -> dict[str, Any]:
+    """Project Engineering Graph Authorities into a Core realization state."""
     validate_engineering_graph(graph)
-    validate_model(model)
-    producers = producer_index(graph)
-    authorities = {item["id"] for item in graph["authorities"]}
-    model_authorities = {item["id"] for item in model.get("authorities", [])}
-    missing = sorted(authorities - model_authorities)
-    if missing:
-        raise CoreError(
-            f"Core model is missing Engineering Graph Authorities: {missing}"
-        )
+    if not isinstance(model, dict):
+        raise CoreError("Core realization must be a mapping")
 
-    for artifact in model.get("artifacts", []):
+    result = copy.deepcopy(model)
+    declared = result.get("authorities", []) or []
+    if not isinstance(declared, list):
+        raise CoreError("Core realization authorities must be a list")
+
+    by_id: dict[str, dict[str, Any]] = {}
+    for authority in declared:
+        if not isinstance(authority, dict):
+            raise CoreError("Core realization authority must be a mapping")
+        authority_id = authority.get("id")
+        if not isinstance(authority_id, str) or not authority_id:
+            raise CoreError("Core realization authority id is required")
+        if authority_id in by_id:
+            raise CoreError(f"duplicate Core realization authority: {authority_id}")
+        by_id[authority_id] = authority
+
+    for authority in graph["authorities"]:
+        by_id.setdefault(authority["id"], {"id": authority["id"]})
+
+    result["authorities"] = list(by_id.values())
+    result.setdefault("artifacts", [])
+    result.setdefault("questions", [])
+    validate_model(result)
+    return result
+
+
+def validate_realization(graph: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:
+    realized = realize_core_model(graph, model)
+    producers = producer_index(graph)
+
+    for artifact in realized.get("artifacts", []):
         for capability in artifact.get("provides", []) or []:
             producer = producers.get(capability)
             if producer is None:
@@ -338,6 +366,7 @@ def validate_realization(graph: dict[str, Any], model: dict[str, Any]) -> None:
                     f"artifact {artifact['id']} provides {capability} under "
                     f"{artifact['authority']}, but Engineering Graph producer is {producer}"
                 )
+    return realized
 
 
 def evaluate_engineering_target(
@@ -345,9 +374,9 @@ def evaluate_engineering_target(
     target_consumer: str,
     model: dict[str, Any],
 ) -> dict[str, Any]:
-    validate_realization(graph, model)
+    realized = validate_realization(graph, model)
     profile = derive_profile(graph, target_consumer)
-    result = evaluate_target_state(profile, model)
+    result = evaluate_target_state(profile, realized)
     return {
         "target": target_consumer,
         "profile": profile,
