@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError, blocked, validate_model
+from harness import CoreError, blocked, capability_blockers, validate_model
 
 
 def _by_id(items: list[dict[str, Any]], kind: str) -> dict[str, dict[str, Any]]:
@@ -68,73 +68,160 @@ def validate_profile(profile: dict[str, Any], model: dict[str, Any] | None = Non
                 f"expectation {expectation_id} references unknown authority: {authority}"
             )
 
+        depends_on = expectation.get("depends_on", [])
+        if not isinstance(depends_on, list) or any(
+            not isinstance(value, str) or not value for value in depends_on
+        ):
+            raise CoreError(f"expectation {expectation_id} depends_on must be expectation ids")
+        if len(depends_on) != len(set(depends_on)):
+            raise CoreError(f"expectation {expectation_id} has duplicate dependencies")
+        for dependency in depends_on:
+            if dependency == expectation_id:
+                raise CoreError(f"expectation {expectation_id} cannot depend on itself")
+            if dependency not in indexed:
+                raise CoreError(
+                    f"expectation {expectation_id} references unknown dependency: {dependency}"
+                )
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(expectation_id: str) -> None:
+        if expectation_id in visited:
+            return
+        if expectation_id in visiting:
+            raise CoreError(f"design profile expectation dependency cycle at: {expectation_id}")
+        visiting.add(expectation_id)
+        for dependency in indexed[expectation_id].get("depends_on", []):
+            visit(dependency)
+        visiting.remove(expectation_id)
+        visited.add(expectation_id)
+
+    for expectation_id in indexed:
+        visit(expectation_id)
+
 
 def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:
     validate_profile(profile, model)
     artifacts = model.get("artifacts", [])
+    expectations = {
+        item["id"]: item
+        for item in profile.get("expectations", [])
+    }
 
     satisfied: list[str] = []
     create: list[dict[str, Any]] = []
     wait: list[dict[str, Any]] = []
+    pending: list[dict[str, Any]] = []
 
-    for expectation in sorted(profile.get("expectations", []), key=lambda item: item["id"]):
-        expectation_id = expectation["id"]
-        subject = expectation["subject"]
-        capability = expectation["capability"]
-        authority = expectation["authority"]
-        providers = sorted(
-            artifact["id"]
-            for artifact in artifacts
-            if capability in (artifact.get("provides", []) or [])
-        )
+    remaining = set(expectations)
+    while remaining:
+        progressed = False
+        for expectation_id in sorted(remaining):
+            expectation = expectations[expectation_id]
+            prerequisites = expectation.get("depends_on", [])
+            unresolved_prerequisites = [
+                dependency for dependency in prerequisites if dependency not in satisfied
+            ]
+            if unresolved_prerequisites:
+                continue
 
-        if not providers:
-            create.append(
+            subject = expectation["subject"]
+            capability = expectation["capability"]
+            authority = expectation["authority"]
+            providers = sorted(
+                artifact["id"]
+                for artifact in artifacts
+                if capability in (artifact.get("provides", []) or [])
+            )
+
+            if not providers:
+                blockers = capability_blockers(model, capability)
+                if blockers:
+                    wait.append(
+                        {
+                            "action": "WAIT",
+                            "expectation": expectation_id,
+                            "subject": subject,
+                            "capability": capability,
+                            "authority": authority,
+                            "providers": [],
+                            "questions": blockers,
+                        }
+                    )
+                else:
+                    create.append(
+                        {
+                            "action": "CREATE",
+                            "expectation": expectation_id,
+                            "subject": subject,
+                            "capability": capability,
+                            "authority": authority,
+                        }
+                    )
+                remaining.remove(expectation_id)
+                progressed = True
+                continue
+
+            provider_authority = next(
+                artifact["authority"]
+                for artifact in artifacts
+                if artifact["id"] == providers[0]
+            )
+            if provider_authority != authority:
+                raise CoreError(
+                    f"expectation {expectation_id} requires authority {authority}, "
+                    f"but capability {capability} is owned by {provider_authority}"
+                )
+
+            blockers = sorted(
                 {
-                    "action": "CREATE",
-                    "expectation": expectation_id,
-                    "subject": subject,
-                    "capability": capability,
-                    "authority": authority,
+                    question
+                    for provider in providers
+                    for question in blocked(model, provider)
                 }
             )
-            continue
+            if blockers:
+                wait.append(
+                    {
+                        "action": "WAIT",
+                        "expectation": expectation_id,
+                        "subject": subject,
+                        "capability": capability,
+                        "authority": authority,
+                        "providers": providers,
+                        "questions": blockers,
+                    }
+                )
+                remaining.remove(expectation_id)
+                progressed = True
+                continue
 
-        provider_authority = next(
-            artifact["authority"]
-            for artifact in artifacts
-            if artifact["id"] == providers[0]
-        )
-        if provider_authority != authority:
-            raise CoreError(
-                f"expectation {expectation_id} requires authority {authority}, "
-                f"but capability {capability} is owned by {provider_authority}"
-            )
+            satisfied.append(expectation_id)
+            remaining.remove(expectation_id)
+            progressed = True
 
-        blockers = sorted(
+        if not progressed:
+            break
+
+    for expectation_id in sorted(remaining):
+        expectation = expectations[expectation_id]
+        pending.append(
             {
-                question
-                for provider in providers
-                for question in blocked(model, provider)
+                "action": "PENDING",
+                "expectation": expectation_id,
+                "subject": expectation["subject"],
+                "capability": expectation["capability"],
+                "authority": expectation["authority"],
+                "depends_on": [
+                    dependency
+                    for dependency in expectation.get("depends_on", [])
+                    if dependency not in satisfied
+                ],
             }
         )
-        if blockers:
-            wait.append(
-                {
-                    "action": "WAIT",
-                    "expectation": expectation_id,
-                    "subject": subject,
-                    "capability": capability,
-                    "authority": authority,
-                    "providers": providers,
-                    "questions": blockers,
-                }
-            )
-            continue
 
-        satisfied.append(expectation_id)
-
-    if not create and not wait:
+    if len(satisfied) == len(expectations):
         status = "COMPLETE"
     elif create:
         status = "READY"
@@ -146,6 +233,7 @@ def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dic
         "satisfied": sorted(satisfied),
         "create": create,
         "wait": wait,
+        "pending": pending,
     }
 
 

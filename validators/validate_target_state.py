@@ -42,6 +42,51 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"{path.relative_to(ROOT)}: {exc}")
 
+    invalid_profiles = [
+        {
+            "version": 1,
+            "kind": "harness-design-profile",
+            "id": "UNKNOWN-DEPENDENCY",
+            "expectations": [
+                {
+                    "id": "A",
+                    "subject": "APPLICATION",
+                    "capability": "application.a",
+                    "authority": "DOMAIN",
+                    "depends_on": ["MISSING"],
+                }
+            ],
+        },
+        {
+            "version": 1,
+            "kind": "harness-design-profile",
+            "id": "DEPENDENCY-CYCLE",
+            "expectations": [
+                {
+                    "id": "A",
+                    "subject": "APPLICATION",
+                    "capability": "application.a",
+                    "authority": "DOMAIN",
+                    "depends_on": ["B"],
+                },
+                {
+                    "id": "B",
+                    "subject": "APPLICATION",
+                    "capability": "application.b",
+                    "authority": "DOMAIN",
+                    "depends_on": ["A"],
+                },
+            ],
+        },
+    ]
+    for profile in invalid_profiles:
+        try:
+            validate_profile(profile)
+        except CoreError:
+            pass
+        else:
+            errors.append(f"invalid target-state profile passed validation: {profile['id']}")
+
     if errors:
         print("Harness target-state validation failed:", file=sys.stderr)
         for error in errors:

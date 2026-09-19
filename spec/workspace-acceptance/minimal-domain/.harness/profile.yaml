@@ -7,3 +7,8 @@ expectations:
     subject: APPLICATION
     capability: application.domain-semantics
     authority: DOMAIN
+
+  - id: APPLICATION-VERIFICATION
+    subject: APPLICATION
+    capability: application.verification-strategy
+    authority: VERIFICATION

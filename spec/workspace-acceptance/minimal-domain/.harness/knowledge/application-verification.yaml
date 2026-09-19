@@ -1,0 +1,21 @@
+version: 1
+kind: harness-knowledge-artifact
+artifact: APPLICATION-VERIFICATION
+schema: verification-plan/v1
+title: Application Verification Strategy
+
+content:
+  purpose: Define how the accepted application semantics are checked before implementation changes are accepted.
+  scope: Application domain behavior and its canonical invariants.
+  checks:
+    - id: DOMAIN-INVARIANTS
+      objective: Verify that application domain invariants remain enforced.
+      evidence:
+        - Automated domain tests covering every accepted invariant.
+        - Regression tests for previously fixed invariant violations.
+    - id: CANONICAL-GENERATION
+      objective: Verify that generated human documentation remains synchronized with canonical knowledge.
+      evidence:
+        - Re-render generated documentation and require a clean diff.
+  out_of_scope:
+    - Performance benchmarking.
