@@ -1,0 +1,33 @@
+version: 1
+kind: harness-design-profile
+id: SOFTWARE-APPLICATION-DESIGN-V0
+
+expectations:
+  - id: PROBLEM
+    subject: APPLICATION
+    capability: application.problem
+    authority: PRODUCT
+
+  - id: REQUIREMENTS
+    subject: APPLICATION
+    capability: application.requirements
+    authority: PRODUCT
+    depends_on: [PROBLEM]
+
+  - id: DOMAIN
+    subject: APPLICATION
+    capability: application.domain-semantics
+    authority: DOMAIN
+    depends_on: [REQUIREMENTS]
+
+  - id: ARCHITECTURE
+    subject: APPLICATION
+    capability: application.architecture
+    authority: ARCHITECTURE
+    depends_on: [DOMAIN]
+
+  - id: VERIFICATION
+    subject: APPLICATION
+    capability: application.verification-strategy
+    authority: VERIFICATION
+    depends_on: [ARCHITECTURE]
