@@ -30,6 +30,25 @@ A Design Profile can declare the engineering knowledge required for a selected s
 
 This is structural design completeness, not semantic interpretation of arbitrary document prose. See `docs/design/target-state-v0.md`.
 
+## Managed knowledge workspace
+
+Projects that want Harness to own machine-readable design knowledge may opt into a local `.harness/` workspace:
+
+```text
+.harness/
+  graph.yaml
+  profile.yaml
+  config.yaml
+  knowledge/**
+docs/generated/**
+```
+
+`.harness/graph.yaml` owns topology, `.harness/knowledge/**` owns typed canonical content, and `docs/generated/**` contains disposable human-readable projections.
+
+`workspace.py validate PROJECT` validates the workspace. `workspace.py render PROJECT` validates it and regenerates documentation.
+
+The first accepted knowledge schema is `domain-model/v1`. Additional schemas are intentionally added one at a time instead of introducing a universal semantic DSL. See `docs/design/managed-knowledge-v0.md`.
+
 ## Existing canonical graphs
 
 When a target repository already owns artifact paths and dependency routing in a canonical graph, do not copy that graph into Harness metadata.
