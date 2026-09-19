@@ -29,3 +29,40 @@ jobs:
       - name: Evaluate implementation target
         run: |
           python engineering_graph.py evaluate             examples/greenfield-csv-deduplicator/engineering-graph.yaml             IMPLEMENTATION             examples/greenfield-csv-deduplicator/core-state.yaml
+
+      - name: Verify semantic skill routing
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+
+          graph = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/greenfield-csv-deduplicator/core-state.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          missing = copy.deepcopy(model)
+          for artifact in missing["artifacts"]:
+              artifact["provides"] = [
+                  capability
+                  for capability in artifact.get("provides", [])
+                  if capability != "csv-deduplicator.verification-strategy"
+              ]
+
+          routed = route_create_work(graph, "IMPLEMENTATION", missing, registry)
+          assert routed["target_status"] == "READY", routed
+          assert routed["unrouted"] == [], routed
+          assert len(routed["routed"]) == 1, routed
+          item = routed["routed"][0]
+          assert item["capability"] == "csv-deduplicator.verification-strategy", item
+          assert item["knowledge_kind"] == "verification-strategy", item
+          assert item["skill"] == "skills/artifacts/verification-strategy/SKILL.md", item
+          PY
