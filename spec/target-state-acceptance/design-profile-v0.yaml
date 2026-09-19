@@ -15,10 +15,12 @@ profile:
       subject: APPLICATION
       capability: application.architecture
       authority: ARCHITECTURE
+      depends_on: [APPLICATION-DOMAIN]
     - id: APPLICATION-VERIFICATION
       subject: APPLICATION
       capability: application.verification
       authority: VERIFICATION
+      depends_on: [APPLICATION-ARCHITECTURE]
 
 empty_model:
   authorities:
@@ -80,31 +82,29 @@ expect:
     satisfied: []
     create:
       - action: CREATE
-        expectation: APPLICATION-ARCHITECTURE
-        subject: APPLICATION
-        capability: application.architecture
-        authority: ARCHITECTURE
-      - action: CREATE
         expectation: APPLICATION-DOMAIN
         subject: APPLICATION
         capability: application.domain-semantics
         authority: DOMAIN
-      - action: CREATE
+    wait: []
+    pending:
+      - action: PENDING
+        expectation: APPLICATION-ARCHITECTURE
+        subject: APPLICATION
+        capability: application.architecture
+        authority: ARCHITECTURE
+        depends_on: [APPLICATION-DOMAIN]
+      - action: PENDING
         expectation: APPLICATION-VERIFICATION
         subject: APPLICATION
         capability: application.verification
         authority: VERIFICATION
-    wait: []
+        depends_on: [APPLICATION-ARCHITECTURE]
 
   partial:
-    status: READY
+    status: BLOCKED
     satisfied: [APPLICATION-DOMAIN]
-    create:
-      - action: CREATE
-        expectation: APPLICATION-VERIFICATION
-        subject: APPLICATION
-        capability: application.verification
-        authority: VERIFICATION
+    create: []
     wait:
       - action: WAIT
         expectation: APPLICATION-ARCHITECTURE
@@ -113,6 +113,13 @@ expect:
         authority: ARCHITECTURE
         providers: [APPLICATION-ARCHITECTURE]
         questions: [Q-APPLICATION-BOUNDARY]
+    pending:
+      - action: PENDING
+        expectation: APPLICATION-VERIFICATION
+        subject: APPLICATION
+        capability: application.verification
+        authority: VERIFICATION
+        depends_on: [APPLICATION-ARCHITECTURE]
 
   complete:
     status: COMPLETE
@@ -122,3 +129,4 @@ expect:
       - APPLICATION-VERIFICATION
     create: []
     wait: []
+    pending: []
