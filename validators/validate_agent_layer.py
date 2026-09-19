@@ -52,6 +52,14 @@ REQUIRED_SKILLS = {
         "## Output contract",
         "project-native canonical artifact",
     ),
+    "skills/artifacts/pinned-source-entity-set/SKILL.md": (
+        "# Pinned Source Entity Set",
+        "## Trigger",
+        "## Inputs",
+        "## Procedure",
+        "## Output contract",
+        "project-native",
+    ),
 }
 
 
