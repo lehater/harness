@@ -22,6 +22,14 @@ def _capabilities(items):
     return sorted(item["capability"] for item in items)
 
 
+def _boundary(label):
+    return {
+        "semantic_cohesion": label,
+        "independent_change": label,
+        "public_contract": label,
+    }
+
+
 def main() -> int:
     errors: list[str] = []
     fixtures = sorted((ROOT / "spec/engineering-graph-acceptance").glob("*.yaml"))
@@ -36,11 +44,7 @@ def main() -> int:
 
             graph = doc["graph"]
             validate_engineering_graph(graph)
-            target = next(
-                item["id"]
-                for item in graph["consumers"]
-                if item["id"] == "IMPLEMENTATION"
-            )
+            target = "IMPLEMENTATION"
             profile = derive_profile(graph, target)
 
             by_id = {item["id"]: item for item in profile["expectations"]}
@@ -105,7 +109,6 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"{path.relative_to(ROOT)}: {exc}")
 
-    # Structural invalidity: one capability cannot have two semantic producers.
     invalid_multiple_producers = {
         "version": 1,
         "kind": "harness-engineering-graph",
@@ -114,23 +117,13 @@ def main() -> int:
             {
                 "id": "A",
                 "responsibility": "A",
-                "boundary": {
-                    "semantic_cohesion": "A",
-                    "independent_change": "A",
-                    "public_contract": "A",
-                },
-                "requires": [],
+                "boundary": _boundary("A"),
                 "produces": ["x"],
             },
             {
                 "id": "B",
                 "responsibility": "B",
-                "boundary": {
-                    "semantic_cohesion": "B",
-                    "independent_change": "B",
-                    "public_contract": "B",
-                },
-                "requires": [],
+                "boundary": _boundary("B"),
                 "produces": ["x"],
             },
         ],
@@ -147,12 +140,7 @@ def main() -> int:
             {
                 "id": "DOMAIN",
                 "responsibility": "Domain",
-                "boundary": {
-                    "semantic_cohesion": "Domain",
-                    "independent_change": "Domain",
-                    "public_contract": "Domain",
-                },
-                "requires": [],
+                "boundary": _boundary("Domain"),
                 "produces": ["domain.tactical"],
             },
         ],
@@ -176,28 +164,46 @@ def main() -> int:
             {
                 "id": "A",
                 "responsibility": "A",
-                "boundary": {
-                    "semantic_cohesion": "A",
-                    "independent_change": "A",
-                    "public_contract": "A",
-                },
-                "requires": ["b"],
-                "produces": ["a"],
+                "boundary": _boundary("A"),
+                "produces": [
+                    {"capability": "a", "requires": ["b"]}
+                ],
             },
             {
                 "id": "B",
                 "responsibility": "B",
-                "boundary": {
-                    "semantic_cohesion": "B",
-                    "independent_change": "B",
-                    "public_contract": "B",
-                },
-                "requires": ["a"],
-                "produces": ["b"],
+                "boundary": _boundary("B"),
+                "produces": [
+                    {"capability": "b", "requires": ["a"]}
+                ],
             },
         ],
         "consumers": [
             {"id": "IMPLEMENTATION", "purpose": "Build", "requires": ["a"]}
+        ],
+    }
+
+    valid_same_authority_chain = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "SAME-AUTHORITY-CHAIN",
+        "authorities": [
+            {
+                "id": "PRODUCT",
+                "responsibility": "Product",
+                "boundary": _boundary("Product"),
+                "produces": [
+                    {"capability": "problem", "requires": []},
+                    {"capability": "requirements", "requires": ["problem"]},
+                ],
+            },
+        ],
+        "consumers": [
+            {
+                "id": "IMPLEMENTATION",
+                "purpose": "Build",
+                "requires": ["requirements"],
+            }
         ],
     }
 
@@ -214,6 +220,14 @@ def main() -> int:
             errors.append(
                 f"invalid Engineering Graph passed validation: {invalid['id']}"
             )
+
+    try:
+        validate_engineering_graph(valid_same_authority_chain)
+    except CoreError as exc:
+        errors.append(
+            "same-Authority acyclic production chain should be valid: "
+            f"{exc}"
+        )
 
     if errors:
         print("Harness Engineering Graph validation failed:", file=sys.stderr)
