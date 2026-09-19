@@ -76,6 +76,16 @@ def main() -> int:
 
             resolution = expect["resolution"]
             resolved = resolve_question(copy.deepcopy(model), resolution["question"], resolution["artifact"])
+            after_action = resolution.get("next_action")
+            if after_action:
+                actual_after = next_action(resolved, after_action["capability"])
+                for key, value in after_action.items():
+                    if key == "capability":
+                        continue
+                    if actual_after.get(key) != value:
+                        raise CoreError(
+                            f"resolved next-action {key} mismatch: {actual_after.get(key)!r} != {value!r}"
+                        )
             if unresolved_questions(resolved) != sorted(resolution["unresolved_after"]):
                 raise CoreError("resolve-question did not clear unresolved question")
             if blocked(resolved, block["artifact"]) != sorted(resolution["blocked_after"]):
