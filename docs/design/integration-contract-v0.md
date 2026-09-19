@@ -1,0 +1,89 @@
+# Harness Integration Contract v0
+
+Status: canonical.
+
+This document defines the repository-independent boundary between Harness and a project that uses it.
+
+## Contract
+
+Every integrated project presents the same two logical inputs to Harness:
+
+1. an **Engineering Graph**: normative producer/consumer topology for engineering knowledge;
+2. a **Core realization**: the accepted current knowledge state used to evaluate that topology.
+
+Harness evaluates a selected Consumer and returns the derived target state (`COMPLETE`, `CREATE`, `WAIT`, `PENDING`) and may route actionable `CREATE` work through the agent skill registry.
+
+The contract is logical, not a mandatory directory layout. Projects may persist either input or derive it at invocation time.
+
+## Ownership boundary
+
+The project owns product/domain/architecture truth, CanonicalArtifact semantic acceptance, project-specific CapabilityIds, applicability/coverage policy, and mapping existing project truth into the Harness inputs.
+
+Harness owns Engineering Graph validation, producer/prerequisite rules, recursive Consumer closure, Core structural validation, target-state evaluation, and generic CREATE-to-skill routing by `knowledge_kind`.
+
+Harness must not infer project semantics from arbitrary prose or require duplication of an existing canonical graph merely to integrate.
+
+## Integration modes
+
+There are two conforming modes. They differ only in how the same logical inputs are obtained.
+
+### Direct declaration
+
+Use when the project has no existing machine-readable owner for the relevant topology/state. A conventional layout is:
+
+```text
+.harness/
+  engineering-graph.yaml
+  core.yaml
+```
+
+The filenames are conventional, not Core entities. Persist only integration metadata with continuing project value.
+
+### Adapter projection
+
+Use when the project already has canonical machine-readable graphs, completeness policy, or other structured ownership metadata. A project-owned adapter derives an Engineering Graph and/or Core realization. Derived documents may remain ephemeral.
+
+Adapter output must satisfy exactly the same Harness schemas and runtime semantics as direct declaration. Harness evaluation must contain no project-specific branches.
+
+## Canonical invocation
+
+A conforming integration performs the equivalent of:
+
+```sh
+python engineering_graph.py validate <engineering-graph>
+python engineering_graph.py evaluate <engineering-graph> <consumer> <core-realization>
+```
+
+For agent execution, actionable CREATE results may additionally be routed with `agent_router.py`.
+
+CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch.
+
+## Derived Design Profiles
+
+A Design Profile derived from an Engineering Graph is a runtime view. It is not a second normative policy owner and normally must not be persisted.
+
+A separately authored Design Profile remains supported for consumers of `target_state.py`, but it is not required by the canonical Engineering Graph integration.
+
+## Managed workspace
+
+The managed knowledge workspace is optional and orthogonal. A project may use `.harness/knowledge/**`, `workspace.py`, and generated documentation when it wants Harness-managed typed semantic artifacts. This does not change the Engineering Graph/Core integration contract and must not force other projects to adopt managed knowledge.
+
+## CI boundary
+
+Permanent project CI should verify the contract, not preserve pilot experiments. A normal integration check should obtain a pinned Harness version, derive inputs when adapters are used, validate the Engineering Graph and Core realization, evaluate selected Consumer(s), and enforce project-owned target assertions.
+
+Large mutation scenarios used to prove Harness semantics belong in Harness acceptance tests. Consumer repositories should retain only assertions that express their own integration contract.
+
+## Portability invariant
+
+Nutrition Management and NAPMS must be able to use the same Harness evaluator and result semantics. Nutrition may directly declare its Engineering Graph/Core realization. NAPMS may project them from its existing canonical graph and completeness/coverage policy. That difference is behind the project-owned adapter boundary.
+
+If supporting either project requires project-specific logic inside Harness evaluation, the integration contract has failed and the abstraction must be reconsidered.
+
+## Non-contract pilot material
+
+Names such as `*-pilot`, experimental mutation workflows, research findings and branch-specific pinning are evidence used to establish this contract. They are not required parts of an integrated project's permanent repository.
+
+## Versioning
+
+This is Integration Contract v0. Breaking changes to the logical Engineering Graph/Core boundary require an explicit contract revision and consumer migration. Additive tooling or new distribution mechanisms do not by themselves change the semantic contract.

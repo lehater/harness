@@ -14,13 +14,13 @@ From that declared structure it derives `affected`, unresolved `questions`, capa
 
 Target repositories remain the source of product/domain/architecture truth. Harness validates ownership, references, dependencies and capability ownership; it does not copy or interpret arbitrary engineering semantics.
 
-Start with `docs/design/core-v0.md`.
+Start with `docs/design/core-v0.md`. For project integration, use `docs/design/integration-contract-v0.md`.
 
 There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
 
 ## Engineering Graph v0
 
-The experimental `pilot/engineering-graph-v0` branch adds a normative producer/consumer layer above Core.
+Engineering Graph v0 is the canonical normative producer/consumer layer above Core.
 
 Core remains the accepted knowledge state. The Engineering Graph declares:
 
@@ -37,7 +37,7 @@ python engineering_graph.py profile /path/to/engineering-graph.yaml IMPLEMENTATI
 python engineering_graph.py evaluate /path/to/engineering-graph.yaml IMPLEMENTATION /path/to/core-model.yaml
 ```
 
-See `docs/design/engineering-graph-v0.md`. This model is branch-only until it passes real Nutrition Management and NAPMS consumer tests.
+See `docs/design/engineering-graph-v0.md`. The repository integration boundary is defined by `docs/design/integration-contract-v0.md` and has been validated against Nutrition Management, NAPMS, and the greenfield acceptance project.
 
 ## Design target state
 
