@@ -177,6 +177,31 @@ def completeness(expectations: list[dict[str, str]], coverage: list[dict[str, st
     return missing
 
 
+def design_frontier(
+    model: dict[str, Any],
+    expectations: list[dict[str, str]],
+    coverage: list[dict[str, str]],
+) -> dict[str, Any]:
+    """Return all immediately designable missing expectations, or their blockers."""
+    missing = completeness(expectations, coverage)
+    if not missing:
+        return {"status": "COMPLETE", "design": [], "wait": []}
+    design: list[dict[str, Any]] = []
+    wait: list[dict[str, Any]] = []
+    for expectation in missing:
+        action = next_action(model, expectation["capability"])
+        item = {**action, "expectation": expectation}
+        if action["action"] == "DESIGN":
+            design.append(item)
+        else:
+            wait.append(item)
+    return {
+        "status": "READY" if design else "BLOCKED",
+        "design": design,
+        "wait": wait,
+    }
+
+
 def next_missing_action(
     model: dict[str, Any],
     expectations: list[dict[str, str]],
