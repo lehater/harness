@@ -74,11 +74,6 @@ expect_profile:
 cases:
   empty:
     model:
-      authorities:
-        - {id: DISCOVERY}
-        - {id: PRODUCT}
-        - {id: ARCHITECTURE}
-        - {id: VERIFICATION}
       artifacts: []
       questions: []
     expect:
@@ -90,11 +85,6 @@ cases:
 
   partial:
     model:
-      authorities:
-        - {id: DISCOVERY}
-        - {id: PRODUCT}
-        - {id: ARCHITECTURE}
-        - {id: VERIFICATION}
       artifacts:
         - id: PROBLEM
           authority: DISCOVERY
@@ -111,11 +101,6 @@ cases:
 
   semantic_block:
     model:
-      authorities:
-        - {id: DISCOVERY}
-        - {id: PRODUCT}
-        - {id: ARCHITECTURE}
-        - {id: VERIFICATION}
       artifacts:
         - id: PROBLEM
           authority: DISCOVERY
@@ -141,11 +126,6 @@ cases:
 
   complete:
     model:
-      authorities:
-        - {id: DISCOVERY}
-        - {id: PRODUCT}
-        - {id: ARCHITECTURE}
-        - {id: VERIFICATION}
       artifacts:
         - id: PROBLEM
           authority: DISCOVERY
