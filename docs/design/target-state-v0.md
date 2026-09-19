@@ -36,6 +36,8 @@ Each expectation means:
 
 The profile declares required knowledge, not where or how that knowledge must be documented.
 
+`subject` identifies the scope/entity of the expectation for humans, profile synthesis and reporting. It is **not** a hidden provider selector. Target-state provider resolution is by `CapabilityId` and Authority. When several artifacts under one Authority provide the same broad capability but cover different subjects, a per-subject expectation must use a sufficiently scoped CapabilityId (possibly derived ephemerally from target-owned coverage metadata) or a project-specific coverage check before target-state evaluation. A broad capability must not be relied upon to prove subject-specific coverage.
+
 `depends_on` is knowledge ordering for the agent, not a project workflow. It answers whether the downstream knowledge can responsibly be formed without inventing an upstream decision.
 
 Dependencies must reference expectations in the same profile and must be acyclic.
@@ -100,6 +102,7 @@ Design Profile is intentionally small. It does not prescribe:
 - project stages or workflow status;
 - implementation tasks;
 - approval/readiness gates;
-- semantic interpretation of arbitrary prose.
+- semantic interpretation of arbitrary prose;
+- implicit subject-to-provider matching beyond the declared CapabilityId.
 
 Starter profiles under `profiles/**` are reusable checklists, not universal proof that a selected target is complete. An agent must adapt them to the target repository and scope.
