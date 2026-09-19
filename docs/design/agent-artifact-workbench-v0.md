@@ -105,11 +105,11 @@ Neither form of validation declares the capability provided.
 
 Only after semantic acceptance should the agent:
 
-1. place the artifact under `.harness/knowledge/**`;
+1. move a Harness-managed artifact under `.harness/knowledge/**`, or place a project-native artifact at its target repository canonical path;
 2. register the corresponding `CanonicalArtifact` in `.harness/graph.yaml`;
 3. add the accepted `CapabilityId` to `provides`;
 4. record the canonical artifact dependencies actually used;
-5. render `docs/generated/**`;
+5. render `docs/generated/**` only for Harness-managed artifacts that have a renderer;
 6. re-evaluate target state.
 
 ## Semantic acceptance
@@ -122,7 +122,7 @@ Before registering `provides`, the agent must establish all of the following:
 4. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
 5. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
 6. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
-7. **Schema validity** — the candidate passes its schema-specific validator.
+7. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
 8. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
 Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
