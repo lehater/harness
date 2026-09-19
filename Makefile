@@ -5,5 +5,6 @@ harness-check:
 	python validators/validate_adapters.py
 	python validators/validate_target_state.py
 	python validators/validate_engineering_graph.py
+	python validators/validate_authority_catalog.py
 	python validators/validate_workspace.py
 	python validators/validate_agent_layer.py
