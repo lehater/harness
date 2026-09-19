@@ -39,6 +39,7 @@ authorities:
       public_contract: Produces implementation-facing architecture constraints.
     produces:
       - capability: csv-deduplicator.architecture
+        knowledge_kind: system-architecture
         requires:
           - capability: csv-deduplicator.product-intent
 
@@ -50,6 +51,7 @@ authorities:
       public_contract: Produces the canonical CLI contract.
     produces:
       - capability: csv-deduplicator.cli-contract
+        knowledge_kind: interface-contract
         requires:
           - capability: csv-deduplicator.acceptance
           - capability: csv-deduplicator.architecture
@@ -62,11 +64,13 @@ authorities:
       public_contract: Produces implementation plan and completion criteria.
     produces:
       - capability: csv-deduplicator.implementation-plan
+        knowledge_kind: implementation-design
         requires:
           - capability: csv-deduplicator.product-intent
           - capability: csv-deduplicator.architecture
           - capability: csv-deduplicator.cli-contract
       - capability: csv-deduplicator.completion-criteria
+        knowledge_kind: implementation-design
         requires:
           - capability: csv-deduplicator.implementation-plan
 
@@ -85,6 +89,7 @@ authorities:
           - capability: csv-deduplicator.cli-contract
           - capability: csv-deduplicator.implementation-plan
       - capability: csv-deduplicator.acceptance-scenarios
+        knowledge_kind: acceptance-scenarios
         requires:
           - capability: csv-deduplicator.verification-strategy
 
