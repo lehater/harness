@@ -94,8 +94,6 @@ Do not merge this model to `main` yet.
 
 The following remain validation targets:
 
-- a true greenfield project where the agent creates accepted artifacts from the root frontier all the way to an implementation-ready target;
-- a standard/reference Authority catalog for new software projects, separated from project-specific topology;
 - first-class parameterized/scoped capabilities instead of adapter-encoded subject CapabilityIds;
 - automatic artifact-skill routing from a production contract;
 - whether project-specific applicability rules need any standard contract beyond evidence CapabilityIds;
@@ -103,3 +101,91 @@ The following remain validation targets:
 - larger graphs with many simultaneous unresolved Questions and multiple active target Consumers.
 
 The model should remain branch-only until at least the standard Authority catalog and one greenfield end-to-end run are exercised.
+
+
+## Greenfield end-to-end pilot
+
+Reference project:
+`examples/greenfield-csv-deduplicator/**`.
+
+The project was intentionally smaller than NAPMS and instantiated only:
+
+- DISCOVERY;
+- PRODUCT-REQUIREMENTS;
+- SYSTEM-ARCHITECTURE;
+- INTERFACE-DESIGN;
+- IMPLEMENTATION-DESIGN;
+- VERIFICATION-DESIGN.
+
+DDD, persistence, security, quality and operability Authorities were omitted
+because no independently owned decision class required those boundaries.
+
+The branch history records an agent-operated progression. Each artifact was
+created only after the current Engineering Graph evaluation exposed the matching
+`CREATE` frontier.
+
+Observed sequence:
+
+1. empty Core realization -> only `csv-deduplicator.problem-evidence` CREATE;
+2. accepted Problem Evidence -> Product Intent + Acceptance CREATE in parallel;
+3. accepted Product Requirements -> Architecture CREATE;
+4. accepted Architecture -> CLI Contract CREATE;
+5. accepted CLI Contract -> Implementation Plan CREATE;
+6. accepted Implementation Plan -> Completion Criteria and Verification Strategy
+   CREATE in parallel;
+7. accepted Verification Strategy -> Acceptance Scenarios CREATE;
+8. accepted Acceptance Scenarios -> target `IMPLEMENTATION` becomes `COMPLETE`.
+
+No manually maintained Design Profile or explicit gate checklist was changed
+during the progression. The target was derived from the same Engineering Graph
+at every commit.
+
+The pilot also confirms:
+
+- one canonical artifact may materialize several capabilities from one Authority
+  when they form one coherent accepted specification;
+- the graph naturally exposes parallel design work when prerequisites permit it;
+- the implementation readiness boundary is a satisfied terminal Consumer
+  contract rather than a special Gate entity;
+- a materially simpler project can omit most NAPMS Authorities without changing
+  the Harness execution model.
+
+## Reference Authority catalog
+
+`catalogs/software-authorities-v0.yaml` now records an experimental reference
+catalog distilled from NAPMS, Nutrition and legacy methodology.
+
+The catalog standardizes the Authority atomicity test:
+
+- semantic cohesion;
+- independent change;
+- public contract.
+
+It separates baseline boundary candidates from conditional ones. The catalog is
+not a required document sequence and does not contain project CapabilityIds.
+Concrete production contracts remain project Engineering Graph data.
+
+The greenfield pilot validates that a project can instantiate a strict subset of
+the reference catalog while using the same Engineering Graph runtime semantics.
+
+## Updated remaining validation targets
+
+The following are no longer unproven:
+
+- cross-consumer Nutrition/NAPMS compatibility;
+- Authority ownership projection into an otherwise empty Core realization;
+- a real agent-operated greenfield path from empty state to IMPLEMENTATION
+  COMPLETE;
+- a smaller project shape that omits most NAPMS Authorities.
+
+Still deliberately experimental:
+
+- first-class parameterized/scoped capabilities instead of adapter-encoded
+  subject CapabilityIds;
+- automatic artifact-skill routing from production contracts;
+- whether production contracts should reference an artifact type/skill contract
+  or remain pure knowledge topology;
+- project-specific applicability beyond the already proven evidence-capability
+  pattern;
+- legitimate engineering feedback topologies that may challenge the static DAG
+  assumption.
