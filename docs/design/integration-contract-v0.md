@@ -80,6 +80,28 @@ Nutrition Management and NAPMS must be able to use the same Harness evaluator an
 
 If supporting either project requires project-specific logic inside Harness evaluation, the integration contract has failed and the abstraction must be reconsidered.
 
+## Project engineering policy and coding boundary
+
+Projects may represent selected engineering principles or design discipline as ordinary project-owned capabilities. Harness does not make SOLID, Clean Architecture, DDD, CQRS, REST or similar methods universal evaluator invariants.
+
+When a project needs such discipline to constrain downstream design, the recommended pattern is:
+
+```text
+project engineering-policy capability
+        ↓
+applicable architecture/application/component production
+        ↓
+component-design capability
+        ↓
+implementation design / coding consumer
+```
+
+The policy artifact states concrete observable obligations; reusable artifact skills contain method knowledge for applying them. The Engineering Graph expresses when the accepted policy is a prerequisite.
+
+Projects that intend to hand implementation to coding agents with little architecturally significant freedom should expose an accepted component-design capability covering responsibility, contract ownership, dependency direction, composition/mapping boundaries and explicit implementation freedoms.
+
+This pattern requires no new Core entity and does not change Integration Contract v0.
+
 ## Non-contract pilot material
 
 Names such as `*-pilot`, experimental mutation workflows, research findings and branch-specific pinning are evidence used to establish this contract. They are not required parts of an integrated project's permanent repository.
