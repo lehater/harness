@@ -159,6 +159,38 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     return sorted(result)
 
 
+def completeness(expectations: list[dict[str, str]], coverage: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Derive missing subject/capability expectations from declared coverage."""
+    covered = {
+        (item.get("subject"), item.get("capability"))
+        for item in coverage
+        if item.get("subject") and item.get("capability")
+    }
+    missing: list[dict[str, str]] = []
+    for expectation in expectations:
+        subject = expectation.get("subject")
+        capability = expectation.get("capability")
+        if not subject or not capability:
+            raise CoreError("expectation subject and capability are required")
+        if (subject, capability) not in covered:
+            missing.append({"subject": subject, "capability": capability})
+    return missing
+
+
+def next_missing_action(
+    model: dict[str, Any],
+    expectations: list[dict[str, str]],
+    coverage: list[dict[str, str]],
+) -> dict[str, Any]:
+    """Resolve the first missing expectation into the next Core action."""
+    missing = completeness(expectations, coverage)
+    if not missing:
+        return {"action": "COMPLETE"}
+    expectation = missing[0]
+    action = next_action(model, expectation["capability"])
+    return {**action, "expectation": expectation}
+
+
 def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     """Return the next Core action for a required capability."""
     validate_model(model)
