@@ -1,0 +1,157 @@
+version: 1
+kind: harness-authority-catalog
+id: SOFTWARE-PRODUCT-REFERENCE-V0
+status: experimental
+
+principles:
+  atomicity_test:
+    - semantic_cohesion
+    - independent_change
+    - public_contract
+  notes:
+    - An Authority owns a coherent kind of engineering decision, not a stage, team, document or domain subject.
+    - Catalog entries are reference boundaries. A project instantiates only applicable Authorities and must justify merges or splits with the same atomicity test.
+    - Applicability changes the graph shape; it does not create workflow stages.
+    - A project-specific Authority is valid when its decision boundary cannot be represented coherently by the reference catalog.
+
+authorities:
+  - id: DISCOVERY
+    class: baseline
+    responsibility: Own problem observations, actors, desired outcomes and motivating evidence without deciding product requirements or solution semantics.
+    boundary:
+      semantic_cohesion: Evidence and observations about the problem space.
+      independent_change: Evidence can be refined before accepted product requirements change.
+      public_contract: Provides accepted problem evidence and unresolved discovery questions.
+    split_when:
+      - Independent evidence domains have different decision owners and public consumers.
+    merge_guidance: May be merged with PRODUCT-REQUIREMENTS only when problem evidence is trivial and has no independent lifecycle or provenance value.
+
+  - id: PRODUCT-REQUIREMENTS
+    class: baseline
+    responsibility: Own accepted product intent, scope, externally observable behavior, constraints and acceptance expectations.
+    boundary:
+      semantic_cohesion: Decisions about what the product must achieve.
+      independent_change: Product intent can change without directly deciding domain or technical realization.
+      public_contract: Provides accepted behavioral and acceptance semantics to downstream design.
+    split_when:
+      - Product policy and externally observable requirements have independent owners or change lifecycles.
+
+  - id: STRATEGIC-DOMAIN-DESIGN
+    class: conditional
+    applies_when: The product has non-trivial semantic ownership boundaries, multiple domain capabilities or independent domain lifecycles.
+    responsibility: Own semantic decomposition, domain responsibility boundaries and relationships between independently modeled domain areas.
+    boundary:
+      semantic_cohesion: Decisions about domain partitioning and public semantic relationships.
+      independent_change: Strategic decomposition can evolve without directly selecting tactical structures or technical architecture.
+      public_contract: Provides accepted semantic ownership boundaries and context relationships.
+    merge_guidance: For a simple domain with one coherent semantic owner, this may collapse into a single DOMAIN-DESIGN Authority.
+
+  - id: DOMAIN-USE-CASE-DESIGN
+    class: conditional
+    applies_when: Observable domain behavior needs an explicit stable contract before tactical modeling.
+    responsibility: Own domain-focused use-case behavior without deciding internal tactical structures or technical transport.
+    boundary:
+      semantic_cohesion: Observable domain behavior for bounded problem slices.
+      independent_change: Use-case behavior can be refined before tactical identities, invariants or persistence are selected.
+      public_contract: Provides accepted domain behavior to tactical modeling and application composition.
+    merge_guidance: May be absorbed by PRODUCT-REQUIREMENTS or TACTICAL-DOMAIN-DESIGN when no independently valuable use-case contract exists.
+
+  - id: TACTICAL-DOMAIN-DESIGN
+    class: conditional
+    applies_when: Domain identities, lifecycles, invariants or domain operations carry non-trivial semantics.
+    responsibility: Own tactical domain language, identities, lifecycles, invariants, decisions and public domain semantics.
+    boundary:
+      semantic_cohesion: Decisions about how accepted domain behavior is modeled semantically.
+      independent_change: Tactical semantics can evolve behind stable strategic/use-case contracts without selecting storage or transport.
+      public_contract: Provides accepted tactical domain semantics to application and technical design.
+    merge_guidance: For transactionally simple products without meaningful domain invariants, a lighter DOMAIN-DESIGN Authority may be sufficient.
+
+  - id: APPLICATION-DESIGN
+    class: conditional
+    applies_when: The product has cross-capability workflows, orchestration, journeys or application-level materialization semantics.
+    responsibility: Own application-level composition of accepted domain/product behavior.
+    boundary:
+      semantic_cohesion: Decisions about orchestration across domain responsibilities and user/system journeys.
+      independent_change: Application composition can evolve without re-owning underlying domain truth or technical architecture.
+      public_contract: Provides accepted application flows and orchestration semantics.
+
+  - id: SYSTEM-ARCHITECTURE
+    class: baseline
+    responsibility: Own system structure, runtime boundaries, dependency/consistency rules and technical interaction topology.
+    boundary:
+      semantic_cohesion: Structural and runtime decisions that constrain implementation.
+      independent_change: Architecture can evolve behind stable product/domain contracts without changing their semantic ownership.
+      public_contract: Provides accepted system topology and architectural constraints.
+
+  - id: SECURITY-ARCHITECTURE
+    class: conditional
+    applies_when: Authentication, identity, authorization boundaries, protected actions or trust zones require design decisions independent of general architecture.
+    responsibility: Own security architecture boundaries and admission/control structure.
+    boundary:
+      semantic_cohesion: Decisions about trust, identity and security enforcement structure.
+      independent_change: Security architecture can evolve independently from domain semantics and later threat analysis.
+      public_contract: Provides security architecture constraints to interfaces, quality, data and implementation.
+    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when security decisions are simple and have no independent public contract.
+
+  - id: INTERFACE-DESIGN
+    class: conditional
+    applies_when: The system exposes machine or human interfaces whose representation/interaction decisions need independent ownership.
+    responsibility: Own supported external interface contracts and shared technical representations.
+    boundary:
+      semantic_cohesion: Decisions about external interaction and representation.
+      independent_change: Interface contracts can evolve while preserving accepted domain/product semantics.
+      public_contract: Provides canonical machine/user interface contracts.
+
+  - id: DATA-DESIGN
+    class: conditional
+    applies_when: Persistence topology, schema constraints or storage representations carry independent engineering decisions.
+    responsibility: Own physical persistence and storage representation.
+    boundary:
+      semantic_cohesion: Decisions about durable physical data representation and constraints.
+      independent_change: Storage design can evolve behind stable domain/application contracts.
+      public_contract: Provides accepted persistence model and storage constraints.
+    merge_guidance: May stay inside SYSTEM-ARCHITECTURE for simple persistence with no independent constraints.
+
+  - id: QUALITY-DESIGN
+    class: conditional
+    applies_when: Architecture-significant performance, availability, scale, consistency or other quality constraints require explicit decisions.
+    responsibility: Own explicit realization quality constraints derived from accepted product/design truth.
+    boundary:
+      semantic_cohesion: Cross-cutting non-functional constraints on realization.
+      independent_change: Quality constraints can evolve without reallocating semantic ownership.
+      public_contract: Provides measurable or explicitly unresolved quality constraints to architecture, implementation and verification.
+    merge_guidance: Simple quality expectations may remain PRODUCT-REQUIREMENTS when they do not need independent design work.
+
+  - id: SECURITY-ANALYSIS
+    class: conditional
+    applies_when: Threat/control analysis is materially different from selecting security architecture.
+    responsibility: Own threat analysis and control coverage against accepted design.
+    boundary:
+      semantic_cohesion: Analysis of threats and mitigations against an already selected design baseline.
+      independent_change: Threat analysis can evolve without itself owning security architecture decisions.
+      public_contract: Provides threat/control evidence and routes missing design decisions upstream.
+
+  - id: OPERABILITY-DESIGN
+    class: conditional
+    applies_when: Runtime diagnosis, observability, correlation, health or operational recovery need explicit design.
+    responsibility: Own observability, diagnostic and operational evidence requirements.
+    boundary:
+      semantic_cohesion: Decisions about runtime visibility and diagnosability.
+      independent_change: Operability design can evolve without redefining product/domain/interface semantics.
+      public_contract: Provides runtime evidence requirements to implementation and verification.
+
+  - id: IMPLEMENTATION-DESIGN
+    class: baseline
+    responsibility: Own implementation slicing, sequencing, migration concerns and completion criteria after upstream engineering decisions are available.
+    boundary:
+      semantic_cohesion: Decisions about how accepted design will be realized in bounded implementation work.
+      independent_change: Realization order and slicing can change without redefining upstream truth.
+      public_contract: Provides implementation plan/completion criteria and routes missing semantic decisions upstream.
+
+  - id: VERIFICATION-DESIGN
+    class: baseline
+    responsibility: Own verification levels, traceability, scenarios and evidence proving implementation realizes accepted engineering knowledge.
+    boundary:
+      semantic_cohesion: Decisions about what executable or inspectable evidence proves accepted design.
+      independent_change: Verification strategy can evolve without taking ownership of product/domain/architecture semantics.
+      public_contract: Provides verification strategy and acceptance evidence; routes design gaps to owning Authorities.
