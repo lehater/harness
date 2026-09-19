@@ -14,7 +14,7 @@ from harness import CoreError  # noqa: E402
 from target_state import validate_profile  # noqa: E402
 
 REQUIRED_SKILLS = {
-    "skills/core/bootstrap-existing-project/SKILL.md": (
+    "skills/agent/bootstrap-existing-project/SKILL.md": (
         "# Bootstrap Existing Project",
         "## Trigger",
         "## Inputs",
@@ -22,7 +22,7 @@ REQUIRED_SKILLS = {
         "## Stop conditions",
         "## Output",
     ),
-    "skills/core/design-profile/SKILL.md": (
+    "skills/agent/design-profile/SKILL.md": (
         "# Design Profile",
         "## Trigger",
         "## Inputs",
