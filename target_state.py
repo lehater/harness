@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError, blocked, validate_model
+from harness import CoreError, blocked, capability_blockers, validate_model
 
 
 def _by_id(items: list[dict[str, Any]], kind: str) -> dict[str, dict[str, Any]]:
@@ -136,15 +136,29 @@ def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dic
             )
 
             if not providers:
-                create.append(
-                    {
-                        "action": "CREATE",
-                        "expectation": expectation_id,
-                        "subject": subject,
-                        "capability": capability,
-                        "authority": authority,
-                    }
-                )
+                blockers = capability_blockers(model, capability)
+                if blockers:
+                    wait.append(
+                        {
+                            "action": "WAIT",
+                            "expectation": expectation_id,
+                            "subject": subject,
+                            "capability": capability,
+                            "authority": authority,
+                            "providers": [],
+                            "questions": blockers,
+                        }
+                    )
+                else:
+                    create.append(
+                        {
+                            "action": "CREATE",
+                            "expectation": expectation_id,
+                            "subject": subject,
+                            "capability": capability,
+                            "authority": authority,
+                        }
+                    )
                 remaining.remove(expectation_id)
                 progressed = True
                 continue
