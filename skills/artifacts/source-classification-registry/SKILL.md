@@ -40,10 +40,11 @@ Historical WIP may be used as implementation evidence, never as accepted semanti
 6. Require deterministic resolution to exactly one category for every source entity. Rule precedence, overlap and override semantics must be explicit rather than implicit parser behavior.
 7. Reject duplicate/unknown ids, unmapped ids, ambiguous rule matches, unused rules and invalid category values.
 8. Do not infer canonical assignment from names, code prefixes, source-native groups, embeddings or model output unless the reviewed registry itself explicitly records the resulting rule/override decision.
-9. Agent/model-assisted classification may propose candidate rules or assignments, but ambiguous cases remain unaccepted until reviewed under the owning Authority.
-10. Build or reuse a target-project validator that materializes/resolves the registry against the exact pinned source set and proves exact-one coverage.
-11. Only after the full registry passes deterministic validation and semantic review should it be registered as the provider capability.
-12. Re-evaluate target state.
+9. Agent/model-assisted classification may propose candidate rules or assignments. The target validator should expose an internal candidate frontier such as resolved, unmapped and ambiguous source entities so the agent can iterate without pretending partial coverage is accepted.
+10. Do not create one Core Question per unresolved source row. Row-level ambiguity is candidate-work inside this artifact skill. Create a Core Question only when a recurring semantic class cannot be decided under the currently accepted taxonomy/assignment policy and therefore requires an Authority-level decision.
+11. Build or reuse a target-project validator that materializes/resolves the registry against the exact pinned source set and proves exact-one coverage.
+12. Only after the full registry passes deterministic validation and semantic review should it be registered as the provider capability.
+13. Re-evaluate target state.
 
 ## Stop conditions
 
@@ -66,6 +67,7 @@ The output contract must specify:
 - source entity key;
 - controlled category vocabulary;
 - exact-coverage validator;
+- candidate-frontier/report mode when the registry is review-heavy;
 - deterministic ordering/serialization where relevant.
 
 For the Nutrition Management BLS consumer, the project-native registry may compact repeated accepted decisions into explicit prefix rules with exact overrides:
