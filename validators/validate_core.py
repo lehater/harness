@@ -74,6 +74,14 @@ def main() -> int:
                         f"{completeness_expect['next_action']!r}"
                     )
 
+                complete_coverage = completeness_expect.get("complete_coverage")
+                if complete_coverage is not None:
+                    actual_complete = next_missing_action(model, expectations, complete_coverage)
+                    if actual_complete != {"action": "COMPLETE"}:
+                        raise CoreError(
+                            f"complete next-action mismatch: {actual_complete!r} != {{'action': 'COMPLETE'}}"
+                        )
+
             action = expect.get("next_action")
             if action:
                 actual_action = next_action(model, action["capability"])
