@@ -135,8 +135,16 @@ No Harness Core change is justified by this experiment.
 
 The problem is missing engineering knowledge, not missing graph mechanics. A new RuntimePolicy entity, Logging entity, Error entity, Configuration entity or telemetry-specific Core model would duplicate semantics already expressible as project capabilities and prerequisites.
 
-## Remaining evidence needed before canonicalization
+## Second-case validation and canonicalization evidence
 
-Nutrition is one local synchronous CLI shape. Before changing the reference catalog from experimental to stronger canonical status, validate the refined boundary on a materially different runtime shape: long-running service, background worker or distributed request path. NAPMS is not required yet; another suitable project can provide that evidence.
+The refined boundary was subsequently validated against NAPMS accepted design on a materially different runtime shape: a long-running HTTP modular monolith with server-side session identity and PostgreSQL readiness.
 
-The Nutrition result is sufficient to keep the work on a research branch and to create a reusable candidate skill, but not sufficient to make broad runtime-control claims universal.
+The second case preserves the same ownership split while adding lifecycle/health evidence that Nutrition did not exercise. In particular, liveness answers process/runtime aliveness without dependency traversal, while readiness reflects the required PostgreSQL dependency selected upstream by Architecture/Data Design. This demonstrates that health evidence can evolve inside Operability without moving dependency topology or application semantics into it.
+
+Across Nutrition and NAPMS the common residual responsibility is stable: runtime evidence / diagnosability. Logging, error handling, configuration and resilience remain cross-boundary concerns rather than Authorities.
+
+This is sufficient evidence to treat OPERABILITY-DESIGN as a reusable **conditional** Authority with merge guidance. It is not mandatory for every project: when runtime evidence has no independent lifecycle or consumers, the responsibility may remain coherently inside System Architecture or Verification Design.
+
+A future distributed/multi-process case remains useful for refining trace propagation/dependency fan-out, but it is no longer required to establish the atomic Authority boundary.
+
+No Harness Core change is justified by either case.
