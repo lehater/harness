@@ -17,6 +17,10 @@ Use when actionable CREATE work has `knowledge_kind: component-design`.
 - accepted project Engineering Policy/design constraints when present;
 - existing code only as evidence of current realization, never as authority over accepted design.
 
+## Read boundary
+
+Read the accepted upstream architecture/application/interface/data/policy knowledge required by the selected component scope plus existing code structure needed to avoid contradicting already-realized contracts. Existing code is evidence of current representation, not authority to redefine accepted semantics.
+
 ## Procedure
 
 1. Confirm upstream capabilities are accepted and identify all project-owned engineering-policy obligations.
@@ -92,3 +96,8 @@ A class diagram is optional. Classes are not mandatory when a function/value mod
 ## Registration
 
 Register the accepted project-native artifact under Component Design and provide the requested component-design capability. Dependencies include the canonical engineering policy and upstream design actually consumed.
+
+
+## Human projection
+
+Prefer a project-native component design document or structured design artifact that is directly reviewable by implementation agents and humans.
