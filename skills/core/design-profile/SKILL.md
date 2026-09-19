@@ -26,6 +26,7 @@ Use before target-state evaluation when no suitable profile exists, or when a co
 6. Prefer existing project vocabulary for capabilities and Authorities.
 7. Reuse a starter profile only as a checklist; adapt it to the actual repository.
 8. Evaluate the profile against the current Core graph and inspect the resulting frontier.
+9. If implementation later exposes a semantic capability that was genuinely required for the selected scope but absent from the profile, add that expectation after the gap is understood. Do not rely only on the historical Question: the refined profile should remember the newly demonstrated knowledge requirement.
 
 ## Review questions
 
