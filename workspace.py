@@ -340,13 +340,29 @@ def main() -> int:
     for name in ("validate", "render"):
         command = sub.add_parser(name)
         command.add_argument("root", nargs="?", default=".")
+    artifact_command = sub.add_parser("validate-artifact")
+    artifact_command.add_argument("path")
 
     args = parser.parse_args()
     if args.command == "validate":
         workspace = load_workspace(args.root)
         print(json.dumps({"valid": True, "target_state": workspace["target_state"]}, indent=2, sort_keys=True))
-    else:
+    elif args.command == "render":
         print(json.dumps(render_workspace(args.root), indent=2, sort_keys=True))
+    else:
+        document = _load_yaml(Path(args.path))
+        validate_knowledge_document(document)
+        print(
+            json.dumps(
+                {
+                    "valid": True,
+                    "artifact": document["artifact"],
+                    "schema": document["schema"],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
     return 0
 
 
