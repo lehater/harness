@@ -18,6 +18,8 @@ from harness import (  # noqa: E402
     capability_owner,
     next_action,
     capability_resolve,
+    completeness,
+    next_missing_action,
     resolve_question,
     unresolved_questions,
     validate_model,
@@ -55,6 +57,22 @@ def main() -> int:
                 raise CoreError("capability resolve mismatch")
             if capability_owner(model, cap["id"]) != cap["owner"]:
                 raise CoreError("capability owner mismatch")
+
+            completeness_expect = expect.get("completeness")
+            if completeness_expect:
+                expectations = completeness_expect["expectations"]
+                coverage = completeness_expect["coverage"]
+                actual_missing = completeness(expectations, coverage)
+                if actual_missing != completeness_expect["missing"]:
+                    raise CoreError(
+                        f"completeness mismatch: {actual_missing!r} != {completeness_expect['missing']!r}"
+                    )
+                actual_missing_action = next_missing_action(model, expectations, coverage)
+                if actual_missing_action != completeness_expect["next_action"]:
+                    raise CoreError(
+                        f"missing next-action mismatch: {actual_missing_action!r} != "
+                        f"{completeness_expect['next_action']!r}"
+                    )
 
             action = expect.get("next_action")
             if action:
