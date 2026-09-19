@@ -133,12 +133,13 @@ authorities:
 
   - id: OPERABILITY-DESIGN
     class: conditional
-    applies_when: Runtime diagnosis, observability, correlation, health or operational recovery need explicit design.
-    responsibility: Own observability, diagnostic and operational evidence requirements.
+    applies_when: Runtime diagnosis, correlation, health, dependency visibility or operational evidence needs an independently valuable pre-code contract.
+    responsibility: Own runtime evidence and diagnosability requirements derived from accepted product, architecture, interface, security and quality truth.
     boundary:
-      semantic_cohesion: Decisions about runtime visibility and diagnosability.
-      independent_change: Operability design can evolve without redefining product/domain/interface semantics.
-      public_contract: Provides runtime evidence requirements to implementation and verification.
+      semantic_cohesion: Decisions about what runtime evidence must exist so accepted behavior, lifecycle state and technical failure are diagnosable.
+      independent_change: Operability evidence can evolve without redefining product/domain/interface semantics or selecting telemetry implementation mechanics.
+      public_contract: Provides runtime evidence requirements to component, verification/test and implementation consumers while routing configuration, failure, security and reliability semantics to their owning Authorities.
+    merge_guidance: May remain inside SYSTEM-ARCHITECTURE or VERIFICATION-DESIGN when runtime evidence has no independent lifecycle or public consumers. Logging, configuration and error handling are not sufficient reasons to instantiate this Authority.
 
   - id: ENGINEERING-POLICY
     class: conditional
