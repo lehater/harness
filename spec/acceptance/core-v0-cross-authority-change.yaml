@@ -75,3 +75,8 @@ expect:
     artifact: POLICY-DOMAIN
     unresolved_after: []
     blocked_after: []
+    next_action:
+      capability: policy.withdrawal-implementation
+      action: DESIGN
+      authority: IMPLEMENTATION
+      providers: [POLICY-IMPLEMENTATION]
