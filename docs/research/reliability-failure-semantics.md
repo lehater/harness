@@ -217,6 +217,176 @@ Nutrition is deliberately local. NAPMS deliberately avoids asynchronous messagin
 
 Therefore a third synthetic distributed/event-driven case is required before claiming the reliability closure model is complete. It must be a research fixture, not a distortion of either pilot.
 
+
+## Validation case 3 — synthetic distributed/event-driven fixture
+
+This fixture exists only to pressure-test ownership and closure. It is not a new product repository and does not prescribe Kafka, a cloud provider, or a particular implementation.
+
+### Accepted baseline
+
+Consider an Order service that accepts a state-changing `PlaceOrder` command and publishes `OrderPlaced` to an at-least-once broker. A Fulfilment consumer reserves stock in its own durable store.
+
+The accepted success path is:
+
+```text
+client -> Order application -> Order state commit
+                           -> outbox/event
+broker -> Fulfilment consumer -> inventory reservation
+```
+
+Assume:
+- Order and Fulfilment own different durable state;
+- no distributed transaction spans them;
+- broker delivery is at least once;
+- acknowledgement can be lost;
+- consumers can crash after committing their local effect but before acknowledging;
+- messages can be delayed and, unless an ordering contract says otherwise, observed out of order;
+- the broker and dependencies have finite capacity.
+
+### Failure experiments
+
+#### F1 — producer commit succeeds, client response is lost
+
+The client cannot infer that `PlaceOrder` failed. Repeating the command can create a second order unless accepted Product/Domain/Application semantics define command identity/equivalent-repeat behavior or a reconciliation/readback path.
+
+Ownership result:
+- duplicate business effect: Domain/Product;
+- command identity and continuation after unknown completion: Application/Domain;
+- external representation of identity/status/readback: Interface;
+- durable uniqueness/transaction realization: Data;
+- timeout mechanics: implementation only after the semantic contract exists.
+
+A generic retry library cannot own this decision.
+
+#### F2 — consumer effect commits, acknowledgement is lost
+
+The broker redelivers `OrderPlaced`. At-least-once delivery therefore creates duplicate **attempts**, while the required semantic effect may still be exactly once per accepted event identity.
+
+Ownership result:
+- whether repeated event application may duplicate inventory reservation: Fulfilment Domain/Application;
+- event identity and deduplication contract: producer/consumer application contract, represented by Interface/event contract;
+- durable deduplication/atomic effect+receipt representation: Data/Application realization;
+- broker redelivery policy: System Architecture within accepted capacity/latency constraints.
+
+This demonstrates that transport delivery guarantee and business-effect guarantee are different knowledge.
+
+#### F3 — messages arrive out of order
+
+Suppose `OrderCancelled` can arrive before a delayed `OrderPlaced`.
+
+No generic reliability rule can decide the result. The owner of the state transition must define whether:
+- ordering is required and enforced;
+- versions/sequence numbers make stale events rejectable;
+- transitions commute;
+- later reconciliation repairs the state;
+- the event model itself is invalid for this use case.
+
+Ownership result: Domain/Application first; Interface represents ordering/version metadata; System Architecture selects delivery mechanisms capable of satisfying the accepted contract.
+
+#### F4 — downstream unavailable; producer retries
+
+Retrying delivery or dependency calls increases load. Independent retry layers can amplify one logical request into many attempts and worsen overload.
+
+Ownership result:
+- acceptable end-user delay/failure/degraded outcome: Product/Quality;
+- one retry-responsibility boundary, queue/buffer placement, circuit breaking, load shedding and isolation: System Architecture/Application;
+- retry budget/backoff/jitter: implementation freedom only inside accepted architecture/capacity constraints;
+- retry/load evidence: Operability.
+
+This confirms that "retry" spans several owners but does not create a coherent owner of its own.
+
+#### F5 — queue reaches capacity
+
+The system must choose among reject, block/backpressure, shed, spill, delay, or degrade. Each can change externally meaningful behavior and recovery time.
+
+Ownership result:
+- accepted rejection/degradation semantics and priority: Product/Application;
+- throughput/latency/headroom constraints: Quality;
+- queue limits, admission, partition/isolation and pressure propagation: System Architecture;
+- public overload response: Interface;
+- evidence: Operability.
+
+A queue/framework default is unsafe when it silently chooses one of these outcomes.
+
+#### F6 — poison message repeatedly fails
+
+Infinite retry prevents progress and can consume capacity. Moving the message aside permits progress but creates an unresolved business effect.
+
+Ownership result:
+- whether later messages may proceed and what unresolved state means: Domain/Application;
+- quarantine/dead-letter topology: System Architecture;
+- operator-visible evidence: Operability;
+- replay/reconciliation semantics: Domain/Application;
+- proof that replay cannot duplicate effects: Verification/Test.
+
+"Dead-letter queue" is therefore a mechanism, not the semantic answer.
+
+#### F7 — reconciliation after partial distributed success
+
+Order is accepted but inventory reservation remains unknown/unavailable.
+
+Possible policies—cancel order, keep pending, compensate, retry later, require operator action—are observably different product/domain outcomes. Architecture may provide saga/workflow/reconciliation machinery only after those outcomes are accepted.
+
+Ownership result: Product/Domain/Application own the transition policy; System/Data own durable coordination realization; Interface owns exposed state; Operability owns stuck/recovery evidence.
+
+### Fixture verdict
+
+The distributed case strengthens, rather than weakens, the two-project verdict.
+
+1. Failure semantics remain attached to the owner of the affected state, outcome or runtime boundary.
+2. No residual coherent decision set remains for RELIABILITY-DESIGN.
+3. A cross-Authority analysis step is valuable because the dangerous gaps occur **between** otherwise valid success-path contracts.
+4. Existing Core primitives can represent every discovered gap as a Question routed to its semantic owner.
+5. Reliability analysis itself need not become a canonical project Capability unless a concrete consumer requires an accepted coverage artifact. For implementation readiness, its useful effect is closure: all material concerns resolve to accepted capabilities or blocking Questions.
+
+## Reliability closure algorithm
+
+For a selected IMPLEMENTATION scope, an agent can perform this analysis without adding Core concepts.
+
+For every state-changing operation, external dependency and asynchronous boundary:
+
+1. identify the authoritative state/effect;
+2. enumerate material interruption points: before effect, during effect, after effect before acknowledgement, duplicate attempt, cancellation, dependency failure and overload;
+3. for each point ask what the caller/consumer can actually know;
+4. derive the allowed continuation: stop, retry, reconcile, compensate, degrade, reject or wait;
+5. locate the Authority that owns that outcome/state/continuation;
+6. classify the concern:
+   - `COVERED` — accepted knowledge answers it;
+   - `NOT_APPLICABLE` — accepted design removes the failure path;
+   - `DEFERRED_NONBLOCKING` — outside current implementation scope with an explicit reopening condition;
+   - `QUESTION` — coding would otherwise invent a material decision;
+7. route every `QUESTION` to the semantic owner;
+8. derive Verification/Test obligations from the accepted outcome;
+9. derive Operability evidence from the accepted failure/recovery states;
+10. permit implementation only when applicable blocking Questions are closed.
+
+This algorithm is a reusable analysis procedure, not a workflow stage and not a new graph entity.
+
+## Distributed validation conclusion
+
+The additional fixture provides the evidence previously missing from the two pilots.
+
+The no-RELIABILITY-DESIGN verdict now survives:
+- local transactional computation;
+- synchronous HTTP/modular-monolith mutation;
+- at-least-once asynchronous delivery;
+- ambiguous acknowledgement;
+- duplicate attempts;
+- reordering;
+- overload/backpressure;
+- poison work;
+- eventual reconciliation.
+
+This is enough to canonicalize the **ownership rule and analysis procedure** in Harness, subject to repository CI/contract checks. It is not evidence to add a Reliability Authority or any Core entity.
+
+Recommended canonicalization:
+- add a reusable `reliability-analysis` skill;
+- add a concise canonical rule that failure-path semantics follow the Authority owning the affected outcome/state/runtime boundary;
+- require the skill to route gaps as Questions and never repair them itself;
+- keep concurrency/distributed-consistency details for the later dedicated study;
+- keep numeric capacity/performance budgets for the later Performance/Capacity study.
+
+
 ## Harness consequences
 
 ### Core
@@ -237,7 +407,7 @@ Potential future catalog refinement: explicitly state in existing Authority cont
 
 ### Reusable skill
 
-Create a `reliability-analysis` skill after the distributed validation fixture confirms the routing rules.
+The distributed validation fixture confirms the routing rules; a `reliability-analysis` skill is now justified.
 
 Proposed responsibility:
 
@@ -267,7 +437,7 @@ This is a skill-level convention; it does not require Core states.
 
 1. Harness must explicitly prohibit coding/framework defaults from inventing retryability, uncertain-completion handling, duplicate-effect semantics, fallback/degradation and cancellation semantics.
 2. Timeout must be modeled in analysis as an observation boundary, not automatically as operation failure.
-3. A distributed/event-driven validation case is required before canonicalizing reusable reliability-analysis guidance.
+3. The distributed/event-driven validation case confirms that reusable reliability-analysis guidance can be canonicalized without a new Authority.
 
 ### P1
 
@@ -283,8 +453,8 @@ The pre-code invariant is:
 
 > For every material failure path in the selected implementation scope, the resulting externally meaningful outcome, authoritative state and permitted continuation must be derivable from accepted upstream knowledge; otherwise IMPLEMENTATION is blocked by a Question routed to the Authority that owns that semantic boundary.
 
-The current Core is sufficient. Two pilots support the no-RELIABILITY-DESIGN verdict. They do not prove distributed closure, so canonicalization should wait for one synthetic distributed/event-driven validation case.
+The current Core is sufficient. Two real pilots plus the synthetic distributed/event-driven fixture support the no-RELIABILITY-DESIGN verdict and provide enough evidence to canonicalize the ownership rule and reusable analysis procedure.
 
 ## Next research step
 
-Before moving to Deployment/Release/Change, add a minimal synthetic distributed reliability fixture exercising at-least-once delivery, uncertain acknowledgement, duplicate execution, ordering, retry amplification, backpressure and reconciliation. Use it only to validate ownership/routing and the proposed reliability-analysis skill; do not introduce new Core entities unless the existing graph fails to express a demonstrated case.
+Canonicalize the validated reliability-analysis procedure and ownership rule in a separate change, run repository checks, then begin the P0 Deployment / Release / Migration / Compatibility / Change research. Do not add a Reliability Authority or Core entity.
