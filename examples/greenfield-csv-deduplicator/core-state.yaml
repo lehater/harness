@@ -23,4 +23,13 @@ artifacts:
     depends_on:
       - PRODUCT-REQUIREMENTS
 
+  - id: CLI-CONTRACT
+    authority: INTERFACE-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
+    provides:
+      - csv-deduplicator.cli-contract
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+      - SYSTEM-ARCHITECTURE
+
 questions: []
