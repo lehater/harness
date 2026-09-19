@@ -78,42 +78,53 @@ def route_create_work(
         for item in registry.get("routes", [])
     }
 
-    routed: list[dict[str, Any]] = []
-    unrouted: list[dict[str, Any]] = []
+    groups: dict[tuple[str, str, str | None], list[dict[str, Any]]] = {}
+    untyped: list[dict[str, Any]] = []
 
     for item in result["create"]:
         capability = item["capability"]
         production = productions[capability]
         knowledge_kind = production.get("knowledge_kind")
-        base = {
-            "capability": capability,
-            "authority": item["authority"],
-            "expectation": item["expectation"],
-        }
         if knowledge_kind is None:
-            unrouted.append(
-                {
-                    **base,
-                    "reason": "NO_KNOWLEDGE_KIND",
-                }
-            )
+            untyped.append(item)
             continue
+        key = (item["authority"], item["subject"], knowledge_kind)
+        groups.setdefault(key, []).append(item)
 
+    routed: list[dict[str, Any]] = []
+    unrouted: list[dict[str, Any]] = []
+
+    for item in untyped:
+        unrouted.append(
+            {
+                "authority": item["authority"],
+                "subject": item["subject"],
+                "capabilities": [item["capability"]],
+                "expectations": [item["expectation"]],
+                "reason": "NO_KNOWLEDGE_KIND",
+            }
+        )
+
+    for (authority, subject, knowledge_kind), items in sorted(groups.items()):
+        base = {
+            "authority": authority,
+            "subject": subject,
+            "knowledge_kind": knowledge_kind,
+            "capabilities": sorted(item["capability"] for item in items),
+            "expectations": sorted(item["expectation"] for item in items),
+        }
         skill = routes.get(knowledge_kind)
         if skill is None:
             unrouted.append(
                 {
                     **base,
-                    "knowledge_kind": knowledge_kind,
                     "reason": "NO_REGISTERED_SKILL",
                 }
             )
             continue
-
         routed.append(
             {
                 **base,
-                "knowledge_kind": knowledge_kind,
                 "skill": skill,
             }
         )
