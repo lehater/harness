@@ -89,7 +89,7 @@ The target-state evaluator can operate once the project has a minimal Core graph
 
 Use prerequisite ordering so that only the first responsible knowledge frontier appears as `CREATE`. Downstream expectations remain `PENDING`.
 
-Bootstrapping Authorities and creating resulting CanonicalArtifacts are agent responsibilities described by `skills/core/bootstrap-existing-project/SKILL.md` and the artifact workbench.
+Bootstrapping Authorities and creating resulting CanonicalArtifacts are agent responsibilities described by `skills/agent/bootstrap-existing-project/SKILL.md` and the artifact workbench.
 
 ## Design boundary
 
