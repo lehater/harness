@@ -17,6 +17,17 @@ Use when a downstream artifact requires the exact entities present in a pinned e
 - source structure sufficient to extract entity identifiers;
 - verified source bytes.
 
+## Read boundary
+
+Read only:
+
+- the accepted source identity/version/digest;
+- the exact pinned source bytes;
+- the minimum source structure needed to extract stable entity identifiers;
+- accepted cardinality/identity constraints relevant to the selected source boundary.
+
+Do not use mirrors, examples or downstream derived datasets as substitutes for the pinned source bytes.
+
 ## Procedure
 
 1. Confirm the expectation is `CREATE`.
