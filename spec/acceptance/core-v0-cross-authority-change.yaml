@@ -16,6 +16,12 @@ model:
       provides: [policy.withdrawal-semantics]
       depends_on: []
 
+    - id: POLICY-RETENTION-DECISION
+      authority: POLICY
+      path: docs/policy-retention-decision.yaml
+      provides: [policy.retention-decision]
+      depends_on: []
+
     - id: POLICY-API
       authority: ARCHITECTURE
       path: docs/policy-api.yaml
@@ -134,3 +140,28 @@ expect:
     artifact: POLICY-DOMAIN
     unresolved_after: [Q-POLICY-RETENTION]
     blocked_after: [Q-POLICY-RETENTION]
+
+  external_resolution:
+    question: Q-POLICY-RETENTION
+    artifact: POLICY-RETENTION-DECISION
+    unresolved_after: [Q-POLICY-WITHDRAWAL]
+    frontier_after:
+      status: BLOCKED
+      design: []
+      wait:
+        - action: WAIT
+          capability: policy.withdrawal-implementation
+          authority: IMPLEMENTATION
+          providers: [POLICY-IMPLEMENTATION]
+          questions: [Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-implementation
+        - action: WAIT
+          capability: policy.withdrawal-verification
+          authority: VERIFICATION
+          providers: [POLICY-VERIFICATION]
+          questions: [Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-verification
