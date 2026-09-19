@@ -21,7 +21,7 @@ artifact skill for one CREATE
         ↓
 candidate canonical knowledge
         ↓
-schema validation
+typed schema or project validator
         ↓
 semantic acceptance by the agent
         ↓
@@ -58,11 +58,20 @@ A skill owns judgement-heavy procedure:
 
 A skill does not own target-project truth.
 
-### Artifact schema
+### Artifact contract
 
-A schema validates the structural contract of a managed knowledge artifact.
+An artifact skill may produce either:
 
-Schema validity is necessary but not sufficient for semantic acceptance.
+- a Harness-managed knowledge artifact with a typed Harness schema; or
+- a project-native canonical artifact with a deterministic project validator.
+
+Use a Harness schema when the knowledge has a stable reusable semantic shape such as a Domain Model or Verification Strategy.
+
+Prefer a project-native artifact when the canonical result is large target-specific data, code-generation input, source registry or another format already owned naturally by the target repository.
+
+Do not force project-specific data into a generic Harness DSL merely so every skill has a Harness schema.
+
+Structural validation is necessary but not sufficient for semantic acceptance.
 
 ### Renderer
 
@@ -72,15 +81,17 @@ Generated documentation is never an independent source of truth.
 
 ## Candidate versus accepted artifact
 
-The agent should draft a managed artifact as a candidate before registering it as a Core provider.
+The agent should draft an artifact as a candidate before registering it as a Core provider.
 
-Use:
+For Harness-managed YAML, use:
 
 ```sh
 python workspace.py validate-artifact /path/to/candidate.yaml
 ```
 
-This validates the artifact schema without declaring the capability provided.
+For project-native artifacts, run the target repository's deterministic validator against the exact required source/coverage contract.
+
+Neither form of validation declares the capability provided.
 
 Only after semantic acceptance should the agent:
 
@@ -127,7 +138,7 @@ Every artifact skill should state:
 - **Read boundary** — the minimum source set the agent should inspect;
 - **Procedure** — how the knowledge is derived;
 - **Stop conditions** — when the agent must create a Question instead of continuing;
-- **Output schema** — the managed artifact schema;
+- **Output contract** — either the managed artifact schema or the project-native format and deterministic validator;
 - **Acceptance checks** — artifact-specific checks in addition to the common semantic acceptance rules;
 - **Registration** — expected Core dependency/provides relationship;
 - **Human projection** — what generated document the renderer produces.
