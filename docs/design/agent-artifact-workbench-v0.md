@@ -141,7 +141,11 @@ The final semantic answer belongs in an Authority-owned canonical artifact, not 
 
 ## Implementation feedback
 
-A `COMPLETE` Design Profile means that the declared knowledge is structurally available and unblocked at that moment. It is not irreversible.
+A `COMPLETE` Design Profile means that the declared knowledge is structurally available and unblocked at that moment. It is not proof that product code already implements that knowledge.
+
+Classify implementation feedback before changing Harness state.
+
+### Missing semantic decision
 
 When implementation exposes a semantic case that the accepted provider does not actually decide:
 
@@ -153,19 +157,37 @@ When implementation exposes a semantic case that the accepted provider does not 
 6. resolve the Question only through Authority-owned canonical truth;
 7. re-evaluate and resume implementation when the required knowledge is unblocked.
 
-This feedback loop is a desired Harness behavior:
-
 ```text
 COMPLETE
 → implementation discovers real semantic gap
 → Question
 → BLOCKED / WAIT
 → canonical decision
-→ COMPLETE
+→ refined COMPLETE
 → resume implementation
 ```
 
-Do not preserve a green `COMPLETE` state by silently choosing an implementation convention for an unresolved domain/architecture decision.
+### Implementation or evidence lag
+
+When accepted canonical knowledge already decides the behavior, but current code, tests or other executable evidence do not yet realize/prove it:
+
+- do **not** create a Core Question;
+- do **not** add another Design Profile expectation for the same decision;
+- keep the design target state `COMPLETE`;
+- treat the finding as implementation or verification-evidence work under the target repository's own authorization and CI rules;
+- use implementation findings only as evidence that the realization is incomplete, never as a reason to rewrite accepted semantic truth to match current code.
+
+```text
+COMPLETE
+→ implementation/evidence does not match accepted knowledge
+→ COMPLETE remains
+→ authorized implementation / verification work
+→ executable evidence catches up
+```
+
+This distinction prevents Harness from becoming an implementation-status or workflow engine.
+
+Do not preserve a green `COMPLETE` state by silently choosing an implementation convention for an unresolved domain/architecture decision. Equally, do not manufacture a semantic Question merely because implementation lags behind already accepted knowledge.
 
 ## Skill contract
 
