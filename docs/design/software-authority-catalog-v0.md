@@ -26,7 +26,7 @@ IMPLEMENTATION-DESIGN
 VERIFICATION-DESIGN
 ```
 
-A domain-heavy product may additionally need strategic/tactical domain design, application composition, interface, data, quality, security and operability Authorities. A project that needs explicit cross-cutting design discipline or coding-agent structural constraints may also instantiate ENGINEERING-POLICY and COMPONENT-DESIGN.
+A domain-heavy product may additionally need strategic/tactical domain design, application composition, interface, data, quality, security and operability Authorities. A project that needs explicit cross-cutting design discipline, coding-agent structural constraints, or independently valuable executable pre-code test contracts may also instantiate ENGINEERING-POLICY, COMPONENT-DESIGN and TEST-DESIGN.
 
 Omitting a reference Authority is valid only when its decisions are absent or are coherently owned inside another atomic boundary. A merge is not valid merely to make the graph smaller.
 
@@ -90,3 +90,20 @@ Nutrition Management demonstrated both a solver boundary and persistence boundar
 NAPMS demonstrated the same pattern in a materially different modular application and project-owned graph/projection. Its engineering policy and component design were representable through ordinary Authority/Capability prerequisites without evaluator-specific logic.
 
 The evidence does not justify a new universal DesignConstraint Core entity. Existing Engineering Graph semantics already express policy availability, dependency and invalidation.
+
+
+## Test design
+
+`TEST-DESIGN` is a conditional boundary between verification intent and concrete test/code realization. It owns executable observable test contracts: preconditions, controlled operations, public or contract-level oracles, invariants/state transitions, failure and atomicity distinctions, and property/state-machine obligations where examples alone are weak.
+
+It does not own product/domain/architecture truth and does not standardize test frameworks, fixtures, mocks, assertion syntax or file layout. When Verification Design already states executable preconditions/operations/oracles and those contracts have no independent lifecycle, Test Design may remain merged into Verification Design.
+
+TDD is not implied. A project may select RED/GREEN/refactor or another test-first process through engineering/process policy. Writing a test first does not make that test semantic authority.
+
+### Evidence
+
+Nutrition Management demonstrated that a design-derived verification strategy still left material observable test contracts unspecified. Its canonicalization validation placed Test Design between Verification Design and terminal Implementation Design, and the project Harness integration evaluated the IMPLEMENTATION consumer COMPLETE with the new capability in closure.
+
+NAPMS, which already had named Test Intent scenarios, independently showed that Test Design adds executable oracle boundaries, atomicity, identity/history preservation, provider substitutability and property/state-machine obligations rather than merely restating verification levels. Its legacy graph also exposed why migration must preserve semantic dependency direction rather than mechanically reorder mixed legacy artifacts.
+
+No new Core entity is required; Test Design uses ordinary Authority/Capability production and prerequisite semantics.
