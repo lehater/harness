@@ -17,7 +17,8 @@ A Question contains no final semantic answer. Resolution means the addressed Aut
 - CanonicalArtifact provides CapabilityId.
 - CanonicalArtifact may `depends_on` other CanonicalArtifact IDs.
 - Question is addressed to one Authority.
-- An unresolved Question may `blocks` downstream artifacts.
+- An unresolved Question may `blocks` existing downstream artifacts.
+- An unresolved Question may `blocks_capabilities` when the semantic gap prevents a required capability from being formed before any provider artifact exists.
 - A resolved Question has `resolution: <artifact-id>` and that artifact must belong to the addressed Authority.
 
 ## Project model
@@ -38,6 +39,7 @@ questions:
     authority: DOMAIN
     text: What semantic choice remains unresolved?
     blocks: [DOWNSTREAM]
+    blocks_capabilities: [domain.future-capability]
 ```
 
 `path` addresses the project-owned canonical source. Harness owns only structural interpretation of this declaration; the target repository remains authoritative for the artifact contents.
@@ -87,13 +89,24 @@ The pilot confirmed that Core can:
 
 The canonical repair merged through the target repository's normal PR/CI path, and the synchronized downstream implementation remained green. No Core behavior change was required.
 
+### Pilot 3 — Nutrition Management BLS production-import slice
+
+An agent-driven Design Profile for the future BLS 4.0 production import exposed a different lifecycle of an unresolved semantic gap.
+
+The accepted source identity, evidence semantics, errata policy and food-category taxonomy already existed. The next missing knowledge was a deterministic assignment of every imported BLS food to exactly one project Food Category. The agent could not responsibly create that mapping from the accepted sources without a further Food Knowledge decision.
+
+At that point no category-mapping CanonicalArtifact existed yet. Artifact-only `Question.blocks` therefore could not express the blocker: target-state incorrectly kept returning `CREATE`.
+
+The minimal extension is `Question.blocks_capabilities`. It lets an unresolved Question block formation of a capability before a provider exists. Once the addressed Authority records the decision in a canonical artifact and the Question is resolved, the capability becomes `CREATE` again.
+
 ### Current conclusion
 
-The two pilots do not justify a Core v0.1 model extension.
+The BLS slice justifies one small Core extension: unresolved Questions may block CapabilityIds in addition to existing CanonicalArtifacts.
 
 Observed usage guidance:
 
 - `Question` is exceptional, not a mandatory work item.
+- use `blocks_capabilities` only when the unresolved semantic decision prevents creation of a provider that does not yet exist; use artifact `blocks` when a provider already exists.
 - `affected` is a dependency-impact closure, not a mandatory file-change list.
 - target repositories remain authoritative for semantic and dependency truth; a Core model should project existing project truth rather than create a second canonical graph.
 - Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.
