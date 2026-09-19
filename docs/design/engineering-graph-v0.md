@@ -128,6 +128,29 @@ consumers:
 
 A string in `produces` is shorthand for a root production contract with no prerequisites.
 
+## Knowledge kind and agent routing
+
+A production contract may optionally declare `knowledge_kind`.
+
+```yaml
+- capability: project.verification.strategy
+  knowledge_kind: verification-strategy
+  requires:
+    - capability: project.architecture
+```
+
+The three identities have different purposes:
+
+- **CapabilityId** — project-specific accepted knowledge identity used by producer/consumer topology and Core providers;
+- **knowledge_kind** — repository-independent semantic class of knowledge used only by the agent execution layer;
+- **artifact skill** — one registered procedure capable of forming that knowledge kind.
+
+Engineering Graph validation and target-state evaluation do not require `knowledge_kind`. A missing or unsupported kind leaves an actionable `CREATE` **unrouted**; it never changes `CREATE` into `WAIT` or `PENDING`.
+
+`agent_router.py` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
+
+When several simultaneously actionable capabilities share the same Authority, subject and knowledge kind, the router groups them into one artifact-work item. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities. Grouping is an agent execution projection, not a Core task entity.
+
 ## Derived target
 
 Selecting a Consumer recursively expands its required capabilities.
