@@ -1,0 +1,98 @@
+version: 1
+kind: harness-engineering-graph
+id: GREENFIELD-CSV-DEDUPLICATOR
+default_subject: CSV-DEDUPLICATOR
+
+authorities:
+  - id: DISCOVERY
+    responsibility: Own observed user problem and evidence for duplicate CSV cleanup.
+    boundary:
+      semantic_cohesion: Evidence about the user problem and desired outcome.
+      independent_change: Problem evidence can change before accepted product behavior changes.
+      public_contract: Produces accepted problem evidence for product requirements.
+    produces:
+      - capability: csv-deduplicator.problem-evidence
+        requires: []
+
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own accepted product intent, behavior and acceptance expectations.
+    boundary:
+      semantic_cohesion: Decisions about what the CSV deduplicator must do.
+      independent_change: Product behavior can change without selecting technical architecture.
+      public_contract: Produces product intent and acceptance semantics.
+    produces:
+      - capability: csv-deduplicator.product-intent
+        requires:
+          - capability: csv-deduplicator.problem-evidence
+      - capability: csv-deduplicator.acceptance
+        requires:
+          - capability: csv-deduplicator.problem-evidence
+
+  - id: SYSTEM-ARCHITECTURE
+    responsibility: Own executable system structure and technical constraints.
+    boundary:
+      semantic_cohesion: Structural decisions about the local CLI application.
+      independent_change: Architecture can change while accepted behavior remains stable.
+      public_contract: Produces implementation-facing architecture constraints.
+    produces:
+      - capability: csv-deduplicator.architecture
+        requires:
+          - capability: csv-deduplicator.product-intent
+
+  - id: INTERFACE-DESIGN
+    responsibility: Own the supported command-line interface contract.
+    boundary:
+      semantic_cohesion: Decisions about user-facing command arguments, outputs and errors.
+      independent_change: CLI representation can evolve while product semantics remain stable.
+      public_contract: Produces the canonical CLI contract.
+    produces:
+      - capability: csv-deduplicator.cli-contract
+        requires:
+          - capability: csv-deduplicator.acceptance
+          - capability: csv-deduplicator.architecture
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation slicing and completion criteria.
+    boundary:
+      semantic_cohesion: Decisions about realizing accepted design as bounded implementation work.
+      independent_change: Implementation order can change without redefining upstream behavior.
+      public_contract: Produces implementation plan and completion criteria.
+    produces:
+      - capability: csv-deduplicator.implementation-plan
+        requires:
+          - capability: csv-deduplicator.product-intent
+          - capability: csv-deduplicator.architecture
+          - capability: csv-deduplicator.cli-contract
+      - capability: csv-deduplicator.completion-criteria
+        requires:
+          - capability: csv-deduplicator.implementation-plan
+
+  - id: VERIFICATION-DESIGN
+    responsibility: Own evidence proving the CLI realizes accepted behavior.
+    boundary:
+      semantic_cohesion: Decisions about tests and acceptance evidence.
+      independent_change: Verification design can change without owning product or architecture semantics.
+      public_contract: Produces verification strategy and acceptance scenarios.
+    produces:
+      - capability: csv-deduplicator.verification-strategy
+        requires:
+          - capability: csv-deduplicator.acceptance
+          - capability: csv-deduplicator.architecture
+          - capability: csv-deduplicator.cli-contract
+          - capability: csv-deduplicator.implementation-plan
+      - capability: csv-deduplicator.acceptance-scenarios
+        requires:
+          - capability: csv-deduplicator.verification-strategy
+
+consumers:
+  - id: IMPLEMENTATION
+    purpose: Implement the CSV deduplicator without inventing product, interface, architecture or verification decisions.
+    requires:
+      - capability: csv-deduplicator.product-intent
+      - capability: csv-deduplicator.acceptance
+      - capability: csv-deduplicator.architecture
+      - capability: csv-deduplicator.cli-contract
+      - capability: csv-deduplicator.implementation-plan
+      - capability: csv-deduplicator.completion-criteria
+      - capability: csv-deduplicator.verification-strategy
+      - capability: csv-deduplicator.acceptance-scenarios
