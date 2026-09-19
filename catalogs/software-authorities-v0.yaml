@@ -160,6 +160,16 @@ authorities:
       public_contract: Provides code-design boundaries sufficient for implementation agents to avoid inventing architecturally significant structure.
     merge_guidance: May remain inside APPLICATION-DESIGN or IMPLEMENTATION-DESIGN for simple systems where component structure has no independently valuable contract.
 
+  - id: TEST-DESIGN
+    class: conditional
+    applies_when: Coding or test agents would otherwise need to invent material executable oracles, or accepted verification obligations need an independently valuable pre-code refinement into test contracts.
+    responsibility: Own executable observable test contracts derived from accepted verification and semantic design without owning production semantics or concrete test-code mechanics.
+    boundary:
+      semantic_cohesion: Preconditions, controlled operations, observable oracles, invariants, state transitions, failure/atomicity distinctions and property/state-machine obligations.
+      independent_change: Test contracts can survive changes in implementation slicing, code structure, frameworks and test mechanics while accepted behavior remains stable.
+      public_contract: Provides traceable executable test semantics sufficient for test-first or implementation work without allowing tests to invent upstream truth.
+    merge_guidance: May remain inside VERIFICATION-DESIGN when verification scenarios already specify executable preconditions/operations/oracles and have no independent lifecycle. TDD is not implied by this Authority.
+
   - id: IMPLEMENTATION-DESIGN
     class: baseline
     responsibility: Own implementation slicing, sequencing, migration concerns and completion criteria after upstream engineering decisions are available.
