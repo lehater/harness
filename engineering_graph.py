@@ -50,8 +50,9 @@ def _requirement(value: object, where: str) -> dict[str, str]:
     return result
 
 
-def _requirements(item: dict[str, Any], where: str) -> list[dict[str, str]]:
-    values = item.get("requires", []) or []
+def _requirements(values: object, where: str) -> list[dict[str, str]]:
+    if values is None:
+        values = []
     if not isinstance(values, list):
         raise CoreError(f"{where} requires must be a list")
     result = [_requirement(value, where) for value in values]
@@ -59,6 +60,46 @@ def _requirements(item: dict[str, Any], where: str) -> list[dict[str, str]]:
     if len(keys) != len(set(keys)):
         raise CoreError(f"{where} has duplicate requirements")
     return result
+
+
+def _production(value: object, authority_id: str) -> dict[str, Any]:
+    where = f"authority {authority_id} production"
+    if isinstance(value, str):
+        value = {"capability": value, "requires": []}
+    if not isinstance(value, dict):
+        raise CoreError(f"{where} must be a capability id or mapping")
+    unknown = set(value) - {"capability", "requires"}
+    if unknown:
+        raise CoreError(f"{where} has unknown fields: {sorted(unknown)}")
+    capability = value.get("capability")
+    if not isinstance(capability, str) or not capability:
+        raise CoreError(f"{where} capability is required")
+    return {
+        "capability": capability,
+        "requires": _requirements(
+            value.get("requires", []),
+            f"production {capability}",
+        ),
+    }
+
+
+def _productions(authority: dict[str, Any]) -> list[dict[str, Any]]:
+    authority_id = authority["id"]
+    values = authority.get("produces", []) or []
+    if not isinstance(values, list):
+        raise CoreError(f"authority {authority_id} produces must be a list")
+    result = [_production(value, authority_id) for value in values]
+    capabilities = [item["capability"] for item in result]
+    if len(capabilities) != len(set(capabilities)):
+        raise CoreError(f"authority {authority_id} has duplicate produced capabilities")
+    return result
+
+
+def _consumer_requirements(consumer: dict[str, Any]) -> list[dict[str, str]]:
+    return _requirements(
+        consumer.get("requires", []),
+        f"consumer {consumer['id']}",
+    )
 
 
 def validate_engineering_graph(graph: dict[str, Any]) -> None:
@@ -81,6 +122,8 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
         raise CoreError(f"authority and consumer ids must be distinct: {sorted(overlap)}")
 
     producer_by_capability: dict[str, str] = {}
+    production_by_capability: dict[str, dict[str, Any]] = {}
+
     for authority_id, authority in authorities.items():
         responsibility = authority.get("responsibility")
         if not isinstance(responsibility, str) or not responsibility.strip():
@@ -96,22 +139,21 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
                     f"authority {authority_id} boundary.{field} is required"
                 )
 
-        produces = authority.get("produces", []) or []
-        if not isinstance(produces, list):
-            raise CoreError(f"authority {authority_id} produces must be a list")
-        if len(produces) != len(set(produces)):
-            raise CoreError(f"authority {authority_id} has duplicate produced capabilities")
-        for capability in produces:
-            if not isinstance(capability, str) or not capability:
-                raise CoreError(f"authority {authority_id} has invalid produced capability")
+        if "requires" in authority:
+            raise CoreError(
+                f"authority {authority_id} must declare prerequisites per produced capability; "
+                "top-level authority.requires is not part of Engineering Graph v0"
+            )
+
+        for production in _productions(authority):
+            capability = production["capability"]
             previous = producer_by_capability.setdefault(capability, authority_id)
             if previous != authority_id:
                 raise CoreError(
                     f"capability {capability} has multiple producer Authorities: "
                     f"{previous}, {authority_id}"
                 )
-
-        _requirements(authority, f"authority {authority_id}")
+            production_by_capability[capability] = production
 
     if not producer_by_capability:
         raise CoreError("engineering graph must declare at least one produced capability")
@@ -120,19 +162,19 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
         purpose = consumer.get("purpose")
         if not isinstance(purpose, str) or not purpose.strip():
             raise CoreError(f"consumer {consumer_id} purpose is required")
-        _requirements(consumer, f"consumer {consumer_id}")
+        _consumer_requirements(consumer)
 
-    # Every required capability must have a declared producer.
+    # Every production prerequisite and consumer requirement needs a semantic producer.
     all_requirements: list[tuple[str, dict[str, str]]] = []
-    for authority_id, authority in authorities.items():
+    for capability, production in production_by_capability.items():
         all_requirements.extend(
-            (f"authority {authority_id}", item)
-            for item in _requirements(authority, f"authority {authority_id}")
+            (f"production {capability}", item)
+            for item in production["requires"]
         )
     for consumer_id, consumer in consumers.items():
         all_requirements.extend(
             (f"consumer {consumer_id}", item)
-            for item in _requirements(consumer, f"consumer {consumer_id}")
+            for item in _consumer_requirements(consumer)
         )
 
     subjects_by_capability: dict[str, set[str]] = {}
@@ -146,7 +188,7 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
         if subject is not None:
             subjects_by_capability.setdefault(capability, set()).add(subject)
 
-    # v0 explicitly rejects the NAPMS false-positive pattern.
+    # v0 rejects the NAPMS false-positive pattern explicitly.
     for capability, subjects in subjects_by_capability.items():
         if len(subjects) > 1:
             raise CoreError(
@@ -154,42 +196,50 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
                 "use distinct subject-scoped CapabilityIds in Engineering Graph v0"
             )
 
-    # Stable producer dependency topology must be acyclic.
-    dependencies: dict[str, set[str]] = {authority_id: set() for authority_id in authorities}
-    for authority_id, authority in authorities.items():
-        for requirement in _requirements(authority, f"authority {authority_id}"):
-            producer = producer_by_capability[requirement["capability"]]
-            if producer == authority_id:
-                raise CoreError(
-                    f"authority {authority_id} requires its own produced capability "
-                    f"{requirement['capability']}"
-                )
-            dependencies[authority_id].add(producer)
+    # Stable capability production topology must be a DAG.
+    dependencies: dict[str, set[str]] = {
+        capability: {
+            requirement["capability"]
+            for requirement in production["requires"]
+        }
+        for capability, production in production_by_capability.items()
+    }
 
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(authority_id: str) -> None:
-        if authority_id in visited:
+    def visit(capability: str) -> None:
+        if capability in visited:
             return
-        if authority_id in visiting:
-            raise CoreError(f"engineering Authority dependency cycle at: {authority_id}")
-        visiting.add(authority_id)
-        for dependency in dependencies[authority_id]:
+        if capability in visiting:
+            raise CoreError(
+                f"engineering capability production cycle at: {capability}"
+            )
+        visiting.add(capability)
+        for dependency in dependencies[capability]:
             visit(dependency)
-        visiting.remove(authority_id)
-        visited.add(authority_id)
+        visiting.remove(capability)
+        visited.add(capability)
 
-    for authority_id in authorities:
-        visit(authority_id)
+    for capability in dependencies:
+        visit(capability)
 
 
 def producer_index(graph: dict[str, Any]) -> dict[str, str]:
     validate_engineering_graph(graph)
     result: dict[str, str] = {}
     for authority in graph["authorities"]:
-        for capability in authority.get("produces", []) or []:
-            result[capability] = authority["id"]
+        for production in _productions(authority):
+            result[production["capability"]] = authority["id"]
+    return result
+
+
+def production_index(graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    validate_engineering_graph(graph)
+    result: dict[str, dict[str, Any]] = {}
+    for authority in graph["authorities"]:
+        for production in _productions(authority):
+            result[production["capability"]] = production
     return result
 
 
@@ -201,16 +251,14 @@ def _expectation_id(capability: str, subject: str) -> str:
 
 def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any]:
     validate_engineering_graph(graph)
-    authorities = {item["id"]: item for item in graph["authorities"]}
     consumers = {item["id"]: item for item in graph["consumers"]}
     if target_consumer not in consumers:
         raise CoreError(f"unknown engineering target consumer: {target_consumer}")
 
     producers = producer_index(graph)
+    productions = production_index(graph)
     default_subject = graph.get("default_subject", graph["id"])
 
-    # capability -> one effective requirement. Multiple subjects for one broad capability
-    # are rejected by validation; repeated same requirements collapse here.
     required: dict[str, dict[str, str]] = {}
     prerequisites: dict[str, set[str]] = {}
 
@@ -226,8 +274,7 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
                 f"{current['subject']}, {subject}"
             )
 
-        producer = producers[capability]
-        upstream = _requirements(authorities[producer], f"authority {producer}")
+        upstream = productions[capability]["requires"]
         dependencies = prerequisites.setdefault(capability, set())
         for upstream_requirement in upstream:
             upstream_capability = upstream_requirement["capability"]
@@ -235,9 +282,7 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
             if upstream_capability not in required:
                 include(upstream_requirement)
 
-    for requirement in _requirements(
-        consumers[target_consumer], f"consumer {target_consumer}"
-    ):
+    for requirement in _consumer_requirements(consumers[target_consumer]):
         include(requirement)
 
     expectation_ids = {
@@ -247,14 +292,16 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
     expectations: list[dict[str, Any]] = []
     for capability in sorted(required):
         item = required[capability]
-        producer = producers[capability]
         expectation: dict[str, Any] = {
             "id": expectation_ids[capability],
             "subject": item["subject"],
             "capability": capability,
-            "authority": producer,
+            "authority": producers[capability],
         }
-        deps = sorted(expectation_ids[value] for value in prerequisites.get(capability, set()))
+        deps = sorted(
+            expectation_ids[value]
+            for value in prerequisites.get(capability, set())
+        )
         if deps:
             expectation["depends_on"] = deps
         expectations.append(expectation)
