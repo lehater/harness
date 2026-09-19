@@ -1,8 +1,8 @@
 # Harness Engineering Graph v0
 
-Status: experimental, branch-only.
+Status: canonical v0.
 
-This model formalizes the producer/consumer idea that originally motivated Harness.
+This model formalizes the producer/consumer idea that originally motivated Harness. Its repository boundary is defined by `integration-contract-v0.md`.
 
 Harness Core remains the accepted **state of engineering knowledge**:
 
