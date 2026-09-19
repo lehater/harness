@@ -76,9 +76,21 @@ A schema controls:
 
 This prevents a generic bag of claims from becoming a weak universal engineering language.
 
-## Acceptance and completeness
+## Candidate validation, acceptance and completeness
 
-For a managed artifact, existence of a file is insufficient. The knowledge document must pass its schema validator before the workspace is valid.
+For a managed artifact, existence of a file is insufficient.
+
+An agent may validate a candidate before making it canonical:
+
+```sh
+python workspace.py validate-artifact candidate.yaml
+```
+
+This checks only the typed artifact structure. It does **not** register a provider or establish semantic correctness.
+
+After the agent applies the semantic acceptance contract in `docs/design/agent-artifact-workbench-v0.md`, the accepted artifact is moved under `.harness/knowledge/**` and registered in the Core graph with its Authority, dependencies and provided capability.
+
+A registered managed knowledge document must pass its schema validator before the workspace is valid.
 
 The pipeline is therefore:
 
@@ -96,7 +108,7 @@ target-state evaluation
 human-readable projection
 ```
 
-`COMPLETE` remains the Design Profile result. In managed mode it is reported only after every Harness-managed knowledge document has passed its schema validation.
+`COMPLETE` remains the Design Profile result. In managed mode it is reported only after every Harness-managed knowledge document has passed schema validation and every declared expectation prerequisite has been satisfied. Semantic acceptance remains an agent responsibility at the graph-registration boundary.
 
 This still does not prove that a stakeholder decision is factually correct. Unknown or conflicting semantics must remain represented as Core `Question` blockers rather than invented content.
 
