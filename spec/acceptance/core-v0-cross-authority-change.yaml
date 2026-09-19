@@ -132,5 +132,5 @@ expect:
   resolution:
     question: Q-POLICY-WITHDRAWAL
     artifact: POLICY-DOMAIN
-    unresolved_after: []
+    unresolved_after: [Q-POLICY-RETENTION]
     blocked_after: [Q-POLICY-RETENTION]
