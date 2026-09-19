@@ -40,8 +40,16 @@ Do not mine the whole repository.
 6. Draft a `harness-knowledge-artifact` using `domain-model/v1`.
 7. Run `workspace.py validate-artifact` on the candidate.
 8. Apply the common semantic-acceptance checks from `docs/design/agent-artifact-workbench-v0.md`.
-9. Register the accepted artifact in the Core graph with dependencies on the canonical sources actually relied upon.
-10. Render the human Domain Model and re-evaluate target state.
+9. After acceptance, register the artifact and re-evaluate target state.
+
+## Stop conditions
+
+Stop and create or preserve a Core `Question` when:
+
+- accepted canonical sources conflict on a required term, concept, responsibility or invariant;
+- the requested domain capability requires a decision not owned by the selected Authority;
+- completing the model would require turning an implementation convention into domain truth;
+- the available sources support only a summary but not a new canonical semantic owner.
 
 ## Output schema
 
@@ -64,6 +72,12 @@ Do not add fields merely to make the document look comprehensive.
 - invariants are actual accepted constraints, not implementation preferences;
 - omitted unknowns are not converted into implied decisions;
 - the artifact provides the requested capability, not merely a summary of existing prose.
+
+## Registration
+
+Register the accepted managed artifact as a Core `CanonicalArtifact`.
+
+Its dependencies must include only the canonical sources actually relied upon. Its `provides` entry must be the capability from the actionable expectation.
 
 ## Human projection
 
