@@ -114,16 +114,6 @@ expect:
         question: Q-POLICY-WITHDRAWAL
         authority: POLICY
         text: Must withdrawal preserve the accepted policy history?
-    next_action:
-      action: WAIT
-      capability: policy.withdrawal-implementation
-      authority: IMPLEMENTATION
-      providers: [POLICY-IMPLEMENTATION]
-      questions: [Q-POLICY-WITHDRAWAL]
-      expectation:
-        subject: POLICY-WITHDRAWAL
-        capability: policy.withdrawal-implementation
-
   blocked:
     artifact: POLICY-IMPLEMENTATION
     by: [Q-POLICY-WITHDRAWAL]
