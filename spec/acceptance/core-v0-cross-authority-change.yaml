@@ -47,6 +47,11 @@ model:
       answer_from: [POLICY-DOMAIN]
       blocks: [POLICY-IMPLEMENTATION]
 
+    - id: Q-POLICY-RETENTION
+      authority: POLICY
+      text: What retention period does the stakeholder require?
+      blocks: [POLICY-API]
+
 expect:
   affected:
     artifact: POLICY-DOMAIN
@@ -58,7 +63,7 @@ expect:
     owner: POLICY
 
   questions:
-    unresolved: [Q-POLICY-WITHDRAWAL]
+    unresolved: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
 
   next_action:
     capability: policy.withdrawal-implementation
@@ -111,6 +116,10 @@ expect:
             subject: POLICY-WITHDRAWAL
             capability: policy.withdrawal-verification
     question_frontier:
+      - action: ASK
+        question: Q-POLICY-RETENTION
+        authority: POLICY
+        text: What retention period does the stakeholder require?
       - action: RESOLVE
         question: Q-POLICY-WITHDRAWAL
         authority: POLICY
