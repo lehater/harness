@@ -24,7 +24,9 @@ def main() -> int:
         fixture / ".harness/profile.yaml",
         fixture / ".harness/config.yaml",
         fixture / ".harness/knowledge/application-domain.yaml",
+        fixture / ".harness/knowledge/application-verification.yaml",
         fixture / "expected/application-domain.md",
+        fixture / "expected/application-verification.md",
     ]
     for path in required:
         if not path.is_file():
@@ -57,6 +59,11 @@ def main() -> int:
                 expected = (fixture / "expected/application-domain.md").read_text(encoding="utf-8")
                 if actual != expected:
                     raise CoreError("generated domain document does not match acceptance output")
+
+                actual = (target / "docs/generated/application-verification.md").read_text(encoding="utf-8")
+                expected = (fixture / "expected/application-verification.md").read_text(encoding="utf-8")
+                if actual != expected:
+                    raise CoreError("generated verification document does not match acceptance output")
         except Exception as exc:
             errors.append(f"workspace acceptance: {exc}")
 
