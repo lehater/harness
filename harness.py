@@ -84,6 +84,13 @@ def validate_model(model: dict[str, Any]) -> None:
         for blocked_id in question.get("blocks", []) or []:
             if blocked_id not in artifacts:
                 raise CoreError(f"question {question_id} blocks unknown artifact: {blocked_id}")
+        for source_id in question.get("answer_from", []) or []:
+            if source_id not in artifacts:
+                raise CoreError(f"question {question_id} answers from unknown artifact: {source_id}")
+            if artifacts[source_id]["authority"] != authority:
+                raise CoreError(
+                    f"question {question_id} answer source must belong to addressed authority {authority}"
+                )
         resolution = question.get("resolution")
         if resolution is not None:
             if resolution not in artifacts:
