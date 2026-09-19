@@ -109,6 +109,11 @@ expect:
           expectation:
             subject: POLICY-WITHDRAWAL
             capability: policy.withdrawal-verification
+    question_frontier:
+      - action: RESOLVE
+        question: Q-POLICY-WITHDRAWAL
+        authority: POLICY
+        text: Must withdrawal preserve the accepted policy history?
     next_action:
       action: WAIT
       capability: policy.withdrawal-implementation
