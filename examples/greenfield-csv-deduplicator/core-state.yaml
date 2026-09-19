@@ -61,4 +61,12 @@ artifacts:
       - CLI-CONTRACT
       - IMPLEMENTATION-PLAN
 
+  - id: ACCEPTANCE-SCENARIOS
+    authority: VERIFICATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/acceptance-scenarios.md
+    provides:
+      - csv-deduplicator.acceptance-scenarios
+    depends_on:
+      - VERIFICATION-STRATEGY
+
 questions: []
