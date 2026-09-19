@@ -170,11 +170,13 @@ def question_frontier(model: dict[str, Any], question_ids: list[str]) -> list[di
             raise CoreError(f"unknown question: {question_id}")
         if question.get("resolution") is not None:
             continue
+        sources = question.get("answer_from", []) or []
         result.append({
-            "action": "RESOLVE",
+            "action": "RESOLVE" if sources else "ASK",
             "question": question_id,
             "authority": question["authority"],
             "text": question["text"],
+            **({"answer_from": sources} if sources else {}),
         })
     return result
 
