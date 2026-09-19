@@ -1,5 +1,6 @@
 authorities:
   - id: DOMAIN
+  - id: VERIFICATION
 
 artifacts:
   - id: APPLICATION-DOMAIN
@@ -7,5 +8,11 @@ artifacts:
     path: .harness/knowledge/application-domain.yaml
     provides: [application.domain-semantics]
     depends_on: []
+
+  - id: APPLICATION-VERIFICATION
+    authority: VERIFICATION
+    path: .harness/knowledge/application-verification.yaml
+    provides: [application.verification-strategy]
+    depends_on: [APPLICATION-DOMAIN]
 
 questions: []
