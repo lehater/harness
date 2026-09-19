@@ -83,6 +83,16 @@ Generated documentation is never an independent source of truth.
 
 The agent should draft an artifact as a candidate before registering it as a Core provider.
 
+A target repository may use `.harness/candidates/**` as a disposable agent workbench. Files there are explicitly non-canonical:
+
+- they are not Core `CanonicalArtifact` entries merely because they exist;
+- they do not provide capabilities;
+- managed-workspace validation/rendering ignores them;
+- they may be partial or structurally valid while semantic acceptance is still pending;
+- they should be deleted or moved to the project-native canonical location when the experiment is over.
+
+This is a filesystem convention for the agent layer, not a new Core entity or workflow state.
+
 For Harness-managed YAML, use:
 
 ```sh
