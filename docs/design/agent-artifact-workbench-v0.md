@@ -34,6 +34,22 @@ target_state again
 
 The agent must never treat `CREATE` as permission to invent missing product/domain decisions. `CREATE` means that the required knowledge has no accepted provider yet.
 
+## Existing-project policy and projection
+
+Harness workspace files are optional integration structure, not mandatory ownership.
+
+Before creating a new persistent Core graph, the agent must check whether the target repository already owns:
+
+- a canonical artifact/dependency graph plus a compatible Harness projection;
+- consumer/input contracts that declare required capabilities and Authorities;
+- engineering completeness or subject-coverage policy.
+
+When a compatible project-owned graph/projection exists, project it into Core in memory and preserve richer target-specific contracts. Do not create a second persistent `.harness/graph.yaml` merely to match Harness layout.
+
+A Design Profile may be derived from several accepted project-owned policy sources. For example, a consumer contract may define which knowledge classes implementation needs while a completeness policy defines which bounded contexts must have tactical coverage. The selected scope is not COMPLETE until every applicable accepted policy is satisfied.
+
+The `subject` field identifies the expectation but does not filter capability providers. If several same-Authority artifacts provide one broad capability for different subjects, subject-specific completeness requires subject-scoped CapabilityIds or a target-owned coverage check/profile. A broad capability alone must not be used as proof of per-subject coverage.
+
 ## Responsibilities
 
 ### Core and target state
@@ -106,7 +122,7 @@ Neither form of validation declares the capability provided.
 Only after semantic acceptance should the agent:
 
 1. move a Harness-managed artifact under `.harness/knowledge/**`, or place a project-native artifact at its target repository canonical path;
-2. register the corresponding `CanonicalArtifact` in `.harness/graph.yaml`;
+2. register the corresponding `CanonicalArtifact` in the active Core ownership projection: `.harness/graph.yaml` for a Harness-managed workspace, or the target repository's compatible project-owned graph/projection when that is the existing owner;
 3. add the accepted `CapabilityId` to `provides`;
 4. record the canonical artifact dependencies actually used;
 5. render `docs/generated/**` only for Harness-managed artifacts that have a renderer;
