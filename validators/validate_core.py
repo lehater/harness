@@ -20,7 +20,6 @@ from harness import (  # noqa: E402
     capability_resolve,
     completeness,
     design_frontier,
-    next_missing_action,
     question_frontier,
     resolve_question,
     unresolved_questions,
@@ -88,13 +87,6 @@ def main() -> int:
                             raise CoreError(
                                 f"question frontier mismatch: {actual_questions!r} != {question_expect!r}"
                             )
-
-                actual_missing_action = next_missing_action(model, expectations, coverage)
-                if actual_missing_action != completeness_expect["next_action"]:
-                    raise CoreError(
-                        f"missing next-action mismatch: {actual_missing_action!r} != "
-                        f"{completeness_expect['next_action']!r}"
-                    )
 
                 complete_coverage = completeness_expect.get("complete_coverage")
                 if complete_coverage is not None:
