@@ -59,6 +59,13 @@ expect:
   questions:
     unresolved: [Q-POLICY-WITHDRAWAL]
 
+  next_action:
+    capability: policy.withdrawal-implementation
+    action: WAIT
+    authority: IMPLEMENTATION
+    providers: [POLICY-IMPLEMENTATION]
+    questions: [Q-POLICY-WITHDRAWAL]
+
   blocked:
     artifact: POLICY-IMPLEMENTATION
     by: [Q-POLICY-WITHDRAWAL]
