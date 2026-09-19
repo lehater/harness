@@ -75,6 +75,7 @@ authorities:
       public_contract: Produces verification strategy and acceptance scenarios.
     produces:
       - capability: csv-deduplicator.verification-strategy
+        knowledge_kind: verification-strategy
         requires:
           - capability: csv-deduplicator.acceptance
           - capability: csv-deduplicator.architecture
