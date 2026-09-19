@@ -26,7 +26,7 @@ IMPLEMENTATION-DESIGN
 VERIFICATION-DESIGN
 ```
 
-A domain-heavy product may additionally need strategic/tactical domain design, application composition, interface, data, quality, security and operability Authorities.
+A domain-heavy product may additionally need strategic/tactical domain design, application composition, interface, data, quality, security and operability Authorities. A project that needs explicit cross-cutting design discipline or coding-agent structural constraints may also instantiate ENGINEERING-POLICY and COMPONENT-DESIGN.
 
 Omitting a reference Authority is valid only when its decisions are absent or are coherently owned inside another atomic boundary. A merge is not valid merely to make the graph smaller.
 
@@ -71,3 +71,22 @@ The catalog is distilled from:
 - legacy Harness methodology, which independently separates problem evidence, product requirements, domain semantics, architecture, implementation readiness and verification responsibilities.
 
 It remains experimental until exercised by the greenfield pilot and at least one additional project shape that is materially simpler than NAPMS.
+
+
+## Engineering policy and component design
+
+Two conditional boundaries are supported when implementation agents need stronger constraints than architecture/application knowledge alone provides.
+
+`ENGINEERING-POLICY` owns project-selected normative engineering obligations. It is not a universal SOLID/Clean Architecture checklist. Reusable principles and production methods belong in skills; the project policy selects which obligations are actually normative and translates names such as DIP, ISP, KISS or CQS into reviewable project constraints.
+
+`COMPONENT-DESIGN` owns implementation-facing responsibility, contract ownership, dependency direction, composition and representation-mapping boundaries. It should constrain architecturally significant code decisions while deliberately leaving private helpers, local algorithms and class/function representation free unless those choices carry accepted semantics.
+
+A project may omit either boundary when the same knowledge is coherently owned elsewhere. For implementation consumers intended to hand work to coding agents with little structural freedom, requiring an applicable component-design capability is recommended.
+
+### Evidence
+
+Nutrition Management demonstrated both a solver boundary and persistence boundary. The experiments showed that semantic contracts should not force unnecessary wrapper classes and that consumer-shaped ports can satisfy DIP/ISP without generic repositories.
+
+NAPMS demonstrated the same pattern in a materially different modular application and project-owned graph/projection. Its engineering policy and component design were representable through ordinary Authority/Capability prerequisites without evaluator-specific logic.
+
+The evidence does not justify a new universal DesignConstraint Core entity. Existing Engineering Graph semantics already express policy availability, dependency and invalidation.
