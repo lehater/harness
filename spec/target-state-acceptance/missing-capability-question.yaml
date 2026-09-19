@@ -1,0 +1,94 @@
+version: 1
+kind: harness-target-state-acceptance
+id: MISSING-CAPABILITY-QUESTION
+
+profile:
+  version: 1
+  kind: harness-design-profile
+  id: DOMAIN-DESIGN
+  expectations:
+    - id: DOMAIN
+      subject: APPLICATION
+      capability: application.domain-semantics
+      authority: DOMAIN
+
+empty_model:
+  authorities:
+    - id: DOMAIN
+  artifacts: []
+  questions:
+    - id: Q-DOMAIN-BOUNDARY
+      authority: DOMAIN
+      text: Which domain boundary is accepted?
+      blocks_capabilities: [application.domain-semantics]
+
+partial_model:
+  authorities:
+    - id: DOMAIN
+  artifacts:
+    - id: DOMAIN-DECISION
+      authority: DOMAIN
+      path: docs/decisions/domain-boundary.md
+      provides: []
+      depends_on: []
+  questions:
+    - id: Q-DOMAIN-BOUNDARY
+      authority: DOMAIN
+      text: Which domain boundary is accepted?
+      blocks_capabilities: [application.domain-semantics]
+      resolution: DOMAIN-DECISION
+
+complete_model:
+  authorities:
+    - id: DOMAIN
+  artifacts:
+    - id: DOMAIN-DECISION
+      authority: DOMAIN
+      path: docs/decisions/domain-boundary.md
+      provides: []
+      depends_on: []
+    - id: DOMAIN-MODEL
+      authority: DOMAIN
+      path: docs/domain/model.yaml
+      provides: [application.domain-semantics]
+      depends_on: [DOMAIN-DECISION]
+  questions:
+    - id: Q-DOMAIN-BOUNDARY
+      authority: DOMAIN
+      text: Which domain boundary is accepted?
+      blocks_capabilities: [application.domain-semantics]
+      resolution: DOMAIN-DECISION
+
+expect:
+  empty:
+    status: BLOCKED
+    satisfied: []
+    create: []
+    wait:
+      - action: WAIT
+        expectation: DOMAIN
+        subject: APPLICATION
+        capability: application.domain-semantics
+        authority: DOMAIN
+        providers: []
+        questions: [Q-DOMAIN-BOUNDARY]
+    pending: []
+
+  partial:
+    status: READY
+    satisfied: []
+    create:
+      - action: CREATE
+        expectation: DOMAIN
+        subject: APPLICATION
+        capability: application.domain-semantics
+        authority: DOMAIN
+    wait: []
+    pending: []
+
+  complete:
+    status: COMPLETE
+    satisfied: [DOMAIN]
+    create: []
+    wait: []
+    pending: []
