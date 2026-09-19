@@ -44,6 +44,7 @@ model:
     - id: Q-POLICY-WITHDRAWAL
       authority: POLICY
       text: Must withdrawal preserve the accepted policy history?
+      answer_from: [POLICY-DOMAIN]
       blocks: [POLICY-IMPLEMENTATION]
 
 expect:
@@ -114,6 +115,7 @@ expect:
         question: Q-POLICY-WITHDRAWAL
         authority: POLICY
         text: Must withdrawal preserve the accepted policy history?
+        answer_from: [POLICY-DOMAIN]
   blocked:
     artifact: POLICY-IMPLEMENTATION
     by: [Q-POLICY-WITHDRAWAL]
