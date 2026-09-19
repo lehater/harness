@@ -66,6 +66,28 @@ expect:
     providers: [POLICY-IMPLEMENTATION]
     questions: [Q-POLICY-WITHDRAWAL]
 
+  completeness:
+    expectations:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+    coverage:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+    missing:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+    next_action:
+      action: WAIT
+      capability: policy.withdrawal-implementation
+      authority: IMPLEMENTATION
+      providers: [POLICY-IMPLEMENTATION]
+      questions: [Q-POLICY-WITHDRAWAL]
+      expectation:
+        subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
+
   blocked:
     artifact: POLICY-IMPLEMENTATION
     by: [Q-POLICY-WITHDRAWAL]
