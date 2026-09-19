@@ -90,10 +90,11 @@ def main() -> int:
 
                 complete_coverage = completeness_expect.get("complete_coverage")
                 if complete_coverage is not None:
-                    actual_complete = next_missing_action(model, expectations, complete_coverage)
-                    if actual_complete != {"action": "COMPLETE"}:
+                    actual_complete = design_frontier(model, expectations, complete_coverage)
+                    expected_complete = {"status": "COMPLETE", "design": [], "wait": []}
+                    if actual_complete != expected_complete:
                         raise CoreError(
-                            f"complete next-action mismatch: {actual_complete!r} != {{'action': 'COMPLETE'}}"
+                            f"complete frontier mismatch: {actual_complete!r} != {expected_complete!r}"
                         )
 
             action = expect.get("next_action")
