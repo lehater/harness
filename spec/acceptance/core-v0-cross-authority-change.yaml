@@ -90,15 +90,8 @@ expect:
       - subject: POLICY-WITHDRAWAL
         capability: policy.withdrawal-verification
     frontier:
-      status: READY
-      design:
-        - action: DESIGN
-          capability: policy.withdrawal-verification
-          authority: VERIFICATION
-          providers: [POLICY-VERIFICATION]
-          expectation:
-            subject: POLICY-WITHDRAWAL
-            capability: policy.withdrawal-verification
+      status: BLOCKED
+      design: []
       wait:
         - action: WAIT
           capability: policy.withdrawal-implementation
@@ -108,6 +101,14 @@ expect:
           expectation:
             subject: POLICY-WITHDRAWAL
             capability: policy.withdrawal-implementation
+        - action: WAIT
+          capability: policy.withdrawal-verification
+          authority: VERIFICATION
+          providers: [POLICY-VERIFICATION]
+          questions: [Q-POLICY-WITHDRAWAL]
+          expectation:
+            subject: POLICY-WITHDRAWAL
+            capability: policy.withdrawal-verification
     next_action:
       action: WAIT
       capability: policy.withdrawal-implementation
