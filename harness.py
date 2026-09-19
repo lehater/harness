@@ -159,6 +159,27 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     return sorted(result)
 
 
+def question_frontier(model: dict[str, Any], question_ids: list[str]) -> list[dict[str, Any]]:
+    """Route unresolved blockers to their addressed authorities without guessing external escalation."""
+    validate_model(model)
+    questions = _by_id(model.get("questions", []), "question")
+    result: list[dict[str, Any]] = []
+    for question_id in sorted(set(question_ids)):
+        question = questions.get(question_id)
+        if question is None:
+            raise CoreError(f"unknown question: {question_id}")
+        if question.get("resolution") is not None:
+            continue
+        result.append({
+            "action": "RESOLVE",
+            "question": question_id,
+            "authority": question["authority"],
+            "text": question["text"],
+        })
+    return result
+
+
+
 def completeness(expectations: list[dict[str, str]], coverage: list[dict[str, str]]) -> list[dict[str, str]]:
     """Derive missing subject/capability expectations from declared coverage."""
     covered = {
