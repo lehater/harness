@@ -66,7 +66,7 @@ Ownership, provided capabilities and dependencies are not repeated here. They re
 
 The envelope is generic; semantic content is not.
 
-Each `schema` has a dedicated validator and renderer. v0 intentionally implements only `domain-model/v1` to prove the end-to-end mechanism. Future schemas such as requirements, architecture or verification must be added from demonstrated project needs.
+Each `schema` has a dedicated validator and renderer. v0 started with `domain-model/v1`; the Nutrition Management consumer pilot demonstrated the need for `verification-plan/v1`. Future schemas such as requirements or architecture must likewise be added from demonstrated project needs.
 
 A schema controls:
 
@@ -124,4 +124,4 @@ docs/generated/**
 
 Deleting generated files loses no accepted knowledge; rerunning the renderer restores them.
 
-The first projection is a conventional Domain Model document with purpose, ubiquitous language, concepts and invariants. Additional industry-recognizable document types should be introduced one at a time after this mechanism proves useful.
+Current projections are a conventional Domain Model and a Verification Strategy. `verification-plan/v1` requires a purpose, explicit scope and one or more checks with concrete evidence; optional out-of-scope items keep the verification boundary explicit. Additional industry-recognizable document types should be introduced one at a time from demonstrated consumer needs.
