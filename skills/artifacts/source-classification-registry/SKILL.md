@@ -36,13 +36,14 @@ Historical WIP may be used as implementation evidence, never as accepted semanti
 2. Confirm the source identity/version and expected entity cardinality are accepted.
 3. Confirm the taxonomy and assignment policy are accepted.
 4. Choose a project-native deterministic registry format appropriate for the target repository.
-5. Require exactly one explicit assignment for every source entity.
-6. Reject duplicate source ids, unknown source ids, missing source ids and invalid category values.
-7. Do not infer canonical assignment from names, code prefixes, source-native groups, embeddings or model output unless an accepted policy explicitly authorizes that derivation.
-8. Agent/model-assisted classification may propose candidate assignments, but ambiguous cases remain unaccepted until reviewed under the owning Authority.
-9. Build or reuse a target-project validator that compares registry coverage to the exact pinned source set.
-10. Only after the full registry passes deterministic validation and semantic review should it be registered as the provider capability.
-11. Re-evaluate target state.
+5. Choose the smallest explicit decision representation that remains auditable. This may be one row per source entity or reviewed classification rules plus exact overrides when the source identifiers have a stable hierarchical structure.
+6. Require deterministic resolution to exactly one category for every source entity. Rule precedence, overlap and override semantics must be explicit rather than implicit parser behavior.
+7. Reject duplicate/unknown ids, unmapped ids, ambiguous rule matches, unused rules and invalid category values.
+8. Do not infer canonical assignment from names, code prefixes, source-native groups, embeddings or model output unless the reviewed registry itself explicitly records the resulting rule/override decision.
+9. Agent/model-assisted classification may propose candidate rules or assignments, but ambiguous cases remain unaccepted until reviewed under the owning Authority.
+10. Build or reuse a target-project validator that materializes/resolves the registry against the exact pinned source set and proves exact-one coverage.
+11. Only after the full registry passes deterministic validation and semantic review should it be registered as the provider capability.
+12. Re-evaluate target state.
 
 ## Stop conditions
 
@@ -67,23 +68,29 @@ The output contract must specify:
 - exact-coverage validator;
 - deterministic ordering/serialization where relevant.
 
-For the Nutrition Management BLS consumer, the intended artifact shape is a project-owned JSON registry conceptually equivalent to:
+For the Nutrition Management BLS consumer, the project-native registry may compact repeated accepted decisions into explicit prefix rules with exact overrides:
 
 ```json
 {
-  "mappings": [
-    {"source_code": "A000001", "category": "fruit_and_vegetables"}
+  "source_version": "4.0",
+  "rules": [
+    {"prefix": "B", "category": "grains_cereal_products_potatoes"}
+  ],
+  "overrides": [
+    {"source_code": "B999999", "category": "other_or_composite"}
   ]
 }
 ```
 
-The actual accepted registry must cover the complete pinned source set, not a sample.
+The validator must resolve this representation against the complete pinned source set and prove exact-one coverage. A compact rule is canonical only because it is explicitly reviewed project data; it must never be an undocumented parser heuristic.
 
 ## Acceptance checks
 
 - source/version matches the accepted input baseline;
-- every source entity occurs exactly once;
-- no extra source entity is present;
+- every source entity resolves to exactly one category;
+- no extra exact override is present;
+- every rule is exercised by the pinned source set;
+- ambiguous overlapping rules are rejected;
 - every category belongs to the accepted controlled taxonomy;
 - difficult cases are explicit decisions, not default fallbacks;
 - deterministic validation succeeds against the exact pinned source set;
