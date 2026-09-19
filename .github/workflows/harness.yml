@@ -11,6 +11,7 @@ on:
       - "spec/**"
       - "validators/**"
       - "harness.py"
+      - "target_state.py"
       - "Makefile"
       - ".github/workflows/harness.yml"
 
