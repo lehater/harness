@@ -50,6 +50,36 @@ A Design Profile may be derived from several accepted project-owned policy sourc
 
 The `subject` field identifies the expectation but does not filter capability providers. If several same-Authority artifacts provide one broad capability for different subjects, subject-specific completeness requires subject-scoped CapabilityIds or a target-owned coverage check/profile. A broad capability alone must not be used as proof of per-subject coverage.
 
+## Engineering Graph execution path
+
+When the target project exposes an Engineering Graph, do not manually choose or maintain a Design Profile as the primary target policy.
+
+Use:
+
+```text
+target Consumer
+        ↓
+Engineering Graph recursive closure
+        ↓
+derived Design Profile
+        ↓
+target state
+        ↓
+CREATE / WAIT / PENDING / COMPLETE
+        ↓
+agent_router for actionable CREATE
+        ↓
+grouped artifact work by Authority + subject + knowledge_kind
+        ↓
+registered artifact skill when available
+        ↓
+candidate → validation → semantic acceptance → Core provider
+        ↓
+reevaluate target Consumer
+```
+
+If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent still has a valid CREATE frontier. It performs the work manually under the production contract or develops a reusable skill only when repeated consumer evidence justifies one.
+
 ## Responsibilities
 
 ### Core and target state
