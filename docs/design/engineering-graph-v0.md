@@ -14,53 +14,80 @@ Harness Core remains the accepted **state of engineering knowledge**:
 
 The Engineering Graph defines the **normative production topology** above that state:
 
-- which Authority is allowed to produce each engineering capability;
-- which capabilities an Authority requires before it can responsibly produce its own knowledge;
+- which Authority owns production of each engineering capability;
+- which accepted upstream capabilities are required to produce each specific capability;
 - which capabilities a terminal consumer requires;
-- how a target consumer expands recursively into an upstream engineering-knowledge closure.
+- how a selected target consumer expands recursively into an upstream engineering-knowledge closure.
 
 It is a graph of engineering responsibility, not a phase/stage workflow.
 
-## Entities
-
-### Authority
+## Authority
 
 An Authority is one atomic boundary of engineering decision ownership.
 
 Each Authority declares:
 
 - `responsibility` — the coherent class of decisions it owns;
-- `boundary.semantic_cohesion` — why the decisions belong together;
-- `boundary.independent_change` — why this knowledge can change independently of neighbouring Authorities;
-- `boundary.public_contract` — what the Authority consumes and exposes to other Authorities;
-- `requires` — capabilities that must be accepted before this Authority can form its outputs;
-- `produces` — capabilities for which this Authority is the unique semantic producer.
+- `boundary.semantic_cohesion` — why those decisions belong together;
+- `boundary.independent_change` — why the knowledge can change independently of neighbouring Authorities;
+- `boundary.public_contract` — what the Authority exposes to downstream engineering work;
+- `produces` — one or more **production contracts**.
 
 The three boundary statements are the structural atomicity test. Harness can require them to exist but cannot mechanically prove their semantic truth.
 
-### Capability
+An Authority does not have one global prerequisite list. Different outputs owned by the same semantic Authority may legitimately need different upstream knowledge.
+
+## Production contract
+
+A production contract belongs to exactly one Authority and declares:
+
+- the CapabilityId produced;
+- the upstream CapabilityIds required specifically to form that output.
+
+Example:
+
+```yaml
+- id: PRODUCT
+  responsibility: Own product decisions.
+  boundary:
+    semantic_cohesion: One class of accepted product decisions.
+    independent_change: Product decisions can change independently of architecture.
+    public_contract: Produces problem framing and product requirements.
+  produces:
+    - capability: example.problem
+      requires: []
+    - capability: example.requirements
+      requires:
+        - capability: example.problem
+```
+
+This allows one Authority to own several related outputs without forcing every output to wait for the union of all Authority inputs.
+
+If two outputs are semantically unrelated, that remains evidence that the Authority should be split. Different prerequisite sets alone do not force a split.
+
+## Capability
 
 A CapabilityId names accepted engineering knowledge, not a file and not a task.
 
-Exactly one Authority in one Engineering Graph may declare a CapabilityId in `produces`.
+Exactly one Authority in one Engineering Graph may own the production contract for a CapabilityId.
 
 A CanonicalArtifact in Core materializes an accepted capability by listing the same CapabilityId in `provides`.
 
-The Engineering Graph therefore knows the producer even before any provider artifact exists. This removes the need to repeat the expected Authority manually in a Design Profile.
+The Engineering Graph therefore knows the producer before any provider artifact exists. CREATE can be routed without copying Authority into a manually authored Design Profile.
 
-### Requirement
+## Requirement
 
-A producer or terminal consumer may require a CapabilityId.
+A production contract or terminal Consumer may require a CapabilityId.
 
 A requirement may carry `subject` metadata for the derived target view. In v0, provider resolution remains CapabilityId-based. If different subjects require independently provable coverage, the project must expose distinct subject-scoped CapabilityIds or a project-owned coverage projection that derives them.
 
 Do not use one broad CapabilityId with different subjects and assume `subject` filters providers.
 
-### Consumer
+## Consumer
 
-A Consumer is a terminal or externally selected target that consumes engineering knowledge but does not need to produce more engineering knowledge inside the selected graph.
+A Consumer is a selected terminal target that consumes engineering knowledge but does not need to produce more engineering knowledge inside the selected graph.
 
-`IMPLEMENTATION` is the primary example, but the model does not make it special. A project may target deployment preparation, an interface slice, verification design or another consumer.
+`IMPLEMENTATION` is the primary example, but it is not special. A project may target deployment preparation, interface implementation, verification design or another terminal consumer.
 
 ## Document shape
 
@@ -76,39 +103,42 @@ authorities:
     boundary:
       semantic_cohesion: One class of knowledge about observed problems.
       independent_change: Evidence may change before requirements change.
-      public_contract: Produces accepted problem evidence for Product Requirements.
-    requires: []
+      public_contract: Produces accepted problem evidence.
     produces:
-      - example.problem
+      - capability: example.problem
+        requires: []
 
-  - id: PRODUCT-REQUIREMENTS
-    responsibility: Own accepted product intent and acceptance semantics.
+  - id: PRODUCT
+    responsibility: Own product intent and acceptance semantics.
     boundary:
       semantic_cohesion: One class of product decisions.
-      independent_change: Requirements may change without changing discovery evidence.
-      public_contract: Consumes problem evidence and produces product requirements.
-    requires:
-      - capability: example.problem
+      independent_change: Product intent may change while architecture remains stable.
+      public_contract: Produces accepted product requirements.
     produces:
-      - example.requirements
+      - capability: example.requirements
+        requires:
+          - capability: example.problem
 
 consumers:
   - id: IMPLEMENTATION
-    purpose: Build the accepted product without inventing design decisions.
+    purpose: Build accepted behavior without inventing design decisions.
     requires:
       - capability: example.requirements
 ```
 
+A string in `produces` is shorthand for a root production contract with no prerequisites.
+
 ## Derived target
 
-Selecting a consumer recursively expands its required capabilities.
+Selecting a Consumer recursively expands its required capabilities.
 
-For every required capability:
+For each required capability:
 
 1. find its unique producer Authority;
-2. add that capability to the target closure;
-3. add the producer Authority's own input requirements;
-4. repeat until root Authorities with no inputs are reached.
+2. add the capability to the target closure;
+3. read that capability's production contract;
+4. add its upstream requirements;
+5. repeat until root production contracts are reached.
 
 The result is a derived Design Profile. The profile is a view, not another policy owner.
 
@@ -117,11 +147,11 @@ target consumer
       ↓
 required capabilities
       ↓
-producer Authorities
+production contracts
       ↓
-their required capabilities
+upstream required capabilities
       ↓
-recursive upstream closure
+recursive closure
       ↓
 derived Design Profile
       ↓
@@ -133,9 +163,9 @@ Core target-state evaluation
 Against a Core model:
 
 - provider exists and is unblocked -> SATISFIED;
-- provider missing, producer inputs satisfied, no capability Question -> CREATE at the declared producer Authority;
+- provider missing, production prerequisites satisfied, no capability Question -> CREATE at the declared producer Authority;
 - provider or missing capability blocked by unresolved Question -> WAIT;
-- producer inputs not yet satisfied -> PENDING;
+- production prerequisites not yet satisfied -> PENDING;
 - every derived expectation satisfied -> COMPLETE.
 
 Question resolution changes canonical truth; it does not itself fabricate the requested capability.
@@ -144,10 +174,10 @@ Question resolution changes canonical truth; it does not itself fabricate the re
 
 Questions are dynamic semantic feedback edges, not workflow tasks.
 
-When an Authority cannot form an output without an unresolved upstream decision:
+When production cannot continue without an unresolved semantic decision:
 
 ```text
-consumer/producer attempts knowledge
+producer attempts capability
         ↓
 semantic gap discovered
         ↓
@@ -162,13 +192,13 @@ Question resolved
 graph reevaluated
 ```
 
-If accepted canonical knowledge already decides the case and only code/tests lag, the Engineering Graph remains complete. Implementation state is not added to Core.
+If accepted canonical knowledge already decides the case and only code/tests lag, the Engineering Graph remains COMPLETE. Implementation status is not added to Core.
 
 ## Applicability
 
 The Engineering Graph has no universal `N/A` state.
 
-If project policy says an engineering requirement is not applicable only when accepted evidence proves that fact, the project translates the requirement to that evidence CapabilityId. The project-specific applicability rule remains owned by the project policy.
+If project policy says a requirement is not applicable only when accepted evidence proves that fact, the project translates the requirement to that evidence CapabilityId. The project-specific applicability rule remains owned by the project policy.
 
 ## Coverage and subjects
 
@@ -176,7 +206,7 @@ A consumer contract answers **which classes of engineering knowledge are needed*
 
 A project completeness policy may additionally answer **for which subjects those capabilities must exist**.
 
-Both are legitimate inputs to graph construction/projection.
+Both may contribute production/consumer requirements to the projected Engineering Graph.
 
 In v0, independent subject coverage is represented by distinct CapabilityIds, for example:
 
@@ -185,17 +215,19 @@ engineering.domain.tactical-model@BC-RESOURCE-CATALOGUE
 engineering.domain.tactical-model@BC-ACCESS-POLICY
 ```
 
-The exact encoding is adapter/project policy. The important invariant is that two independently required subject instances must not collapse onto one broad provider key.
+The exact encoding is adapter/project policy. The invariant is that independently required subject instances must not collapse onto one broad provider key.
 
-A future first-class parameterized Capability model requires additional consumer evidence before changing Core.
+A first-class parameterized Capability model remains a future candidate requiring more consumer evidence.
 
 ## Atomicity and graph shape
 
-Stable Authority input dependencies must form a DAG.
+Stable **capability production dependencies** must form a DAG.
 
-Feedback is expressed through Questions and canonical repair, not by introducing static producer cycles.
+Two production contracts owned by the same Authority may depend on one another if they remain acyclic. This represents internal refinement inside one semantic responsibility boundary.
 
-If two groups of outputs need materially different upstream contracts, that is evidence that the Authority boundary may not be atomic and should be reviewed or split.
+Feedback is expressed through Questions and canonical repair, not static production cycles.
+
+Authority atomicity is about semantic responsibility, independent change and public contract—not about forcing every output to share identical prerequisites.
 
 ## Relationship to project artifacts
 
