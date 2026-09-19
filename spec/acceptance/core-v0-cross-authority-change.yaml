@@ -75,6 +75,11 @@ expect:
     coverage:
       - subject: POLICY-WITHDRAWAL
         capability: policy.withdrawal-semantics
+    complete_coverage:
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-semantics
+      - subject: POLICY-WITHDRAWAL
+        capability: policy.withdrawal-implementation
     missing:
       - subject: POLICY-WITHDRAWAL
         capability: policy.withdrawal-implementation
