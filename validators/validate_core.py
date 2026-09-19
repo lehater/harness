@@ -21,6 +21,7 @@ from harness import (  # noqa: E402
     completeness,
     design_frontier,
     next_missing_action,
+    question_frontier,
     resolve_question,
     unresolved_questions,
     validate_model,
@@ -75,6 +76,18 @@ def main() -> int:
                         raise CoreError(
                             f"design frontier mismatch: {actual_frontier!r} != {frontier_expect!r}"
                         )
+                    question_expect = completeness_expect.get("question_frontier")
+                    if question_expect is not None:
+                        blocker_ids = [
+                            question
+                            for item in actual_frontier["wait"]
+                            for question in item.get("questions", [])
+                        ]
+                        actual_questions = question_frontier(model, blocker_ids)
+                        if actual_questions != question_expect:
+                            raise CoreError(
+                                f"question frontier mismatch: {actual_questions!r} != {question_expect!r}"
+                            )
 
                 actual_missing_action = next_missing_action(model, expectations, coverage)
                 if actual_missing_action != completeness_expect["next_action"]:
