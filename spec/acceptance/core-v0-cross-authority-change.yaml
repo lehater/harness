@@ -127,13 +127,13 @@ expect:
         answer_from: [POLICY-DOMAIN]
   blocked:
     artifact: POLICY-IMPLEMENTATION
-    by: [Q-POLICY-WITHDRAWAL]
+    by: [Q-POLICY-RETENTION, Q-POLICY-WITHDRAWAL]
 
   resolution:
     question: Q-POLICY-WITHDRAWAL
     artifact: POLICY-DOMAIN
     unresolved_after: []
-    blocked_after: []
+    blocked_after: [Q-POLICY-RETENTION]
     next_action:
       capability: policy.withdrawal-implementation
       action: DESIGN
