@@ -16,6 +16,7 @@ from harness import (  # noqa: E402
     affected,
     blocked,
     capability_owner,
+    next_action,
     capability_resolve,
     resolve_question,
     unresolved_questions,
@@ -54,6 +55,17 @@ def main() -> int:
                 raise CoreError("capability resolve mismatch")
             if capability_owner(model, cap["id"]) != cap["owner"]:
                 raise CoreError("capability owner mismatch")
+
+            action = expect.get("next_action")
+            if action:
+                actual_action = next_action(model, action["capability"])
+                for key, value in action.items():
+                    if key == "capability":
+                        continue
+                    if actual_action.get(key) != value:
+                        raise CoreError(
+                            f"next-action {key} mismatch: {actual_action.get(key)!r} != {value!r}"
+                        )
 
             if unresolved_questions(model) != sorted(expect["questions"]["unresolved"]):
                 raise CoreError("questions mismatch")
