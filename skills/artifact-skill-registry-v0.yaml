@@ -9,6 +9,18 @@ routes:
   - knowledge_kind: product-requirements
     skill: skills/artifacts/product-requirements/SKILL.md
 
+  - knowledge_kind: system-architecture
+    skill: skills/artifacts/system-architecture/SKILL.md
+
+  - knowledge_kind: interface-contract
+    skill: skills/artifacts/interface-contract/SKILL.md
+
+  - knowledge_kind: implementation-design
+    skill: skills/artifacts/implementation-design/SKILL.md
+
+  - knowledge_kind: acceptance-scenarios
+    skill: skills/artifacts/acceptance-scenarios/SKILL.md
+
   - knowledge_kind: domain-model
     skill: skills/artifacts/domain-model/SKILL.md
 
