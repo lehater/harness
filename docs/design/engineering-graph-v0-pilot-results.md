@@ -189,3 +189,65 @@ Still deliberately experimental:
   pattern;
 - legitimate engineering feedback topologies that may challenge the static DAG
   assumption.
+
+
+## Semantic CREATE-to-skill routing
+
+Engineering Graph production contracts may now declare an optional
+`knowledge_kind`.
+
+This separates:
+
+- project-specific CapabilityId;
+- repository-independent semantic knowledge kind;
+- installed artifact skill implementation.
+
+`agent_router.py` routes only actionable `CREATE` work through
+`skills/artifact-skill-registry-v0.yaml`.
+
+Observed evidence:
+
+- greenfield `csv-deduplicator.verification-strategy` routes to the existing
+  reusable `verification-strategy` skill even though its CapabilityId has no
+  Nutrition/NAPMS naming relationship;
+- the real Nutrition BLS frontier
+  `nutrition-management.food-knowledge.bls-v4.source-code-set` routes to
+  `pinned-source-entity-set`;
+- WAIT work is never routed to an artifact skill;
+- unknown/missing knowledge kinds remain valid CREATE work but are reported as
+  `UNROUTED`, preserving the distinction between engineering readiness and
+  available automation.
+
+The greenfield Product Requirements step also showed that one canonical artifact
+may satisfy several simultaneously actionable capabilities. The router therefore
+groups CREATE work by `Authority + subject + knowledge_kind`.
+
+Two greenfield capabilities:
+
+- `csv-deduplicator.product-intent`;
+- `csv-deduplicator.acceptance`;
+
+become one `product-requirements` artifact-work item rather than two fake tasks.
+
+This grouping is an agent execution view, not a new Core Task/Workflow entity.
+
+## Applicability evidence
+
+NAPMS Engineering Graph projection was tested with the project-native
+not-applicable rule for asynchronous messaging.
+
+The existing contract states that an asynchronous interface contract is not
+required when the accepted capability
+`engineering.architecture.async-messaging-not-applicable` proves that fact.
+
+The adapter translates this to an ordinary upstream capability requirement.
+
+Observed behavior after removing only that evidence provider:
+
+- IMPLEMENTATION target -> READY;
+- exactly `engineering.architecture.async-messaging-not-applicable` -> CREATE;
+- no special N/A state;
+- no WAIT.
+
+This confirms the current applicability rule: applicability remains project-owned
+policy and Harness consumes its accepted evidence as normal engineering knowledge.
