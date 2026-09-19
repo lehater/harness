@@ -59,9 +59,9 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `profiles/**` — reusable starter Design Profiles.
-- `skills/agent/bootstrap-existing-project/SKILL.md` — scoped existing-project graph bootstrap.
-- `skills/agent/design-profile/SKILL.md` — agent Design Profile construction/review.
-- `skills/artifacts/**` — artifact-specific engineering procedures.
+- `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.
+- `skills/artifacts/**` — active artifact-specific engineering procedures.
+- `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` — retained pre-Core material; not part of the active v0 agent contract.
 - `harness.py` — Core v0 structural operations.
 - `target_state.py` — target-state evaluator above Core.
 - `workspace.py` — managed knowledge validation and rendering.
