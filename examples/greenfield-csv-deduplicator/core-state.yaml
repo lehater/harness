@@ -32,4 +32,14 @@ artifacts:
       - PRODUCT-REQUIREMENTS
       - SYSTEM-ARCHITECTURE
 
+  - id: IMPLEMENTATION-PLAN
+    authority: IMPLEMENTATION-DESIGN
+    path: examples/greenfield-csv-deduplicator/artifacts/implementation-plan.md
+    provides:
+      - csv-deduplicator.implementation-plan
+    depends_on:
+      - PRODUCT-REQUIREMENTS
+      - SYSTEM-ARCHITECTURE
+      - CLI-CONTRACT
+
 questions: []
