@@ -69,19 +69,27 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         value = {"capability": value, "requires": []}
     if not isinstance(value, dict):
         raise CoreError(f"{where} must be a capability id or mapping")
-    unknown = set(value) - {"capability", "requires"}
+    unknown = set(value) - {"capability", "requires", "knowledge_kind"}
     if unknown:
         raise CoreError(f"{where} has unknown fields: {sorted(unknown)}")
     capability = value.get("capability")
     if not isinstance(capability, str) or not capability:
         raise CoreError(f"{where} capability is required")
-    return {
+    knowledge_kind = value.get("knowledge_kind")
+    if knowledge_kind is not None and (
+        not isinstance(knowledge_kind, str) or not knowledge_kind
+    ):
+        raise CoreError(f"{where} knowledge_kind must be a non-empty string")
+    result = {
         "capability": capability,
         "requires": _requirements(
             value.get("requires", []),
             f"production {capability}",
         ),
     }
+    if knowledge_kind is not None:
+        result["knowledge_kind"] = knowledge_kind
+    return result
 
 
 def _productions(authority: dict[str, Any]) -> list[dict[str, Any]]:
