@@ -49,6 +49,17 @@ def main() -> int:
             else:
                 raise CoreError("invalid domain knowledge passed schema validation")
 
+            invalid_verification = yaml.safe_load(
+                (fixture / ".harness/knowledge/application-verification.yaml").read_text(encoding="utf-8")
+            )
+            invalid_verification["content"]["checks"] = []
+            try:
+                validate_knowledge_document(invalid_verification)
+            except CoreError:
+                pass
+            else:
+                raise CoreError("invalid verification knowledge passed schema validation")
+
             with tempfile.TemporaryDirectory() as temp_dir:
                 target = Path(temp_dir) / "project"
                 shutil.copytree(fixture, target)
