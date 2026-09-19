@@ -112,10 +112,11 @@ When a skill cannot produce the requested knowledge without choosing an unresolv
 
 - identify the Authority that may decide it;
 - create a Core `Question` addressed to that Authority;
-- block the affected artifact or downstream provider;
+- when an affected provider already exists, block that artifact with `blocks`;
+- when the required provider does not yet exist, block the missing `CapabilityId` with `blocks_capabilities`;
 - do not fabricate an answer inside the candidate.
 
-The final semantic answer belongs in an Authority-owned canonical artifact, not in the Question itself.
+The final semantic answer belongs in an Authority-owned canonical artifact, not in the Question itself. Resolving a capability-blocking Question does not itself provide the capability: after resolution, target state normally returns `CREATE` so the artifact skill can form the requested knowledge from the accepted decision.
 
 ## Skill contract
 
