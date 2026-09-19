@@ -5,4 +5,14 @@ artifacts:
     provides:
       - csv-deduplicator.problem-evidence
     depends_on: []
+
+  - id: PRODUCT-REQUIREMENTS
+    authority: PRODUCT-REQUIREMENTS
+    path: examples/greenfield-csv-deduplicator/artifacts/product-requirements.md
+    provides:
+      - csv-deduplicator.product-intent
+      - csv-deduplicator.acceptance
+    depends_on:
+      - PROBLEM-EVIDENCE
+
 questions: []
