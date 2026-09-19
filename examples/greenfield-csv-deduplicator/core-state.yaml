@@ -1,2 +1,8 @@
-artifacts: []
+artifacts:
+  - id: PROBLEM-EVIDENCE
+    authority: DISCOVERY
+    path: examples/greenfield-csv-deduplicator/artifacts/problem.md
+    provides:
+      - csv-deduplicator.problem-evidence
+    depends_on: []
 questions: []
