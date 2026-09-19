@@ -53,7 +53,7 @@ A skill owns judgement-heavy procedure:
 - which canonical sources are relevant;
 - what semantic questions must be answered;
 - what contradictions or unknowns prevent acceptance;
-- which typed schema represents the result;
+- which output contract represents the result;
 - what evidence is required before registration.
 
 A skill does not own target-project truth.
