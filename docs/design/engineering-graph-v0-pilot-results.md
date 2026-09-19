@@ -251,3 +251,72 @@ Observed behavior after removing only that evidence provider:
 
 This confirms the current applicability rule: applicability remains project-owned
 policy and Harness consumes its accepted evidence as normal engineering knowledge.
+
+
+## Full greenfield artifact-skill coverage
+
+The greenfield pilot now classifies every production capability in its
+IMPLEMENTATION closure with a reusable `knowledge_kind` and verifies a registered
+artifact skill for every possible frontier.
+
+Registered greenfield path:
+
+```text
+problem-evidence
+→ problem-evidence skill
+
+product-intent + acceptance
+→ one grouped product-requirements work item
+→ product-requirements skill
+
+architecture
+→ system-architecture skill
+
+CLI contract
+→ interface-contract skill
+
+implementation plan
+→ implementation-design skill
+
+completion criteria
+→ implementation-design skill
+
+verification strategy
+→ verification-strategy skill
+
+acceptance scenarios
+→ acceptance-scenarios skill
+```
+
+The greenfield workflow starts from the final accepted model, removes each
+provider (or coherent provider capability group) in turn, reevaluates
+IMPLEMENTATION, and proves the newly exposed CREATE routes to exactly one expected
+skill work item.
+
+The artifact skills are repository-independent procedures. Their outputs remain
+project-native where NAPMS/greenfield/Nutrition demonstrate different natural
+formats.
+
+New skills justified by repeated evidence:
+
+- `problem-evidence` — NAPMS Discovery, Nutrition Problem/Evidence, greenfield;
+- `product-requirements` — NAPMS Product Requirements, Nutrition Product
+  Requirements, greenfield;
+- `system-architecture` — NAPMS system rules, Nutrition target architecture,
+  greenfield;
+- `interface-contract` — NAPMS external interface contracts and greenfield CLI;
+- `implementation-design` — NAPMS readiness design and greenfield plan/completion;
+- `acceptance-scenarios` — NAPMS test intent and greenfield scenarios.
+
+This proves skill routing can cover a complete simple software-product design
+path without putting skill names into CapabilityIds or Core state.
+
+## Scoped capability conclusion
+
+First-class subject-parameterized capabilities remain deliberately deferred.
+
+See `docs/design/scoped-capabilities-research-v0.md`.
+
+The current evidence supports explicit scoped CapabilityIds in project/adaptor
+projection, but does not yet define universal subject propagation through
+production prerequisites.
