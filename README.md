@@ -57,7 +57,7 @@ The reusable agent loop is documented in `docs/design/agent-artifact-workbench-v
 
 - `skills/core/design-profile/SKILL.md` to define/review the target knowledge;
 - `skills/core/bootstrap-existing-project/SKILL.md` to reuse existing canonical project truth;
-- artifact-specific skills under `skills/artifacts/**` for actionable `CREATE` expectations;
+- artifact-specific skills under `skills/artifacts/**` for actionable `CREATE` expectations; skills may produce typed `.harness/knowledge` or project-native canonical artifacts when that is the natural target format;
 - starter profiles under `profiles/**` as adaptable checklists, not universal completeness proofs.
 
 Schema validation does not itself accept semantics. The agent registers `provides` only after the artifact passes semantic acceptance.
