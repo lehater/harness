@@ -1,0 +1,14 @@
+version: 0
+kind: harness-artifact-schema-candidate
+schema: product-requirements/v0-experiment
+artifact: INVALID
+source: research-fixture
+capability_claims: [example.requirements]
+content:
+  purpose: Deliberately invalid fixture.
+  goals: [A goal exists.]
+  requirement_groups: []
+  constraints: []
+  acceptance_examples: []
+  non_goals: []
+  evidence: []
