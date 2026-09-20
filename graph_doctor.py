@@ -109,6 +109,24 @@ def diagnose_engineering_graph(graph: dict[str, Any]) -> list[dict[str, Any]]:
     producers, productions = _productions(graph)
     requirements = _requirements(graph)
 
+    for authority in graph.get("authorities", []) or []:
+        if not isinstance(authority, dict):
+            continue
+        authority_id = authority.get("id")
+        if not (authority.get("produces", []) or []):
+            findings.append(
+                finding(
+                    "AUTHORITY_NO_OUTPUTS",
+                    "WARN",
+                    f"Authority {authority_id} declares no public production contracts.",
+                    owner=authority_id,
+                    suggestions=[
+                        "Remove the Authority if it is stale.",
+                        "Add the public capability it actually owns if the omission is accidental.",
+                    ],
+                )
+            )
+
     seen_producers: dict[str, str] = {}
     for authority in graph.get("authorities", []) or []:
         if not isinstance(authority, dict):
@@ -169,7 +187,7 @@ def diagnose_engineering_graph(graph: dict[str, Any]) -> list[dict[str, Any]]:
             findings.append(
                 finding(
                     "CAPABILITY_DEAD_PUBLIC",
-                    "WARN",
+                    "ERROR",
                     f"Public capability {capability} is produced by {authority} but is neither consumed nor explicitly terminal.",
                     owner=authority,
                     evidence={"capability": capability},
@@ -223,21 +241,28 @@ def diagnose_engineering_graph(graph: dict[str, Any]) -> list[dict[str, Any]]:
         validate_engineering_graph(graph)
     except CoreError as exc:
         message = str(exc)
-        code = "ENGINEERING_GRAPH_INVALID"
-        if "production cycle" in message:
-            code = "CAPABILITY_CYCLE"
-        elif "multiple subjects" in message:
-            code = "CAPABILITY_SUBJECT_COLLISION"
-        elif "duplicate" in message:
-            code = "ENGINEERING_GRAPH_DUPLICATE"
-        findings.append(
-            finding(
-                code,
-                "ERROR",
-                message,
-                suggestions=["Repair the Engineering Graph before relying on target-state evaluation."],
+        already_explained = False
+        if "unconsumed public capabilities require explicit terminal declaration" in message:
+            already_explained = any(
+                row["code"] == "CAPABILITY_DEAD_PUBLIC"
+                for row in findings
             )
-        )
+        if not already_explained:
+            code = "ENGINEERING_GRAPH_INVALID"
+            if "production cycle" in message:
+                code = "CAPABILITY_CYCLE"
+            elif "multiple subjects" in message:
+                code = "CAPABILITY_SUBJECT_COLLISION"
+            elif "duplicate" in message:
+                code = "ENGINEERING_GRAPH_DUPLICATE"
+            findings.append(
+                finding(
+                    code,
+                    "ERROR",
+                    message,
+                    suggestions=["Repair the Engineering Graph before relying on target-state evaluation."],
+                )
+            )
 
     return findings
 
@@ -274,6 +299,54 @@ def diagnose_model(
                 by_id[artifact_id] = artifact
         if isinstance(path, str) and path:
             path_owners.setdefault(path, []).append(artifact)
+
+    declared_authorities = {
+        item.get("id")
+        for item in model.get("authorities", []) or []
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    engineering_authorities = {
+        item.get("id")
+        for item in (engineering_graph or {}).get("authorities", []) or []
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    known_authorities = declared_authorities | engineering_authorities
+
+    depended_on = {
+        dep
+        for artifact in artifacts
+        if isinstance(artifact, dict)
+        for dep in (artifact.get("depends_on", []) or [])
+        if isinstance(dep, str)
+    }
+    for artifact_id, artifact in sorted(by_id.items()):
+        owner = artifact.get("authority")
+        if known_authorities and owner not in known_authorities:
+            findings.append(
+                finding(
+                    "ARTIFACT_UNKNOWN_AUTHORITY",
+                    "ERROR",
+                    f"Artifact {artifact_id} is owned by unknown Authority {owner}.",
+                    owner=owner if isinstance(owner, str) else None,
+                    evidence={"artifact": artifact_id, "authority": owner},
+                    suggestions=["Correct the artifact owner or restore the Authority declaration."],
+                )
+            )
+        if not (artifact.get("provides", []) or []) and artifact_id not in depended_on:
+            findings.append(
+                finding(
+                    "ARTIFACT_ORPHAN",
+                    "WARN",
+                    f"Artifact {artifact_id} provides no public capability and is not a dependency of another canonical artifact.",
+                    owner=owner if isinstance(owner, str) else None,
+                    evidence={"artifact": artifact_id, "path": artifact.get("path")},
+                    suggestions=[
+                        "Remove the stale artifact registration if it is obsolete.",
+                        "Add the missing dependency edge if it is accepted supporting knowledge.",
+                        "Expose a CapabilityId only if there is a real downstream consumer.",
+                    ],
+                )
+            )
 
     for path, rows in sorted(path_owners.items()):
         if len(rows) > 1:
@@ -394,6 +467,17 @@ def diagnose_model(
             continue
         qid = question.get("id")
         owner = question.get("authority")
+        if known_authorities and owner not in known_authorities:
+            findings.append(
+                finding(
+                    "QUESTION_UNKNOWN_AUTHORITY",
+                    "ERROR",
+                    f"Question {qid} is addressed to unknown Authority {owner}.",
+                    owner=owner if isinstance(owner, str) else None,
+                    evidence={"question": qid, "authority": owner},
+                    suggestions=["Route the Question to an existing semantic owner or restore the missing Authority."],
+                )
+            )
         for artifact_id in question.get("blocks", []) or []:
             if artifact_id not in by_id:
                 findings.append(
@@ -512,7 +596,8 @@ def diagnose_project(
             )
         )
 
-    if target is not None and realized is not None:
+    structural_errors = any(row["severity"] == "ERROR" for row in findings)
+    if target is not None and realized is not None and not structural_errors:
         try:
             result = evaluate_engineering_target(engineering_graph, target, realized)
             if result["status"] != "COMPLETE":
