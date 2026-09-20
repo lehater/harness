@@ -1,36 +1,36 @@
 authorities: []
 artifacts:
   - id: EXAMPLE-REQUIREMENTS
-    path: examples/user-facing-application/canonical/napms-mvp-requirements.yaml
+    path: examples/user-facing-application/canonical/example-requirements.yaml
     authority: PRODUCT-REQUIREMENTS
     provides: [example.requirements]
   - id: EXAMPLE-DOMAIN-USE-CASES
-    path: examples/user-facing-application/canonical/napms-mvp-domain-use-cases.yaml
+    path: examples/user-facing-application/canonical/example-domain-use-cases.yaml
     authority: DOMAIN-USE-CASE-DESIGN
     provides: [example.domain-use-cases]
     depends_on: [EXAMPLE-REQUIREMENTS]
   - id: EXAMPLE-SECURITY
-    path: examples/user-facing-application/canonical/napms-mvp-security.yaml
+    path: examples/user-facing-application/canonical/example-security.yaml
     authority: SECURITY-ARCHITECTURE
     provides: [example.security-architecture]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
   - id: EXAMPLE-QUALITY
-    path: examples/user-facing-application/canonical/napms-mvp-quality.yaml
+    path: examples/user-facing-application/canonical/example-quality.yaml
     authority: QUALITY-DESIGN
     provides: [example.quality-constraints]
     depends_on: [EXAMPLE-REQUIREMENTS]
   - id: EXAMPLE-MACHINE-INTERFACE
-    path: examples/user-facing-application/canonical/napms-mvp-machine-interface.yaml
+    path: examples/user-facing-application/canonical/example-machine-interface.yaml
     authority: INTERFACE-DESIGN
     provides: [example.machine-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
   - id: EXAMPLE-FRONTEND-JOURNEYS
-    path: examples/user-facing-application/canonical/napms-mvp-frontend-journeys.yaml
+    path: examples/user-facing-application/canonical/example-frontend-journeys.yaml
     authority: APPLICATION-DESIGN
     provides: [example.frontend.user-journeys]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
   - id: EXAMPLE-HUMAN-INTERFACE
-    path: examples/user-facing-application/canonical/napms-mvp-human-interface.yaml
+    path: examples/user-facing-application/canonical/example-human-interface.yaml
     authority: INTERFACE-DESIGN
     provides: [example.frontend.human-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-FRONTEND-JOURNEYS, EXAMPLE-SECURITY, EXAMPLE-MACHINE-INTERFACE]
