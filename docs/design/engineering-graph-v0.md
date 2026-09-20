@@ -83,6 +83,17 @@ A requirement may carry `subject` metadata for the derived target view. In v0, p
 
 Do not use one broad CapabilityId with different subjects and assume `subject` filters providers.
 
+## Public capability liveness
+
+Every produced public CapabilityId must have a reason to exist in the selected Engineering Graph.
+
+A produced capability must either:
+
+- be required by another production contract or Consumer; or
+- be declared explicitly in `terminal_capabilities` with its owning Authority and a reason.
+
+An already-consumed capability cannot also be declared terminal. This catches stale or accidentally-public outputs without turning private intermediate artifact facts into capabilities.
+
 ## Consumer
 
 A Consumer is a selected terminal target that consumes engineering knowledge but does not need to produce more engineering knowledge inside the selected graph.
@@ -124,6 +135,8 @@ consumers:
     purpose: Build accepted behavior without inventing design decisions.
     requires:
       - capability: example.requirements
+
+terminal_capabilities: []
 ```
 
 A string in `produces` is shorthand for a root production contract with no prerequisites.

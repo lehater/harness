@@ -68,6 +68,29 @@ A separately authored Design Profile remains supported for consumers of `target_
 
 The managed knowledge workspace is optional and orthogonal. A project may use `.harness/knowledge/**`, `workspace.py`, and generated documentation when it wants Harness-managed typed semantic artifacts. This does not change the Engineering Graph/Core integration contract and must not force other projects to adopt managed knowledge.
 
+## Project graph consistency
+
+When a project already owns an authoritative canonical artifact graph, Harness may validate the projected artifact routing against the Engineering Graph capability topology.
+
+For a complete selected projection:
+
+- every selected canonical artifact has exactly one Authority binding;
+- every provided CapabilityId agrees with its Engineering Graph producer Authority;
+- cross-Authority artifact dependencies must not introduce an upstream Authority absent from capability prerequisites (hidden dependency);
+- capability prerequisites must not claim an upstream Authority absent from the project artifact dependency graph (phantom dependency).
+
+The comparison is performed at the Authority/capability frontier. Harness does not require one artifact edge for every capability edge and does not become the owner of the project graph.
+
+## Authority execution context
+
+Harness may derive an ephemeral bounded execution context for one Authority from the Engineering Graph and Core realization.
+
+The context contains accepted upstream provider artifacts, same-Authority supporting closure, owned artifacts, public outputs, downstream consumers, blockers and allowed canonical read/write paths.
+
+It is routing data, not a CanonicalArtifact, task, approval, stage or workflow state.
+
+Projects may provide format-specific reference extractors, but Harness owns validation against the derived allowed-read boundary. Write-set validation must reject changes to canonical artifacts outside the selected Authority and must reject production while required inputs are blocked.
+
 ## CI boundary
 
 Permanent project CI should verify the contract, not preserve pilot experiments. A normal integration check should obtain a pinned Harness version, derive inputs when adapters are used, validate the Engineering Graph and Core realization, evaluate selected Consumer(s), and enforce project-owned target assertions.

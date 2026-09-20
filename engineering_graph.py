@@ -111,6 +111,38 @@ def _consumer_requirements(consumer: dict[str, Any]) -> list[dict[str, str]]:
     )
 
 
+def _terminal_capabilities(graph: dict[str, Any]) -> dict[str, dict[str, str]]:
+    values = graph.get("terminal_capabilities", []) or []
+    if not isinstance(values, list):
+        raise CoreError("engineering graph terminal_capabilities must be a list")
+    result: dict[str, dict[str, str]] = {}
+    for value in values:
+        if not isinstance(value, dict):
+            raise CoreError("terminal capability must be a mapping")
+        unknown = set(value) - {"capability", "authority", "reason"}
+        if unknown:
+            raise CoreError(
+                f"terminal capability has unknown fields: {sorted(unknown)}"
+            )
+        capability = value.get("capability")
+        authority = value.get("authority")
+        reason = value.get("reason")
+        if not isinstance(capability, str) or not capability:
+            raise CoreError("terminal capability id is required")
+        if capability in result:
+            raise CoreError(f"duplicate terminal capability: {capability}")
+        if not isinstance(authority, str) or not authority:
+            raise CoreError(f"terminal capability {capability} authority is required")
+        if not isinstance(reason, str) or not reason.strip():
+            raise CoreError(f"terminal capability {capability} reason is required")
+        result[capability] = {
+            "capability": capability,
+            "authority": authority,
+            "reason": reason,
+        }
+    return result
+
+
 def validate_engineering_graph(graph: dict[str, Any]) -> None:
     if graph.get("version") != 1:
         raise CoreError("engineering graph version must be 1")
@@ -204,6 +236,39 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
                 f"capability {capability} is required for multiple subjects {sorted(subjects)}; "
                 "use distinct subject-scoped CapabilityIds in Engineering Graph v0"
             )
+
+    # Every public production must have a downstream consumer or be explicitly terminal.
+    consumed_capabilities = {
+        requirement["capability"]
+        for _, requirement in all_requirements
+    }
+    terminal_capabilities = _terminal_capabilities(graph)
+
+    for capability, terminal in terminal_capabilities.items():
+        producer = producer_by_capability.get(capability)
+        if producer is None:
+            raise CoreError(
+                f"terminal capability {capability} has no producer Authority"
+            )
+        if terminal["authority"] != producer:
+            raise CoreError(
+                f"terminal capability {capability} is owned by {producer}, "
+                f"expected {terminal['authority']}"
+            )
+        if capability in consumed_capabilities:
+            raise CoreError(
+                f"terminal capability {capability} is already consumed downstream"
+            )
+
+    unconsumed = sorted(
+        set(producer_by_capability)
+        - consumed_capabilities
+        - set(terminal_capabilities)
+    )
+    if unconsumed:
+        raise CoreError(
+            f"unconsumed public capabilities require explicit terminal declaration: {unconsumed}"
+        )
 
     # Stable capability production topology must be a DAG.
     dependencies: dict[str, set[str]] = {

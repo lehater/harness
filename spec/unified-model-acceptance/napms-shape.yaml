@@ -1,0 +1,95 @@
+version: 1
+kind: harness-unified-model-acceptance
+id: NAPMS-SHAPE
+
+engineering_graph:
+  version: 1
+  kind: harness-engineering-graph
+  id: NAPMS-SHAPE
+  default_subject: APPLICATION
+  authorities:
+    - id: PRODUCT
+      responsibility: Own accepted product intent.
+      boundary:
+        semantic_cohesion: Product intent is one decision family.
+        independent_change: Product intent can change before architecture.
+        public_contract: Produces accepted requirements.
+      produces:
+        - capability: example.requirements
+          requires: []
+    - id: APPLICATION
+      responsibility: Own application journey composition.
+      boundary:
+        semantic_cohesion: Application journey is one orchestration family.
+        independent_change: Journey composition can change behind stable product intent.
+        public_contract: Produces accepted application journey.
+      produces:
+        - capability: example.journey
+          requires: [example.requirements]
+    - id: ARCHITECTURE
+      responsibility: Own system architecture.
+      boundary:
+        semantic_cohesion: Structural architecture is one decision family.
+        independent_change: Architecture can change behind stable journey semantics.
+        public_contract: Produces accepted architecture.
+      produces:
+        - capability: example.architecture
+          requires: [example.journey]
+        - capability: example.async-not-applicable
+          requires: [example.architecture]
+    - id: INTERFACE
+      responsibility: Own supported external interfaces.
+      boundary:
+        semantic_cohesion: External interaction contracts are one decision family.
+        independent_change: Representations can change behind stable architecture semantics.
+        public_contract: Produces accepted interface contracts.
+      produces:
+        - capability: example.interface
+          requires: [example.architecture]
+    - id: IMPLEMENTATION-DESIGN
+      responsibility: Own implementation realization design.
+      boundary:
+        semantic_cohesion: Implementation slicing is one decision family.
+        independent_change: Slicing can change behind accepted upstream design.
+        public_contract: Produces implementation design.
+      produces:
+        - capability: example.implementation-design
+          requires:
+            - example.interface
+            - example.async-not-applicable
+  consumers:
+    - id: BACKEND-IMPLEMENTATION
+      purpose: Build the accepted backend.
+      requires: [example.implementation-design]
+    - id: FRONTEND-IMPLEMENTATION
+      purpose: Build the accepted frontend.
+      requires: [example.interface]
+  terminal_capabilities: []
+
+source_graph:
+  version: 1
+  kind: canonical-design-graph
+  nodes:
+    - {id: REQUIREMENTS, path: docs/requirements.yaml, depends_on: []}
+    - {id: JOURNEY, path: docs/journey.yaml, depends_on: [REQUIREMENTS]}
+    - {id: ARCHITECTURE, path: docs/architecture.yaml, depends_on: [JOURNEY]}
+    - {id: ASYNC-NA, path: docs/async-na.yaml, depends_on: [ARCHITECTURE]}
+    - {id: INTERFACE, path: docs/interface.yaml, depends_on: [ARCHITECTURE]}
+    - {id: IMPLEMENTATION-DESIGN, path: docs/implementation-design.yaml, depends_on: [ASYNC-NA, INTERFACE]}
+
+projection:
+  kind: harness-canonical-graph-projection
+  authorities:
+    - {id: PRODUCT}
+    - {id: APPLICATION}
+    - {id: ARCHITECTURE}
+    - {id: INTERFACE}
+    - {id: IMPLEMENTATION-DESIGN}
+  bindings:
+    - {artifact: REQUIREMENTS, authority: PRODUCT, provides: [example.requirements]}
+    - {artifact: JOURNEY, authority: APPLICATION, provides: [example.journey]}
+    - {artifact: ARCHITECTURE, authority: ARCHITECTURE, provides: [example.architecture]}
+    - {artifact: ASYNC-NA, authority: ARCHITECTURE, provides: [example.async-not-applicable]}
+    - {artifact: INTERFACE, authority: INTERFACE, provides: [example.interface]}
+    - {artifact: IMPLEMENTATION-DESIGN, authority: IMPLEMENTATION-DESIGN, provides: [example.implementation-design]}
+  questions: []
