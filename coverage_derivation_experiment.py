@@ -97,10 +97,16 @@ def selector_matches(mapping: dict[str,Any], artifact: dict[str,Any]) -> bool:
         if any(token in cap for cap in caps): return True
     return False
 
-def evidence_for(mapping: dict[str,Any], knowledge: dict[str,Any]) -> list[dict[str,Any]]:
+def proof_matches(mapping: dict[str,Any], artifact: dict[str,Any]) -> bool:
+    caps=set(artifact.get("provides",[]) or [])
+    required=set(mapping.get("proof_capability_ids",[]) or [])
+    return bool(caps & required)
+
+def evidence_for(mapping: dict[str,Any], knowledge: dict[str,Any], *, proof_only: bool=False) -> list[dict[str,Any]]:
     result=[]
     for artifact in knowledge["artifacts"].values():
-        if selector_matches(mapping,artifact):
+        matched = proof_matches(mapping,artifact) if proof_only else selector_matches(mapping,artifact)
+        if matched:
             result.append({
                 "artifact":artifact["id"],
                 "authority":artifact.get("authority"),
@@ -153,12 +159,15 @@ def derive(catalog: dict[str,Any], registry: dict[str,Any], knowledge_docs: list
 
         mapping=mappings.get(cid)
         evidence=evidence_for(mapping,knowledge) if mapping else []
+        proof=evidence_for(mapping,knowledge,proof_only=True) if mapping else []
         blockers=blocked_by(mapping,knowledge) if mapping else []
 
         if blockers and cid in required:
             state="BLOCKED"
-        elif evidence:
+        elif proof:
             state="COVERED"
+        elif cid in required and evidence:
+            state="UNASSESSED"
         elif cid in required:
             state="MISSING"
         else:
@@ -173,6 +182,7 @@ def derive(catalog: dict[str,Any], registry: dict[str,Any], knowledge_docs: list
             "state":state,
             "derivation":"AUTO" if mapping else "NO_MAPPING",
             "evidence":evidence,
+            "proof":proof,
             "blockers":blockers,
             "freshness":fresh,
             "attention_required": cid in required,
