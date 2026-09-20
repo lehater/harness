@@ -225,3 +225,95 @@ Validate this decomposition against:
 2. NAPMS — architecture/tooling dependencies and any external service/package constraints.
 
 The validation must use canonical design artifacts, not production code as design evidence.
+
+
+## Real-project validation
+
+### Nutrition Management
+
+Evidence used: current canonical Harness graph and accepted design artifacts only. Production code was not inspected.
+
+Nutrition provides two deliberately different dependency classes.
+
+**BLS 4.0 external data source.** Food Knowledge explicitly owns accepted external-food data decisions and publishes separate source-identity, source-structure, source-code-set, evidence-semantics, errata and production-package capabilities. The accepted domain design says BLS 4.0 is the preferred/canonical MVP semantic baseline, retains provenance at the finest available level, permits manual/external preparation, and does not require online synchronization.
+
+This is a strong counterexample to a generic SUPPLY-CHAIN Authority. The external source is part of Food Knowledge semantics: changing source identity can change accepted domain evidence semantics. Acquisition/import mechanics remain outer adapters and verification is separately owned. The existing capability graph already distinguishes source identity from derived/import knowledge.
+
+**Implementation dependencies.** Accepted Implementation Design selects Python 3.14, uv with committed lockfile, SQLite, Alembic, SQLAlchemy, SCIP/PySCIPOpt and pytest, while explicitly stating that these are implementation choices rather than domain semantics. This independently confirms that concrete package/tool selection can be owned by Implementation Design while upstream semantic requirements remain elsewhere.
+
+The committed lockfile requirement is evidence/control over resolved realization. It does not become the semantic owner of why SQLAlchemy, PySCIPOpt or another dependency is acceptable.
+
+Nutrition verdict: PASS. Existing Authorities and capability granularity can express both semantic external data dependencies and implementation package/tool dependencies without a new Authority.
+
+### NAPMS
+
+Evidence used: current canonical graph, Harness responsibility contracts and canonical design-control contract only. Production code/tests were not used as design truth.
+
+NAPMS explicitly states:
+- product code/tests are forbidden as design truth;
+- external Harness runtime dependency is forbidden;
+- one semantic fact has one current owner;
+- technologies/packages/deployment units must not cause an Authority split by themselves;
+- generators may not invent missing semantic details;
+- missing downstream knowledge routes to the Authority allowed to decide it.
+
+This directly rejects technology/package identity as an Authority boundary.
+
+NAPMS also separates System Architecture, Security Architecture, Quality, Security Analysis, Operability, Implementation Design and Verification Design through public capability contracts. An acquired dependency can therefore impose different concerns on different owners without requiring one supply-chain owner.
+
+The control-plane rule that implementation must not depend at runtime on the external Harness repository is itself an accepted dependency constraint. It is project design truth. A package manifest or SBOM could prove whether realization obeys it, but cannot replace that rule.
+
+NAPMS verdict: PASS. The model needs dependency evidence integration, not another Authority.
+
+## Adversarial scenarios
+
+### A — implementation library vulnerability
+
+A CVE in SQLAlchemy/PySCIPOpt does not by itself rewrite Nutrition design. Security Analysis evaluates applicability. If the selected stack must change, Implementation Design owns the replacement selection; architecture/security/quality owners are involved only when their accepted constraints change. A non-trivial migration invokes Change Transition Design.
+
+PASS without new Authority.
+
+### B — BLS source supersession
+
+A new BLS source/version is not merely a package upgrade. Food Knowledge owns whether the new source preserves/changes canonical nutrient semantics. Its accepted source-identity capability may receive a new acceptance assertion, after which Capability Lifecycle derives stale consumers.
+
+A generic supply-chain owner would be semantically wrong here because it could not decide Food Knowledge equivalence.
+
+PASS without new Authority.
+
+### C — compromised build artifact with unchanged design
+
+If source/design selections remain accepted but a resolved binary/package has unacceptable provenance/integrity, the failure is realization/evidence-level. Verification/security controls reject the artifact. No semantic capability needs to be superseded unless the response changes an accepted engineering decision.
+
+This proves that acquired-artifact validity cannot be represented solely through Capability Lifecycle: lifecycle tracks accepted knowledge, while artifact provenance tracks realization evidence.
+
+PASS, but exposes an integration requirement.
+
+### D — external SaaS deprecation
+
+Provider deprecation evidence routes to the Authority owning the external service's required semantic/architectural role. If replacement requires coexistence, data migration or staged cutover, Change Transition Design applies. License/contract changes route through Obligation Analysis.
+
+PASS without package-specific Core semantics.
+
+## Refined conclusion
+
+The two projects confirm the no-new-Authority result, but expose a precise missing integration concern:
+
+Harness needs a reusable **acquisition/supply-chain evidence analysis**, not a new semantic owner.
+
+Its purpose is to prove that realized external dependencies satisfy accepted constraints while preserving the distinction:
+- accepted engineering capability/constraint;
+- selected realization identity;
+- resolved immutable artifact/service identity;
+- provenance/integrity/inventory evidence;
+- verification result.
+
+This analysis must not promote lockfiles, SBOMs, signatures, scanner findings or provenance statements into CanonicalArtifact design truth.
+
+## Promotion criterion
+
+Canonicalize the reusable analysis only if it can be expressed as a consumer of existing accepted capabilities and project-owned evidence without introducing duplicated dependency truth.
+
+A future Core primitive is justified only if multiple integrations demonstrate that the same minimal acquired-artifact identity/provenance fact must be persisted by Harness itself rather than referenced from project-native evidence systems.
+
+Current Nutrition and NAPMS evidence does not demonstrate that need.
