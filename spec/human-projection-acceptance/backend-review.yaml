@@ -1,0 +1,32 @@
+version: 1
+kind: harness-human-projection
+id: backend-review
+consumer: BACKEND-IMPLEMENTATION
+
+documents:
+  - id: overview
+    title: System Overview
+    sections:
+      - id: product-boundary
+        title: Product Boundary
+        purpose: Explain accepted product intent.
+        renderer: narrative
+        select:
+          capabilities:
+            - example.requirements
+      - id: architecture
+        title: Architecture
+        purpose: Explain accepted system structure.
+        renderer: narrative
+        select:
+          capabilities:
+            - example.architecture
+  - id: implementation
+    title: Implementation Guide
+    sections:
+      - id: implementation-design
+        title: Implementation Design
+        renderer: narrative
+        select:
+          authorities:
+            - IMPLEMENTATION-DESIGN
