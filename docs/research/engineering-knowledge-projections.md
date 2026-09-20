@@ -90,3 +90,67 @@ Documentation is a view over a selected semantic closure. Generating or deleting
 Validate the same three projection classes against NAPMS. Specifically test whether its existing canonical graph can deterministically supply structural identities/relationships through an adapter. If Nutrition requires a typed schema while NAPMS can adapt existing structure, that is evidence for a renderer-neutral structural projection contract, not evidence for a universal canonical architecture format.
 
 Do not change Core or Integration Contract v0 from the Nutrition result alone.
+
+
+## NAPMS validation
+
+NAPMS provides the structurally different second case requested by the Nutrition experiment.
+
+Unlike Nutrition, NAPMS already owns canonical structural architecture in `docs/architecture/structurizr/workspace.dsl`. The project artifact specification explicitly assigns system/container/component/deployment structure to Structurizr DSL, while non-C4 rules, HTTP contracts, persistence and domain semantics remain in their own canonical formats.
+
+The canonical graph registers that artifact as `C4-STRUCTURE` with kind `structural-architecture`; the Harness projection binds it to `SYSTEM-ARCHITECTURE` and capability `engineering.architecture.c4-model`. The IMPLEMENTATION consumer explicitly requires that capability.
+
+NAPMS also has deterministic projections from other typed canonical artifacts into PlantUML views, and embeds those disposable views into the Structurizr workspace. This demonstrates that Structurizr may be either:
+
+1. a canonical artifact when the project deliberately chooses Structurizr DSL as the natural notation for structural architecture; or
+2. a disposable projection target when structural truth is owned elsewhere in a typed/adaptable form.
+
+The distinction is ownership, not file format.
+
+### Revised Structurizr conclusion
+
+The Nutrition-only conclusion that Structurizr should not be a canonical store was too strong.
+
+The validated rule is:
+
+> Harness does not prescribe whether Structurizr is canonical or generated. A project may make Structurizr DSL the canonical owner of structural C4 semantics, or generate it from another canonical structural model. What is forbidden is two competing owners or semantic inference hidden in a renderer.
+
+NAPMS proves that no universal `system-architecture/v1` schema is required for Harness integration. Its project-native Structurizr model already provides a deterministic machine-readable structural contract and is directly addressable through the canonical graph.
+
+### Human projection evidence
+
+NAPMS also has `generate_human_context_package.py`, which resolves the exact IMPLEMENTATION consumer capability closure, writes a manifest, groups artifacts for humans and copies canonical sources into a disposable package. This independently validates assembly projection.
+
+Its current rendering of arbitrary canonical files inside fenced YAML/text is intentionally low-semantic: useful for bounded context packaging, but not evidence that Harness should parse every project-native notation into a universal document model.
+
+## Cross-pilot conclusion
+
+Nutrition and NAPMS together establish:
+
+- capability closure, not a fixed document catalogue, selects documentation input;
+- human-document grouping is projection policy;
+- canonical format is concern-specific and project-native;
+- standard machine-readable notations such as Structurizr/OpenAPI are valid canonical owners when they naturally express the concern;
+- generated diagrams/documents remain disposable when their semantics are owned by another canonical artifact;
+- Harness needs a renderer-neutral **projection contract**, not a universal canonical knowledge schema;
+- no Core primitive or new DOCUMENTATION consumer is justified.
+
+### Projection contract candidate
+
+A generic projection declaration needs only:
+
+- projection id;
+- selected source artifact IDs or selected Consumer closure;
+- renderer/adapter identity;
+- output paths;
+- deterministic regeneration command;
+- optional view metadata;
+- traceability back to canonical sources.
+
+This is orchestration metadata, not semantic knowledge. NAPMS already carries an equivalent project-native form in `canonical-graph.yaml.projections`.
+
+## Decision
+
+The research question is sufficiently validated across two materially different projects.
+
+Recommended canonicalization: generalize the existing project-native Human Projection contract into an **Engineering Knowledge Projection v0** contract covering assembly, semantic and visual projections, while preserving project-native projection declarations/adapters. Do not change Core v0.
