@@ -422,3 +422,95 @@ Do not canonicalize yet.
 
 The remaining decision gate is not Core, graph topology, packaging, scope, freshness or provenance. It is whether narrative semantic review can be made reliable enough for routine regeneration without silently changing meaning.
 
+## Follow-up: claim-level evidence fragments
+
+Artifact-level provenance is useful but still broad: a claim may cite the correct file while being weakly grounded in its actual content.
+
+The experiment therefore added optional claim evidence:
+
+```yaml
+claims:
+  - text: <human assertion>
+    sources: [SYSTEM-RULES]
+    evidence:
+      - source: SYSTEM-RULES
+        locator: consistency.export
+        excerpt: "One shared read snapshot covers selection authority evaluation effectiveness provenance and technical realization."
+```
+
+The validator can now require evidence and prove:
+
+- every evidence source is already cited by the claim;
+- every cited claim source has evidence;
+- evidence source belongs to the section scope and manifest;
+- the canonical source file exists;
+- the exact evidence excerpt exists in that canonical source;
+- optional locators are non-empty presentation metadata.
+
+Harness acceptance covers:
+- valid evidence;
+- missing evidence;
+- evidence for an uncited/out-of-scope source;
+- excerpt not present in the canonical source.
+
+NAPMS research adds a real evidence sample over:
+- SYSTEM-RULES;
+- SECURITY-ARCHITECTURE;
+- QUALITY-REQUIREMENTS.
+
+The sample passed against the real project files.
+
+### Interpretation
+
+Claim-level evidence is a useful middle ground:
+
+```
+claim text
+   ↓
+source CanonicalArtifact
+   ↓
+verifiable source excerpt / optional locator
+```
+
+It does not mathematically prove that the paraphrase follows from the excerpt, but it makes review local and auditable rather than requiring a reviewer to rediscover the relevant fact in an entire file.
+
+For structured sources, future adapters may replace or complement excerpts with stable field locators/JSONPath/YAML-path/native identifiers. A universal locator syntax is not required for v1.
+
+### Candidate narrative acceptance levels
+
+The experiments suggest three useful levels:
+
+1. **SOURCE-BOUND**
+   - every claim cites allowed CanonicalArtifacts.
+
+2. **EVIDENCE-BOUND**
+   - every cited source also supplies a verifiable excerpt/locator.
+   - recommended default for generated REVIEW/HANDOFF narrative.
+
+3. **TYPED**
+   - claim is rendered deterministically from a typed/native structured field.
+   - strongest when the source representation naturally supports it.
+
+These are projection-validation strengths, not Core target states.
+
+## Current research position
+
+The package architecture is now validated across:
+- exact Consumer scope;
+- explicit overview scope widening;
+- source existence;
+- source content freshness;
+- topic recipes;
+- narrative IR;
+- REVIEW/HANDOFF materialization;
+- real project narrative claims;
+- claim-level evidence fragments.
+
+Remaining work before canonicalization is primarily policy/ergonomics:
+- decide whether EVIDENCE-BOUND should be mandatory for narrative REVIEW/HANDOFF;
+- test a meaningful canonical source change and narrative regeneration workflow;
+- decide how generated projection IR/package is stored or published by default;
+- decide whether reusable software documentation recipes belong in Harness as optional starter profiles.
+
+No Core change is indicated.
+
