@@ -54,6 +54,7 @@ def build_authority_context(
     graph: dict[str, Any],
     model: dict[str, Any],
     authority_id: str,
+    capability_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     validate_engineering_graph(graph)
     realized = realize_core_model(graph, model)
@@ -80,11 +81,21 @@ def build_authority_context(
         key=lambda item: item["id"],
     )
 
-    public_outputs = sorted(
+    authority_outputs = sorted(
         capability
         for capability, owner in producers.items()
         if owner == authority_id
     )
+    if capability_ids is None:
+        public_outputs = authority_outputs
+    else:
+        requested = sorted(set(capability_ids))
+        unknown = sorted(set(requested) - set(authority_outputs))
+        if unknown:
+            raise CoreError(
+                f"Authority {authority_id} does not produce requested capabilities: {unknown}"
+            )
+        public_outputs = requested
 
     required_caps: dict[str, dict[str, Any]] = {}
     for capability in public_outputs:
@@ -215,6 +226,8 @@ def build_authority_context(
         "input_artifacts": input_artifacts,
         "supporting_input_artifacts": supporting_input_artifacts,
         "owned_artifacts": owned,
+        "selected_outputs": public_outputs,
+        "authority_outputs": authority_outputs,
         "public_outputs": public_outputs,
         "downstream_consumers": sorted(
             downstream,
@@ -286,6 +299,12 @@ def main() -> int:
     parser.add_argument("engineering_graph")
     parser.add_argument("core_model")
     parser.add_argument("authority")
+    parser.add_argument(
+        "--capability",
+        action="append",
+        dest="capabilities",
+        help="Limit context to one produced capability; may be repeated",
+    )
     parser.add_argument("--check-write", nargs="*")
     args = parser.parse_args()
 
@@ -293,6 +312,7 @@ def main() -> int:
         _load(args.engineering_graph),
         _load(args.core_model),
         args.authority,
+        args.capabilities,
     )
     if args.check_write is not None:
         context["validated_write_set"] = validate_write_set(
