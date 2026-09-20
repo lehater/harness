@@ -1,277 +1,97 @@
 #!/usr/bin/env python3
-"""Experimental lifecycle-aware evaluation for accepted engineering knowledge.
+"""Experimental capability-granular lifecycle evaluation.
 
-This module intentionally does not change Core v0. It overlays optional revision
-and accepted-prerequisite-baseline facts on a normal Core realization and uses
-Engineering Graph production prerequisites for semantic staleness propagation.
+Lifecycle metadata is a separate projection so Core v0 remains unchanged.
+Semantic invalidation is keyed by CapabilityId revisions, not artifact revisions.
 """
 from __future__ import annotations
-
-import argparse
-import json
+import argparse, json
 from pathlib import Path
 from typing import Any
-
 import yaml
-
-from engineering_graph import (
-    derive_profile,
-    production_index,
-    validate_engineering_graph,
-    validate_realization,
-)
+from engineering_graph import derive_profile, production_index, validate_realization
 from harness import CoreError, blocked, capability_blockers
-from target_state import validate_profile
-
 
 def _load(path: str | Path) -> dict[str, Any]:
-    value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise CoreError(f"{path} must contain a mapping")
+    value=yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value,dict): raise CoreError(f"{path} must contain a mapping")
     return value
 
-
-def _providers(model: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    result: dict[str, dict[str, Any]] = {}
-    for artifact in model.get("artifacts", []):
-        for capability in artifact.get("provides", []) or []:
-            if capability in result:
-                raise CoreError(
-                    f"lifecycle experiment requires one current provider per capability: {capability}"
-                )
-            result[capability] = artifact
+def lifecycle_index(projection: dict[str,Any]) -> dict[str,dict[str,Any]]:
+    if projection.get("version")!=1 or projection.get("kind")!="harness-capability-lifecycle":
+        raise CoreError("unexpected capability lifecycle projection")
+    result={}
+    for item in projection.get("providers",[]):
+        if not isinstance(item,dict): raise CoreError("lifecycle provider must be a mapping")
+        capability,artifact,revision=item.get("capability"),item.get("artifact"),item.get("revision")
+        baseline=item.get("accepted_prerequisites",{})
+        if not all(isinstance(v,str) and v for v in (capability,artifact,revision)):
+            raise CoreError("lifecycle provider artifact/capability/revision are required")
+        if capability in result: raise CoreError(f"duplicate lifecycle capability: {capability}")
+        if not isinstance(baseline,dict) or any(not isinstance(k,str) or not k or not isinstance(v,str) or not v for k,v in baseline.items()):
+            raise CoreError(f"invalid prerequisite baseline for {capability}")
+        result[capability]=item
     return result
 
+def validate_projection(graph,model,projection):
+    realized=validate_realization(graph,model); productions=production_index(graph)
+    lifecycle=lifecycle_index(projection); artifacts={a["id"]:a for a in realized.get("artifacts",[])}
+    for capability,item in lifecycle.items():
+        artifact=artifacts.get(item["artifact"])
+        if artifact is None or capability not in (artifact.get("provides",[]) or []):
+            raise CoreError(f"lifecycle provider does not match Core provider: {capability}")
+        production=productions.get(capability)
+        expected=set() if production is None else {r["capability"] for r in production["requires"]}
+        actual=set(item.get("accepted_prerequisites",{}))
+        if actual!=expected:
+            raise CoreError(f"lifecycle baseline for {capability} must cover exactly production prerequisites; expected {sorted(expected)}, got {sorted(actual)}")
+    return lifecycle
 
-def validate_lifecycle_metadata(
-    graph: dict[str, Any], model: dict[str, Any]
-) -> dict[str, dict[str, Any]]:
-    realized = validate_realization(graph, model)
-    productions = production_index(graph)
-    providers = _providers(realized)
-
-    revisions: set[str] = set()
-    for artifact in realized.get("artifacts", []):
-        revision = artifact.get("revision")
-        baseline = artifact.get("accepted_prerequisites")
-        if revision is None and baseline is None:
-            continue
-        if not isinstance(revision, str) or not revision:
-            raise CoreError(f"artifact {artifact['id']} revision is required with lifecycle metadata")
-        if revision in revisions:
-            raise CoreError(f"duplicate artifact revision identity: {revision}")
-        revisions.add(revision)
-        if not isinstance(baseline, dict):
-            raise CoreError(
-                f"artifact {artifact['id']} accepted_prerequisites must be a mapping"
-            )
-        if any(
-            not isinstance(capability, str)
-            or not capability
-            or not isinstance(value, str)
-            or not value
-            for capability, value in baseline.items()
-        ):
-            raise CoreError(
-                f"artifact {artifact['id']} accepted_prerequisites must map capability ids to revision ids"
-            )
-
-        expected: set[str] = set()
-        for capability in artifact.get("provides", []) or []:
-            production = productions.get(capability)
-            if production is None:
-                continue
-            expected.update(req["capability"] for req in production["requires"])
-        unknown = set(baseline) - expected
-        if unknown:
-            raise CoreError(
-                f"artifact {artifact['id']} baseline contains non-prerequisites: {sorted(unknown)}"
-            )
-
-    return providers
-
-
-def lifecycle_states(
-    graph: dict[str, Any], model: dict[str, Any]
-) -> dict[str, dict[str, Any]]:
-    validate_engineering_graph(graph)
-    providers = validate_lifecycle_metadata(graph, model)
-    productions = production_index(graph)
-    memo: dict[str, dict[str, Any]] = {}
-
-    def state(capability: str) -> dict[str, Any]:
-        if capability in memo:
-            return memo[capability]
-        artifact = providers.get(capability)
-        if artifact is None:
-            result = {"state": "MISSING", "capability": capability}
-            memo[capability] = result
-            return result
-
-        revision = artifact.get("revision")
-        baseline = artifact.get("accepted_prerequisites")
-        production = productions.get(capability)
-        required = [] if production is None else [
-            req["capability"] for req in production["requires"]
-        ]
-
-        if revision is None or baseline is None:
-            result = {
-                "state": "UNKNOWN",
-                "capability": capability,
-                "provider": artifact["id"],
-                "reason": "lifecycle metadata unavailable",
-            }
-            memo[capability] = result
-            return result
-
-        mismatches: list[dict[str, Any]] = []
+def lifecycle_states(graph,model,projection):
+    lifecycle=validate_projection(graph,model,projection); productions=production_index(graph); memo={}
+    def state(capability):
+        if capability in memo: return memo[capability]
+        item=lifecycle.get(capability)
+        if item is None:
+            result={"state":"UNKNOWN","capability":capability,"reason":"lifecycle coverage unavailable"}; memo[capability]=result; return result
+        production=productions.get(capability); required=[] if production is None else [r["capability"] for r in production["requires"]]
+        mismatches=[]; baseline=item.get("accepted_prerequisites",{})
         for prerequisite in required:
-            upstream = state(prerequisite)
-            upstream_artifact = providers.get(prerequisite)
-            current_revision = (
-                upstream_artifact.get("revision") if upstream_artifact is not None else None
-            )
-            accepted_revision = baseline.get(prerequisite)
-            if upstream["state"] != "CURRENT" or accepted_revision != current_revision:
-                mismatches.append({
-                    "capability": prerequisite,
-                    "accepted_revision": accepted_revision,
-                    "current_revision": current_revision,
-                    "upstream_state": upstream["state"],
-                })
-
-        result = {
-            "state": "STALE" if mismatches else "CURRENT",
-            "capability": capability,
-            "provider": artifact["id"],
-            "revision": revision,
-        }
-        if mismatches:
-            result["mismatches"] = mismatches
-        memo[capability] = result
-        return result
-
-    for capability in productions:
-        state(capability)
+            upstream=state(prerequisite); current=lifecycle.get(prerequisite,{}).get("revision")
+            if upstream["state"]!="CURRENT" or baseline.get(prerequisite)!=current:
+                mismatches.append({"capability":prerequisite,"accepted_revision":baseline.get(prerequisite),"current_revision":current,"upstream_state":upstream["state"]})
+        result={"state":"STALE" if mismatches else "CURRENT","capability":capability,"artifact":item["artifact"],"revision":item["revision"]}
+        if mismatches: result["mismatches"]=mismatches
+        memo[capability]=result; return result
+    for capability in productions: state(capability)
     return memo
 
-
-def evaluate_lifecycle_target(
-    graph: dict[str, Any], target_consumer: str, model: dict[str, Any]
-) -> dict[str, Any]:
-    realized = validate_realization(graph, model)
-    profile = derive_profile(graph, target_consumer)
-    validate_profile(profile, realized)
-    states = lifecycle_states(graph, realized)
-    artifacts = realized.get("artifacts", [])
-    expectations = {item["id"]: item for item in profile["expectations"]}
-
-    satisfied: list[str] = []
-    revalidate: list[dict[str, Any]] = []
-    create: list[dict[str, Any]] = []
-    wait: list[dict[str, Any]] = []
-    pending: list[dict[str, Any]] = []
-    remaining = set(expectations)
-
+def evaluate_lifecycle_target(graph,target,model,projection):
+    realized=validate_realization(graph,model); profile=derive_profile(graph,target); states=lifecycle_states(graph,realized,projection)
+    artifacts=realized.get("artifacts",[]); expectations={e["id"]:e for e in profile["expectations"]}
+    satisfied=[]; create=[]; revalidate=[]; wait=[]; pending=[]; remaining=set(expectations)
     while remaining:
-        progressed = False
-        for expectation_id in sorted(remaining):
-            expectation = expectations[expectation_id]
-            deps = expectation.get("depends_on", [])
-            unresolved = [dep for dep in deps if dep not in satisfied]
-            if unresolved:
-                continue
-            capability = expectation["capability"]
-            providers = [
-                artifact for artifact in artifacts
-                if capability in (artifact.get("provides", []) or [])
-            ]
+        progressed=False
+        for eid in sorted(remaining):
+            e=expectations[eid]; deps=e.get("depends_on",[])
+            if any(dep not in satisfied for dep in deps): continue
+            capability=e["capability"]; providers=[a for a in artifacts if capability in (a.get("provides",[]) or [])]
             if not providers:
-                blockers = capability_blockers(realized, capability)
-                item = {
-                    "expectation": expectation_id,
-                    "capability": capability,
-                    "authority": expectation["authority"],
-                }
-                if blockers:
-                    wait.append({"action": "WAIT", **item, "questions": blockers})
-                else:
-                    create.append({"action": "CREATE", **item})
-                remaining.remove(expectation_id)
-                progressed = True
-                continue
-
-            blockers = sorted({
-                question
-                for provider in providers
-                for question in blocked(realized, provider["id"])
-            })
-            if blockers:
-                wait.append({
-                    "action": "WAIT",
-                    "expectation": expectation_id,
-                    "capability": capability,
-                    "authority": expectation["authority"],
-                    "questions": blockers,
-                })
-                remaining.remove(expectation_id)
-                progressed = True
-                continue
-
-            lifecycle = states[capability]
-            if lifecycle["state"] == "CURRENT":
-                satisfied.append(expectation_id)
+                blockers=capability_blockers(realized,capability); item={"expectation":eid,"capability":capability,"authority":e["authority"]}
+                if blockers: wait.append({"action":"WAIT",**item,"questions":blockers})
+                else: create.append({"action":"CREATE",**item})
             else:
-                revalidate.append({
-                    "action": "REVALIDATE",
-                    "expectation": expectation_id,
-                    "capability": capability,
-                    "authority": expectation["authority"],
-                    "lifecycle": lifecycle,
-                })
-            remaining.remove(expectation_id)
-            progressed = True
+                blockers=sorted({q for a in providers for q in blocked(realized,a["id"])})
+                if blockers: wait.append({"action":"WAIT","expectation":eid,"capability":capability,"authority":e["authority"],"questions":blockers})
+                elif states[capability]["state"]=="CURRENT": satisfied.append(eid)
+                else: revalidate.append({"action":"REVALIDATE","expectation":eid,"capability":capability,"authority":e["authority"],"lifecycle":states[capability]})
+            remaining.remove(eid); progressed=True
+        if not progressed: break
+    for eid in sorted(remaining):
+        e=expectations[eid]; pending.append({"action":"PENDING","expectation":eid,"capability":e["capability"],"authority":e["authority"],"depends_on":[d for d in e.get("depends_on",[]) if d not in satisfied]})
+    return {"status":"COMPLETE" if len(satisfied)==len(expectations) else ("READY" if create or revalidate else "BLOCKED"),"satisfied":sorted(satisfied),"create":create,"revalidate":revalidate,"wait":wait,"pending":pending}
 
-        if not progressed:
-            break
-
-    for expectation_id in sorted(remaining):
-        expectation = expectations[expectation_id]
-        pending.append({
-            "action": "PENDING",
-            "expectation": expectation_id,
-            "capability": expectation["capability"],
-            "authority": expectation["authority"],
-            "depends_on": [dep for dep in expectation.get("depends_on", []) if dep not in satisfied],
-        })
-
-    status = "COMPLETE" if len(satisfied) == len(expectations) else (
-        "READY" if create or revalidate else "BLOCKED"
-    )
-    return {
-        "status": status,
-        "satisfied": sorted(satisfied),
-        "create": create,
-        "revalidate": revalidate,
-        "wait": wait,
-        "pending": pending,
-    }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Experimental Harness lifecycle evaluator")
-    parser.add_argument("graph")
-    parser.add_argument("target")
-    parser.add_argument("model")
-    args = parser.parse_args()
-    print(json.dumps(
-        evaluate_lifecycle_target(_load(args.graph), args.target, _load(args.model)),
-        indent=2,
-        sort_keys=True,
-    ))
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+def main():
+    p=argparse.ArgumentParser(); p.add_argument("graph"); p.add_argument("target"); p.add_argument("model"); p.add_argument("lifecycle"); a=p.parse_args()
+    print(json.dumps(evaluate_lifecycle_target(_load(a.graph),a.target,_load(a.model),_load(a.lifecycle)),indent=2,sort_keys=True)); return 0
+if __name__=="__main__": raise SystemExit(main())
