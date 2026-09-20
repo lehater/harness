@@ -1,0 +1,58 @@
+# Experimental Artifact Schemas
+
+Status: research-only. These schemas are not canonical Harness contracts.
+
+They test whether recurring CanonicalArtifact semantic shapes can use reusable
+machine-verifiable profiles without changing Core, Capability identity, Authority
+boundaries, or project-native canonical ownership.
+
+## product-requirements/v0-experiment
+
+Required:
+
+- purpose;
+- one or more goals;
+- one or more named requirement groups;
+- every group has one or more requirement statements.
+
+Optional:
+
+- constraints;
+- acceptance examples;
+- non-goals;
+- evidence references.
+
+The profile deliberately does not require acceptance examples merely because the
+artifact is Product Requirements. Acceptance becomes mandatory only if the concrete
+artifact claims an acceptance capability and its semantic acceptance process
+establishes that the corresponding fields are sufficient.
+
+## implementation-design/v0-experiment
+
+Required:
+
+- purpose;
+- one or more named design sections containing concrete implementation-facing
+  decisions;
+- one or more implementation slices;
+- one or more completion criteria.
+
+Optional:
+
+- forbidden decisions;
+- open questions;
+- design references.
+
+The profile does not prescribe language, framework, persistence technology,
+repository layout, or a fixed number of sections.
+
+## Test rule
+
+Structural PASS is not semantic acceptance. Each candidate also carries:
+
+- the original canonical source path;
+- the CapabilityIds it is intended to materialize.
+
+The experiment succeeds only if manual source comparison finds no missing or
+invented semantics and the project can discard the candidate without changing its
+current canonical state.
