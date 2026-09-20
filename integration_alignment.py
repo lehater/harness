@@ -2,6 +2,8 @@
 """Unified Harness integration checks for project-owned canonical graphs."""
 from __future__ import annotations
 
+import argparse
+import json
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -155,3 +157,34 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise CoreError(f"{path} must contain a mapping")
     return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Validate project canonical-graph alignment with Harness Engineering Graph"
+    )
+    parser.add_argument("source_graph")
+    parser.add_argument("projection")
+    parser.add_argument("engineering_graph")
+    parser.add_argument("--allow-partial-binding", action="store_true")
+    parser.add_argument("--output-core")
+    args = parser.parse_args()
+
+    result = validate_project_alignment(
+        load_yaml(args.source_graph),
+        load_yaml(args.projection),
+        load_yaml(args.engineering_graph),
+        require_complete_binding=not args.allow_partial_binding,
+    )
+    if args.output_core:
+        Path(args.output_core).write_text(
+            yaml.safe_dump(result["model"], sort_keys=False),
+            encoding="utf-8",
+        )
+    printable = {key: value for key, value in result.items() if key != "model"}
+    print(json.dumps(printable, indent=2, sort_keys=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
