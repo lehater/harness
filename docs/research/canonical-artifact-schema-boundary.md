@@ -414,3 +414,28 @@ The stable axis is:
 This means a “final artifact catalogue” can exist only as a **schema/profile
 catalogue of reusable materialization shapes**, not as a mandatory lifecycle
 checklist.
+
+
+## Migration consequence
+
+The Product Requirements experiment also rejects a generic automatic
+Markdown-to-schema migration.
+
+Nutrition and greenfield carry accepted requirements in prose sections and lists.
+Mapping those statements into semantic schema fields such as requirement,
+constraint, acceptance example or non-goal requires classification judgement.
+That judgement can change meaning and therefore cannot be hidden inside a renderer
+or deterministic projection adapter.
+
+Consequences:
+
+- new artifacts may be authored directly in an accepted reusable schema/profile;
+- standard-native artifacts may remain in their native standard;
+- existing project-native prose can remain canonical until there is a justified
+  migration/re-materialization;
+- migration of accepted prose into a typed schema is Authority-owned semantic work,
+  followed by ordinary semantic acceptance;
+- a generated typed copy of prose must not silently become a second canonical owner.
+
+This means schema standardization can be prospective and incremental. It does not
+require a repository-wide rewrite merely to adopt Harness.
