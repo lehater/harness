@@ -1,0 +1,179 @@
+authorities:
+  - {id: DISCOVERY}
+  - {id: PRODUCT-REQUIREMENTS}
+  - {id: STRATEGIC-DOMAIN-DESIGN}
+  - {id: DOMAIN-USE-CASE-DESIGN}
+  - {id: TACTICAL-DOMAIN-DESIGN}
+  - {id: APPLICATION-DESIGN}
+  - {id: QUALITY-DESIGN}
+  - {id: SYSTEM-ARCHITECTURE}
+  - {id: SECURITY-ARCHITECTURE}
+  - {id: INTERFACE-DESIGN}
+  - {id: DATA-DESIGN}
+  - {id: OPERABILITY-DESIGN}
+  - {id: ENGINEERING-POLICY}
+  - {id: COMPONENT-DESIGN}
+  - {id: SECURITY-ANALYSIS}
+  - {id: VERIFICATION-DESIGN}
+  - {id: TEST-DESIGN}
+  - {id: IMPLEMENTATION-DESIGN}
+
+artifacts:
+  - id: BLIND-PROBLEM
+    authority: DISCOVERY
+    path: experiments/blind-backend-2026-09-20/design/problem-evidence.md
+    provides: [napms.backend.problem-evidence]
+    depends_on: []
+
+  - id: BLIND-PRODUCT
+    authority: PRODUCT-REQUIREMENTS
+    path: experiments/blind-backend-2026-09-20/design/product-requirements.md
+    provides:
+      - napms.backend.product-requirements
+      - napms.backend.acceptance-semantics
+    depends_on: [BLIND-PROBLEM]
+
+  - id: BLIND-STRATEGIC-DOMAIN
+    authority: STRATEGIC-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/strategic-domain.md
+    provides: [napms.backend.strategic-domain-model]
+    depends_on: [BLIND-PRODUCT]
+
+  - id: BLIND-DOMAIN-USE-CASES
+    authority: DOMAIN-USE-CASE-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain-use-cases.md
+    provides:
+      - napms.backend.use-cases.resource-description
+      - napms.backend.use-cases.application-communication
+      - napms.backend.use-cases.application-deployment
+      - napms.backend.use-cases.business-connectivity
+      - napms.backend.use-cases.access-policy
+    depends_on: [BLIND-STRATEGIC-DOMAIN, BLIND-PRODUCT]
+
+  - id: BLIND-DOMAIN-RESOURCE
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain/resource-description.md
+    provides: [napms.backend.domain.resource-description]
+    depends_on: [BLIND-DOMAIN-USE-CASES]
+
+  - id: BLIND-DOMAIN-APP-COMM
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain/application-communication.md
+    provides: [napms.backend.domain.application-communication]
+    depends_on: [BLIND-DOMAIN-USE-CASES]
+
+  - id: BLIND-DOMAIN-DEPLOYMENT
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain/application-deployment.md
+    provides: [napms.backend.domain.application-deployment]
+    depends_on: [BLIND-DOMAIN-USE-CASES]
+
+  - id: BLIND-DOMAIN-BUSINESS
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain/business-connectivity.md
+    provides: [napms.backend.domain.business-connectivity]
+    depends_on: [BLIND-DOMAIN-USE-CASES]
+
+  - id: BLIND-DOMAIN-ACCESS
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/domain/access-policy.md
+    provides: [napms.backend.domain.access-policy]
+    depends_on: [BLIND-DOMAIN-USE-CASES]
+
+  - id: BLIND-APPLICATION
+    authority: APPLICATION-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/application-design.md
+    provides: [napms.backend.application-design]
+    depends_on:
+      - BLIND-DOMAIN-RESOURCE
+      - BLIND-DOMAIN-APP-COMM
+      - BLIND-DOMAIN-DEPLOYMENT
+      - BLIND-DOMAIN-BUSINESS
+      - BLIND-DOMAIN-ACCESS
+
+  - id: BLIND-QUALITY
+    authority: QUALITY-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/quality-design.md
+    provides: [napms.backend.quality-design]
+    depends_on: [BLIND-PRODUCT, BLIND-APPLICATION]
+
+  - id: BLIND-ARCHITECTURE
+    authority: SYSTEM-ARCHITECTURE
+    path: experiments/blind-backend-2026-09-20/design/system-architecture.md
+    provides: [napms.backend.system-architecture]
+    depends_on: [BLIND-APPLICATION, BLIND-QUALITY]
+
+  - id: BLIND-SECURITY-ARCH
+    authority: SECURITY-ARCHITECTURE
+    path: experiments/blind-backend-2026-09-20/design/security-architecture.md
+    provides: [napms.backend.security-architecture]
+    depends_on: [BLIND-PRODUCT, BLIND-DOMAIN-ACCESS, BLIND-ARCHITECTURE]
+
+  - id: BLIND-API
+    authority: INTERFACE-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/api-contract.md
+    provides: [napms.backend.api-contract]
+    depends_on: [BLIND-PRODUCT, BLIND-APPLICATION, BLIND-ARCHITECTURE, BLIND-SECURITY-ARCH]
+
+  - id: BLIND-DATA
+    authority: DATA-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/persistence-design.md
+    provides: [napms.backend.persistence-design]
+    depends_on: [BLIND-APPLICATION, BLIND-ARCHITECTURE, BLIND-SECURITY-ARCH]
+
+  - id: BLIND-OPERABILITY
+    authority: OPERABILITY-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/operability-design.md
+    provides: [napms.backend.operability-design]
+    depends_on: [BLIND-ARCHITECTURE, BLIND-SECURITY-ARCH, BLIND-API, BLIND-DATA]
+
+  - id: BLIND-ENGINEERING-POLICY
+    authority: ENGINEERING-POLICY
+    path: experiments/blind-backend-2026-09-20/design/engineering-policy.md
+    provides: [napms.backend.engineering-policy]
+    depends_on: [BLIND-ARCHITECTURE, BLIND-SECURITY-ARCH]
+
+  - id: BLIND-COMPONENT
+    authority: COMPONENT-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/component-design.md
+    provides: [napms.backend.component-design]
+    depends_on:
+      - BLIND-APPLICATION
+      - BLIND-ARCHITECTURE
+      - BLIND-API
+      - BLIND-DATA
+      - BLIND-SECURITY-ARCH
+      - BLIND-OPERABILITY
+      - BLIND-ENGINEERING-POLICY
+
+  - id: BLIND-SECURITY-ANALYSIS
+    authority: SECURITY-ANALYSIS
+    path: experiments/blind-backend-2026-09-20/design/security-analysis.md
+    provides: [napms.backend.security-coverage]
+    depends_on: [BLIND-API, BLIND-DATA, BLIND-OPERABILITY, BLIND-SECURITY-ARCH]
+
+  - id: BLIND-VERIFICATION
+    authority: VERIFICATION-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/verification-strategy.md
+    provides: [napms.backend.verification-strategy]
+    depends_on: [BLIND-PRODUCT, BLIND-COMPONENT, BLIND-SECURITY-ANALYSIS, BLIND-QUALITY]
+
+  - id: BLIND-TEST-DESIGN
+    authority: TEST-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/test-design.md
+    provides: [napms.backend.test-design]
+    depends_on: [BLIND-VERIFICATION, BLIND-API, BLIND-COMPONENT]
+
+  - id: BLIND-IMPLEMENTATION-PLAN
+    authority: IMPLEMENTATION-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/implementation-design.md
+    provides: [napms.backend.implementation-plan]
+    depends_on: [BLIND-COMPONENT, BLIND-TEST-DESIGN, BLIND-SECURITY-ANALYSIS, BLIND-OPERABILITY]
+
+  - id: BLIND-COMPLETION-CRITERIA
+    authority: IMPLEMENTATION-DESIGN
+    path: experiments/blind-backend-2026-09-20/design/implementation-completion.md
+    provides: [napms.backend.completion-criteria]
+    depends_on: [BLIND-IMPLEMENTATION-PLAN, BLIND-VERIFICATION]
+
+questions: []
