@@ -12,3 +12,4 @@ harness-check:
 	python validators/validate_source_coverage.py
 	python validators/validate_user_facing_application.py
 	python validators/validate_unified_model.py
+	python validators/validate_human_projection.py
