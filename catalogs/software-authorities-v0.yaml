@@ -4,6 +4,8 @@ id: SOFTWARE-PRODUCT-REFERENCE-V0
 status: experimental
 
 principles:
+  - Concurrency, consistency, ordering and backpressure semantics remain with the Authority owning the affected invariant, state, observable outcome, capacity constraint or runtime boundary; coordination mechanisms do not create a generic concurrency Authority.
+  - Database, broker, framework and runtime defaults must not invent material conflict, ordering, staleness, duplicate, overload or degradation semantics; unresolved material behavior is a Question for its semantic owner.
   atomicity_test:
     - semantic_cohesion
     - independent_change
