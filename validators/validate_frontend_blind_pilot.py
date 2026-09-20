@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+import sys
 from pathlib import Path
 
-from agent_router import load_yaml, route_create_work
-from engineering_graph import evaluate_engineering_target, validate_engineering_graph
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from agent_router import load_yaml, route_create_work  # noqa: E402
+from engineering_graph import evaluate_engineering_target, validate_engineering_graph  # noqa: E402
 PILOT = ROOT / "examples" / "frontend-blind-pilot"
 GRAPH = load_yaml(PILOT / "engineering-graph.yaml")
 REGISTRY = load_yaml(ROOT / "skills" / "artifact-skill-registry-v0.yaml")
