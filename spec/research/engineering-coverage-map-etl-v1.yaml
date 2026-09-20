@@ -5,6 +5,12 @@ project: SYNTHETIC-CSV-ETL
 scope: single-script
 status: research
 
+subtree_decisions:
+  - concern: interface.human
+    state: NOT_APPLICABLE
+    rationale: No interactive human interface or rendered human-facing document is in accepted scope.
+    evidence: [accepted-interface-decision]
+
 rows:
   - {concern: intent.problem, state: COVERED, evidence: [accepted-problem]}
   - {concern: intent.scope, state: COVERED, evidence: [accepted-scope]}
