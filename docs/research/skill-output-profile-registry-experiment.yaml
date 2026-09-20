@@ -1,0 +1,56 @@
+version: 0
+kind: harness-skill-output-profile-registry-experiment
+status: research
+
+rule: >-
+  knowledge_kind routes actionable CREATE work to an Artifact Skill. The Skill may
+  produce one or more reusable artifact profiles or a justified project-native
+  artifact. Profile selection is an agent/project concern and does not change
+  Engineering Graph topology or Core state.
+
+skills:
+  - skill: product-requirements
+    knowledge_kind: product-requirements
+    outputs:
+      - {profile: product-requirements/v0-experiment, mode: harness-managed}
+      - {profile: project-native, mode: project-native, deterministic_validator_required: false}
+
+  - skill: implementation-design
+    knowledge_kind: implementation-design
+    outputs:
+      - {profile: implementation-design/v0-experiment, mode: harness-managed}
+      - {profile: project-native, mode: project-native, deterministic_validator_required: false}
+
+  - skill: interface-contract
+    knowledge_kind: interface-contract
+    outputs:
+      - {profile: cli-contract/v0-experiment, mode: harness-managed}
+      - {profile: openapi/3.1, mode: standard-native}
+      - {profile: project-native, mode: project-native, deterministic_validator_required: when-automation-claims-structured-consumption}
+
+  - skill: domain-model
+    knowledge_kind: domain-model
+    outputs:
+      - {profile: domain-model/v1, mode: harness-managed}
+
+  - skill: verification-strategy
+    knowledge_kind: verification-strategy
+    outputs:
+      - {profile: verification-plan/v1, mode: harness-managed}
+
+invariants:
+  - one knowledge_kind routes to one reusable skill in the current registry
+  - one skill may support several output profiles
+  - profile identity never appears inside CapabilityId
+  - profile selection does not alter Authority ownership
+  - schema validation never registers provides
+  - project-native remains valid when no reusable profile is justified
+  - standard-native contracts are not copied into Harness YAML
+
+pilot_examples:
+  - {project: nutrition-management, skill: interface-contract, profile: cli-contract/v0-experiment}
+  - {project: napms, skill: interface-contract, profile: openapi/3.1}
+  - {project: nutrition-management, skill: product-requirements, profile: product-requirements/v0-experiment}
+  - {project: napms, skill: product-requirements, profile: product-requirements/v0-experiment}
+  - {project: nutrition-management, skill: implementation-design, profile: implementation-design/v0-experiment}
+  - {project: napms, skill: implementation-design, profile: implementation-design/v0-experiment}
