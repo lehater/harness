@@ -171,6 +171,16 @@ authorities:
       public_contract: Provides traceable executable test semantics sufficient for test-first or implementation work without allowing tests to invent upstream truth.
     merge_guidance: May remain inside VERIFICATION-DESIGN when verification scenarios already specify executable preconditions/operations/oracles and have no independent lifecycle. TDD is not implied by this Authority.
 
+  - id: CHANGE-TRANSITION-DESIGN
+    class: conditional
+    applies_when: Moving between accepted engineering states introduces material intermediate or coexistence states, ordering constraints, irreversible points, rollout gates, recovery choices or retirement conditions not fully derivable from the endpoint designs.
+    responsibility: Own validity of the transition between accepted engineering states without re-owning source-state or target-state semantics.
+    boundary:
+      semantic_cohesion: Decisions about permitted coexistence/intermediate states, transition ordering, compatibility window, irreversible points, progression gates, abort/recovery paths and retirement conditions.
+      independent_change: A transition strategy can change while accepted source and target states remain stable, and can survive changes in migration/deployment tooling.
+      public_contract: Provides accepted transition constraints to implementation, verification/test, operability and deployment/release automation while routing missing endpoint semantics to their owning Authorities.
+    merge_guidance: Omit for trivial atomic replacement with no material intermediate state. Deployment, release, migration and compatibility mechanisms alone do not justify separate Authorities; endpoint semantics remain with Product/Domain/Application/System/Interface/Data/Quality owners.
+
   - id: IMPLEMENTATION-DESIGN
     class: baseline
     responsibility: Own implementation slicing, sequencing, migration concerns and completion criteria after upstream engineering decisions are available.
