@@ -142,3 +142,29 @@ roles:
       - engineering.governance.data
       - engineering.governance.audit
       - engineering.governance.ownership
+
+  quality:
+    can_produce:
+      - engineering.quality.performance.latency
+      - engineering.quality.performance.throughput
+      - engineering.quality.performance.resource-efficiency
+      - engineering.quality.performance.capacity
+      - engineering.quality.compatibility.interoperability
+      - engineering.quality.compatibility.coexistence
+      - engineering.quality.maintainability.modularity
+      - engineering.quality.maintainability.reusability
+      - engineering.quality.maintainability.analysability
+      - engineering.quality.maintainability.modifiability
+      - engineering.quality.maintainability.testability
+      - engineering.quality.flexibility.adaptability
+      - engineering.quality.flexibility.scalability
+      - engineering.quality.flexibility.installability
+      - engineering.quality.flexibility.replaceability
+
+  transition:
+    can_produce:
+      - engineering.transition.compatibility
+      - engineering.transition.data-migration
+      - engineering.transition.rollout
+      - engineering.transition.deprecation
+      - engineering.transition.revalidation
