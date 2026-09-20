@@ -321,3 +321,104 @@ REVIEW or HANDOFF package
 Do not yet canonicalize it.
 
 The next decision gate is narrative generation quality, not another Core/schema redesign.
+
+## Follow-up: source-bound freshness
+
+The first prototype manifest bound scope/topology but not canonical file contents.
+
+That was insufficient: a canonical source file could change while its graph/provider identity remained stable, leaving an older narrative IR structurally valid.
+
+The compiler experiment now optionally binds every selected source to a SHA-256 digest taken from the project checkout.
+
+The manifest digest therefore covers:
+- Consumer/composite scope;
+- provider/source closure;
+- Harness/project baseline metadata;
+- canonical source content hashes.
+
+Validation now detects:
+- missing selected source path;
+- changed source content;
+- stale manifest/IR after canonical source modification.
+
+Harness acceptance includes a controlled source mutation and rejects the old manifest as stale.
+
+Both Nutrition and NAPMS research pilots now compile manifests from real source files with content hashes and pass.
+
+### Consequence
+
+For repository-backed REVIEW/HANDOFF packages, source-content binding should be part of the projection manifest.
+
+A project commit SHA is useful baseline metadata but is not by itself enough for dirty working trees or partial/exported source sets.
+
+The canonical source hashes are the precise projection freshness boundary.
+
+## Follow-up: narrative generation
+
+A research-only agent skill, `human-documentation-projection`, was prototyped.
+
+Its constraints are:
+- section-specific read boundary from the compiled plan;
+- projection IR before Markdown;
+- every substantive claim carries one or more CanonicalArtifact IDs;
+- no reading of old generated documentation as semantic input during controlled generation;
+- unresolved Questions/gaps are preserved;
+- unsupported or out-of-scope claims are rejected structurally.
+
+NAPMS now contains a research-only source-bounded narrative IR for the backend documentation recipe.
+
+It covers:
+- product/discovery/application journey;
+- strategic/use-case/tactical domain design;
+- architecture/security/interface/data;
+- quality/threat/operability;
+- implementation and verification.
+
+The IR was produced from canonical NAPMS sources and passed:
+- recipe scope validation;
+- claim source validation;
+- real source hash binding;
+- REVIEW materialization;
+- HANDOFF materialization.
+
+This demonstrates that the NAPMS package can become a genuine topic-oriented human document set rather than raw YAML wrappers without weakening source boundaries.
+
+### What this does not prove
+
+Claim-level provenance does not automatically prove that a paraphrase is semantically perfect.
+
+The remaining semantic-quality gate is:
+- independent review against allowed sources;
+- controlled regeneration after meaningful source changes;
+- comparison of omitted/strengthened/contradictory claims.
+
+The structural architecture is no longer the uncertain part; semantic narrative review policy is.
+
+## Updated recommendation
+
+The research evidence now supports the following candidate architecture strongly enough for one more semantic-quality experiment:
+
+```
+Engineering Graph + Core/project projection
+          ↓
+Consumer closure + explicit extra capabilities
+          ↓
+source existence + source hashes
+          ↓
+deterministic projection manifest
+          ↓
+project presentation recipe
+          ↓
+section source plan
+          ↓
+source-bounded narrative/typed/native projection IR
+          ↓
+REVIEW package
+          or
+HANDOFF package + exact source snapshot
+```
+
+Do not canonicalize yet.
+
+The remaining decision gate is not Core, graph topology, packaging, scope, freshness or provenance. It is whether narrative semantic review can be made reliable enough for routine regeneration without silently changing meaning.
+
