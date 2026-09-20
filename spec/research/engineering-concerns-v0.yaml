@@ -1,0 +1,86 @@
+version: 1
+kind: harness-engineering-concern-catalog
+id: software-engineering-baseline/v0
+
+concerns:
+  - id: problem.discovery
+    category: problem
+    question: Is the problem/evidence space explicitly understood?
+  - id: product.intent
+    category: product
+    question: Are product goals, scope and observable behavior explicit?
+  - id: domain.semantics
+    category: domain
+    question: Are business/domain concepts, ownership and invariants explicit where relevant?
+  - id: application.use-cases
+    category: application
+    question: Are application/journey semantics explicit?
+  - id: architecture.structure
+    category: architecture
+    question: Is runtime/structural architecture explicit?
+  - id: interface.machine
+    category: interface
+    question: Are external machine contracts explicit where present?
+  - id: interface.human
+    category: interface
+    question: Are human interaction contracts explicit where present?
+  - id: data.persistence
+    category: data
+    question: Are persistence/storage semantics explicit where state exists?
+  - id: security.architecture
+    category: security
+    question: Are identity, trust and protected-action boundaries explicit where relevant?
+  - id: security.analysis
+    category: security
+    question: Has threat/control coverage been analyzed where relevant?
+  - id: privacy.governance
+    category: governance
+    question: Are privacy/data-governance obligations analyzed where personal/sensitive data exists?
+  - id: obligation.external
+    category: governance
+    question: Are external or organizational obligations explicitly assessed?
+  - id: quality.attributes
+    category: quality
+    question: Are architecture-significant quality requirements explicit?
+  - id: reliability.concurrency
+    category: reliability
+    question: Are consistency, concurrency, retries and failure semantics explicit where material?
+  - id: operability.observability
+    category: operability
+    question: Are logging, diagnostics, health and observability requirements explicit?
+  - id: engineering.policy
+    category: engineering
+    question: Are implementation-shaping engineering rules explicit where needed?
+  - id: dependencies.supply-chain
+    category: engineering
+    question: Are external dependency and provenance constraints understood?
+  - id: build.reproducibility
+    category: engineering
+    question: Are build/reproducibility requirements explicit where material?
+  - id: component.design
+    category: implementation
+    question: Are component boundaries/contracts explicit where implementation complexity requires them?
+  - id: implementation.design
+    category: implementation
+    question: Is implementation realization/sequencing explicit?
+  - id: verification.strategy
+    category: verification
+    question: Is verification strategy and traceability explicit?
+  - id: test.design
+    category: verification
+    question: Is executable test design explicit where useful?
+  - id: change.transition
+    category: lifecycle
+    question: Are migration/backward-compatibility/transition semantics explicit where material?
+  - id: accessibility
+    category: interface
+    question: Are accessibility requirements/applicability explicit for human interfaces?
+  - id: internationalization
+    category: interface
+    question: Are locale/language/time-presentation concerns explicit where relevant?
+  - id: safety
+    category: specialized
+    question: Are hazard/safety concerns explicitly assessed where failure can harm people/property/environment?
+  - id: ai.risk
+    category: specialized
+    question: Are AI/ML-specific behavior, risk and evaluation concerns explicit where AI is part of the system?
