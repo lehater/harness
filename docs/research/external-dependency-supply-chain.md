@@ -317,3 +317,66 @@ Canonicalize the reusable analysis only if it can be expressed as a consumer of 
 A future Core primitive is justified only if multiple integrations demonstrate that the same minimal acquired-artifact identity/provenance fact must be persisted by Harness itself rather than referenced from project-native evidence systems.
 
 Current Nutrition and NAPMS evidence does not demonstrate that need.
+
+
+## Contradiction and boundary review
+
+Reviewed against the canonical Security Analysis and Capability Lifecycle contracts, plus the accepted boundaries established by the Obligation and Change Transition research.
+
+### Security Analysis
+
+No ownership collision.
+
+Security Analysis determines threat/control applicability and routes security gaps to their semantic owners. External Dependency Analysis has a broader but shallower role: it checks dependency acquisition/evidence closure across security, quality, obligation, implementation and transition concerns.
+
+Rule: when the question is "is this dependency/provenance/advisory security-relevant and what control is required?", Security Analysis owns the answer. External Dependency Analysis only requires that this route and its evidence closure exist.
+
+### Obligation Analysis
+
+No ownership collision.
+
+License, supplier contract, regulation and organizational mandate provenance/applicability remain Obligation Analysis semantics. External Dependency Analysis must consume/route them and must not independently interpret license/legal applicability.
+
+### Capability Lifecycle
+
+No collision.
+
+Capability Lifecycle tracks currentness of accepted semantic assertions. Supply-chain evidence tracks whether a realized/acquired artifact satisfies accepted constraints.
+
+A provenance failure with unchanged accepted design must not produce STALE. Conversely a changed accepted dependency-selection capability can make downstream knowledge STALE even before a new artifact is acquired.
+
+### Change Transition Design
+
+No collision.
+
+External Dependency Analysis detects that replacement may require migration/coexistence/cutover/rollback. It does not own those transition semantics. Material transition routes to CHANGE-TRANSITION-DESIGN.
+
+### Verification
+
+No collision.
+
+External Dependency Analysis identifies required evidence categories and traceability closure. Verification Design owns what evidence proves accepted requirements and how proof is structured. The analysis must not invent test strategy.
+
+### Atomicity of the analysis itself
+
+This is intentionally an analysis method, not an Authority.
+
+Its cohesion is a single audit question: "For each material external dependency, can accepted need/constraints be traced to selected realization and sufficient acquisition/provenance/verification evidence, with changes routed to the correct semantic owner?"
+
+Its output does not become a new source of dependency truth. It is coverage/routing analysis.
+
+Therefore the method may cross Authorities without violating Authority atomicity, in the same way Security Analysis can evaluate accepted design without owning it.
+
+## Final research verdict
+
+P0: no contradiction with Core, Engineering Graph, Capability Lifecycle or existing Authority boundaries.
+
+P0: do not create EXTERNAL-DEPENDENCY-DESIGN, SUPPLY-CHAIN-DESIGN, SBOM, PROVENANCE or BUILD Authority.
+
+P1: canonicalize External Dependency / Supply-Chain Analysis as a reusable cross-Authority analysis skill.
+
+P1: keep actual inventory, lock, SBOM, signatures, attestations and build provenance project/integration-owned.
+
+P1: route security interpretation to Security Analysis, normative source applicability to Obligation Analysis, accepted semantic changes to the owning Authority, semantic supersession through Capability Lifecycle, material migration through Change Transition Design, and proof design through Verification.
+
+P2: future build/reproducibility research may refine evidence expectations but should not reopen the Authority conclusion unless it demonstrates an independently changing public semantic contract.
