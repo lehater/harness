@@ -1,0 +1,198 @@
+name: NAPMS Blind Backend Validation
+
+on:
+  pull_request:
+    paths:
+      - "examples/napms-blind-backend/**"
+      - ".github/workflows/napms-blind-backend-validation.yml"
+      - "engineering_graph.py"
+      - "agent_router.py"
+      - "harness.py"
+      - "target_state.py"
+      - "skills/artifact-skill-registry-v0.yaml"
+      - "skills/artifacts/**"
+  push:
+    paths:
+      - "examples/napms-blind-backend/**"
+      - ".github/workflows/napms-blind-backend-validation.yml"
+      - "engineering_graph.py"
+      - "agent_router.py"
+      - "harness.py"
+      - "target_state.py"
+      - "skills/artifact-skill-registry-v0.yaml"
+      - "skills/artifacts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  blind-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install PyYAML
+
+      - name: Validate Engineering Graph
+        run: |
+          python engineering_graph.py validate examples/napms-blind-backend/engineering-graph.yaml
+
+      - name: Validate Core realization
+        run: |
+          python harness.py validate examples/napms-blind-backend/core-realization.yaml
+
+      - name: Evaluate IMPLEMENTATION closure
+        run: |
+          python engineering_graph.py evaluate             examples/napms-blind-backend/engineering-graph.yaml             IMPLEMENTATION             examples/napms-blind-backend/core-realization.yaml             > /tmp/napms-blind-evaluation.json
+          cat /tmp/napms-blind-evaluation.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("/tmp/napms-blind-evaluation.json").read_text())
+          assert result["status"] == "COMPLETE", result
+          assert result["create"] == [], result
+          assert result["wait"] == [], result
+          assert result["pending"] == [], result
+          PY
+
+      - name: Verify every IMPLEMENTATION capability has a provider
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          from engineering_graph import derive_profile
+
+          graph = yaml.safe_load(
+              Path("examples/napms-blind-backend/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/napms-blind-backend/core-realization.yaml").read_text()
+          )
+          profile = derive_profile(graph, "IMPLEMENTATION")
+
+          providers = {}
+          for artifact in model["artifacts"]:
+              for capability in artifact.get("provides", []):
+                  providers.setdefault(capability, []).append(artifact["id"])
+
+          missing = [
+              item["capability"]
+              for item in profile["expectations"]
+              if not providers.get(item["capability"])
+          ]
+          assert missing == [], missing
+          print(f"IMPLEMENTATION closure capabilities: {len(profile['expectations'])}")
+          PY
+
+      - name: Reproduce Artifact Skill routing gaps
+        run: |
+          python - <<'PY'
+          import copy
+          from pathlib import Path
+          import yaml
+
+          from agent_router import route_create_work
+          from engineering_graph import derive_profile, production_index
+
+          graph = yaml.safe_load(
+              Path("examples/napms-blind-backend/engineering-graph.yaml").read_text()
+          )
+          model = yaml.safe_load(
+              Path("examples/napms-blind-backend/core-realization.yaml").read_text()
+          )
+          registry = yaml.safe_load(
+              Path("skills/artifact-skill-registry-v0.yaml").read_text()
+          )
+
+          routes = {
+              route["knowledge_kind"]: route["skill"]
+              for route in registry["routes"]
+          }
+          profile = derive_profile(graph, "IMPLEMENTATION")
+          productions = production_index(graph)
+          kinds = {
+              productions[item["capability"]].get("knowledge_kind")
+              for item in profile["expectations"]
+          }
+          kinds.discard(None)
+          missing_kinds = sorted(kind for kind in kinds if kind not in routes)
+
+          expected_missing = sorted({
+              "strategic-domain-design",
+              "domain-use-case",
+              "application-design",
+              "quality-design",
+              "security-architecture",
+              "data-design",
+              "operability-design",
+              "security-analysis",
+          })
+          print("Missing registered knowledge kinds:", missing_kinds)
+          assert missing_kinds == expected_missing, (missing_kinds, expected_missing)
+
+          cases = [
+              ("napms.backend.strategic-domain-model", "strategic-domain-design"),
+              ("napms.backend.use-cases.resource-description", "domain-use-case"),
+              ("napms.backend.application-design", "application-design"),
+              ("napms.backend.quality-design", "quality-design"),
+              ("napms.backend.security-architecture", "security-architecture"),
+              ("napms.backend.persistence-design", "data-design"),
+              ("napms.backend.operability-design", "operability-design"),
+              ("napms.backend.security-coverage", "security-analysis"),
+          ]
+
+          for capability, expected_kind in cases:
+              state = copy.deepcopy(model)
+              removed = False
+              for artifact in state["artifacts"]:
+                  if capability in artifact.get("provides", []):
+                      artifact["provides"] = [
+                          value
+                          for value in artifact.get("provides", [])
+                          if value != capability
+                      ]
+                      removed = True
+                      break
+              assert removed, capability
+
+              result = route_create_work(
+                  graph,
+                  "IMPLEMENTATION",
+                  state,
+                  registry,
+              )
+              matches = [
+                  item
+                  for item in result["unrouted"]
+                  if capability in item.get("capabilities", [])
+              ]
+              assert len(matches) == 1, (capability, result)
+              item = matches[0]
+              assert item["knowledge_kind"] == expected_kind, item
+              assert item["reason"] == "NO_REGISTERED_SKILL", item
+
+          # Control: a registered tactical Domain Model route still works.
+          control = copy.deepcopy(model)
+          cap = "napms.backend.domain.resource-description"
+          for artifact in control["artifacts"]:
+              if cap in artifact.get("provides", []):
+                  artifact["provides"] = [
+                      value for value in artifact["provides"] if value != cap
+                  ]
+                  break
+          routed = route_create_work(graph, "IMPLEMENTATION", control, registry)
+          match = [
+              item
+              for item in routed["routed"]
+              if cap in item.get("capabilities", [])
+          ]
+          assert len(match) == 1, routed
+          assert match[0]["knowledge_kind"] == "domain-model", match[0]
+          assert match[0]["skill"] == "skills/artifacts/domain-model/SKILL.md", match[0]
+          PY
