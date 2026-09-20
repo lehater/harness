@@ -51,9 +51,12 @@ decision was accepted merely because current code behaves that way.
    inventing a convenient behavior.
 9. Do not invent numeric quality targets. Record an explicit unknown or route a
    Question when downstream design requires one.
-10. Produce the smallest project-native canonical requirements artifact.
-11. Apply common semantic acceptance, register all capabilities actually
-    satisfied by the artifact, then re-evaluate the target Consumer.
+10. Produce one canonical managed `product-requirements/v1` artifact.
+11. Give every atomic normative requirement a stable unique `REQ-*` identifier.
+12. Record non-empty `source_refs` for every requirement; preserve rationale when it materially explains derivation or intent.
+13. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing their IDs for different meaning.
+14. Run `workspace.py validate-artifact` on the candidate.
+15. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
 
 ## Stop conditions
 
@@ -69,33 +72,30 @@ Route downstream instead of deciding here when the unresolved issue is semantic
 domain ownership, architecture, interface representation, persistence or
 implementation detail.
 
-## Output contract
+## Output schema
 
-Prefer the target repository's project-native requirements format.
+`product-requirements/v1`.
 
-One coherent artifact may provide several grouped product-requirements
-capabilities such as:
+The canonical artifact contains:
 
-- product intent;
-- externally observable requirements;
-- acceptance semantics.
+- `purpose`;
+- non-empty `requirements`;
+- for each requirement:
+  - stable unique `id` beginning with `REQ-`;
+  - one atomic normative `statement`;
+  - `status: ACCEPTED|RETIRED`;
+  - non-empty `source_refs`;
+  - optional `rationale`;
+- optional `non_goals`.
 
-Useful content normally includes:
-
-- purpose/goal;
-- required observable behavior;
-- constraints;
-- scope boundaries/non-goals;
-- acceptance expectations/examples;
-- unresolved product decisions, if any remain outside the accepted capability.
-
-A generic Harness requirements schema is intentionally not introduced by this
-skill.
+Requirement IDs identify the accepted requirement, not its document position or technical implementation. Reasonable wording refinement does not require a new ID when the same normative requirement remains intact; materially different semantics must not silently reuse an old ID. Git history remains the revision mechanism.
 
 ## Acceptance checks
 
-- every accepted requirement is supported by evidence or explicit product
-  decision;
+- every accepted requirement is supported by evidence or explicit product decision;
+- every normative requirement is atomic enough to be reviewed and verified independently;
+- every requirement has one stable unique `REQ-*` ID and non-empty source provenance;
+- IDs are not reused for materially different requirement meaning;
 - statements describe what the product must achieve, not how it is implemented;
 - acceptance semantics are concrete enough for downstream design/verification;
 - non-goals prevent accidental scope expansion;
@@ -116,5 +116,4 @@ artifacts actually used.
 
 ## Human projection
 
-Normally none; the project-native requirements artifact is the human-readable
-canonical owner.
+Render the managed canonical artifact into a disposable human-readable Requirements document. The projection is for review; `.harness/knowledge/**` remains the source of truth.
