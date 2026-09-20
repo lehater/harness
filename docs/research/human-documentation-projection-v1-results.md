@@ -696,3 +696,76 @@ Human Projection must therefore emit no invented diagrams for Nutrition merely b
 
 This is positive evidence for the renderer-neutral rule: visual assets are included only when accepted project-native structure/generators already support them.
 
+## Follow-up: Nutrition narrative quality benchmark
+
+Nutrition's existing `docs/generated/overview.md` was used as a quality/information-architecture benchmark, but not as a semantic input to the research narrative.
+
+A new evidence-bound research overview was produced from only:
+- Product Requirements;
+- Target Architecture;
+- Strategic Domain / Context Map;
+- Application Design;
+- CLI Contract.
+
+It covers the same reader-facing dimensions:
+- product boundary;
+- modular-monolith/system shape;
+- primary planning flow;
+- technical failure boundary;
+- deterministic first external interface;
+- explicit no-HTTP/browser/authentication first-slice boundary.
+
+Every generated claim is evidence-bound to exact canonical source excerpts.
+
+The generated wording is intentionally not identical to the existing benchmark.
+
+### Acceptance correction
+
+An initial experiment compared literal markers across generated and benchmark prose and failed because the benchmark describes the primary planning flow without naming `GeneratePurchasePlan`.
+
+This is evidence that byte/lexical similarity is not a valid narrative-quality criterion.
+
+The corrected comparison uses **semantic coverage dimensions**, allowing different wording for the same accepted concept.
+
+Recommended narrative acceptance therefore combines:
+
+1. structural source-scope validation;
+2. source-content freshness;
+3. claim-level evidence;
+4. semantic coverage checklist appropriate to the presentation recipe;
+5. human/agent review for unsupported strengthening, omission or contradiction.
+
+Do not use exact generated-text snapshots as the primary acceptance oracle for narrative projection.
+
+Typed/source-native deterministic renderers may still use exact snapshots.
+
+## Research-stage conclusion
+
+The current research has now validated the proposed architecture against both materially different projects across:
+
+- exact Consumer-scoped handoff;
+- explicit broader overview scope;
+- deterministic source closure;
+- source existence and content hashes;
+- project presentation recipes;
+- source-bounded narrative IR;
+- evidence-bound claims;
+- REVIEW and HANDOFF packages;
+- stale-source and stale-narrative rejection;
+- controlled semantic regeneration;
+- project-native visual projections;
+- high-quality Nutrition narrative coverage;
+- incomplete NAPMS frontend scope without invented documentation.
+
+No new Core entity, Documentation Authority, fixed document catalogue or universal artifact schema was required.
+
+The remaining work is no longer fundamental model research. Before any canonicalization, the next phase should be a **candidate-contract cleanup**:
+- simplify the experimental API/schema;
+- define which fields are mandatory vs optional;
+- decide EVIDENCE-BOUND defaults by package mode;
+- turn the research skill into a clean reusable skill candidate;
+- produce compact acceptance fixtures;
+- re-run both project pilots from the cleaned candidate.
+
+This cleanup must remain on research/candidate branches until explicitly approved for main.
+
