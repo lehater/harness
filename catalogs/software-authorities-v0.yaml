@@ -131,6 +131,26 @@ authorities:
       independent_change: Threat knowledge and coverage can evolve without itself owning product/domain/security/system/interface/data decisions.
       public_contract: Provides security coverage evidence, verification obligations and blocking Questions; it never silently repairs missing upstream design.
 
+  - id: OBLIGATION-ANALYSIS
+    class: conditional
+    applies_when: Material law, regulation, contract, license, organizational policy, platform mandate or another independently governed normative source must be traced into engineering decisions.
+    responsibility: Own provenance, applicability and coverage of imposed normative obligations, derive and route constraints to their semantic owners, and expose unresolved interpretation or coverage as Questions without owning constrained semantics.
+    boundary:
+      semantic_cohesion: Normative-source identity, applicability, scoped interpretation, routed constraints, coverage state and reopening conditions.
+      independent_change: Sources, versions, jurisdictions, contracts or applicability can change independently of downstream design.
+      public_contract: Provides obligation/applicability coverage and routed constraints to semantic owners and verification consumers.
+    merge_guidance: Omit when no material independently governed normative source applies; do not create generic COMPLIANCE-DESIGN, LEGAL-DESIGN or LICENSE-DESIGN.
+
+  - id: CHANGE-TRANSITION-DESIGN
+    class: conditional
+    applies_when: Moving between accepted engineering states introduces material intermediate/coexistence states, ordering constraints, irreversible points, rollout gates, recovery choices or retirement conditions not fully derivable from endpoint designs.
+    responsibility: Own validity of the transition between accepted engineering states without re-owning source-state or target-state semantics.
+    boundary:
+      semantic_cohesion: Permitted intermediate/coexistence states, transition ordering, compatibility windows, irreversible points, progression gates, recovery paths and retirement conditions.
+      independent_change: Transition strategy can change while accepted source and target states remain stable and can survive changes in deployment/migration tooling.
+      public_contract: Provides transition constraints to implementation, verification/test and operability while routing missing endpoint semantics to their owners.
+    merge_guidance: Omit for trivial atomic replacement with no material intermediate state; deployment, release, migration and compatibility mechanisms alone do not justify separate Authorities.
+
   - id: OPERABILITY-DESIGN
     class: conditional
     applies_when: Runtime diagnosis, correlation, health, dependency visibility or operational evidence needs an independently valuable pre-code contract.
