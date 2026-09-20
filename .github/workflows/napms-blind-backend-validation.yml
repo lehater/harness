@@ -114,7 +114,7 @@ jobs:
           print(f"IMPLEMENTATION closure capabilities: {len(profile['expectations'])}")
           PY
 
-      - name: Reproduce Artifact Skill routing gaps
+      - name: Verify Artifact Skill routing closure
         run: |
           python - <<'PY'
           import copy
@@ -146,32 +146,29 @@ jobs:
           }
           kinds.discard(None)
           missing_kinds = sorted(kind for kind in kinds if kind not in routes)
-
-          expected_missing = sorted({
-              "strategic-domain-design",
-              "domain-use-case",
-              "application-design",
-              "quality-design",
-              "security-architecture",
-              "data-design",
-              "operability-design",
-              "security-analysis",
-          })
           print("Missing registered knowledge kinds:", missing_kinds)
-          assert missing_kinds == expected_missing, (missing_kinds, expected_missing)
+          assert missing_kinds == [], missing_kinds
 
           cases = [
-              ("napms.backend.strategic-domain-model", "strategic-domain-design"),
-              ("napms.backend.use-cases.resource-description", "domain-use-case"),
-              ("napms.backend.application-design", "application-design"),
-              ("napms.backend.quality-design", "quality-design"),
-              ("napms.backend.security-architecture", "security-architecture"),
-              ("napms.backend.persistence-design", "data-design"),
-              ("napms.backend.operability-design", "operability-design"),
-              ("napms.backend.security-coverage", "security-analysis"),
+              ("napms.backend.strategic-domain-model", "strategic-domain-design",
+               "skills/artifacts/strategic-domain-design/SKILL.md"),
+              ("napms.backend.use-cases.resource-description", "domain-use-case",
+               "skills/artifacts/domain-use-case/SKILL.md"),
+              ("napms.backend.application-design", "application-design",
+               "skills/artifacts/application-design/SKILL.md"),
+              ("napms.backend.quality-design", "quality-design",
+               "skills/artifacts/quality-design/SKILL.md"),
+              ("napms.backend.security-architecture", "security-architecture",
+               "skills/artifacts/security-architecture/SKILL.md"),
+              ("napms.backend.persistence-design", "data-design",
+               "skills/artifacts/data-design/SKILL.md"),
+              ("napms.backend.operability-design", "operability-design",
+               "skills/artifacts/operability-design/SKILL.md"),
+              ("napms.backend.security-coverage", "security-analysis",
+               "skills/artifacts/security-analysis/SKILL.md"),
           ]
 
-          for capability, expected_kind in cases:
+          for capability, expected_kind, expected_skill in cases:
               state = copy.deepcopy(model)
               removed = False
               for artifact in state["artifacts"]:
@@ -193,30 +190,18 @@ jobs:
               )
               matches = [
                   item
-                  for item in result["unrouted"]
+                  for item in result["routed"]
                   if capability in item.get("capabilities", [])
               ]
               assert len(matches) == 1, (capability, result)
               item = matches[0]
               assert item["knowledge_kind"] == expected_kind, item
-              assert item["reason"] == "NO_REGISTERED_SKILL", item
+              assert item["skill"] == expected_skill, item
+              assert not [
+                  unrouted
+                  for unrouted in result["unrouted"]
+                  if capability in unrouted.get("capabilities", [])
+              ], result
 
-          # Control: a registered tactical Domain Model route still works.
-          control = copy.deepcopy(model)
-          cap = "napms.backend.domain.resource-description"
-          for artifact in control["artifacts"]:
-              if cap in artifact.get("provides", []):
-                  artifact["provides"] = [
-                      value for value in artifact["provides"] if value != cap
-                  ]
-                  break
-          routed = route_create_work(graph, "IMPLEMENTATION", control, registry)
-          match = [
-              item
-              for item in routed["routed"]
-              if cap in item.get("capabilities", [])
-          ]
-          assert len(match) == 1, routed
-          assert match[0]["knowledge_kind"] == "domain-model", match[0]
-          assert match[0]["skill"] == "skills/artifacts/domain-model/SKILL.md", match[0]
+          print("Previously unrouted blind-backend knowledge kinds: 8/8 routed")
           PY
