@@ -249,3 +249,43 @@ Before promoting Engineering Knowledge Projection v0:
 6. only then merge the research into main.
 
 No universal engineering-document schema is proposed.
+
+
+## Experiment status: not canonical
+
+The Representation Contract hypothesis is explicitly **not accepted or canonicalized** by this research branch.
+
+Two isolated pilot branches were created for falsification:
+
+- Nutrition Management: `research/representation-contract-v0`
+- NAPMS: `research/representation-contract-v0`
+
+No pilot change was written to `main`.
+
+### First falsification result
+
+NAPMS contains an independently developed artifact-type registry that already models canonical representation rules, format families, validator requirements, canonical uniqueness and projection non-canonicity. This is strong convergent evidence for the Representation Contract hypothesis, but it is not yet proof that the proposed Harness abstraction is correctly shaped.
+
+Nutrition is materially weaker: several `knowledge_kind` values currently resolve to Markdown/project-native artifacts whose integration validator proves graph/integration properties, not necessarily the internal semantic structure of the artifact. The experiment therefore exposes an important distinction:
+
+- **artifact validity**: file/graph/ownership/integration is valid;
+- **representation validity**: the artifact conforms to a machine-checkable representation contract for its knowledge kind;
+- **semantic acceptance**: the represented decisions are accepted and supported.
+
+These three must not be collapsed.
+
+The Nutrition experiment is therefore intentionally incomplete until each selected knowledge kind can demonstrate what its representation validator actually proves. A generic “project validator” label is insufficient evidence.
+
+### Acceptance gate for the hypothesis
+
+Do not promote Representation Contract v0 or Projection v0 to Harness main until the experiments demonstrate, on both pilots:
+
+1. every sampled `knowledge_kind` resolves deterministically to an admissible representation;
+2. invalid representation is rejected independently of semantic judgement;
+3. valid representation does not automatically imply semantic acceptance;
+4. canonical ownership remains unique;
+5. projections can be regenerated without changing canonical state;
+6. project-native standard formats need no duplicated Harness schema;
+7. the contract can be consumed by an agent/validator without project-specific inference hidden in Harness.
+
+Failure of any item requires revising or rejecting the abstraction rather than canonicalizing it.
