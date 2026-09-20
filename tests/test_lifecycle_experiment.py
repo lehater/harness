@@ -45,4 +45,8 @@ class LifecycleExperimentTest(unittest.TestCase):
     def test_assertion_must_match_core_provider(self):
         p=projection(); p["providers"][0]["artifact"]="USE"
         with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
+    def test_historical_alternate_provider_blocker_does_not_block_selected_assertion(self):
+        m={"artifacts":[*MODEL["artifacts"],{"id":"USE-OLD","authority":"USE","path":"use-old.md","provides":["use.result"],"depends_on":["SOURCE"]}],"questions":[{"id":"Q-OLD","authority":"USE","text":"Old provider unresolved.","blocks":["USE-OLD"]}]}
+        r=evaluate_lifecycle_target(GRAPH,"IMPLEMENTATION",m,projection())
+        self.assertEqual("COMPLETE",r["status"]); self.assertEqual([],r["wait"])
 if __name__=="__main__": unittest.main()
