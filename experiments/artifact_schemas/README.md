@@ -20,7 +20,7 @@ Optional:
 - constraints;
 - acceptance examples;
 - non-goals;
-- evidence references.
+- structured evidence/provenance records when the requirements artifact itself owns them.
 
 The profile deliberately does not require acceptance examples merely because the
 artifact is Product Requirements. Acceptance becomes mandatory only if the concrete
@@ -41,7 +41,8 @@ Optional:
 
 - forbidden decisions;
 - open questions;
-- design references.
+- design references;
+- explicit authorization semantics.
 
 The profile does not prescribe language, framework, persistence technology,
 repository layout, or a fixed number of sections.
