@@ -127,9 +127,56 @@ def _validate_implementation_design(content: dict[str, Any]) -> None:
     _strings(content.get("authorization_semantics", []), "authorization_semantics")
 
 
+
+def _validate_cli_contract(content: dict[str, Any]) -> None:
+    command = content.get("command")
+    if not isinstance(command, str) or not command.strip():
+        raise ExperimentError("cli-contract command is required")
+    arguments = content.get("arguments")
+    if not isinstance(arguments, list) or not arguments:
+        raise ExperimentError("cli-contract arguments must be a non-empty list")
+    seen: set[str] = set()
+    for item in arguments:
+        if not isinstance(item, dict):
+            raise ExperimentError("cli-contract argument must be a mapping")
+        name = item.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ExperimentError("cli-contract argument name is required")
+        if name in seen:
+            raise ExperimentError(f"duplicate cli argument: {name}")
+        seen.add(name)
+        if not isinstance(item.get("semantics"), str) or not item["semantics"].strip():
+            raise ExperimentError(f"cli-contract argument {name}: semantics are required")
+        required = item.get("required")
+        if required is not None and not isinstance(required, bool):
+            raise ExperimentError(f"cli-contract argument {name}: required must be boolean")
+    _strings(content.get("success_semantics", []), "success_semantics", allow_empty=False)
+    failures = content.get("failure_classes", [])
+    if not isinstance(failures, list):
+        raise ExperimentError("failure_classes must be a list")
+    failure_ids: set[str] = set()
+    for item in failures:
+        if not isinstance(item, dict):
+            raise ExperimentError("failure class must be a mapping")
+        failure_id = item.get("id")
+        if not isinstance(failure_id, str) or not failure_id:
+            raise ExperimentError("failure class id is required")
+        if failure_id in failure_ids:
+            raise ExperimentError(f"duplicate failure class id: {failure_id}")
+        failure_ids.add(failure_id)
+        _strings(item.get("conditions", []), f"{failure_id}.conditions", allow_empty=False)
+        _strings(item.get("result_semantics", []), f"{failure_id}.result_semantics", allow_empty=False)
+        exit_status = item.get("exit_status")
+        if exit_status is not None and not isinstance(exit_status, int):
+            raise ExperimentError(f"{failure_id}.exit_status must be integer when present")
+    _strings(content.get("representation_rules", []), "representation_rules")
+    _strings(content.get("boundary_rules", []), "boundary_rules")
+    _strings(content.get("scope_exclusions", []), "scope_exclusions")
+
 VALIDATORS = {
     "product-requirements/v0-experiment": _validate_product_requirements,
     "implementation-design/v0-experiment": _validate_implementation_design,
+    "cli-contract/v0-experiment": _validate_cli_contract,
 }
 
 
