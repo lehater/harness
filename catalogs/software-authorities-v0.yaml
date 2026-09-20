@@ -131,6 +131,16 @@ authorities:
       independent_change: Threat knowledge and coverage can evolve without itself owning product/domain/security/system/interface/data decisions.
       public_contract: Provides security coverage evidence, verification obligations and blocking Questions; it never silently repairs missing upstream design.
 
+  - id: OBLIGATION-ANALYSIS
+    class: conditional
+    applies_when: Material law, regulation, contract, license, organizational policy, platform mandate or other independently governed normative source must be traced into engineering decisions.
+    responsibility: Own provenance, applicability and coverage of externally or organizationally imposed normative obligations against accepted engineering scope, derive and route material constraints to their semantic owners, and expose unresolved interpretation or coverage as Questions without owning the constrained product/design semantics.
+    boundary:
+      semantic_cohesion: Decisions about normative-source identity, applicability, scoped interpretation, derived constraint routing, coverage state and reopening conditions.
+      independent_change: Obligation sources, versions, jurisdictions, contracts or applicability can change independently of downstream product/design realization while making affected knowledge stale or blocked.
+      public_contract: Provides accepted obligation/applicability coverage and routed constraints to semantic owners and verification consumers; unresolved interpretation or conflicting obligations remain explicit Questions.
+    merge_guidance: Omit when no material independently governed normative source applies. Project-selected engineering discipline remains ENGINEERING-POLICY; security threat/control coverage remains SECURITY-ANALYSIS. Do not create generic COMPLIANCE-DESIGN, LEGAL-DESIGN or LICENSE-DESIGN solely from subject matter.
+
   - id: OPERABILITY-DESIGN
     class: conditional
     applies_when: Runtime diagnosis, correlation, health, dependency visibility or operational evidence needs an independently valuable pre-code contract.
