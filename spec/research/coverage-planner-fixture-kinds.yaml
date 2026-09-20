@@ -1,0 +1,7 @@
+version: 1
+kind: harness-knowledge-kind-bindings
+project: DERIVATION-FIXTURE
+status: research
+bindings:
+  - capability: engineering.operability.logging
+    knowledge_kinds: [engineering.operability.logging]
