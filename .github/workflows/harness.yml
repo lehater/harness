@@ -32,9 +32,8 @@ jobs:
       - run: make harness-check
       - name: Validate artifact schema experiments
         run: |
-          python experiments/artifact_schemas/validate.py \
-            experiments/artifact_schemas/greenfield-cli-contract.candidate.yaml
-          if python experiments/artifact_schemas/validate.py \
+          python workspace.py validate-artifact experiments/artifact_schemas/greenfield-cli-contract.candidate.yaml
+          if python workspace.py validate-artifact \
             experiments/artifact_schemas/invalid-product-requirements.yaml; then
             echo "invalid research fixture was unexpectedly accepted" >&2
             exit 1
