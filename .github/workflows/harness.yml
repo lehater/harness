@@ -17,6 +17,7 @@ on:
       - "workspace.py"
       - "Makefile"
       - "examples/greenfield-csv-deduplicator/**"
+      - "examples/user-facing-application/**"
       - ".github/workflows/harness.yml"
 
 jobs:
