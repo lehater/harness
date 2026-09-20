@@ -33,6 +33,15 @@ def main() -> None:
     for state_name, knowledge_kind, authority in CASES:
         assert_single_frontier(state_name, knowledge_kind, authority)
 
+    blocked_state = load_yaml(PILOT / "core-state-browser-auth-blocked.yaml")
+    blocked = route_create_work(
+        GRAPH, "FRONTEND-IMPLEMENTATION", blocked_state, REGISTRY
+    )
+    assert blocked["target_status"] == "BLOCKED", blocked
+    assert not blocked["routed"], blocked
+    assert not blocked["unrouted"], blocked
+    assert blocked["wait"], blocked
+
     architecture_state = load_yaml(PILOT / "core-state-with-architecture.yaml")
     architecture_frontier = route_create_work(
         GRAPH, "FRONTEND-IMPLEMENTATION", architecture_state, REGISTRY
