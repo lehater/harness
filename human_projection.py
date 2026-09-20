@@ -74,6 +74,7 @@ def compile_manifest(
     project_revision: str | None = None,
     recipe_id: str | None = None,
     extra_capabilities: list[str] | None = None,
+    source_root: str | Path | None = None,
 ) -> dict[str, Any]:
     validate_model(model)
     profile = derive_profile(engineering_graph, consumer_id)
@@ -145,6 +146,14 @@ def compile_manifest(
         )
 
     questions = _question_rows(model, closure_set, selected_cap_set)
+
+    if source_root is not None:
+        source_root = Path(source_root)
+        for row in source_rows:
+            path = source_root / row["path"]
+            if not path.is_file():
+                raise CoreError(f"projection canonical source does not exist: {row['path']}")
+            row["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
 
     manifest: dict[str, Any] = {
         "version": 1,
@@ -353,6 +362,26 @@ def validate_projection_ir(
         raise CoreError(f"projection IR missing planned sections: {missing}")
 
 
+def validate_manifest_sources(
+    manifest: dict[str, Any],
+    source_root: str | Path,
+) -> None:
+    source_root = Path(source_root)
+    for source in manifest.get("sources", []) or []:
+        path = source_root / source["path"]
+        if not path.is_file():
+            raise CoreError(f"projection canonical source does not exist: {source['path']}")
+        expected = source.get("sha256")
+        if expected is None:
+            continue
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != expected:
+            raise CoreError(
+                f"projection canonical source is stale: {source['path']} "
+                f"{actual} != {expected}"
+            )
+
+
 def render_projection_documents(
     manifest: dict[str, Any],
     plan: dict[str, Any],
@@ -408,6 +437,8 @@ def materialize_package(
 ) -> dict[str, Any]:
     if mode not in {"REVIEW", "HANDOFF"}:
         raise CoreError(f"unsupported human projection package mode: {mode}")
+    if source_root is not None:
+        validate_manifest_sources(manifest, source_root)
     output_root = Path(output_root)
     if output_root.exists():
         shutil.rmtree(output_root)
@@ -515,6 +546,7 @@ def main() -> int:
     )
     compile_cmd.add_argument("--harness-version")
     compile_cmd.add_argument("--project-revision")
+    compile_cmd.add_argument("--source-root")
     compile_cmd.add_argument("--output-manifest")
     compile_cmd.add_argument("--output-plan")
 
@@ -542,6 +574,7 @@ def main() -> int:
             project_revision=args.project_revision,
             recipe_id=recipe.get("id") if recipe else None,
             extra_capabilities=args.extra_capabilities,
+            source_root=args.source_root,
         )
         plan = validate_recipe(recipe, manifest) if recipe else None
         if args.output_manifest:
