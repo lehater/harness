@@ -172,3 +172,15 @@ For NAPMS and Nutrition:
 5. keep only the minimal overlay required to preserve semantic correctness.
 
 If this converges, the full project coverage-map YAML should be removed from the architecture and treated only as generated output.
+
+
+## Proof versus candidate evidence
+
+The experiment now separates two roles:
+
+- **proof evidence** — exact semantic evidence that is sufficient to derive `COVERED`, currently represented by exact concern-specific CapabilityIds;
+- **candidate evidence** — artifact kinds, paths, broad capabilities or substring matches that help navigation and human/research review but are not sufficient to close a concern.
+
+Therefore an activated concern with candidate evidence but no proof remains `UNASSESSED`, not `COVERED`.
+
+This exposes an architectural requirement for Harness: if a concern must be checked algorithmically, the canonical knowledge model needs a semantic claim fine-grained enough to prove that concern. A coarse capability such as `engineering.operability.observability` cannot safely prove logging, metrics, tracing and health independently.
