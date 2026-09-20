@@ -272,3 +272,68 @@ Do not canonicalize this hypothesis until all of the following are demonstrated:
 5. invalid structured artifacts are rejected deterministically;
 6. generated projections remain disposable;
 7. Core behavior remains unchanged.
+
+
+## Verification-family cross-check
+
+Verification provides a stronger counterexample than architecture.
+
+Nutrition currently has two distinct accepted canonical verification artifacts:
+
+- `docs/redesign/verification-design.md` — pre-code, design-derived evidence classes; explicitly independent of current tests;
+- `.harness/knowledge/verification-strategy.yaml` — `verification-plan/v1`, with concrete checks and evidence paths/commands against the current baseline.
+
+NAPMS uses `test-intent` YAML centered on required scenarios and traceability, while
+greenfield uses a narrative strategy organized by evidence level.
+
+Therefore `verification-plan/v1` is a valid reusable schema for one materialization
+profile, but it is not the schema of the entire VERIFICATION Authority or of every
+`verification-strategy` routed work item.
+
+This strongly supports treating the **schema/profile id itself as the reusable artifact
+contract** rather than introducing a second redundant ArtifactType object.
+
+## Simplified candidate model
+
+The experiments now favor this minimal model:
+
+```text
+Authority
+  -> Production Contract
+      -> CapabilityId
+          -> knowledge_kind (optional routing hint)
+              -> Artifact Skill
+                  -> chooses one or more Artifact Schemas / native standard profiles
+                      -> CanonicalArtifact instance(s)
+                          -> provides CapabilityId(s)
+```
+
+An Artifact Schema/Profile defines:
+
+- semantic shape owned by that artifact instance;
+- required/optional fields or grammar;
+- structural validator;
+- renderer/projection support where deterministic;
+- version.
+
+Examples of the same concept:
+
+- `domain-model/v1` — Harness schema;
+- `verification-plan/v1` — Harness schema;
+- Product Requirements candidate schema — reusable semantic schema still under test;
+- OpenAPI version/profile — external standard used as the artifact schema/profile;
+- Structurizr DSL + project invariants — external/native structural architecture profile.
+
+No separate `RepresentationContract` or `ArtifactType` entity is currently justified.
+If a schema/profile id can carry the reusable contract, introducing both would duplicate
+identity.
+
+## Remaining question
+
+The unresolved question is no longer “what format for every Capability?” It is:
+
+> Which recurring canonical artifact semantic shapes deserve a reusable schema/profile,
+> and which should remain project-native until repeated consumer evidence exists?
+
+The schema catalog must therefore be empirical and sparse. Skills may support several
+schemas; projects instantiate only the schemas their actual production contracts need.
