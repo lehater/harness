@@ -35,8 +35,9 @@ Read canonical sources needed to establish user-visible interaction semantics. E
 9. Define responsive/adaptive behavior only where supported platform constraints require it.
 10. Map machine/application outcomes to user-visible semantic outcomes without exposing transport codes as product meaning.
 11. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
-12. Route missing product/domain/security/quality decisions upstream as Questions.
-13. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
+12. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
+13. Route missing product/domain/security/quality decisions upstream as Questions.
+14. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
 
 ## Stop conditions
 
@@ -74,7 +75,8 @@ A useful human-interface design includes:
 - relevant non-happy-path states are explicit;
 - transport/framework details do not become interface semantics;
 - Product/Domain/Security ownership is preserved;
-- downstream frontend architecture/component/test work can proceed without inventing material user-visible behavior.
+- downstream frontend architecture/component/test work can proceed without inventing material user-visible behavior;
+- applicable accessibility/usability coverage has been reviewed and material gaps are either accepted by their owning Authority or represented as Questions.
 
 ## Registration
 
