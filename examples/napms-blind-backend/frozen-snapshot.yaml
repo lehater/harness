@@ -1,0 +1,18 @@
+version: 1
+kind: napms-blind-backend-validation-snapshot
+source_repository: lehater/napms
+frozen_design_commit: ac6c2e1c17b50a62abd3320c4e4cb6cbbaf129ba
+freeze_marker_commit: dcfcfb5fac816f45b340e6a7a0ae987cef20106d
+semantic_gate: CODING_AGENT_CHALLENGE_13_PASS
+source_graph:
+  path: experiments/blind-backend-2026-09-20/engineering-graph.yaml
+  fixture_path: examples/napms-blind-backend/engineering-graph.yaml
+  git_blob_sha: 42345f9188b9ea0d808716f00bd1d1e1e145b9a0
+source_core_realization:
+  path: experiments/blind-backend-2026-09-20/core-realization.yaml
+  fixture_path: examples/napms-blind-backend/core-realization.yaml
+  git_blob_sha: 31b54a40aa9ad0c842f6881bd70de7e4ff2906f7
+harness_change_policy:
+  engine_changes_for_this_rerun: forbidden
+  artifact_skill_registry_changes_for_this_rerun: forbidden
+  purpose: validate unchanged Harness against exact frozen NAPMS graph/core
