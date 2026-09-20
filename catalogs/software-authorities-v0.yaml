@@ -4,6 +4,8 @@ id: SOFTWARE-PRODUCT-REFERENCE-V0
 status: experimental
 
 principles:
+  - Performance, capacity, scalability, resource-efficiency and operational-cost targets are Quality constraints when they materially constrain realization; workload, measurement boundary and observable overload semantics must be explicit enough that Architecture and Implementation do not invent them.
+  - Capacity planning connects accepted Quality constraints to System/Data/Implementation mechanisms and Operability/Verification evidence; it does not create a separate performance or capacity Authority, and optimization must not silently weaken accepted correctness, security, consistency or product semantics.
   atomicity_test:
     - semantic_cohesion
     - independent_change
