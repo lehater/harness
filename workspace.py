@@ -87,6 +87,106 @@ def _validate_domain_model(document: dict[str, Any]) -> None:
         seen.add(item["id"])
 
 
+def _validate_product_requirements(document: dict[str, Any]) -> None:
+    content = document.get("content")
+    if not isinstance(content, dict):
+        raise CoreError("product-requirements/v1 content must be a mapping")
+
+    purpose = content.get("purpose")
+    if not isinstance(purpose, str) or not purpose.strip():
+        raise CoreError("product-requirements/v1 purpose is required")
+
+    requirements = content.get("requirements")
+    if not isinstance(requirements, list) or not requirements:
+        raise CoreError("product-requirements/v1 requirements must be a non-empty list")
+
+    seen: set[str] = set()
+    for item in requirements:
+        if not isinstance(item, dict):
+            raise CoreError("product-requirements/v1 requirement must be a mapping")
+        requirement_id = item.get("id")
+        statement = item.get("statement")
+        status = item.get("status")
+        if not isinstance(requirement_id, str) or not requirement_id.strip():
+            raise CoreError("product-requirements/v1 requirement id is required")
+        if not requirement_id.startswith("REQ-"):
+            raise CoreError(
+                f"product-requirements/v1 requirement id must start with REQ-: {requirement_id}"
+            )
+        if requirement_id in seen:
+            raise CoreError(f"duplicate product requirement id: {requirement_id}")
+        seen.add(requirement_id)
+        if not isinstance(statement, str) or not statement.strip():
+            raise CoreError(
+                f"product-requirements/v1 requirement {requirement_id} statement is required"
+            )
+        if status not in {"ACCEPTED", "RETIRED"}:
+            raise CoreError(
+                f"product-requirements/v1 requirement {requirement_id} status must be ACCEPTED or RETIRED"
+            )
+        source_refs = item.get("source_refs")
+        if not isinstance(source_refs, list) or not source_refs or any(
+            not isinstance(value, str) or not value.strip() for value in source_refs
+        ):
+            raise CoreError(
+                f"product-requirements/v1 requirement {requirement_id} requires non-empty source_refs"
+            )
+        rationale = item.get("rationale")
+        if rationale is not None and (
+            not isinstance(rationale, str) or not rationale.strip()
+        ):
+            raise CoreError(
+                f"product-requirements/v1 requirement {requirement_id} rationale must be non-empty when present"
+            )
+
+    non_goals = content.get("non_goals", [])
+    if not isinstance(non_goals, list) or any(
+        not isinstance(value, str) or not value.strip() for value in non_goals
+    ):
+        raise CoreError("product-requirements/v1 non_goals must be strings")
+
+
+def _validate_test_design(document: dict[str, Any]) -> None:
+    content = document.get("content")
+    if not isinstance(content, dict):
+        raise CoreError("test-design/v1 content must be a mapping")
+
+    purpose = content.get("purpose")
+    if not isinstance(purpose, str) or not purpose.strip():
+        raise CoreError("test-design/v1 purpose is required")
+
+    tests = content.get("tests")
+    if not isinstance(tests, list) or not tests:
+        raise CoreError("test-design/v1 tests must be a non-empty list")
+
+    seen: set[str] = set()
+    for item in tests:
+        if not isinstance(item, dict):
+            raise CoreError("test-design/v1 test must be a mapping")
+        test_id = item.get("id")
+        if not isinstance(test_id, str) or not test_id.strip():
+            raise CoreError("test-design/v1 test id is required")
+        if test_id in seen:
+            raise CoreError(f"duplicate test design id: {test_id}")
+        seen.add(test_id)
+
+        verification_refs = item.get("verification_refs")
+        if not isinstance(verification_refs, list) or not verification_refs or any(
+            not isinstance(value, str) or not value.strip()
+            for value in verification_refs
+        ):
+            raise CoreError(
+                f"test-design/v1 test {test_id} requires non-empty verification_refs"
+            )
+
+        for field in ("precondition", "operation", "oracle"):
+            value = item.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise CoreError(
+                    f"test-design/v1 test {test_id} requires {field}"
+                )
+
+
 def _validate_verification_plan(document: dict[str, Any]) -> None:
     content = document.get("content")
     if not isinstance(content, dict):
@@ -116,6 +216,18 @@ def _validate_verification_plan(document: dict[str, Any]) -> None:
         if item["id"] in seen:
             raise CoreError(f"duplicate verification check id: {item['id']}")
         seen.add(item["id"])
+        verifies = item.get("verifies")
+        if not isinstance(verifies, list) or not verifies or any(
+            not isinstance(value, str) or not value.strip() for value in verifies
+        ):
+            raise CoreError(
+                f"verification-plan/v1 check {item['id']} requires non-empty verifies refs"
+            )
+        method = item.get("method")
+        if method not in {"TEST", "ANALYSIS", "INSPECTION", "DEMONSTRATION"}:
+            raise CoreError(
+                f"verification-plan/v1 check {item['id']} has unsupported method: {method}"
+            )
         evidence = item.get("evidence")
         if not isinstance(evidence, list) or not evidence or any(
             not isinstance(value, str) or not value.strip() for value in evidence
@@ -133,7 +245,9 @@ def _validate_verification_plan(document: dict[str, Any]) -> None:
 
 SCHEMA_VALIDATORS = {
     "domain-model/v1": _validate_domain_model,
+    "product-requirements/v1": _validate_product_requirements,
     "verification-plan/v1": _validate_verification_plan,
+    "test-design/v1": _validate_test_design,
 }
 
 
@@ -195,6 +309,86 @@ def _render_domain_model(document: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _render_product_requirements(document: dict[str, Any]) -> str:
+    content = document["content"]
+    lines = [
+        f"# {document['title']}",
+        "",
+        "> Generated from Harness canonical knowledge. Do not edit this file directly.",
+        "",
+        "## Purpose",
+        "",
+        content["purpose"].strip(),
+        "",
+        "## Requirements",
+        "",
+    ]
+
+    for item in content["requirements"]:
+        lines.extend(
+            [
+                f"### {item['id']}",
+                "",
+                item["statement"].strip(),
+                "",
+                f"Status: {item['status']}",
+                "",
+                "Sources:",
+                "",
+            ]
+        )
+        lines.extend(f"- {value}" for value in item["source_refs"])
+        rationale = item.get("rationale")
+        if rationale:
+            lines.extend(["", "Rationale:", "", rationale.strip()])
+        lines.append("")
+
+    non_goals = content.get("non_goals", [])
+    if non_goals:
+        lines.extend(["## Non-goals", ""])
+        lines.extend(f"- {value}" for value in non_goals)
+
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def _render_test_design(document: dict[str, Any]) -> str:
+    content = document["content"]
+    lines = [
+        f"# {document['title']}",
+        "",
+        "> Generated from Harness canonical knowledge. Do not edit this file directly.",
+        "",
+        "## Purpose",
+        "",
+        content["purpose"].strip(),
+        "",
+        "## Test contracts",
+        "",
+    ]
+    for item in content["tests"]:
+        lines.extend(
+            [
+                f"### {item['id']}",
+                "",
+                "Verification:",
+                "",
+            ]
+        )
+        lines.extend(f"- {value}" for value in item["verification_refs"])
+        lines.extend(
+            [
+                "",
+                f"**Precondition:** {item['precondition'].strip()}",
+                "",
+                f"**Operation:** {item['operation'].strip()}",
+                "",
+                f"**Oracle:** {item['oracle'].strip()}",
+                "",
+            ]
+        )
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def _render_verification_plan(document: dict[str, Any]) -> str:
     content = document["content"]
     lines = [
@@ -221,10 +415,14 @@ def _render_verification_plan(document: dict[str, Any]) -> str:
                 "",
                 item["objective"].strip(),
                 "",
-                "Evidence:",
+                f"Method: {item['method']}",
+                "",
+                "Verifies:",
                 "",
             ]
         )
+        lines.extend(f"- {value}" for value in item["verifies"])
+        lines.extend(["", "Evidence:", ""])
         lines.extend(f"- {value}" for value in item["evidence"])
 
     out_of_scope = content.get("out_of_scope", [])
@@ -237,8 +435,81 @@ def _render_verification_plan(document: dict[str, Any]) -> str:
 
 SCHEMA_RENDERERS = {
     "domain-model/v1": _render_domain_model,
+    "product-requirements/v1": _render_product_requirements,
     "verification-plan/v1": _render_verification_plan,
+    "test-design/v1": _render_test_design,
 }
+
+
+def _validate_traceability(documents: dict[str, dict[str, Any]]) -> None:
+    requirements: dict[str, dict[str, Any]] = {}
+    verification_checks: dict[str, dict[str, Any]] = {}
+    test_contracts: list[dict[str, Any]] = []
+
+    for document in documents.values():
+        schema = document["schema"]
+        if schema == "product-requirements/v1":
+            for item in document["content"]["requirements"]:
+                if item["id"] in requirements:
+                    raise CoreError(
+                        f"duplicate requirement id across managed artifacts: {item['id']}"
+                    )
+                requirements[item["id"]] = item
+        elif schema == "verification-plan/v1":
+            for item in document["content"]["checks"]:
+                if item["id"] in verification_checks:
+                    raise CoreError(
+                        f"duplicate verification check id across managed artifacts: {item['id']}"
+                    )
+                verification_checks[item["id"]] = item
+        elif schema == "test-design/v1":
+            test_contracts.extend(document["content"]["tests"])
+
+    if requirements:
+        covered_requirements = {
+            ref
+            for check in verification_checks.values()
+            for ref in check["verifies"]
+            if ref.startswith("REQ-")
+        }
+        unknown_requirement_refs = sorted(covered_requirements - set(requirements))
+        if unknown_requirement_refs:
+            raise CoreError(
+                f"verification references unknown requirements: {unknown_requirement_refs}"
+            )
+        uncovered = sorted(
+            requirement_id
+            for requirement_id, requirement in requirements.items()
+            if requirement["status"] == "ACCEPTED"
+            and requirement_id not in covered_requirements
+        )
+        if uncovered:
+            raise CoreError(
+                f"accepted requirements without verification disposition: {uncovered}"
+            )
+
+    if verification_checks:
+        known_test_refs = {
+            ref
+            for test in test_contracts
+            for ref in test["verification_refs"]
+        }
+        unknown_verification_refs = sorted(
+            known_test_refs - set(verification_checks)
+        )
+        if unknown_verification_refs:
+            raise CoreError(
+                f"test design references unknown verification checks: {unknown_verification_refs}"
+            )
+        missing_tests = sorted(
+            check_id
+            for check_id, check in verification_checks.items()
+            if check["method"] == "TEST" and check_id not in known_test_refs
+        )
+        if missing_tests:
+            raise CoreError(
+                f"TEST verification checks without test-design contract: {missing_tests}"
+            )
 
 
 def load_workspace(root: str | Path) -> dict[str, Any]:
@@ -299,6 +570,8 @@ def load_workspace(root: str | Path) -> dict[str, Any]:
     for path, artifact in managed_by_path.items():
         if artifact["id"] not in documents:
             raise CoreError(f"managed graph artifact has no knowledge document: {path}")
+
+    _validate_traceability(documents)
 
     target_state = evaluate_target_state(profile, model)
     return {
