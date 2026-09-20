@@ -59,12 +59,14 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
+- `docs/design/graph-doctor-v1.md` — canonical aggregate graph/model diagnostic contract.
 - `profiles/**` — reusable starter Design Profiles.
 - `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.
 - `skills/artifacts/**` — active artifact-specific engineering procedures.
 - `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` — retained pre-Core material; not part of the active v0 agent contract.
 - `harness.py` — Core v0 structural operations.
 - `target_state.py` — target-state evaluator above Core.
+- `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `workspace.py` — managed knowledge validation and rendering.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
@@ -74,6 +76,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `validators/validate_core.py` — Core validator/acceptance runner.
 - `validators/validate_adapters.py` — adapter acceptance runner.
 - `validators/validate_target_state.py` — target-state acceptance runner.
+- `validators/validate_graph_doctor.py` — Graph Doctor v1 acceptance runner.
 - `validators/validate_workspace.py` — managed-workspace acceptance runner.
 - `validators/validate_agent_layer.py` — agent-layer skill/profile contract validation.
 - `docs/methodology/**` — retained pre-Core material; not part of Core v0 consumer semantics.
