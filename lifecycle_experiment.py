@@ -2,7 +2,7 @@
 """Experimental capability-granular lifecycle evaluation.
 
 Lifecycle metadata is a separate projection so Core v0 remains unchanged.
-Semantic invalidation is keyed by CapabilityId acceptance_ids, not artifact acceptance_ids.
+Semantic invalidation is keyed by Capability acceptance assertions, not artifact revisions.
 """
 from __future__ import annotations
 import argparse, json
@@ -90,7 +90,7 @@ def evaluate_lifecycle_target(graph,target,model,projection):
         if not progressed: break
     for eid in sorted(remaining):
         e=expectations[eid]; pending.append({"action":"PENDING","expectation":eid,"capability":e["capability"],"authority":e["authority"],"depends_on":[d for d in e.get("depends_on",[]) if d not in satisfied]})
-    return {"status":"COMPLETE" if len(satisfied)==len(expectations) else ("READY" if create or revalidate else "BLOCKED"),"satisfied":sorted(satisfied),"create":create,"revalidate":revalidate,"wait":wait,"pending":pending,"lifecycle_gaps":lifecycle_gaps}
+    return {"status":"COMPLETE" if len(satisfied)==len(expectations) else ("READY" if create or revalidate else ("INCOMPLETE" if lifecycle_gaps else "BLOCKED")),"satisfied":sorted(satisfied),"create":create,"revalidate":revalidate,"wait":wait,"pending":pending,"lifecycle_gaps":lifecycle_gaps}
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument("graph"); p.add_argument("target"); p.add_argument("model"); p.add_argument("lifecycle"); a=p.parse_args()
