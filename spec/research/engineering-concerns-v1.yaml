@@ -155,7 +155,11 @@ concerns:
       - {id: verification.quality, title: Quality-attribute verification}
       - {id: verification.security, title: Security verification}
       - {id: verification.reliability, title: Reliability/failure verification}
-      - {id: verification.interface, title: Interface and journey verification}
+      - id: verification.interface
+        title: Interface and journey verification
+        children:
+          - {id: verification.interface.machine, title: Machine-interface verification}
+          - {id: verification.interface.human, title: Human-interface and journey verification}
       - {id: verification.architecture, title: Architecture constraints verification}
       - {id: verification.data, title: Data/evidence verification}
 
