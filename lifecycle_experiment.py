@@ -41,7 +41,9 @@ def validate_projection(graph,model,projection):
         if artifact is None or capability not in (artifact.get("provides",[]) or []):
             raise CoreError(f"lifecycle provider does not match Core provider: {capability}")
         production=productions.get(capability)
-        expected=set() if production is None else {r["capability"] for r in production["requires"]}
+        if production is None:
+            raise CoreError(f"lifecycle capability is not in Engineering Graph production topology: {capability}")
+        expected={r["capability"] for r in production["requires"]}
         actual=set(item.get("accepted_prerequisites",{}))
         if actual!=expected:
             raise CoreError(f"lifecycle baseline for {capability} must cover exactly production prerequisites; expected {sorted(expected)}, got {sorted(actual)}")
