@@ -154,3 +154,98 @@ This is orchestration metadata, not semantic knowledge. NAPMS already carries an
 The research question is sufficiently validated across two materially different projects.
 
 Recommended canonicalization: generalize the existing project-native Human Projection contract into an **Engineering Knowledge Projection v0** contract covering assembly, semantic and visual projections, while preserving project-native projection declarations/adapters. Do not change Core v0.
+
+
+## Representation-contract correction
+
+Follow-up inspection of the active artifact skills shows that Harness already has the beginning of a representation model, but it is split across prose contracts.
+
+The agent-layer validator requires every artifact skill to declare either an `Output schema` or an `Output contract`. Managed artifacts such as `domain-model/v1` and `verification-plan/v1` have executable schema validators/renderers. Other skills deliberately target standard or project-native representations such as OpenAPI and Structurizr DSL and rely on deterministic native/project validators.
+
+Therefore “canonical artifacts may use arbitrary formats” is rejected.
+
+### Representation Contract v0
+
+For every reusable `knowledge_kind`, the producing artifact skill MUST define an explicit Representation Contract. It determines which representations are admissible for that knowledge and how structural validity is established.
+
+A Representation Contract has these logical fields:
+
+- `knowledge_kind`;
+- accepted representation family/families;
+- schema/grammar/specification identifier when applicable;
+- deterministic validator;
+- canonicalization/normalization rules when needed;
+- optional renderer/projection adapters;
+- artifact-skill owner.
+
+A representation family may be:
+
+1. **Harness typed schema** — e.g. `domain-model/v1`, `verification-plan/v1`;
+2. **standard/domain notation** — e.g. OpenAPI or Structurizr DSL, validated by its native specification/tooling plus project invariants;
+3. **project-native typed contract** — allowed only when the project supplies a deterministic validator/adapter sufficient for the declared knowledge contract.
+
+Free-form prose with no deterministic representation contract is not sufficient merely because it is registered as a CanonicalArtifact. It may still be canonical rationale/evidence where machine extraction is not a downstream requirement, but it cannot satisfy a capability whose consumers require structured semantics unless its Representation Contract explicitly permits that form.
+
+### Relationship to Core
+
+Representation Contract does not belong in Core v0. Core remains concerned with ownership, capabilities, dependencies and Questions.
+
+The agent/skill layer owns production semantics:
+
+```text
+Engineering Graph production
+        ↓ knowledge_kind
+Artifact Skill
+        ↓
+Representation Contract
+        ↓
+Canonical Artifact
+        ↓
+validator
+        ↓
+semantic acceptance
+        ↓
+provides Capability
+```
+
+This also means schema validation must not be confused with semantic acceptance. A structurally valid artifact can still be semantically wrong or unsupported; `provides` is registered only after both representation validation and semantic acceptance.
+
+### Relationship to Projection
+
+Projection is downstream of Representation Contract:
+
+```text
+Canonical Artifact
+        + Representation Contract
+        ↓
+Projection Adapter / Renderer
+        ↓
+human / visual / machine view
+```
+
+A projection must consume only semantics admitted by the Representation Contract. It must not recover missing structure by interpreting arbitrary prose.
+
+### Cross-pilot validation
+
+Nutrition demonstrates Harness-managed typed schemas and project-native artifacts. NAPMS demonstrates standard typed notations: Structurizr DSL canonically owns C4 structure and OpenAPI canonically owns HTTP representation. Both fit one model without forcing either project into a universal Harness DSL.
+
+### Priority findings
+
+- **P0:** none.
+- **P1:** current skill contracts encode representation requirements mostly in prose; the relationship `knowledge_kind -> admissible representation -> validator` is not yet machine-addressable as one registry.
+- **P1:** project-native free-form artifacts must not be treated as equivalent to typed knowledge when downstream consumers need deterministic semantic access.
+- **P2:** managed schema registry in `workspace.py` is implementation-local and covers only two schemas; it is not yet the general representation registry.
+- **P2:** projection contracts should reference representation contracts rather than independently deciding how to parse canonical artifacts.
+
+## Revised promotion sequence
+
+Before promoting Engineering Knowledge Projection v0:
+
+1. canonicalize Representation Contract v0 at the agent/skill layer;
+2. make artifact-skill representation declarations machine-checkable without moving semantic ownership into Core;
+3. retain Harness schemas, standard notations and validated project-native typed formats as first-class representation families;
+4. make Projection v0 consume those contracts;
+5. validate against Nutrition and NAPMS;
+6. only then merge the research into main.
+
+No universal engineering-document schema is proposed.
