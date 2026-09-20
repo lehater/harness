@@ -1,0 +1,27 @@
+authorities: []
+artifacts:
+  - id: EXAMPLE-REQUIREMENTS
+    path: examples/user-facing-application/canonical/napms-mvp-requirements.yaml
+    authority: PRODUCT-REQUIREMENTS
+    provides: [example.requirements]
+  - id: EXAMPLE-DOMAIN-USE-CASES
+    path: examples/user-facing-application/canonical/napms-mvp-domain-use-cases.yaml
+    authority: DOMAIN-USE-CASE-DESIGN
+    provides: [example.domain-use-cases]
+    depends_on: [EXAMPLE-REQUIREMENTS]
+  - id: EXAMPLE-SECURITY
+    path: examples/user-facing-application/canonical/napms-mvp-security.yaml
+    authority: SECURITY-ARCHITECTURE
+    provides: [example.security-architecture]
+    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
+  - id: EXAMPLE-QUALITY
+    path: examples/user-facing-application/canonical/napms-mvp-quality.yaml
+    authority: QUALITY-DESIGN
+    provides: [example.quality-constraints]
+    depends_on: [EXAMPLE-REQUIREMENTS]
+  - id: EXAMPLE-MACHINE-INTERFACE
+    path: examples/user-facing-application/canonical/napms-mvp-machine-interface.yaml
+    authority: INTERFACE-DESIGN
+    provides: [example.machine-interface]
+    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
+questions: []
