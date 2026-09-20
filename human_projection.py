@@ -75,6 +75,8 @@ def compile_manifest(
     recipe_id: str | None = None,
     extra_capabilities: list[str] | None = None,
     source_root: str | Path | None = None,
+    visual_assets: list[dict[str, Any]] | None = None,
+    asset_root: str | Path | None = None,
 ) -> dict[str, Any]:
     validate_model(model)
     profile = derive_profile(engineering_graph, consumer_id)
@@ -450,6 +452,65 @@ def validate_manifest_sources(
             )
 
 
+def resolve_visual_assets(
+    manifest: dict[str, Any],
+    declarations: list[dict[str, Any]],
+    *,
+    source_root: str | Path | None = None,
+) -> list[dict[str, Any]]:
+    selected = {item["artifact"] for item in manifest.get("sources", []) or []}
+    root = Path(source_root) if source_root is not None else None
+    result: list[dict[str, Any]] = []
+
+    for item in declarations:
+        projection_id = item.get("id")
+        source_ids = item.get("source_ids", []) or []
+        outputs = item.get("outputs", []) or []
+        command = item.get("command")
+        if not isinstance(projection_id, str) or not projection_id:
+            raise CoreError("visual projection id is required")
+        if not isinstance(source_ids, list) or any(
+            not isinstance(value, str) or not value for value in source_ids
+        ):
+            raise CoreError(f"visual projection {projection_id} source_ids must be strings")
+        if not isinstance(outputs, list) or not outputs or any(
+            not isinstance(value, str) or not value for value in outputs
+        ):
+            raise CoreError(f"visual projection {projection_id} outputs are required")
+
+        # A visual projection is eligible only when every canonical source it
+        # declares is already inside the explicit human-projection scope.
+        if not set(source_ids) <= selected:
+            continue
+
+        resolved_outputs: list[dict[str, Any]] = []
+        for output in outputs:
+            path = Path(output)
+            if path.is_absolute() or ".." in path.parts:
+                raise CoreError(
+                    f"visual projection {projection_id} output must be repository-relative: {output}"
+                )
+            row: dict[str, Any] = {"path": path.as_posix()}
+            if root is not None:
+                actual = root / path
+                if not actual.is_file():
+                    raise CoreError(
+                        f"visual projection {projection_id} output does not exist: {output}"
+                    )
+                row["sha256"] = hashlib.sha256(actual.read_bytes()).hexdigest()
+            resolved_outputs.append(row)
+
+        result.append(
+            {
+                "id": projection_id,
+                "source_ids": sorted(source_ids),
+                "command": command,
+                "outputs": resolved_outputs,
+            }
+        )
+    return sorted(result, key=lambda item: item["id"])
+
+
 def render_projection_documents(
     manifest: dict[str, Any],
     plan: dict[str, Any],
@@ -581,11 +642,45 @@ def materialize_package(
             shutil.copy2(src, dst)
             copied_sources.append(relative.as_posix())
 
+    copied_visuals: list[str] = []
+    if visual_assets:
+        visual_root = Path(asset_root) if asset_root is not None else (
+            Path(source_root) if source_root is not None else None
+        )
+        if visual_root is None:
+            raise CoreError("visual package assets require asset_root or source_root")
+        diagrams_root = output_root / "diagrams"
+        for projection in visual_assets:
+            projection_dir = diagrams_root / projection["id"].lower()
+            projection_dir.mkdir(parents=True, exist_ok=True)
+            for output in projection.get("outputs", []) or []:
+                relative = Path(output["path"])
+                src = visual_root / relative
+                if not src.is_file():
+                    raise CoreError(
+                        f"visual projection output does not exist during package materialization: {relative}"
+                    )
+                expected = output.get("sha256")
+                if expected is not None:
+                    actual = hashlib.sha256(src.read_bytes()).hexdigest()
+                    if actual != expected:
+                        raise CoreError(
+                            f"visual projection output is stale: {relative}"
+                        )
+                dst = projection_dir / relative.name
+                shutil.copy2(src, dst)
+                copied_visuals.append(dst.relative_to(output_root).as_posix())
+        (output_root / "visuals.yaml").write_text(
+            yaml.safe_dump(visual_assets, sort_keys=False),
+            encoding="utf-8",
+        )
+
     return {
         "mode": mode,
         "output": output_root.as_posix(),
         "documents": sorted(rendered),
         "sources": sorted(copied_sources),
+        "visuals": sorted(copied_visuals),
         "manifest_digest": manifest["manifest_digest"],
     }
 
