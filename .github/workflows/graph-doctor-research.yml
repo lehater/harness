@@ -1,0 +1,32 @@
+name: Graph Doctor Research
+
+on:
+  push:
+    branches: [research/graph-doctor-v1]
+    paths:
+      - "graph_doctor.py"
+      - "validators/validate_graph_doctor.py"
+      - "engineering_graph.py"
+      - "integration_alignment.py"
+      - ".github/workflows/graph-doctor-research.yml"
+  pull_request:
+    paths:
+      - "graph_doctor.py"
+      - "validators/validate_graph_doctor.py"
+      - "engineering_graph.py"
+      - "integration_alignment.py"
+      - ".github/workflows/graph-doctor-research.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14.7"
+      - run: python -m pip install PyYAML
+      - run: python validators/validate_graph_doctor.py
