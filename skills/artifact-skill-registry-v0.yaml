@@ -9,11 +9,35 @@ routes:
   - knowledge_kind: product-requirements
     skill: skills/artifacts/product-requirements/SKILL.md
 
+  - knowledge_kind: strategic-domain-design
+    skill: skills/artifacts/strategic-domain-design/SKILL.md
+
+  - knowledge_kind: domain-use-case
+    skill: skills/artifacts/domain-use-case/SKILL.md
+
+  - knowledge_kind: application-design
+    skill: skills/artifacts/application-design/SKILL.md
+
+  - knowledge_kind: quality-design
+    skill: skills/artifacts/quality-design/SKILL.md
+
   - knowledge_kind: system-architecture
     skill: skills/artifacts/system-architecture/SKILL.md
 
+  - knowledge_kind: security-architecture
+    skill: skills/artifacts/security-architecture/SKILL.md
+
   - knowledge_kind: interface-contract
     skill: skills/artifacts/interface-contract/SKILL.md
+
+  - knowledge_kind: data-design
+    skill: skills/artifacts/data-design/SKILL.md
+
+  - knowledge_kind: operability-design
+    skill: skills/artifacts/operability-design/SKILL.md
+
+  - knowledge_kind: security-analysis
+    skill: skills/artifacts/security-analysis/SKILL.md
 
   - knowledge_kind: engineering-policy
     skill: skills/artifacts/engineering-policy/SKILL.md
