@@ -66,7 +66,7 @@ Ownership, provided capabilities and dependencies are not repeated here. They re
 
 The envelope is generic; semantic content is not.
 
-Each `schema` has a dedicated validator and renderer. v0 started with `domain-model/v1`; the Nutrition Management consumer pilot demonstrated the need for `verification-plan/v1`. Future schemas such as requirements or architecture must likewise be added from demonstrated project needs.
+Each `schema` has a dedicated validator and renderer. Managed knowledge now includes `domain-model/v1`, `product-requirements/v1`, `verification-plan/v1` and `test-design/v1`. Additional schemas such as architecture must likewise be added from demonstrated project needs.
 
 A schema controls:
 
@@ -75,6 +75,46 @@ A schema controls:
 - schema-specific validation rules.
 
 This prevents a generic bag of claims from becoming a weak universal engineering language.
+
+## Canonical requirements and verification traceability
+
+`product-requirements/v1` is the canonical Product Requirements representation for Harness-managed requirements.
+
+Each normative requirement has:
+- a stable unique `REQ-*` id;
+- one independently reviewable statement;
+- `ACCEPTED` or `RETIRED` status;
+- non-empty `source_refs`;
+- optional rationale.
+
+Git history remains the revision mechanism. Requirement IDs are not document positions and must not be silently reused for materially different semantics.
+
+`verification-plan/v1` gives every verification check:
+- a stable check id;
+- non-empty `verifies` references to accepted requirements/design obligations;
+- one verification method: `TEST`, `ANALYSIS`, `INSPECTION` or `DEMONSTRATION`;
+- concrete evidence.
+
+Workspace validation enforces that every `ACCEPTED` managed Product Requirement has at least one verification disposition. A requirement therefore cannot disappear between canonical requirements and verification while the managed workspace remains valid.
+
+For checks whose method is `TEST`, `test-design/v1` must contain at least one executable test contract referencing that verification check. Test Design owns precondition, controlled operation and observable oracle; it does not restate or invent the Product Requirement.
+
+The trace is therefore:
+
+```text
+product-requirements/v1
+  REQ-*
+      ↓ verifies
+verification-plan/v1
+  VER-* + method
+      ↓ when method=TEST
+test-design/v1
+  TEST-* + verification_refs
+```
+
+Other accepted design obligations may also be referenced by Verification checks. Not every engineering test needs to originate in Product Requirements, but every managed accepted Product Requirement must have an explicit verification disposition.
+
+Generated Markdown for Requirements, Verification Strategy and Test Design is disposable review projection only.
 
 ## Candidate validation, acceptance and completeness
 
@@ -136,4 +176,4 @@ docs/generated/**
 
 Deleting generated files loses no accepted knowledge; rerunning the renderer restores them.
 
-Current projections are a conventional Domain Model and a Verification Strategy. `verification-plan/v1` requires a purpose, explicit scope and one or more checks with concrete evidence; optional out-of-scope items keep the verification boundary explicit. Additional industry-recognizable document types should be introduced one at a time from demonstrated consumer needs.
+Current projections include Product Requirements, Domain Model, Verification Strategy and Test Design. Coverage is validated from canonical managed artifacts before rendering. Additional industry-recognizable document types should be introduced one at a time from demonstrated consumer needs.
