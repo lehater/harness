@@ -1,5 +1,6 @@
 import unittest
-from lifecycle_experiment import evaluate_lifecycle_target
+from harness import CoreError
+from lifecycle_experiment import evaluate_lifecycle_target, validate_projection
 
 GRAPH={"version":1,"kind":"harness-engineering-graph","id":"X","authorities":[
 {"id":"SOURCE","responsibility":"Source facts.","boundary":{"semantic_cohesion":"Source facts.","independent_change":"Source facts change independently.","public_contract":"Accepted source facts."},"produces":[{"capability":"source.identity","requires":[]},{"capability":"source.structure","requires":[]}]},
@@ -27,4 +28,16 @@ class LifecycleExperimentTest(unittest.TestCase):
         p=projection(); p["providers"]=[x for x in p["providers"] if x["capability"]!="use.result"]
         r=evaluate_lifecycle_target(GRAPH,"IMPLEMENTATION",MODEL,p)
         self.assertEqual("INCOMPLETE",r["status"]); self.assertEqual([],r["revalidate"]); self.assertEqual("use.result",r["lifecycle_gaps"][0]["capability"])
+    def test_missing_required_baseline_is_rejected(self):
+        p=projection(); p["providers"][-1]["accepted_prerequisites"]={}
+        with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
+    def test_extra_baseline_edge_is_rejected(self):
+        p=projection(); p["providers"][-1]["accepted_prerequisites"]["source.structure"]="S1"
+        with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
+    def test_duplicate_capability_assertion_is_rejected(self):
+        p=projection(); p["providers"].append(dict(p["providers"][0]))
+        with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
+    def test_assertion_must_match_core_provider(self):
+        p=projection(); p["providers"][0]["artifact"]="USE"
+        with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
 if __name__=="__main__": unittest.main()
