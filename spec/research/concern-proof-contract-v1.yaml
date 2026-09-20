@@ -155,3 +155,93 @@ proofs:
     accepted_knowledge_kinds: [engineering.verification.architecture]
   verification.data:
     accepted_knowledge_kinds: [engineering.verification.data]
+
+  engineering.principles:
+    accepted_knowledge_kinds: [engineering.engineering.principles]
+  engineering.components:
+    accepted_knowledge_kinds: [engineering.engineering.components]
+  engineering.error-handling:
+    accepted_knowledge_kinds: [engineering.engineering.error-handling]
+  engineering.time:
+    accepted_knowledge_kinds: [engineering.engineering.time]
+  engineering.configuration:
+    accepted_knowledge_kinds: [engineering.engineering.configuration]
+  engineering.code-quality:
+    accepted_knowledge_kinds: [engineering.engineering.code-quality]
+
+  dependency.inventory:
+    accepted_knowledge_kinds: [engineering.dependency.inventory]
+  dependency.trust:
+    accepted_knowledge_kinds: [engineering.dependency.trust]
+  dependency.versioning:
+    accepted_knowledge_kinds: [engineering.dependency.versioning]
+  dependency.license:
+    accepted_knowledge_kinds: [engineering.dependency.license]
+  dependency.vulnerability:
+    accepted_knowledge_kinds: [engineering.dependency.vulnerability]
+
+  delivery.reproducible-build:
+    accepted_knowledge_kinds: [engineering.delivery.reproducible-build]
+  delivery.provenance:
+    accepted_knowledge_kinds: [engineering.delivery.provenance]
+  delivery.integrity:
+    accepted_knowledge_kinds: [engineering.delivery.integrity]
+  delivery.release:
+    accepted_knowledge_kinds: [engineering.delivery.release]
+  delivery.migration:
+    accepted_knowledge_kinds: [engineering.delivery.migration]
+  delivery.rollback:
+    accepted_knowledge_kinds: [engineering.delivery.rollback]
+
+  transition.compatibility:
+    accepted_knowledge_kinds: [engineering.transition.compatibility]
+  transition.data-migration:
+    accepted_knowledge_kinds: [engineering.transition.data-migration]
+  transition.rollout:
+    accepted_knowledge_kinds: [engineering.transition.rollout]
+  transition.deprecation:
+    accepted_knowledge_kinds: [engineering.transition.deprecation]
+  transition.revalidation:
+    accepted_knowledge_kinds: [engineering.transition.revalidation]
+
+  governance.external-obligations:
+    accepted_knowledge_kinds: [engineering.governance.external-obligations]
+  governance.privacy:
+    accepted_knowledge_kinds: [engineering.governance.privacy]
+  governance.data:
+    accepted_knowledge_kinds: [engineering.governance.data]
+  governance.audit:
+    accepted_knowledge_kinds: [engineering.governance.audit]
+  governance.ownership:
+    accepted_knowledge_kinds: [engineering.governance.ownership]
+
+  quality.performance.latency:
+    accepted_knowledge_kinds: [engineering.quality.performance.latency]
+  quality.performance.throughput:
+    accepted_knowledge_kinds: [engineering.quality.performance.throughput]
+  quality.performance.resource-efficiency:
+    accepted_knowledge_kinds: [engineering.quality.performance.resource-efficiency]
+  quality.performance.capacity:
+    accepted_knowledge_kinds: [engineering.quality.performance.capacity]
+  quality.compatibility.interoperability:
+    accepted_knowledge_kinds: [engineering.quality.compatibility.interoperability]
+  quality.compatibility.coexistence:
+    accepted_knowledge_kinds: [engineering.quality.compatibility.coexistence]
+  quality.maintainability.modularity:
+    accepted_knowledge_kinds: [engineering.quality.maintainability.modularity]
+  quality.maintainability.reusability:
+    accepted_knowledge_kinds: [engineering.quality.maintainability.reusability]
+  quality.maintainability.analysability:
+    accepted_knowledge_kinds: [engineering.quality.maintainability.analysability]
+  quality.maintainability.modifiability:
+    accepted_knowledge_kinds: [engineering.quality.maintainability.modifiability]
+  quality.maintainability.testability:
+    accepted_knowledge_kinds: [engineering.quality.maintainability.testability]
+  quality.flexibility.adaptability:
+    accepted_knowledge_kinds: [engineering.quality.flexibility.adaptability]
+  quality.flexibility.scalability:
+    accepted_knowledge_kinds: [engineering.quality.flexibility.scalability]
+  quality.flexibility.installability:
+    accepted_knowledge_kinds: [engineering.quality.flexibility.installability]
+  quality.flexibility.replaceability:
+    accepted_knowledge_kinds: [engineering.quality.flexibility.replaceability]
