@@ -72,13 +72,24 @@ def compile_manifest(
     harness_version: str | None = None,
     project_revision: str | None = None,
     recipe_id: str | None = None,
+    extra_capabilities: list[str] | None = None,
 ) -> dict[str, Any]:
     validate_model(model)
     profile = derive_profile(engineering_graph, consumer_id)
     target = evaluate_engineering_target(engineering_graph, consumer_id, model)
 
     artifacts = _artifacts(model)
-    selected_capabilities = [item["capability"] for item in profile["expectations"]]
+    consumer_capabilities = [item["capability"] for item in profile["expectations"]]
+    extra_capabilities = sorted(set(extra_capabilities or []))
+    known_productions = {
+        production["capability"]
+        for authority in engineering_graph.get("authorities", []) or []
+        for production in authority.get("produces", []) or []
+    }
+    unknown_extras = sorted(set(extra_capabilities) - known_productions)
+    if unknown_extras:
+        raise CoreError(f"projection scope references unknown extra capabilities: {unknown_extras}")
+    selected_capabilities = list(dict.fromkeys(consumer_capabilities + extra_capabilities))
     selected_cap_set = set(selected_capabilities)
 
     providers_by_capability: dict[str, list[str]] = {}
@@ -99,7 +110,11 @@ def compile_manifest(
         direct_roots.extend(providers)
         if not providers:
             state, detail = target_by_capability.get(
-                capability, ("UNKNOWN", {"capability": capability})
+                capability,
+                (
+                    "EXTRA_MISSING" if capability in extra_capabilities else "UNKNOWN",
+                    {"capability": capability},
+                ),
             )
             unresolved.append(
                 {
@@ -134,6 +149,10 @@ def compile_manifest(
         "version": 1,
         "kind": "harness-human-projection-manifest",
         "consumer": consumer_id,
+        "scope": {
+            "consumer_capabilities": consumer_capabilities,
+            "extra_capabilities": extra_capabilities,
+        },
         "recipe": recipe_id,
         "baseline": {
             "harness_version": harness_version,
@@ -349,6 +368,12 @@ def main() -> int:
     compile_cmd.add_argument("core_model")
     compile_cmd.add_argument("consumer")
     compile_cmd.add_argument("--recipe")
+    compile_cmd.add_argument(
+        "--extra-capability",
+        action="append",
+        dest="extra_capabilities",
+        help="Explicitly widen projection scope beyond the selected Consumer; repeatable",
+    )
     compile_cmd.add_argument("--harness-version")
     compile_cmd.add_argument("--project-revision")
     compile_cmd.add_argument("--output-manifest")
@@ -369,6 +394,7 @@ def main() -> int:
             harness_version=args.harness_version,
             project_revision=args.project_revision,
             recipe_id=recipe.get("id") if recipe else None,
+            extra_capabilities=args.extra_capabilities,
         )
         plan = validate_recipe(recipe, manifest) if recipe else None
         if args.output_manifest:
