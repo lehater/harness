@@ -1,0 +1,182 @@
+# Frontend design v0
+
+Status: canonical active design
+
+Harness supports user-facing/frontend engineering through the existing engineering-knowledge model. Frontend work does not introduce a separate workflow or Core entity family.
+
+## Boundary
+
+Frontend completeness is consumer-specific.
+
+A frontend implementation consumer may require this knowledge closure:
+
+```
+Product Requirements
+      ↓
+Domain / Use-case Design
+      ↓
+User Journey Design
+      ↓
+Human Interface Design
+      ↓
+Frontend System Architecture
+      ↓
+Component Design + Verification Design
+      ↓
+Test Design
+      ↓
+Implementation Design
+      ↓
+Frontend Implementation
+```
+
+Security, Quality, machine-interface and Engineering Policy capabilities attach as prerequisites where required by the project.
+
+This is a dependency graph, not a stage machine.
+
+## Ownership
+
+Existing Authorities remain sufficient:
+
+- PRODUCT-REQUIREMENTS owns users, outcomes, scope and externally observable product behavior.
+- DOMAIN / DOMAIN-USE-CASE-DESIGN owns domain language, states, invariants and business outcomes.
+- APPLICATION-DESIGN owns user-goal/application journeys and orchestration before screen decisions.
+- INTERFACE-DESIGN owns information architecture, navigation, views, user-visible states, transitions and interaction semantics.
+- SYSTEM-ARCHITECTURE owns frontend runtime boundaries, client/server responsibility, state/cache ownership when architectural, and dependency topology.
+- SECURITY-ARCHITECTURE owns authentication/session trust boundaries and credential lifecycle.
+- QUALITY-DESIGN owns measurable architecture-significant frontend quality constraints.
+- COMPONENT-DESIGN owns code-facing frontend component/port/dependency boundaries.
+- VERIFICATION-DESIGN and TEST-DESIGN own evidence and executable behavioral contracts.
+- IMPLEMENTATION-DESIGN owns bounded realization slicing.
+
+Do not create FRONTEND-DESIGN, UI-DESIGN, UX-DESIGN or ACCESSIBILITY-DESIGN Authorities merely to group frontend work.
+
+## Active reusable knowledge kinds
+
+### user-journey-design
+
+Owner: APPLICATION-DESIGN.
+
+Purpose: materialize task-oriented application interaction before view/screen decisions.
+
+Canonical procedure:
+`skills/artifacts/user-journey-design/SKILL.md`.
+
+A journey establishes actor, goal, entry conditions, meaningful interactions, alternate/failure/recovery paths, completion and externally visible effects.
+
+A journey is not a screen flow.
+
+### human-interface-design
+
+Owner: INTERFACE-DESIGN.
+
+Purpose: materialize implementation-independent human-interface semantics from accepted journeys and upstream product/domain/security knowledge.
+
+Canonical procedure:
+`skills/artifacts/human-interface-design/SKILL.md`.
+
+The result may establish:
+
+- information architecture;
+- navigation;
+- view/screen boundaries;
+- user-visible state model;
+- state transitions;
+- actions;
+- validation/error/recovery semantics;
+- authorization-sensitive presentation;
+- focus/keyboard/input semantics where applicable;
+- responsive/adaptive semantics where accepted constraints require them.
+
+It must preserve implementation freedom for framework, CSS mechanics, private component decomposition, state libraries and equivalent local realization choices.
+
+## Human-interface quality analysis
+
+Accessibility/usability coverage remains a cross-Authority analysis, not a new Authority.
+
+For user-facing surfaces, Human Interface Design applies:
+`skills/artifacts/human-interface-quality-analysis/SKILL.md`
+before semantic acceptance.
+
+Discovered gaps are routed to their semantic owners:
+
+- Product for user/scope requirements;
+- Interface for interaction/presentation semantics;
+- Quality for measurable targets;
+- Obligation for external conformance duties;
+- Verification/Test for evidence.
+
+A persistent quality/conformance CapabilityId is added only when the target project has an independently consumed durable contract.
+
+## Frontend architecture
+
+Use ordinary SYSTEM-ARCHITECTURE production for frontend-scoped architecture.
+
+Typical decisions include:
+
+- browser/mobile/desktop runtime boundary;
+- client/server responsibility;
+- rendering/deployment topology when material;
+- frontend module topology;
+- state ownership and lifetime;
+- cache/invalidation policy when architectural;
+- API adapter boundary;
+- authentication/session integration;
+- dependency direction.
+
+Do not introduce a new `frontend-architecture` knowledge kind unless repeated consumer evidence shows the generic system-architecture procedure is insufficient.
+
+Security-critical browser/session decisions are not frontend implementation conventions. If authentication acquisition, credential storage, refresh, logout or invalidation semantics are missing, create a Question to SECURITY-ARCHITECTURE and block downstream frontend architecture.
+
+## Frontend component and test design
+
+Reuse existing `component-design`, `verification-strategy`, `test-design` and `implementation-design` knowledge kinds with frontend-scoped capabilities.
+
+Component Design should prevent:
+
+- raw transport DTOs becoming UI semantic models;
+- pages/views owning business truth;
+- shared components becoming cross-feature dependency hubs;
+- global state becoming the default owner;
+- framework-specific stores/routes becoming hidden cross-feature integration contracts.
+
+Frontend Test Design derives observable oracles from accepted human-interface semantics. It may cover journeys, view-state transitions, navigation, validation/recovery, keyboard/focus behavior, permission-sensitive behavior and backend-outcome-to-UI-state mapping.
+
+Snapshot or visual-regression tests do not become semantic authority unless the corresponding visual invariant is intentionally canonical.
+
+## Design system
+
+A design-system capability is conditional.
+
+Create it only when reusable visual/presentation decisions have independent downstream consumers or lifecycle. It remains owned by INTERFACE-DESIGN.
+
+Figma, Storybook, token files, diagrams or prototypes may materialize canonical knowledge only when the target project explicitly assigns them Authority ownership and versioned contract meaning. Otherwise they are projections/review surfaces.
+
+## Consumer completeness
+
+Do not make every software application require human-interface knowledge.
+
+A user-facing implementation consumer explicitly requires the frontend closure. Backend or non-interactive consumers may require different closures from the same Engineering Graph.
+
+The acceptance fixture in `examples/user-facing-application/**` verifies that:
+
+1. missing journey knowledge routes to APPLICATION-DESIGN;
+2. missing human-interface knowledge routes to INTERFACE-DESIGN;
+3. frontend architecture follows accepted interface/security/quality inputs;
+4. Component Design and Verification may become parallel frontiers;
+5. Test Design and Implementation Design follow;
+6. the consumer reaches COMPLETE only when its declared closure is realized;
+7. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work.
+
+## Evidence for this boundary
+
+The model was validated against NAPMS in two blind design slices:
+
+- a cross-context first-MVP policy journey;
+- Resource detail/history.
+
+The blind reconstruction recovered material user-visible semantics from accepted upstream product/domain/security/machine-interface knowledge without using existing frontend source as authority.
+
+It also exposed a real missing browser authentication/session decision and successfully routed that gap back to SECURITY-ARCHITECTURE through the existing Question mechanism.
+
+Therefore no Core, Engineering Graph, target-state or agent-router semantic change is required for frontend design.
