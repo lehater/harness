@@ -39,6 +39,12 @@ python engineering_graph.py evaluate /path/to/engineering-graph.yaml IMPLEMENTAT
 
 See `docs/design/engineering-graph-v0.md`. The repository integration boundary is defined by `docs/design/integration-contract-v0.md` and has been validated against Nutrition Management, NAPMS, and the greenfield acceptance project.
 
+## User-facing/frontend design
+
+User-facing applications use the same Engineering Graph and Core semantics as backend work. Harness adds reusable `user-journey-design` and `human-interface-design` production procedures while retaining Application Design, Interface Design, System Architecture, Security, Component, Verification, Test and Implementation ownership boundaries.
+
+See `docs/design/frontend-design-v0.md` and the executable `examples/user-facing-application/**` fixture.
+
 ## Design target state
 
 A Design Profile can declare the engineering knowledge required for a selected scope as stable expectations of `subject + CapabilityId + Authority`.
