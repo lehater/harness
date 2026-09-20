@@ -16,6 +16,7 @@ on:
       - "engineering_graph.py"
       - "integration_alignment.py"
       - "authority_context.py"
+      - "human_projection.py"
       - "agent_router.py"
       - "target_state.py"
       - "workspace.py"
