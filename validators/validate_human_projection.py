@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -14,6 +15,7 @@ from adapters.canonical_graph import project_model  # noqa: E402
 from harness import CoreError  # noqa: E402
 from human_projection import (  # noqa: E402
     compile_manifest,
+    materialize_package,
     validate_projection_ir,
     validate_recipe,
 )
@@ -73,6 +75,38 @@ def main() -> int:
     ir = copy.deepcopy(ir_template)
     ir["manifest_digest"] = manifest["manifest_digest"]
     validate_projection_ir(ir, plan)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        review_root = Path(temp_dir) / "review"
+        review_result = materialize_package(
+            manifest,
+            plan,
+            ir,
+            review_root,
+            mode="REVIEW",
+        )
+        assert review_result["documents"] == ["implementation.md", "overview.md"]
+        assert (review_root / "README.md").is_file()
+        assert (review_root / "manifest.yaml").is_file()
+        assert (review_root / "documents/overview.md").is_file()
+        assert not (review_root / "sources").exists()
+
+        source_root = Path(temp_dir) / "source-project"
+        for source in manifest["sources"]:
+            path = source_root / source["path"]
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(source["artifact"] + "\n", encoding="utf-8")
+        handoff_root = Path(temp_dir) / "handoff"
+        handoff_result = materialize_package(
+            manifest,
+            plan,
+            ir,
+            handoff_root,
+            mode="HANDOFF",
+            source_root=source_root,
+        )
+        assert len(handoff_result["sources"]) == len(manifest["sources"])
+        assert (handoff_root / "sources/docs/requirements.yaml").is_file()
 
     bad_recipe = copy.deepcopy(recipe)
     bad_recipe["documents"][0]["sections"][0]["select"]["artifacts"] = ["UNKNOWN"]
