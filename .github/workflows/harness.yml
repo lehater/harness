@@ -40,6 +40,7 @@ jobs:
             exit 1
           fi
           echo "invalid research fixture rejected as expected"
+          python experiments/artifact_schemas/validate_registries.py
       - name: Evaluate greenfield implementation frontier
         run: |
           python engineering_graph.py evaluate \
