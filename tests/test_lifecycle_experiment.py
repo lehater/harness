@@ -26,5 +26,5 @@ class LifecycleExperimentTest(unittest.TestCase):
     def test_missing_lifecycle_assertion_is_not_revalidate(self):
         p=projection(); p["providers"]=[x for x in p["providers"] if x["capability"]!="use.result"]
         r=evaluate_lifecycle_target(GRAPH,"IMPLEMENTATION",MODEL,p)
-        self.assertEqual([],r["revalidate"]); self.assertEqual("use.result",r["lifecycle_gaps"][0]["capability"])
+        self.assertEqual("INCOMPLETE",r["status"]); self.assertEqual([],r["revalidate"]); self.assertEqual("use.result",r["lifecycle_gaps"][0]["capability"])
 if __name__=="__main__": unittest.main()
