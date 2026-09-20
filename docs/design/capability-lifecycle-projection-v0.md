@@ -4,7 +4,7 @@ Status: experimental contract validated against Nutrition Management and NAPMS.
 
 ## Purpose
 
-Represent whether accepted Capability knowledge is still current against the accepted prerequisite Capability acceptance identitys on which its semantic acceptance depended, without changing Harness Core v0 or duplicating project-owned history.
+Represent whether accepted Capability knowledge is still current against the accepted prerequisite Capability acceptance identities on which its semantic acceptance depended, without changing Harness Core v0 or duplicating project-owned history.
 
 ## Boundary
 
@@ -73,12 +73,12 @@ For a Capability in the selected consumer closure:
 - every current prerequisite acceptance identity equals the recorded accepted prerequisite acceptance identity.
 
 ### STALE
-Provider/assertion exists but at least one production prerequisite is not CURRENT or its current revision differs from the recorded baseline.
+Provider/assertion exists but at least one production prerequisite is not CURRENT or its current acceptance identity differs from the recorded baseline.
 
 STALE means "not proven current against the selected baseline". It does not mean semantically wrong.
 
 ### UNKNOWN
-Provider exists but lifecycle assertion/required revision coverage is unavailable.
+Provider exists but lifecycle assertion/required acceptance coverage is unavailable.
 
 UNKNOWN must never satisfy lifecycle-aware target completeness. It is reported as a lifecycle coverage gap, not REVALIDATE: Harness lacks enough acceptance evidence to claim staleness.
 
@@ -92,7 +92,8 @@ Evaluation order remains prerequisite-first.
 - missing provider + no blocker -> CREATE;
 - missing/provider blocked by unresolved Question -> WAIT;
 - provider CURRENT -> SATISFIED;
-- provider STALE or UNKNOWN and all target prerequisites are satisfied/current -> REVALIDATE;
+- provider STALE and all target prerequisites are satisfied/current -> REVALIDATE;
+- provider UNKNOWN -> lifecycle coverage gap / INCOMPLETE;
 - downstream whose prerequisites are not satisfied/current -> PENDING.
 
 REVALIDATE routes to the Capability's owning Authority. It does not automatically change semantic truth.
