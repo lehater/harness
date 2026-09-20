@@ -132,67 +132,61 @@ def validate_project_alignment(
         if seed in visited_capabilities:
             continue
         owner = producers[seed]
-        group_capabilities: set[str] = {seed}
+        group_capabilities: set[str] = set()
         group_artifacts: set[str] = set()
-        work_capabilities = [seed]
-        work_artifacts: list[str] = []
+        actual_upstream: set[str] = set()
+        capability_stack = [seed]
+        artifact_stack: list[str] = []
 
-        # Capability <-> provider-artifact closure captures co-provided
-        # capabilities and multiple canonical providers.
-        while work_capabilities or work_artifacts:
-            while work_capabilities:
-                capability = work_capabilities.pop()
+        # One closure over Capability <-> providers plus same-Authority
+        # artifact dependencies. This handles:
+        # - one capability with several canonical providers;
+        # - one artifact co-providing several capabilities;
+        # - internal support artifacts with or without public capabilities;
+        # while never pulling unrelated artifacts merely because they share an
+        # Authority.
+        while capability_stack or artifact_stack:
+            while capability_stack:
+                capability = capability_stack.pop()
+                if capability in group_capabilities:
+                    continue
                 if producers.get(capability) != owner:
                     raise CoreError(
                         f"alignment group for {seed} crosses producer Authorities"
                     )
-                if capability in visited_capabilities:
-                    continue
-                visited_capabilities.add(capability)
                 group_capabilities.add(capability)
+                visited_capabilities.add(capability)
                 for artifact_id in providers_by_capability.get(capability, set()):
                     if artifact_id not in group_artifacts:
-                        group_artifacts.add(artifact_id)
-                        work_artifacts.append(artifact_id)
+                        artifact_stack.append(artifact_id)
 
-            while work_artifacts:
-                artifact_id = work_artifacts.pop()
+            while artifact_stack:
+                artifact_id = artifact_stack.pop()
+                if artifact_id in group_artifacts:
+                    continue
                 if artifact_authority[artifact_id] != owner:
                     raise CoreError(
                         f"provider group for {seed} crosses artifact Authorities"
                     )
+                group_artifacts.add(artifact_id)
+
                 for capability in capabilities_by_artifact.get(artifact_id, set()):
                     if capability not in group_capabilities:
-                        group_capabilities.add(capability)
-                        work_capabilities.append(capability)
+                        capability_stack.append(capability)
 
-        # Same-Authority support closure belongs to the selected provider
-        # group even when support artifacts expose no public CapabilityId.
-        support_stack = list(group_artifacts)
-        support_seen = set(group_artifacts)
-        actual_upstream: set[str] = set()
-        while support_stack:
-            artifact_id = support_stack.pop()
-            for dep in source_nodes[artifact_id].get("depends_on", []) or []:
-                dep_owner = artifact_authority.get(dep)
-                if dep_owner is None:
-                    if require_complete_binding:
-                        raise CoreError(
-                            f"canonical dependency {dep} of {artifact_id} has no Authority binding"
-                        )
-                    continue
-                if dep_owner == owner:
-                    if dep not in support_seen:
-                        support_seen.add(dep)
-                        support_stack.append(dep)
-                    # If an internal support artifact itself publishes a
-                    # capability, its contract is physically part of this
-                    # provider group and must explain its external frontier.
-                    for capability in capabilities_by_artifact.get(dep, set()):
-                        if capability not in group_capabilities:
-                            group_capabilities.add(capability)
-                else:
-                    actual_upstream.add(dep_owner)
+                for dep in source_nodes[artifact_id].get("depends_on", []) or []:
+                    dep_owner = artifact_authority.get(dep)
+                    if dep_owner is None:
+                        if require_complete_binding:
+                            raise CoreError(
+                                f"canonical dependency {dep} of {artifact_id} has no Authority binding"
+                            )
+                        continue
+                    if dep_owner == owner:
+                        if dep not in group_artifacts:
+                            artifact_stack.append(dep)
+                    else:
+                        actual_upstream.add(dep_owner)
 
         declared_upstream: set[str] = set()
         for capability in sorted(group_capabilities):
@@ -224,8 +218,16 @@ def validate_project_alignment(
             {
                 "authority": owner,
                 "capabilities": sorted(group_capabilities),
-                "provider_artifacts": sorted(group_artifacts),
-                "support_artifacts": sorted(support_seen - group_artifacts),
+                "provider_artifacts": sorted(
+                    artifact_id
+                    for artifact_id in group_artifacts
+                    if capabilities_by_artifact.get(artifact_id)
+                ),
+                "support_artifacts": sorted(
+                    artifact_id
+                    for artifact_id in group_artifacts
+                    if not capabilities_by_artifact.get(artifact_id)
+                ),
                 "upstream_authorities": sorted(actual_upstream),
             }
         )
