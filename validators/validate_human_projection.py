@@ -16,6 +16,7 @@ from harness import CoreError  # noqa: E402
 from human_projection import (  # noqa: E402
     compile_manifest,
     materialize_package,
+    resolve_visual_assets,
     validate_manifest_sources,
     validate_projection_ir,
     validate_recipe,
@@ -177,6 +178,63 @@ def main() -> int:
         )
         assert len(handoff_result["sources"]) == len(manifest["sources"])
         assert (handoff_root / "sources/docs/requirements.yaml").is_file()
+        visual_file = source_root / "docs-generated/architecture/system.puml"
+        visual_file.parent.mkdir(parents=True, exist_ok=True)
+        visual_file.write_text("@startuml\nA -> B\n@enduml\n", encoding="utf-8")
+        declarations = [
+            {
+                "id": "SYSTEM-VIEW",
+                "source_ids": ["ARCHITECTURE"],
+                "command": "project-owned-generator",
+                "outputs": ["docs-generated/architecture/system.puml"],
+            },
+            {
+                "id": "OUT-OF-SCOPE-VIEW",
+                "source_ids": ["NOT-IN-MANIFEST"],
+                "command": "project-owned-generator",
+                "outputs": ["docs-generated/architecture/ignored.puml"],
+            },
+        ]
+        visuals = resolve_visual_assets(
+            manifest,
+            declarations,
+            source_root=source_root,
+        )
+        assert [item["id"] for item in visuals] == ["SYSTEM-VIEW"]
+
+        visual_root = Path(temp_dir) / "visual-review"
+        visual_result = materialize_package(
+            manifest,
+            plan,
+            ir,
+            visual_root,
+            mode="REVIEW",
+            source_root=source_root,
+            visual_assets=visuals,
+            asset_root=source_root,
+        )
+        assert visual_result["visuals"] == [
+            "diagrams/system-view/system.puml"
+        ]
+        assert (visual_root / "visuals.yaml").is_file()
+        assert (visual_root / "diagrams/system-view/system.puml").is_file()
+
+        visual_file.write_text("@startuml\nA -> C\n@enduml\n", encoding="utf-8")
+        expect_error(
+            lambda: materialize_package(
+                manifest,
+                plan,
+                ir,
+                Path(temp_dir) / "stale-visual-review",
+                mode="REVIEW",
+                source_root=source_root,
+                visual_assets=visuals,
+                asset_root=source_root,
+            ),
+            "visual projection output is stale",
+        )
+        visual_file.write_text("@startuml\nA -> B\n@enduml\n", encoding="utf-8")
+
 
     bad_recipe = copy.deepcopy(recipe)
     bad_recipe["documents"][0]["sections"][0]["select"]["artifacts"] = ["UNKNOWN"]
