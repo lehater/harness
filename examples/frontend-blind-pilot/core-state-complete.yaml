@@ -1,49 +1,61 @@
 authorities: []
 artifacts:
   - id: NAPMS-MVP-REQUIREMENTS
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-requirements.yaml
     authority: PRODUCT-REQUIREMENTS
     provides: [napms.mvp.requirements]
   - id: NAPMS-MVP-DOMAIN-USE-CASES
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-domain-use-cases.yaml
     authority: DOMAIN-USE-CASE-DESIGN
     provides: [napms.mvp.domain-use-cases]
     depends_on: [NAPMS-MVP-REQUIREMENTS]
   - id: NAPMS-MVP-SECURITY
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-security.yaml
     authority: SECURITY-ARCHITECTURE
     provides: [napms.mvp.security-architecture]
     depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES]
   - id: NAPMS-MVP-QUALITY
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-quality.yaml
     authority: QUALITY-DESIGN
     provides: [napms.mvp.quality-constraints]
     depends_on: [NAPMS-MVP-REQUIREMENTS]
   - id: NAPMS-MVP-MACHINE-INTERFACE
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-machine-interface.yaml
     authority: INTERFACE-DESIGN
     provides: [napms.mvp.machine-interface]
     depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES, NAPMS-MVP-SECURITY]
   - id: NAPMS-MVP-FRONTEND-JOURNEYS
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-journeys.yaml
     authority: APPLICATION-DESIGN
     provides: [napms.mvp.frontend.user-journeys]
     depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES]
   - id: NAPMS-MVP-HUMAN-INTERFACE
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-human-interface.yaml
     authority: INTERFACE-DESIGN
     provides: [napms.mvp.frontend.human-interface]
     depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES, NAPMS-MVP-FRONTEND-JOURNEYS, NAPMS-MVP-SECURITY, NAPMS-MVP-MACHINE-INTERFACE]
   - id: NAPMS-MVP-FRONTEND-ARCHITECTURE
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-architecture.yaml
     authority: SYSTEM-ARCHITECTURE
     provides: [napms.mvp.frontend.architecture]
     depends_on: [NAPMS-MVP-HUMAN-INTERFACE, NAPMS-MVP-MACHINE-INTERFACE, NAPMS-MVP-SECURITY, NAPMS-MVP-QUALITY]
   - id: NAPMS-MVP-FRONTEND-COMPONENT-DESIGN
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-component-design.yaml
     authority: COMPONENT-DESIGN
     provides: [napms.mvp.frontend.component-design]
     depends_on: [NAPMS-MVP-HUMAN-INTERFACE, NAPMS-MVP-FRONTEND-ARCHITECTURE, NAPMS-MVP-MACHINE-INTERFACE]
   - id: NAPMS-MVP-FRONTEND-VERIFICATION
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-verification.yaml
     authority: VERIFICATION-DESIGN
     provides: [napms.mvp.frontend.verification]
     depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-HUMAN-INTERFACE, NAPMS-MVP-FRONTEND-ARCHITECTURE]
   - id: NAPMS-MVP-FRONTEND-TEST-DESIGN
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-test-design.yaml
     authority: TEST-DESIGN
     provides: [napms.mvp.frontend.test-design]
     depends_on: [NAPMS-MVP-FRONTEND-VERIFICATION, NAPMS-MVP-HUMAN-INTERFACE]
   - id: NAPMS-MVP-FRONTEND-IMPLEMENTATION-DESIGN
+    path: examples/frontend-blind-pilot/canonical/napms-mvp-frontend-implementation-design.yaml
     authority: IMPLEMENTATION-DESIGN
     provides: [napms.mvp.frontend.implementation-design]
     depends_on: [NAPMS-MVP-FRONTEND-COMPONENT-DESIGN, NAPMS-MVP-FRONTEND-VERIFICATION, NAPMS-MVP-FRONTEND-TEST-DESIGN]
