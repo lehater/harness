@@ -1,0 +1,17 @@
+version: 1
+kind: harness-knowledge-artifact
+artifact: APPLICATION-REQUIREMENTS
+schema: product-requirements/v1
+title: Application Product Requirements
+
+content:
+  purpose: Define the accepted observable requirements for application component membership.
+  requirements:
+    - id: REQ-APPLICATION-COMPONENT-UNIQUE
+      statement: An Application shall not contain the same Component more than once.
+      status: ACCEPTED
+      source_refs:
+        - stakeholder-application-membership
+      rationale: Preserve unambiguous component membership inside one Application.
+  non_goals:
+    - Define persistence or API representation.

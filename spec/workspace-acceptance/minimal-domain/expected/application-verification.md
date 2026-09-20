@@ -4,25 +4,37 @@
 
 ## Purpose
 
-Define how the accepted application semantics are checked before implementation changes are accepted.
+Define how accepted application requirements and semantics are checked before implementation changes are accepted.
 
 ## Scope
 
-Application domain behavior and its canonical invariants.
+Application product requirement and domain behavior.
 
 ## Verification checks
 
-### DOMAIN-INVARIANTS
+### VER-COMPONENT-UNIQUENESS
 
-Verify that application domain invariants remain enforced.
+Verify that an Application cannot contain the same Component more than once.
+
+Method: TEST
+
+Verifies:
+
+- REQ-APPLICATION-COMPONENT-UNIQUE
+- APPLICATION-COMPONENT-UNIQUE
 
 Evidence:
 
-- Automated domain tests covering every accepted invariant.
-- Regression tests for previously fixed invariant violations.
-### CANONICAL-GENERATION
+- Executable test contract covering duplicate component membership.
+### VER-CANONICAL-GENERATION
 
 Verify that generated human documentation remains synchronized with canonical knowledge.
+
+Method: INSPECTION
+
+Verifies:
+
+- APPLICATION-COMPONENT-UNIQUE
 
 Evidence:
 

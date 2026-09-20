@@ -3,6 +3,11 @@ kind: harness-design-profile
 id: APPLICATION-DESIGN
 
 expectations:
+  - id: APPLICATION-REQUIREMENTS
+    subject: APPLICATION
+    capability: application.product-requirements
+    authority: PRODUCT
+
   - id: APPLICATION-DOMAIN
     subject: APPLICATION
     capability: application.domain-semantics
@@ -12,3 +17,8 @@ expectations:
     subject: APPLICATION
     capability: application.verification-strategy
     authority: VERIFICATION
+
+  - id: APPLICATION-TEST-DESIGN
+    subject: APPLICATION
+    capability: application.test-design
+    authority: TEST-DESIGN
