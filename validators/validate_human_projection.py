@@ -99,6 +99,48 @@ def main() -> int:
         validate_projection_ir(hashed_ir, hashed_plan)
         validate_manifest_sources(hashed_manifest, source_root)
 
+        evidence_ir = copy.deepcopy(hashed_ir)
+        for document in evidence_ir["documents"]:
+            for section in document["sections"]:
+                for claim in section["claims"]:
+                    claim["evidence"] = [
+                        {"source": source_id, "excerpt": source_id}
+                        for source_id in claim["sources"]
+                    ]
+        validate_projection_ir(
+            evidence_ir,
+            hashed_plan,
+            manifest=hashed_manifest,
+            source_root=source_root,
+            require_evidence=True,
+        )
+
+        missing_evidence_ir = copy.deepcopy(evidence_ir)
+        del missing_evidence_ir["documents"][0]["sections"][0]["claims"][0]["evidence"]
+        expect_error(
+            lambda: validate_projection_ir(
+                missing_evidence_ir,
+                hashed_plan,
+                manifest=hashed_manifest,
+                source_root=source_root,
+                require_evidence=True,
+            ),
+            "requires evidence",
+        )
+
+        bad_excerpt_ir = copy.deepcopy(evidence_ir)
+        bad_excerpt_ir["documents"][0]["sections"][0]["claims"][0]["evidence"][0]["excerpt"] = "NOT-IN-SOURCE"
+        expect_error(
+            lambda: validate_projection_ir(
+                bad_excerpt_ir,
+                hashed_plan,
+                manifest=hashed_manifest,
+                source_root=source_root,
+                require_evidence=True,
+            ),
+            "excerpt not found",
+        )
+
         changed = source_root / hashed_manifest["sources"][0]["path"]
         changed.write_text("changed\n", encoding="utf-8")
         expect_error(
