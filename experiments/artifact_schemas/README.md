@@ -57,3 +57,23 @@ Structural PASS is not semantic acceptance. Each candidate also carries:
 The experiment succeeds only if manual source comparison finds no missing or
 invented semantics and the project can discard the candidate without changing its
 current canonical state.
+
+
+## cli-contract/v0-experiment
+
+Required:
+
+- command syntax;
+- one or more argument contracts;
+- one or more success semantics.
+
+Optional:
+
+- failure classes with optional concrete exit status;
+- representation rules;
+- outer-adapter/boundary rules;
+- explicit scope exclusions.
+
+The profile intentionally does not assume HTTP-style operations or a fixed stderr
+format. It is one Interface Contract profile alongside standard-native profiles
+such as OpenAPI.
