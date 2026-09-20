@@ -26,13 +26,36 @@ Accepted project design is authority. Standards and user-research findings impro
 
 1. Identify user, journey/task and interface surface.
 2. Identify accepted interaction semantics and required modes.
-3. Apply accessibility/usability lenses to find material concerns.
+3. Apply the reusable concern matrix below to find material concerns. Treat heuristics as analysis lenses unless the project explicitly adopts them as policy/obligation.
 4. Route user/scope requirements to Product.
 5. Route interaction/presentation semantics to Interface Design.
 6. Route measurable architecture-significant constraints to Quality Design.
 7. Route external conformance duties to Obligation Analysis.
 8. Route proof to Verification/Test.
 9. Record COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING or QUESTION.
+
+## Reusable concern matrix
+
+Review applicable concerns across the selected journey/surface:
+
+- task/goal alignment;
+- visibility of material system/UI states;
+- match to accepted domain/product language;
+- user control, cancellation, reversal and destructive-action safeguards;
+- consistency/continuity across equivalent actions and states;
+- error prevention, actionable validation and recovery;
+- recognition over recall for identifiers, choices and prior state;
+- cognitive/choice complexity and discoverability;
+- information grouping and visual hierarchy;
+- progressive disclosure of secondary/history/provenance detail;
+- keyboard operability, focus order, focus visibility and restoration;
+- semantic names, labels, roles and status announcements;
+- non-visual equivalence and no color-only meaning;
+- pointer/target interaction where applicable;
+- responsive/reflow behavior for accepted platforms;
+- authentication/authorization-sensitive visibility and action behavior.
+
+Named heuristics such as Nielsen, Gestalt, Fitts/Hick or platform guidelines improve recall but are not pass/fail rules by themselves. Formal conformance criteria such as WCAG become normative only through accepted Product/Quality/Obligation/Interface contracts.
 
 ## Stop conditions
 
