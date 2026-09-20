@@ -55,6 +55,50 @@ def main() -> int:
                 "INTERFACE",
             ]
 
+            # Independent capabilities under one Authority must not contaminate
+            # each other's project-graph alignment. This is the backend/frontend
+            # coexistence regression that Authority-wide alignment would fail.
+            independent_graph = copy.deepcopy(graph)
+            interface_authority = next(
+                item for item in independent_graph["authorities"]
+                if item["id"] == "INTERFACE"
+            )
+            interface_authority["produces"].append(
+                {
+                    "capability": "example.independent-interface",
+                    "requires": ["example.requirements"],
+                }
+            )
+            independent_graph["terminal_capabilities"].append(
+                {
+                    "capability": "example.independent-interface",
+                    "authority": "INTERFACE",
+                    "reason": "Acceptance fixture for an unrelated interface capability.",
+                }
+            )
+            independent_source = copy.deepcopy(source)
+            independent_source["nodes"].append(
+                {
+                    "id": "INDEPENDENT-INTERFACE",
+                    "path": "docs/independent-interface.yaml",
+                    "depends_on": ["REQUIREMENTS"],
+                }
+            )
+            independent_projection = copy.deepcopy(projection)
+            independent_projection["bindings"].append(
+                {
+                    "artifact": "INDEPENDENT-INTERFACE",
+                    "authority": "INTERFACE",
+                    "provides": ["example.independent-interface"],
+                }
+            )
+            validate_project_alignment(
+                independent_source,
+                independent_projection,
+                independent_graph,
+                target_consumer="BACKEND-IMPLEMENTATION",
+            )
+
             context = build_authority_context(
                 graph, model, "IMPLEMENTATION-DESIGN"
             )
