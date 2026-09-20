@@ -31,16 +31,19 @@ Do not treat a performance benchmark, lint check or test count as useful evidenc
 
 1. Confirm the expectation is `CREATE`, not `WAIT` or `PENDING`.
 2. Identify the accepted behaviors/invariants/boundaries whose regression would invalidate the selected scope.
-3. Map each verification objective to concrete evidence:
-   - an existing test/validator/command; or
-   - an explicit evidence requirement that must be created before the stronger capability is claimed.
-4. Remove redundant or diagnostic-only checks from the correctness gate.
-5. Preserve important out-of-scope boundaries.
-6. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
-7. Draft `verification-plan/v1`.
-8. Run `workspace.py validate-artifact`.
-9. Apply common semantic acceptance.
-10. After acceptance, register, render and re-evaluate target state.
+3. For every accepted `REQ-*` in prerequisite closure, create at least one explicit verification disposition.
+4. For each verification check:
+   - assign a stable check id;
+   - list `verifies` references to the accepted Requirement/design obligations it proves;
+   - select exactly one method: `TEST`, `ANALYSIS`, `INSPECTION` or `DEMONSTRATION`;
+   - identify concrete evidence or an explicit evidence requirement that must exist before the stronger capability is claimed.
+5. Remove redundant or diagnostic-only checks from the correctness gate.
+6. Preserve important out-of-scope boundaries.
+7. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
+8. Draft `verification-plan/v1`.
+9. Run `workspace.py validate-artifact`.
+10. Apply common semantic acceptance.
+11. After acceptance, register, render and re-evaluate target state.
 
 ## Stop conditions
 
@@ -60,13 +63,18 @@ Required knowledge:
 - purpose;
 - selected scope;
 - one or more named verification checks;
+- for every check, non-empty `verifies` references;
+- one verification `method`: TEST, ANALYSIS, INSPECTION or DEMONSTRATION;
 - concrete evidence for every check.
 
 Optional `out_of_scope` makes non-gates explicit.
 
 ## Artifact-specific acceptance
 
-- every check traces to accepted behavior or a structural constraint;
+- every accepted Product Requirement has a verification disposition;
+- every check traces through `verifies` to accepted behavior or a structural constraint;
+- every `REQ-*` reference resolves to a canonical Product Requirement;
+- `TEST` checks are expected to be refined by Test Design rather than leaving the coding agent to invent an oracle;
 - every evidence item is specific enough for an agent to locate or create;
 - diagnostic performance evidence is not mislabeled as correctness;
 - the strategy does not introduce new product requirements;
