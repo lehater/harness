@@ -237,7 +237,7 @@ def validate_project_alignment(
         "model": model,
         "authority_dependencies": {
             authority: sorted(actual_by_authority.get(authority, set()))
-            for authority in sorted(selected_authorities)
+            for authority in sorted(actual_by_authority)
         },
         "bound_artifacts": sorted(bindings),
         "materialized_capabilities": sorted(materialized_capabilities),
