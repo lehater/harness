@@ -63,6 +63,7 @@ mappings:
     capability_contains: [.architecture]
 
   interface.machine.contract:
+    proof_capability_ids: [engineering.interface.http-contract]
     artifact_kinds: [http-contract, contract-requirements]
     capability_contains: [interface.cli, application-contracts, interface.http-contract]
   interface.machine.errors:
@@ -79,6 +80,7 @@ mappings:
     capability_contains: [human-interface, frontend.verification-design]
 
   data.model:
+    proof_capability_ids: [engineering.data.persistence-model]
     artifact_kinds: [physical-persistence-model]
     capability_contains: [data-design, data.persistence-model]
   data.integrity:
@@ -109,6 +111,7 @@ mappings:
   security.availability-abuse:
     artifact_kinds: [threat-model, security-architecture]
   security.threat-analysis:
+    proof_capability_ids: [engineering.security.threat-analysis]
     artifact_kinds: [threat-model]
     capability_contains: [security.threat-analysis]
 
@@ -134,6 +137,7 @@ mappings:
     artifact_kinds: [security-architecture, application-architecture-rules]
     capability_contains: [engineering-policy]
   operability.logging:
+    proof_capability_ids: [engineering.operability.logging]
     artifact_kinds: [observability-requirements]
     capability_contains: [operability.observability]
   operability.metrics:
@@ -167,6 +171,7 @@ mappings:
     capability_contains: [engineering-policy, architecture]
 
   verification.strategy:
+    proof_capability_ids: [engineering.verification.strategy]
     artifact_kinds: [test-intent]
     capability_contains: [verification.strategy, verification-design]
   verification.requirement-traceability:
