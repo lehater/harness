@@ -234,3 +234,78 @@ Before canonicalization:
 3. run a second blind slice focused on Resource detail/history because NAPMS already has a narrow canonical UI contract suitable for exact comparison;
 4. challenge the resulting closure with an implementation-agent review;
 5. only then promote skills/reference guidance into main.
+
+
+## Follow-up validation
+
+### Second blind slice: Resource detail/history
+
+A second blind reconstruction used Resource Catalogue use-case/domain semantics while excluding existing UI contracts.
+
+It independently recovered the important canonical Resource-detail semantics:
+
+- stable ResourceId workspace identity;
+- current facts primary;
+- explicit absence of current facts;
+- history subordinate to Resource detail;
+- loading/not-found/error separation;
+- mutation refresh preserving current/history distinction;
+- retry behavior;
+- Resource/Site/responsibility semantics kept distinct from authority.
+
+It deliberately did not invent exact route syntax or whether History is a tab/disclosure/inline region. Those are legitimate Interface Design choices rather than derivable domain truth.
+
+Result: the `human-interface-design` boundary survives a second materially narrower slice.
+
+### Human-interface quality integration
+
+Accessibility/usability coverage does not require a new Authority or default persistent capability.
+
+The existing `human-interface-quality-analysis` is now invoked by the experimental Human Interface Design procedure before semantic acceptance. Findings are routed to Product, Interface, Quality, Obligation and Verification/Test owners.
+
+A persistent quality/conformance capability is justified only when a project has an independently consumed durable contract.
+
+### Coding-boundary challenge
+
+Attempting to continue from Human Interface Design into Frontend Architecture exposed a real missing upstream decision:
+
+the accepted NAPMS backend security contract defines OIDC bearer-token validation, but does not define the browser-side authentication/session lifecycle needed by the separate Web Application.
+
+Missing semantics include browser credential acquisition, refresh/re-authentication, storage boundary and logout/invalidation responsibility.
+
+The pilot models this as a Question addressed to SECURITY-ARCHITECTURE which blocks the accepted Security Architecture artifact.
+
+Harness then correctly reports the frontend target as BLOCKED and does not route downstream Frontend Architecture/Component/Test/Implementation work.
+
+This validates frontend feedback routing with existing Core Question semantics.
+
+### Executable validation
+
+`validators/validate_frontend_blind_pilot.py` now verifies:
+
+- CREATE frontier ordering from journey through implementation design;
+- parallel Component Design + Verification frontier after frontend architecture;
+- terminal COMPLETE state when the experimental closure is fully materialized;
+- BLOCKED propagation for the browser-auth Security Architecture Question.
+
+GitHub Actions `harness core` run 218 passed, including `make harness-check` and the frontend pilot validator.
+
+## Updated promotion assessment
+
+Evidence now supports promotion of the minimal frontend capability set:
+
+- `user-journey-design` under APPLICATION-DESIGN;
+- `human-interface-design` under INTERFACE-DESIGN;
+- corresponding artifact-skill registry routes;
+- frontend consumer/example guidance;
+- frontend blind-pilot acceptance fixture.
+
+Evidence still does not justify:
+
+- FRONTEND-DESIGN/UI-DESIGN/UX-DESIGN Authority;
+- frontend-specific Core entities;
+- mandatory design-system capability;
+- frontend-specific evaluator/router semantics;
+- Figma-specific Core integration.
+
+Before merging the research branch, the remaining review is mainly canonicalization hygiene: decide which experimental examples/research artifacts belong in the permanent repository and reduce the branch to the smallest durable change set.
