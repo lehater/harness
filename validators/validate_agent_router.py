@@ -97,6 +97,21 @@ def main() -> int:
 
     try:
         result = route_create_work(
+            graph_for("source-coverage-audit"),
+            "IMPLEMENTATION",
+            empty_model,
+            registry,
+        )
+        assert result["unrouted"] == [], result
+        assert len(result["routed"]) == 1, result
+        routed = result["routed"][0]
+        assert routed["knowledge_kind"] == "source-coverage-audit", routed
+        assert routed["skill"] == "skills/artifacts/source-coverage-audit/SKILL.md", routed
+    except Exception as exc:
+        errors.append(f"source coverage route: {exc}")
+
+    try:
+        result = route_create_work(
             graph_for(None),
             "IMPLEMENTATION",
             empty_model,
