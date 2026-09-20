@@ -30,22 +30,28 @@ def _strings(value: Any, field: str, *, allow_empty: bool = True) -> list[str]:
 
 
 def _base(doc: dict[str, Any]) -> tuple[str, dict[str, Any]]:
-    if doc.get("version") != 0:
-        raise ExperimentError("version must be 0 for the research experiment")
-    if doc.get("kind") != "harness-artifact-schema-candidate":
-        raise ExperimentError("kind must be harness-artifact-schema-candidate")
+    if doc.get("version") != 1:
+        raise ExperimentError("knowledge artifact version must be 1")
+    if doc.get("kind") != "harness-knowledge-artifact":
+        raise ExperimentError("kind must be harness-knowledge-artifact")
     schema = doc.get("schema")
     if not isinstance(schema, str) or not schema:
         raise ExperimentError("schema is required")
     artifact = doc.get("artifact")
     if not isinstance(artifact, str) or not artifact:
         raise ExperimentError("artifact is required")
-    source = doc.get("source")
+    title = doc.get("title")
+    if not isinstance(title, str) or not title.strip():
+        raise ExperimentError("title is required")
+    research = doc.get("research")
+    if not isinstance(research, dict):
+        raise ExperimentError("research metadata is required for experiment candidates")
+    source = research.get("source")
     if not isinstance(source, str) or not source:
-        raise ExperimentError("source is required")
-    claims = _strings(doc.get("capability_claims", []), "capability_claims", allow_empty=False)
+        raise ExperimentError("research.source is required")
+    claims = _strings(research.get("capability_claims", []), "research.capability_claims", allow_empty=False)
     if len(claims) != len(set(claims)):
-        raise ExperimentError("capability_claims must be unique")
+        raise ExperimentError("research.capability_claims must be unique")
     content = doc.get("content")
     if not isinstance(content, dict):
         raise ExperimentError("content must be a mapping")
