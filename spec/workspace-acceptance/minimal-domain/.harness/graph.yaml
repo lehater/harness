@@ -1,18 +1,32 @@
 authorities:
+  - id: PRODUCT
   - id: DOMAIN
   - id: VERIFICATION
+  - id: TEST-DESIGN
 
 artifacts:
+  - id: APPLICATION-REQUIREMENTS
+    authority: PRODUCT
+    path: .harness/knowledge/application-requirements.yaml
+    provides: [application.product-requirements]
+    depends_on: []
+
   - id: APPLICATION-DOMAIN
     authority: DOMAIN
     path: .harness/knowledge/application-domain.yaml
     provides: [application.domain-semantics]
-    depends_on: []
+    depends_on: [APPLICATION-REQUIREMENTS]
 
   - id: APPLICATION-VERIFICATION
     authority: VERIFICATION
     path: .harness/knowledge/application-verification.yaml
     provides: [application.verification-strategy]
-    depends_on: [APPLICATION-DOMAIN]
+    depends_on: [APPLICATION-REQUIREMENTS, APPLICATION-DOMAIN]
+
+  - id: APPLICATION-TEST-DESIGN
+    authority: TEST-DESIGN
+    path: .harness/knowledge/application-test-design.yaml
+    provides: [application.test-design]
+    depends_on: [APPLICATION-VERIFICATION]
 
 questions: []
