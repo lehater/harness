@@ -83,7 +83,9 @@ def evaluate_lifecycle_target(graph,target,model,projection):
                 if blockers: wait.append({"action":"WAIT",**item,"questions":blockers})
                 else: create.append({"action":"CREATE",**item})
             else:
-                blockers=sorted({q for a in providers for q in blocked(realized,a["id"])})
+                lifecycle_provider=validate_projection(graph,realized,projection).get(capability)
+                selected=[a for a in providers if lifecycle_provider is not None and a["id"]==lifecycle_provider["artifact"]]
+                blockers=sorted({q for a in (selected or providers) for q in blocked(realized,a["id"])})
                 if blockers: wait.append({"action":"WAIT","expectation":eid,"capability":capability,"authority":e["authority"],"questions":blockers})
                 elif states[capability]["state"]=="CURRENT": satisfied.append(eid)
                 elif states[capability]["state"]=="STALE": revalidate.append({"action":"REVALIDATE","expectation":eid,"capability":capability,"authority":e["authority"],"lifecycle":states[capability]})
