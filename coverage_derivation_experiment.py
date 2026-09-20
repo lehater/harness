@@ -148,7 +148,7 @@ def derive(catalog: dict[str,Any], registry: dict[str,Any], knowledge_docs: list
         decision=explicit.get(cid) or subtree_defaults.get(cid)
         if decision:
             state=decision["state"]
-            rows.append({"concern":cid,"state":state,"derivation":"EXPLICIT_APPLICABILITY","rationale":decision.get("rationale"),"evidence":decision.get("evidence",[])})
+            rows.append({"concern":cid,"state":state,"derivation":"EXPLICIT_APPLICABILITY","rationale":decision.get("rationale"),"evidence":decision.get("evidence",[]),"attention_required": state == "UNASSESSED" or cid in required})
             continue
 
         mapping=mappings.get(cid)
@@ -175,6 +175,7 @@ def derive(catalog: dict[str,Any], registry: dict[str,Any], knowledge_docs: list
             "evidence":evidence,
             "blockers":blockers,
             "freshness":fresh,
+            "attention_required": cid in required,
         })
 
     counts={}
@@ -190,7 +191,11 @@ def derive(catalog: dict[str,Any], registry: dict[str,Any], knowledge_docs: list
     }
 
 def remaining_work(result: dict[str,Any]) -> list[dict[str,Any]]:
-    return [r for r in result["rows"] if r["state"] in {"MISSING","BLOCKED","STALE","UNASSESSED"}]
+    return [
+        r for r in result["rows"]
+        if r["state"] in {"MISSING","BLOCKED","STALE"}
+        or (r["state"] == "UNASSESSED" and r.get("attention_required"))
+    ]
 
 def main() -> int:
     ap=argparse.ArgumentParser()
