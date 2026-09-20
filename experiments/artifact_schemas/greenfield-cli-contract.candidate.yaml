@@ -1,11 +1,12 @@
-version: 0
-kind: harness-artifact-schema-candidate
-schema: cli-contract/v0-experiment
+version: 1
+kind: harness-knowledge-artifact
 artifact: GREENFIELD-CLI-CONTRACT
-source: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
-capability_claims:
-  - csv-deduplicator.cli-contract
-
+schema: cli-contract/v0-experiment
+title: CSV Deduplicator CLI Contract
+research:
+  source: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
+  capability_claims:
+    - csv-deduplicator.cli-contract
 content:
   command: "csv-deduplicate INPUT --output OUTPUT [--key COLUMN ...] [--force]"
   arguments:
