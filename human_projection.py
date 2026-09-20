@@ -319,6 +319,10 @@ def validate_recipe(recipe: dict[str, Any], manifest: dict[str, Any]) -> dict[st
 def validate_projection_ir(
     projection_ir: dict[str, Any],
     plan: dict[str, Any],
+    *,
+    manifest: dict[str, Any] | None = None,
+    source_root: str | Path | None = None,
+    require_evidence: bool = False,
 ) -> None:
     if projection_ir.get("version") != 1 or projection_ir.get("kind") != "harness-human-projection-ir":
         raise CoreError("unexpected human projection IR")
@@ -329,6 +333,14 @@ def validate_projection_ir(
     for document in plan["documents"]:
         for section in document["sections"]:
             allowed[(document["id"], section["id"])] = set(section["sources"])
+
+    source_rows = {
+        item["artifact"]: item
+        for item in (manifest or {}).get("sources", []) or []
+    }
+    source_root_path = Path(source_root) if source_root is not None else None
+    if require_evidence and (manifest is None or source_root_path is None):
+        raise CoreError("evidence validation requires manifest and source_root")
 
     seen: set[tuple[str, str]] = set()
     for document in projection_ir.get("documents", []) or []:
@@ -356,6 +368,62 @@ def validate_projection_ir(
                     raise CoreError(
                         f"projection claim in {doc_id}/{section_id} references sources outside section scope: {outside}"
                     )
+
+                evidence = claim.get("evidence", []) or []
+                if require_evidence and not evidence:
+                    raise CoreError(
+                        f"projection claim in {doc_id}/{section_id} requires evidence"
+                    )
+                evidence_sources: set[str] = set()
+                for item in evidence:
+                    if not isinstance(item, dict):
+                        raise CoreError(
+                            f"projection claim evidence in {doc_id}/{section_id} must be a mapping"
+                        )
+                    source_id = item.get("source")
+                    excerpt = item.get("excerpt")
+                    locator = item.get("locator")
+                    if source_id not in sources:
+                        raise CoreError(
+                            f"projection claim evidence in {doc_id}/{section_id} references "
+                            f"uncited source: {source_id}"
+                        )
+                    if not isinstance(excerpt, str) or not excerpt.strip():
+                        raise CoreError(
+                            f"projection claim evidence in {doc_id}/{section_id} requires excerpt"
+                        )
+                    if locator is not None and (
+                        not isinstance(locator, str) or not locator.strip()
+                    ):
+                        raise CoreError(
+                            f"projection claim evidence locator in {doc_id}/{section_id} must be non-empty"
+                        )
+                    evidence_sources.add(source_id)
+
+                    if source_root_path is not None:
+                        source = source_rows.get(source_id)
+                        if source is None:
+                            raise CoreError(
+                                f"projection claim evidence references artifact outside manifest: {source_id}"
+                            )
+                        path = source_root_path / source["path"]
+                        if not path.is_file():
+                            raise CoreError(
+                                f"projection claim evidence source does not exist: {source['path']}"
+                            )
+                        source_text = path.read_text(encoding="utf-8")
+                        if excerpt.strip() not in source_text:
+                            raise CoreError(
+                                f"projection claim evidence excerpt not found in {source['path']}"
+                            )
+
+                if require_evidence:
+                    missing_evidence = sorted(set(sources) - evidence_sources)
+                    if missing_evidence:
+                        raise CoreError(
+                            f"projection claim in {doc_id}/{section_id} lacks evidence for sources: "
+                            f"{missing_evidence}"
+                        )
 
     missing = sorted(set(allowed) - seen)
     if missing:
