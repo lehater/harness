@@ -17,6 +17,7 @@ on:
       - "workspace.py"
       - "Makefile"
       - "examples/greenfield-csv-deduplicator/**"
+      - "experiments/**"
       - ".github/workflows/harness.yml"
 
 jobs:
@@ -29,6 +30,16 @@ jobs:
           python-version: "3.10"
       - run: pip install PyYAML
       - run: make harness-check
+      - name: Validate artifact schema experiments
+        run: |
+          python experiments/artifact_schemas/validate.py \
+            experiments/artifact_schemas/greenfield-cli-contract.candidate.yaml
+          if python experiments/artifact_schemas/validate.py \
+            experiments/artifact_schemas/invalid-product-requirements.yaml; then
+            echo "invalid research fixture was unexpectedly accepted" >&2
+            exit 1
+          fi
+          echo "invalid research fixture rejected as expected"
       - name: Evaluate greenfield implementation frontier
         run: |
           python engineering_graph.py evaluate \
