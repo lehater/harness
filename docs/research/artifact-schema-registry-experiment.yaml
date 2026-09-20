@@ -1,0 +1,85 @@
+version: 0
+kind: harness-artifact-schema-registry-experiment
+status: research
+
+principle: >-
+  A schema/profile describes one reusable CanonicalArtifact materialization shape.
+  It does not own Authority semantics, Capability identity, or workflow state.
+
+profiles:
+  - id: domain-model/v1
+    status: existing-harness-profile
+    semantic_scope: compact domain concepts, terminology, responsibilities and invariants
+    representation: harness-yaml
+    validator: workspace.py
+    cross_project_limit: >-
+      Not sufficient for full tactical DDD models observed in NAPMS and Nutrition.
+
+  - id: verification-plan/v1
+    status: existing-harness-profile
+    semantic_scope: verification checks tied to concrete evidence
+    representation: harness-yaml
+    validator: workspace.py
+    cross_project_limit: >-
+      Not sufficient as the universal pre-code verification/test-intent profile.
+
+  - id: product-requirements/v0-experiment
+    status: candidate-after-three-project-structural-fit
+    semantic_scope: product purpose, goals, grouped observable requirements, constraints, acceptance examples and non-goals
+    representations_under_test:
+      - harness-yaml
+      - deterministic-project-adapter
+    evidence:
+      - nutrition-management: docs/requirements/product-requirements.md
+      - napms: docs/requirements/first-mvp-policy-export.yaml
+      - harness-greenfield: examples/greenfield-csv-deduplicator/artifacts/product-requirements.md
+    open_question: >-
+      Whether migration to one Harness-native encoding adds enough automation value
+      to justify replacing accepted project-native canonical formats.
+
+  - id: openapi/3.1
+    status: standard-native
+    semantic_scope: HTTP operations, schemas, outcomes and security representation
+    representation: OpenAPI 3.1
+    validator: standard-plus-project
+    evidence:
+      - napms: docs/contracts/http/napms.openapi.yaml
+    rule: Do not duplicate this contract into a Harness semantic DSL.
+
+  - id: structurizr-dsl/c4
+    status: standard-native
+    semantic_scope: C4 structural and deployment model
+    representation: Structurizr DSL
+    validator: standard-plus-project
+    evidence:
+      - napms: docs/architecture/structurizr/workspace.dsl
+    rule: >-
+      Valid canonical profile when the structural model itself is owned truth;
+      otherwise diagrams are projections.
+
+unresolved_profile_families:
+  - problem-evidence
+  - strategic-domain-model
+  - tactical-domain-model
+  - architecture-rules
+  - module-contract-design
+  - application-design
+  - data-design
+  - physical-persistence-model
+  - cli-contract
+  - component-design
+  - implementation-design
+  - verification-design
+  - test-intent
+  - acceptance-scenarios
+  - security-architecture
+  - threat-model
+  - observability-requirements
+
+non_goals:
+  - one schema per Authority
+  - one schema per CapabilityId
+  - one schema per knowledge_kind
+  - mandatory artifact catalogue
+  - universal engineering DSL
+  - changing Core v0
