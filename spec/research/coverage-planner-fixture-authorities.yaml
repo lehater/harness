@@ -1,0 +1,8 @@
+version: 1
+kind: harness-project-authority-role-bindings
+project: DERIVATION-FIXTURE
+status: research
+bindings:
+  DATA: [data]
+  RELIABILITY: [reliability]
+  OPERABILITY: [operability]
