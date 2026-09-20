@@ -29,7 +29,7 @@ def main() -> int:
 
     states = derive_tree(catalog, etl)
     assert states["interface.human"] == "NOT_APPLICABLE"
-    assert states["interface"] == "PARTIAL"
+    assert states["interface"] == "COVERED"
     assert states["data"] == "PARTIAL"
     assert states["security"] == "PARTIAL"
     assert states["verification"] == "COVERED"
