@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression acceptance for research Graph Doctor diagnostics."""
+"""Acceptance regression for canonical Graph Doctor v1 diagnostics."""
 from __future__ import annotations
 
 import copy
@@ -207,7 +207,7 @@ def main() -> int:
     )
     assert target_row["severity"] == "INFO"
 
-    print("Graph Doctor research acceptance PASS")
+    print("Graph Doctor v1 acceptance PASS")
     return 0
 
 
