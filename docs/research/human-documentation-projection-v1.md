@@ -10,6 +10,34 @@ How should Harness optimally generate a human-readable project documentation pac
 
 This research continues existing work rather than starting from zero.
 
+### Harness: Engineering Knowledge Projection research
+
+A previously unmerged branch, `research/engineering-knowledge-projections`, already continued the original Human Projection work across **both Nutrition Management and NAPMS**.
+
+Its stable findings are important and are adopted here:
+
+- there are three projection classes: **assembly**, **semantic**, and **visual** projection;
+- Consumer/capability closure, not a fixed document catalogue, selects projection input;
+- human document grouping is presentation policy;
+- canonical formats remain concern-specific and project-native;
+- OpenAPI/Structurizr and other standard-native formats may be canonical when they naturally own that knowledge;
+- generated diagrams/documents are disposable views;
+- projection must not infer missing architecture/domain structure from prose;
+- no DOCUMENTATION Authority/Capability/Consumer and no Core change is justified;
+- Harness needs a renderer-neutral projection contract, not a universal knowledge/document schema.
+
+That branch also explored a first-class Representation Contract and reusable artifact schemas. Later falsification work on the same branch narrowed the conclusion:
+
+- do **not** introduce RepresentationContract, ArtifactType, schema identity, or a universal representation entity into Core;
+- Authority, CapabilityId, knowledge_kind and Artifact Skill are all the wrong 1:1 storage-schema key;
+- reusable typed Artifact Schema/Profile is justified only for repeated stable shapes with real machine-consumer value;
+- native standards such as OpenAPI/Structurizr should stay native;
+- project-native narrative artifacts may remain narrative indefinitely;
+- deterministic projections must reject unsupported source representations rather than recover missing semantics by inference;
+- current artifact-skill/materialization contracts are the correct boundary for deciding whether a source can support a particular deterministic renderer.
+
+The earlier branch therefore solved much of the **projection boundary** question, but it did not deliver a generic human documentation package compiler or a high-quality source-bounded narrative pipeline. That remaining gap is the focus of v1 here.
+
 ### Harness: Project-native Human Projection v0
 
 Commit `92e9cc37305c0709aefa0c0f6fcdab76e5f6db3e` introduced
@@ -221,6 +249,8 @@ It MUST NOT contain domain/design assertions merely to make the generated prose 
 It is presentation/navigation policy, not a Capability provider.
 
 ### Layer 3 — Rendering backends
+
+Renderer selection must rely on existing materialization/output contracts, native standards or project adapters. Human Projection v1 does **not** require a new first-class Representation Contract entity.
 
 A generated document section may use one of three backends.
 
@@ -582,6 +612,36 @@ Frontend documentation should be generated separately from the FRONTEND-IMPLEMEN
 Harness managed workspace remains the typed-renderer fixture.
 
 Harness can also use a project-native projection of its own design docs later as a third dogfood case.
+
+## Relationship to the earlier Engineering Knowledge Projection research
+
+Human Documentation Projection v1 should be treated as the **human-package specialization** of the earlier Engineering Knowledge Projection work, not a competing abstraction.
+
+The broader projection model remains:
+
+```
+accepted canonical knowledge
+        ↓
+assembly projection
+semantic projection
+visual projection
+```
+
+This v1 research specifies how assembly + semantic projection should compose into a useful human documentation package:
+
+```
+Consumer closure
+   ↓ assembly compiler
+projection manifest
+   ↓ presentation recipe
+typed/source-native/narrative semantic projection
+   ↓
+human package
+```
+
+Visual assets may be linked/copied into the same package when deterministic project/native renderers already exist.
+
+The prior branch's Artifact Schema/Profile experiments remain separate. Human documentation must work even when canonical sources are ordinary accepted Markdown and no reusable typed schema is justified.
 
 ## What should be canonicalized after prototype validation
 
