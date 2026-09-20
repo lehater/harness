@@ -12,6 +12,7 @@ import yaml
 
 from adapters.canonical_graph import project_model
 from engineering_graph import (
+    derive_profile,
     producer_index,
     production_index,
     validate_engineering_graph,
@@ -42,6 +43,7 @@ def validate_project_alignment(
     engineering_graph: dict[str, Any],
     *,
     require_complete_binding: bool = True,
+    target_consumer: str | None = None,
 ) -> dict[str, Any]:
     """Validate that project artifact routing and capability topology agree.
 
@@ -117,7 +119,15 @@ def validate_project_alignment(
         for binding in bindings.values()
         for capability in binding.get("provides", []) or []
     }
-    for capability in materialized_capabilities:
+    if target_consumer is None:
+        alignment_capabilities = set(materialized_capabilities)
+    else:
+        profile = derive_profile(engineering_graph, target_consumer)
+        alignment_capabilities = {
+            item["capability"] for item in profile["expectations"]
+        }
+
+    for capability in alignment_capabilities:
         production = productions[capability]
         owner = producers[capability]
         for requirement in production.get("requires", []) or []:
@@ -125,7 +135,14 @@ def validate_project_alignment(
             if upstream != owner:
                 declared_by_authority[owner].add(upstream)
 
-    selected_authorities = set(artifact_authority.values())
+    selected_authorities = {
+        authority
+        for authority in artifact_authority.values()
+        if any(
+            producers.get(capability) == authority
+            for capability in alignment_capabilities
+        )
+    }
     for authority in sorted(selected_authorities):
         actual = actual_by_authority.get(authority, set())
         declared = declared_by_authority.get(authority, set())
@@ -149,6 +166,8 @@ def validate_project_alignment(
         },
         "bound_artifacts": sorted(bindings),
         "materialized_capabilities": sorted(materialized_capabilities),
+        "alignment_capabilities": sorted(alignment_capabilities),
+        "target_consumer": target_consumer,
     }
 
 
@@ -167,6 +186,7 @@ def main() -> int:
     parser.add_argument("projection")
     parser.add_argument("engineering_graph")
     parser.add_argument("--allow-partial-binding", action="store_true")
+    parser.add_argument("--target")
     parser.add_argument("--output-core")
     args = parser.parse_args()
 
@@ -175,6 +195,7 @@ def main() -> int:
         load_yaml(args.projection),
         load_yaml(args.engineering_graph),
         require_complete_binding=not args.allow_partial_binding,
+        target_consumer=args.target,
     )
     if args.output_core:
         Path(args.output_core).write_text(
