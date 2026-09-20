@@ -197,3 +197,103 @@ P1: realization lineage remains project/integration evidence unless the owning s
 P1: fitness-for-use is consumer-relative and must trace to an accepted constraint; it is not an intrinsic global score.
 
 P2: project-native lineage systems should be referenced rather than copied into Harness.
+
+
+## Contradiction and boundary review
+
+### Domain / Application ownership
+
+No collision.
+
+Data Evidence Analysis may identify missingness, source disagreement, transformation provenance or fitness concerns, but it cannot decide what a datum means, which source is authoritative, whether two values are semantically equivalent, or which transformation is valid. Those decisions remain with the Authority owning the semantic fact/use.
+
+### Data Design
+
+No collision.
+
+Data Design owns physical persistence representation, constraints and integrity mechanisms. Data Evidence Analysis may require that accepted semantic states/provenance survive persistence and may identify evidence of loss, but it cannot choose schema/storage representation.
+
+### Interface Design
+
+No collision.
+
+Interface Design owns boundary representation and validation contracts. The analysis may trace whether source/provenance/evidence semantics survive a boundary; it does not define wire formats.
+
+### Quality Design
+
+No collision if fitness remains concrete and consumer-relative.
+
+Quality Design owns architecture-significant measurable constraints. Data Evidence Analysis may use completeness, freshness, precision or consistency as recall lenses, but must not invent thresholds or convert generic dimensions into requirements.
+
+### Verification Design
+
+No collision.
+
+Verification owns the evidence strategy proving accepted constraints. Data Evidence Analysis identifies what semantic/evidence properties require closure and whether proof is traceable; it does not define test levels, scenarios or oracle mechanics.
+
+### Capability Lifecycle
+
+No collision.
+
+Capability Lifecycle asks whether accepted engineering knowledge remains current against accepted prerequisite identities. Data Evidence Analysis asks whether concrete application data/evidence is semantically admissible and fit for a particular accepted use.
+
+A stale business fact is not a STALE Capability. A STALE Capability does not imply persisted business data is old.
+
+### External Dependency / Supply-Chain Analysis
+
+Adjacent but distinct.
+
+External Dependency Analysis traces acquired dependency realization/provenance against accepted dependency constraints.
+
+Data Evidence Analysis traces application/domain data evidence, transformation lineage and fitness against accepted semantic/consumer constraints.
+
+An external data source such as BLS can invoke both:
+- supply-chain/acquisition analysis for source acquisition/integrity evidence;
+- data-evidence analysis for nutrient source semantics, normalization, provenance and consumer fitness.
+
+The analyses compose without sharing ownership.
+
+### Operability
+
+No collision.
+
+Operability owns runtime diagnostic evidence requirements. Data lineage may be useful diagnostic evidence, but Data Evidence Analysis cannot require logs/traces/metrics unless Operability or another accepted constraint creates that requirement.
+
+## Atomicity of reusable analysis
+
+The proposed method is not an Authority.
+
+Its single audit question is:
+
+> For each material application datum/evidence flow, are meaning, source/provenance, transformation semantics and consumer fitness explicitly owned and traceable to accepted constraints, with sufficient verification/evidence closure?
+
+It produces coverage and routing, not a second source of data truth.
+
+## Canonical method decision
+
+Create a reusable DATA-EVIDENCE-ANALYSIS skill, not a DATA-EVIDENCE-ANALYSIS Authority.
+
+The skill must:
+- start from a concrete semantic fact/data flow and consumer;
+- distinguish semantic provenance from realization lineage;
+- distinguish source/effective-time freshness from consumer freshness constraints and Capability Lifecycle staleness;
+- treat generic data-quality dimensions only as recall lenses;
+- route semantic decisions to the owning Domain/Application/Product Authority;
+- route representation to Interface/Data Design;
+- route architecture-significant targets to Quality Design;
+- route proof strategy to Verification;
+- preserve project-native lineage/provenance evidence rather than duplicating it in Harness.
+
+## Final research verdict
+
+P0: no contradiction with existing Authority boundaries or Capability Lifecycle.
+
+P0: no Core v0 change.
+
+P0: no generic quality score, provenance graph or lineage graph in Harness.
+
+P1: reusable Data Evidence / Fitness Analysis is justified by two materially different project cases.
+
+P1: external-source data may compose Data Evidence Analysis with External Dependency Analysis without merging them.
+
+P2: future specialized data-governance/privacy research may add obligation/security constraints but should not change semantic ownership.
