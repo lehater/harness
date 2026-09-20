@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -352,6 +353,144 @@ def validate_projection_ir(
         raise CoreError(f"projection IR missing planned sections: {missing}")
 
 
+def render_projection_documents(
+    manifest: dict[str, Any],
+    plan: dict[str, Any],
+    projection_ir: dict[str, Any],
+) -> dict[str, str]:
+    validate_projection_ir(projection_ir, plan)
+    ir_docs = {
+        document["id"]: document
+        for document in projection_ir.get("documents", []) or []
+    }
+    rendered: dict[str, str] = {}
+
+    for document in plan["documents"]:
+        doc_id = document["id"]
+        ir_document = ir_docs[doc_id]
+        ir_sections = {
+            section["id"]: section
+            for section in ir_document.get("sections", []) or []
+        }
+        lines = [
+            f"# {document['title']}",
+            "",
+            "> Generated projection from accepted canonical project knowledge. "
+            "Do not edit as a source of truth.",
+            "",
+        ]
+        for section in document["sections"]:
+            section_id = section["id"]
+            ir_section = ir_sections[section_id]
+            lines.extend([f"## {section['title']}", ""])
+            for claim in ir_section["claims"]:
+                lines.extend([claim["text"].strip(), ""])
+            lines.extend(["Canonical sources:", ""])
+            for artifact_id in section["sources"]:
+                source = next(
+                    item for item in manifest["sources"]
+                    if item["artifact"] == artifact_id
+                )
+                lines.append(f"- `{source['path']}` ({artifact_id})")
+            lines.append("")
+        rendered[f"{doc_id}.md"] = "\n".join(lines).rstrip() + "\n"
+    return rendered
+
+
+def materialize_package(
+    manifest: dict[str, Any],
+    plan: dict[str, Any],
+    projection_ir: dict[str, Any],
+    output_root: str | Path,
+    *,
+    mode: str = "REVIEW",
+    source_root: str | Path | None = None,
+) -> dict[str, Any]:
+    if mode not in {"REVIEW", "HANDOFF"}:
+        raise CoreError(f"unsupported human projection package mode: {mode}")
+    output_root = Path(output_root)
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    documents_root = output_root / "documents"
+    ir_root = output_root / "projection-ir"
+    documents_root.mkdir(parents=True)
+    ir_root.mkdir(parents=True)
+
+    rendered = render_projection_documents(manifest, plan, projection_ir)
+    for name, content in rendered.items():
+        (documents_root / name).write_text(content, encoding="utf-8")
+
+    (output_root / "manifest.yaml").write_text(
+        yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8"
+    )
+    (output_root / "plan.yaml").write_text(
+        yaml.safe_dump(plan, sort_keys=False), encoding="utf-8"
+    )
+    (ir_root / "projection.yaml").write_text(
+        yaml.safe_dump(projection_ir, sort_keys=False), encoding="utf-8"
+    )
+
+    readme_lines = [
+        "# Human Documentation Package",
+        "",
+        "> Generated projection. Canonical engineering truth remains in the listed source artifacts.",
+        "",
+        f"Consumer: {manifest['consumer']}",
+        f"Target state: {manifest['target']['status']}",
+        f"Mode: {mode}",
+        f"Manifest digest: {manifest['manifest_digest']}",
+        "",
+        "## Documents",
+        "",
+    ]
+    for document in plan["documents"]:
+        readme_lines.append(
+            f"- [{document['title']}](documents/{document['id']}.md)"
+        )
+    if manifest.get("unresolved"):
+        readme_lines.extend(["", "## Unresolved projection scope", ""])
+        for item in manifest["unresolved"]:
+            readme_lines.append(
+                f"- `{item['capability']}`: {item['state']}"
+            )
+    if manifest.get("questions"):
+        readme_lines.extend(["", "## Open Questions", ""])
+        for question in manifest["questions"]:
+            readme_lines.append(
+                f"- **{question['id']}** ({question['authority']}): {question['text']}"
+            )
+    readme_lines.append("")
+    (output_root / "README.md").write_text(
+        "\n".join(readme_lines), encoding="utf-8"
+    )
+
+    copied_sources: list[str] = []
+    if mode == "HANDOFF":
+        if source_root is None:
+            raise CoreError("HANDOFF package requires source_root")
+        source_root = Path(source_root)
+        snapshot_root = output_root / "sources"
+        for source in manifest["sources"]:
+            relative = Path(source["path"])
+            src = source_root / relative
+            if not src.is_file():
+                raise CoreError(
+                    f"HANDOFF canonical source does not exist: {source['path']}"
+                )
+            dst = snapshot_root / relative
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            copied_sources.append(relative.as_posix())
+
+    return {
+        "mode": mode,
+        "output": output_root.as_posix(),
+        "documents": sorted(rendered),
+        "sources": sorted(copied_sources),
+        "manifest_digest": manifest["manifest_digest"],
+    }
+
+
 def _load(path: str | Path) -> dict[str, Any]:
     value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -383,6 +522,14 @@ def main() -> int:
     ir_cmd.add_argument("plan")
     ir_cmd.add_argument("projection_ir")
 
+    render_cmd = sub.add_parser("render")
+    render_cmd.add_argument("manifest")
+    render_cmd.add_argument("plan")
+    render_cmd.add_argument("projection_ir")
+    render_cmd.add_argument("output")
+    render_cmd.add_argument("--mode", choices=("REVIEW", "HANDOFF"), default="REVIEW")
+    render_cmd.add_argument("--source-root")
+
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -409,8 +556,20 @@ def main() -> int:
             )
         return 0
 
-    validate_projection_ir(_load(args.projection_ir), _load(args.plan))
-    print("Human projection IR valid")
+    if args.command == "validate-ir":
+        validate_projection_ir(_load(args.projection_ir), _load(args.plan))
+        print("Human projection IR valid")
+        return 0
+
+    result = materialize_package(
+        _load(args.manifest),
+        _load(args.plan),
+        _load(args.projection_ir),
+        args.output,
+        mode=args.mode,
+        source_root=args.source_root,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
 
