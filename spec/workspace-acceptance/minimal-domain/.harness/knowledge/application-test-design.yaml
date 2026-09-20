@@ -1,0 +1,15 @@
+version: 1
+kind: harness-knowledge-artifact
+artifact: APPLICATION-TEST-DESIGN
+schema: test-design/v1
+title: Application Test Design
+
+content:
+  purpose: Define executable observable test contracts for application verification obligations.
+  tests:
+    - id: TEST-COMPONENT-UNIQUENESS
+      verification_refs:
+        - VER-COMPONENT-UNIQUENESS
+      precondition: An Application already contains Component C1.
+      operation: Attempt to add Component C1 to the same Application again.
+      oracle: The duplicate membership is rejected and the existing membership remains unchanged.
