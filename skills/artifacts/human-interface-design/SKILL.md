@@ -34,10 +34,18 @@ Read canonical sources needed to establish user-visible interaction semantics. E
 8. Define semantic interaction patterns and focus/keyboard/input behavior where applicable.
 9. Define responsive/adaptive behavior only where supported platform constraints require it.
 10. Map machine/application outcomes to user-visible semantic outcomes without exposing transport codes as product meaning.
-11. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
-12. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
-13. Route missing product/domain/security/quality decisions upstream as Questions.
-14. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
+11. When spatial composition materially constrains implementation, derive a low-fidelity layout/wireframe from accepted semantics:
+    - identify primary task and current context;
+    - rank information/actions by task importance;
+    - group semantically related information/actions;
+    - distinguish persistent task-critical content from progressively disclosed secondary/history/provenance detail;
+    - sketch relevant non-happy-path states, not only the loaded state;
+    - ensure visual order does not contradict keyboard/focus/read order.
+    Treat exact pixels, colors, typography, CSS mechanics and framework layout primitives as implementation freedom unless separately accepted.
+12. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
+13. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
+14. Route missing product/domain/security/quality decisions upstream as Questions.
+15. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
 
 ## Stop conditions
 
@@ -65,6 +73,7 @@ A useful human-interface design includes:
 - authorization-sensitive visibility/interaction behavior;
 - focus/keyboard/input semantics where applicable;
 - responsive/adaptive rules where applicable;
+- layout/wireframe constraints when spatial composition is material;
 - deliberately unconstrained implementation details;
 - unresolved Questions.
 
