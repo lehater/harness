@@ -563,6 +563,8 @@ def materialize_package(
     *,
     mode: str = "REVIEW",
     source_root: str | Path | None = None,
+    visual_assets: list[dict[str, Any]] | None = None,
+    asset_root: str | Path | None = None,
 ) -> dict[str, Any]:
     if mode not in {"REVIEW", "HANDOFF"}:
         raise CoreError(f"unsupported human projection package mode: {mode}")
