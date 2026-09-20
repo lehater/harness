@@ -37,6 +37,11 @@ class LifecycleExperimentTest(unittest.TestCase):
     def test_duplicate_capability_assertion_is_rejected(self):
         p=projection(); p["providers"].append(dict(p["providers"][0]))
         with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
+    def test_capability_outside_production_topology_is_rejected(self):
+        g={**GRAPH,"authorities":[*GRAPH["authorities"]]}
+        m={"artifacts":[*MODEL["artifacts"],{"id":"EXTRA","authority":"USE","path":"extra.md","provides":["extra.capability"],"depends_on":[]}],"questions":[]}
+        p=projection(); p["providers"].append({"artifact":"EXTRA","capability":"extra.capability","acceptance_id":"E1","accepted_prerequisites":{}})
+        with self.assertRaises(CoreError): validate_projection(g,m,p)
     def test_assertion_must_match_core_provider(self):
         p=projection(); p["providers"][0]["artifact"]="USE"
         with self.assertRaises(CoreError): validate_projection(GRAPH,MODEL,p)
