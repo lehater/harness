@@ -10,7 +10,7 @@ artifacts:
     authority: OPERABILITY
     path: observability.yaml
     kind: observability-requirements
-    provides: [engineering.operability.observability]
+    provides: [engineering.operability.logging]
 questions:
   - id: Q-RECOVERY
     authority: RELIABILITY
