@@ -1,0 +1,297 @@
+version: 1
+kind: harness-engineering-graph
+id: NAPMS-BLIND-BACKEND-2026-09-20
+default_subject: NAPMS-BACKEND-MVP
+
+authorities:
+  - id: DISCOVERY
+    responsibility: Own accepted problem observations, actors, desired outcomes and source evidence.
+    boundary:
+      semantic_cohesion: Problem-space evidence and motivating observations.
+      independent_change: Evidence can change before accepted product behavior changes.
+      public_contract: Produces the accepted blind problem/evidence baseline.
+    produces:
+      - capability: napms.backend.problem-evidence
+        knowledge_kind: problem-evidence
+        requires: []
+
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own accepted backend MVP intent, observable behavior, scope and acceptance semantics.
+    boundary:
+      semantic_cohesion: Decisions about what the backend-supported product must achieve.
+      independent_change: Product behavior can change without selecting domain ownership or technical realization.
+      public_contract: Produces accepted MVP requirements and acceptance semantics.
+    produces:
+      - capability: napms.backend.product-requirements
+        knowledge_kind: product-requirements
+        requires: [{capability: napms.backend.problem-evidence}]
+      - capability: napms.backend.acceptance-semantics
+        knowledge_kind: product-requirements
+        requires: [{capability: napms.backend.problem-evidence}]
+
+  - id: STRATEGIC-DOMAIN-DESIGN
+    responsibility: Own semantic decomposition, domain responsibility boundaries and relationships for the selected backend MVP.
+    boundary:
+      semantic_cohesion: Domain ownership and public semantic relationships.
+      independent_change: Context decomposition can evolve without choosing tactical structures or runtime architecture.
+      public_contract: Produces accepted domain ownership boundaries and relationship contracts.
+    produces:
+      - capability: napms.backend.strategic-domain-model
+        knowledge_kind: strategic-domain-design
+        requires:
+          - {capability: napms.backend.product-requirements}
+          - {capability: napms.backend.acceptance-semantics}
+
+  - id: DOMAIN-USE-CASE-DESIGN
+    responsibility: Own stable domain-focused behavior contracts for each independently modeled responsibility.
+    boundary:
+      semantic_cohesion: Domain behavior and outcomes without tactical or transport realization.
+      independent_change: Use cases can be refined without changing context ownership or internal tactical structures.
+      public_contract: Produces domain behavior contracts consumed by tactical and application design.
+    produces:
+      - capability: napms.backend.use-cases.resource-description
+        knowledge_kind: domain-use-case
+        requires: [{capability: napms.backend.strategic-domain-model}, {capability: napms.backend.acceptance-semantics}]
+      - capability: napms.backend.use-cases.application-communication
+        knowledge_kind: domain-use-case
+        requires: [{capability: napms.backend.strategic-domain-model}, {capability: napms.backend.acceptance-semantics}]
+      - capability: napms.backend.use-cases.application-deployment
+        knowledge_kind: domain-use-case
+        requires: [{capability: napms.backend.strategic-domain-model}, {capability: napms.backend.acceptance-semantics}]
+      - capability: napms.backend.use-cases.business-connectivity
+        knowledge_kind: domain-use-case
+        requires: [{capability: napms.backend.strategic-domain-model}, {capability: napms.backend.acceptance-semantics}]
+      - capability: napms.backend.use-cases.access-policy
+        knowledge_kind: domain-use-case
+        requires: [{capability: napms.backend.strategic-domain-model}, {capability: napms.backend.acceptance-semantics}]
+
+  - id: TACTICAL-DOMAIN-DESIGN
+    responsibility: Own identities, entities/value objects, aggregate boundaries, invariants, lifecycle and public domain operations.
+    boundary:
+      semantic_cohesion: Tactical semantic modeling of accepted domain behavior.
+      independent_change: Tactical models can evolve behind stable strategic/use-case contracts without choosing transport or storage.
+      public_contract: Produces implementation-independent domain semantics for application and technical design.
+    produces:
+      - capability: napms.backend.domain.resource-description
+        knowledge_kind: domain-model
+        requires: [{capability: napms.backend.use-cases.resource-description}]
+      - capability: napms.backend.domain.application-communication
+        knowledge_kind: domain-model
+        requires: [{capability: napms.backend.use-cases.application-communication}]
+      - capability: napms.backend.domain.application-deployment
+        knowledge_kind: domain-model
+        requires: [{capability: napms.backend.use-cases.application-deployment}]
+      - capability: napms.backend.domain.business-connectivity
+        knowledge_kind: domain-model
+        requires: [{capability: napms.backend.use-cases.business-connectivity}]
+      - capability: napms.backend.domain.access-policy
+        knowledge_kind: domain-model
+        requires: [{capability: napms.backend.use-cases.access-policy}]
+
+  - id: APPLICATION-DESIGN
+    responsibility: Own cross-domain orchestration, application commands/queries and policy-materialization semantics.
+    boundary:
+      semantic_cohesion: Composition of accepted domain behavior into backend journeys.
+      independent_change: Orchestration can evolve without re-owning domain truth or runtime topology.
+      public_contract: Produces application flows and cross-owner consistency semantics.
+    produces:
+      - capability: napms.backend.application-design
+        knowledge_kind: application-design
+        requires:
+          - {capability: napms.backend.domain.resource-description}
+          - {capability: napms.backend.domain.application-communication}
+          - {capability: napms.backend.domain.application-deployment}
+          - {capability: napms.backend.domain.business-connectivity}
+          - {capability: napms.backend.domain.access-policy}
+
+  - id: QUALITY-DESIGN
+    responsibility: Own explicit architecture-significant quality, concurrency, performance and reliability constraints for the backend.
+    boundary:
+      semantic_cohesion: Measurable or explicitly unresolved realization-quality constraints.
+      independent_change: Quality constraints can change without reallocating product/domain ownership.
+      public_contract: Produces quality constraints and applicability decisions for architecture and verification.
+    produces:
+      - capability: napms.backend.quality-design
+        knowledge_kind: quality-design
+        requires:
+          - {capability: napms.backend.product-requirements}
+          - {capability: napms.backend.application-design}
+
+  - id: SYSTEM-ARCHITECTURE
+    responsibility: Own backend runtime/module structure, dependency direction, interaction topology and consistency boundaries.
+    boundary:
+      semantic_cohesion: Structural/runtime decisions constraining implementation.
+      independent_change: Runtime architecture can evolve behind stable product/domain/application contracts.
+      public_contract: Produces accepted backend topology, module boundaries and architectural constraints.
+    produces:
+      - capability: napms.backend.system-architecture
+        knowledge_kind: system-architecture
+        requires:
+          - {capability: napms.backend.application-design}
+          - {capability: napms.backend.quality-design}
+
+  - id: SECURITY-ARCHITECTURE
+    responsibility: Own backend trust, identity, admission, credential and protection structure without redefining business permission.
+    boundary:
+      semantic_cohesion: Security trust and enforcement structure.
+      independent_change: Security realization can evolve behind stable product/domain entitlement semantics.
+      public_contract: Produces security constraints for interfaces, data, components, operability and implementation.
+    produces:
+      - capability: napms.backend.security-architecture
+        knowledge_kind: security-architecture
+        requires:
+          - {capability: napms.backend.product-requirements}
+          - {capability: napms.backend.domain.access-policy}
+          - {capability: napms.backend.system-architecture}
+
+  - id: INTERFACE-DESIGN
+    responsibility: Own the supported external backend interaction/representation contract.
+    boundary:
+      semantic_cohesion: External operations, representations and observable outcome/error semantics.
+      independent_change: Interface representation can evolve while preserving accepted product/domain meaning.
+      public_contract: Produces the canonical backend API contract.
+    produces:
+      - capability: napms.backend.api-contract
+        knowledge_kind: interface-contract
+        requires:
+          - {capability: napms.backend.acceptance-semantics}
+          - {capability: napms.backend.application-design}
+          - {capability: napms.backend.system-architecture}
+          - {capability: napms.backend.security-architecture}
+
+  - id: DATA-DESIGN
+    responsibility: Own physical persistence model, storage ownership, constraints, transactions and durable representation.
+    boundary:
+      semantic_cohesion: Durable storage and physical data representation decisions.
+      independent_change: Storage design can evolve behind stable domain/application contracts.
+      public_contract: Produces persistence ownership/schema/transaction constraints.
+    produces:
+      - capability: napms.backend.persistence-design
+        knowledge_kind: data-design
+        requires:
+          - {capability: napms.backend.application-design}
+          - {capability: napms.backend.system-architecture}
+          - {capability: napms.backend.security-architecture}
+
+  - id: OPERABILITY-DESIGN
+    responsibility: Own runtime diagnostic evidence, health/readiness, correlation and configuration observability contracts.
+    boundary:
+      semantic_cohesion: Runtime evidence needed to diagnose accepted behavior and failures.
+      independent_change: Diagnostic evidence can evolve without redefining domain/interface meaning.
+      public_contract: Produces logging/telemetry/health/configuration evidence obligations.
+    produces:
+      - capability: napms.backend.operability-design
+        knowledge_kind: operability-design
+        requires:
+          - {capability: napms.backend.system-architecture}
+          - {capability: napms.backend.security-architecture}
+          - {capability: napms.backend.api-contract}
+          - {capability: napms.backend.persistence-design}
+
+  - id: ENGINEERING-POLICY
+    responsibility: Own project-selected cross-cutting implementation obligations and anti-pattern constraints.
+    boundary:
+      semantic_cohesion: Normative rules for realizing accepted backend design.
+      independent_change: Engineering discipline can change without redefining product/domain semantics.
+      public_contract: Produces implementation/review obligations shared by component and verification work.
+    produces:
+      - capability: napms.backend.engineering-policy
+        knowledge_kind: engineering-policy
+        requires:
+          - {capability: napms.backend.system-architecture}
+          - {capability: napms.backend.security-architecture}
+
+  - id: COMPONENT-DESIGN
+    responsibility: Own implementation-facing component responsibilities, ports, dependency ownership and mapping/composition boundaries.
+    boundary:
+      semantic_cohesion: Public code-component contracts and dependency direction.
+      independent_change: Component realization can evolve behind stable architecture/application/interface contracts.
+      public_contract: Produces code-design boundaries sufficient for a coding agent.
+    produces:
+      - capability: napms.backend.component-design
+        knowledge_kind: component-design
+        requires:
+          - {capability: napms.backend.application-design}
+          - {capability: napms.backend.system-architecture}
+          - {capability: napms.backend.api-contract}
+          - {capability: napms.backend.persistence-design}
+          - {capability: napms.backend.security-architecture}
+          - {capability: napms.backend.operability-design}
+          - {capability: napms.backend.engineering-policy}
+
+  - id: SECURITY-ANALYSIS
+    responsibility: Own threat/control/applicability coverage and route security gaps to their semantic owners.
+    boundary:
+      semantic_cohesion: Security coverage against accepted backend design.
+      independent_change: Threat knowledge can evolve without owning the design decisions it reviews.
+      public_contract: Produces security coverage evidence, verification obligations and blocking Questions.
+    produces:
+      - capability: napms.backend.security-coverage
+        knowledge_kind: security-analysis
+        requires:
+          - {capability: napms.backend.api-contract}
+          - {capability: napms.backend.persistence-design}
+          - {capability: napms.backend.operability-design}
+          - {capability: napms.backend.security-architecture}
+
+  - id: VERIFICATION-DESIGN
+    responsibility: Own verification strategy, traceability and evidence proving implementation realizes accepted backend knowledge.
+    boundary:
+      semantic_cohesion: Proof obligations and verification levels.
+      independent_change: Verification strategy can evolve without owning product/domain/architecture truth.
+      public_contract: Produces implementation-independent verification strategy and acceptance evidence.
+    produces:
+      - capability: napms.backend.verification-strategy
+        knowledge_kind: verification-strategy
+        requires:
+          - {capability: napms.backend.acceptance-semantics}
+          - {capability: napms.backend.component-design}
+          - {capability: napms.backend.security-coverage}
+          - {capability: napms.backend.quality-design}
+
+  - id: TEST-DESIGN
+    responsibility: Own executable pre-code test contracts and observable oracles derived from accepted verification/design.
+    boundary:
+      semantic_cohesion: Preconditions, operations, oracles, invariants and failure/atomicity distinctions.
+      independent_change: Test contracts survive implementation/framework changes while accepted behavior remains stable.
+      public_contract: Produces executable test semantics without owning production truth.
+    produces:
+      - capability: napms.backend.test-design
+        knowledge_kind: test-design
+        requires:
+          - {capability: napms.backend.verification-strategy}
+          - {capability: napms.backend.api-contract}
+          - {capability: napms.backend.component-design}
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation slicing, sequencing and completion criteria after upstream backend design is accepted.
+    boundary:
+      semantic_cohesion: Realization planning of accepted design.
+      independent_change: Slicing/order can change without redefining upstream truth.
+      public_contract: Produces implementation plan/completion criteria and routes residual semantic gaps upstream.
+    produces:
+      - capability: napms.backend.implementation-plan
+        knowledge_kind: implementation-design
+        requires:
+          - {capability: napms.backend.component-design}
+          - {capability: napms.backend.test-design}
+          - {capability: napms.backend.security-coverage}
+          - {capability: napms.backend.operability-design}
+      - capability: napms.backend.completion-criteria
+        knowledge_kind: implementation-design
+        requires:
+          - {capability: napms.backend.implementation-plan}
+          - {capability: napms.backend.verification-strategy}
+
+consumers:
+  - id: IMPLEMENTATION
+    purpose: Implement the backend without inventing material product/domain/architecture/interface/data/security/operability/verification decisions.
+    requires:
+      - {capability: napms.backend.implementation-plan}
+      - {capability: napms.backend.completion-criteria}
+      - {capability: napms.backend.component-design}
+      - {capability: napms.backend.api-contract}
+      - {capability: napms.backend.persistence-design}
+      - {capability: napms.backend.security-architecture}
+      - {capability: napms.backend.operability-design}
+      - {capability: napms.backend.test-design}
