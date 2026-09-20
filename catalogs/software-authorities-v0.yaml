@@ -4,6 +4,8 @@ id: SOFTWARE-PRODUCT-REFERENCE-V0
 status: experimental
 
 principles:
+  - Recovery is a cross-Authority closure property: Product/Domain own loss meaning, Quality owns recovery objectives, Data/System own protection and reconstruction topology, Change Transition owns material restore-path validity, Security owns protected recovery material, Operability owns evidence and Verification/Test own proof; backup mechanisms do not create a generic recovery owner.
+  - Durable commit, replica or successful backup alone is not evidence of recoverability; material recovery objectives, authoritative-state semantics and restore validity must be accepted before implementation or operations choose recovery mechanisms.
   atomicity_test:
     - semantic_cohesion
     - independent_change
