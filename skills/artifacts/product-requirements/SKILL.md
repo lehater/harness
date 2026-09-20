@@ -37,26 +37,28 @@ decision was accepted merely because current code behaves that way.
 
 1. Confirm all grouped capabilities are actionable CREATE under one Product
    Requirements Authority and subject.
-2. Trace each requirement to accepted problem evidence or an explicit
-   user/stakeholder product decision.
-3. Define required observable behavior and product-level constraints.
-4. Define acceptance semantics/examples sufficient for downstream design to know
-   what success means.
-5. Preserve scope boundaries and non-goals.
-6. Keep source/evidence semantics distinct from accepted product decisions.
-7. Do not select Domain entities/aggregates, architecture, API shape, persistence,
-   package layout or implementation strategy.
-8. If a needed product choice is not determined by accepted input, create a Core
-   Question to Product Requirements and stop the affected capability rather than
-   inventing a convenient behavior.
-9. Do not invent numeric quality targets. Record an explicit unknown or route a
-   Question when downstream design requires one.
-10. Produce one canonical managed `product-requirements/v1` artifact.
-11. Give every atomic normative requirement a stable unique `REQ-*` identifier.
-12. Record non-empty `source_refs` for every requirement; preserve rationale when it materially explains derivation or intent.
-13. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing their IDs for different meaning.
-14. Run `workspace.py validate-artifact` on the candidate.
-15. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
+2. Enumerate the relevant source/evidence statements before drafting requirements.
+3. Classify each statement as requirement-bearing, rationale/context, example, prior derived design, duplicate, out-of-scope or unresolved.
+4. For requirement-bearing statements:
+   - preserve all observable constraints, including scope, time, cardinality, negative conditions and NOT_REQUIRED decisions;
+   - split compound statements into independently verifiable atomic requirements;
+   - merge only true semantic duplicates;
+   - do not discard an observable constraint merely because the same sentence also contains design vocabulary.
+5. Reconcile conflicts. If two accepted sources imply incompatible product behavior, create a Product Requirements Question and stop the affected capability.
+6. Normalize the accepted result into product-level observable requirements without importing Domain/Architecture/API/Data choices.
+7. Define acceptance semantics/examples sufficient for downstream design to know what success means.
+8. Preserve scope boundaries and non-goals.
+9. Keep source/evidence semantics distinct from accepted product decisions.
+10. Do not select Domain entities/aggregates, architecture, API shape, persistence, package layout or implementation strategy.
+11. If a needed product choice is not determined by accepted input, create a Core Question to Product Requirements and stop the affected capability rather than inventing behavior.
+12. Do not invent numeric quality targets; preserve explicit NOT_REQUIRED decisions when they exist.
+13. Produce one canonical managed `product-requirements/v1` artifact.
+14. Give every atomic normative requirement a stable unique `REQ-*` identifier.
+15. Record non-empty `source_refs` for every requirement; preserve rationale when it materially explains derivation or intent.
+16. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing IDs.
+17. Review the resulting requirement list against the enumerated source/evidence set; no requirement-bearing source statement may disappear silently.
+18. Run `workspace.py validate-artifact` on the candidate.
+19. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
 
 ## Stop conditions
 
@@ -92,6 +94,10 @@ Requirement IDs identify the accepted requirement, not its document position or 
 
 ## Acceptance checks
 
+- every relevant source/evidence statement has an explicit disposition during requirements production;
+- every requirement-bearing source statement maps to one or more accepted requirements or to a blocking Question;
+- no observable scope/time/cardinality/negative/NOT_REQUIRED constraint is silently dropped;
+- true duplicates may merge, but independent semantics remain independently addressable;
 - every accepted requirement is supported by evidence or explicit product decision;
 - every normative requirement is atomic enough to be reviewed and verified independently;
 - every requirement has one stable unique `REQ-*` ID and non-empty source provenance;
