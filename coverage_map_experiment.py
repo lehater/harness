@@ -59,6 +59,23 @@ def validate(catalog: dict[str, Any], project: dict[str, Any]) -> list[str]:
     nodes, children = flatten_catalog(catalog)
     errors: list[str] = []
     seen: set[str] = set()
+    for decision in project.get("subtree_decisions", []):
+        cid = decision.get("concern")
+        state = decision.get("state")
+        if cid not in nodes:
+            errors.append(f"unknown subtree concern: {cid}")
+            continue
+        if not children.get(cid):
+            errors.append(f"subtree decision must target a parent concern: {cid}")
+        if state not in {"NOT_APPLICABLE", "DEFERRED"}:
+            errors.append(f"subtree decision may only be NOT_APPLICABLE or DEFERRED: {cid}")
+        if state == "NOT_APPLICABLE" and not (decision.get("rationale") or decision.get("evidence")):
+            errors.append(f"subtree NOT_APPLICABLE lacks rationale/evidence: {cid}")
+        if state == "DEFERRED":
+            for key in ("rationale", "owner", "reopen_when"):
+                if not decision.get(key):
+                    errors.append(f"subtree DEFERRED lacks {key}: {cid}")
+
     for row in project.get("rows", []):
         cid = row.get("concern")
         state = row.get("state")
@@ -85,9 +102,33 @@ def validate(catalog: dict[str, Any], project: dict[str, Any]) -> list[str]:
             errors.append(f"STALE lacks lifecycle freshness evidence: {cid}")
     return errors
 
+def resolved_leaf_states(catalog: dict[str, Any], project: dict[str, Any]) -> dict[str, str]:
+    nodes, children = flatten_catalog(catalog)
+    explicit = {r["concern"]: r["state"] for r in project.get("rows", [])}
+    inherited: dict[str, str] = {}
+
+    def leaves(cid: str) -> list[str]:
+        if not children[cid]:
+            return [cid]
+        result: list[str] = []
+        for child in children[cid]:
+            result.extend(leaves(child))
+        return result
+
+    for decision in project.get("subtree_decisions", []):
+        cid = decision["concern"]
+        for leaf in leaves(cid):
+            inherited[leaf] = decision["state"]
+
+    return {
+        cid: explicit.get(cid, inherited.get(cid, "UNASSESSED"))
+        for cid in nodes
+        if not children[cid]
+    }
+
 def derive_tree(catalog: dict[str, Any], project: dict[str, Any]) -> dict[str, str]:
     nodes, children = flatten_catalog(catalog)
-    rows = {r["concern"]: r["state"] for r in project.get("rows", [])}
+    rows = resolved_leaf_states(catalog, project)
     out: dict[str, str] = {}
 
     def state(cid: str) -> str:
