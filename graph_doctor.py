@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Research prototype: aggregate structural diagnostics for Harness project graphs."""
+"""Harness Graph Doctor v1: aggregate structural diagnostics for project graphs."""
 from __future__ import annotations
 
 import argparse
@@ -677,7 +677,7 @@ def _print_human(report: dict[str, Any]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Harness Graph Doctor research prototype")
+    parser = argparse.ArgumentParser(description="Harness Graph Doctor v1")
     parser.add_argument("engineering_graph")
     parser.add_argument("--core-model")
     parser.add_argument("--source-graph")
