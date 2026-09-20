@@ -1,0 +1,50 @@
+version: 0
+kind: harness-artifact-schema-candidate
+schema: cli-contract/v0-experiment
+artifact: GREENFIELD-CLI-CONTRACT
+source: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
+capability_claims:
+  - csv-deduplicator.cli-contract
+
+content:
+  command: "csv-deduplicate INPUT --output OUTPUT [--key COLUMN ...] [--force]"
+  arguments:
+    - {name: "INPUT", required: true, semantics: "Path to the UTF-8 CSV source file."}
+    - {name: "--output", required: true, semantics: "Destination path; source and output must not resolve to the same file."}
+    - {name: "--key", required: false, semantics: "Repeatable header name added to duplicate identity; with no key, full-row equality is used."}
+    - {name: "--force", required: false, semantics: "Permits replacement of an existing output only after transformation succeeds."}
+  success_semantics:
+    - Stdout contains exactly one line in the form input_rows=<N> retained_rows=<N> removed_rows=<N> output=<PATH>.
+    - Counts exclude the header row.
+    - Exit status is 0.
+  failure_classes:
+    - id: usage-contract
+      exit_status: 2
+      conditions:
+        - Missing required arguments.
+        - Duplicate --key option values.
+        - Source and output resolve to the same file.
+        - Requested key column is absent from the CSV header.
+        - Existing output without --force.
+        - Invalid, duplicate or empty header names.
+      result_semantics:
+        - Error is written to stderr as one human-readable line beginning with error:.
+        - No successful summary is written.
+    - id: operational
+      exit_status: 1
+      conditions:
+        - Input cannot be opened or read.
+        - Malformed CSV cannot be parsed.
+        - Temporary output cannot be created, written or published.
+      result_semantics:
+        - Error is written to stderr as one human-readable line beginning with error:.
+        - No successful summary is written.
+  representation_rules:
+    - Header names and row field values are compared exactly as parsed.
+    - The CLI does not trim, lowercase or otherwise normalize values for duplicate identity.
+    - Output preserves input header order.
+    - Output preserves retained row order.
+    - At least one --key is not required.
+    - Repeating the same key column is invalid.
+  boundary_rules: []
+  scope_exclusions: []
