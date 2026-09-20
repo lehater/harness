@@ -127,6 +127,7 @@ def validate_project_alignment(
     visited_capabilities: set[str] = set()
     alignment_groups: list[dict[str, Any]] = []
     actual_by_authority: dict[str, set[str]] = defaultdict(set)
+    alignment_errors: list[str] = []
 
     for seed in pending:
         if seed in visited_capabilities:
@@ -203,12 +204,12 @@ def validate_project_alignment(
         hidden = sorted(actual_upstream - declared_upstream)
         phantom = sorted(declared_upstream - actual_upstream)
         if hidden:
-            raise CoreError(
+            alignment_errors.append(
                 f"Authority {owner} capability/provider group {sorted(group_capabilities)} "
                 f"has hidden project-graph upstream Authorities: {hidden}"
             )
         if phantom:
-            raise CoreError(
+            alignment_errors.append(
                 f"Authority {owner} capability/provider group {sorted(group_capabilities)} "
                 f"has phantom capability prerequisites not present in project graph: {phantom}"
             )
@@ -232,6 +233,12 @@ def validate_project_alignment(
             }
         )
 
+
+    if alignment_errors:
+        raise CoreError(
+            "project graph/capability alignment failed:\n- "
+            + "\n- ".join(alignment_errors)
+        )
 
     return {
         "model": model,
