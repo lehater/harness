@@ -337,3 +337,80 @@ The unresolved question is no longer “what format for every Capability?” It 
 
 The schema catalog must therefore be empirical and sparse. Skills may support several
 schemas; projects instantiate only the schemas their actual production contracts need.
+
+
+## Cross-project schema-family inventory
+
+The current canonical artifacts and greenfield evidence produce the following
+non-normative inventory. “Strong” means repeated independent project evidence, not
+that a schema has been designed or accepted.
+
+| Semantic artifact family | Nutrition | NAPMS | Greenfield | Evidence result |
+| --- | --- | --- | --- | --- |
+| Problem evidence | Markdown Problem | YAML discovery | Markdown Problem | strong recurring family; schema candidate |
+| Product requirements | Markdown requirements | YAML product-requirements | Markdown requirements | strong recurring family; schema candidate |
+| Strategic domain structure | Markdown strategic model + context map | typed capabilities/contexts/relationships | absent | recurring concern, but split shape differs |
+| Tactical domain model | per-context Markdown | typed tactical-domain-model/domain-language | absent | strong two-project need; `domain-model/v1` is too small for full tactical semantics |
+| Application/use-case design | application-design Markdown | typed use-case/journey | absent | related but not yet proven to be one schema family |
+| Structural architecture | embedded narrative topology | Structurizr DSL | embedded narrative topology | standard-native structural profile proven; migration from prose requires reviewed semantic extraction |
+| Architecture rules | embedded in target architecture | typed application-architecture-rules | embedded in system architecture | recurring facet; likely separate profile from structure |
+| Module/component contracts | Component Design + application contracts | typed module-contract-design | architecture/implementation boundaries | recurring concern; ownership differs by project, so schema must not encode Authority |
+| Data/persistence | Data Design Markdown | typed physical-persistence-model | not applicable | recurring but detail level differs; likely more than one profile |
+| CLI interface contract | Markdown CLI | not applicable | Markdown CLI | repeated direct profile candidate |
+| HTTP interface contract | absent | OpenAPI | absent | standard-native profile; no Harness duplicate schema needed |
+| UI contract | absent | typed UI navigation/screen contracts | absent | single-project evidence only |
+| Engineering policy | Markdown | no equivalent separate owner | absent | insufficient cross-project evidence |
+| Security architecture/analysis | merged/not separately applicable | typed security artifacts | absent | insufficient cross-project evidence for generic schema |
+| Operability | merged/not separately applicable | typed observability requirements | absent | insufficient cross-project evidence |
+| Implementation design/plan | Markdown implementation design | typed implementation readiness | Markdown plan + completion artifact | strong recurring family; combination/splitting differs |
+| Verification design/strategy | Markdown redesign verification + typed verification-plan | typed test-intent | Markdown strategy + scenarios | strong recurring concern but clearly several artifact profiles |
+
+### Existing schema audit
+
+The two existing Harness schemas are valid evidence but must not be overgeneralized.
+
+**`domain-model/v1`** carries purpose, terms, concepts, responsibilities and
+invariants. Real NAPMS tactical domain models additionally own aggregates, entities,
+value objects, domain services, command semantics and explicit non-decisions.
+Nutrition tactical documents also own operations, cross-context relationships,
+special evidence semantics and precision rules. Therefore `domain-model/v1` is a
+compact domain-knowledge profile, not a universal tactical-domain schema.
+
+**`verification-plan/v1`** carries purpose, scope and concrete checks with evidence.
+Nutrition's pre-code redesign Verification Design intentionally has no current-test
+evidence. NAPMS test-intent is scenario/trace oriented, and greenfield verification is
+organized by evidence level. Therefore `verification-plan/v1` is one verification
+artifact profile, not the universal Verification schema.
+
+### Data/Persistence check
+
+Nutrition Data Design owns representation rules, logical context ownership,
+scalar encodings, transaction/read behavior and migration constraints but does not
+enumerate the complete physical schema.
+
+NAPMS `physical-persistence-model` owns concrete schemas, tables, columns, keys,
+indexes, checks and owner-enforced invariants.
+
+Collapsing both into one mandatory physical-persistence schema would either force
+Nutrition to decide unnecessary physical details early or make most fields optional.
+The evidence favors at least a conceptual Data Design profile and a more concrete
+Physical Persistence profile.
+
+## What the inventory says about “final artifacts”
+
+Harness should not define a mandatory final-document list.
+
+The stable axis is:
+
+1. the Engineering Graph determines which public knowledge capabilities a selected
+   consumer requires;
+2. Authorities decide and own the accepted semantics;
+3. CanonicalArtifacts persist the smallest useful owner-local units of that truth;
+4. each concrete CanonicalArtifact selects a reusable schema/profile only when a
+   validated profile exists for its semantic shape;
+5. Artifact Skills may create one or several such artifacts;
+6. generated human/visual views remain projections.
+
+This means a “final artifact catalogue” can exist only as a **schema/profile
+catalogue of reusable materialization shapes**, not as a mandatory lifecycle
+checklist.
