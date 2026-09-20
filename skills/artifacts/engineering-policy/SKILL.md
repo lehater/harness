@@ -30,7 +30,8 @@ Read accepted project architecture/requirements and organizational constraints n
 6. Keep obligations language/framework independent unless the project has already selected that technology.
 7. Identify downstream design capabilities that must consume the policy.
 8. Route any missing product/domain/architecture decision to its owning Authority rather than deciding it here.
-9. Produce project-native policy, semantically accept/register and reevaluate.
+9. For user-facing scopes, useful selectable obligations may include task-first information architecture, explicit UI-state modeling, accepted domain language over DTO/framework terminology, recognition over recall, error prevention/recovery, consistency/continuity, progressive disclosure and an explicit accessibility baseline or conformance target. Translate only selected/applicable principles into reviewable obligations.
+10. Produce project-native policy, semantically accept/register and reevaluate.
 
 ## Stop conditions
 
