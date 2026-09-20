@@ -615,3 +615,84 @@ affected narrative claim/evidence must be regenerated or deliberately reviewed
 
 This is substantially stronger than a timestamp or "generated from commit X" notice alone.
 
+## Follow-up: visual projections inside documentation packages
+
+The earlier Engineering Knowledge Projection research identified visual projection as a separate class. NAPMS provides a concrete second-stage validation because its canonical graph already declares deterministic project-owned projections:
+
+- CONTEXT-MAP;
+- Resource Catalogue views;
+- Application Communication / Deployment / Business Connectivity / Access Policy domain views;
+- first-MVP journey view;
+- persistence ERD.
+
+Each declaration already contains:
+- canonical `source_ids`;
+- a project-owned generation command;
+- disposable output paths.
+
+The Harness prototype now supports scoped visual assets without taking ownership of their generation.
+
+### Eligibility rule
+
+A declared visual projection may be included in a Human Documentation package only when **all** declared canonical `source_ids` are already inside the explicit human-projection manifest scope.
+
+Therefore a diagram cannot become a back door for reading knowledge outside the selected Consumer/composite documentation scope.
+
+### Execution boundary
+
+Harness does not execute the project declaration's arbitrary `command`.
+
+NAPMS research CI explicitly runs its own project generators before packaging, then passes the resulting assets to Harness for:
+- output existence validation;
+- output hashing;
+- package copying;
+- visual metadata materialization.
+
+This preserves the boundary:
+
+```
+project canonical sources
+      ↓
+project-owned deterministic generator/check
+      ↓
+disposable visual projection
+      ↓
+Harness scope validation + package assembly
+```
+
+The NAPMS research workflow generated all declared architecture/domain/journey/ERD PlantUML projections and the Human Projection test passed.
+
+### Repository-storage result
+
+The declared NAPMS visual outputs are not committed to main. This is valid.
+
+Human Documentation Projection therefore must not require visual assets to exist in Git. They may be:
+- generated immediately before package assembly;
+- verified by a project-owned `--check`/freshness command;
+- published only inside REVIEW/HANDOFF/CI artifacts.
+
+### Visual freshness limit
+
+Hashing a generated visual file proves the packaged bytes are stable after selection. It does **not by itself** prove that the file was generated from the current source versions.
+
+A stale diagram could theoretically be rebound to new source hashes if a caller skipped the project generator/check step.
+
+Therefore visual projection acceptance requires external generation/freshness evidence from the project adapter/orchestration.
+
+Recommended v1 rule:
+
+- Harness validates visual **scope**, path safety and packaged-output hashes.
+- The project owns visual **generation correctness/freshness** through its deterministic generator/check command.
+- A package that claims visual freshness must be assembled only after that project-owned step succeeds.
+- Harness must not silently execute arbitrary repository commands merely because they appear in projection metadata.
+
+Future tooling may accept an explicit verified-generation receipt, but no new Core concept is justified.
+
+### Nutrition contrast
+
+Nutrition currently has no equivalent machine-declared visual projection set.
+
+Human Projection must therefore emit no invented diagrams for Nutrition merely because a generic software documentation profile would look nicer with them.
+
+This is positive evidence for the renderer-neutral rule: visual assets are included only when accepted project-native structure/generators already support them.
+
