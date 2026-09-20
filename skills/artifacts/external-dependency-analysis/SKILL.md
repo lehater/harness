@@ -14,7 +14,8 @@ Use when a material library, tool, base image, external data source, acquired/ge
 - accepted Engineering Graph capabilities and Authority ownership;
 - relevant CanonicalArtifacts;
 - project-owned dependency selections and constraints;
-- available lock/SBOM/provenance/signature/advisory/service evidence.
+- available lock/SBOM/provenance/signature/advisory/service evidence;
+- accepted build/reproducibility/artifact-identity constraints and build provenance where applicable.
 
 ## Read boundary
 
@@ -32,7 +33,8 @@ Accepted canonical design is authority. Production code is not design evidence. 
 8. Route vulnerability, compromise, deprecation or upstream-change evidence to the semantic owner allowed to decide the response.
 9. Use Capability Lifecycle only after an accepted capability assertion changes.
 10. Use Change Transition Design when replacement introduces material coexistence, ordering, rollback, irreversible or retirement states.
-11. Record each concern as COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING with reopening condition, or QUESTION.
+11. For produced software artifacts, trace accepted source/build-environment/build-instruction identity, reproducibility expectations and build provenance where applicable; treat attestations as realization evidence.
+12. Record each concern as COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING with reopening condition, or QUESTION.
 
 ## Stop conditions
 
@@ -52,6 +54,8 @@ Produce dependency/evidence coverage containing semantic need, owning Authority,
 - accepted semantic changes use Capability Lifecycle;
 - material migration routes to Change Transition Design;
 - verification evidence traces to accepted constraints;
+- reproducibility/provenance expectations are explicit rather than inferred from build tooling;
+- build attestations do not become design truth;
 - project-native supply-chain history is not duplicated in Harness.
 
 ## Registration
