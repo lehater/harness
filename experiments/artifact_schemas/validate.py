@@ -77,7 +77,25 @@ def _validate_product_requirements(content: dict[str, Any]) -> None:
     _strings(content.get("constraints", []), "constraints")
     _strings(content.get("acceptance_examples", []), "acceptance_examples")
     _strings(content.get("non_goals", []), "non_goals")
-    _strings(content.get("evidence_refs", []), "evidence_refs")
+    evidence = content.get("evidence", [])
+    if not isinstance(evidence, list):
+        raise ExperimentError("evidence: expected list")
+    for index, item in enumerate(evidence):
+        if not isinstance(item, dict):
+            raise ExperimentError(f"evidence[{index}]: expected mapping")
+        if not isinstance(item.get("kind"), str) or not item["kind"].strip():
+            raise ExperimentError(f"evidence[{index}].kind is required")
+        meaningful = [
+            item.get("ref"),
+            item.get("statement"),
+            item.get("accepted_requirement_id"),
+            item.get("rule"),
+        ]
+        if not any(isinstance(value, str) and value.strip() for value in meaningful):
+            raise ExperimentError(f"evidence[{index}] requires ref/statement/accepted_requirement_id/rule")
+        date = item.get("date")
+        if date is not None and (not isinstance(date, str) or not date.strip()):
+            raise ExperimentError(f"evidence[{index}].date must be a non-empty string")
 
 
 def _validate_implementation_design(content: dict[str, Any]) -> None:
@@ -106,6 +124,7 @@ def _validate_implementation_design(content: dict[str, Any]) -> None:
     _strings(content.get("forbidden_decisions", []), "forbidden_decisions")
     _strings(content.get("open_questions", []), "open_questions")
     _strings(content.get("design_refs", []), "design_refs")
+    _strings(content.get("authorization_semantics", []), "authorization_semantics")
 
 
 VALIDATORS = {
