@@ -95,6 +95,47 @@ def main() -> int:
         "missing planned sections",
     )
 
+    widened_graph = copy.deepcopy(fixture["engineering_graph"])
+    interface = next(
+        item for item in widened_graph["authorities"]
+        if item["id"] == "INTERFACE"
+    )
+    interface["produces"].append(
+        {
+            "capability": "example.documentation-context",
+            "requires": ["example.requirements"],
+        }
+    )
+    widened_graph["terminal_capabilities"].append(
+        {
+            "capability": "example.documentation-context",
+            "authority": "INTERFACE",
+            "reason": "Research fixture: accepted context useful for overview documentation.",
+        }
+    )
+    widened_model = copy.deepcopy(model)
+    widened_model["artifacts"].append(
+        {
+            "id": "DOC-CONTEXT",
+            "authority": "INTERFACE",
+            "path": "docs/documentation-context.yaml",
+            "provides": ["example.documentation-context"],
+            "depends_on": ["REQUIREMENTS"],
+        }
+    )
+    widened_manifest = compile_manifest(
+        widened_graph,
+        widened_model,
+        "BACKEND-IMPLEMENTATION",
+        extra_capabilities=["example.documentation-context"],
+    )
+    assert widened_manifest["scope"]["extra_capabilities"] == [
+        "example.documentation-context"
+    ]
+    assert "DOC-CONTEXT" in {
+        item["artifact"] for item in widened_manifest["sources"]
+    }
+
     partial_model = copy.deepcopy(model)
     implementation = next(
         item for item in partial_model["artifacts"]
