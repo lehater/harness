@@ -1,0 +1,144 @@
+version: 1
+kind: harness-authority-role-contract
+id: engineering-authority-roles/v1-research
+status: research
+
+# Roles define responsibility/competence, not mandatory work.
+# A knowledge kind becomes required only when an activated concern needs it.
+roles:
+  product:
+    can_produce:
+      - engineering.intent.problem
+      - engineering.intent.scope
+      - engineering.intent.behavior
+      - engineering.intent.quality-targets
+
+  domain:
+    can_produce:
+      - engineering.domain.model
+      - engineering.domain.boundaries
+      - engineering.domain.invariants
+      - engineering.domain.time
+      - engineering.domain.provenance
+
+  application:
+    can_produce:
+      - engineering.application.use-cases
+      - engineering.application.orchestration
+      - engineering.application.failures
+      - engineering.application.idempotency
+
+  architecture:
+    can_produce:
+      - engineering.architecture.structure
+      - engineering.architecture.boundaries
+      - engineering.architecture.communication
+      - engineering.architecture.deployment
+      - engineering.architecture.decisions
+
+  interface:
+    can_produce:
+      - engineering.interface.machine.contract
+      - engineering.interface.machine.errors
+      - engineering.interface.machine.compatibility
+      - engineering.interface.human.journeys
+      - engineering.interface.human.usability
+      - engineering.interface.human.accessibility
+      - engineering.interface.human.responsiveness
+      - engineering.interface.human.i18n
+
+  data:
+    can_produce:
+      - engineering.data.model
+      - engineering.data.integrity
+      - engineering.data.lifecycle
+      - engineering.data.quality
+      - engineering.data.provenance
+      - engineering.data.reproducibility
+      - engineering.data.classification
+
+  security-architecture:
+    can_produce:
+      - engineering.security.boundaries
+      - engineering.security.identity
+      - engineering.security.authorization
+      - engineering.security.confidentiality
+      - engineering.security.integrity
+      - engineering.security.accountability
+      - engineering.security.availability-abuse
+
+  security-analysis:
+    can_produce:
+      - engineering.security.threat-analysis
+      - engineering.security.vulnerability-management
+      - engineering.security.secure-development
+
+  reliability:
+    can_produce:
+      - engineering.reliability.failure-semantics
+      - engineering.reliability.availability
+      - engineering.reliability.fault-tolerance
+      - engineering.reliability.recovery
+      - engineering.reliability.consistency
+      - engineering.reliability.retry-idempotency
+      - engineering.reliability.durability
+      - engineering.reliability.dependency-failure
+
+  operability:
+    can_produce:
+      - engineering.operability.configuration
+      - engineering.operability.logging
+      - engineering.operability.metrics
+      - engineering.operability.tracing
+      - engineering.operability.health
+      - engineering.operability.alerting
+      - engineering.operability.incident
+      - engineering.operability.admin
+      - engineering.operability.capacity
+
+  verification:
+    can_produce:
+      - engineering.verification.strategy
+      - engineering.verification.requirement-traceability
+      - engineering.verification.functional
+      - engineering.verification.quality
+      - engineering.verification.security
+      - engineering.verification.reliability
+      - engineering.verification.interface.machine
+      - engineering.verification.interface.human
+      - engineering.verification.architecture
+      - engineering.verification.data
+
+  engineering:
+    can_produce:
+      - engineering.engineering.principles
+      - engineering.engineering.components
+      - engineering.engineering.error-handling
+      - engineering.engineering.time
+      - engineering.engineering.configuration
+      - engineering.engineering.code-quality
+
+  dependency:
+    can_produce:
+      - engineering.dependency.inventory
+      - engineering.dependency.trust
+      - engineering.dependency.versioning
+      - engineering.dependency.license
+      - engineering.dependency.vulnerability
+
+  delivery:
+    can_produce:
+      - engineering.delivery.reproducible-build
+      - engineering.delivery.provenance
+      - engineering.delivery.integrity
+      - engineering.delivery.release
+      - engineering.delivery.migration
+      - engineering.delivery.rollback
+
+  governance:
+    can_produce:
+      - engineering.governance.external-obligations
+      - engineering.governance.privacy
+      - engineering.governance.data
+      - engineering.governance.audit
+      - engineering.governance.ownership
