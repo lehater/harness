@@ -514,3 +514,104 @@ Remaining work before canonicalization is primarily policy/ergonomics:
 
 No Core change is indicated.
 
+## Follow-up: reusable documentation profile experiment
+
+A tempting next step is to ship one generic software-document recipe that automatically selects sources by `knowledge_kind`.
+
+Cross-project inspection rejects that as a reliable automatic mechanism.
+
+Current production-contract coverage:
+
+- NAPMS: 31/31 productions declare `knowledge_kind` (100%);
+- Nutrition Management: 19/86 productions declare `knowledge_kind` (about 22%).
+
+Nutrition legitimately has many project/domain-specific capabilities that are consumed by engineering agents but were never meant to participate in generic artifact-skill routing.
+
+Authority IDs are also not a stable universal document taxonomy:
+- NAPMS largely uses reusable engineering Authority names;
+- Nutrition has several project/domain Authorities such as NUTRITION-TARGETING, FOOD-KNOWLEDGE, MARKET-CATALOG and PURCHASE-PLANNING.
+
+### Decision
+
+Do not make a generic software documentation profile an automatic source selector.
+
+Harness may provide an optional **information-architecture starter** such as:
+
+- Overview / Product Boundary;
+- Domain & Application;
+- Architecture & Interfaces;
+- Security / Quality / Operability when applicable;
+- Implementation Guide;
+- Verification / Test / Readiness;
+- Human Interface / Frontend Guide when applicable.
+
+But every project must map those sections to explicit CapabilityIds, Authorities or CanonicalArtifact IDs in its own presentation recipe.
+
+The starter owns headings/purpose suggestions only. It does not infer semantic applicability or source selection.
+
+## Follow-up: persistence and publication policy
+
+The pilots also demonstrate two valid publication styles:
+
+- Nutrition keeps generated human documentation in-repository for convenient browsing/review;
+- NAPMS has used generated implementation packages as CI artifacts/handoff output.
+
+These should remain project policy.
+
+Recommended defaults:
+
+### Persist
+- presentation recipe, when the project wants stable navigation/document organization;
+- no generated document as a Capability provider;
+- optionally generated REVIEW Markdown when repository review/browsing value justifies keeping it.
+
+### Generate by default
+- manifest;
+- projection plan;
+- projection IR;
+- HANDOFF source snapshot;
+- package metadata/freshness state.
+
+### Prefer CI/on-demand artifact
+- HANDOFF package, because committing a source snapshot duplicates canonical files;
+- non-deterministic narrative output when the project does not want generated prose churn in Git;
+- PDF/site/export formats.
+
+### Commit generated narrative only when
+- the project deliberately wants human documentation diff/review in Git;
+- CI validates source hashes and projection scope;
+- stale package detection is enforced;
+- generated files are visibly non-canonical.
+
+No single repository-storage policy belongs in Core or the projection contract.
+
+## Controlled regeneration result
+
+NAPMS research now includes a controlled semantic source mutation performed only in a temporary source copy.
+
+The experiment changes the canonical quality statement from numeric targets being NOT_REQUIRED to a deliberately different REQUIRED statement.
+
+Observed behavior:
+
+1. old IR + new manifest/plan -> rejected because manifest digest changed;
+2. old IR with only the new digest substituted -> rejected because its evidence excerpt no longer exists;
+3. regenerated claim + regenerated evidence excerpt -> accepted.
+
+This proves the intended regeneration fence:
+
+```
+canonical source changes
+      ↓
+source hash changes
+      ↓
+manifest digest changes
+      ↓
+old IR is stale
+      ↓
+digest-only rebinding is insufficient when evidence is required
+      ↓
+affected narrative claim/evidence must be regenerated or deliberately reviewed
+```
+
+This is substantially stronger than a timestamp or "generated from commit X" notice alone.
+
