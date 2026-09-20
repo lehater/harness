@@ -137,6 +137,25 @@ SCHEMA_VALIDATORS = {
 }
 
 
+# Research branch only: prove that the existing managed-knowledge registry can
+# host additional reusable artifact profiles without changing Core.
+try:
+    from experiments.artifact_schemas.validate import VALIDATORS as _EXPERIMENTAL_SCHEMA_VALIDATORS
+except ImportError:
+    _EXPERIMENTAL_SCHEMA_VALIDATORS = {}
+
+for _schema_id, _content_validator in _EXPERIMENTAL_SCHEMA_VALIDATORS.items():
+    def _wrapper(document: dict[str, Any], validator=_content_validator) -> None:
+        content = document.get("content")
+        if not isinstance(content, dict):
+            raise CoreError(f"{document.get('schema')} content must be a mapping")
+        try:
+            validator(content)
+        except ValueError as exc:
+            raise CoreError(str(exc)) from exc
+    SCHEMA_VALIDATORS[_schema_id] = _wrapper
+
+
 def validate_knowledge_document(document: dict[str, Any]) -> None:
     if document.get("version") != 1:
         raise CoreError("knowledge artifact version must be 1")
