@@ -5,16 +5,22 @@ schema: verification-plan/v1
 title: Application Verification Strategy
 
 content:
-  purpose: Define how the accepted application semantics are checked before implementation changes are accepted.
-  scope: Application domain behavior and its canonical invariants.
+  purpose: Define how accepted application requirements and semantics are checked before implementation changes are accepted.
+  scope: Application product requirement and domain behavior.
   checks:
-    - id: DOMAIN-INVARIANTS
-      objective: Verify that application domain invariants remain enforced.
+    - id: VER-COMPONENT-UNIQUENESS
+      objective: Verify that an Application cannot contain the same Component more than once.
+      verifies:
+        - REQ-APPLICATION-COMPONENT-UNIQUE
+        - APPLICATION-COMPONENT-UNIQUE
+      method: TEST
       evidence:
-        - Automated domain tests covering every accepted invariant.
-        - Regression tests for previously fixed invariant violations.
-    - id: CANONICAL-GENERATION
+        - Executable test contract covering duplicate component membership.
+    - id: VER-CANONICAL-GENERATION
       objective: Verify that generated human documentation remains synchronized with canonical knowledge.
+      verifies:
+        - APPLICATION-COMPONENT-UNIQUE
+      method: INSPECTION
       evidence:
         - Re-render generated documentation and require a clean diff.
   out_of_scope:
