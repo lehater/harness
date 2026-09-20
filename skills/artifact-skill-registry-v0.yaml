@@ -65,3 +65,6 @@ routes:
 
   - knowledge_kind: source-classification-registry
     skill: skills/artifacts/source-classification-registry/SKILL.md
+
+  - knowledge_kind: source-coverage-audit
+    skill: skills/artifacts/source-coverage-audit/SKILL.md

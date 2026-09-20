@@ -9,3 +9,4 @@ harness-check:
 	python validators/validate_agent_router.py
 	python validators/validate_workspace.py
 	python validators/validate_agent_layer.py
+	python validators/validate_source_coverage.py

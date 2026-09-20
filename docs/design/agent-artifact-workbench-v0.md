@@ -185,6 +185,49 @@ When a skill cannot produce the requested knowledge without choosing an unresolv
 
 The final semantic answer belongs in an Authority-owned canonical artifact, not in the Question itself. Resolving a capability-blocking Question does not itself provide the capability: after resolution, target state normally returns `CREATE` so the artifact skill can form the requested knowledge from the accepted decision.
 
+## Reconstruction and blind source coverage
+
+Structural target closure cannot detect source truth that disappeared **before** the Engineering Graph was formed.
+
+For reconstruction/blind work where original source material is sanitized, filtered or separated from prior derived design, use a statement-level source-coverage artifact before claiming semantic readiness.
+
+The assurance path is:
+
+```text
+original independently evidenced source
+        ↓
+statement-level source ledger
+        ↓
+exact-one disposition for every statement
+        ↓
+SOURCE COVERAGE COMPLETE
+        ↓
+Engineering Graph / Core structural closure
+        ↓
+IMPLEMENTATION STRUCTURAL COMPLETE
+        ↓
+coding-agent semantic challenge
+        ↓
+RECONSTRUCTION-READY
+```
+
+These gates are independent:
+
+- **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification.
+- **Structural COMPLETE** proves every declared capability/prerequisite has an accepted unblocked provider.
+- **Semantic challenge PASS** proves an implementation consumer is not still forced to make a material upstream decision from the accepted closure.
+
+None substitutes for another.
+
+For source-loss-sensitive work:
+- classify at statement granularity, not whole-file granularity;
+- split mixed source/design sentences when needed so observable constraints survive without importing prior solution choices;
+- require an explicit exclusion rationale;
+- treat a remaining classification/provenance QUESTION as source coverage INCOMPLETE;
+- make a project-specific source-coverage capability a prerequisite of Product Requirements or the terminal consumer when the experiment requires blind/reconstruction assurance.
+
+Use `skills/artifacts/source-coverage-audit/SKILL.md` and `source_coverage.py` for the reusable procedure/validator. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
+
 ## Implementation feedback
 
 A `COMPLETE` Design Profile means that the declared knowledge is structurally available and unblocked at that moment. It is not proof that product code already implements that knowledge.
