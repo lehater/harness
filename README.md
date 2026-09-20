@@ -138,3 +138,23 @@ If the target repository later gains its own canonical graph, prefer projecting 
 Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
 
 `skills/agent/**` and `skills/artifacts/**` are the active v0 agent operating layer above Core. Existing `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` and `docs/methodology/**` are retained pre-Core material unless a future consumer-driven migration explicitly promotes them. Active agent skills do not extend Core entities.
+
+
+## Graph Doctor
+
+`graph_doctor.py` performs one non-destructive diagnostic pass over the Engineering Graph, Core/project realization, canonical files and project-graph alignment.
+
+It aggregates stable findings with severity, owner, evidence and suggested human actions. Semantic auto-fix is intentionally not performed.
+
+```sh
+python graph_doctor.py .harness/engineering-graph.yaml \
+  --core-model .harness/graph.yaml \
+  --target IMPLEMENTATION \
+  --source-root .
+
+python graph_doctor.py .harness/engineering-graph.yaml \
+  --core-model .harness/graph.yaml \
+  --json
+```
+
+See `docs/design/graph-doctor-v1.md`.
