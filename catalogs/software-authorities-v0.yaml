@@ -4,6 +4,8 @@ id: SOFTWARE-PRODUCT-REFERENCE-V0
 status: experimental
 
 principles:
+  - Data collection, purpose, lifecycle, retention and disposition semantics remain with the Authorities owning product need, domain meaning, external policy, security handling or operational evidence; persistence mechanisms do not create a generic data-governance owner.
+  - Data, security, framework and storage defaults must not invent material collection, secondary-use, durable-derived-data, retention, deletion, anonymization, archival or disclosure semantics; unresolved material behavior is a Question for its semantic or policy owner.
   atomicity_test:
     - semantic_cohesion
     - independent_change
