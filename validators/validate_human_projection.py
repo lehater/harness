@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import copy
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from adapters.canonical_graph import project_model  # noqa: E402
+from harness import CoreError  # noqa: E402
+from human_projection import (  # noqa: E402
+    compile_manifest,
+    validate_projection_ir,
+    validate_recipe,
+)
+
+
+def load(path: Path):
+    value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise CoreError(f"{path} must contain a mapping")
+    return value
+
+
+def expect_error(fn, contains: str):
+    try:
+        fn()
+    except CoreError as exc:
+        if contains not in str(exc):
+            raise AssertionError((contains, str(exc))) from exc
+    else:
+        raise AssertionError(f"expected CoreError containing {contains!r}")
+
+
+def main() -> int:
+    fixture = load(ROOT / "spec/unified-model-acceptance/napms-shape.yaml")
+    recipe = load(ROOT / "spec/human-projection-acceptance/backend-review.yaml")
+    ir_template = load(ROOT / "spec/human-projection-acceptance/backend-review-ir.yaml")
+
+    model = project_model(fixture["source_graph"], fixture["projection"])
+    manifest = compile_manifest(
+        fixture["engineering_graph"],
+        model,
+        "BACKEND-IMPLEMENTATION",
+        harness_version="research-fixture",
+        project_revision="fixture-revision",
+        recipe_id=recipe["id"],
+    )
+
+    assert manifest["consumer"] == "BACKEND-IMPLEMENTATION"
+    assert manifest["target"]["status"] == "COMPLETE"
+    assert "REQUIREMENTS" in manifest["direct_provider_artifacts"]
+    assert "IMPLEMENTATION-DESIGN" in manifest["direct_provider_artifacts"]
+    assert {item["artifact"] for item in manifest["sources"]} == {
+        "REQUIREMENTS",
+        "JOURNEY",
+        "ARCHITECTURE",
+        "ASYNC-NA",
+        "INTERFACE",
+        "IMPLEMENTATION-DESIGN",
+    }
+    assert manifest["unresolved"] == []
+
+    plan = validate_recipe(recipe, manifest)
+    overview = next(item for item in plan["documents"] if item["id"] == "overview")
+    product = next(item for item in overview["sections"] if item["id"] == "product-boundary")
+    assert product["sources"] == ["REQUIREMENTS"]
+
+    ir = copy.deepcopy(ir_template)
+    ir["manifest_digest"] = manifest["manifest_digest"]
+    validate_projection_ir(ir, plan)
+
+    bad_recipe = copy.deepcopy(recipe)
+    bad_recipe["documents"][0]["sections"][0]["select"]["artifacts"] = ["UNKNOWN"]
+    expect_error(
+        lambda: validate_recipe(bad_recipe, manifest),
+        "outside manifest",
+    )
+
+    bad_ir = copy.deepcopy(ir)
+    bad_ir["documents"][0]["sections"][0]["claims"][0]["sources"] = ["INTERFACE"]
+    expect_error(
+        lambda: validate_projection_ir(bad_ir, plan),
+        "outside section scope",
+    )
+
+    missing_ir = copy.deepcopy(ir)
+    missing_ir["documents"][0]["sections"] = missing_ir["documents"][0]["sections"][:1]
+    expect_error(
+        lambda: validate_projection_ir(missing_ir, plan),
+        "missing planned sections",
+    )
+
+    partial_model = copy.deepcopy(model)
+    implementation = next(
+        item for item in partial_model["artifacts"]
+        if item["id"] == "IMPLEMENTATION-DESIGN"
+    )
+    implementation["provides"] = []
+    partial_manifest = compile_manifest(
+        fixture["engineering_graph"],
+        partial_model,
+        "BACKEND-IMPLEMENTATION",
+    )
+    assert partial_manifest["target"]["status"] == "READY"
+    assert any(
+        item["capability"] == "example.implementation-design"
+        for item in partial_manifest["unresolved"]
+    )
+
+    print("Human projection compiler acceptance PASS")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
