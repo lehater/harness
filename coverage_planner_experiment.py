@@ -151,11 +151,16 @@ def derive_plan(
         counts[row["state"]] = counts.get(row["state"], 0) + 1
         actions[row["action"]] = actions.get(row["action"], 0) + 1
 
+    completion_ready = all(
+        row["state"] in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
+        for row in rows
+    )
     return {
         "version": 1,
         "kind": "harness-derived-engineering-work-plan",
         "project": overlay.get("project"),
         "scope": overlay.get("scope"),
+        "completion_ready": completion_ready,
         "summary": {"states": counts, "actions": actions},
         "rows": rows,
     }
