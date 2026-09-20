@@ -187,7 +187,19 @@ Expected routing:
 - concrete SQLite migration mechanics -> Implementation;
 - transition ordering/reversibility/retirement contract -> candidate Change Transition boundary if independently useful.
 
-This case tests whether the candidate collapses for trivial upgrades. It should be conditional, not baseline.
+Accepted Nutrition evidence sharpens the case:
+
+- Data Design requires forward schema changes to preserve accepted provider semantics and requires upstream reopening when a schema change changes domain meaning, ownership or planning consistency.
+- ADR-010 permits ordinary dependency upgrades only when tests prove compatibility and accepted architecture/domain semantics remain unchanged.
+- Neither artifact requires old/new application coexistence, rolling deployment, zero-downtime migration or arbitrary downgrade support.
+
+Result:
+
+- CHANGE-TRANSITION-DESIGN is **NOT_APPLICABLE by default** to ordinary dependency maintenance and trivial forward migrations whose transition has no independently meaningful intermediate state.
+- It becomes applicable when a proposed change introduces a material coexistence window, irreversible data transformation, user-visible migration state, availability constraint, or recovery/retirement decision not derivable from the endpoint designs.
+- This is positive evidence for a *conditional* Authority: absence is legitimate and must not force transition bureaucracy onto a local application.
+
+The case also shows why the candidate cannot own target persistence semantics: Data Design already owns preservation of provider meaning. The residual transition contract only exists when moving between two accepted representations creates additional states/ordering/recovery knowledge.
 
 ## Validation case 2 — NAPMS
 
@@ -204,7 +216,24 @@ The accepted current design must be checked for:
 - restore/roll-forward behavior;
 - release health gates.
 
-Missing answers should be routed as Questions rather than inferred from Docker/PostgreSQL/framework behavior.
+Accepted NAPMS evidence provides a stronger boundary test:
+
+- current System Architecture says schema migrations are one backend deployment concern while preserving module ownership;
+- current persistence design owns module schema/repository boundaries and migration organization;
+- current accepted material does **not** establish arbitrary old/new runtime coexistence, downgrade compatibility, progressive release, or rollback safety;
+- the source ledger classifies the legacy local upgrade procedure as downstream S4/operations evidence rather than current domain truth.
+
+Therefore current NAPMS does not authorize inventing rolling/blue-green/rollback semantics. For the present implementation slice, migration organization can remain System/Data/Implementation knowledge.
+
+But the legacy upgrade evidence demonstrates a historically real consumer contract: forward-upgrade ordering and recovery can be independently documented while endpoint architecture remains stable. It is discovery evidence, not authority for current semantics.
+
+Result:
+
+- do not manufacture a CHANGE-TRANSITION-DESIGN instance for the current NAPMS slice unless the selected deployment/upgrade scope makes transition states material;
+- if NAPMS adopts mixed runtime versions, independently executed schema migration, zero-downtime upgrade, progressive release or a non-trivial recovery boundary, existing endpoint Authorities are insufficient by themselves to own the **path validity**;
+- at that point the transition contract is independently consumed by Implementation, Verification, Operability and deployment automation.
+
+Missing answers must be routed as Questions rather than inferred from Docker/PostgreSQL/framework behavior.
 
 ## Validation case 3 — synthetic mixed-version rollout
 
@@ -240,6 +269,45 @@ Failure experiments:
 
 This fixture strongly supports an independent transition contract.
 
+## Atomicity resolution after project validation
+
+The two real projects and the synthetic fixture distinguish applicability from atomicity.
+
+### Semantic cohesion — PASS
+
+The residual knowledge is exactly path validity between accepted engineering states: coexistence, ordered transition constraints, irreversible points, gates, recovery and retirement.
+
+It does not own either endpoint.
+
+### Independent change — PASS
+
+Nutrition can change migration mechanism without creating a transition Authority when no material transition state exists. Conversely, the synthetic case can change rolling to blue/green or alter migration/release ordering while endpoint A and B remain unchanged.
+
+This demonstrates a lifecycle independent from endpoint design and from concrete implementation mechanics.
+
+### Public producer/consumer contract — PASS
+
+When applicable, the contract has concrete consumers:
+- IMPLEMENTATION-DESIGN consumes permitted ordering and irreversible boundaries;
+- VERIFICATION/TEST consumes transition-state and gate oracles;
+- OPERABILITY consumes evidence required to decide progression/recovery;
+- deployment/release automation consumes gates and allowed actions;
+- endpoint Authorities consume routed Questions when a transition reveals missing compatibility semantics.
+
+The contract remains meaningful if the CI/CD product, migration framework or scripts change.
+
+### Final research verdict
+
+**Create a conditional CHANGE-TRANSITION-DESIGN Authority.**
+
+Do not create separate DEPLOYMENT-DESIGN, RELEASE-DESIGN, MIGRATION-DESIGN or COMPATIBILITY-DESIGN Authorities from this evidence. Those names describe mechanisms or subconcerns of one transition-validity boundary, while their endpoint semantics remain with Product/Domain/Application/System/Interface/Data/Quality.
+
+Applicability rule:
+
+> Instantiate CHANGE-TRANSITION-DESIGN only when moving between accepted engineering states introduces material intermediate/coexistence states, ordering constraints, irreversible points, rollout gates, recovery choices or retirement conditions that are not fully derivable from the endpoint designs.
+
+For a trivial atomic replacement with no material intermediate state, it is NOT_APPLICABLE.
+
 ## Current conclusion
 
 Unlike Reliability, Change/Transition currently shows a plausible residual atomic boundary after existing owners keep their native semantics.
@@ -272,7 +340,7 @@ Candidate outputs:
 1. Endpoint design completeness does not imply transition completeness.
 2. Rollback must never be assumed safe after durable or externally visible B-state effects.
 3. Mixed-version states need explicit applicability and validity.
-4. A conditional CHANGE-TRANSITION-DESIGN Authority is now a serious candidate and requires project validation before catalog insertion.
+4. Project validation and the mixed-version fixture satisfy the atomicity test for a conditional CHANGE-TRANSITION-DESIGN Authority.
 
 ### P1
 
@@ -283,4 +351,4 @@ Candidate outputs:
 
 ## Next research step
 
-Inspect accepted Nutrition and NAPMS artifacts specifically for schema/application/interface upgrade semantics. Resolve whether the candidate transition contract has independent consumers in both projects. If it survives, define a reusable change-transition analysis/design skill and prepare conditional Authority canonicalization in this research branch.
+Canonicalize the conditional CHANGE-TRANSITION-DESIGN Authority and its reusable artifact skill in this research branch. Then run repository checks before considering merge. After that, continue to the next uncovered P0/P1 engineering area rather than expanding transition mechanics further.
