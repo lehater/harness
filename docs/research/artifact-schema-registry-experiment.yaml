@@ -37,6 +37,24 @@ profiles:
       Whether migration to one Harness-native encoding adds enough automation value
       to justify replacing accepted project-native canonical formats.
 
+  - id: implementation-design/v0-experiment
+    status: candidate-after-two-real-project-materializations
+    semantic_scope: implementation-facing realization decisions, slices, completion criteria and authorization boundary
+    representation: harness-managed-envelope
+    validator: experiments/artifact_schemas/validate.py
+    evidence:
+      - nutrition-management: docs/redesign/implementation-design.md
+      - napms: docs/plans/first-mvp-implementation-readiness.yaml
+
+  - id: cli-contract/v0-experiment
+    status: candidate-after-repeated-cli-materialization
+    semantic_scope: command syntax, argument semantics, success/failure behavior and CLI boundary rules
+    representation: harness-managed-envelope
+    validator: experiments/artifact_schemas/validate.py
+    evidence:
+      - nutrition-management: docs/interface/cli-contract.md
+      - harness-greenfield: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
+
   - id: openapi/3.1
     status: standard-native
     semantic_scope: HTTP operations, schemas, outcomes and security representation
@@ -75,6 +93,13 @@ unresolved_profile_families:
   - security-architecture
   - threat-model
   - observability-requirements
+
+storage_result:
+  harness_native_envelope: harness-knowledge-artifact/v1
+  rule: >-
+    Reuse the existing managed knowledge envelope for Harness-native profiles.
+    Do not invent a second envelope. Standard-native profiles remain in their
+    native canonical files and are associated through project/adapter metadata.
 
 non_goals:
   - one schema per Authority
