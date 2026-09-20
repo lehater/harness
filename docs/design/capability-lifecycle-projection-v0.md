@@ -4,7 +4,7 @@ Status: experimental contract validated against Nutrition Management and NAPMS.
 
 ## Purpose
 
-Represent whether accepted Capability knowledge is still current against the accepted prerequisite Capability revisions on which its semantic acceptance depended, without changing Harness Core v0 or duplicating project-owned history.
+Represent whether accepted Capability knowledge is still current against the accepted prerequisite Capability acceptance identitys on which its semantic acceptance depended, without changing Harness Core v0 or duplicating project-owned history.
 
 ## Boundary
 
@@ -20,7 +20,7 @@ kind: harness-capability-lifecycle
 providers:
   - artifact: TARGET-ARCHITECTURE
     capability: nutrition-management.architecture
-    revision: architecture-acceptance-7
+    acceptance_id: architecture-acceptance-7
     accepted_prerequisites:
       nutrition-management.requirements: requirements-acceptance-4
       nutrition-management.domain.context-contracts: context-contracts-3
@@ -33,21 +33,21 @@ Each entry identifies one currently selected accepted Capability assertion.
 Required fields:
 - `artifact`: current CanonicalArtifact provider id in the Core realization;
 - `capability`: CapabilityId provided by that artifact;
-- `revision`: opaque stable identity of this accepted semantic assertion;
-- `accepted_prerequisites`: exact mapping of every Engineering Graph production prerequisite CapabilityId to the prerequisite revision against which this assertion was accepted.
+- `acceptance_id`: opaque stable identity of this accepted semantic assertion;
+- `accepted_prerequisites`: exact mapping of every Engineering Graph production prerequisite CapabilityId to the prerequisite acceptance identity against which this assertion was accepted.
 
-Revision identity is opaque. Harness must not infer order, age or superiority from its spelling or timestamp.
+Acceptance identity is opaque. Harness must not infer order, age or superiority from its spelling or timestamp.
 
-Revalidation may create a new revision identity even when materialized artifact bytes do not change, because semantic acceptance against a new baseline is a new assertion.
+Revalidation may create a new acceptance identity even when materialized artifact bytes do not change, because semantic acceptance against a new baseline is a new assertion.
 
 ## Granularity
 
 Lifecycle identity is Capability-granular, not artifact-granular.
 
 One CanonicalArtifact may provide several Capabilities with:
-- independent revisions;
+- independent acceptance identities;
 - independent prerequisite baselines;
-- intentionally shared revisions when the project explicitly models one semantic acceptance lifecycle.
+- intentionally shared acceptance identities when the project explicitly models one semantic acceptance lifecycle.
 
 Artifact revision/provenance may exist in the project but is not the invalidation key.
 
@@ -58,7 +58,7 @@ For every lifecycle provider:
 2. artifact currently provides the CapabilityId;
 3. CapabilityId exists in the Engineering Graph production topology;
 4. accepted prerequisite keys equal the production prerequisite CapabilityIds exactly;
-5. prerequisite revision values are non-empty opaque identities.
+5. prerequisite acceptance identity values are non-empty opaque identities.
 
 A lifecycle projection may be partial as integration data, but partial coverage cannot prove lifecycle-aware completeness.
 
@@ -70,7 +70,7 @@ For a Capability in the selected consumer closure:
 - a current provider exists;
 - lifecycle assertion exists;
 - every production prerequisite is CURRENT;
-- every current prerequisite revision equals the recorded accepted prerequisite revision.
+- every current prerequisite acceptance identity equals the recorded accepted prerequisite acceptance identity.
 
 ### STALE
 Provider/assertion exists but at least one production prerequisite is not CURRENT or its current revision differs from the recorded baseline.
@@ -80,7 +80,7 @@ STALE means "not proven current against the selected baseline". It does not mean
 ### UNKNOWN
 Provider exists but lifecycle assertion/required revision coverage is unavailable.
 
-UNKNOWN must never satisfy lifecycle-aware target completeness.
+UNKNOWN must never satisfy lifecycle-aware target completeness. It is reported as a lifecycle coverage gap, not REVALIDATE: Harness lacks enough acceptance evidence to claim staleness.
 
 ### MISSING
 No current Core provider exists. Existing Core CREATE/WAIT semantics remain authoritative.
@@ -101,8 +101,8 @@ If revalidation discovers uncertainty, the owner creates/routes a Question throu
 
 ## Supersession
 
-Selecting a new current Capability revision:
-- does not delete historical revisions;
+Selecting a new current Capability acceptance identity:
+- does not delete historical acceptance identities;
 - does not assert downstream knowledge is wrong;
 - causes baseline mismatch in direct consumers;
 - makes those consumers STALE;
@@ -120,7 +120,7 @@ Adapters MUST NOT:
 - use timestamps as semantic validity;
 - use file modification alone as semantic acceptance;
 - treat every file dependency as a production prerequisite;
-- fabricate missing revisions;
+- fabricate missing acceptance identities;
 - duplicate project history merely to satisfy Harness.
 
 ## Backward compatibility
@@ -136,7 +136,7 @@ Lifecycle-aware evaluation must explicitly report unavailable/UNKNOWN coverage r
 Nutrition Management demonstrated:
 - fan-out/fan-in stale propagation;
 - a single artifact providing independently consumed source-identity/source-structure capabilities;
-- false positives from artifact-level revisions.
+- false positives from artifact-level acceptance identities.
 
 NAPMS demonstrated:
 - multiple public capabilities from System Architecture and Product Requirements;
