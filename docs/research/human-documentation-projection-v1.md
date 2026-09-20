@@ -447,6 +447,25 @@ The project may rename/regroup them.
 
 Documentation must be generated for a selected Consumer or explicit capability scope.
 
+Cross-project prototyping exposed an important distinction:
+
+- an **implementation handoff** should use the exact selected Consumer closure;
+- a **project overview** may legitimately include additional accepted capabilities that are not implementation prerequisites.
+
+Nutrition's existing human documentation mixes these concerns: its Domain & Data narrative cites accepted nutrient-evidence semantics that are not currently in the `IMPLEMENTATION` Consumer closure. The correct response is not to let a presentation recipe silently escape scope.
+
+Human Projection v1 should therefore support an explicit **composite projection scope**:
+
+```
+selected Consumer closure
+    + explicitly named additional CapabilityIds
+```
+
+The additional capabilities are presentation-scope inputs only. They do not change the Consumer, its target state, or implementation readiness. They must be recorded in the manifest and must resolve through normal Harness ownership/provider semantics.
+
+This permits a broad project overview while keeping an exact implementation package exact.
+
+
 Examples:
 
 - BACKEND-IMPLEMENTATION package;
