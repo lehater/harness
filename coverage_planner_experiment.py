@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""Research-only coverage planning experiment.
+
+Turns activated concern gaps into Authority-routed work by combining:
+- concern proof contract
+- reusable Authority role competence
+- project Authority role bindings
+- project capability -> knowledge-kind bindings
+- project canonical artifact realization
+- project applicability/required overlay
+"""
+from __future__ import annotations
+import argparse
+from pathlib import Path
+from typing import Any
+import yaml
+
+
+def load(path: str) -> dict[str, Any]:
+    value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a mapping")
+    return value
+
+
+def realized_capabilities(project_docs: list[dict[str, Any]]) -> set[str]:
+    result: set[str] = set()
+    for doc in project_docs:
+        for artifact in doc.get("artifacts", []) or []:
+            result.update(artifact.get("provides", []) or [])
+        for binding in doc.get("bindings", []) or []:
+            result.update(binding.get("provides", []) or [])
+    return result
+
+
+def capability_kind_index(bindings: dict[str, Any]) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = {}
+    for item in bindings.get("bindings", []) or []:
+        result.setdefault(item["capability"], set()).update(item.get("knowledge_kinds", []) or [])
+    return result
+
+
+def concern_proofs(contract: dict[str, Any]) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = {}
+    for concern, spec in (contract.get("proofs", {}) or {}).items():
+        result[concern] = set(spec.get("accepted_knowledge_kinds", []) or [])
+    return result
+
+
+def role_kinds(contract: dict[str, Any]) -> dict[str, set[str]]:
+    return {
+        role: set(spec.get("can_produce", []) or [])
+        for role, spec in (contract.get("roles", {}) or {}).items()
+    }
+
+
+def authorities_for_kind(
+    knowledge_kind: str,
+    roles: dict[str, set[str]],
+    project_roles: dict[str, Any],
+) -> list[str]:
+    capable_roles = {role for role, kinds in roles.items() if knowledge_kind in kinds}
+    result = []
+    for authority, assigned_roles in (project_roles.get("bindings", {}) or {}).items():
+        if capable_roles & set(assigned_roles or []):
+            result.append(authority)
+    return sorted(result)
+
+
+def derive_plan(
+    proof_contract: dict[str, Any],
+    role_contract: dict[str, Any],
+    project_roles: dict[str, Any],
+    capability_bindings: dict[str, Any],
+    overlay: dict[str, Any],
+    project_docs: list[dict[str, Any]],
+) -> dict[str, Any]:
+    proofs = concern_proofs(proof_contract)
+    roles = role_kinds(role_contract)
+    cap_kinds = capability_kind_index(capability_bindings)
+    realized_caps = realized_capabilities(project_docs)
+
+    realized_kinds: dict[str, list[str]] = {}
+    for cap in sorted(realized_caps):
+        for kind in sorted(cap_kinds.get(cap, set())):
+            realized_kinds.setdefault(kind, []).append(cap)
+
+    explicit = {d["concern"]: d for d in overlay.get("decisions", []) or []}
+    required = list(overlay.get("required", []) or [])
+    rows = []
+
+    for concern in required:
+        decision = explicit.get(concern)
+        if decision and decision.get("state") in {"NOT_APPLICABLE", "DEFERRED"}:
+            rows.append({
+                "concern": concern,
+                "state": decision["state"],
+                "action": "NONE",
+                "reason": "explicit project applicability decision",
+            })
+            continue
+
+        accepted = sorted(proofs.get(concern, set()))
+        present = {
+            kind: realized_kinds[kind]
+            for kind in accepted
+            if kind in realized_kinds
+        }
+        if present:
+            rows.append({
+                "concern": concern,
+                "state": "COVERED",
+                "action": "NONE",
+                "proof": present,
+            })
+            continue
+
+        routes: dict[str, list[str]] = {}
+        for kind in accepted:
+            auths = authorities_for_kind(kind, roles, project_roles)
+            if auths:
+                routes[kind] = auths
+
+        if not accepted:
+            rows.append({
+                "concern": concern,
+                "state": "BLOCKED",
+                "action": "MODEL_PROOF_CONTRACT",
+                "reason": "concern has no accepted knowledge-kind proof contract",
+            })
+        elif routes:
+            rows.append({
+                "concern": concern,
+                "state": "MISSING",
+                "action": "PRODUCE_KNOWLEDGE",
+                "accepted_knowledge_kinds": accepted,
+                "routes": routes,
+            })
+        else:
+            rows.append({
+                "concern": concern,
+                "state": "BLOCKED",
+                "action": "ASSIGN_AUTHORITY",
+                "accepted_knowledge_kinds": accepted,
+                "reason": "project has no Authority bound to a role that can produce an accepted knowledge kind",
+            })
+
+    counts: dict[str, int] = {}
+    actions: dict[str, int] = {}
+    for row in rows:
+        counts[row["state"]] = counts.get(row["state"], 0) + 1
+        actions[row["action"]] = actions.get(row["action"], 0) + 1
+
+    return {
+        "version": 1,
+        "kind": "harness-derived-engineering-work-plan",
+        "project": overlay.get("project"),
+        "scope": overlay.get("scope"),
+        "summary": {"states": counts, "actions": actions},
+        "rows": rows,
+    }
+
+
+def main() -> int:
+    p = argparse.ArgumentParser()
+    p.add_argument("proof_contract")
+    p.add_argument("role_contract")
+    p.add_argument("project_roles")
+    p.add_argument("capability_bindings")
+    p.add_argument("overlay")
+    p.add_argument("project_docs", nargs="+")
+    args = p.parse_args()
+
+    result = derive_plan(
+        load(args.proof_contract),
+        load(args.role_contract),
+        load(args.project_roles),
+        load(args.capability_bindings),
+        load(args.overlay),
+        [load(x) for x in args.project_docs],
+    )
+    print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
