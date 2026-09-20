@@ -1,0 +1,34 @@
+authorities: []
+artifacts:
+  - id: NAPMS-MVP-REQUIREMENTS
+    authority: PRODUCT-REQUIREMENTS
+    provides: [napms.mvp.requirements]
+  - id: NAPMS-MVP-DOMAIN-USE-CASES
+    authority: DOMAIN-USE-CASE-DESIGN
+    provides: [napms.mvp.domain-use-cases]
+    depends_on: [NAPMS-MVP-REQUIREMENTS]
+  - id: NAPMS-MVP-SECURITY
+    authority: SECURITY-ARCHITECTURE
+    provides: [napms.mvp.security-architecture]
+    depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES]
+  - id: NAPMS-MVP-QUALITY
+    authority: QUALITY-DESIGN
+    provides: [napms.mvp.quality-constraints]
+    depends_on: [NAPMS-MVP-REQUIREMENTS]
+  - id: NAPMS-MVP-MACHINE-INTERFACE
+    authority: INTERFACE-DESIGN
+    provides: [napms.mvp.machine-interface]
+    depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES, NAPMS-MVP-SECURITY]
+  - id: NAPMS-MVP-FRONTEND-JOURNEYS
+    authority: APPLICATION-DESIGN
+    provides: [napms.mvp.frontend.user-journeys]
+    depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES]
+  - id: NAPMS-MVP-HUMAN-INTERFACE
+    authority: INTERFACE-DESIGN
+    provides: [napms.mvp.frontend.human-interface]
+    depends_on: [NAPMS-MVP-REQUIREMENTS, NAPMS-MVP-DOMAIN-USE-CASES, NAPMS-MVP-FRONTEND-JOURNEYS, NAPMS-MVP-SECURITY, NAPMS-MVP-MACHINE-INTERFACE]
+  - id: NAPMS-MVP-FRONTEND-ARCHITECTURE
+    authority: SYSTEM-ARCHITECTURE
+    provides: [napms.mvp.frontend.architecture]
+    depends_on: [NAPMS-MVP-HUMAN-INTERFACE, NAPMS-MVP-MACHINE-INTERFACE, NAPMS-MVP-SECURITY, NAPMS-MVP-QUALITY]
+questions: []
