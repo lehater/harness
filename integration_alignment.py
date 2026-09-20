@@ -97,23 +97,6 @@ def validate_project_alignment(
         for item in projection.get("bindings", []) or []
     }
 
-    actual_by_authority: dict[str, set[str]] = defaultdict(set)
-    for artifact_id, node in source_nodes.items():
-        owner = artifact_authority.get(artifact_id)
-        if owner is None:
-            continue
-        for dep in node.get("depends_on", []) or []:
-            dep_owner = artifact_authority.get(dep)
-            if dep_owner is None:
-                if require_complete_binding:
-                    raise CoreError(
-                        f"canonical dependency {dep} of {artifact_id} has no Authority binding"
-                    )
-                continue
-            if dep_owner != owner:
-                actual_by_authority[owner].add(dep_owner)
-
-    declared_by_authority: dict[str, set[str]] = defaultdict(set)
     materialized_capabilities = {
         capability
         for binding in bindings.values()
@@ -127,36 +110,126 @@ def validate_project_alignment(
             item["capability"] for item in profile["expectations"]
         }
 
-    for capability in alignment_capabilities:
-        production = productions[capability]
-        owner = producers[capability]
-        for requirement in production.get("requires", []) or []:
-            upstream = producers[requirement["capability"]]
-            if upstream != owner:
-                declared_by_authority[owner].add(upstream)
+    providers_by_capability: dict[str, set[str]] = defaultdict(set)
+    capabilities_by_artifact: dict[str, set[str]] = defaultdict(set)
+    for artifact_id, binding in bindings.items():
+        for capability in binding.get("provides", []) or []:
+            providers_by_capability[capability].add(artifact_id)
+            capabilities_by_artifact[artifact_id].add(capability)
 
-    selected_authorities = {
-        authority
-        for authority in artifact_authority.values()
-        if any(
-            producers.get(capability) == authority
-            for capability in alignment_capabilities
-        )
-    }
-    for authority in sorted(selected_authorities):
-        actual = actual_by_authority.get(authority, set())
-        declared = declared_by_authority.get(authority, set())
-        hidden = sorted(actual - declared)
-        phantom = sorted(declared - actual)
+    # Compare topology at the smallest level the project artifact graph can
+    # actually prove. A single canonical artifact may co-materialize several
+    # public capabilities, and one capability may have several same-Authority
+    # provider artifacts. Such physically inseparable providers form one
+    # alignment group. Unrelated capabilities of the same Authority remain
+    # independent, which is essential for backend/frontend coexistence.
+    pending = sorted(alignment_capabilities & materialized_capabilities)
+    visited_capabilities: set[str] = set()
+    alignment_groups: list[dict[str, Any]] = []
+    actual_by_authority: dict[str, set[str]] = defaultdict(set)
+
+    for seed in pending:
+        if seed in visited_capabilities:
+            continue
+        owner = producers[seed]
+        group_capabilities: set[str] = {seed}
+        group_artifacts: set[str] = set()
+        work_capabilities = [seed]
+        work_artifacts: list[str] = []
+
+        # Capability <-> provider-artifact closure captures co-provided
+        # capabilities and multiple canonical providers.
+        while work_capabilities or work_artifacts:
+            while work_capabilities:
+                capability = work_capabilities.pop()
+                if producers.get(capability) != owner:
+                    raise CoreError(
+                        f"alignment group for {seed} crosses producer Authorities"
+                    )
+                if capability in visited_capabilities:
+                    continue
+                visited_capabilities.add(capability)
+                group_capabilities.add(capability)
+                for artifact_id in providers_by_capability.get(capability, set()):
+                    if artifact_id not in group_artifacts:
+                        group_artifacts.add(artifact_id)
+                        work_artifacts.append(artifact_id)
+
+            while work_artifacts:
+                artifact_id = work_artifacts.pop()
+                if artifact_authority[artifact_id] != owner:
+                    raise CoreError(
+                        f"provider group for {seed} crosses artifact Authorities"
+                    )
+                for capability in capabilities_by_artifact.get(artifact_id, set()):
+                    if capability not in group_capabilities:
+                        group_capabilities.add(capability)
+                        work_capabilities.append(capability)
+
+        # Same-Authority support closure belongs to the selected provider
+        # group even when support artifacts expose no public CapabilityId.
+        support_stack = list(group_artifacts)
+        support_seen = set(group_artifacts)
+        actual_upstream: set[str] = set()
+        while support_stack:
+            artifact_id = support_stack.pop()
+            for dep in source_nodes[artifact_id].get("depends_on", []) or []:
+                dep_owner = artifact_authority.get(dep)
+                if dep_owner is None:
+                    if require_complete_binding:
+                        raise CoreError(
+                            f"canonical dependency {dep} of {artifact_id} has no Authority binding"
+                        )
+                    continue
+                if dep_owner == owner:
+                    if dep not in support_seen:
+                        support_seen.add(dep)
+                        support_stack.append(dep)
+                    # If an internal support artifact itself publishes a
+                    # capability, its contract is physically part of this
+                    # provider group and must explain its external frontier.
+                    for capability in capabilities_by_artifact.get(dep, set()):
+                        if capability not in group_capabilities:
+                            group_capabilities.add(capability)
+                else:
+                    actual_upstream.add(dep_owner)
+
+        declared_upstream: set[str] = set()
+        for capability in sorted(group_capabilities):
+            production = productions.get(capability)
+            if production is None:
+                raise CoreError(
+                    f"project capability {capability} has no Engineering Graph production"
+                )
+            for requirement in production.get("requires", []) or []:
+                upstream = producers[requirement["capability"]]
+                if upstream != owner:
+                    declared_upstream.add(upstream)
+
+        hidden = sorted(actual_upstream - declared_upstream)
+        phantom = sorted(declared_upstream - actual_upstream)
         if hidden:
             raise CoreError(
-                f"Authority {authority} has hidden project-graph upstream Authorities: {hidden}"
+                f"Authority {owner} capability/provider group {sorted(group_capabilities)} "
+                f"has hidden project-graph upstream Authorities: {hidden}"
             )
         if phantom:
             raise CoreError(
-                f"Authority {authority} has phantom capability prerequisites not present "
-                f"in project graph: {phantom}"
+                f"Authority {owner} capability/provider group {sorted(group_capabilities)} "
+                f"has phantom capability prerequisites not present in project graph: {phantom}"
             )
+
+        actual_by_authority[owner].update(actual_upstream)
+        alignment_groups.append(
+            {
+                "authority": owner,
+                "capabilities": sorted(group_capabilities),
+                "provider_artifacts": sorted(group_artifacts),
+                "support_artifacts": sorted(support_seen - group_artifacts),
+                "upstream_authorities": sorted(actual_upstream),
+            }
+        )
+
 
     return {
         "model": model,
@@ -168,6 +241,10 @@ def validate_project_alignment(
         "materialized_capabilities": sorted(materialized_capabilities),
         "alignment_capabilities": sorted(alignment_capabilities),
         "target_consumer": target_consumer,
+        "alignment_groups": sorted(
+            alignment_groups,
+            key=lambda item: (item["authority"], item["capabilities"]),
+        ),
     }
 
 
