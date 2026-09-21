@@ -1,0 +1,43 @@
+version: 1
+kind: harness-architecture-driver-closure-contract
+id: architecture-driver-closure/v1
+status: research
+
+ownership:
+  authority: SYSTEM-ARCHITECTURE
+  role: input-closure-precondition
+  note: This contract does not own product, quality, security or operability semantics; it proves that architecture-driving inputs are explicit enough for architecture selection.
+
+principles:
+  - do-not-infer-absence-as-not-applicable
+  - ask-only-material-unknowns
+  - no-topology-choice-with-unresolved-material-driver
+  - smallest-satisfying-architecture
+  - every-material-complexity-needs-upstream-justification
+
+baseline_concerns:
+  - execution-mode
+  - consumers
+  - load-volume-frequency
+  - latency-freshness
+  - availability
+  - recovery-durability
+  - growth-horizon
+  - deployment-environment
+  - concurrency
+  - integration-boundaries
+  - persistence-history
+  - security-trust-boundary
+
+states:
+  - RESOLVED
+  - NOT_APPLICABLE
+  - DEFERRED
+  - QUESTION
+
+completion:
+  - every-baseline-concern-classified
+  - resolved-driver-has-decision-and-source
+  - not-applicable-has-rationale
+  - deferred-driver-is-non-material-and-has-rationale
+  - no-question-remains
