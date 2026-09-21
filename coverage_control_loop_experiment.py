@@ -31,6 +31,7 @@ def evaluate(
         project_roles,
         activation_overlay,
         project_docs,
+        target_consumer,
     )
 
     target_consumer = activation.get("consumer")
