@@ -8,10 +8,10 @@ from coverage_planner_experiment import derive_plan, load
 
 def main() -> int:
     result = derive_plan(
-        load(str(ROOT / "spec/research/concern-proof-contract-v1.yaml")),
+        load(str(ROOT / "spec/research/concern-semantic-proof-contract-v1.yaml")),
         load(str(ROOT / "spec/research/authority-role-contract-v1.yaml")),
         load(str(ROOT / "spec/research/coverage-planner-fixture-authorities.yaml")),
-        load(str(ROOT / "spec/research/coverage-planner-fixture-kinds.yaml")),
+        load(str(ROOT / "spec/research/coverage-planner-fixture-claims.yaml")),
         load(str(ROOT / "spec/research/coverage-derivation-fixture-overlay.yaml")),
         [load(str(ROOT / "spec/research/coverage-derivation-fixture-knowledge.yaml"))],
     )
