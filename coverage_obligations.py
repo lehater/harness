@@ -155,6 +155,22 @@ def derive_subject_obligation_rows(
         extension_capabilities,
     )
 
+    producer_by_capability: dict[str, str] = {}
+    production_by_capability: dict[str, dict[str, Any]] = {}
+    for authority in graph.get("authorities", []) or []:
+        if not isinstance(authority, dict) or not authority.get("id"):
+            continue
+        for production in authority.get("produces", []) or []:
+            if isinstance(production, str):
+                producer_by_capability[production] = authority["id"]
+                production_by_capability[production] = {
+                    "capability": production,
+                    "requires": [],
+                }
+            elif isinstance(production, dict) and production.get("capability"):
+                producer_by_capability[production["capability"]] = authority["id"]
+                production_by_capability[production["capability"]] = production
+
     rows: list[dict[str, Any]] = []
     if validation["unclassified_requirements"]:
         rows.append(
@@ -191,29 +207,104 @@ def derive_subject_obligation_rows(
                 )
                 continue
             if declared_state == "QUESTION":
+                question_ids = (
+                    [item["question"]]
+                    if isinstance(item.get("question"), str) and item.get("question")
+                    else []
+                )
                 rows.append(
                     {
                         **base,
                         "state": "BLOCKED",
-                        "action": "RESOLVE_QUESTION",
+                        "action": "RESOLVE_QUESTIONS",
                         "reason": item["rationale"],
-                        **({"question": item["question"]} if item.get("question") else {}),
+                        "questions": question_ids,
                     }
                 )
                 continue
 
             accepted_claims = sorted(proofs.get(concern, set()))
-            exact_proofs = []
-            candidates = []
-            for cap, claims in usable_claims.items():
+            if not accepted_claims:
+                rows.append(
+                    {
+                        **base,
+                        "state": "BLOCKED",
+                        "action": "MODEL_PROOF_CONTRACT",
+                        "reason": "concern has no accepted semantic-claim proof contract",
+                    }
+                )
+                continue
+
+            matching_declared: list[tuple[str, dict[str, str]]] = []
+            for cap, claims in declared.items():
                 if cap not in scoped_caps:
                     continue
                 for claim in claims:
-                    if claim["claim"] in accepted_claims and claim.get("subject") == subject:
-                        if cap in realized_caps:
-                            exact_proofs.append(
-                                {"claim": claim["claim"], "subject": subject, "capability": cap}
-                            )
+                    if (
+                        claim["claim"] in accepted_claims
+                        and claim.get("subject") == subject
+                    ):
+                        matching_declared.append((cap, claim))
+
+            semantic_invalid_caps = sorted(
+                {
+                    cap
+                    for cap, _claim in matching_declared
+                    if cap in provided_caps and cap in realization.get("semantic_invalid", {})
+                }
+            )
+            if semantic_invalid_caps:
+                rows.append(
+                    {
+                        **base,
+                        "state": "BLOCKED",
+                        "action": "REVALIDATE_SEMANTICS",
+                        "accepted_semantic_claims": accepted_claims,
+                        "capabilities": semantic_invalid_caps,
+                        "causes": {
+                            cap: realization["semantic_invalid"][cap]
+                            for cap in semantic_invalid_caps
+                        },
+                    }
+                )
+                continue
+
+            blocked_questions = sorted(
+                {
+                    question
+                    for cap, _claim in matching_declared
+                    if cap in provided_caps and cap not in realized_caps
+                    for question in realization.get("blocked", {}).get(cap, [])
+                }
+            )
+            if blocked_questions:
+                rows.append(
+                    {
+                        **base,
+                        "state": "BLOCKED",
+                        "action": "RESOLVE_QUESTIONS",
+                        "accepted_semantic_claims": accepted_claims,
+                        "questions": blocked_questions,
+                    }
+                )
+                continue
+
+            exact_proofs = []
+            for cap, claims in usable_claims.items():
+                if cap not in scoped_caps or cap not in realized_caps:
+                    continue
+                for claim in claims:
+                    if (
+                        claim["claim"] in accepted_claims
+                        and claim.get("subject") == subject
+                    ):
+                        exact_proofs.append(
+                            {
+                                "claim": claim["claim"],
+                                "subject": subject,
+                                "capability": cap,
+                            }
+                        )
             if exact_proofs:
                 rows.append(
                     {
@@ -225,30 +316,79 @@ def derive_subject_obligation_rows(
                 )
                 continue
 
-            for cap, claims in declared.items():
-                if cap not in scoped_caps or cap in provided_caps:
+            candidates = []
+            for cap, claim in matching_declared:
+                if cap in provided_caps:
                     continue
-                for claim in claims:
-                    if claim["claim"] in accepted_claims and claim.get("subject") == subject:
-                        candidates.append(
-                            {
-                                "capability": cap,
-                                "claim": claim["claim"],
-                                "subject": subject,
-                            }
-                        )
+                production = production_by_capability.get(cap, {})
+                prerequisites = []
+                for requirement in production.get("requires", []) or []:
+                    upstream = (
+                        requirement
+                        if isinstance(requirement, str)
+                        else requirement.get("capability")
+                    )
+                    if upstream:
+                        prerequisites.append(upstream)
+                missing_prerequisites = sorted(
+                    prerequisite
+                    for prerequisite in prerequisites
+                    if prerequisite not in realized_caps
+                )
+                direct_questions = realization.get("direct_blockers", {}).get(cap, [])
+                candidates.append(
+                    {
+                        "capability": cap,
+                        "claim": claim["claim"],
+                        "subject": subject,
+                        "authority": producer_by_capability.get(cap),
+                        "knowledge_kind": production.get("knowledge_kind"),
+                        "requires": sorted(prerequisites),
+                        "missing_prerequisites": missing_prerequisites,
+                        "questions": direct_questions,
+                        "ready": not missing_prerequisites and not direct_questions,
+                    }
+                )
+
+            if candidates:
+                ready_candidates = [candidate for candidate in candidates if candidate["ready"]]
+                candidate_questions = sorted(
+                    {
+                        question
+                        for candidate in candidates
+                        for question in candidate.get("questions", [])
+                    }
+                )
+                action = (
+                    "PRODUCE_CAPABILITY"
+                    if ready_candidates
+                    else (
+                        "RESOLVE_QUESTIONS"
+                        if candidate_questions
+                        else "WAIT_FOR_PREREQUISITES"
+                    )
+                )
+                rows.append(
+                    {
+                        **base,
+                        "state": "MISSING",
+                        "action": action,
+                        "accepted_semantic_claims": accepted_claims,
+                        "production_candidates": candidates,
+                        "ready_production_candidates": ready_candidates,
+                        **({"questions": candidate_questions} if candidate_questions else {}),
+                        "reason": "required subject has declared subject-scoped proof capability that is not realized",
+                    }
+                )
+                continue
+
             rows.append(
                 {
                     **base,
                     "state": "MISSING",
-                    "action": "PRODUCE_CAPABILITY" if candidates else "MODEL_PRODUCTION_CONTRACT",
+                    "action": "MODEL_PRODUCTION_CONTRACT",
                     "accepted_semantic_claims": accepted_claims,
-                    **({"production_candidates": candidates} if candidates else {}),
-                    "reason": (
-                        "required subject has declared subject-scoped proof capability that is not realized"
-                        if candidates
-                        else "required subject has no in-scope subject-scoped proof contract"
-                    ),
+                    "reason": "required subject has no in-scope subject-scoped proof contract",
                 }
             )
 
