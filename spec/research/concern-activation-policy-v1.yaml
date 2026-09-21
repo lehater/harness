@@ -46,6 +46,7 @@ rules:
       - verification.interface.machine
 
   - id: PERSISTENT-DATA
+    match: all
     when:
       authority_roles_any: [data]
       capability_contains_any: [.data-design, .persistence-model, .persistence]
@@ -101,6 +102,7 @@ rules:
       - reliability.dependency-failure
 
   - id: RUNTIME-SERVICE
+    match: all
     when:
       capability_contains_any: [.serve, http-contract, .frontend.architecture, .deployment]
       authority_roles_any: [architecture]
@@ -125,8 +127,8 @@ rules:
 
   - id: QUALITY-DESIGN
     when:
-      authority_roles_any: [quality]
-      capability_contains_any: [quality.constraints, quality-targets]
+      knowledge_kinds_any: [quality-design]
+      capability_contains_any: [quality.constraints, quality-constraints, quality-targets]
     activate:
       - intent.quality-targets
       - verification.quality
@@ -140,6 +142,7 @@ rules:
       - quality.maintainability.testability
 
   - id: MODULAR-COMPONENT-DESIGN
+    match: all
     when:
       authority_roles_any: [engineering]
       knowledge_kinds_any: [component-design, engineering-policy]
