@@ -26,3 +26,4 @@ harness-check:
 	python validators/validate_consumer_scoped_activation.py
 	python validators/validate_consumer_scoped_coverage_proof.py
 	python validators/validate_intra_consumer_scope.py
+	python validators/validate_subject_scoped_coverage.py
