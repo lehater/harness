@@ -29,3 +29,4 @@ harness-check:
 	python validators/validate_subject_scoped_coverage.py
 	python validators/validate_engineering_coverage.py
 	python validators/validate_coverage_blocker_transition.py
+	python validators/validate_coverage_production_contract_overlay.py
