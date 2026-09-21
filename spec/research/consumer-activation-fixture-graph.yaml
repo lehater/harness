@@ -35,6 +35,7 @@ authorities:
       public_contract: Produces data design.
     produces:
       - capability: fixture.data-design
+        semantic_claims: [engineering.data.model, engineering.data.classification]
         requires:
           - capability: fixture.architecture
 
@@ -47,6 +48,7 @@ authorities:
     produces:
       - capability: fixture.frontend.human-interface
         knowledge_kind: human-interface-design
+        semantic_claims: [engineering.interface.human.accessibility]
         requires:
           - capability: fixture.architecture
 
