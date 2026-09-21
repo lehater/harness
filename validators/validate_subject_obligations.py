@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
 from coverage_obligations import derive_subject_obligation_rows
-from engineering_coverage import _derive_work_items
+from engineering_coverage import _derive_work_items, evaluate_coverage, load
 
 
 PROOF={
@@ -131,6 +131,70 @@ def run(ob, source=SOURCE, realized=("fixture.ui.resource","fixture.ui.broad")):
 
 
 def main():
+    # Meta-completeness is mandatory even when graph/concern completeness has
+    # nothing left to do. This is the regression for the original false COMPLETE.
+    empty_policy={"id":"empty-activation","baseline":[],"rules":[]}
+    fixture_graph=load(str(ROOT/"spec/research/subject-coverage-fixture-graph.yaml"))
+    fixture_core=load(str(ROOT/"spec/research/subject-coverage-fixture-core-complete.yaml"))
+    mandatory=evaluate_coverage(
+        graph=fixture_graph,
+        realization=fixture_core,
+        consumer="IMPLEMENTATION",
+        scope="all",
+        scope_roots=[],
+        activation_policy=empty_policy,
+        proof_contract=PROOF,
+        authority_role_contract={"roles":{}},
+        standard_authority_roles={"bindings":{}},
+    )
+    assert mandatory["rows"]==[]
+    assert not mandatory["completion_ready"]
+    assert mandatory["remaining_work_count"]==1
+    assert mandatory["subject_obligation_rows"][0]["concern"]=="meta.subject-inventory"
+    assert mandatory["subject_obligation_rows"][0]["state"]=="MISSING"
+    assert mandatory["subject_obligation_rows"][0]["action"]=="DECLARE_SUBJECT_INVENTORY"
+    assert mandatory["work_items"][0]["action"]=="DECLARE_SUBJECT_INVENTORY"
+
+    explicit_na=evaluate_coverage(
+        graph=fixture_graph,
+        realization=fixture_core,
+        consumer="IMPLEMENTATION",
+        scope="all",
+        scope_roots=[],
+        activation_policy=empty_policy,
+        proof_contract=PROOF,
+        authority_role_contract={"roles":{}},
+        standard_authority_roles={"bindings":{}},
+        project_overlay={
+            "subject_inventory":{
+                "state":"NOT_APPLICABLE",
+                "rationale":"Fixture has no independently selected semantic subject inventory.",
+            }
+        },
+    )
+    assert explicit_na["completion_ready"]
+    assert explicit_na["subject_obligation_rows"][0]["state"]=="NOT_APPLICABLE"
+
+    required_without_contract=evaluate_coverage(
+        graph=fixture_graph,
+        realization=fixture_core,
+        consumer="IMPLEMENTATION",
+        scope="all",
+        scope_roots=[],
+        activation_policy=empty_policy,
+        proof_contract=PROOF,
+        authority_role_contract={"roles":{}},
+        standard_authority_roles={"bindings":{}},
+        project_overlay={
+            "subject_inventory":{
+                "state":"REQUIRED",
+                "rationale":"Fixture declares that a subject inventory is required.",
+            }
+        },
+    )
+    assert not required_without_contract["completion_ready"]
+    assert required_without_contract["subject_obligation_rows"][0]["action"]=="DEFINE_SUBJECT_OBLIGATIONS"
+
     partial=run(obligations())
     by_subject={r.get("subject"):r for r in partial["rows"] if r.get("subject")!="__accepted_scope__"}
     assert not partial["completion_ready"]
