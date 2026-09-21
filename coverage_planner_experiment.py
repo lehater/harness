@@ -199,6 +199,7 @@ def derive_plan(
             scoped_caps=set().union(*nonempty)
 
     producer_by_capability: dict[str, str] = {}
+    production_by_capability: dict[str, dict[str, Any]] = {}
     for doc in project_docs:
         for authority in doc.get("authorities", []) or []:
             if not isinstance(authority, dict) or not authority.get("id"):
@@ -206,8 +207,13 @@ def derive_plan(
             for production in authority.get("produces", []) or []:
                 if isinstance(production, str):
                     producer_by_capability[production] = authority["id"]
+                    production_by_capability[production] = {
+                        "capability": production,
+                        "requires": [],
+                    }
                 elif isinstance(production, dict) and production.get("capability"):
                     producer_by_capability[production["capability"]] = authority["id"]
+                    production_by_capability[production["capability"]] = production
 
     realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
@@ -279,6 +285,21 @@ def derive_plan(
             for claim_info in claims_for_cap:
                 if claim_info["claim"] not in accepted:
                     continue
+                production = production_by_capability.get(cap, {})
+                prerequisites = []
+                for requirement in production.get("requires", []) or []:
+                    upstream = (
+                        requirement
+                        if isinstance(requirement, str)
+                        else requirement.get("capability")
+                    )
+                    if upstream:
+                        prerequisites.append(upstream)
+                missing_prerequisites = sorted(
+                    prerequisite
+                    for prerequisite in prerequisites
+                    if prerequisite not in realized_caps
+                )
                 production_candidates.append({
                     "claim": claim_info["claim"],
                     **(
@@ -288,6 +309,9 @@ def derive_plan(
                     ),
                     "capability": cap,
                     "authority": producer_by_capability.get(cap),
+                    "requires": sorted(prerequisites),
+                    "missing_prerequisites": missing_prerequisites,
+                    "ready": not missing_prerequisites,
                 })
 
         routes: dict[str, list[str]] = {}
@@ -304,12 +328,20 @@ def derive_plan(
                 "reason": "concern has no accepted semantic-claim proof contract",
             })
         elif production_candidates:
+            ready_candidates = [
+                item for item in production_candidates if item["ready"]
+            ]
             row={
                 "concern": concern,
                 "state": "MISSING",
-                "action": "PRODUCE_CAPABILITY",
+                "action": (
+                    "PRODUCE_CAPABILITY"
+                    if ready_candidates
+                    else "WAIT_FOR_PREREQUISITES"
+                ),
                 "accepted_semantic_claims": accepted,
                 "production_candidates": production_candidates,
+                "ready_production_candidates": ready_candidates,
             }
             if subject_instances:
                 row["missing_instances"]=[
