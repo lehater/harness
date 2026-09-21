@@ -51,6 +51,7 @@ def main() -> int:
     assert "interface.human.accessibility" in later_rows
     assert "data.lifecycle" not in later_rows
     assert mvp["remaining_work_count"] == len(mvp["remaining_work"])
+    assert mvp["work_item_count"] == len(mvp["work_items"])
     assert not mvp["completion_ready"]
 
     partial = subject_eval("subject-coverage-fixture-core-partial.yaml")
@@ -62,6 +63,18 @@ def main() -> int:
     assert p["state"] == "MISSING"
     assert {item["subject"] for item in p["covered_instances"]} == {"BC-A"}
     assert {item["subject"] for item in p["missing_instances"]} == {"BC-B"}
+    assert p["action"] == "PRODUCE_CAPABILITY"
+    subject_work = [
+        item for item in partial["work_items"]
+        if item.get("capability") == "fixture.domain.model.bc-b"
+    ]
+    assert len(subject_work) == 1
+    assert subject_work[0]["authority"] == "TACTICAL-DOMAIN-DESIGN"
+    assert subject_work[0]["concerns"] == ["domain.model"]
+    assert subject_work[0]["semantic_claims"] == [
+        {"claim": "engineering.domain.model", "subject": "BC-B"}
+    ]
+
     assert c["state"] == "COVERED"
     assert {item["subject"] for item in c["proof_instances"]} == {"BC-A", "BC-B"}
 
