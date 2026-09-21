@@ -1,0 +1,28 @@
+version: 1
+kind: repository-realization-pilot
+id: napms
+result: PASS
+facts:
+  backend: true
+  frontend: true
+  persistence: PostgreSQL
+  transport: HTTP
+  identity: OIDC
+  security_boundary: true
+decisions:
+  repository_topology: project-selected-mono-or-multi-package-roots-with-one-versioned-repository-contract
+  module_realization: accepted-backend-and-frontend-component-boundaries-map-to-owned-physical-roots
+  migration_topology: explicit-migrate-mode-and-owned-schema-assets
+  authoritative_gate: pull-request-ci
+obligations:
+  - {id: backend-static-quality, applicability: REQUIRED, enforcement: language-appropriate-checkers}
+  - {id: frontend-static-quality, applicability: REQUIRED, enforcement: language-appropriate-checkers}
+  - {id: architecture-dependencies, applicability: REQUIRED, enforcement: mechanical-boundary-checks}
+  - {id: secret-scanning, applicability: REQUIRED, enforcement: repository-push-and-ci-security-controls}
+  - {id: dependency-review, applicability: REQUIRED, enforcement: blocking-pr-check-at-accepted-threshold}
+  - {id: sast, applicability: REQUIRED, enforcement: blocking-or-policy-driven-code-scanning}
+  - {id: build-package-validation, applicability: REQUIRED, enforcement: clean-ci-build}
+  - {id: sbom-provenance, applicability: DEFERRED, rationale: becomes required when deployable artifacts are published or policy requires it}
+freedoms:
+  - concrete-tool-products-may-differ-between-backend-and-frontend
+  - private-file-layout-inside-accepted-module-boundaries
