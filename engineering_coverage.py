@@ -28,7 +28,7 @@ import yaml
 
 from concern_activation import derive_activation
 from coverage_planner import derive_plan
-from coverage_obligations import derive_subject_obligation_rows
+from coverage_obligations import derive_subject_inventory_disposition, derive_subject_obligation_rows
 from engineering_graph import validate_engineering_graph, validate_realization
 from harness import question_frontier
 from integration_alignment import validate_project_alignment
@@ -261,6 +261,17 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             )
             continue
 
+        if action in {"DECLARE_SUBJECT_INVENTORY", "DEFINE_SUBJECT_OBLIGATIONS"}:
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "subject": row.get("subject"),
+                    "reason": row.get("reason"),
+                }
+            )
+            continue
+
         if action == "RESOLVE_QUESTIONS":
             others.append(
                 {
@@ -464,10 +475,17 @@ def evaluate_coverage(
         consumer,
     )
 
-    subject_evaluation = None
+    subject_inventory = overlay.get("subject_inventory")
     if subject_obligations is not None:
         if scope_source is None:
             raise ValueError("scope_source is required with subject_obligations")
+        if subject_inventory is not None:
+            if not isinstance(subject_inventory, dict):
+                raise ValueError("subject_inventory disposition must be a mapping")
+            if subject_inventory.get("state") != "REQUIRED":
+                raise ValueError(
+                    "subject-obligation contract conflicts with non-REQUIRED subject_inventory disposition"
+                )
         subject_evaluation = derive_subject_obligation_rows(
             obligations=subject_obligations,
             source=scope_source,
@@ -481,6 +499,12 @@ def evaluate_coverage(
             extension_capabilities=set(
                 planner_overlay.get("coverage_extension_capabilities", []) or []
             ),
+        )
+    else:
+        subject_evaluation = derive_subject_inventory_disposition(
+            subject_inventory,
+            consumer=consumer,
+            scope=scope,
         )
 
     activation_by_concern = {

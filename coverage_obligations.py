@@ -16,6 +16,80 @@ from coverage_planner import (
 TERMINAL_STATES = {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
 
 
+def derive_subject_inventory_disposition(
+    disposition: dict[str, Any] | None,
+    *,
+    consumer: str,
+    scope: str,
+) -> dict[str, Any]:
+    """Require an explicit subject-inventory decision when no obligation contract exists."""
+    row: dict[str, Any]
+    if disposition is None:
+        row = {
+            "concern": "meta.subject-inventory",
+            "subject": "__accepted_scope__",
+            "state": "MISSING",
+            "action": "DECLARE_SUBJECT_INVENTORY",
+            "reason": (
+                "Coverage cannot prove subject/scope completeness without either "
+                "a subject-obligation contract or an explicit subject-inventory disposition"
+            ),
+        }
+    else:
+        if not isinstance(disposition, dict):
+            raise ValueError("subject_inventory disposition must be a mapping")
+        state = disposition.get("state")
+        rationale = str(disposition.get("rationale", "")).strip()
+        if state not in {"REQUIRED", "NOT_APPLICABLE", "DEFERRED", "QUESTION"}:
+            raise ValueError(f"invalid subject_inventory state: {state}")
+        if state == "REQUIRED":
+            row = {
+                "concern": "meta.subject-inventory",
+                "subject": "__accepted_scope__",
+                "state": "MISSING",
+                "action": "DEFINE_SUBJECT_OBLIGATIONS",
+                "reason": (
+                    rationale
+                    or "subject inventory is required but no subject-obligation contract was supplied"
+                ),
+            }
+        elif state in {"NOT_APPLICABLE", "DEFERRED"}:
+            if not rationale:
+                raise ValueError(f"subject_inventory {state} requires rationale")
+            row = {
+                "concern": "meta.subject-inventory",
+                "subject": "__accepted_scope__",
+                "state": state,
+                "action": "NONE",
+                "reason": rationale,
+            }
+        else:
+            question = disposition.get("question")
+            if not rationale:
+                raise ValueError("subject_inventory QUESTION requires rationale")
+            if not isinstance(question, str) or not question:
+                raise ValueError("subject_inventory QUESTION requires question")
+            row = {
+                "concern": "meta.subject-inventory",
+                "subject": "__accepted_scope__",
+                "state": "BLOCKED",
+                "action": "RESOLVE_QUESTIONS",
+                "reason": rationale,
+                "questions": [question],
+            }
+
+    remaining = [] if row["state"] in TERMINAL_STATES else [row]
+    return {
+        "kind": "harness-derived-subject-obligation-evaluation",
+        "consumer": consumer,
+        "scope": scope,
+        "source_validation": None,
+        "rows": [row],
+        "remaining_work": remaining,
+        "completion_ready": not remaining,
+    }
+
+
 def _accepted_requirement_ids(source: dict[str, Any]) -> set[str]:
     """Extract accepted atomic requirement identities from an adapted canonical source."""
     if source.get("kind") == "harness-markdown-scope-source":
