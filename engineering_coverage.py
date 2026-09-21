@@ -30,6 +30,7 @@ from concern_activation_experiment import derive_activation
 from coverage_planner_experiment import derive_plan
 from engineering_graph import validate_engineering_graph, validate_realization
 from harness import question_frontier
+from agent_router import validate_skill_registry
 
 
 ROOT = Path(__file__).resolve().parent
@@ -272,6 +273,43 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return capability_items + others
 
 
+def _route_production_work(
+    work_items: list[dict[str, Any]],
+    registry: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if registry is None:
+        return work_items
+    validate_skill_registry(registry)
+    routes = {
+        item["knowledge_kind"]: item["skill"]
+        for item in registry.get("routes", []) or []
+    }
+    result = []
+    for item in work_items:
+        current = dict(item)
+        if current.get("action") == "PRODUCE_CAPABILITY":
+            knowledge_kind = current.get("knowledge_kind")
+            if knowledge_kind is None:
+                current["execution_route"] = {
+                    "status": "UNROUTED",
+                    "reason": "NO_KNOWLEDGE_KIND",
+                }
+            elif knowledge_kind not in routes:
+                current["execution_route"] = {
+                    "status": "UNROUTED",
+                    "reason": "NO_REGISTERED_SKILL",
+                    "knowledge_kind": knowledge_kind,
+                }
+            else:
+                current["execution_route"] = {
+                    "status": "ROUTED",
+                    "knowledge_kind": knowledge_kind,
+                    "skill": routes[knowledge_kind],
+                }
+        result.append(current)
+    return result
+
+
 def evaluate_coverage(
     *,
     graph: dict[str, Any],
@@ -287,6 +325,7 @@ def evaluate_coverage(
     project_overlay: dict[str, Any] | None = None,
     semantic_claim_bindings: dict[str, Any] | None = None,
     production_contract_overlay: dict[str, Any] | None = None,
+    artifact_skill_registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     graph = _apply_production_contract_overlay(graph, production_contract_overlay)
     validate_engineering_graph(graph)
@@ -366,7 +405,10 @@ def evaluate_coverage(
         row for row in rows
         if row["state"] not in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
     ]
-    work_items = _derive_work_items(remaining_work)
+    work_items = _route_production_work(
+        _derive_work_items(remaining_work),
+        artifact_skill_registry,
+    )
     question_ids = sorted(
         {
             question
@@ -388,6 +430,11 @@ def evaluate_coverage(
         "activated_count": activation["activated_count"],
         "remaining_work_count": len(remaining_work),
         "work_item_count": len(work_items),
+        "routed_production_count": sum(
+            1
+            for item in work_items
+            if item.get("execution_route", {}).get("status") == "ROUTED"
+        ),
         "question_frontier_count": len(questions),
         "summary": plan["summary"],
         "authority_roles": roles,
@@ -410,7 +457,12 @@ def evaluate_with_repository_policy(
     project_overlay: dict[str, Any] | None = None,
     semantic_claim_bindings: dict[str, Any] | None = None,
     production_contract_overlay: dict[str, Any] | None = None,
+    artifact_skill_registry: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if artifact_skill_registry is None:
+        artifact_skill_registry = load(
+            ROOT / "skills/artifact-skill-registry-v0.yaml"
+        )
     return evaluate_coverage(
         graph=graph,
         realization=realization,
@@ -425,6 +477,7 @@ def evaluate_with_repository_policy(
         project_overlay=project_overlay,
         semantic_claim_bindings=semantic_claim_bindings,
         production_contract_overlay=production_contract_overlay,
+        artifact_skill_registry=artifact_skill_registry,
     )
 
 
