@@ -200,6 +200,15 @@ def main():
     )
     assert markdown["source_validation"]["source_complete"]
     assert markdown["completion_ready"]
+    # Scope isolation: an obligation contract for another scope is rejected rather than reused.
+    wrong_scope=dict(obligations())
+    wrong_scope["scope"]="later"
+    try:
+        run(wrong_scope)
+    except ValueError as exc:
+        assert "scope mismatch" in str(exc)
+    else:
+        raise AssertionError("scope mismatch must not be accepted")
     print("subject obligation coverage: ok")
     return 0
 
