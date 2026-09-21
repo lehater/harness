@@ -59,6 +59,8 @@ Useful content may include:
 - transaction mechanics realize, not redefine, Application/System consistency;
 - unknown lifecycle/security/retention policy is not silently defaulted;
 - implementation can build persistence without inventing material data semantics.
+- concrete database/runtime/tool choices appear only when the accepted input closure authorizes them; otherwise they remain Implementation Design decisions;
+- material persistence assertions carry provenance to their semantic owner; copying a downstream implementation choice into Data Design is a semantic ownership violation;
 
 ## Registration
 
