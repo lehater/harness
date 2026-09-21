@@ -1,0 +1,76 @@
+version: 1
+kind: harness-engineering-graph
+id: SCOPE-ACTIVATION-FIXTURE
+default_subject: FIXTURE
+
+authorities:
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own product requirements.
+    boundary:
+      semantic_cohesion: Product intent.
+      independent_change: Requirements may change independently.
+      public_contract: Produces requirements.
+    produces:
+      - capability: fixture.requirements
+        knowledge_kind: product-requirements
+        requires: []
+
+  - id: SYSTEM-ARCHITECTURE
+    responsibility: Own shared architecture.
+    boundary:
+      semantic_cohesion: Shared architecture.
+      independent_change: Architecture may change independently.
+      public_contract: Produces architecture.
+    produces:
+      - capability: fixture.architecture
+        knowledge_kind: system-architecture
+        requires:
+          - capability: fixture.requirements
+
+  - id: DATA-DESIGN
+    responsibility: Own MVP persistence.
+    boundary:
+      semantic_cohesion: MVP persistence.
+      independent_change: Persistence may change independently.
+      public_contract: Produces MVP data design.
+    produces:
+      - capability: fixture.mvp.data-design
+        semantic_claims: [engineering.data.model]
+        requires:
+          - capability: fixture.architecture
+
+  - id: INTERFACE-DESIGN
+    responsibility: Own later human interface.
+    boundary:
+      semantic_cohesion: Later human interface.
+      independent_change: Interface may change independently.
+      public_contract: Produces later interface.
+    produces:
+      - capability: fixture.later.human-interface
+        knowledge_kind: human-interface-design
+        semantic_claims: [engineering.interface.human.accessibility]
+        requires:
+          - capability: fixture.architecture
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation slices.
+    boundary:
+      semantic_cohesion: Implementation design.
+      independent_change: Slices may change independently.
+      public_contract: Produces implementation slices.
+    produces:
+      - capability: fixture.mvp.implementation-design
+        knowledge_kind: implementation-design
+        requires:
+          - capability: fixture.mvp.data-design
+      - capability: fixture.later.implementation-design
+        knowledge_kind: implementation-design
+        requires:
+          - capability: fixture.later.human-interface
+
+consumers:
+  - id: IMPLEMENTATION
+    purpose: Implement both accepted slices eventually.
+    requires:
+      - capability: fixture.mvp.implementation-design
+      - capability: fixture.later.implementation-design
