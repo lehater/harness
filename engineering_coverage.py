@@ -28,6 +28,7 @@ import yaml
 
 from concern_activation import derive_activation
 from coverage_planner import derive_plan
+from coverage_obligations import derive_subject_obligation_rows
 from engineering_graph import validate_engineering_graph, validate_realization
 from harness import question_frontier
 from integration_alignment import validate_project_alignment
@@ -42,6 +43,20 @@ def load(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a mapping")
     return value
+
+def load_scope_source(path: str | Path) -> dict[str, Any]:
+    raw = Path(path).read_text(encoding="utf-8")
+    try:
+        value = yaml.safe_load(raw)
+    except yaml.YAMLError:
+        value = None
+    if isinstance(value, dict):
+        return value
+    return {
+        "kind": "harness-markdown-scope-source",
+        "path": str(path),
+        "text": raw,
+    }
 
 
 def _apply_production_contract_overlay(
@@ -362,6 +377,8 @@ def evaluate_coverage(
     artifact_skill_registry: dict[str, Any] | None = None,
     canonical_source: dict[str, Any] | None = None,
     semantic_evaluations: dict[str, Any] | None = None,
+    subject_obligations: dict[str, Any] | None = None,
+    scope_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     graph = _apply_production_contract_overlay(graph, production_contract_overlay)
     validate_engineering_graph(graph)
@@ -433,6 +450,25 @@ def evaluate_coverage(
         consumer,
     )
 
+    subject_evaluation = None
+    if subject_obligations is not None:
+        if scope_source is None:
+            raise ValueError("scope_source is required with subject_obligations")
+        subject_evaluation = derive_subject_obligation_rows(
+            obligations=subject_obligations,
+            source=scope_source,
+            graph=graph,
+            project_docs=project_docs,
+            proof_contract=proof_contract,
+            capability_bindings=claim_bindings,
+            consumer=consumer,
+            scope=scope,
+            scope_roots=activation.get("scope_roots", []),
+            extension_capabilities=set(
+                planner_overlay.get("coverage_extension_capabilities", []) or []
+            ),
+        )
+
     activation_by_concern = {
         row["concern"]: row.get("provenance", [])
         for row in activation["rows"]
@@ -449,6 +485,17 @@ def evaluate_coverage(
         row for row in rows
         if row["state"] not in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
     ]
+    subject_rows = (
+        list(subject_evaluation.get("rows", []))
+        if subject_evaluation is not None
+        else []
+    )
+    subject_remaining = (
+        list(subject_evaluation.get("remaining_work", []))
+        if subject_evaluation is not None
+        else []
+    )
+    remaining_work = remaining_work + subject_remaining
     work_items = _route_production_work(
         _derive_work_items(remaining_work),
         artifact_skill_registry,
@@ -484,6 +531,8 @@ def evaluate_coverage(
         "authority_roles": roles,
         "activation_signals": activation["signals"],
         "rows": rows,
+        "subject_obligation_rows": subject_rows,
+        "subject_obligation_evaluation": subject_evaluation,
         "remaining_work": remaining_work,
         "work_items": work_items,
         "question_frontier": questions,
@@ -504,6 +553,8 @@ def evaluate_with_repository_policy(
     artifact_skill_registry: dict[str, Any] | None = None,
     canonical_source: dict[str, Any] | None = None,
     semantic_evaluations: dict[str, Any] | None = None,
+    subject_obligations: dict[str, Any] | None = None,
+    scope_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if artifact_skill_registry is None:
         artifact_skill_registry = load(
@@ -526,6 +577,8 @@ def evaluate_with_repository_policy(
         artifact_skill_registry=artifact_skill_registry,
         canonical_source=canonical_source,
         semantic_evaluations=semantic_evaluations,
+        subject_obligations=subject_obligations,
+        scope_source=scope_source,
     )
 
 
@@ -541,6 +594,8 @@ def main() -> int:
     parser.add_argument("--semantic-claim-bindings")
     parser.add_argument("--canonical-source")
     parser.add_argument("--production-contract-overlay")
+    parser.add_argument("--subject-obligations")
+    parser.add_argument("--scope-source")
     parser.add_argument(
         "--semantic-evaluations",
         help="Generated semantic acceptance evidence document; may contain one evaluation or semantic_evaluations list.",
@@ -575,6 +630,12 @@ def main() -> int:
             if args.semantic_evaluations
             else None
         ),
+        subject_obligations=(
+            load(args.subject_obligations)
+            if args.subject_obligations
+            else None
+        ),
+        scope_source=(load_scope_source(args.scope_source) if args.scope_source else None),
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
