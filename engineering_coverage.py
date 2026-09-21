@@ -28,6 +28,7 @@ import yaml
 from concern_activation_experiment import derive_activation
 from coverage_planner_experiment import derive_plan
 from engineering_graph import validate_engineering_graph, validate_realization
+from harness import question_frontier
 
 
 ROOT = Path(__file__).resolve().parent
@@ -165,6 +166,16 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             )
             continue
 
+        if action == "RESOLVE_QUESTIONS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "questions": sorted(row.get("questions", []) or []),
+                }
+            )
+            continue
+
         if action in {"ASSIGN_AUTHORITY", "MODEL_PROOF_CONTRACT"}:
             others.append(
                 {
@@ -283,6 +294,14 @@ def evaluate_coverage(
         if row["state"] not in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
     ]
     work_items = _derive_work_items(remaining_work)
+    question_ids = sorted(
+        {
+            question
+            for row in remaining_work
+            for question in row.get("questions", []) or []
+        }
+    )
+    questions = question_frontier(realized, question_ids)
 
     return {
         "version": 1,
@@ -296,12 +315,14 @@ def evaluate_coverage(
         "activated_count": activation["activated_count"],
         "remaining_work_count": len(remaining_work),
         "work_item_count": len(work_items),
+        "question_frontier_count": len(questions),
         "summary": plan["summary"],
         "authority_roles": roles,
         "activation_signals": activation["signals"],
         "rows": rows,
         "remaining_work": remaining_work,
         "work_items": work_items,
+        "question_frontier": questions,
     }
 
 
