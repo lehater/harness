@@ -154,6 +154,7 @@ rules:
 
   - id: RELEASE-DELIVERY
     when:
+      knowledge_kinds_any: [implementation-design]
       capability_contains_any: [implementation-design, implementation.plan, delivery, migration]
     activate:
       - delivery.release
