@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 import yaml
 
+from semantic_acceptance import evaluation_index, semantic_invalidation_closure
+
 
 def load(path: str) -> dict[str, Any]:
     value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
@@ -145,6 +147,8 @@ def capability_realization(
     providers_by_capability: dict[str, list[str]] = {}
     blockers_by_artifact: dict[str, set[str]] = {}
     direct_capability_blockers: dict[str, set[str]] = {}
+    semantic_evaluations = evaluation_index(project_docs)
+    rejected_providers: dict[str, set[str]] = {}
 
     for doc in project_docs:
         artifact_blockers, capability_blockers = _artifact_blocker_index(doc)
@@ -160,6 +164,11 @@ def capability_realization(
                 if allowed is not None and capability not in allowed:
                     continue
                 providers_by_capability.setdefault(capability, []).append(artifact["id"])
+                evaluation = semantic_evaluations.get((artifact["id"], capability))
+                if evaluation is None:
+                    evaluation = semantic_evaluations.get((artifact["id"], None))
+                if evaluation is not None and evaluation.get("status") != "ACCEPTED":
+                    rejected_providers.setdefault(capability, set()).add(artifact["id"])
 
         for binding in doc.get("bindings", []) or []:
             if not isinstance(binding, dict):
@@ -170,16 +179,53 @@ def capability_realization(
                     continue
                 if artifact_id:
                     providers_by_capability.setdefault(capability, []).append(artifact_id)
+                    evaluation = semantic_evaluations.get((artifact_id, capability))
+                    if evaluation is None:
+                        evaluation = semantic_evaluations.get((artifact_id, None))
+                    if evaluation is not None and evaluation.get("status") != "ACCEPTED":
+                        rejected_providers.setdefault(capability, set()).add(artifact_id)
 
     provided = set(providers_by_capability)
+
+    # Semantic acceptance is opt-in for migration safety: providers without an
+    # evaluation retain legacy behavior. Once an evaluation exists, REJECTED
+    # providers cannot realize the capability. Rejection then propagates through
+    # Engineering Graph production prerequisites.
+    directly_rejected = {
+        capability
+        for capability, providers in rejected_providers.items()
+        if providers
+        and set(providers) >= set(providers_by_capability.get(capability, []))
+    }
+    semantic_invalid: dict[str, list[str]] = {}
+    for doc in project_docs:
+        if doc.get("kind") != "harness-engineering-graph":
+            continue
+        closure = semantic_invalidation_closure(doc, directly_rejected)
+        for capability, causes in closure.items():
+            semantic_invalid.setdefault(capability, [])
+            semantic_invalid[capability] = sorted(
+                set(semantic_invalid[capability]) | set(causes)
+            )
+
     usable: set[str] = set()
     blocked_capabilities: dict[str, list[str]] = {}
     for capability, providers in providers_by_capability.items():
+        if capability in semantic_invalid:
+            continue
         provider_blockers = {
             provider: sorted(blockers_by_artifact.get(provider, set()))
             for provider in providers
         }
-        if any(not questions for questions in provider_blockers.values()):
+        accepted_providers = [
+            provider
+            for provider in providers
+            if provider not in rejected_providers.get(capability, set())
+        ]
+        if accepted_providers and any(
+            not provider_blockers.get(provider, [])
+            for provider in accepted_providers
+        ):
             usable.add(capability)
         else:
             questions = sorted(
@@ -208,6 +254,11 @@ def capability_realization(
             capability: sorted(set(values))
             for capability, values in providers_by_capability.items()
         },
+        "semantic_rejected_providers": {
+            capability: sorted(values)
+            for capability, values in rejected_providers.items()
+        },
+        "semantic_invalid": semantic_invalid,
     }
 
 
