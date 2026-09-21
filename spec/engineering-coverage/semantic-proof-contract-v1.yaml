@@ -1,0 +1,247 @@
+version: 1
+kind: harness-concern-semantic-proof-contract
+id: engineering-concern-semantic-proof/v1
+status: canonical
+
+# A concern is machine-coverable only by stable semantic claims.
+# Project-specific CapabilityIds may declare these claims without changing their names.
+proofs:
+  intent.problem:
+    accepted_semantic_claims: [engineering.intent.problem]
+  intent.scope:
+    accepted_semantic_claims: [engineering.intent.scope]
+  intent.behavior:
+    accepted_semantic_claims: [engineering.intent.behavior]
+  intent.quality-targets:
+    accepted_semantic_claims: [engineering.intent.quality-targets]
+
+  domain.model:
+    accepted_semantic_claims: [engineering.domain.model]
+  domain.boundaries:
+    accepted_semantic_claims: [engineering.domain.boundaries]
+  domain.invariants:
+    accepted_semantic_claims: [engineering.domain.invariants]
+  domain.time:
+    accepted_semantic_claims: [engineering.domain.time]
+  domain.provenance:
+    accepted_semantic_claims: [engineering.domain.provenance]
+
+  application.use-cases:
+    accepted_semantic_claims: [engineering.application.use-cases]
+  application.orchestration:
+    accepted_semantic_claims: [engineering.application.orchestration]
+  application.failures:
+    accepted_semantic_claims: [engineering.application.failures]
+  application.idempotency:
+    accepted_semantic_claims: [engineering.application.idempotency]
+
+  architecture.structure:
+    accepted_semantic_claims: [engineering.architecture.structure]
+  architecture.boundaries:
+    accepted_semantic_claims: [engineering.architecture.boundaries]
+  architecture.communication:
+    accepted_semantic_claims: [engineering.architecture.communication]
+  architecture.deployment:
+    accepted_semantic_claims: [engineering.architecture.deployment]
+  architecture.decisions:
+    accepted_semantic_claims: [engineering.architecture.decisions]
+
+  interface.machine.contract:
+    accepted_semantic_claims: [engineering.interface.machine.contract]
+  interface.machine.errors:
+    accepted_semantic_claims: [engineering.interface.machine.errors]
+  interface.machine.compatibility:
+    accepted_semantic_claims: [engineering.interface.machine.compatibility]
+  interface.human.journeys:
+    accepted_semantic_claims: [engineering.interface.human.journeys]
+  interface.human.usability:
+    accepted_semantic_claims: [engineering.interface.human.usability]
+  interface.human.accessibility:
+    accepted_semantic_claims: [engineering.interface.human.accessibility]
+  interface.human.responsiveness:
+    accepted_semantic_claims: [engineering.interface.human.responsiveness]
+  interface.human.i18n:
+    accepted_semantic_claims: [engineering.interface.human.i18n]
+
+  data.model:
+    accepted_semantic_claims: [engineering.data.model]
+  data.integrity:
+    accepted_semantic_claims: [engineering.data.integrity]
+  data.lifecycle:
+    accepted_semantic_claims: [engineering.data.lifecycle]
+  data.quality:
+    accepted_semantic_claims: [engineering.data.quality]
+  data.provenance:
+    accepted_semantic_claims: [engineering.data.provenance]
+  data.reproducibility:
+    accepted_semantic_claims: [engineering.data.reproducibility]
+  data.classification:
+    accepted_semantic_claims: [engineering.data.classification]
+
+  security.boundaries:
+    accepted_semantic_claims: [engineering.security.boundaries]
+  security.identity:
+    accepted_semantic_claims: [engineering.security.identity]
+  security.authorization:
+    accepted_semantic_claims: [engineering.security.authorization]
+  security.confidentiality:
+    accepted_semantic_claims: [engineering.security.confidentiality]
+  security.integrity:
+    accepted_semantic_claims: [engineering.security.integrity]
+  security.accountability:
+    accepted_semantic_claims: [engineering.security.accountability]
+  security.availability-abuse:
+    accepted_semantic_claims: [engineering.security.availability-abuse]
+  security.threat-analysis:
+    accepted_semantic_claims: [engineering.security.threat-analysis]
+  security.vulnerability-management:
+    accepted_semantic_claims: [engineering.security.vulnerability-management]
+  security.secure-development:
+    accepted_semantic_claims: [engineering.security.secure-development]
+
+  reliability.failure-semantics:
+    accepted_semantic_claims: [engineering.reliability.failure-semantics]
+  reliability.availability:
+    accepted_semantic_claims: [engineering.reliability.availability]
+  reliability.fault-tolerance:
+    accepted_semantic_claims: [engineering.reliability.fault-tolerance]
+  reliability.recovery:
+    accepted_semantic_claims: [engineering.reliability.recovery]
+  reliability.consistency:
+    accepted_semantic_claims: [engineering.reliability.consistency]
+  reliability.retry-idempotency:
+    accepted_semantic_claims: [engineering.reliability.retry-idempotency]
+  reliability.durability:
+    accepted_semantic_claims: [engineering.reliability.durability]
+  reliability.dependency-failure:
+    accepted_semantic_claims: [engineering.reliability.dependency-failure]
+
+  operability.configuration:
+    accepted_semantic_claims: [engineering.operability.configuration]
+  operability.logging:
+    accepted_semantic_claims: [engineering.operability.logging]
+  operability.metrics:
+    accepted_semantic_claims: [engineering.operability.metrics]
+  operability.tracing:
+    accepted_semantic_claims: [engineering.operability.tracing]
+  operability.health:
+    accepted_semantic_claims: [engineering.operability.health]
+  operability.alerting:
+    accepted_semantic_claims: [engineering.operability.alerting]
+  operability.incident:
+    accepted_semantic_claims: [engineering.operability.incident]
+  operability.admin:
+    accepted_semantic_claims: [engineering.operability.admin]
+  operability.capacity:
+    accepted_semantic_claims: [engineering.operability.capacity]
+
+  verification.strategy:
+    accepted_semantic_claims: [engineering.verification.strategy]
+  verification.requirement-traceability:
+    accepted_semantic_claims: [engineering.verification.requirement-traceability]
+  verification.functional:
+    accepted_semantic_claims: [engineering.verification.functional]
+  verification.quality:
+    accepted_semantic_claims: [engineering.verification.quality]
+  verification.security:
+    accepted_semantic_claims: [engineering.verification.security]
+  verification.reliability:
+    accepted_semantic_claims: [engineering.verification.reliability]
+  verification.interface.machine:
+    accepted_semantic_claims: [engineering.verification.interface.machine]
+  verification.interface.human:
+    accepted_semantic_claims: [engineering.verification.interface.human]
+  verification.architecture:
+    accepted_semantic_claims: [engineering.verification.architecture]
+  verification.data:
+    accepted_semantic_claims: [engineering.verification.data]
+
+  engineering.principles:
+    accepted_semantic_claims: [engineering.engineering.principles]
+  engineering.components:
+    accepted_semantic_claims: [engineering.engineering.components]
+  engineering.error-handling:
+    accepted_semantic_claims: [engineering.engineering.error-handling]
+  engineering.time:
+    accepted_semantic_claims: [engineering.engineering.time]
+  engineering.configuration:
+    accepted_semantic_claims: [engineering.engineering.configuration]
+  engineering.code-quality:
+    accepted_semantic_claims: [engineering.engineering.code-quality]
+
+  dependency.inventory:
+    accepted_semantic_claims: [engineering.dependency.inventory]
+  dependency.trust:
+    accepted_semantic_claims: [engineering.dependency.trust]
+  dependency.versioning:
+    accepted_semantic_claims: [engineering.dependency.versioning]
+  dependency.license:
+    accepted_semantic_claims: [engineering.dependency.license]
+  dependency.vulnerability:
+    accepted_semantic_claims: [engineering.dependency.vulnerability]
+
+  delivery.reproducible-build:
+    accepted_semantic_claims: [engineering.delivery.reproducible-build]
+  delivery.provenance:
+    accepted_semantic_claims: [engineering.delivery.provenance]
+  delivery.integrity:
+    accepted_semantic_claims: [engineering.delivery.integrity]
+  delivery.release:
+    accepted_semantic_claims: [engineering.delivery.release]
+  delivery.migration:
+    accepted_semantic_claims: [engineering.delivery.migration]
+  delivery.rollback:
+    accepted_semantic_claims: [engineering.delivery.rollback]
+
+  transition.compatibility:
+    accepted_semantic_claims: [engineering.transition.compatibility]
+  transition.data-migration:
+    accepted_semantic_claims: [engineering.transition.data-migration]
+  transition.rollout:
+    accepted_semantic_claims: [engineering.transition.rollout]
+  transition.deprecation:
+    accepted_semantic_claims: [engineering.transition.deprecation]
+  transition.revalidation:
+    accepted_semantic_claims: [engineering.transition.revalidation]
+
+  governance.external-obligations:
+    accepted_semantic_claims: [engineering.governance.external-obligations]
+  governance.privacy:
+    accepted_semantic_claims: [engineering.governance.privacy]
+  governance.data:
+    accepted_semantic_claims: [engineering.governance.data]
+  governance.audit:
+    accepted_semantic_claims: [engineering.governance.audit]
+  governance.ownership:
+    accepted_semantic_claims: [engineering.governance.ownership]
+
+  quality.performance.latency:
+    accepted_semantic_claims: [engineering.quality.performance.latency]
+  quality.performance.throughput:
+    accepted_semantic_claims: [engineering.quality.performance.throughput]
+  quality.performance.resource-efficiency:
+    accepted_semantic_claims: [engineering.quality.performance.resource-efficiency]
+  quality.performance.capacity:
+    accepted_semantic_claims: [engineering.quality.performance.capacity]
+  quality.compatibility.interoperability:
+    accepted_semantic_claims: [engineering.quality.compatibility.interoperability]
+  quality.compatibility.coexistence:
+    accepted_semantic_claims: [engineering.quality.compatibility.coexistence]
+  quality.maintainability.modularity:
+    accepted_semantic_claims: [engineering.quality.maintainability.modularity]
+  quality.maintainability.reusability:
+    accepted_semantic_claims: [engineering.quality.maintainability.reusability]
+  quality.maintainability.analysability:
+    accepted_semantic_claims: [engineering.quality.maintainability.analysability]
+  quality.maintainability.modifiability:
+    accepted_semantic_claims: [engineering.quality.maintainability.modifiability]
+  quality.maintainability.testability:
+    accepted_semantic_claims: [engineering.quality.maintainability.testability]
+  quality.flexibility.adaptability:
+    accepted_semantic_claims: [engineering.quality.flexibility.adaptability]
+  quality.flexibility.scalability:
+    accepted_semantic_claims: [engineering.quality.flexibility.scalability]
+  quality.flexibility.installability:
+    accepted_semantic_claims: [engineering.quality.flexibility.installability]
+  quality.flexibility.replaceability:
+    accepted_semantic_claims: [engineering.quality.flexibility.replaceability]
