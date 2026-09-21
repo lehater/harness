@@ -1,0 +1,30 @@
+version: 1
+kind: repository-realization-pilot
+id: nutrition-management
+result: PASS
+facts:
+  language: Python 3.14
+  dependency_manager: uv
+  persistence: SQLite + SQLAlchemy + Alembic
+  solver: SCIP/PySCIPOpt
+  shape: modular-monolith
+  bounded_contexts: 4
+decisions:
+  repository_topology: single-repository-single-python-project
+  source_topology: package-safe-source-root-with-context-aligned-subpackages
+  composition_root: one-explicit-cross-context-composition-root
+  migration_topology: one-alembic-stream-with-explicit-context-ownership
+  dependency_environment: committed-uv-lock-and-locked-ci
+  authoritative_gate: pull-request-ci
+obligations:
+  - {id: deterministic-formatting, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
+  - {id: linting, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
+  - {id: static-typing, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
+  - {id: architecture-dependencies, applicability: REQUIRED, enforcement: mechanical-import-dependency-check}
+  - {id: tests, applicability: REQUIRED, enforcement: pytest-plus-browser-tests-where-applicable}
+  - {id: vulnerability-dependency-check, applicability: REQUIRED, enforcement: ci-scanner}
+  - {id: sbom-provenance, applicability: NOT_APPLICABLE, rationale: local MVP has no published distributable artifact or external obligation}
+freedoms:
+  - private-helper-layout
+  - exact-file-names-inside-context-packages
+  - test-helper-decomposition
