@@ -189,6 +189,17 @@ def main():
     resource=[r for r in isolated["rows"] if r.get("subject")=="Resource"][0]
     assert resource["state"]=="MISSING"
 
+    markdown_source={
+        "kind":"harness-markdown-scope-source",
+        "text":"# Requirements\n\nStatus: accepted.\n\n- [REQ-RESOURCE] Resource.\n- [REQ-APPLICATION] Application.\n",
+    }
+    markdown=run(
+        obligations(),
+        source=markdown_source,
+        realized=("fixture.ui.resource","fixture.ui.application"),
+    )
+    assert markdown["source_validation"]["source_complete"]
+    assert markdown["completion_ready"]
     print("subject obligation coverage: ok")
     return 0
 
