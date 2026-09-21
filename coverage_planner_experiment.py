@@ -67,11 +67,62 @@ def _consumer_closure(doc: dict[str, Any], target_consumer: str) -> set[str]:
     return _capability_closure(doc, roots)
 
 
-def realized_capabilities(
+def _artifact_blocker_index(doc: dict[str, Any]) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    artifacts = {
+        item.get("id"): item
+        for item in doc.get("artifacts", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+    reverse: dict[str, set[str]] = {artifact_id: set() for artifact_id in artifacts}
+    providers: dict[str, set[str]] = {}
+    for artifact_id, artifact in artifacts.items():
+        for dependency in artifact.get("depends_on", []) or []:
+            if dependency in reverse:
+                reverse[dependency].add(artifact_id)
+        for capability in artifact.get("provides", []) or []:
+            providers.setdefault(capability, set()).add(artifact_id)
+
+    artifact_blockers: dict[str, set[str]] = {
+        artifact_id: set() for artifact_id in artifacts
+    }
+    capability_blockers: dict[str, set[str]] = {}
+
+    def affected(seed: str) -> set[str]:
+        result = {seed}
+        stack = list(reverse.get(seed, set()))
+        while stack:
+            current = stack.pop()
+            if current in result:
+                continue
+            result.add(current)
+            stack.extend(reverse.get(current, set()))
+        return result
+
+    for question in doc.get("questions", []) or []:
+        if not isinstance(question, dict) or question.get("resolution") is not None:
+            continue
+        question_id = question.get("id")
+        if not question_id:
+            continue
+
+        seeds = set(question.get("blocks", []) or [])
+        for capability in question.get("blocks_capabilities", []) or []:
+            capability_blockers.setdefault(capability, set()).add(question_id)
+            seeds.update(providers.get(capability, set()))
+
+        for seed in seeds:
+            for artifact_id in affected(seed):
+                if artifact_id in artifact_blockers:
+                    artifact_blockers[artifact_id].add(question_id)
+
+    return artifact_blockers, capability_blockers
+
+
+def capability_realization(
     project_docs: list[dict[str, Any]],
     target_consumer: str | None = None,
     scope_roots: list[str] | None = None,
-) -> set[str]:
+) -> dict[str, Any]:
     allowed: set[str] | None = None
     if target_consumer:
         closures = []
@@ -92,19 +143,87 @@ def realized_capabilities(
         if nonempty:
             allowed = set().union(*nonempty)
 
-    result: set[str] = set()
+    providers_by_capability: dict[str, list[str]] = {}
+    blockers_by_artifact: dict[str, set[str]] = {}
+    direct_capability_blockers: dict[str, set[str]] = {}
+
     for doc in project_docs:
+        artifact_blockers, capability_blockers = _artifact_blocker_index(doc)
+        for artifact_id, blockers in artifact_blockers.items():
+            blockers_by_artifact.setdefault(artifact_id, set()).update(blockers)
+        for capability, blockers in capability_blockers.items():
+            direct_capability_blockers.setdefault(capability, set()).update(blockers)
+
         for artifact in doc.get("artifacts", []) or []:
-            provided=set(artifact.get("provides", []) or [])
-            if allowed is not None:
-                provided &= allowed
-            result.update(provided)
+            if not isinstance(artifact, dict) or not artifact.get("id"):
+                continue
+            for capability in artifact.get("provides", []) or []:
+                if allowed is not None and capability not in allowed:
+                    continue
+                providers_by_capability.setdefault(capability, []).append(artifact["id"])
+
         for binding in doc.get("bindings", []) or []:
-            provided=set(binding.get("provides", []) or [])
-            if allowed is not None:
-                provided &= allowed
-            result.update(provided)
-    return result
+            if not isinstance(binding, dict):
+                continue
+            artifact_id = binding.get("artifact")
+            for capability in binding.get("provides", []) or []:
+                if allowed is not None and capability not in allowed:
+                    continue
+                if artifact_id:
+                    providers_by_capability.setdefault(capability, []).append(artifact_id)
+
+    provided = set(providers_by_capability)
+    usable: set[str] = set()
+    blocked_capabilities: dict[str, list[str]] = {}
+    for capability, providers in providers_by_capability.items():
+        provider_blockers = {
+            provider: sorted(blockers_by_artifact.get(provider, set()))
+            for provider in providers
+        }
+        if any(not questions for questions in provider_blockers.values()):
+            usable.add(capability)
+        else:
+            questions = sorted(
+                {
+                    question
+                    for values in provider_blockers.values()
+                    for question in values
+                }
+                | direct_capability_blockers.get(capability, set())
+            )
+            if questions:
+                blocked_capabilities[capability] = questions
+            else:
+                usable.add(capability)
+
+    return {
+        "provided": provided,
+        "usable": usable,
+        "blocked": blocked_capabilities,
+        "direct_blockers": {
+            capability: sorted(values)
+            for capability, values in direct_capability_blockers.items()
+            if allowed is None or capability in allowed
+        },
+        "providers": {
+            capability: sorted(set(values))
+            for capability, values in providers_by_capability.items()
+        },
+    }
+
+
+def realized_capabilities(
+    project_docs: list[dict[str, Any]],
+    target_consumer: str | None = None,
+    scope_roots: list[str] | None = None,
+) -> set[str]:
+    return set(
+        capability_realization(
+            project_docs,
+            target_consumer,
+            scope_roots,
+        )["usable"]
+    )
 
 
 def _normalize_claim(item: Any) -> dict[str, str]:
@@ -182,7 +301,9 @@ def derive_plan(
     roles = role_claims(role_contract)
     cap_claims = capability_claim_index(capability_bindings, project_docs)
     scope_roots = list(overlay.get("scope_roots", []) or [])
-    realized_caps = realized_capabilities(project_docs, target_consumer, scope_roots)
+    realization = capability_realization(project_docs, target_consumer, scope_roots)
+    realized_caps = set(realization["usable"])
+    provided_caps = set(realization["provided"])
 
     scoped_caps: set[str] | None = None
     if target_consumer:
@@ -238,6 +359,26 @@ def derive_plan(
 
         accepted = sorted(proofs.get(concern, set()))
 
+        blocked_proof_questions = sorted(
+            {
+                question
+                for cap, claims_for_cap in cap_claims.items()
+                if cap in provided_caps and cap not in realized_caps
+                for claim_info in claims_for_cap
+                if claim_info["claim"] in accepted
+                for question in realization["blocked"].get(cap, [])
+            }
+        )
+        if blocked_proof_questions:
+            rows.append({
+                "concern": concern,
+                "state": "BLOCKED",
+                "action": "RESOLVE_QUESTIONS",
+                "accepted_semantic_claims": accepted,
+                "questions": blocked_proof_questions,
+            })
+            continue
+
         subject_instances = []
         for cap, claims_for_cap in cap_claims.items():
             if scoped_caps is not None and cap not in scoped_caps:
@@ -280,7 +421,7 @@ def derive_plan(
         for cap, claims_for_cap in cap_claims.items():
             if scoped_caps is not None and cap not in scoped_caps:
                 continue
-            if cap in realized_caps:
+            if cap in provided_caps:
                 continue
             for claim_info in claims_for_cap:
                 if claim_info["claim"] not in accepted:
@@ -300,6 +441,7 @@ def derive_plan(
                     for prerequisite in prerequisites
                     if prerequisite not in realized_caps
                 )
+                direct_questions = realization["direct_blockers"].get(cap, [])
                 production_candidates.append({
                     "claim": claim_info["claim"],
                     **(
@@ -311,7 +453,8 @@ def derive_plan(
                     "authority": producer_by_capability.get(cap),
                     "requires": sorted(prerequisites),
                     "missing_prerequisites": missing_prerequisites,
-                    "ready": not missing_prerequisites,
+                    "questions": direct_questions,
+                    "ready": not missing_prerequisites and not direct_questions,
                 })
 
         routes: dict[str, list[str]] = {}
@@ -331,17 +474,29 @@ def derive_plan(
             ready_candidates = [
                 item for item in production_candidates if item["ready"]
             ]
+            blocked_questions = sorted(
+                {
+                    question
+                    for item in production_candidates
+                    for question in item.get("questions", [])
+                }
+            )
             row={
                 "concern": concern,
                 "state": "MISSING",
                 "action": (
                     "PRODUCE_CAPABILITY"
                     if ready_candidates
-                    else "WAIT_FOR_PREREQUISITES"
+                    else (
+                        "RESOLVE_QUESTIONS"
+                        if blocked_questions
+                        else "WAIT_FOR_PREREQUISITES"
+                    )
                 ),
                 "accepted_semantic_claims": accepted,
                 "production_candidates": production_candidates,
                 "ready_production_candidates": ready_candidates,
+                **({"questions": blocked_questions} if blocked_questions else {}),
             }
             if subject_instances:
                 row["missing_instances"]=[
