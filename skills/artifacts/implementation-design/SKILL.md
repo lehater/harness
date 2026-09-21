@@ -36,7 +36,7 @@ semantics.
 5. Identify migrations/data transitions and compatibility risks when applicable.
 6. Derive repository realization from accepted semantic/component boundaries: physical module/package roots, composition root, source/generated/test/migration/configuration topology and explicit implementation freedoms. Do not prescribe a universal folder layout.
 7. For every applicable engineering/security/quality/supply-chain obligation, select a concrete deterministic enforcement mechanism or record an explicit terminal disposition. Keep the obligation independent from the selected tool.
-8. Define the reproducible dependency/tool environment and authoritative CI quality gates; local/pre-commit checks may optimize feedback but do not replace CI enforcement.
+8. Define the reproducible dependency/tool environment. If the project's delivery workflow has merge/release gating, define its authoritative reproducible gate; local/pre-commit checks may optimize feedback but do not replace that gate.
 9. Identify code/test/CI surfaces each slice must change.
 10. Define completion criteria that prove the accepted design is realized.
 11. If any slice would require a new product/domain/architecture/interface
@@ -69,7 +69,7 @@ Useful content may include:
 - applicable tooling obligations and selected concrete tools;
 - source/generated/test/migration/configuration topology;
 - reproducible dependency/tool environment;
-- authoritative CI quality gates and optional local fast-feedback subset;
+- authoritative merge/release gate when applicable and optional local fast-feedback subset;
 - migrations;
 - risks;
 - completion criteria;
@@ -86,7 +86,7 @@ when the project owns them together; they may also be separate production output
 - architecturally significant dependency rules have deterministic mechanical enforcement;
 - every applicable tooling/security/supply-chain obligation has enforcement or an explicit disposition;
 - generated artifacts identify their canonical source and regeneration path;
-- CI gate semantics are authoritative and reproducible from versioned project inputs;
+- applicable merge/release gate semantics are authoritative and reproducible from versioned project inputs, or non-applicability is explicit;
 - no hidden/manual state fabrication is required for supported behavior;
 - unresolved design gaps are routed upstream.
 
