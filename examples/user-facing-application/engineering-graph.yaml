@@ -86,6 +86,18 @@ authorities:
           - capability: example.frontend.user-journeys
           - capability: example.security-architecture
           - capability: example.machine-interface
+      - capability: example.frontend.presentation-system
+        knowledge_kind: presentation-system-design
+        requires:
+          - capability: example.requirements
+          - capability: example.frontend.user-journeys
+          - capability: example.quality-constraints
+          - capability: example.machine-interface
+      - capability: example.frontend.screen-view-design
+        knowledge_kind: screen-view-design
+        requires:
+          - capability: example.frontend.human-interface
+          - capability: example.frontend.presentation-system
 
   - id: SYSTEM-ARCHITECTURE
     responsibility: Own frontend runtime and structural architecture.
@@ -98,6 +110,8 @@ authorities:
         knowledge_kind: system-architecture
         requires:
           - capability: example.frontend.human-interface
+          - capability: example.frontend.presentation-system
+          - capability: example.frontend.screen-view-design
           - capability: example.machine-interface
           - capability: example.security-architecture
           - capability: example.quality-constraints
@@ -113,6 +127,8 @@ authorities:
         knowledge_kind: component-design
         requires:
           - capability: example.frontend.human-interface
+          - capability: example.frontend.presentation-system
+          - capability: example.frontend.screen-view-design
           - capability: example.frontend.architecture
           - capability: example.machine-interface
 
@@ -128,6 +144,8 @@ authorities:
         requires:
           - capability: example.requirements
           - capability: example.frontend.human-interface
+          - capability: example.frontend.presentation-system
+          - capability: example.frontend.screen-view-design
           - capability: example.frontend.architecture
 
   - id: TEST-DESIGN
@@ -142,6 +160,8 @@ authorities:
         requires:
           - capability: example.frontend.verification
           - capability: example.frontend.human-interface
+          - capability: example.frontend.presentation-system
+          - capability: example.frontend.screen-view-design
 
   - id: IMPLEMENTATION-DESIGN
     responsibility: Own bounded frontend realization slicing after accepted design exists.

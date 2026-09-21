@@ -1,0 +1,35 @@
+version: 1
+kind: presentation-system-design
+id: EXAMPLE-PRESENTATION-SYSTEM
+status: CURRENT
+
+scope: user-facing application
+
+principles:
+  hierarchy: One clear task context and primary action role per view.
+  consistency: Equivalent actions and states use equivalent reusable patterns.
+  density: Comfortable default; denser local composition requires rationale.
+
+patterns:
+  DETAIL:
+    regions: [context, primary-content, actions, secondary-content]
+  FORM:
+    rules: [labels-before-controls, field-errors-near-fields, error-summary-on-rejection]
+  STATUS:
+    rules: [semantic-text-not-color-only, non-modal-for-routine-status]
+
+responsive:
+  preserve: [information, actions, semantic-order]
+
+accessibility_defaults:
+  - visible focus
+  - keyboard reachable actions
+  - semantic status/error presentation
+
+deviation_policy:
+  require_rationale: true
+
+implementation_freedom:
+  - css layout mechanism
+  - frontend framework
+  - private component decomposition

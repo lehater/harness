@@ -17,7 +17,11 @@ Domain / Use-case Design
       ↓
 User Journey Design
       ↓
-Human Interface Design
+Human Interface Design ─────┐
+      ↓                    │
+Presentation System Design │
+      ↓                    │
+Screen / View Design ◀─────┘
       ↓
 Frontend System Architecture
       ↓
@@ -41,7 +45,7 @@ Existing Authorities remain sufficient:
 - PRODUCT-REQUIREMENTS owns users, outcomes, scope and externally observable product behavior.
 - DOMAIN / DOMAIN-USE-CASE-DESIGN owns domain language, states, invariants and business outcomes.
 - APPLICATION-DESIGN owns user-goal/application journeys and orchestration before screen decisions.
-- INTERFACE-DESIGN owns information architecture, navigation, views, user-visible states, transitions and interaction semantics.
+- INTERFACE-DESIGN owns information architecture, navigation, user-visible interaction semantics, reusable presentation-system decisions and concrete screen/view composition.
 - SYSTEM-ARCHITECTURE owns frontend runtime boundaries, client/server responsibility, state/cache ownership when architectural, and dependency topology.
 - SECURITY-ARCHITECTURE owns authentication/session trust boundaries and credential lifecycle.
 - QUALITY-DESIGN owns measurable architecture-significant frontend quality constraints.
@@ -89,6 +93,26 @@ The result may establish:
 - responsive/adaptive semantics where accepted constraints require them.
 
 It must preserve implementation freedom for framework, CSS mechanics, private component decomposition, state libraries and equivalent local realization choices.
+
+### presentation-system-design
+
+Owner: INTERFACE-DESIGN.
+
+Purpose: define reusable application-level presentation knowledge once so every screen inherits a consistent visual/interaction language instead of re-deciding it locally.
+
+Typical facets include hierarchy, density, typography/color/spacing roles, layout principles, action/navigation/feedback patterns, responsive/accessibility defaults, reusable task patterns and design tokens where they carry stable design meaning.
+
+This is design knowledge. A UI component library remains a downstream reusable implementation asset unless explicitly granted canonical contract status.
+
+### screen-view-design
+
+Owner: INTERFACE-DESIGN.
+
+Purpose: define implementation-independent composition for each required screen/view after interaction semantics and a Presentation System are known.
+
+A screen contract identifies inherited presentation system, regions/sections/tabs/disclosures, content/action hierarchy, reusable pattern references, state variants, responsive transformations and justified local overrides. CSS/framework mechanics and exact coordinates remain free unless an accepted invariant requires them.
+
+Structured YAML/JSON is preferred when sufficient. Wireframes, prototypes, Figma frames and Storybook stories may be generated projections.
 
 ## Human-interface quality analysis
 
@@ -146,9 +170,9 @@ Snapshot or visual-regression tests do not become semantic authority unless the 
 
 ## Design system
 
-A design-system capability is conditional.
+A monolithic design-system capability is conditional.
 
-Create it only when reusable visual/presentation decisions have independent downstream consumers or lifecycle. It remains owned by INTERFACE-DESIGN.
+Reusable project presentation decisions are represented by `presentation-system-design`. A broader governed Design System may exist when foundations, patterns, reusable components and governance have independent lifecycle/consumers; do not use the term to collapse those distinct concerns.
 
 Figma, Storybook, token files, diagrams or prototypes may materialize canonical knowledge only when the target project explicitly assigns them Authority ownership and versioned contract meaning. Otherwise they are projections/review surfaces.
 
@@ -162,11 +186,13 @@ The acceptance fixture in `examples/user-facing-application/**` verifies that:
 
 1. missing journey knowledge routes to APPLICATION-DESIGN;
 2. missing human-interface knowledge routes to INTERFACE-DESIGN;
-3. frontend architecture follows accepted interface/security/quality inputs;
-4. Component Design and Verification may become parallel frontiers;
-5. Test Design and Implementation Design follow;
-6. the consumer reaches COMPLETE only when its declared closure is realized;
-7. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work.
+3. reusable Presentation System knowledge and concrete Screen/View Design are required before frontend architecture;
+4. every required screen inherits the shared Presentation System and local deviations are explicit;
+5. frontend architecture follows accepted interface/security/quality inputs;
+6. Component Design and Verification may become parallel frontiers;
+7. Test Design and Implementation Design follow;
+8. the consumer reaches COMPLETE only when its declared closure is realized;
+9. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work.
 
 ## Evidence for this boundary
 

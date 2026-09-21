@@ -13,8 +13,9 @@ REGISTRY = load_yaml(ROOT / "skills" / "artifact-skill-registry-v0.yaml")
 
 CASES = [
     ("core-state-upstream.yaml", "user-journey-design", "APPLICATION-DESIGN"),
-    ("core-state-with-journeys.yaml", "human-interface-design", "INTERFACE-DESIGN"),
-    ("core-state-with-interface.yaml", "system-architecture", "SYSTEM-ARCHITECTURE"),
+    ("core-state-with-interface.yaml", "presentation-system-design", "INTERFACE-DESIGN"),
+    ("core-state-with-ui-foundations.yaml", "screen-view-design", "INTERFACE-DESIGN"),
+    ("core-state-with-screen-view.yaml", "system-architecture", "SYSTEM-ARCHITECTURE"),
 ]
 
 def assert_single_frontier(state_name: str, knowledge_kind: str, authority: str) -> None:
@@ -32,6 +33,45 @@ def main() -> None:
 
     for state_name, knowledge_kind, authority in CASES:
         assert_single_frontier(state_name, knowledge_kind, authority)
+
+    # Human Interface semantics and the shared Presentation System are independent
+    # once journeys/upstream constraints are known; both must close before screen design.
+    journeys_state = load_yaml(EXAMPLE / "core-state-with-journeys.yaml")
+    journeys_frontier = route_create_work(
+        GRAPH, "FRONTEND-IMPLEMENTATION", journeys_state, REGISTRY
+    )
+    assert journeys_frontier["target_status"] == "READY", journeys_frontier
+    actual_journeys = {
+        (item["knowledge_kind"], item["authority"])
+        for item in journeys_frontier["routed"]
+    }
+    assert actual_journeys == {
+        ("human-interface-design", "INTERFACE-DESIGN"),
+        ("presentation-system-design", "INTERFACE-DESIGN"),
+    }, journeys_frontier
+    assert not journeys_frontier["unrouted"], journeys_frontier["unrouted"]
+
+    # Regression: Human Interface alone must not allow frontend architecture.
+    interface_only = load_yaml(EXAMPLE / "core-state-with-interface.yaml")
+    interface_only_eval = evaluate_engineering_target(
+        GRAPH, "FRONTEND-IMPLEMENTATION", interface_only
+    )
+    assert interface_only_eval["status"] != "COMPLETE", interface_only_eval
+    assert any(
+        item.get("capability") == "example.frontend.presentation-system"
+        for item in interface_only_eval["create"]
+    ), interface_only_eval
+
+    # Regression: Presentation + Human Interface without Screen/View Design is incomplete.
+    ui_foundations = load_yaml(EXAMPLE / "core-state-with-ui-foundations.yaml")
+    ui_foundations_eval = evaluate_engineering_target(
+        GRAPH, "FRONTEND-IMPLEMENTATION", ui_foundations
+    )
+    assert ui_foundations_eval["status"] != "COMPLETE", ui_foundations_eval
+    assert any(
+        item.get("capability") == "example.frontend.screen-view-design"
+        for item in ui_foundations_eval["create"]
+    ), ui_foundations_eval
 
     blocked_state = load_yaml(EXAMPLE / "core-state-browser-auth-blocked.yaml")
     blocked = route_create_work(

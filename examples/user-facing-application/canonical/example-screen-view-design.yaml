@@ -1,0 +1,22 @@
+version: 1
+kind: screen-view-design
+id: EXAMPLE-SCREEN-VIEW-DESIGN
+status: CURRENT
+inherits: EXAMPLE-PRESENTATION-SYSTEM
+
+screens:
+  - id: EXAMPLE-DETAIL
+    purpose: Inspect and edit the selected example subject.
+    regions:
+      - {id: context, role: heading-context, priority: primary}
+      - {id: facts, role: primary-content, pattern: DETAIL, priority: primary}
+      - {id: actions, role: task-actions, priority: primary}
+      - {id: history, role: secondary-content, priority: secondary}
+    states: [loading, loaded, empty, validation-rejected, authorization-rejected, error]
+    responsive:
+      preserve: [facts, actions, history-access]
+    overrides: []
+
+rules:
+  - Every required screen inherits EXAMPLE-PRESENTATION-SYSTEM.
+  - Local deviations require rationale.

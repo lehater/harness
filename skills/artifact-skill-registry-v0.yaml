@@ -36,6 +36,12 @@ routes:
   - knowledge_kind: human-interface-design
     skill: skills/artifacts/human-interface-design/SKILL.md
 
+  - knowledge_kind: presentation-system-design
+    skill: skills/artifacts/presentation-system-design/SKILL.md
+
+  - knowledge_kind: screen-view-design
+    skill: skills/artifacts/screen-view-design/SKILL.md
+
   - knowledge_kind: data-design
     skill: skills/artifacts/data-design/SKILL.md
 

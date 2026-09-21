@@ -44,19 +44,4 @@ artifacts:
     authority: INTERFACE-DESIGN
     provides: [example.frontend.screen-view-design]
     depends_on: [EXAMPLE-HUMAN-INTERFACE, EXAMPLE-PRESENTATION-SYSTEM]
-  - id: EXAMPLE-FRONTEND-ARCHITECTURE
-    path: examples/user-facing-application/canonical/example-frontend-architecture.yaml
-    authority: SYSTEM-ARCHITECTURE
-    provides: [example.frontend.architecture]
-    depends_on: [EXAMPLE-HUMAN-INTERFACE, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-SCREEN-VIEW-DESIGN, EXAMPLE-MACHINE-INTERFACE, EXAMPLE-SECURITY, EXAMPLE-QUALITY]
-  - id: EXAMPLE-FRONTEND-COMPONENT-DESIGN
-    path: examples/user-facing-application/canonical/example-frontend-component-design.yaml
-    authority: COMPONENT-DESIGN
-    provides: [example.frontend.component-design]
-    depends_on: [EXAMPLE-HUMAN-INTERFACE, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-SCREEN-VIEW-DESIGN, EXAMPLE-FRONTEND-ARCHITECTURE, EXAMPLE-MACHINE-INTERFACE]
-  - id: EXAMPLE-FRONTEND-VERIFICATION
-    path: examples/user-facing-application/canonical/example-frontend-verification.yaml
-    authority: VERIFICATION-DESIGN
-    provides: [example.frontend.verification]
-    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-HUMAN-INTERFACE, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-SCREEN-VIEW-DESIGN, EXAMPLE-FRONTEND-ARCHITECTURE]
 questions: []
