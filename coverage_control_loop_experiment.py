@@ -33,11 +33,19 @@ def evaluate(
         project_docs,
     )
 
+    target_consumer = activation.get("consumer")
+    decisions = []
+    for item in activation_overlay.get("decisions", []) or []:
+        consumers = item.get("consumers", []) or []
+        if consumers and target_consumer is not None and target_consumer not in consumers:
+            continue
+        decisions.append(item)
+
     planner_overlay = {
         "project": activation_overlay.get("project"),
         "scope": activation_overlay.get("scope"),
         "required": [row["concern"] for row in activation["rows"]],
-        "decisions": activation_overlay.get("decisions", []) or [],
+        "decisions": decisions,
     }
 
     plan = derive_plan(
@@ -61,6 +69,7 @@ def evaluate(
         "kind": "harness-derived-engineering-coverage-control",
         "project": activation_overlay.get("project"),
         "scope": activation_overlay.get("scope"),
+        "consumer": target_consumer,
         "completion_ready": plan["completion_ready"],
         "activated_count": activation["activated_count"],
         "summary": plan["summary"],
