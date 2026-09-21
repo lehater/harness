@@ -1,0 +1,22 @@
+version: 1
+kind: harness-core-model
+authorities:
+  - {id: PRODUCT-REQUIREMENTS}
+  - {id: SECURITY-ANALYSIS}
+artifacts:
+  - id: REQUIREMENTS
+    authority: PRODUCT-REQUIREMENTS
+    path: requirements.yaml
+    provides: [fixture.requirements]
+    depends_on: []
+  - id: THREAT-DECISION
+    authority: SECURITY-ANALYSIS
+    path: threat-decision.yaml
+    provides: []
+    depends_on: [REQUIREMENTS]
+questions:
+  - id: Q-THREAT
+    authority: SECURITY-ANALYSIS
+    text: What trust-boundary threat decision is required?
+    blocks_capabilities: [fixture.security.threat-analysis]
+    resolution: THREAT-DECISION
