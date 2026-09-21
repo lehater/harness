@@ -347,21 +347,45 @@ def capability_claim_index(
     project_docs: list[dict[str, Any]],
 ) -> dict[str, list[dict[str, str]]]:
     result: dict[str, list[dict[str, str]]] = {}
+
+    # Legacy projects without semantic evaluations retain declared claims.
+    # Once capability-specific evaluation evidence exists, only claims explicitly
+    # accepted by at least one ACCEPTED evaluation remain usable as Coverage proof.
+    evaluated_capabilities: set[str] = set()
+    accepted_by_capability: dict[str, set[str]] = {}
+    for evaluation in evaluation_index(project_docs).values():
+        capability = evaluation.get("capability")
+        if not isinstance(capability, str) or not capability:
+            continue
+        evaluated_capabilities.add(capability)
+        if evaluation.get("status") == "ACCEPTED":
+            accepted_by_capability.setdefault(capability, set()).update(
+                evaluation.get("semantic_claims", {}).get("accepted", []) or []
+            )
+
+    def add_claims(capability: str, values: list[Any]) -> None:
+        for value in values:
+            claim = _normalize_claim(value)
+            if (
+                capability in evaluated_capabilities
+                and claim["claim"] not in accepted_by_capability.get(capability, set())
+            ):
+                continue
+            result.setdefault(capability, []).append(claim)
+
     for item in bindings.get("bindings", []) or []:
-        capability=item["capability"]
-        result.setdefault(capability, []).extend(
-            _normalize_claim(value)
-            for value in item.get("semantic_claims", []) or []
-        )
+        capability = item["capability"]
+        add_claims(capability, item.get("semantic_claims", []) or [])
+
     for doc in project_docs:
         for authority in doc.get("authorities", []) or []:
             for production in authority.get("produces", []) or []:
                 if isinstance(production, dict):
                     capability = production.get("capability")
                     if capability:
-                        result.setdefault(capability, []).extend(
-                            _normalize_claim(value)
-                            for value in production.get("semantic_claims", []) or []
+                        add_claims(
+                            capability,
+                            production.get("semantic_claims", []) or [],
                         )
     return result
 
