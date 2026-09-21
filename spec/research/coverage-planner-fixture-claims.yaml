@@ -1,0 +1,7 @@
+version: 1
+kind: harness-semantic-claim-bindings
+project: DERIVATION-FIXTURE
+status: research
+bindings:
+  - capability: engineering.operability.logging
+    semantic_claims: [engineering.operability.logging]
