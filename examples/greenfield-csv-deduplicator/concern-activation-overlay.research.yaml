@@ -1,0 +1,6 @@
+version: 1
+kind: harness-concern-activation-overlay
+project: GREENFIELD-CSV-DEDUPLICATOR
+scope: implementation
+activate: []
+decisions: []
