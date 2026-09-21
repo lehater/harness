@@ -29,6 +29,22 @@ This knowledge kind is design knowledge, not a component library and not framewo
 
 Missing upstream facts that materially affect presentation become Questions.
 
+## Read boundary
+
+Read accepted project requirements, journeys, interface semantics, quality/obligation constraints and existing canonical presentation contracts. Existing CSS, component code, screenshots, Figma files and vendor design-system defaults are evidence or implementation context, not authority unless explicitly declared canonical.
+
+## Procedure
+
+1. Identify the user-facing surfaces that share a presentation language.
+2. Resolve applicable shared facets only to the depth needed by downstream screens.
+3. Define semantic hierarchy, density/layout defaults, action/navigation/feedback conventions and reusable task patterns.
+4. Define typography/color/spacing/iconography roles and design tokens only when they carry stable reusable decisions.
+5. Define responsive/accessibility/localization defaults where applicable.
+6. Define inheritance and local-deviation policy.
+7. Preserve implementation freedom for framework, CSS mechanics and private component structure.
+8. Route missing upstream requirements or obligations as Questions.
+9. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
+
 ## Facets
 
 Resolve only applicable facets, at the minimum depth needed to prevent material downstream invention:
@@ -66,6 +82,10 @@ Implementation freedom:
 
 Exact pixel values are canonical only when an accepted requirement, platform convention, accessibility criterion or intentional design invariant needs them.
 
+## Stop conditions
+
+Stop and route a Question when users/tasks, platform/channel, branding/content constraints, accessibility obligations, localization requirements or other upstream facts materially affect a shared presentation decision and are unresolved.
+
 ## Output contract
 
 A useful contract includes:
@@ -85,6 +105,10 @@ A useful contract includes:
 - design-system/vendor mechanics are not mistaken for project semantics;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
 - downstream screen design can choose composition without inventing the application's common visual/interaction language.
+
+## Registration
+
+Register under INTERFACE-DESIGN and provide only the presentation-system capabilities actually materialized. Dependencies include the accepted journeys, interface/quality/obligation inputs genuinely consumed.
 
 ## Human projection
 
