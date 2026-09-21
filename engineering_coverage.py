@@ -94,6 +94,107 @@ def _scope_overlay(
     return result
 
 
+def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_capability: dict[str, dict[str, Any]] = {}
+    others: list[dict[str, Any]] = []
+
+    for row in rows:
+        action = row.get("action")
+        concern = row.get("concern")
+
+        if action == "PRODUCE_CAPABILITY":
+            for candidate in row.get("ready_production_candidates", []) or []:
+                capability = candidate["capability"]
+                item = by_capability.setdefault(
+                    capability,
+                    {
+                        "action": "PRODUCE_CAPABILITY",
+                        "capability": capability,
+                        "authority": candidate.get("authority"),
+                        "concerns": [],
+                        "semantic_claims": [],
+                    },
+                )
+                if concern not in item["concerns"]:
+                    item["concerns"].append(concern)
+                claim_entry = {"claim": candidate["claim"]}
+                if candidate.get("subject") is not None:
+                    claim_entry["subject"] = candidate["subject"]
+                if claim_entry not in item["semantic_claims"]:
+                    item["semantic_claims"].append(claim_entry)
+            continue
+
+        if action == "WAIT_FOR_PREREQUISITES":
+            blocked = []
+            for candidate in row.get("production_candidates", []) or []:
+                blocked.append(
+                    {
+                        "capability": candidate["capability"],
+                        "authority": candidate.get("authority"),
+                        "missing_prerequisites": candidate.get(
+                            "missing_prerequisites", []
+                        ),
+                    }
+                )
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "blocked_productions": blocked,
+                }
+            )
+            continue
+
+        if action == "MODEL_PRODUCTION_CONTRACT":
+            candidate_authorities = sorted(
+                {
+                    authority
+                    for values in (row.get("routes", {}) or {}).values()
+                    for authority in values
+                }
+            )
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "candidate_authorities": candidate_authorities,
+                    "accepted_semantic_claims": row.get(
+                        "accepted_semantic_claims", []
+                    ),
+                }
+            )
+            continue
+
+        if action in {"ASSIGN_AUTHORITY", "MODEL_PROOF_CONTRACT"}:
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **(
+                        {
+                            "accepted_semantic_claims": row.get(
+                                "accepted_semantic_claims", []
+                            )
+                        }
+                        if row.get("accepted_semantic_claims") is not None
+                        else {}
+                    ),
+                }
+            )
+
+    capability_items = sorted(
+        by_capability.values(),
+        key=lambda item: (item.get("authority") or "", item["capability"]),
+    )
+    for item in capability_items:
+        item["concerns"].sort()
+        item["semantic_claims"] = sorted(
+            item["semantic_claims"],
+            key=lambda value: (value["claim"], value.get("subject", "")),
+        )
+    return capability_items + others
+
+
 def evaluate_coverage(
     *,
     graph: dict[str, Any],
@@ -181,6 +282,7 @@ def evaluate_coverage(
         row for row in rows
         if row["state"] not in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
     ]
+    work_items = _derive_work_items(remaining_work)
 
     return {
         "version": 1,
@@ -193,11 +295,13 @@ def evaluate_coverage(
         "completion_ready": not remaining_work,
         "activated_count": activation["activated_count"],
         "remaining_work_count": len(remaining_work),
+        "work_item_count": len(work_items),
         "summary": plan["summary"],
         "authority_roles": roles,
         "activation_signals": activation["signals"],
         "rows": rows,
         "remaining_work": remaining_work,
+        "work_items": work_items,
     }
 
 
