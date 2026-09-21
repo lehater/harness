@@ -1,6 +1,6 @@
 # Architecture Driver Closure v1
 
-Status: research candidate.
+Status: canonical v1.
 
 ## Decision
 
