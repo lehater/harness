@@ -1,6 +1,6 @@
 # Repository Realization Design v1
 
-Status: canonical candidate.
+Status: canonical.
 
 ## Purpose
 
