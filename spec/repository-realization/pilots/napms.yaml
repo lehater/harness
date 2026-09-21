@@ -1,0 +1,63 @@
+version: 1
+kind: repository-realization-design
+id: NAPMS-REPOSITORY-REALIZATION-PILOT
+status: accepted-pilot
+pilot_result: PASS
+
+facts:
+  backend: Python/FastAPI-compatible runtime
+  frontend: TypeScript/React/Vite-compatible toolchain
+  persistence: PostgreSQL
+  transport: HTTP
+  identity: OIDC
+  security_boundary: true
+
+repository_topology: one-repository-with-independent-backend-and-frontend-package-roots
+
+module_realizations:
+  - {semantic_owner: backend runtime/composition/adapters/modules, physical_root: backend}
+  - {semantic_owner: frontend application shell/features, physical_root: web}
+  - {semantic_owner: database migrations/schema assets, physical_root: backend-owned migration root}
+
+dependency_rules:
+  - rule: backend module dependencies follow mvp-backend-component-design and cross-module contracts
+    enforcement: deterministic Python import/dependency rules plus architecture tests
+  - rule: domain/application modules never depend on HTTP database OIDC or framework types
+    enforcement: deterministic backend dependency rules
+  - rule: frontend features access backend only through the accepted HTTP/OpenAPI boundary
+    enforcement: frontend dependency rules plus integration tests
+
+obligations:
+  - {id: backend-format-lint, applicability: REQUIRED, enforcement: pinned Python formatter/linter in PR CI}
+  - {id: backend-static-typing, applicability: REQUIRED, enforcement: pinned Python type checker in PR CI}
+  - {id: frontend-format-lint, applicability: REQUIRED, enforcement: pinned TypeScript/React formatter-linter in PR CI}
+  - {id: frontend-static-typing, applicability: REQUIRED, enforcement: TypeScript compiler type check in PR CI}
+  - {id: architecture-dependencies, applicability: REQUIRED, enforcement: backend/frontend mechanical boundary checks}
+  - {id: secret-scanning, applicability: REQUIRED, enforcement: repository push protection/secret scan or equivalent}
+  - {id: dependency-review, applicability: REQUIRED, enforcement: blocking pull-request dependency review at accepted severity threshold}
+  - {id: sast, applicability: REQUIRED, enforcement: blocking or policy-controlled code scanning for supported backend/frontend languages}
+  - {id: build-package-validation, applicability: REQUIRED, enforcement: clean backend install plus frontend production build in CI}
+  - {id: sbom-provenance, applicability: DEFERRED, rationale: becomes required when deployable artifacts are published or organizational policy requires attestations}
+
+generated_artifacts:
+  - path: generated OpenAPI/client/schema derivatives where introduced
+    source_of_truth: accepted interface/design contract
+    regenerate: deterministic project generator check
+
+environment:
+  reproducibility: REQUIRED
+  lock_or_equivalent: committed backend and frontend lock/resolution inputs with pinned CI tool versions
+
+quality_gates:
+  - id: pull-request
+    trigger: pull_request
+    blocking: true
+    command: project check entrypoint covering backend frontend architecture security dependencies tests and builds
+  - id: release
+    trigger: release
+    blocking: true
+    command: clean build migration/schema compatibility and release verification
+
+implementation_freedoms:
+  - concrete checker products may differ between backend and frontend
+  - private file layout inside accepted component/feature boundaries

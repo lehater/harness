@@ -193,11 +193,11 @@ authorities:
 
   - id: IMPLEMENTATION-DESIGN
     class: baseline
-    responsibility: Own implementation slicing, sequencing, migration concerns and completion criteria after upstream engineering decisions are available.
+    responsibility: Own implementation slicing, sequencing, repository realization, concrete toolchain/gate wiring, migration concerns and completion criteria after upstream engineering decisions are available.
     boundary:
-      semantic_cohesion: Decisions about how accepted design will be realized in bounded implementation work.
-      independent_change: Realization order and slicing can change without redefining upstream truth.
-      public_contract: Provides implementation plan/completion criteria and routes missing semantic decisions upstream.
+      semantic_cohesion: Decisions about how accepted design will be realized as bounded implementation work and a reproducible physical codebase/toolchain.
+      independent_change: Realization order, physical mapping and replaceable tools can change without redefining upstream truth when accepted boundaries and obligations remain satisfied.
+      public_contract: Provides implementation plan, repository/tooling realization, quality-gate wiring and completion criteria while routing missing semantic decisions upstream.
 
   - id: VERIFICATION-DESIGN
     class: baseline
