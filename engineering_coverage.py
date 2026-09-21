@@ -68,6 +68,7 @@ def _apply_production_contract_overlay(
         authority_id = item.get("authority")
         capability = item.get("capability")
         semantic_claims = item.get("semantic_claims", []) or []
+        knowledge_kind = item.get("knowledge_kind")
         requires = item.get("requires", []) or []
 
         if authority_id not in authorities:
@@ -85,14 +86,21 @@ def _apply_production_contract_overlay(
                 f"production contract overlay {capability} must declare semantic_claims"
             )
 
-        authorities[authority_id].setdefault("produces", []).append({
+        production = {
             "capability": capability,
             "semantic_claims": semantic_claims,
             "requires": [
                 value if isinstance(value, dict) else {"capability": value}
                 for value in requires
             ],
-        })
+        }
+        if knowledge_kind is not None:
+            if not isinstance(knowledge_kind, str) or not knowledge_kind:
+                raise ValueError(
+                    f"production contract overlay {capability} knowledge_kind must be non-empty"
+                )
+            production["knowledge_kind"] = knowledge_kind
+        authorities[authority_id].setdefault("produces", []).append(production)
         existing.add(capability)
 
     return result
