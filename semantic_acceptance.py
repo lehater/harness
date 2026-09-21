@@ -11,8 +11,13 @@ universal engineering ontology.
 """
 from __future__ import annotations
 
+import argparse
+import json
 from collections import defaultdict, deque
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 
 def semantic_key(item: dict[str, Any]) -> tuple[str, str | None]:
@@ -351,3 +356,36 @@ def coverage_proof_available(
         and accepted_claim
         in evaluation.get("semantic_claims", {}).get("accepted", [])
     )
+
+
+def load(path: str | Path) -> dict[str, Any]:
+    value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a mapping")
+    return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Evaluate candidate artifact semantic acceptance"
+    )
+    parser.add_argument("contract")
+    parser.add_argument("sources")
+    parser.add_argument("candidate")
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args()
+
+    result = evaluate_artifact(
+        load(args.contract),
+        load(args.sources),
+        load(args.candidate),
+    )
+    if args.json:
+        print(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
+    return 0 if result["status"] == "ACCEPTED" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
