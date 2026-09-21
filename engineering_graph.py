@@ -277,6 +277,11 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
         requirement["capability"]
         for _, requirement in all_requirements
     }
+    coverage_consumed_capabilities = {
+        capability
+        for capability, production in production_by_capability.items()
+        if production.get("semantic_claims")
+    }
     terminal_capabilities = _terminal_capabilities(graph)
 
     for capability, terminal in terminal_capabilities.items():
@@ -290,7 +295,7 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
                 f"terminal capability {capability} is owned by {producer}, "
                 f"expected {terminal['authority']}"
             )
-        if capability in consumed_capabilities:
+        if capability in consumed_capabilities or capability in coverage_consumed_capabilities:
             raise CoreError(
                 f"terminal capability {capability} is already consumed downstream"
             )
@@ -298,6 +303,7 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
     unconsumed = sorted(
         set(producer_by_capability)
         - consumed_capabilities
+        - coverage_consumed_capabilities
         - set(terminal_capabilities)
     )
     if unconsumed:
