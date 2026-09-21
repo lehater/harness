@@ -6,7 +6,7 @@ Status: canonical candidate.
 
 Close the last implementation-facing structural gap without prescribing a universal directory tree, build system or toolchain.
 
-Repository Realization is a facet of `implementation-design`. It materializes accepted architecture/component/policy/security/quality/verification decisions into a physical codebase and enforceable developer/CI toolchain.
+Repository Realization is a facet of `implementation-design`. It materializes accepted architecture/component/policy/security/quality/verification decisions into a physical codebase and enforceable developer/integration toolchain.
 
 ## Ownership
 
@@ -16,7 +16,7 @@ Repository Realization is a facet of `implementation-design`. It materializes ac
 - concrete tool choices for already-applicable obligations;
 - dependency/environment reproducibility mechanism;
 - generated/source/config/test/migration topology needed for coding;
-- authoritative quality-gate wiring;
+- authoritative quality-gate wiring when the delivery workflow has merge/release gates;
 - explicit implementation freedoms.
 
 It does not re-own module semantics, dependency direction, security policy, quality targets or verification truth.
@@ -29,14 +29,14 @@ It does not re-own module semantics, dependency direction, security policy, qual
 4. Tool obligations are stated independently from products; concrete products are replaceable realization decisions.
 5. Versioned project inputs are sufficient to reproduce the dependency/tool/build environment to the level required by the project.
 6. Human-authored and generated artifacts are distinguishable; generators and canonical source are explicit.
-7. CI is the authoritative enforcement boundary for merge/release gates. Local/pre-commit checks optimize feedback and reuse the same semantics where practical.
+7. When merge/release gating is applicable, its authoritative enforcement boundary is explicit and reproducible. In PR/CI workflows that boundary is normally CI. Local/pre-commit checks optimize feedback and reuse the same semantics where practical, but are not a second source of truth.
 8. Generated tree/config/guide outputs are projections, never a second source of truth.
 
 ## Applicability
 
 Each obligation is one of `REQUIRED`, `NOT_APPLICABLE`, `DEFERRED`, or `QUESTION`.
 
-Applicability is derived from accepted project facts where mechanically safe (persistence, external dependencies, deployable/package artifacts, generated files, security boundaries, multiple packages) and otherwise declared explicitly with rationale.
+Applicability is derived from accepted project facts where mechanically safe (persistence, external dependencies, deployable/package artifacts, generated files, security boundaries, multiple packages, merge/release workflow) and otherwise declared explicitly with rationale.
 
 Silence for a known applicable facet is incomplete.
 
@@ -66,6 +66,8 @@ generated_artifacts:
 environment:
   dependency_resolution: ...
   lock_or_equivalent: ...
+gate_policy:
+  applicability: REQUIRED
 quality_gates:
   - id: ...
     trigger: pull_request
@@ -73,6 +75,15 @@ quality_gates:
     command: ...
 implementation_freedoms:
   - ...
+```
+
+For a project without an applicable merge/release gate:
+
+```yaml
+gate_policy:
+  applicability: NOT_APPLICABLE
+  rationale: ...
+quality_gates: []
 ```
 
 Exact field extensions are project-native; Harness only requires the semantic invariants.
@@ -85,7 +96,7 @@ Repository realization is complete for an Implementation consumer when:
 - applicable obligations have enforcement or an explicit terminal disposition;
 - generated/source and migration/test boundaries are decided when applicable;
 - environment/dependency resolution is reproducible as required;
-- authoritative blocking gates are explicit;
+- authoritative gates are explicit when merge/release gating is applicable, otherwise non-applicability is explicit;
 - no unresolved `QUESTION` remains.
 
 No new Authority, Capability family or knowledge kind is required. Projects may expose a separate implementation-design Capability for repository realization when its lifecycle is independently useful, but it keeps `knowledge_kind: implementation-design`.
