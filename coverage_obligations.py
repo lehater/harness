@@ -2,6 +2,7 @@
 """Generic subject-obligation derivation and proof for Engineering Coverage."""
 from __future__ import annotations
 from typing import Any
+import re
 
 from coverage_planner import (
     _coverage_extended_scope,
@@ -16,6 +17,22 @@ TERMINAL_STATES = {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
 
 
 def _accepted_requirement_ids(source: dict[str, Any]) -> set[str]:
+    """Extract accepted atomic requirement identities from an adapted canonical source."""
+    if source.get("kind") == "harness-markdown-scope-source":
+        text = source.get("text", "")
+        if not isinstance(text, str):
+            raise ValueError("markdown scope source text must be a string")
+        status_match = re.search(r"(?im)^Status:\\s*[:]?\\s*`?([^\\n`]+)`?\\.?\\s*$", text)
+        if not status_match or "accepted" not in status_match.group(1).lower():
+            return set()
+        return {
+            match.group("id")
+            for match in re.finditer(
+                r"(?m)^\\s*-\\s+\\[(?P<id>[A-Z][A-Z0-9_.-]+)\\]\\s+",
+                text,
+            )
+        }
+
     content = source.get("content", {}) or {}
     requirements = content.get("requirements", []) or []
     result: set[str] = set()
@@ -26,7 +43,6 @@ def _accepted_requirement_ids(source: dict[str, Any]) -> set[str]:
         if item.get("status") == "ACCEPTED" and isinstance(requirement_id, str) and requirement_id:
             result.add(requirement_id)
     return result
-
 
 def validate_subject_obligations(
     obligations: dict[str, Any],
