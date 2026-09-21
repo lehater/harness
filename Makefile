@@ -28,3 +28,4 @@ harness-check:
 	python validators/validate_intra_consumer_scope.py
 	python validators/validate_subject_scoped_coverage.py
 	python validators/validate_engineering_coverage.py
+	python validators/validate_coverage_blocker_transition.py
