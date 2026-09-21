@@ -1,0 +1,79 @@
+version: 1
+kind: harness-repository-realization-contract
+id: repository-realization/v1
+status: canonical-candidate
+
+ownership:
+  authority: IMPLEMENTATION-DESIGN
+  knowledge_kind: implementation-design
+  upstream:
+    - architecture
+    - component-design
+    - engineering-policy
+    - security
+    - quality
+    - verification
+  note: Concrete realization may be a distinct Capability without creating a new knowledge kind.
+
+decision_classes:
+  - universal-invariant
+  - conditional-invariant
+  - project-decision
+  - implementation-freedom
+  - generated-projection
+  - concrete-tool-choice
+
+principles:
+  - semantic-cohesion
+  - explicit-ownership
+  - independent-change
+  - dependency-direction
+  - visibility
+  - deployability
+  - testability
+  - generated-vs-source-distinction
+  - framework-isolation
+  - cross-context-contracts
+  - locality-of-change
+  - reproducibility
+
+facets:
+  - repository-topology
+  - module-realization
+  - dependency-enforcement
+  - shared-code-policy
+  - test-topology
+  - fixture-test-data-topology
+  - migration-topology
+  - generated-artifact-topology
+  - configuration-topology
+  - scripts-tooling-topology
+  - dependency-environment-realization
+  - static-quality-toolchain
+  - secure-development-toolchain
+  - build-package-validation
+  - ci-quality-gates
+  - local-developer-workflow
+  - ownership-review-routing
+  - release-evidence
+
+applicability_states: [REQUIRED, NOT_APPLICABLE, DEFERRED, QUESTION]
+
+completeness:
+  - required-modules-have-physical-realization
+  - significant-dependency-rules-have-mechanical-enforcement
+  - applicable-obligations-have-enforcement-or-explicit-terminal-disposition
+  - source-generated-boundary-is-explicit-when-applicable
+  - test-migration-configuration-topology-is-explicit-when-applicable
+  - dependency-environment-resolution-is-reproducible-as-required
+  - authoritative-blocking-gates-are-explicit
+  - no-unresolved-question-remains
+
+projection_targets:
+  - repository-tree
+  - bootstrap-skeleton
+  - ci-configuration
+  - pre-commit-configuration
+  - formatter-linter-typechecker-configuration
+  - dependency-architecture-rules
+  - developer-guide
