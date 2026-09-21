@@ -7,6 +7,7 @@ sys.path.insert(0, str(ROOT))
 
 from semantic_acceptance import evaluate_artifact
 from coverage_planner import capability_realization
+from engineering_coverage import evaluate_with_repository_policy, load
 
 
 def codes(result):
@@ -168,9 +169,52 @@ def test_coverage_gating_and_invalidation():
     ]
 
 
+
+def test_engineering_coverage_evidence_input():
+    graph = load(ROOT / "spec/research/subject-coverage-fixture-graph.yaml")
+    realization = load(ROOT / "spec/research/subject-coverage-fixture-core-complete.yaml")
+    evidence = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "version": 1,
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "BC-B-DOMAIN",
+                "capability": "fixture.domain.model.bc-b",
+                "status": "REJECTED",
+                "obligations": {"expected": ["domain"], "satisfied": []},
+                "findings": [{"code": "MISSING_OBLIGATION", "obligation": "domain"}],
+                "semantic_claims": {"accepted": []},
+            }
+        ],
+    }
+    result = evaluate_with_repository_policy(
+        graph=graph,
+        realization=realization,
+        consumer="IMPLEMENTATION",
+        scope="all",
+        project_overlay={
+            "activate": [
+                {
+                    "concern": "domain.model",
+                    "rationale": "Both bounded contexts require accepted domain semantics.",
+                }
+            ],
+            "decisions": [],
+        },
+        semantic_evaluations=evidence,
+    )
+    row = {item["concern"]: item for item in result["rows"]}["domain.model"]
+    assert row["state"] == "BLOCKED"
+    assert row["action"] == "REVALIDATE_SEMANTICS"
+    assert row["capabilities"] == ["fixture.domain.model.bc-b"]
+    assert result["completion_ready"] is False
+
 def main():
     test_real_defect_regressions()
     test_coverage_gating_and_invalidation()
+    test_engineering_coverage_evidence_input()
     print("semantic acceptance: PASS (real defect regressions + gating/invalidation)")
     return 0
 
