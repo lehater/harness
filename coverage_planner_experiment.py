@@ -122,6 +122,7 @@ def capability_realization(
     project_docs: list[dict[str, Any]],
     target_consumer: str | None = None,
     scope_roots: list[str] | None = None,
+    extension_capabilities: set[str] | None = None,
 ) -> dict[str, Any]:
     allowed: set[str] | None = None
     if target_consumer:
@@ -130,7 +131,12 @@ def capability_realization(
             if doc.get("kind") != "harness-engineering-graph":
                 continue
             closures.append(
-                _coverage_extended_scope(doc, target_consumer, scope_roots)
+                _coverage_extended_scope(
+                    doc,
+                    target_consumer,
+                    scope_roots,
+                    extension_capabilities,
+                )
             )
         nonempty = [value for value in closures if value]
         if nonempty:
@@ -209,6 +215,7 @@ def _coverage_extended_scope(
     doc: dict[str, Any],
     target_consumer: str,
     scope_roots: list[str] | None = None,
+    extension_capabilities: set[str] | None = None,
 ) -> set[str]:
     base = _consumer_closure(doc, target_consumer)
     if scope_roots:
@@ -221,6 +228,7 @@ def _coverage_extended_scope(
         base &= selected
 
     scope = set(base)
+    extension_capabilities = set(extension_capabilities or set())
     productions: dict[str, dict[str, Any]] = {}
     for authority in doc.get("authorities", []) or []:
         if not isinstance(authority, dict):
@@ -233,7 +241,11 @@ def _coverage_extended_scope(
     while changed:
         changed = False
         for capability, production in productions.items():
-            if capability in scope or not production.get("semantic_claims"):
+            if (
+                capability in scope
+                or capability not in extension_capabilities
+                or not production.get("semantic_claims")
+            ):
                 continue
             prerequisites = []
             for requirement in production.get("requires", []) or []:
@@ -256,12 +268,14 @@ def realized_capabilities(
     project_docs: list[dict[str, Any]],
     target_consumer: str | None = None,
     scope_roots: list[str] | None = None,
+    extension_capabilities: set[str] | None = None,
 ) -> set[str]:
     return set(
         capability_realization(
             project_docs,
             target_consumer,
             scope_roots,
+            extension_capabilities,
         )["usable"]
     )
 
@@ -341,7 +355,15 @@ def derive_plan(
     roles = role_claims(role_contract)
     cap_claims = capability_claim_index(capability_bindings, project_docs)
     scope_roots = list(overlay.get("scope_roots", []) or [])
-    realization = capability_realization(project_docs, target_consumer, scope_roots)
+    extension_capabilities = set(
+        overlay.get("coverage_extension_capabilities", []) or []
+    )
+    realization = capability_realization(
+        project_docs,
+        target_consumer,
+        scope_roots,
+        extension_capabilities,
+    )
     realized_caps = set(realization["usable"])
     provided_caps = set(realization["provided"])
 
@@ -352,7 +374,12 @@ def derive_plan(
             if doc.get("kind") != "harness-engineering-graph":
                 continue
             closures.append(
-                _coverage_extended_scope(doc, target_consumer, scope_roots)
+                _coverage_extended_scope(
+                    doc,
+                    target_consumer,
+                    scope_roots,
+                    extension_capabilities,
+                )
             )
         nonempty=[value for value in closures if value]
         if nonempty:
