@@ -32,7 +32,14 @@ def main() -> int:
                             },
                         ],
                         "requires": [],
-                    }
+                    },
+                    {
+                        "capability": "fixture.coverage-only",
+                        "semantic_claims": [
+                            "engineering.data.lifecycle",
+                        ],
+                        "requires": [],
+                    },
                 ],
             }
         ],
@@ -48,6 +55,7 @@ def main() -> int:
 
     validate_engineering_graph(graph)
     production = production_index(graph)["fixture.data-design"]
+    assert "fixture.coverage-only" in production_index(graph)
     assert production["semantic_claims"] == [
         {"claim": "engineering.data.model"},
         {
