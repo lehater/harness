@@ -115,6 +115,13 @@ def build_authority_context(
         key=lambda item: item["id"],
     )
 
+    selected_same_authority_support_ids: set[str] = set()
+    for artifact_id in owned_ids:
+        selected_same_authority_support_ids.update(
+            _same_authority_closure(artifact_id, artifacts)
+        )
+    selected_same_authority_support_ids.difference_update(owned_ids)
+
     required_caps: dict[str, dict[str, Any]] = {}
     for capability in public_outputs:
         for requirement in productions[capability].get("requires", []) or []:
@@ -169,6 +176,7 @@ def build_authority_context(
         if status != "SATISFIED":
             blockers.append(row)
 
+    support_artifact_ids.update(selected_same_authority_support_ids)
     support_artifact_ids.difference_update(input_artifact_ids)
     own_ids = {item["id"] for item in owned}
     support_artifact_ids.difference_update(own_ids)

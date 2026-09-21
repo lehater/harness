@@ -84,12 +84,30 @@ def main() -> int:
                     "depends_on": ["REQUIREMENTS"],
                 }
             )
+            independent_source["nodes"].append(
+                {
+                    "id": "INTERFACE-SUPPORT",
+                    "path": "docs/interface-support.yaml",
+                    "depends_on": [],
+                }
+            )
+            next(
+                item for item in independent_source["nodes"]
+                if item["id"] == "INTERFACE"
+            )["depends_on"].append("INTERFACE-SUPPORT")
             independent_projection = copy.deepcopy(projection)
             independent_projection["bindings"].append(
                 {
                     "artifact": "INDEPENDENT-INTERFACE",
                     "authority": "INTERFACE",
                     "provides": ["example.independent-interface"],
+                }
+            )
+            independent_projection["bindings"].append(
+                {
+                    "artifact": "INTERFACE-SUPPORT",
+                    "authority": "INTERFACE",
+                    "provides": [],
                 }
             )
             independent_model = validate_project_alignment(
@@ -112,6 +130,8 @@ def main() -> int:
                 item["path"] for item in scoped_interface["owned_artifacts"]
             } == {"docs/interface.yaml"}
             assert "docs/independent-interface.yaml" not in scoped_interface["access"]["read"]
+            assert "docs/interface-support.yaml" in scoped_interface["access"]["read"]
+            assert "docs/interface-support.yaml" not in scoped_interface["access"]["write"]
 
             context = build_authority_context(
                 graph, model, "IMPLEMENTATION-DESIGN"
