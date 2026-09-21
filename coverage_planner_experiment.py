@@ -517,6 +517,7 @@ def derive_plan(
                     ),
                     "capability": cap,
                     "authority": producer_by_capability.get(cap),
+                    "knowledge_kind": production.get("knowledge_kind"),
                     "requires": sorted(prerequisites),
                     "missing_prerequisites": missing_prerequisites,
                     "questions": direct_questions,
