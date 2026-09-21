@@ -49,12 +49,12 @@ def concern_proofs(contract: dict[str, Any]) -> dict[str, set[str]]:
 
 def role_claims(contract: dict[str, Any]) -> dict[str, set[str]]:
     return {
-        role: set(spec.get("can_produce", []) or [])
+        role: set(spec.get("can_produce_claims", []) or [])
         for role, spec in (contract.get("roles", {}) or {}).items()
     }
 
 
-def authorities_for_kind(
+def authorities_for_claim(
     semantic_claim: str,
     roles: dict[str, set[str]],
     project_roles: dict[str, Any],
@@ -83,7 +83,7 @@ def derive_plan(
     realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
         for claim in sorted(cap_claims.get(cap, set())):
-            realized_claims.setdefault(kind, []).append(cap)
+            realized_claims.setdefault(claim, []).append(cap)
 
     explicit = {d["concern"]: d for d in overlay.get("decisions", []) or []}
     required = list(overlay.get("required", []) or [])
@@ -117,7 +117,7 @@ def derive_plan(
 
         routes: dict[str, list[str]] = {}
         for claim in accepted:
-            auths = authorities_for_kind(kind, roles, project_roles)
+            auths = authorities_for_claim(claim, roles, project_roles)
             if auths:
                 routes[claim] = auths
 
@@ -126,7 +126,7 @@ def derive_plan(
                 "concern": concern,
                 "state": "BLOCKED",
                 "action": "MODEL_PROOF_CONTRACT",
-                "reason": "concern has no accepted knowledge-kind proof contract",
+                "reason": "concern has no accepted semantic-claim proof contract",
             })
         elif routes:
             rows.append({
