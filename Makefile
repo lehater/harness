@@ -30,3 +30,7 @@ harness-check:
 	python validators/validate_engineering_coverage.py
 	python validators/validate_coverage_blocker_transition.py
 	python validators/validate_coverage_production_contract_overlay.py
+
+	python validators/validate_semantic_acceptance_experiment.py
+	python validators/validate_semantic_acceptance_real_project_pilots.py
+	python validators/validate_semantic_acceptance_regressions.py
