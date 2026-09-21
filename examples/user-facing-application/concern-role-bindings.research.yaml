@@ -1,0 +1,16 @@
+version: 1
+kind: harness-project-authority-role-bindings
+project: USER-FACING-APPLICATION-EXAMPLE
+status: research
+bindings:
+  PRODUCT-REQUIREMENTS: [product]
+  DOMAIN-USE-CASE-DESIGN: [domain]
+  APPLICATION-DESIGN: [application]
+  SECURITY-ARCHITECTURE: [security-architecture]
+  QUALITY-DESIGN: [quality]
+  INTERFACE-DESIGN: [interface]
+  SYSTEM-ARCHITECTURE: [architecture, reliability]
+  COMPONENT-DESIGN: [engineering]
+  VERIFICATION-DESIGN: [verification]
+  TEST-DESIGN: [verification]
+  IMPLEMENTATION-DESIGN: [delivery]
