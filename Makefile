@@ -24,3 +24,4 @@ harness-check:
 	python validators/validate_concern_activation_scaling.py
 	python validators/validate_authority_role_projection_experiment.py
 	python validators/validate_consumer_scoped_activation.py
+	python validators/validate_consumer_scoped_coverage_proof.py
