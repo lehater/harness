@@ -55,6 +55,9 @@ Useful content may include:
 - cross-owner consistency is sufficient for downstream architecture/data design;
 - failure/unresolved distinctions match accepted behavior;
 - no infrastructure default is promoted to semantic truth.
+- every selected journey action is covered by an explicit application operation or an explicit upstream disposition;
+- subject identity/lifecycle creation semantics are explicit when a journey can create a previously nonexistent subject;
+- subject-level operation coverage is checked as a finite set rather than inferred from nearby command names;
 
 ## Registration
 
