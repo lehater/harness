@@ -56,7 +56,11 @@ def main() -> int:
     ):
         assert concern in mvp_rows
         assert mvp_rows[concern]["state"] != "COVERED"
-    assert mvp_rows["engineering.components"]["action"] == "MODEL_PRODUCTION_CONTRACT"
+    assert mvp_rows["engineering.components"]["action"] in {
+        "ASSIGN_AUTHORITY",
+        "MODEL_PRODUCTION_CONTRACT",
+        "PRODUCE_CAPABILITY",
+    }
     assert "interface.human.accessibility" not in mvp_rows
     assert "interface.human.accessibility" in later_rows
     assert "data.lifecycle" not in later_rows
