@@ -27,6 +27,7 @@ import yaml
 
 from concern_activation_experiment import derive_activation
 from coverage_planner_experiment import derive_plan
+from engineering_graph import validate_engineering_graph, validate_realization
 
 
 ROOT = Path(__file__).resolve().parent
@@ -108,6 +109,9 @@ def evaluate_coverage(
     project_overlay: dict[str, Any] | None = None,
     semantic_claim_bindings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    validate_engineering_graph(graph)
+    realized = validate_realization(graph, realization)
+
     aliases = authority_aliases or {"bindings": {}}
     overlay = _scope_overlay(
         project_overlay or {},
@@ -123,7 +127,7 @@ def evaluate_coverage(
     }
 
     roles = _merge_authority_roles(standard_authority_roles, aliases, graph)
-    project_docs = [graph, realization]
+    project_docs = [graph, realized]
 
     activation = derive_activation(
         activation_policy,
