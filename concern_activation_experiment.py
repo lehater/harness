@@ -64,29 +64,37 @@ def _contains_any(values: set[str], tokens: list[str]) -> bool:
 
 def rule_matches(rule: dict[str, Any], signals: dict[str, set[str]]) -> tuple[bool, list[str]]:
     when = rule.get("when", {}) or {}
-    matched: list[str] = []
+    evidence: list[str] = []
+    group_results: list[bool] = []
 
     kinds = when.get("knowledge_kinds_any", []) or []
     if kinds:
         hits = sorted(signals["knowledge_kinds"] & set(kinds))
-        if hits:
-            matched.extend(f"knowledge_kind:{x}" for x in hits)
+        group_results.append(bool(hits))
+        evidence.extend(f"knowledge_kind:{x}" for x in hits)
 
     roles = when.get("authority_roles_any", []) or []
     if roles:
         hits = sorted(signals["authority_roles"] & set(roles))
-        if hits:
-            matched.extend(f"authority_role:{x}" for x in hits)
+        group_results.append(bool(hits))
+        evidence.extend(f"authority_role:{x}" for x in hits)
 
     tokens = when.get("capability_contains_any", []) or []
     if tokens:
-        for cap in sorted(signals["capabilities"]):
-            if any(token in cap for token in tokens):
-                matched.append(f"capability:{cap}")
+        hits = [
+            cap for cap in sorted(signals["capabilities"])
+            if any(token in cap for token in tokens)
+        ]
+        group_results.append(bool(hits))
+        evidence.extend(f"capability:{x}" for x in hits)
 
-    # Rule semantics: any declared structural signal group may activate.
-    # Rules that need conjunction must encode a more specific machine signal instead.
-    return bool(matched), matched
+    mode = rule.get("match", "any")
+    if mode not in {"any", "all"}:
+        raise ValueError(f"activation rule {rule.get('id')} has invalid match mode: {mode}")
+    if not group_results:
+        return False, []
+    matched = all(group_results) if mode == "all" else any(group_results)
+    return matched, evidence if matched else []
 
 
 def derive_activation(
