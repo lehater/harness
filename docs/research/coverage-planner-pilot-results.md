@@ -8,7 +8,7 @@ Test whether activated Engineering Concerns can be turned into an algorithmic wo
 
 ```text
 activated concern
-  -> accepted knowledge kind
+  -> accepted semantic claim
   -> capable Authority role
   -> project Authority
   -> missing semantic production
@@ -67,7 +67,7 @@ Result:
 - blocked by missing project role assignment: 12;
 - completion gate: false.
 
-Important: `ASSIGN_AUTHORITY` does not automatically mean "create a new Authority". It means the project graph currently has no Authority explicitly bound to a reusable role competent to produce that knowledge kind. Resolution may be:
+Important: `ASSIGN_AUTHORITY` does not automatically mean "create a new Authority". It means the project graph currently has no Authority explicitly bound to a reusable role competent to produce that semantic claim. Resolution may be:
 1. bind an existing Authority if that responsibility is semantically coherent with its boundary;
 2. split/create an Authority if responsibility would otherwise be mixed incorrectly;
 3. decide that the concern is not applicable/deferred, with explicit evidence.
@@ -110,14 +110,16 @@ This prevents the Concern Catalog from becoming a universal mandatory checklist 
 
 ## Next research step
 
-The remaining weakness is that project `knowledge-kind-bindings` are still an external research adapter.
+The remaining weakness is that project `semantic-claim-bindings` are still an external research adapter.
 
-The next experiment should move this semantic classification into the actual Engineering Graph production contract:
+The target form is to move this semantic classification into the actual Engineering Graph production contract:
 
 ```yaml
 produces:
   - capability: project-specific-capability
-    knowledge_kind: engineering.data.classification
+    knowledge_kind: data-design
+    semantic_claims:
+      - engineering.data.classification
 ```
 
-Then the planner can derive proof and routing directly from the Engineering Graph/Core without a separate bindings file.
+Research migration check found an important ordering constraint: project graphs pinned to the current Harness reject the new field. Therefore the correct migration is Harness schema/runtime first, project adoption second. Until then pilot branches keep semantic claims in a research adapter.
