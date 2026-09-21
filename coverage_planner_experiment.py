@@ -198,6 +198,17 @@ def derive_plan(
         if nonempty:
             scoped_caps=set().union(*nonempty)
 
+    producer_by_capability: dict[str, str] = {}
+    for doc in project_docs:
+        for authority in doc.get("authorities", []) or []:
+            if not isinstance(authority, dict) or not authority.get("id"):
+                continue
+            for production in authority.get("produces", []) or []:
+                if isinstance(production, str):
+                    producer_by_capability[production] = authority["id"]
+                elif isinstance(production, dict) and production.get("capability"):
+                    producer_by_capability[production["capability"]] = authority["id"]
+
     realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
         for claim_info in cap_claims.get(cap, []):
@@ -259,6 +270,26 @@ def derive_plan(
                 })
                 continue
 
+        production_candidates = []
+        for cap, claims_for_cap in cap_claims.items():
+            if scoped_caps is not None and cap not in scoped_caps:
+                continue
+            if cap in realized_caps:
+                continue
+            for claim_info in claims_for_cap:
+                if claim_info["claim"] not in accepted:
+                    continue
+                production_candidates.append({
+                    "claim": claim_info["claim"],
+                    **(
+                        {"subject": claim_info["subject"]}
+                        if claim_info.get("subject") is not None
+                        else {}
+                    ),
+                    "capability": cap,
+                    "authority": producer_by_capability.get(cap),
+                })
+
         routes: dict[str, list[str]] = {}
         for claim in accepted:
             auths = authorities_for_claim(claim, roles, project_roles)
@@ -272,13 +303,13 @@ def derive_plan(
                 "action": "MODEL_PROOF_CONTRACT",
                 "reason": "concern has no accepted semantic-claim proof contract",
             })
-        elif routes:
+        elif production_candidates:
             row={
                 "concern": concern,
                 "state": "MISSING",
-                "action": "PRODUCE_KNOWLEDGE",
+                "action": "PRODUCE_CAPABILITY",
                 "accepted_semantic_claims": accepted,
-                "routes": routes,
+                "production_candidates": production_candidates,
             }
             if subject_instances:
                 row["missing_instances"]=[
@@ -288,6 +319,18 @@ def derive_plan(
                     item for item in subject_instances if item["realized"]
                 ]
             rows.append(row)
+        elif routes:
+            rows.append({
+                "concern": concern,
+                "state": "MISSING",
+                "action": "MODEL_PRODUCTION_CONTRACT",
+                "accepted_semantic_claims": accepted,
+                "routes": routes,
+                "reason": (
+                    "A capable Authority role exists, but no in-scope Capability "
+                    "declares an accepted semantic claim for this concern."
+                ),
+            })
         else:
             rows.append({
                 "concern": concern,
