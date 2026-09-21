@@ -15,7 +15,18 @@ def run(consumer):
             "kind":"harness-concern-activation-overlay",
             "project":"CONSUMER-ACTIVATION-FIXTURE",
             "scope":consumer.lower(),
-            "activate":[],
+            "activate":[
+                {
+                    "concern":"governance.data",
+                    "rationale":"Shared project fact.",
+                    "consumers":["BACKEND","FRONTEND"],
+                },
+                {
+                    "concern":"quality.performance.latency",
+                    "rationale":"Frontend-only interaction concern.",
+                    "consumers":["FRONTEND"],
+                },
+            ],
             "decisions":[],
         },
         [load(str(ROOT/"spec/research/consumer-activation-fixture-graph.yaml"))],
@@ -38,6 +49,9 @@ def main():
 
     assert "architecture.structure" in b and "architecture.structure" in f
     assert "delivery.release" in b and "delivery.release" in f
+    assert "governance.data" in b and "governance.data" in f
+    assert "quality.performance.latency" not in b
+    assert "quality.performance.latency" in f
 
     print(f"consumer scoped activation: backend={backend['activated_count']} frontend={frontend['activated_count']}")
     return 0
