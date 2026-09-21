@@ -129,16 +129,9 @@ def capability_realization(
         for doc in project_docs:
             if doc.get("kind") != "harness-engineering-graph":
                 continue
-            consumer_scope = _consumer_closure(doc, target_consumer)
-            if scope_roots:
-                selected = _capability_closure(doc, scope_roots)
-                unknown = set(scope_roots) - consumer_scope
-                if unknown:
-                    raise ValueError(
-                        f"scope roots outside Consumer {target_consumer} closure: {sorted(unknown)}"
-                    )
-                consumer_scope &= selected
-            closures.append(consumer_scope)
+            closures.append(
+                _coverage_extended_scope(doc, target_consumer, scope_roots)
+            )
         nonempty = [value for value in closures if value]
         if nonempty:
             allowed = set().union(*nonempty)
@@ -210,6 +203,53 @@ def capability_realization(
             for capability, values in providers_by_capability.items()
         },
     }
+
+
+def _coverage_extended_scope(
+    doc: dict[str, Any],
+    target_consumer: str,
+    scope_roots: list[str] | None = None,
+) -> set[str]:
+    base = _consumer_closure(doc, target_consumer)
+    if scope_roots:
+        selected = _capability_closure(doc, scope_roots)
+        unknown = set(scope_roots) - base
+        if unknown:
+            raise ValueError(
+                f"scope roots outside Consumer {target_consumer} closure: {sorted(unknown)}"
+            )
+        base &= selected
+
+    scope = set(base)
+    productions: dict[str, dict[str, Any]] = {}
+    for authority in doc.get("authorities", []) or []:
+        if not isinstance(authority, dict):
+            continue
+        for production in authority.get("produces", []) or []:
+            if isinstance(production, dict) and production.get("capability"):
+                productions[production["capability"]] = production
+
+    changed = True
+    while changed:
+        changed = False
+        for capability, production in productions.items():
+            if capability in scope or not production.get("semantic_claims"):
+                continue
+            prerequisites = []
+            for requirement in production.get("requires", []) or []:
+                upstream = (
+                    requirement
+                    if isinstance(requirement, str)
+                    else requirement.get("capability")
+                )
+                if upstream:
+                    prerequisites.append(upstream)
+            # Coverage-only production contracts must anchor to the selected
+            # Consumer/scope through at least one prerequisite.
+            if prerequisites and all(value in scope for value in prerequisites):
+                scope.add(capability)
+                changed = True
+    return scope
 
 
 def realized_capabilities(
@@ -311,10 +351,9 @@ def derive_plan(
         for doc in project_docs:
             if doc.get("kind") != "harness-engineering-graph":
                 continue
-            consumer_scope = _consumer_closure(doc, target_consumer)
-            if scope_roots:
-                consumer_scope &= _capability_closure(doc, scope_roots)
-            closures.append(consumer_scope)
+            closures.append(
+                _coverage_extended_scope(doc, target_consumer, scope_roots)
+            )
         nonempty=[value for value in closures if value]
         if nonempty:
             scoped_caps=set().union(*nonempty)
