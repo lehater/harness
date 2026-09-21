@@ -38,7 +38,7 @@ rules:
   - id: MACHINE-INTERFACE
     when:
       knowledge_kinds_any: [interface-contract]
-      capability_contains_any: [.interface.cli, .http-contract, .application-contracts, .machine-interface]
+      capability_contains_any: [.interface.cli, .http-contract, .machine-interface]
     activate:
       - interface.machine.contract
       - interface.machine.errors
