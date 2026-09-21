@@ -5,7 +5,7 @@ Turns activated concern gaps into Authority-routed work by combining:
 - concern proof contract
 - reusable Authority role competence
 - project Authority role bindings
-- project capability -> knowledge-kind bindings
+- project capability -> semantic-claim bindings
 - project canonical artifact realization
 - project applicability/required overlay
 """
@@ -33,21 +33,21 @@ def realized_capabilities(project_docs: list[dict[str, Any]]) -> set[str]:
     return result
 
 
-def capability_kind_index(bindings: dict[str, Any]) -> dict[str, set[str]]:
+def capability_claim_index(bindings: dict[str, Any]) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
     for item in bindings.get("bindings", []) or []:
-        result.setdefault(item["capability"], set()).update(item.get("knowledge_kinds", []) or [])
+        result.setdefault(item["capability"], set()).update(item.get("semantic_claims", []) or [])
     return result
 
 
 def concern_proofs(contract: dict[str, Any]) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
     for concern, spec in (contract.get("proofs", {}) or {}).items():
-        result[concern] = set(spec.get("accepted_knowledge_kinds", []) or [])
+        result[concern] = set(spec.get("accepted_semantic_claims", []) or [])
     return result
 
 
-def role_kinds(contract: dict[str, Any]) -> dict[str, set[str]]:
+def role_claims(contract: dict[str, Any]) -> dict[str, set[str]]:
     return {
         role: set(spec.get("can_produce", []) or [])
         for role, spec in (contract.get("roles", {}) or {}).items()
@@ -55,11 +55,11 @@ def role_kinds(contract: dict[str, Any]) -> dict[str, set[str]]:
 
 
 def authorities_for_kind(
-    knowledge_kind: str,
+    semantic_claim: str,
     roles: dict[str, set[str]],
     project_roles: dict[str, Any],
 ) -> list[str]:
-    capable_roles = {role for role, kinds in roles.items() if knowledge_kind in kinds}
+    capable_roles = {role for role, claims in roles.items() if semantic_claim in claims}
     result = []
     for authority, assigned_roles in (project_roles.get("bindings", {}) or {}).items():
         if capable_roles & set(assigned_roles or []):
@@ -76,14 +76,14 @@ def derive_plan(
     project_docs: list[dict[str, Any]],
 ) -> dict[str, Any]:
     proofs = concern_proofs(proof_contract)
-    roles = role_kinds(role_contract)
-    cap_kinds = capability_kind_index(capability_bindings)
+    roles = role_claims(role_contract)
+    cap_claims = capability_claim_index(capability_bindings)
     realized_caps = realized_capabilities(project_docs)
 
-    realized_kinds: dict[str, list[str]] = {}
+    realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
-        for kind in sorted(cap_kinds.get(cap, set())):
-            realized_kinds.setdefault(kind, []).append(cap)
+        for claim in sorted(cap_claims.get(cap, set())):
+            realized_claims.setdefault(kind, []).append(cap)
 
     explicit = {d["concern"]: d for d in overlay.get("decisions", []) or []}
     required = list(overlay.get("required", []) or [])
@@ -102,9 +102,9 @@ def derive_plan(
 
         accepted = sorted(proofs.get(concern, set()))
         present = {
-            kind: realized_kinds[kind]
-            for kind in accepted
-            if kind in realized_kinds
+            claim: realized_claims[claim]
+            for claim in accepted
+            if claim in realized_claims
         }
         if present:
             rows.append({
@@ -116,10 +116,10 @@ def derive_plan(
             continue
 
         routes: dict[str, list[str]] = {}
-        for kind in accepted:
+        for claim in accepted:
             auths = authorities_for_kind(kind, roles, project_roles)
             if auths:
-                routes[kind] = auths
+                routes[claim] = auths
 
         if not accepted:
             rows.append({
@@ -133,7 +133,7 @@ def derive_plan(
                 "concern": concern,
                 "state": "MISSING",
                 "action": "PRODUCE_KNOWLEDGE",
-                "accepted_knowledge_kinds": accepted,
+                "accepted_semantic_claims": accepted,
                 "routes": routes,
             })
         else:
@@ -141,8 +141,8 @@ def derive_plan(
                 "concern": concern,
                 "state": "BLOCKED",
                 "action": "ASSIGN_AUTHORITY",
-                "accepted_knowledge_kinds": accepted,
-                "reason": "project has no Authority bound to a role that can produce an accepted knowledge kind",
+                "accepted_semantic_claims": accepted,
+                "reason": "project has no Authority bound to a role that can produce an accepted semantic claim",
             })
 
     counts: dict[str, int] = {}
