@@ -35,6 +35,7 @@ def main():
                     "authority":"DATA-DESIGN",
                     "capability":"fixture.mvp.data-lifecycle-design",
                     "semantic_claims":["engineering.data.lifecycle"],
+                    "knowledge_kind":"data-design",
                     "requires":["fixture.mvp.data-design"],
                 }
             ],
@@ -51,6 +52,7 @@ def main():
             "claim":"engineering.data.lifecycle",
             "capability":"fixture.mvp.data-lifecycle-design",
             "authority":"DATA-DESIGN",
+            "knowledge_kind":"data-design",
             "requires":["fixture.mvp.data-design"],
             "missing_prerequisites":[],
             "questions":[],
@@ -65,6 +67,12 @@ def main():
     assert len(items)==1
     assert items[0]["authority"]=="DATA-DESIGN"
     assert items[0]["concerns"]==["data.lifecycle"]
+    assert items[0]["execution_route"] == {
+        "status":"ROUTED",
+        "knowledge_kind":"data-design",
+        "skill":"skills/artifacts/data-design/SKILL.md",
+    }
+    assert result["routed_production_count"] == 1
 
     # The new Coverage-only capability must not become an activation signal.
     assert "fixture.mvp.data-lifecycle-design" not in result["activation_signals"]["capabilities"]
