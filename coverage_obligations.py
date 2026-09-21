@@ -22,13 +22,13 @@ def _accepted_requirement_ids(source: dict[str, Any]) -> set[str]:
         text = source.get("text", "")
         if not isinstance(text, str):
             raise ValueError("markdown scope source text must be a string")
-        status_match = re.search(r"(?im)^Status:\\s*[:]?\\s*`?([^\\n`]+)`?\\.?\\s*$", text)
+        status_match = re.search(r"(?im)^Status:\s*:?\s*`?([^\n`]+)`?\.?\s*$", text)
         if not status_match or "accepted" not in status_match.group(1).lower():
             return set()
         return {
             match.group("id")
             for match in re.finditer(
-                r"(?m)^\\s*-\\s+\\[(?P<id>[A-Z][A-Z0-9_.-]+)\\]\\s+",
+                r"(?m)^\s*-\s+\[(?P<id>[A-Z][A-Z0-9_.-]+)\]\s+",
                 text,
             )
         }
