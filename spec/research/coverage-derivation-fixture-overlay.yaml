@@ -1,0 +1,12 @@
+version: 1
+kind: harness-engineering-coverage-overlay
+project: DERIVATION-FIXTURE
+scope: test
+required:
+  - reliability.recovery
+  - data.classification
+decisions:
+  - concern: interface.human.accessibility
+    state: NOT_APPLICABLE
+    rationale: No human interface in fixture.
+    evidence: [scope]

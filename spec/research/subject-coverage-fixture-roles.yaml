@@ -1,0 +1,6 @@
+version: 1
+kind: harness-project-authority-role-bindings
+project: SUBJECT-COVERAGE-FIXTURE
+bindings:
+  TACTICAL-DOMAIN-DESIGN: [domain]
+  IMPLEMENTATION-DESIGN: [delivery]

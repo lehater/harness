@@ -1,0 +1,42 @@
+version: 1
+kind: harness-engineering-graph
+id: SUBJECT-COVERAGE-FIXTURE
+default_subject: FIXTURE
+
+authorities:
+  - id: TACTICAL-DOMAIN-DESIGN
+    responsibility: Own subject-scoped tactical domain models.
+    boundary:
+      semantic_cohesion: Tactical domain semantics.
+      independent_change: Each subject model may evolve independently.
+      public_contract: Produces subject-scoped domain models.
+    produces:
+      - capability: fixture.domain.model.bc-a
+        semantic_claims:
+          - claim: engineering.domain.model
+            subject: BC-A
+        requires: []
+      - capability: fixture.domain.model.bc-b
+        semantic_claims:
+          - claim: engineering.domain.model
+            subject: BC-B
+        requires: []
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation readiness.
+    boundary:
+      semantic_cohesion: Implementation preparation.
+      independent_change: Preparation may change independently.
+      public_contract: Produces implementation design.
+    produces:
+      - capability: fixture.implementation
+        knowledge_kind: implementation-design
+        requires:
+          - capability: fixture.domain.model.bc-a
+          - capability: fixture.domain.model.bc-b
+
+consumers:
+  - id: IMPLEMENTATION
+    purpose: Implement both bounded contexts.
+    requires:
+      - capability: fixture.implementation

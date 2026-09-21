@@ -1,0 +1,26 @@
+version: 1
+kind: harness-standard-authority-role-bindings
+id: software-authority-role-bindings/v1-research
+status: research
+
+bindings:
+  DISCOVERY: [product]
+  PRODUCT-REQUIREMENTS: [product]
+  STRATEGIC-DOMAIN-DESIGN: [domain]
+  DOMAIN-USE-CASE-DESIGN: [application]
+  TACTICAL-DOMAIN-DESIGN: [domain]
+  APPLICATION-DESIGN: [application]
+  SYSTEM-ARCHITECTURE: [architecture, reliability]
+  SECURITY-ARCHITECTURE: [security-architecture]
+  INTERFACE-DESIGN: [interface]
+  DATA-DESIGN: [data]
+  QUALITY-DESIGN: [quality]
+  SECURITY-ANALYSIS: [security-analysis]
+  OBLIGATION-ANALYSIS: [governance]
+  CHANGE-TRANSITION-DESIGN: [transition]
+  OPERABILITY-DESIGN: [operability]
+  ENGINEERING-POLICY: [engineering]
+  COMPONENT-DESIGN: [engineering]
+  TEST-DESIGN: [verification]
+  IMPLEMENTATION-DESIGN: [delivery]
+  VERIFICATION-DESIGN: [verification]

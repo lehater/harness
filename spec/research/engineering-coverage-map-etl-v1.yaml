@@ -1,0 +1,163 @@
+version: 1
+kind: harness-engineering-coverage-map
+catalog: software-engineering-concerns/v1-research
+project: SYNTHETIC-CSV-ETL
+scope: single-script
+status: research
+
+subtree_decisions:
+  - concern: interface.human
+    state: NOT_APPLICABLE
+    rationale: No interactive human interface or rendered human-facing document is in accepted scope.
+    evidence: [accepted-interface-decision]
+
+rows:
+  - {concern: intent.problem, state: COVERED, evidence: [accepted-problem]}
+  - {concern: intent.scope, state: COVERED, evidence: [accepted-scope]}
+  - {concern: intent.behavior, state: COVERED, evidence: [csv-transform-contract]}
+  - {concern: intent.quality-targets, state: COVERED, evidence: [determinism-and-bounded-memory]}
+
+  - concern: domain.model
+    state: NOT_APPLICABLE
+    rationale: Mechanical schema normalization has no independent business-domain model.
+    evidence: [accepted-scope]
+  - concern: domain.boundaries
+    state: NOT_APPLICABLE
+    rationale: No domain ownership decomposition exists in the accepted single-transform scope.
+    evidence: [accepted-scope]
+  - concern: domain.invariants
+    state: NOT_APPLICABLE
+    rationale: Transformation constraints are interface/data rules rather than independent domain policy.
+    evidence: [accepted-scope]
+
+  - {concern: application.use-cases, state: COVERED, evidence: [single-batch-flow]}
+  - {concern: application.orchestration, state: COVERED, evidence: [parse-normalize-validate-emit]}
+  - {concern: application.failures, state: COVERED, evidence: [exit-and-error-contract]}
+  - concern: application.idempotency
+    state: NOT_APPLICABLE
+    rationale: Pure file transformation has no state-changing command retry semantics.
+    evidence: [accepted-execution-model]
+
+  - {concern: architecture.structure, state: COVERED, evidence: [single-process-local-files]}
+  - {concern: architecture.boundaries, state: COVERED, evidence: [parser-normalizer-validator-emitter-seams]}
+  - concern: architecture.communication
+    state: NOT_APPLICABLE
+    rationale: No inter-process or network communication exists.
+    evidence: [accepted-execution-model]
+  - {concern: architecture.deployment, state: COVERED, evidence: [single-cli-executable]}
+  - {concern: architecture.decisions, state: COVERED, evidence: [accepted-execution-model]}
+
+  - {concern: interface.machine.contract, state: COVERED, evidence: [cli-and-csv-schema]}
+  - {concern: interface.machine.errors, state: COVERED, evidence: [exit-and-error-contract]}
+  - {concern: interface.machine.compatibility, state: COVERED, evidence: [canonical-csv-schema]}
+  - {concern: data.model, state: COVERED, evidence: [input-output-schema]}
+  - {concern: data.integrity, state: COVERED, evidence: [validation-contract]}
+  - concern: data.lifecycle
+    state: NOT_APPLICABLE
+    rationale: No persistent application state exists beyond caller-owned input/output files.
+    evidence: [accepted-storage-decision]
+  - {concern: data.quality, state: COVERED, evidence: [schema-validation-and-row-errors]}
+  - {concern: data.provenance, state: COVERED, evidence: [source-file-and-row-reference]}
+  - {concern: data.reproducibility, state: COVERED, evidence: [deterministic-output]}
+  - concern: data.classification
+    state: UNASSESSED
+    rationale: Content sensitivity is not known from the generic ETL fixture.
+
+  - concern: security.boundaries
+    state: COVERED
+    evidence: [local-file-boundary-analysis]
+  - concern: security.identity
+    state: NOT_APPLICABLE
+    rationale: No identity boundary exists in accepted local-only scope.
+    evidence: [accepted-trust-boundary]
+  - concern: security.authorization
+    state: NOT_APPLICABLE
+    rationale: No protected multi-user action exists.
+    evidence: [accepted-trust-boundary]
+  - concern: security.confidentiality
+    state: UNASSESSED
+    rationale: Depends on input data classification.
+  - {concern: security.integrity, state: COVERED, evidence: [input-validation-and-output-atomicity]}
+  - concern: security.accountability
+    state: NOT_APPLICABLE
+    rationale: No multi-user authority/action attribution exists.
+    evidence: [accepted-trust-boundary]
+  - {concern: security.availability-abuse, state: COVERED, evidence: [bounded-input-and-memory-rules]}
+  - {concern: security.threat-analysis, state: COVERED, evidence: [file-path-input-dependency-review]}
+  - concern: security.vulnerability-management
+    state: UNASSESSED
+  - {concern: security.secure-development, state: COVERED, evidence: [pinned-dependencies-and-tests]}
+
+  - {concern: reliability.failure-semantics, state: COVERED, evidence: [exit-and-error-contract]}
+  - concern: reliability.availability
+    state: NOT_APPLICABLE
+    rationale: Batch invocation has no continuously available service objective.
+    evidence: [accepted-execution-model]
+  - concern: reliability.fault-tolerance
+    state: NOT_APPLICABLE
+    rationale: Accepted single-process batch job fails explicitly rather than continuing through component faults.
+    evidence: [accepted-failure-model]
+  - {concern: reliability.recovery, state: COVERED, evidence: [rerunnable-deterministic-job]}
+  - concern: reliability.consistency
+    state: NOT_APPLICABLE
+    rationale: No concurrent shared mutable state exists.
+    evidence: [accepted-execution-model]
+  - concern: reliability.retry-idempotency
+    state: COVERED
+    evidence: [deterministic-output]
+  - concern: reliability.durability
+    state: NOT_APPLICABLE
+    rationale: Application owns no durable state.
+    evidence: [accepted-storage-decision]
+  - concern: reliability.dependency-failure
+    state: COVERED
+    evidence: [explicit-dependency-error]
+
+  - {concern: operability.configuration, state: COVERED, evidence: [cli-options]}
+  - {concern: operability.logging, state: COVERED, evidence: [structured-error-summary]}
+  - concern: operability.metrics
+    state: NOT_APPLICABLE
+    rationale: No long-running service or SLO measurement need in accepted fixture.
+    evidence: [accepted-execution-model]
+  - concern: operability.tracing
+    state: NOT_APPLICABLE
+    rationale: Single-process batch flow requires no distributed tracing.
+    evidence: [accepted-execution-model]
+  - concern: operability.health
+    state: NOT_APPLICABLE
+    rationale: No resident service exists.
+    evidence: [accepted-execution-model]
+  - concern: operability.alerting
+    state: NOT_APPLICABLE
+    rationale: No resident production service exists.
+    evidence: [accepted-execution-model]
+  - {concern: operability.incident, state: COVERED, evidence: [row-level-error-summary]}
+  - {concern: operability.admin, state: COVERED, evidence: [single-cli-command]}
+  - {concern: operability.capacity, state: COVERED, evidence: [bounded-memory-requirement]}
+
+  - {concern: quality.performance.latency, state: NOT_APPLICABLE, rationale: No latency objective exists for offline batch scope., evidence: [accepted-quality-scope]}
+  - {concern: quality.performance.throughput, state: COVERED, evidence: [bounded-batch-throughput-expectation]}
+  - {concern: quality.performance.resource-efficiency, state: COVERED, evidence: [bounded-memory-requirement]}
+  - {concern: quality.performance.capacity, state: COVERED, evidence: [input-size-bound]}
+  - {concern: quality.compatibility.interoperability, state: COVERED, evidence: [csv-schema]}
+  - {concern: quality.compatibility.coexistence, state: NOT_APPLICABLE, rationale: No shared runtime environment interaction is material., evidence: [accepted-execution-model]}
+  - {concern: quality.maintainability.modularity, state: COVERED, evidence: [small-explicit-transform-stages]}
+  - {concern: quality.maintainability.reusability, state: NOT_APPLICABLE, rationale: Reuse is not an accepted goal of the tiny fixture., evidence: [accepted-quality-scope]}
+  - {concern: quality.maintainability.analysability, state: COVERED, evidence: [explicit-stage-errors]}
+  - {concern: quality.maintainability.modifiability, state: COVERED, evidence: [small-stage-separation]}
+  - {concern: quality.maintainability.testability, state: COVERED, evidence: [golden-and-table-driven-tests]}
+  - {concern: quality.flexibility.adaptability, state: NOT_APPLICABLE, rationale: One accepted runtime/format target., evidence: [accepted-quality-scope]}
+  - {concern: quality.flexibility.scalability, state: NOT_APPLICABLE, rationale: No scale-out execution model., evidence: [accepted-execution-model]}
+  - {concern: quality.flexibility.installability, state: COVERED, evidence: [reproducible-package]}
+  - {concern: quality.flexibility.replaceability, state: NOT_APPLICABLE, rationale: No replaceable platform dependency is required., evidence: [accepted-quality-scope]}
+
+  - {concern: verification.strategy, state: COVERED, evidence: [golden-malformed-deterministic-checks]}
+  - {concern: verification.requirement-traceability, state: COVERED, evidence: [requirement-test-links]}
+  - {concern: verification.functional, state: COVERED, evidence: [golden-files]}
+  - {concern: verification.quality, state: COVERED, evidence: [determinism-and-memory-tests]}
+  - {concern: verification.security, state: COVERED, evidence: [path-input-tests]}
+  - {concern: verification.reliability, state: COVERED, evidence: [failure-rerun-tests]}
+  - {concern: verification.interface.machine, state: COVERED, evidence: [cli-schema-tests]}
+  - {concern: verification.interface.human, state: NOT_APPLICABLE, rationale: No human interface exists., evidence: [accepted-interface-decision]}
+  - {concern: verification.architecture, state: COVERED, evidence: [single-process-structure-check]}
+  - {concern: verification.data, state: COVERED, evidence: [schema-and-row-tests]}

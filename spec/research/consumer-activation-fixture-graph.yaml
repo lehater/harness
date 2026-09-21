@@ -1,0 +1,91 @@
+version: 1
+kind: harness-engineering-graph
+id: CONSUMER-ACTIVATION-FIXTURE
+default_subject: FIXTURE
+
+authorities:
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own accepted product behavior.
+    boundary:
+      semantic_cohesion: Product behavior.
+      independent_change: Product behavior may change independently.
+      public_contract: Produces requirements.
+    produces:
+      - capability: fixture.requirements
+        knowledge_kind: product-requirements
+        requires: []
+
+  - id: SYSTEM-ARCHITECTURE
+    responsibility: Own shared architecture.
+    boundary:
+      semantic_cohesion: Shared structure.
+      independent_change: Architecture may change independently.
+      public_contract: Produces shared architecture.
+    produces:
+      - capability: fixture.architecture
+        knowledge_kind: system-architecture
+        requires:
+          - capability: fixture.requirements
+
+  - id: DATA-DESIGN
+    responsibility: Own backend persistence.
+    boundary:
+      semantic_cohesion: Persistence semantics.
+      independent_change: Storage may change independently.
+      public_contract: Produces data design.
+    produces:
+      - capability: fixture.data-design
+        semantic_claims: [engineering.data.model, engineering.data.classification]
+        requires:
+          - capability: fixture.architecture
+
+  - id: INTERFACE-DESIGN
+    responsibility: Own human interface.
+    boundary:
+      semantic_cohesion: Human interaction.
+      independent_change: Human interface may change independently.
+      public_contract: Produces human interface.
+    produces:
+      - capability: fixture.frontend.human-interface
+        knowledge_kind: human-interface-design
+        semantic_claims: [engineering.interface.human.accessibility]
+        requires:
+          - capability: fixture.architecture
+
+  - id: SECURITY-ARCHITECTURE
+    responsibility: Own frontend security boundary.
+    boundary:
+      semantic_cohesion: Frontend trust boundary.
+      independent_change: Security design may change independently.
+      public_contract: Produces frontend security.
+    produces:
+      - capability: fixture.frontend.security
+        knowledge_kind: security-architecture
+        requires:
+          - capability: fixture.frontend.human-interface
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation design.
+    boundary:
+      semantic_cohesion: Implementation slicing.
+      independent_change: Slicing may change independently.
+      public_contract: Produces target implementation design.
+    produces:
+      - capability: fixture.backend.implementation-design
+        knowledge_kind: implementation-design
+        requires:
+          - capability: fixture.data-design
+      - capability: fixture.frontend.implementation-design
+        knowledge_kind: implementation-design
+        requires:
+          - capability: fixture.frontend.security
+
+consumers:
+  - id: BACKEND
+    purpose: Implement backend only.
+    requires:
+      - capability: fixture.backend.implementation-design
+  - id: FRONTEND
+    purpose: Implement frontend only.
+    requires:
+      - capability: fixture.frontend.implementation-design

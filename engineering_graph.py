@@ -69,7 +69,7 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         value = {"capability": value, "requires": []}
     if not isinstance(value, dict):
         raise CoreError(f"{where} must be a capability id or mapping")
-    unknown = set(value) - {"capability", "requires", "knowledge_kind"}
+    unknown = set(value) - {"capability", "requires", "knowledge_kind", "semantic_claims"}
     if unknown:
         raise CoreError(f"{where} has unknown fields: {sorted(unknown)}")
     capability = value.get("capability")
@@ -80,6 +80,39 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         not isinstance(knowledge_kind, str) or not knowledge_kind
     ):
         raise CoreError(f"{where} knowledge_kind must be a non-empty string")
+    semantic_claims_raw = value.get("semantic_claims", []) or []
+    if not isinstance(semantic_claims_raw, list):
+        raise CoreError(f"{where} semantic_claims must be a list")
+    semantic_claims = []
+    claim_keys = []
+    for item in semantic_claims_raw:
+        if isinstance(item, str):
+            if not item:
+                raise CoreError(f"{where} semantic claim must be non-empty")
+            normalized = {"claim": item}
+        elif isinstance(item, dict):
+            unknown_claim_fields = set(item) - {"claim", "subject"}
+            if unknown_claim_fields:
+                raise CoreError(
+                    f"{where} semantic claim has unknown fields: {sorted(unknown_claim_fields)}"
+                )
+            claim = item.get("claim")
+            subject = item.get("subject")
+            if not isinstance(claim, str) or not claim:
+                raise CoreError(f"{where} semantic claim.claim must be non-empty")
+            if subject is not None and (not isinstance(subject, str) or not subject):
+                raise CoreError(f"{where} semantic claim.subject must be non-empty")
+            normalized = {"claim": claim}
+            if subject is not None:
+                normalized["subject"] = subject
+        else:
+            raise CoreError(f"{where} semantic claim must be string or mapping")
+        key = (normalized["claim"], normalized.get("subject"))
+        if key in claim_keys:
+            raise CoreError(f"{where} semantic_claims must be unique by claim+subject")
+        claim_keys.append(key)
+        semantic_claims.append(normalized)
+
     result = {
         "capability": capability,
         "requires": _requirements(
@@ -87,6 +120,8 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
             f"production {capability}",
         ),
     }
+    if semantic_claims:
+        result["semantic_claims"] = semantic_claims
     if knowledge_kind is not None:
         result["knowledge_kind"] = knowledge_kind
     return result
@@ -242,6 +277,11 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
         requirement["capability"]
         for _, requirement in all_requirements
     }
+    coverage_consumed_capabilities = {
+        capability
+        for capability, production in production_by_capability.items()
+        if production.get("semantic_claims")
+    }
     terminal_capabilities = _terminal_capabilities(graph)
 
     for capability, terminal in terminal_capabilities.items():
@@ -255,7 +295,7 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
                 f"terminal capability {capability} is owned by {producer}, "
                 f"expected {terminal['authority']}"
             )
-        if capability in consumed_capabilities:
+        if capability in consumed_capabilities or capability in coverage_consumed_capabilities:
             raise CoreError(
                 f"terminal capability {capability} is already consumed downstream"
             )
@@ -263,6 +303,7 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
     unconsumed = sorted(
         set(producer_by_capability)
         - consumed_capabilities
+        - coverage_consumed_capabilities
         - set(terminal_capabilities)
     )
     if unconsumed:
