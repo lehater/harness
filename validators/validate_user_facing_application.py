@@ -58,7 +58,7 @@ def main() -> None:
     )
     assert interface_only_eval["status"] != "COMPLETE", interface_only_eval
     assert any(
-        item.get("knowledge_kind") == "presentation-system-design"
+        item.get("capability") == "example.frontend.presentation-system"
         for item in interface_only_eval["create"]
     ), interface_only_eval
 
@@ -69,7 +69,7 @@ def main() -> None:
     )
     assert ui_foundations_eval["status"] != "COMPLETE", ui_foundations_eval
     assert any(
-        item.get("knowledge_kind") == "screen-view-design"
+        item.get("capability") == "example.frontend.screen-view-design"
         for item in ui_foundations_eval["create"]
     ), ui_foundations_eval
 
