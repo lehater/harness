@@ -34,14 +34,17 @@ semantics.
    ownership/contracts.
 4. Order slices only where a real implementation dependency exists.
 5. Identify migrations/data transitions and compatibility risks when applicable.
-6. Identify code/test/CI surfaces each slice must change.
-7. Define completion criteria that prove the accepted design is realized.
-8. If any slice would require a new product/domain/architecture/interface
+6. Derive repository realization from accepted semantic/component boundaries: physical module/package roots, composition root, source/generated/test/migration/configuration topology and explicit implementation freedoms. Do not prescribe a universal folder layout.
+7. For every applicable engineering/security/quality/supply-chain obligation, select a concrete deterministic enforcement mechanism or record an explicit terminal disposition. Keep the obligation independent from the selected tool.
+8. Define the reproducible dependency/tool environment and authoritative CI quality gates; local/pre-commit checks may optimize feedback but do not replace CI enforcement.
+9. Identify code/test/CI surfaces each slice must change.
+10. Define completion criteria that prove the accepted design is realized.
+11. If any slice would require a new product/domain/architecture/interface
    decision, create/route a Question upstream instead of embedding the decision in
    the implementation plan.
-9. Do not treat this artifact as authorization to merge/deploy unless the target
+12. Do not treat this artifact as authorization to merge/deploy unless the target
    repository explicitly assigns it that role.
-10. Produce project-native implementation design, semantically accept/register
+13. Produce project-native implementation design, semantically accept/register
     and reevaluate.
 
 ## Stop conditions
@@ -61,7 +64,12 @@ Useful content may include:
 
 - implementation boundary;
 - slices and real dependencies;
-- repository/module surfaces;
+- repository/module surfaces and semantic-to-physical mapping;
+- dependency-rule enforcement and composition root;
+- applicable tooling obligations and selected concrete tools;
+- source/generated/test/migration/configuration topology;
+- reproducible dependency/tool environment;
+- authoritative CI quality gates and optional local fast-feedback subset;
 - migrations;
 - risks;
 - completion criteria;
@@ -75,6 +83,10 @@ when the project owns them together; they may also be separate production output
 - every slice realizes accepted design rather than redefining it;
 - sequencing is justified by dependencies, not methodology stages;
 - completion criteria trace to canonical contracts;
+- architecturally significant dependency rules have deterministic mechanical enforcement;
+- every applicable tooling/security/supply-chain obligation has enforcement or an explicit disposition;
+- generated artifacts identify their canonical source and regeneration path;
+- CI gate semantics are authoritative and reproducible from versioned project inputs;
 - no hidden/manual state fabrication is required for supported behavior;
 - unresolved design gaps are routed upstream.
 
