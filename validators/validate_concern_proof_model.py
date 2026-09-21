@@ -25,7 +25,7 @@ def leaf_ids(catalog):
 
 def main():
     catalog=load(ROOT/"spec/research/engineering-concerns-v1.yaml")
-    proofs=load(ROOT/"spec/research/concern-proof-contract-v1.yaml")
+    proofs=load(ROOT/"spec/research/concern-semantic-proof-contract-v1.yaml")
     roles=load(ROOT/"spec/research/authority-role-contract-v1.yaml")
 
     leaves=set(leaf_ids(catalog))
@@ -35,14 +35,14 @@ def main():
 
     producible=set()
     for spec in (roles.get("roles",{}) or {}).values():
-        producible.update(spec.get("can_produce",[]) or [])
+        producible.update(spec.get("can_produce_claims",[]) or [])
 
     unproducible={}
     for concern,spec in proof_map.items():
-        kinds=set(spec.get("accepted_knowledge_kinds",[]) or [])
+        kinds=set(spec.get("accepted_semantic_claims",[]) or [])
         if concern in leaves and not (kinds & producible):
             unproducible[concern]=sorted(kinds)
-    assert not unproducible, f"proof kinds without producer role: {unproducible}"
+    assert not unproducible, f"proof semantic claims without producer role: {unproducible}"
 
     print(f"coverage proof model: ok ({len(leaves)} leaves)")
     return 0
