@@ -30,6 +30,7 @@ from concern_activation_experiment import derive_activation
 from coverage_planner_experiment import derive_plan
 from engineering_graph import validate_engineering_graph, validate_realization
 from harness import question_frontier
+from integration_alignment import validate_project_alignment
 from agent_router import validate_skill_registry
 
 
@@ -310,6 +311,28 @@ def _route_production_work(
     return result
 
 
+def _resolve_realization(
+    graph: dict[str, Any],
+    realization: dict[str, Any],
+    *,
+    consumer: str,
+    canonical_source: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if realization.get("kind") == "harness-canonical-graph-projection":
+        if canonical_source is None:
+            raise ValueError(
+                "canonical_source is required when realization is a canonical graph projection"
+            )
+        aligned = validate_project_alignment(
+            canonical_source,
+            realization,
+            graph,
+            target_consumer=consumer,
+        )
+        return aligned["model"]
+    return realization
+
+
 def evaluate_coverage(
     *,
     graph: dict[str, Any],
@@ -491,6 +514,7 @@ def main() -> int:
     parser.add_argument("--authority-aliases")
     parser.add_argument("--overlay")
     parser.add_argument("--semantic-claim-bindings")
+    parser.add_argument("--canonical-source")
     parser.add_argument("--production-contract-overlay")
     args = parser.parse_args()
 
