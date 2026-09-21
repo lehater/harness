@@ -196,12 +196,18 @@ def derive_activation(
                 "signals": evidence,
             })
 
+    def applies_to_consumer(item: dict[str, Any]) -> bool:
+        consumers = item.get("consumers", []) or []
+        return not consumers or target_consumer is None or target_consumer in consumers
+
     for item in overlay.get("activate", []) or []:
         if isinstance(item, str):
             concern = item
             rationale = None
             evidence = []
         else:
+            if not applies_to_consumer(item):
+                continue
             concern = item["concern"]
             rationale = item.get("rationale")
             evidence = item.get("evidence", []) or []
@@ -211,7 +217,11 @@ def derive_activation(
             "evidence": evidence,
         })
 
-    decisions = {d["concern"]: d for d in overlay.get("decisions", []) or []}
+    decisions = {
+        d["concern"]: d
+        for d in overlay.get("decisions", []) or []
+        if applies_to_consumer(d)
+    }
     rows = []
     for concern in sorted(provenance):
         decision = decisions.get(concern)
