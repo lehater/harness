@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Unified research Engineering Coverage evaluator.
+"""Canonical Engineering Coverage evaluator.
 
-Public research interface:
+Public interface:
     evaluate_coverage(
         graph,
         realization,
@@ -13,7 +13,7 @@ Public research interface:
         semantic_claim_bindings,
     )
 
-Reusable Harness policy is loaded by the CLI from spec/research. Callers do not
+Reusable Harness policy is loaded from spec/engineering-coverage. Callers do not
 manually assemble activation -> proof -> routing stages.
 """
 from __future__ import annotations
@@ -26,8 +26,8 @@ from typing import Any
 
 import yaml
 
-from concern_activation_experiment import derive_activation
-from coverage_planner_experiment import derive_plan
+from concern_activation import derive_activation
+from coverage_planner import derive_plan
 from engineering_graph import validate_engineering_graph, validate_realization
 from harness import question_frontier
 from integration_alignment import validate_project_alignment
@@ -349,9 +349,16 @@ def evaluate_coverage(
     semantic_claim_bindings: dict[str, Any] | None = None,
     production_contract_overlay: dict[str, Any] | None = None,
     artifact_skill_registry: dict[str, Any] | None = None,
+    canonical_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     graph = _apply_production_contract_overlay(graph, production_contract_overlay)
     validate_engineering_graph(graph)
+    realization = _resolve_realization(
+        graph,
+        realization,
+        consumer=consumer,
+        canonical_source=canonical_source,
+    )
     realized = validate_realization(graph, realization)
 
     aliases = authority_aliases or {"bindings": {}}
@@ -444,7 +451,7 @@ def evaluate_coverage(
     return {
         "version": 1,
         "kind": "harness-engineering-coverage-evaluation",
-        "status": "research",
+        "status": "canonical",
         "project": overlay["project"],
         "consumer": consumer,
         "scope": scope,
@@ -481,6 +488,7 @@ def evaluate_with_repository_policy(
     semantic_claim_bindings: dict[str, Any] | None = None,
     production_contract_overlay: dict[str, Any] | None = None,
     artifact_skill_registry: dict[str, Any] | None = None,
+    canonical_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if artifact_skill_registry is None:
         artifact_skill_registry = load(
@@ -492,20 +500,21 @@ def evaluate_with_repository_policy(
         consumer=consumer,
         scope=scope,
         scope_roots=scope_roots,
-        activation_policy=load(ROOT / "spec/research/concern-activation-policy-v1.yaml"),
-        proof_contract=load(ROOT / "spec/research/concern-semantic-proof-contract-v1.yaml"),
-        authority_role_contract=load(ROOT / "spec/research/authority-role-contract-v1.yaml"),
-        standard_authority_roles=load(ROOT / "spec/research/standard-authority-role-bindings-v1.yaml"),
+        activation_policy=load(ROOT / "spec/engineering-coverage/activation-policy-v1.yaml"),
+        proof_contract=load(ROOT / "spec/engineering-coverage/semantic-proof-contract-v1.yaml"),
+        authority_role_contract=load(ROOT / "spec/engineering-coverage/authority-role-contract-v1.yaml"),
+        standard_authority_roles=load(ROOT / "spec/engineering-coverage/standard-authority-role-bindings-v1.yaml"),
         authority_aliases=authority_aliases,
         project_overlay=project_overlay,
         semantic_claim_bindings=semantic_claim_bindings,
         production_contract_overlay=production_contract_overlay,
         artifact_skill_registry=artifact_skill_registry,
+        canonical_source=canonical_source,
     )
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Research Engineering Coverage evaluator")
+    parser = argparse.ArgumentParser(description="Engineering Coverage evaluator")
     parser.add_argument("graph")
     parser.add_argument("realization")
     parser.add_argument("consumer")
@@ -534,6 +543,11 @@ def main() -> int:
         production_contract_overlay=(
             load(args.production_contract_overlay)
             if args.production_contract_overlay
+            else None
+        ),
+        canonical_source=(
+            load(args.canonical_source)
+            if args.canonical_source
             else None
         ),
     )
