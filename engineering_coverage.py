@@ -46,7 +46,10 @@ def load(path: str | Path) -> dict[str, Any]:
 
 def load_scope_source(path: str | Path) -> dict[str, Any]:
     raw = Path(path).read_text(encoding="utf-8")
-    value = yaml.safe_load(raw)
+    try:
+        value = yaml.safe_load(raw)
+    except yaml.YAMLError:
+        value = None
     if isinstance(value, dict):
         return value
     return {
