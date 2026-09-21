@@ -52,7 +52,25 @@ def main():
         issue["code"] for issue in questioned_result["errors"]
     }
 
-    print("repository realization design: ok (2 structurally different pilots + negative completeness cases)")
+    no_gate = dict(nutrition)
+    no_gate["gate_policy"] = {
+        "applicability": "NOT_APPLICABLE",
+        "rationale": "project has no merge/release gating workflow",
+    }
+    no_gate["quality_gates"] = []
+    no_gate_result = evaluate(no_gate)
+    assert no_gate_result["complete"], no_gate_result
+
+    missing_gate = dict(nutrition)
+    missing_gate["gate_policy"] = {"applicability": "REQUIRED"}
+    missing_gate["quality_gates"] = []
+    missing_gate_result = evaluate(missing_gate)
+    assert not missing_gate_result["complete"]
+    assert "AUTHORITATIVE_GATE_MISSING" in {
+        issue["code"] for issue in missing_gate_result["errors"]
+    }
+
+    print("repository realization design: ok (2 structurally different pilots + applicability/negative completeness cases)")
     return 0
 
 if __name__ == "__main__":
