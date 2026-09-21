@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import sys
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from repository_realization import evaluate
 
 def load(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    with open(path, "r", encoding="utf-8") as stream:
+        return yaml.safe_load(stream)
 
 def main():
     contract = load(ROOT / "spec/repository-realization/contract-v1.yaml")
@@ -20,18 +24,35 @@ def main():
     assert contract["applicability_states"] == ["REQUIRED", "NOT_APPLICABLE", "DEFERRED", "QUESTION"]
     assert "no-unresolved-question-remains" in contract["completeness"]
 
-    for pilot in (nutrition, napms):
-        assert pilot["result"] == "PASS"
-        for item in pilot["obligations"]:
-            assert item["applicability"] in contract["applicability_states"]
-            if item["applicability"] == "REQUIRED":
-                assert item.get("enforcement")
-            if item["applicability"] in {"NOT_APPLICABLE", "DEFERRED"}:
-                assert item.get("rationale")
-        assert pilot["decisions"]["authoritative_gate"] == "pull-request-ci"
+    nutrition_result = evaluate(nutrition)
+    napms_result = evaluate(napms)
+    assert nutrition_result["complete"], nutrition_result
+    assert napms_result["complete"], napms_result
 
-    assert nutrition["decisions"]["repository_topology"] != napms["decisions"]["repository_topology"]
-    print("repository realization design: ok (2 structurally different pilots)")
+    assert nutrition["repository_topology"] != napms["repository_topology"]
+    assert len(nutrition["module_realizations"]) > len(napms["module_realizations"])
+
+    broken = dict(nutrition)
+    broken["obligations"] = [
+        {"id": "architecture-dependencies", "applicability": "REQUIRED"}
+    ]
+    broken_result = evaluate(broken)
+    assert not broken_result["complete"]
+    assert "REQUIRED_ENFORCEMENT_MISSING" in {
+        issue["code"] for issue in broken_result["errors"]
+    }
+
+    questioned = dict(nutrition)
+    questioned["obligations"] = [
+        {"id": "tooling-choice", "applicability": "QUESTION"}
+    ]
+    questioned_result = evaluate(questioned)
+    assert not questioned_result["complete"]
+    assert "UNRESOLVED_QUESTION" in {
+        issue["code"] for issue in questioned_result["errors"]
+    }
+
+    print("repository realization design: ok (2 structurally different pilots + negative completeness cases)")
     return 0
 
 if __name__ == "__main__":
