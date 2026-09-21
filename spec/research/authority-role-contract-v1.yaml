@@ -4,17 +4,17 @@ id: engineering-authority-roles/v1-research
 status: research
 
 # Roles define responsibility/competence, not mandatory work.
-# A knowledge kind becomes required only when an activated concern needs it.
+# A semantic claim becomes required only when an activated concern needs it.
 roles:
   product:
-    can_produce:
+    can_produce_claims:
       - engineering.intent.problem
       - engineering.intent.scope
       - engineering.intent.behavior
       - engineering.intent.quality-targets
 
   domain:
-    can_produce:
+    can_produce_claims:
       - engineering.domain.model
       - engineering.domain.boundaries
       - engineering.domain.invariants
@@ -22,14 +22,14 @@ roles:
       - engineering.domain.provenance
 
   application:
-    can_produce:
+    can_produce_claims:
       - engineering.application.use-cases
       - engineering.application.orchestration
       - engineering.application.failures
       - engineering.application.idempotency
 
   architecture:
-    can_produce:
+    can_produce_claims:
       - engineering.architecture.structure
       - engineering.architecture.boundaries
       - engineering.architecture.communication
@@ -37,7 +37,7 @@ roles:
       - engineering.architecture.decisions
 
   interface:
-    can_produce:
+    can_produce_claims:
       - engineering.interface.machine.contract
       - engineering.interface.machine.errors
       - engineering.interface.machine.compatibility
@@ -48,7 +48,7 @@ roles:
       - engineering.interface.human.i18n
 
   data:
-    can_produce:
+    can_produce_claims:
       - engineering.data.model
       - engineering.data.integrity
       - engineering.data.lifecycle
@@ -58,7 +58,7 @@ roles:
       - engineering.data.classification
 
   security-architecture:
-    can_produce:
+    can_produce_claims:
       - engineering.security.boundaries
       - engineering.security.identity
       - engineering.security.authorization
@@ -68,13 +68,13 @@ roles:
       - engineering.security.availability-abuse
 
   security-analysis:
-    can_produce:
+    can_produce_claims:
       - engineering.security.threat-analysis
       - engineering.security.vulnerability-management
       - engineering.security.secure-development
 
   reliability:
-    can_produce:
+    can_produce_claims:
       - engineering.reliability.failure-semantics
       - engineering.reliability.availability
       - engineering.reliability.fault-tolerance
@@ -85,7 +85,7 @@ roles:
       - engineering.reliability.dependency-failure
 
   operability:
-    can_produce:
+    can_produce_claims:
       - engineering.operability.configuration
       - engineering.operability.logging
       - engineering.operability.metrics
@@ -97,7 +97,7 @@ roles:
       - engineering.operability.capacity
 
   verification:
-    can_produce:
+    can_produce_claims:
       - engineering.verification.strategy
       - engineering.verification.requirement-traceability
       - engineering.verification.functional
@@ -110,7 +110,7 @@ roles:
       - engineering.verification.data
 
   engineering:
-    can_produce:
+    can_produce_claims:
       - engineering.engineering.principles
       - engineering.engineering.components
       - engineering.engineering.error-handling
@@ -119,7 +119,7 @@ roles:
       - engineering.engineering.code-quality
 
   dependency:
-    can_produce:
+    can_produce_claims:
       - engineering.dependency.inventory
       - engineering.dependency.trust
       - engineering.dependency.versioning
@@ -127,7 +127,7 @@ roles:
       - engineering.dependency.vulnerability
 
   delivery:
-    can_produce:
+    can_produce_claims:
       - engineering.delivery.reproducible-build
       - engineering.delivery.provenance
       - engineering.delivery.integrity
@@ -136,7 +136,7 @@ roles:
       - engineering.delivery.rollback
 
   governance:
-    can_produce:
+    can_produce_claims:
       - engineering.governance.external-obligations
       - engineering.governance.privacy
       - engineering.governance.data
@@ -144,7 +144,7 @@ roles:
       - engineering.governance.ownership
 
   quality:
-    can_produce:
+    can_produce_claims:
       - engineering.quality.performance.latency
       - engineering.quality.performance.throughput
       - engineering.quality.performance.resource-efficiency
@@ -162,7 +162,7 @@ roles:
       - engineering.quality.flexibility.replaceability
 
   transition:
-    can_produce:
+    can_produce_claims:
       - engineering.transition.compatibility
       - engineering.transition.data-migration
       - engineering.transition.rollout
