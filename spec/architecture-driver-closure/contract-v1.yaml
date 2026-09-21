@@ -1,7 +1,7 @@
 version: 1
 kind: harness-architecture-driver-closure-contract
 id: architecture-driver-closure/v1
-status: research
+status: canonical
 
 ownership:
   authority: SYSTEM-ARCHITECTURE
