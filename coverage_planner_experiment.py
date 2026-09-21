@@ -33,10 +33,17 @@ def realized_capabilities(project_docs: list[dict[str, Any]]) -> set[str]:
     return result
 
 
-def capability_claim_index(bindings: dict[str, Any]) -> dict[str, set[str]]:
+def capability_claim_index(bindings: dict[str, Any], project_docs: list[dict[str, Any]]) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
     for item in bindings.get("bindings", []) or []:
         result.setdefault(item["capability"], set()).update(item.get("semantic_claims", []) or [])
+    for doc in project_docs:
+        for authority in doc.get("authorities", []) or []:
+            for production in authority.get("produces", []) or []:
+                if isinstance(production, dict):
+                    capability = production.get("capability")
+                    if capability:
+                        result.setdefault(capability, set()).update(production.get("semantic_claims", []) or [])
     return result
 
 
@@ -77,7 +84,7 @@ def derive_plan(
 ) -> dict[str, Any]:
     proofs = concern_proofs(proof_contract)
     roles = role_claims(role_contract)
-    cap_claims = capability_claim_index(capability_bindings)
+    cap_claims = capability_claim_index(capability_bindings, project_docs)
     realized_caps = realized_capabilities(project_docs)
 
     realized_claims: dict[str, list[str]] = {}
