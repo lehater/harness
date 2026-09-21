@@ -68,18 +68,11 @@ def build_authority_context(
     productions = production_index(graph)
     artifacts = _artifacts(realized)
 
-    owned = sorted(
-        (
-            {
-                "id": artifact_id,
-                "path": artifact["path"],
-                "provides": sorted(artifact.get("provides", []) or []),
-            }
-            for artifact_id, artifact in artifacts.items()
-            if artifact["authority"] == authority_id
-        ),
-        key=lambda item: item["id"],
-    )
+    authority_owned_ids = {
+        artifact_id
+        for artifact_id, artifact in artifacts.items()
+        if artifact["authority"] == authority_id
+    }
 
     authority_outputs = sorted(
         capability
@@ -96,6 +89,31 @@ def build_authority_context(
                 f"Authority {authority_id} does not produce requested capabilities: {unknown}"
             )
         public_outputs = requested
+
+    if capability_ids is None:
+        owned_ids = set(authority_owned_ids)
+    else:
+        owned_ids: set[str] = set()
+        for capability in public_outputs:
+            try:
+                providers = capability_resolve(realized, capability)
+            except CoreError:
+                providers = []
+            for provider in providers:
+                if provider in authority_owned_ids:
+                    owned_ids.add(provider)
+
+    owned = sorted(
+        (
+            {
+                "id": artifact_id,
+                "path": artifacts[artifact_id]["path"],
+                "provides": sorted(artifacts[artifact_id].get("provides", []) or []),
+            }
+            for artifact_id in owned_ids
+        ),
+        key=lambda item: item["id"],
+    )
 
     required_caps: dict[str, dict[str, Any]] = {}
     for capability in public_outputs:
