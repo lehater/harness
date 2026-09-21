@@ -17,3 +17,4 @@ harness-check:
 	python validators/validate_coverage_derivation_experiment.py
 	python validators/validate_coverage_planner_experiment.py
 	python validators/validate_concern_proof_model.py
+	python validators/validate_engineering_graph_semantic_claims_experiment.py
