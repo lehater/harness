@@ -23,13 +23,71 @@ def load(path: str) -> dict[str, Any]:
     return value
 
 
-def realized_capabilities(project_docs: list[dict[str, Any]]) -> set[str]:
+def _consumer_closure(doc: dict[str, Any], target_consumer: str) -> set[str]:
+    consumers = {
+        item.get("id"): item
+        for item in doc.get("consumers", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+    if target_consumer not in consumers:
+        return set()
+    productions: dict[str, dict[str, Any]] = {}
+    for authority in doc.get("authorities", []) or []:
+        if not isinstance(authority, dict):
+            continue
+        for production in authority.get("produces", []) or []:
+            if isinstance(production, str):
+                productions[production] = {"capability": production, "requires": []}
+            elif isinstance(production, dict) and production.get("capability"):
+                productions[production["capability"]] = production
+
+    closure: set[str] = set()
+    def include(capability: str) -> None:
+        if capability in closure:
+            return
+        closure.add(capability)
+        production = productions.get(capability)
+        if not production:
+            return
+        for requirement in production.get("requires", []) or []:
+            upstream = requirement if isinstance(requirement, str) else requirement.get("capability")
+            if upstream:
+                include(upstream)
+
+    for requirement in consumers[target_consumer].get("requires", []) or []:
+        capability = requirement if isinstance(requirement, str) else requirement.get("capability")
+        if capability:
+            include(capability)
+    return closure
+
+
+def realized_capabilities(
+    project_docs: list[dict[str, Any]],
+    target_consumer: str | None = None,
+) -> set[str]:
+    allowed: set[str] | None = None
+    if target_consumer:
+        closures = [
+            _consumer_closure(doc, target_consumer)
+            for doc in project_docs
+            if doc.get("kind") == "harness-engineering-graph"
+        ]
+        nonempty = [value for value in closures if value]
+        if nonempty:
+            allowed = set().union(*nonempty)
+
     result: set[str] = set()
     for doc in project_docs:
         for artifact in doc.get("artifacts", []) or []:
-            result.update(artifact.get("provides", []) or [])
+            provided=set(artifact.get("provides", []) or [])
+            if allowed is not None:
+                provided &= allowed
+            result.update(provided)
         for binding in doc.get("bindings", []) or []:
-            result.update(binding.get("provides", []) or [])
+            provided=set(binding.get("provides", []) or [])
+            if allowed is not None:
+                provided &= allowed
+            result.update(provided)
     return result
 
 
@@ -81,11 +139,12 @@ def derive_plan(
     capability_bindings: dict[str, Any],
     overlay: dict[str, Any],
     project_docs: list[dict[str, Any]],
+    target_consumer: str | None = None,
 ) -> dict[str, Any]:
     proofs = concern_proofs(proof_contract)
     roles = role_claims(role_contract)
     cap_claims = capability_claim_index(capability_bindings, project_docs)
-    realized_caps = realized_capabilities(project_docs)
+    realized_caps = realized_capabilities(project_docs, target_consumer)
 
     realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
@@ -167,6 +226,7 @@ def derive_plan(
         "kind": "harness-derived-engineering-work-plan",
         "project": overlay.get("project"),
         "scope": overlay.get("scope"),
+        "consumer": target_consumer,
         "completion_ready": completion_ready,
         "summary": {"states": counts, "actions": actions},
         "rows": rows,
@@ -181,6 +241,7 @@ def main() -> int:
     p.add_argument("capability_bindings")
     p.add_argument("overlay")
     p.add_argument("project_docs", nargs="+")
+    p.add_argument("--consumer")
     args = p.parse_args()
 
     result = derive_plan(
@@ -190,6 +251,7 @@ def main() -> int:
         load(args.capability_bindings),
         load(args.overlay),
         [load(x) for x in args.project_docs],
+        args.consumer,
     )
     print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
     return 0
