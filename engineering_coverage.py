@@ -177,6 +177,7 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         "action": "PRODUCE_CAPABILITY",
                         "capability": capability,
                         "authority": candidate.get("authority"),
+                        "knowledge_kind": candidate.get("knowledge_kind"),
                         "concerns": [],
                         "semantic_claims": [],
                     },
