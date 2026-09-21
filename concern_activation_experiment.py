@@ -14,41 +14,112 @@ def load(path: str) -> dict[str, Any]:
     return value
 
 
-def project_signals(project_docs: list[dict[str, Any]], project_roles: dict[str, Any]) -> dict[str, set[str]]:
+def _consumer_closure(doc: dict[str, Any], target_consumer: str) -> set[str]:
+    consumers = {
+        item.get("id"): item
+        for item in doc.get("consumers", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+    if target_consumer not in consumers:
+        return set()
+
+    productions: dict[str, dict[str, Any]] = {}
+    for authority in doc.get("authorities", []) or []:
+        if not isinstance(authority, dict):
+            continue
+        for production in authority.get("produces", []) or []:
+            if isinstance(production, str):
+                productions[production] = {"capability": production, "requires": []}
+            elif isinstance(production, dict) and production.get("capability"):
+                productions[production["capability"]] = production
+
+    closure: set[str] = set()
+    def include(capability: str) -> None:
+        if capability in closure:
+            return
+        closure.add(capability)
+        production = productions.get(capability)
+        if not production:
+            return
+        for requirement in production.get("requires", []) or []:
+            upstream = requirement if isinstance(requirement, str) else requirement.get("capability")
+            if upstream:
+                include(upstream)
+
+    for requirement in consumers[target_consumer].get("requires", []) or []:
+        capability = requirement if isinstance(requirement, str) else requirement.get("capability")
+        if capability:
+            include(capability)
+    return closure
+
+
+def project_signals(
+    project_docs: list[dict[str, Any]],
+    project_roles: dict[str, Any],
+    target_consumer: str | None = None,
+) -> dict[str, set[str]]:
     capabilities: set[str] = set()
     knowledge_kinds: set[str] = set()
     authorities: set[str] = set()
     roles: set[str] = set()
 
+    scoped_capabilities: set[str] | None = None
+    if target_consumer:
+        closures = [
+            _consumer_closure(doc, target_consumer)
+            for doc in project_docs
+            if doc.get("kind") == "harness-engineering-graph"
+        ]
+        nonempty = [value for value in closures if value]
+        if nonempty:
+            scoped_capabilities = set().union(*nonempty)
+
     for doc in project_docs:
         for authority in doc.get("authorities", []) or []:
             if isinstance(authority, dict):
                 aid = authority.get("id")
-                if aid:
-                    authorities.add(aid)
+                authority_in_scope = False
                 for production in authority.get("produces", []) or []:
                     if isinstance(production, str):
-                        capabilities.add(production)
+                        cap = production
+                        kind = None
                     elif isinstance(production, dict):
                         cap = production.get("capability")
-                        if cap:
-                            capabilities.add(cap)
                         kind = production.get("knowledge_kind")
-                        if kind:
-                            knowledge_kinds.add(kind)
+                    else:
+                        continue
+                    if not cap:
+                        continue
+                    if scoped_capabilities is not None and cap not in scoped_capabilities:
+                        continue
+                    capabilities.add(cap)
+                    authority_in_scope = True
+                    if kind:
+                        knowledge_kinds.add(kind)
+                if aid and (scoped_capabilities is None or authority_in_scope):
+                    authorities.add(aid)
         for artifact in doc.get("artifacts", []) or []:
             if isinstance(artifact, dict):
-                authorities.add(artifact.get("authority")) if artifact.get("authority") else None
-                capabilities.update(artifact.get("provides", []) or [])
+                provided=set(artifact.get("provides", []) or [])
+                if scoped_capabilities is not None:
+                    provided &= scoped_capabilities
+                if provided:
+                    if artifact.get("authority"):
+                        authorities.add(artifact["authority"])
+                    capabilities.update(provided)
         for binding in doc.get("bindings", []) or []:
             if isinstance(binding, dict):
-                if binding.get("authority"):
-                    authorities.add(binding["authority"])
-                capabilities.update(binding.get("provides", []) or [])
+                provided=set(binding.get("provides", []) or [])
+                if scoped_capabilities is not None:
+                    provided &= scoped_capabilities
+                if provided:
+                    if binding.get("authority"):
+                        authorities.add(binding["authority"])
+                    capabilities.update(provided)
 
     for authority, assigned in (project_roles.get("bindings", {}) or {}).items():
-        authorities.add(authority)
-        roles.update(assigned or [])
+        if scoped_capabilities is None or authority in authorities:
+            roles.update(assigned or [])
 
     return {
         "capabilities": capabilities,
@@ -102,8 +173,10 @@ def derive_activation(
     project_roles: dict[str, Any],
     overlay: dict[str, Any],
     project_docs: list[dict[str, Any]],
+    target_consumer: str | None = None,
 ) -> dict[str, Any]:
-    signals = project_signals(project_docs, project_roles)
+    target_consumer = target_consumer or overlay.get("consumer")
+    signals = project_signals(project_docs, project_roles, target_consumer)
     provenance: dict[str, list[dict[str, Any]]] = {}
 
     for concern in policy.get("baseline", []) or []:
@@ -154,6 +227,7 @@ def derive_activation(
         "kind": "harness-derived-concern-activation",
         "project": overlay.get("project"),
         "scope": overlay.get("scope"),
+        "consumer": target_consumer,
         "activated_count": len(rows),
         "rows": rows,
         "signals": {
@@ -169,6 +243,7 @@ def main() -> int:
     p.add_argument("project_roles")
     p.add_argument("overlay")
     p.add_argument("project_docs", nargs="+")
+    p.add_argument("--consumer")
     args = p.parse_args()
 
     result = derive_activation(
@@ -176,6 +251,7 @@ def main() -> int:
         load(args.project_roles),
         load(args.overlay),
         [load(x) for x in args.project_docs],
+        args.consumer,
     )
     print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
     return 0
