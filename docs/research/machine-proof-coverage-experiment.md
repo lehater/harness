@@ -88,32 +88,29 @@ Cons:
 - can over-standardize project capability naming;
 - domain-specific capabilities still need their own namespace.
 
-### B. Stable `knowledge_kind` on capabilities/artifacts
+### B. Production-contract `semantic_claims`
 
 Example:
 
 ```yaml
 produces:
   - capability: nutrition-management.frontend.security
-    knowledge_kind: engineering.security.boundaries
+    knowledge_kind: security-architecture
+    semantic_claims:
+      - engineering.security.boundaries
 ```
 
-Concern registry:
-
-```yaml
-security.boundaries:
-  accepted_knowledge_kinds:
-    - engineering.security.boundaries
-```
+The existing `knowledge_kind` keeps its established purpose: reusable artifact/skill routing. Coverage proof uses the independent, multi-valued `semantic_claims` field.
 
 Pros:
 - project CapabilityId remains project-specific;
-- reusable semantics live in Harness;
-- best fit with the existing Engineering Graph concept, which already supports `knowledge_kind`.
+- coverage semantics are explicit and machine-readable;
+- one capability may prove several independent concern facets without redefining its execution routing kind;
+- artifact realization, prerequisites, blockers and lifecycle still decide whether the claim is currently valid.
 
 Cons:
-- knowledge kinds must be sufficiently granular;
-- migration needed for projects that currently expose only project-local provides.
+- Engineering Graph schema must support the new field before project graphs can adopt it;
+- claims require semantic review because an over-broad claim can create false COVERED states.
 
 ### C. Artifact-level `covers_concerns`
 
@@ -136,21 +133,19 @@ This is not recommended as the primary model.
 
 ## Current preferred direction
 
-Use **B: stable knowledge kinds**, with exact CapabilityIds still allowed as direct proof where already universal.
-
-Target chain:
+Use production-contract **semantic claims**.
 
 ```text
 Authority
-  -> produces Capability
-       -> knowledge_kind
-            -> reusable concern-proof mapping
+  -> production contract
+       -> CapabilityId
+       -> knowledge_kind       (agent/skill routing only)
+       -> semantic_claims[]    (coverage proof semantics)
+            -> reusable Concern proof contract
                  -> Concern Coverage State
 ```
 
-Artifact realization proves that the capability/knowledge kind has actually been materialized and accepted.
-
-This keeps project-specific naming and universal engineering semantics separate.
+The two metadata dimensions are deliberately independent.
 
 ## Completion algorithm
 
@@ -173,4 +168,4 @@ If the concern is activated but:
 
 The Coverage Map concept is viable as an algorithmic planner/completion gate, but **the current canonical machine vocabulary is not yet rich enough to prove most leaves automatically**.
 
-The next experiment should therefore focus on a concern-proof/knowledge-kind contract, not on adding more manual coverage rows.
+The next experiment should therefore focus on a concern-proof/semantic-claim contract, not on adding more manual coverage rows.
