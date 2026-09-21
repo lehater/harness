@@ -11,16 +11,29 @@ GRAPH=ROOT/"spec/research/scope-activation-fixture-graph.yaml"
 ROLES=ROOT/"spec/research/scope-activation-fixture-roles.yaml"
 CORE=ROOT/"spec/research/scope-activation-fixture-core.yaml"
 
-def activation(root):
+def activation(root, scope):
     return derive_activation(
         load(str(ROOT/"spec/research/concern-activation-policy-v1.yaml")),
         load(str(ROLES)),
         {
             "project":"SCOPE-ACTIVATION-FIXTURE",
-            "scope":"selected",
+            "scope":scope,
             "scope_roots":[root],
-            "activate":[],
-            "decisions":[],
+            "activate":[
+                {
+                    "concern":"quality.performance.latency",
+                    "scopes":["later"],
+                    "rationale":"Later interactive slice only.",
+                }
+            ],
+            "decisions":[
+                {
+                    "concern":"security.identity",
+                    "scopes":["mvp"],
+                    "state":"NOT_APPLICABLE",
+                    "rationale":"MVP has no identity boundary.",
+                }
+            ],
         },
         [load(str(GRAPH))],
         "IMPLEMENTATION",
@@ -44,8 +57,8 @@ def plan(root, required):
     )
 
 def main():
-    mvp=activation("fixture.mvp.implementation-design")
-    later=activation("fixture.later.implementation-design")
+    mvp=activation("fixture.mvp.implementation-design","mvp")
+    later=activation("fixture.later.implementation-design","later")
     ms={r["concern"] for r in mvp["rows"]}
     ls={r["concern"] for r in later["rows"]}
 
@@ -53,6 +66,8 @@ def main():
     assert "interface.human.accessibility" not in ms
     assert "interface.human.accessibility" in ls
     assert "data.lifecycle" not in ls
+    assert "quality.performance.latency" not in ms
+    assert "quality.performance.latency" in ls
 
     mp={r["concern"]:r for r in plan(
         "fixture.mvp.implementation-design",
@@ -69,7 +84,7 @@ def main():
     assert lp["data.model"]["state"] == "MISSING"
 
     try:
-        activation("fixture.not-in-consumer")
+        activation("fixture.not-in-consumer","mvp")
     except ValueError:
         pass
     else:
