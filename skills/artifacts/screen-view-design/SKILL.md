@@ -24,6 +24,10 @@ Materialize each concrete screen/view as a composition contract that inherits an
 - security/authorization semantics;
 - applicable quality/accessibility/localization constraints.
 
+## Read boundary
+
+Read accepted Human Interface semantics, Presentation System, upstream data/action/security contracts and applicable quality obligations. Existing frontend code, routes, screenshots or design-tool files are not authority unless explicitly declared canonical.
+
 ## Procedure
 
 For each required view:
@@ -40,6 +44,10 @@ For each required view:
 10. define focus/read-order consequences where composition changes;
 11. record local overrides only with rationale;
 12. route missing upstream semantics as Questions.
+
+## Stop conditions
+
+Stop and route a Question when screen purpose, required data/actions, authorization semantics, presentation inheritance, required state behavior or responsive/accessibility constraints are insufficient to choose composition without inventing product/interface meaning.
 
 ## Boundary
 
@@ -81,6 +89,10 @@ The contract should be sufficient to generate review projections such as a scree
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
 - framework/CSS implementation freedom remains.
+
+## Registration
+
+Register under INTERFACE-DESIGN and provide the screen/view capabilities actually materialized. Dependencies include the Human Interface contract, inherited Presentation System and upstream semantic contracts genuinely consumed.
 
 ## Human projection
 
