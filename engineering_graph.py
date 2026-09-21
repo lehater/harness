@@ -80,13 +80,38 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         not isinstance(knowledge_kind, str) or not knowledge_kind
     ):
         raise CoreError(f"{where} knowledge_kind must be a non-empty string")
-    semantic_claims = value.get("semantic_claims", []) or []
-    if not isinstance(semantic_claims, list) or any(
-        not isinstance(item, str) or not item for item in semantic_claims
-    ):
-        raise CoreError(f"{where} semantic_claims must be a list of non-empty strings")
-    if len(semantic_claims) != len(set(semantic_claims)):
-        raise CoreError(f"{where} semantic_claims must be unique")
+    semantic_claims_raw = value.get("semantic_claims", []) or []
+    if not isinstance(semantic_claims_raw, list):
+        raise CoreError(f"{where} semantic_claims must be a list")
+    semantic_claims = []
+    claim_keys = []
+    for item in semantic_claims_raw:
+        if isinstance(item, str):
+            if not item:
+                raise CoreError(f"{where} semantic claim must be non-empty")
+            normalized = {"claim": item}
+        elif isinstance(item, dict):
+            unknown_claim_fields = set(item) - {"claim", "subject"}
+            if unknown_claim_fields:
+                raise CoreError(
+                    f"{where} semantic claim has unknown fields: {sorted(unknown_claim_fields)}"
+                )
+            claim = item.get("claim")
+            subject = item.get("subject")
+            if not isinstance(claim, str) or not claim:
+                raise CoreError(f"{where} semantic claim.claim must be non-empty")
+            if subject is not None and (not isinstance(subject, str) or not subject):
+                raise CoreError(f"{where} semantic claim.subject must be non-empty")
+            normalized = {"claim": claim}
+            if subject is not None:
+                normalized["subject"] = subject
+        else:
+            raise CoreError(f"{where} semantic claim must be string or mapping")
+        key = (normalized["claim"], normalized.get("subject"))
+        if key in claim_keys:
+            raise CoreError(f"{where} semantic_claims must be unique by claim+subject")
+        claim_keys.append(key)
+        semantic_claims.append(normalized)
 
     result = {
         "capability": capability,
