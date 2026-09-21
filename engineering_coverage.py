@@ -244,6 +244,17 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             )
             continue
 
+        if action == "REVALIDATE_SEMANTICS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "capabilities": sorted(row.get("capabilities", []) or []),
+                    "causes": row.get("causes", {}),
+                }
+            )
+            continue
+
         if action in {"ASSIGN_AUTHORITY", "MODEL_PROOF_CONTRACT"}:
             others.append(
                 {
