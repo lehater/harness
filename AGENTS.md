@@ -24,8 +24,9 @@ When Harness is used with another repository:
 6. obey expectation `depends_on`: act only on `CREATE`; do not design `PENDING` knowledge early;
 7. for a `CREATE`, load the matching artifact skill under `skills/artifacts/**` when one exists;
 8. validate the artifact candidate, perform semantic acceptance, and only then register `provides` in the Core graph;
-9. when the project opts into a managed `.harness/` workspace, render and verify generated documentation;
-10. if implementation exposes an unresolved semantic case, reopen the owning knowledge through a Core `Question` instead of choosing an implementation convention silently.
+9. when the selected implementation Consumer becomes structurally `COMPLETE`, evaluate Engineering Coverage and all applicable deterministic project/traceability validators before claiming implementation-documentation closure;
+10. when the project opts into a managed `.harness/` workspace, render and verify generated documentation;
+11. if implementation exposes an unresolved semantic case, reopen the owning knowledge through a Core `Question` instead of choosing an implementation convention silently.
 
 No manifest, pin, submodule or repository-to-repository runtime binding is required. The managed workspace is a target-project-local opt-in format.
 
