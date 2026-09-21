@@ -342,17 +342,51 @@ def _normalize_claim(item: Any) -> dict[str, str]:
     raise ValueError(f"invalid semantic claim: {item!r}")
 
 
+def declared_capability_claim_index(
+    bindings: dict[str, Any],
+    project_docs: list[dict[str, Any]],
+) -> dict[str, list[dict[str, str]]]:
+    """Return claims declared by production/binding contracts, before acceptance gating."""
+    result: dict[str, list[dict[str, str]]] = {}
+    seen: dict[str, set[tuple[str, str | None]]] = {}
+
+    def add(capability: str, values: list[Any]) -> None:
+        for value in values:
+            claim = _normalize_claim(value)
+            key = (claim["claim"], claim.get("subject"))
+            if key in seen.setdefault(capability, set()):
+                continue
+            seen[capability].add(key)
+            result.setdefault(capability, []).append(claim)
+
+    for item in bindings.get("bindings", []) or []:
+        capability = item["capability"]
+        add(capability, item.get("semantic_claims", []) or [])
+
+    for doc in project_docs:
+        for authority in doc.get("authorities", []) or []:
+            for production in authority.get("produces", []) or []:
+                if isinstance(production, dict):
+                    capability = production.get("capability")
+                    if capability:
+                        add(capability, production.get("semantic_claims", []) or [])
+    return result
+
+
 def capability_claim_index(
     bindings: dict[str, Any],
     project_docs: list[dict[str, Any]],
 ) -> dict[str, list[dict[str, str]]]:
-    result: dict[str, list[dict[str, str]]] = {}
+    """Return only claims usable as Coverage proof.
 
-    # Legacy projects without semantic evaluations retain declared claims.
-    # Once capability-specific evaluation evidence exists, only claims explicitly
-    # accepted by at least one ACCEPTED evaluation remain usable as Coverage proof.
+    Legacy capabilities without semantic evaluation retain declared claims.
+    Once capability-specific evaluation exists, only explicitly accepted claims
+    remain usable.
+    """
+    declared = declared_capability_claim_index(bindings, project_docs)
     evaluated_capabilities: set[str] = set()
     accepted_by_capability: dict[str, set[str]] = {}
+
     for evaluation in evaluation_index(project_docs).values():
         capability = evaluation.get("capability")
         if not isinstance(capability, str) or not capability:
@@ -363,38 +397,16 @@ def capability_claim_index(
                 evaluation.get("semantic_claims", {}).get("accepted", []) or []
             )
 
-    seen_claims: dict[str, set[tuple[str, str | None]]] = {}
-
-    def add_claims(capability: str, values: list[Any]) -> None:
-        for value in values:
-            claim = _normalize_claim(value)
+    result: dict[str, list[dict[str, str]]] = {}
+    for capability, claims in declared.items():
+        for claim in claims:
             if (
                 capability in evaluated_capabilities
                 and claim["claim"] not in accepted_by_capability.get(capability, set())
             ):
                 continue
-            key = (claim["claim"], claim.get("subject"))
-            if key in seen_claims.setdefault(capability, set()):
-                continue
-            seen_claims[capability].add(key)
             result.setdefault(capability, []).append(claim)
-
-    for item in bindings.get("bindings", []) or []:
-        capability = item["capability"]
-        add_claims(capability, item.get("semantic_claims", []) or [])
-
-    for doc in project_docs:
-        for authority in doc.get("authorities", []) or []:
-            for production in authority.get("produces", []) or []:
-                if isinstance(production, dict):
-                    capability = production.get("capability")
-                    if capability:
-                        add_claims(
-                            capability,
-                            production.get("semantic_claims", []) or [],
-                        )
     return result
-
 
 def concern_proofs(contract: dict[str, Any]) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
@@ -434,6 +446,9 @@ def derive_plan(
 ) -> dict[str, Any]:
     proofs = concern_proofs(proof_contract)
     roles = role_claims(role_contract)
+    declared_cap_claims = declared_capability_claim_index(
+        capability_bindings, project_docs
+    )
     cap_claims = capability_claim_index(capability_bindings, project_docs)
     scope_roots = list(overlay.get("scope_roots", []) or [])
     extension_capabilities = set(
@@ -509,7 +524,7 @@ def derive_plan(
         semantic_invalid_proofs = sorted(
             {
                 cap
-                for cap, claims_for_cap in cap_claims.items()
+                for cap, claims_for_cap in declared_cap_claims.items()
                 if cap in provided_caps
                 and cap in realization.get("semantic_invalid", {})
                 for claim_info in claims_for_cap
