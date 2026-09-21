@@ -150,8 +150,8 @@ The generic evidence registry still contains heuristic capability substring/kind
 
 Next refinement should replace string heuristics with stable semantic mapping declarations:
 - exact CapabilityId;
-- knowledge_kind;
-- declared artifact kind;
+- exact semantic claims declared by a production contract;
+- declared artifact kind as candidate evidence only;
 - optional project adapter mapping.
 
 ## Success criterion for the next experiment
@@ -184,3 +184,13 @@ The experiment now separates two roles:
 Therefore an activated concern with candidate evidence but no proof remains `UNASSESSED`, not `COVERED`.
 
 This exposes an architectural requirement for Harness: if a concern must be checked algorithmically, the canonical knowledge model needs a semantic claim fine-grained enough to prove that concern. A coarse capability such as `engineering.operability.observability` cannot safely prove logging, metrics, tracing and health independently.
+
+
+## Semantic-claim boundary
+
+Coverage proof must not reuse Engineering Graph `knowledge_kind`.
+
+- `knowledge_kind` is the existing execution-layer classification used for agent/skill routing.
+- `semantic_claims[]` is a proposed research-only production-contract classification used for Coverage proof.
+
+A capability may have one broad execution kind and several fine-grained semantic claims. The claims do not state that a concern is currently COVERED; they state what accepted semantic knowledge the capability is capable of proving once its canonical realization is valid.
