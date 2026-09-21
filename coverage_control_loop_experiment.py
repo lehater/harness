@@ -48,6 +48,7 @@ def evaluate(
         "project": activation_overlay.get("project"),
         "scope": activation_overlay.get("scope"),
         "required": [row["concern"] for row in activation["rows"]],
+        "scope_roots": activation.get("scope_roots", []),
         "decisions": decisions,
     }
 
@@ -74,6 +75,7 @@ def evaluate(
         "project": activation_overlay.get("project"),
         "scope": activation_overlay.get("scope"),
         "consumer": target_consumer,
+        "scope_roots": activation.get("scope_roots", []),
         "completion_ready": plan["completion_ready"],
         "activated_count": activation["activated_count"],
         "summary": plan["summary"],
