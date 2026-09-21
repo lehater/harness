@@ -76,10 +76,21 @@ registered artifact skill when available
 candidate → validation → semantic acceptance → Core provider
         ↓
 reevaluate target Consumer
+        ↓
+when structurally COMPLETE, evaluate Engineering Coverage + applicable project validators
+        ↓
+claim implementation-documentation closure only when the derived conjunction passes
 ```
 
 If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent still has a valid CREATE frontier. It performs the work manually under the production contract or develops a reusable skill only when repeated consumer evidence justifies one.
 
+## Coding handoff closure
+
+`COMPLETE` from Target State proves structural knowledge availability only. Before handing a selected implementation scope to a coding agent, evaluate the derived implementation-design closure defined by the Integration Contract.
+
+The handoff must fail closed when any applicable concern/subject remains non-terminal, a registered semantic claim lacks its deterministic validator evidence, an accepted requirement lacks verification disposition, a required TEST disposition lacks executable Test Design, a conditional architecture/repository precondition fails, or a blocking Question remains.
+
+Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results.
 ## Responsibilities
 
 ### Core and target state
