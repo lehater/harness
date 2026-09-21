@@ -1,0 +1,9 @@
+version: 1
+kind: harness-concern-activation-overlay
+project: DERIVATION-FIXTURE
+scope: test
+activate:
+  - concern: governance.privacy
+    rationale: Fixture explicit project fact.
+    evidence: [fixture]
+decisions: []
