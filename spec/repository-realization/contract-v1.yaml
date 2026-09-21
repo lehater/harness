@@ -1,7 +1,7 @@
 version: 1
 kind: harness-repository-realization-contract
 id: repository-realization/v1
-status: canonical-candidate
+status: canonical
 
 ownership:
   authority: IMPLEMENTATION-DESIGN
