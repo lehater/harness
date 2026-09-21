@@ -70,9 +70,11 @@ def project_signals(
     knowledge_kinds: set[str] = set()
     authorities: set[str] = set()
     roles: set[str] = set()
+    consumers: set[str] = set()
 
     scoped_capabilities: set[str] | None = None
     if target_consumer:
+        consumers.add(target_consumer)
         closures = []
         for doc in project_docs:
             if doc.get("kind") != "harness-engineering-graph":
@@ -143,6 +145,7 @@ def project_signals(
         "knowledge_kinds": knowledge_kinds,
         "authorities": authorities,
         "authority_roles": roles,
+        "consumers": consumers,
     }
 
 
@@ -175,6 +178,15 @@ def rule_matches(rule: dict[str, Any], signals: dict[str, set[str]]) -> tuple[bo
         ]
         group_results.append(bool(hits))
         evidence.extend(f"capability:{x}" for x in hits)
+
+    consumer_tokens = when.get("consumer_contains_any", []) or []
+    if consumer_tokens:
+        hits = [
+            consumer for consumer in sorted(signals["consumers"])
+            if any(token in consumer for token in consumer_tokens)
+        ]
+        group_results.append(bool(hits))
+        evidence.extend(f"consumer:{x}" for x in hits)
 
     mode = rule.get("match", "any")
     if mode not in {"any", "all"}:

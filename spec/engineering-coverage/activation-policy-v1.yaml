@@ -23,6 +23,14 @@ baseline:
   - verification.architecture
 
 rules:
+  - id: SOFTWARE-IMPLEMENTATION-STRUCTURE
+    when:
+      consumer_contains_any: [IMPLEMENTATION]
+    activate:
+      - engineering.principles
+      - engineering.components
+      - engineering.code-quality
+
   - id: HUMAN-INTERFACE
     when:
       knowledge_kinds_any: [human-interface-design, user-journey-design]

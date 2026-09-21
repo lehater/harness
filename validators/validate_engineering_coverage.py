@@ -47,6 +47,20 @@ def main() -> int:
     assert mvp["consumer"] == "IMPLEMENTATION"
     assert mvp["scope_roots"] == ["fixture.mvp.implementation-design"]
     assert "data.lifecycle" in mvp_rows
+    # Implementation completeness must not depend on an already-declared
+    # component-design capability. The consumer itself activates these concerns.
+    for concern in (
+        "engineering.principles",
+        "engineering.components",
+        "engineering.code-quality",
+    ):
+        assert concern in mvp_rows
+        assert mvp_rows[concern]["state"] != "COVERED"
+    assert mvp_rows["engineering.components"]["action"] in {
+        "ASSIGN_AUTHORITY",
+        "MODEL_PRODUCTION_CONTRACT",
+        "PRODUCE_CAPABILITY",
+    }
     assert "interface.human.accessibility" not in mvp_rows
     assert "interface.human.accessibility" in later_rows
     assert "data.lifecycle" not in later_rows
