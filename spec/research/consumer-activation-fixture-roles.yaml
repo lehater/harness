@@ -1,0 +1,10 @@
+version: 1
+kind: harness-project-authority-role-bindings
+project: CONSUMER-ACTIVATION-FIXTURE
+bindings:
+  PRODUCT-REQUIREMENTS: [product]
+  SYSTEM-ARCHITECTURE: [architecture, reliability]
+  DATA-DESIGN: [data]
+  INTERFACE-DESIGN: [interface]
+  SECURITY-ARCHITECTURE: [security-architecture]
+  IMPLEMENTATION-DESIGN: [delivery]
