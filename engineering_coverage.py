@@ -44,6 +44,17 @@ def load(path: str | Path) -> dict[str, Any]:
         raise ValueError(f"{path} must contain a mapping")
     return value
 
+def load_scope_source(path: str | Path) -> dict[str, Any]:
+    raw = Path(path).read_text(encoding="utf-8")
+    value = yaml.safe_load(raw)
+    if isinstance(value, dict):
+        return value
+    return {
+        "kind": "harness-markdown-scope-source",
+        "path": str(path),
+        "text": raw,
+    }
+
 
 def _apply_production_contract_overlay(
     graph: dict[str, Any],
@@ -621,7 +632,7 @@ def main() -> int:
             if args.subject_obligations
             else None
         ),
-        scope_source=(load(args.scope_source) if args.scope_source else None),
+        scope_source=(load_scope_source(args.scope_source) if args.scope_source else None),
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
