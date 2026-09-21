@@ -33,6 +33,7 @@ rules:
 
   - id: HUMAN-INTERFACE
     when:
+      consumer_contains_any: [FRONTEND]
       knowledge_kinds_any: [human-interface-design, user-journey-design]
       capability_contains_any: [.frontend., .ui-, .human-interface, .user-journeys]
     activate:
