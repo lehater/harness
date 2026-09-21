@@ -322,6 +322,11 @@ def evaluate_coverage(
         "project": overlay["project"],
         "scope": scope,
         "scope_roots": activation.get("scope_roots", []),
+        "coverage_extension_capabilities": [
+            item["capability"]
+            for item in (production_contract_overlay or {}).get("productions", []) or []
+            if isinstance(item, dict) and item.get("capability")
+        ],
         "required": [row["concern"] for row in activation["rows"]],
         "decisions": applicable_decisions,
     }
