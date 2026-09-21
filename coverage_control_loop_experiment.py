@@ -38,9 +38,13 @@ def evaluate(
 
     target_consumer = activation.get("consumer")
     decisions = []
+    selected_scope = activation_overlay.get("scope")
     for item in activation_overlay.get("decisions", []) or []:
         consumers = item.get("consumers", []) or []
+        scopes = item.get("scopes", []) or []
         if consumers and target_consumer is not None and target_consumer not in consumers:
+            continue
+        if scopes and selected_scope is not None and selected_scope not in scopes:
             continue
         decisions.append(item)
 
