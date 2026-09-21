@@ -241,10 +241,22 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "action": action,
                     "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
                     "candidate_authorities": candidate_authorities,
                     "accepted_semantic_claims": row.get(
                         "accepted_semantic_claims", []
                     ),
+                }
+            )
+            continue
+
+        if action == "CLASSIFY_ACCEPTED_SCOPE":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "subject": row.get("subject"),
+                    "requirement_refs": sorted(row.get("requirement_refs", []) or []),
                 }
             )
             continue
@@ -254,6 +266,7 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "action": action,
                     "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
                     "questions": sorted(row.get("questions", []) or []),
                 }
             )
@@ -264,6 +277,7 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "action": action,
                     "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
                     "capabilities": sorted(row.get("capabilities", []) or []),
                     "causes": row.get("causes", {}),
                 }

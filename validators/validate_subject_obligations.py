@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
 from coverage_obligations import derive_subject_obligation_rows
+from engineering_coverage import _derive_work_items
 
 
 PROOF={
@@ -137,6 +138,25 @@ def main():
     assert by_subject["Application"]["state"]=="MISSING"
     # Broad subjectless proof must not close a required subject.
     assert by_subject["Application"]["action"]=="PRODUCE_CAPABILITY"
+    assert by_subject["Application"]["ready_production_candidates"] == [
+        {
+            "capability":"fixture.ui.application",
+            "claim":"engineering.interface.human.journeys",
+            "subject":"Application",
+            "authority":"INTERFACE-DESIGN",
+            "knowledge_kind":None,
+            "requires":[],
+            "missing_prerequisites":[],
+            "questions":[],
+            "ready":True,
+        }
+    ]
+    work=_derive_work_items(partial["remaining_work"])
+    app_work=[item for item in work if item.get("capability")=="fixture.ui.application"]
+    assert len(app_work)==1
+    assert app_work[0]["semantic_claims"] == [
+        {"claim":"engineering.interface.human.journeys","subject":"Application"}
+    ]
 
     assert run(obligations("NOT_APPLICABLE"))["completion_ready"]
     assert run(obligations("DEFERRED"))["completion_ready"]
@@ -160,6 +180,31 @@ def main():
     meta=[r for r in stale["rows"] if r["concern"]=="meta.subject-inventory"]
     assert meta and meta[0]["state"]=="MISSING"
     assert meta[0]["requirement_refs"]==["REQ-NEW"]
+    classify_work=[
+        item for item in _derive_work_items(stale["remaining_work"])
+        if item.get("action")=="CLASSIFY_ACCEPTED_SCOPE"
+    ]
+    assert classify_work and classify_work[0]["requirement_refs"]==["REQ-NEW"]
+
+    # A fully realized declared graph is still incomplete when accepted scope
+    # requires a subject for which no subject-scoped production contract exists.
+    undeclared=obligations()
+    undeclared["subjects"].append({
+        "subject":"Deployment",
+        "concerns":["interface.human.journeys"],
+        "requirement_refs":["REQ-APPLICATION"],
+    })
+    full_graph_gap=run(
+        undeclared,
+        realized=("fixture.ui.resource","fixture.ui.application","fixture.ui.broad"),
+    )
+    deployment=[
+        r for r in full_graph_gap["rows"]
+        if r.get("subject")=="Deployment"
+    ][0]
+    assert deployment["state"]=="MISSING"
+    assert deployment["action"]=="MODEL_PRODUCTION_CONTRACT"
+    assert not full_graph_gap["completion_ready"]
 
     # Consumer isolation: frontend obligations cannot be proven by a CLI-only capability.
     isolated=derive_subject_obligation_rows(
@@ -200,6 +245,24 @@ def main():
     )
     assert markdown["source_validation"]["source_complete"]
     assert markdown["completion_ready"]
+    question_obligations=obligations()
+    question_obligations["subjects"][1]=dict(question_obligations["subjects"][1])
+    question_obligations["subjects"][1].update({
+        "state":"QUESTION",
+        "rationale":"frontend applicability needs an upstream decision",
+        "question":"Q-APPLICATION-UI",
+    })
+    question=run(question_obligations)
+    question_row=[r for r in question["rows"] if r.get("subject")=="Application"][0]
+    assert question_row["state"]=="BLOCKED"
+    assert question_row["action"]=="RESOLVE_QUESTIONS"
+    assert question_row["questions"]==["Q-APPLICATION-UI"]
+    question_work=[
+        item for item in _derive_work_items(question["remaining_work"])
+        if item.get("action")=="RESOLVE_QUESTIONS"
+    ]
+    assert question_work and question_work[0]["questions"]==["Q-APPLICATION-UI"]
+
     # Scope isolation: an obligation contract for another scope is rejected rather than reused.
     wrong_scope=dict(obligations())
     wrong_scope["scope"]="later"
