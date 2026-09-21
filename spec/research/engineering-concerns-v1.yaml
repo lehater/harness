@@ -1,0 +1,233 @@
+version: 1
+kind: harness-engineering-concern-catalog
+id: software-engineering-concerns/v1-research
+status: research
+
+semantics:
+  leaf_states: [COVERED, MISSING, BLOCKED, STALE, NOT_APPLICABLE, DEFERRED, UNASSESSED]
+  aggregate_display_states: [COVERED, PARTIAL, MISSING, BLOCKED, STALE, NOT_APPLICABLE, DEFERRED, UNASSESSED]
+  rules:
+    - Leaf concern state is project truth only when backed by accepted project evidence or derived from accepted Harness knowledge.
+    - Parent state is always derived; it is never persisted as independent truth.
+    - Empty or absent mapping means UNASSESSED, never NOT_APPLICABLE.
+    - A concern can map to many capabilities, authorities and artifacts.
+    - File names are navigation hints, never semantic evidence.
+    - Cross-cutting lenses reference canonical concern ids and never own duplicate coverage state.
+
+concerns:
+  - id: intent
+    title: Intent and requirements
+    children:
+      - {id: intent.problem, title: Problem and evidence}
+      - {id: intent.scope, title: Goals, scope and exclusions}
+      - {id: intent.behavior, title: Required observable behavior}
+      - {id: intent.quality-targets, title: Explicit quality targets and trade-offs}
+
+  - id: domain
+    title: Domain semantics
+    children:
+      - {id: domain.model, title: Concepts and language}
+      - {id: domain.boundaries, title: Ownership and bounded contexts}
+      - {id: domain.invariants, title: Invariants and policies}
+      - {id: domain.time, title: Domain time semantics}
+      - {id: domain.provenance, title: Domain evidence and provenance}
+
+  - id: application
+    title: Application behavior
+    children:
+      - {id: application.use-cases, title: Use cases and journeys}
+      - {id: application.orchestration, title: Orchestration and transaction boundaries}
+      - {id: application.failures, title: Application failure semantics}
+      - {id: application.idempotency, title: Idempotency and duplicate handling}
+
+  - id: architecture
+    title: Architecture
+    children:
+      - {id: architecture.structure, title: Structural and runtime decomposition}
+      - {id: architecture.boundaries, title: Dependency and ownership boundaries}
+      - {id: architecture.communication, title: Communication styles and protocols}
+      - {id: architecture.deployment, title: Deployment topology}
+      - {id: architecture.decisions, title: Architecture decisions and rationale}
+
+  - id: interface
+    title: Interfaces
+    children:
+      - id: interface.machine
+        title: Machine interfaces
+        children:
+          - {id: interface.machine.contract, title: Contract and schema}
+          - {id: interface.machine.errors, title: Error semantics}
+          - {id: interface.machine.compatibility, title: Compatibility and versioning}
+      - id: interface.human
+        title: Human interface
+        children:
+          - {id: interface.human.journeys, title: User journeys}
+          - {id: interface.human.usability, title: Usability and interaction semantics}
+          - {id: interface.human.accessibility, title: Accessibility}
+          - {id: interface.human.responsiveness, title: Responsive/adaptive presentation}
+          - {id: interface.human.i18n, title: Internationalization and localization}
+
+  - id: data
+    title: Data and evidence
+    children:
+      - {id: data.model, title: Data model and ownership}
+      - {id: data.integrity, title: Integrity and consistency}
+      - {id: data.lifecycle, title: Retention, deletion and lifecycle}
+      - {id: data.quality, title: Data quality}
+      - {id: data.provenance, title: Lineage and provenance}
+      - {id: data.reproducibility, title: Reproducible derivation}
+      - {id: data.classification, title: Classification and sensitivity}
+
+  - id: security
+    title: Security
+    children:
+      - {id: security.boundaries, title: Trust boundaries and attack surface}
+      - {id: security.identity, title: Authentication and identity}
+      - {id: security.authorization, title: Authorization and least privilege}
+      - {id: security.confidentiality, title: Confidentiality and secret handling}
+      - {id: security.integrity, title: Integrity and tamper resistance}
+      - {id: security.accountability, title: Accountability and repudiation resistance}
+      - {id: security.availability-abuse, title: Abuse and denial-of-service resistance}
+      - {id: security.threat-analysis, title: Threat analysis}
+      - {id: security.vulnerability-management, title: Vulnerability response}
+      - {id: security.secure-development, title: Secure development practices}
+
+  - id: reliability
+    title: Reliability and distributed behavior
+    children:
+      - {id: reliability.failure-semantics, title: Failure classification and propagation}
+      - {id: reliability.availability, title: Availability objectives}
+      - {id: reliability.fault-tolerance, title: Fault tolerance and graceful degradation}
+      - {id: reliability.recovery, title: Recovery, restore and continuity}
+      - {id: reliability.consistency, title: Consistency and concurrency}
+      - {id: reliability.retry-idempotency, title: Retry and idempotency}
+      - {id: reliability.durability, title: Durability}
+      - {id: reliability.dependency-failure, title: Dependency failure behavior}
+
+  - id: operability
+    title: Operability
+    children:
+      - {id: operability.configuration, title: Configuration and environment}
+      - {id: operability.logging, title: Logging}
+      - {id: operability.metrics, title: Metrics and SLIs}
+      - {id: operability.tracing, title: Tracing and correlation}
+      - {id: operability.health, title: Health/readiness diagnostics}
+      - {id: operability.alerting, title: Alerting and actionable signals}
+      - {id: operability.incident, title: Incident response and diagnosis}
+      - {id: operability.admin, title: Administrative operations}
+      - {id: operability.capacity, title: Capacity and resource operations}
+
+  - id: engineering
+    title: Engineering policy and implementation structure
+    children:
+      - {id: engineering.principles, title: Design principles and dependency rules}
+      - {id: engineering.components, title: Component boundaries and contracts}
+      - {id: engineering.error-handling, title: Error-handling policy}
+      - {id: engineering.time, title: Technical time/clock policy}
+      - {id: engineering.configuration, title: Configuration policy}
+      - {id: engineering.code-quality, title: Code quality constraints}
+
+  - id: dependency
+    title: External dependencies and supply chain
+    children:
+      - {id: dependency.inventory, title: Dependency inventory}
+      - {id: dependency.trust, title: Dependency trust and provenance}
+      - {id: dependency.versioning, title: Version/update policy}
+      - {id: dependency.license, title: Licensing obligations}
+      - {id: dependency.vulnerability, title: Dependency vulnerability handling}
+
+  - id: delivery
+    title: Build, release and deployment
+    children:
+      - {id: delivery.reproducible-build, title: Build reproducibility}
+      - {id: delivery.provenance, title: Build and artifact provenance}
+      - {id: delivery.integrity, title: Artifact integrity}
+      - {id: delivery.release, title: Release process}
+      - {id: delivery.migration, title: Deployment and schema migration}
+      - {id: delivery.rollback, title: Rollback and safe transition}
+
+  - id: verification
+    title: Verification
+    children:
+      - {id: verification.strategy, title: Verification strategy}
+      - {id: verification.requirement-traceability, title: Requirement traceability}
+      - {id: verification.functional, title: Functional verification}
+      - {id: verification.quality, title: Quality-attribute verification}
+      - {id: verification.security, title: Security verification}
+      - {id: verification.reliability, title: Reliability/failure verification}
+      - id: verification.interface
+        title: Interface and journey verification
+        children:
+          - {id: verification.interface.machine, title: Machine-interface verification}
+          - {id: verification.interface.human, title: Human-interface and journey verification}
+      - {id: verification.architecture, title: Architecture constraints verification}
+      - {id: verification.data, title: Data/evidence verification}
+
+  - id: transition
+    title: Change and transition
+    children:
+      - {id: transition.compatibility, title: Backward/forward compatibility}
+      - {id: transition.data-migration, title: Data migration}
+      - {id: transition.rollout, title: Rollout and coexistence}
+      - {id: transition.deprecation, title: Deprecation and removal}
+      - {id: transition.revalidation, title: Revalidation after upstream change}
+
+  - id: governance
+    title: Governance and obligations
+    children:
+      - {id: governance.external-obligations, title: Legal/regulatory/contractual obligations}
+      - {id: governance.privacy, title: Privacy risk and controls}
+      - {id: governance.data, title: Data governance}
+      - {id: governance.audit, title: Auditability and evidence retention}
+      - {id: governance.ownership, title: Decision ownership and approval}
+
+quality_lens:
+  id: quality
+  title: Product/system quality
+  purpose: Cross-cutting navigation lens; it does not duplicate project coverage state.
+  mappings:
+    functional-suitability:
+      refs: [intent.behavior, verification.functional]
+    performance-efficiency:
+      refs: [quality.performance.latency, quality.performance.throughput, quality.performance.resource-efficiency, quality.performance.capacity]
+    compatibility:
+      refs: [interface.machine.compatibility, quality.compatibility.interoperability, quality.compatibility.coexistence]
+    interaction-capability:
+      refs: [interface.human.usability, interface.human.accessibility, interface.human.i18n]
+    reliability:
+      refs: [reliability.failure-semantics, reliability.availability, reliability.fault-tolerance, reliability.recovery, reliability.consistency, reliability.durability]
+    security:
+      refs: [security.boundaries, security.identity, security.authorization, security.confidentiality, security.integrity, security.accountability, security.availability-abuse]
+    maintainability:
+      refs: [quality.maintainability.modularity, quality.maintainability.analysability, quality.maintainability.modifiability, quality.maintainability.testability, quality.maintainability.reusability]
+    flexibility:
+      refs: [quality.flexibility.adaptability, quality.flexibility.scalability, quality.flexibility.installability, quality.flexibility.replaceability]
+    safety:
+      refs: [specialized.safety]
+
+quality_attribute_leaves:
+  - {id: quality.performance.latency, title: Latency/time behavior}
+  - {id: quality.performance.throughput, title: Throughput}
+  - {id: quality.performance.resource-efficiency, title: Resource efficiency}
+  - {id: quality.performance.capacity, title: Capacity}
+  - {id: quality.compatibility.interoperability, title: Interoperability}
+  - {id: quality.compatibility.coexistence, title: Co-existence}
+  - {id: quality.maintainability.modularity, title: Modularity}
+  - {id: quality.maintainability.reusability, title: Reusability}
+  - {id: quality.maintainability.analysability, title: Analysability}
+  - {id: quality.maintainability.modifiability, title: Modifiability}
+  - {id: quality.maintainability.testability, title: Testability}
+  - {id: quality.flexibility.adaptability, title: Adaptability/portability}
+  - {id: quality.flexibility.scalability, title: Scalability}
+  - {id: quality.flexibility.installability, title: Installability}
+  - {id: quality.flexibility.replaceability, title: Replaceability}
+
+specializations:
+  - id: specialized.safety
+    activation_prompt: Can failure cause material harm to people, property or environment?
+  - id: specialized.ai
+    activation_prompt: Does the system contain AI/ML/agentic behavior whose uncertainty or autonomy changes risk?
+  - id: specialized.distributed
+    activation_prompt: Are there independent runtime nodes, asynchronous communication or distributed consistency concerns?
+  - id: specialized.regulated
+    activation_prompt: Do sector-specific legal/regulatory controls apply?

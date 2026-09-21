@@ -13,3 +13,20 @@ harness-check:
 	python validators/validate_user_facing_application.py
 	python validators/validate_unified_model.py
 	python validators/validate_graph_doctor.py
+	python validators/validate_coverage_map_experiment.py
+	python validators/validate_coverage_derivation_experiment.py
+	python validators/validate_coverage_planner_experiment.py
+	python validators/validate_concern_proof_model.py
+	python validators/validate_engineering_graph_semantic_claims_experiment.py
+	python validators/validate_concern_activation_policy.py
+	python validators/validate_concern_activation_experiment.py
+	python validators/validate_coverage_control_loop_experiment.py
+	python validators/validate_concern_activation_scaling.py
+	python validators/validate_authority_role_projection_experiment.py
+	python validators/validate_consumer_scoped_activation.py
+	python validators/validate_consumer_scoped_coverage_proof.py
+	python validators/validate_intra_consumer_scope.py
+	python validators/validate_subject_scoped_coverage.py
+	python validators/validate_engineering_coverage.py
+	python validators/validate_coverage_blocker_transition.py
+	python validators/validate_coverage_production_contract_overlay.py

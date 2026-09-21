@@ -1,0 +1,107 @@
+version: 1
+kind: harness-engineering-coverage-map
+catalog: software-engineering-baseline/v0
+project: SYNTHETIC-CSV-ETL
+scope: single-script
+
+rows:
+  - concern: problem.discovery
+    state: COVERED
+    rationale: Input/output transformation problem and failure expectations are explicit.
+  - concern: product.intent
+    state: COVERED
+    rationale: Required CSV transformation behavior and acceptance criteria are explicit.
+  - concern: domain.semantics
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: The script performs mechanical schema normalization with no independent business-domain model.
+      evidence: [accepted-scope-decision]
+  - concern: application.use-cases
+    state: COVERED
+    rationale: One batch invocation flow is explicit.
+  - concern: architecture.structure
+    state: COVERED
+    rationale: One executable process, local files and no network/runtime container decomposition.
+  - concern: interface.machine
+    state: COVERED
+    rationale: CLI arguments and input/output CSV schemas are explicit.
+  - concern: interface.human
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No interactive human interface is in accepted scope.
+      evidence: [accepted-scope-decision]
+  - concern: data.persistence
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No persistent application state exists beyond input/output files.
+      evidence: [accepted-storage-decision]
+  - concern: security.architecture
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No identity, trust-boundary or protected remote action exists in the accepted local-only scope.
+      evidence: [accepted-trust-boundary-decision]
+  - concern: security.analysis
+    state: COVERED
+    rationale: File/path/input abuse and dependency risks were assessed and no independent security architecture was required.
+  - concern: privacy.governance
+    state: UNASSESSED
+    rationale: Input data classification is not yet known.
+  - concern: obligation.external
+    state: UNASSESSED
+  - concern: quality.attributes
+    state: COVERED
+    rationale: Deterministic output, bounded memory and clear failure behavior are explicit.
+  - concern: reliability.concurrency
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: Single-process non-concurrent batch execution is accepted.
+      evidence: [accepted-execution-model]
+  - concern: operability.observability
+    state: COVERED
+    rationale: Structured exit codes, error messages and row-level failure summary are required.
+  - concern: engineering.policy
+    state: COVERED
+    rationale: Minimal dependency and deterministic transformation rules are explicit.
+  - concern: dependencies.supply-chain
+    state: COVERED
+    rationale: Runtime dependencies are pinned and provenance is known.
+  - concern: build.reproducibility
+    state: COVERED
+    rationale: Same source/dependencies must produce the same executable package.
+  - concern: component.design
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: Accepted complexity does not justify independently designed components.
+      evidence: [accepted-complexity-decision]
+  - concern: implementation.design
+    state: COVERED
+    rationale: Parsing, normalization, validation and emission sequence is explicit.
+  - concern: verification.strategy
+    state: COVERED
+    rationale: Golden-file, malformed-input and deterministic-output checks are explicit.
+  - concern: test.design
+    state: COVERED
+    rationale: Table-driven cases cover schema, normalization and failure behavior.
+  - concern: change.transition
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No persisted state or compatibility migration is in scope.
+      evidence: [accepted-versioning-decision]
+  - concern: accessibility
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No human UI/document output requiring accessibility conformance is in scope.
+      evidence: [accepted-interface-decision]
+  - concern: internationalization
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: Input/output schema is locale-independent and canonical.
+      evidence: [accepted-format-decision]
+  - concern: safety
+    state: UNASSESSED
+    rationale: Harm classification has not been explicitly evaluated.
+  - concern: ai.risk
+    state: NOT_APPLICABLE
+    applicability:
+      rationale: No AI/ML component exists in the accepted solution.
+      evidence: [accepted-technology-decision]

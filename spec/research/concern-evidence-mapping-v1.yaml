@@ -1,0 +1,211 @@
+version: 1
+kind: harness-concern-evidence-mapping
+id: software-engineering-concern-evidence/v1-research
+status: research
+
+# Generic evidence selectors. A selector means "this knowledge is relevant evidence",
+# never "every project must have this concern".
+mappings:
+  intent.problem:
+    artifact_kinds: [discovery]
+    capability_suffixes: [.problem]
+    capability_contains: [discovery.problem]
+  intent.scope:
+    artifact_kinds: [product-requirements/v1]
+    capability_contains: [.requirements]
+  intent.behavior:
+    artifact_kinds: [product-requirements/v1]
+    capability_contains: [requirements.product-intent, requirements.acceptance]
+  intent.quality-targets:
+    artifact_kinds: [quality-requirements, requirements-evidence]
+    artifact_ids: [QUALITY-REQUIREMENTS, MVP-QUALITY-TARGETS]
+
+  domain.model:
+    artifact_kinds: [strategic-model, tactical-domain-model, domain-language]
+    capability_contains: [.domain.]
+  domain.boundaries:
+    artifact_kinds: [strategic-model, module-contract-design]
+    capability_contains: [domain.boundaries, domain.context-contracts, architecture.module-contracts]
+  domain.invariants:
+    artifact_kinds: [tactical-domain-model, domain-decisions, application-architecture-rules]
+    capability_contains: [.domain.]
+  domain.time:
+    artifact_kinds: [application-architecture-rules, physical-persistence-model]
+  domain.provenance:
+    artifact_kinds: [physical-persistence-model]
+    capability_contains: [evidence-semantics, source-identity]
+
+  application.use-cases:
+    artifact_kinds: [use-case, cross-context-use-case]
+    capability_contains: [application.journey, application-design, user-journeys]
+  application.orchestration:
+    artifact_kinds: [application-architecture-rules]
+    capability_contains: [application-design]
+  application.failures:
+    artifact_kinds: [application-architecture-rules, quality-requirements]
+  application.idempotency:
+    artifact_kinds: [application-architecture-rules]
+
+  architecture.structure:
+    artifact_kinds: [structural-architecture]
+    capability_contains: [.architecture]
+  architecture.boundaries:
+    artifact_kinds: [module-contract-design, application-architecture-rules]
+    capability_contains: [.architecture, engineering-policy]
+  architecture.communication:
+    artifact_kinds: [contract-requirements, http-contract, application-architecture-rules]
+    capability_contains: [application-contracts, interface.]
+  architecture.deployment:
+    artifact_kinds: [application-architecture-rules, security-architecture]
+    capability_contains: [delivery-decision, frontend.architecture]
+  architecture.decisions:
+    artifact_kinds: [application-architecture-rules, security-architecture]
+    capability_contains: [.architecture]
+
+  interface.machine.contract:
+    proof_capability_ids: [engineering.interface.http-contract]
+    artifact_kinds: [http-contract, contract-requirements]
+    capability_contains: [interface.cli, application-contracts, interface.http-contract]
+  interface.machine.errors:
+    artifact_kinds: [contract-requirements, application-architecture-rules]
+    capability_contains: [interface.cli, application-contracts]
+  interface.human.journeys:
+    artifact_kinds: [ui-navigation-model, ui-screen-contract]
+    capability_contains: [user-journeys, human-interface]
+  interface.human.usability:
+    capability_contains: [human-interface]
+  interface.human.accessibility:
+    capability_contains: [human-interface, frontend.verification-design]
+  interface.human.responsiveness:
+    capability_contains: [human-interface, frontend.verification-design]
+
+  data.model:
+    proof_capability_ids: [engineering.data.persistence-model]
+    artifact_kinds: [physical-persistence-model]
+    capability_contains: [data-design, data.persistence-model]
+  data.integrity:
+    artifact_kinds: [physical-persistence-model, quality-requirements, application-architecture-rules]
+    capability_contains: [data-design]
+  data.quality:
+    artifact_kinds: [quality-requirements]
+    capability_contains: [evidence-semantics, verification.strategy]
+  data.provenance:
+    capability_contains: [source-identity, evidence-semantics, data-design]
+  data.reproducibility:
+    capability_contains: [verification.strategy, normalization-order]
+    artifact_kinds: [application-architecture-rules]
+
+  security.boundaries:
+    artifact_kinds: [security-architecture]
+    capability_contains: [architecture.security, frontend.security]
+  security.identity:
+    artifact_kinds: [security-architecture]
+  security.authorization:
+    artifact_kinds: [security-architecture, application-architecture-rules]
+  security.confidentiality:
+    artifact_kinds: [security-architecture, observability-requirements]
+  security.integrity:
+    artifact_kinds: [security-architecture, threat-model]
+  security.accountability:
+    artifact_kinds: [threat-model, observability-requirements]
+  security.availability-abuse:
+    artifact_kinds: [threat-model, security-architecture]
+  security.threat-analysis:
+    proof_capability_ids: [engineering.security.threat-analysis]
+    artifact_kinds: [threat-model]
+    capability_contains: [security.threat-analysis]
+
+  reliability.failure-semantics:
+    artifact_kinds: [quality-requirements, application-architecture-rules]
+    capability_contains: [verification-design]
+  reliability.fault-tolerance:
+    artifact_kinds: [application-architecture-rules, security-architecture]
+    capability_contains: [verification-design]
+  reliability.consistency:
+    artifact_kinds: [application-architecture-rules, physical-persistence-model, quality-requirements]
+    capability_contains: [data-design]
+  reliability.retry-idempotency:
+    artifact_kinds: [application-architecture-rules]
+  reliability.durability:
+    artifact_kinds: [physical-persistence-model]
+    capability_contains: [data-design]
+  reliability.dependency-failure:
+    artifact_kinds: [application-architecture-rules, security-architecture, observability-requirements]
+    capability_contains: [verification-design]
+
+  operability.configuration:
+    artifact_kinds: [security-architecture, application-architecture-rules]
+    capability_contains: [engineering-policy]
+  operability.logging:
+    proof_capability_ids: [engineering.operability.logging]
+    artifact_kinds: [observability-requirements]
+    capability_contains: [operability.observability]
+  operability.metrics:
+    artifact_kinds: [observability-requirements]
+  operability.tracing:
+    artifact_kinds: [observability-requirements]
+  operability.health:
+    artifact_kinds: [observability-requirements]
+  operability.admin:
+    artifact_kinds: [application-architecture-rules]
+    capability_contains: [interface.cli]
+
+  quality.compatibility.interoperability:
+    artifact_kinds: [http-contract]
+    capability_contains: [interface.cli, application-contracts]
+  quality.maintainability.modularity:
+    artifact_kinds: [module-contract-design, quality-requirements]
+    capability_contains: [engineering-policy, component-design]
+  quality.maintainability.analysability:
+    artifact_kinds: [structural-architecture, module-contract-design, observability-requirements]
+    capability_contains: [architecture, component-design]
+  quality.maintainability.modifiability:
+    artifact_kinds: [module-contract-design, quality-requirements]
+    capability_contains: [engineering-policy, component-design]
+  quality.maintainability.testability:
+    artifact_kinds: [test-intent]
+    capability_contains: [test-design, verification-design, verification.strategy]
+  quality.flexibility.adaptability:
+    capability_contains: [engineering-policy, architecture]
+  quality.flexibility.replaceability:
+    capability_contains: [engineering-policy, architecture]
+
+  verification.strategy:
+    proof_capability_ids: [engineering.verification.strategy]
+    artifact_kinds: [test-intent]
+    capability_contains: [verification.strategy, verification-design]
+  verification.requirement-traceability:
+    artifact_kinds: [test-intent]
+    capability_contains: [verification-design]
+  verification.functional:
+    artifact_kinds: [test-intent]
+    capability_contains: [verification.strategy, verification-design]
+  verification.quality:
+    artifact_kinds: [test-intent, quality-requirements]
+    capability_contains: [verification-design]
+  verification.security:
+    artifact_kinds: [test-intent, threat-model]
+    capability_contains: [frontend.verification-design]
+  verification.reliability:
+    artifact_kinds: [test-intent]
+    capability_contains: [verification-design]
+  verification.interface.machine:
+    artifact_kinds: [test-intent, http-contract]
+    capability_contains: [verification-design, interface.cli]
+  verification.interface.human:
+    capability_contains: [frontend.verification-design, frontend.test-design]
+  verification.architecture:
+    artifact_kinds: [test-intent]
+    capability_contains: [verification.strategy, verification-design]
+  verification.data:
+    artifact_kinds: [test-intent]
+    capability_contains: [verification.strategy, verification-design]
+
+  engineering.principles:
+    capability_contains: [engineering-policy]
+  engineering.components:
+    artifact_kinds: [module-contract-design]
+    capability_contains: [component-design]
+
+  delivery.migration:
+    artifact_kinds: [physical-persistence-model, application-architecture-rules]

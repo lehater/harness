@@ -1,0 +1,16 @@
+version: 1
+kind: harness-core-model
+authorities:
+  - {id: TACTICAL-DOMAIN-DESIGN}
+artifacts:
+  - id: BC-A-DOMAIN
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: bc-a.yaml
+    provides: [fixture.domain.model.bc-a]
+    depends_on: []
+  - id: BC-B-DOMAIN
+    authority: TACTICAL-DOMAIN-DESIGN
+    path: bc-b.yaml
+    provides: [fixture.domain.model.bc-b]
+    depends_on: []
+questions: []

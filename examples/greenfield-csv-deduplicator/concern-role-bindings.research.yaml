@@ -1,0 +1,11 @@
+version: 1
+kind: harness-project-authority-role-bindings
+project: GREENFIELD-CSV-DEDUPLICATOR
+status: research
+bindings:
+  DISCOVERY: [product]
+  PRODUCT-REQUIREMENTS: [product]
+  SYSTEM-ARCHITECTURE: [architecture]
+  INTERFACE-DESIGN: [interface]
+  IMPLEMENTATION-DESIGN: [delivery]
+  VERIFICATION-DESIGN: [verification]

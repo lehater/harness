@@ -1,0 +1,23 @@
+version: 1
+kind: harness-derived-coverage-fixture
+artifacts:
+  - id: DATA
+    authority: DATA
+    path: data.yaml
+    kind: physical-persistence-model
+    provides: [fixture.data-design]
+  - id: REQ
+    authority: PRODUCT
+    path: requirements.yaml
+    kind: product-requirements/v1
+    provides: [demo.requirements]
+  - id: OBS
+    authority: OPERABILITY
+    path: observability.yaml
+    kind: observability-requirements
+    provides: [engineering.operability.logging]
+questions:
+  - id: Q-RECOVERY
+    authority: RELIABILITY
+    text: What is the recovery policy?
+    blocks_capabilities: [demo.reliability.recovery]
