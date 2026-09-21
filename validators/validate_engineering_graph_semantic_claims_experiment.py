@@ -26,7 +26,10 @@ def main() -> int:
                         "capability": "fixture.data-design",
                         "semantic_claims": [
                             "engineering.data.model",
-                            "engineering.data.classification",
+                            {
+                                "claim": "engineering.data.classification",
+                                "subject": "CUSTOMER-DATA",
+                            },
                         ],
                         "requires": [],
                     }
@@ -46,8 +49,11 @@ def main() -> int:
     validate_engineering_graph(graph)
     production = production_index(graph)["fixture.data-design"]
     assert production["semantic_claims"] == [
-        "engineering.data.model",
-        "engineering.data.classification",
+        {"claim": "engineering.data.model"},
+        {
+            "claim": "engineering.data.classification",
+            "subject": "CUSTOMER-DATA",
+        },
     ]
 
     bad = {
@@ -60,7 +66,7 @@ def main() -> int:
                         "capability": "fixture.data-design",
                         "semantic_claims": [
                             "engineering.data.model",
-                            "engineering.data.model",
+                            {"claim": "engineering.data.model"},
                         ],
                         "requires": [],
                     }
