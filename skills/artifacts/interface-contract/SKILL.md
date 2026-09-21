@@ -69,6 +69,9 @@ Do not force all interface forms into one Harness schema.
 - internal implementation details do not leak without contract value;
 - supported interface surface is sufficient for downstream implementation and
   verification.
+- semantic completeness is subject-aware: every externally required operation/interaction is materialized or explicitly disposed upstream;
+- every normative input/output/error/compatibility decision from the accepted interface requirements has a corresponding contract realization or explicit N/A disposition;
+- a machine contract consumed by a human-interface contract must be checked for operation/read-model compatibility, not merely co-existence;
 
 ## Registration
 
