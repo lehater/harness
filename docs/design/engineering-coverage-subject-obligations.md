@@ -27,6 +27,8 @@ The obligation contract is canonical routing/classification knowledge because de
 
 Every accepted requirement identity in the selected scope source must occur in at least one subject or in an explicit exclusion. Adding an accepted requirement therefore invalidates completion until classification is updated.
 
+This proof boundary is deliberate: Harness proves completeness over machine-addressable accepted scope atoms; it does not infer hidden subjects from free prose. Scope atoms should therefore be atomic with respect to independently decidable Consumer obligations. A broader umbrella requirement may reference several subjects, but classifying it into one subject is not evidence that its remaining semantics were considered. Where that distinction matters, Product/Use-Case design must expose stable atoms or an equivalent canonical decomposition before Coverage can prove subject completeness.
+
 ## Evaluation
 
 For every REQUIRED subject and concern, proof must match both accepted semantic claim and exact subject. A subjectless broad Capability cannot close a subject-scoped obligation.
@@ -49,7 +51,7 @@ Upstream accepted-scope growth creates an unclassified requirement and makes Cov
 
 ## Activation self-suppression audit
 
-Subject obligations remove one self-suppression class: a required subject can no longer disappear merely because no producer Capability was declared for it.
+Subject obligations remove one self-suppression class: a required subject can no longer disappear merely because no producer Capability was declared for it. Obligation gaps participate in the same control loop as concern gaps: semantic rejection, blocking Questions, missing prerequisites, ready Capability production, missing production contracts and unclassified accepted scope are all explicit remaining work.
 
 Concern activation has a distinct residual risk when a rule is activated only by knowledge that the concern itself is expected to produce. Current high-risk rules are:
 
