@@ -95,10 +95,28 @@ def evaluate(model: dict[str, Any]) -> dict[str, Any]:
         elif state in {"NOT_APPLICABLE", "DEFERRED"} and not environment.get("rationale"):
             error("REPRODUCIBILITY_RATIONALE_MISSING", "environment.rationale", f"{state} reproducibility needs rationale")
 
+    gate_policy = model.get("gate_policy")
     gates = model.get("quality_gates", [])
+    if gate_policy is None:
+        gate_state = "REQUIRED" if gates else "QUESTION"
+    elif not isinstance(gate_policy, dict):
+        gate_state = None
+        error("INVALID_GATE_POLICY", "gate_policy", "gate policy must be a mapping")
+    else:
+        gate_state = gate_policy.get("applicability")
+        if gate_state not in APPLICABILITY:
+            error("INVALID_GATE_APPLICABILITY", "gate_policy.applicability", f"expected one of {sorted(APPLICABILITY)}")
+        elif gate_state in {"NOT_APPLICABLE", "DEFERRED"} and not gate_policy.get("rationale"):
+            error("GATE_DISPOSITION_RATIONALE_MISSING", "gate_policy.rationale", f"{gate_state} gate policy requires rationale")
+        elif gate_state == "QUESTION":
+            error("UNRESOLVED_GATE_QUESTION", "gate_policy", "QUESTION blocks repository-realization completeness")
+
     blocking = [g for g in gates if isinstance(g, dict) and g.get("blocking") is True]
-    if not blocking:
-        error("AUTHORITATIVE_GATE_MISSING", "quality_gates", "at least one authoritative blocking gate is required")
+    if gate_state == "REQUIRED" and not blocking:
+        error("AUTHORITATIVE_GATE_MISSING", "quality_gates", "required merge/release gating needs at least one authoritative blocking gate")
+    if gate_state in {"NOT_APPLICABLE", "DEFERRED"} and gates:
+        error("GATE_DISPOSITION_CONFLICT", "quality_gates", f"{gate_state} gate policy cannot declare active quality gates")
+
     for i, gate in enumerate(gates):
         if not isinstance(gate, dict):
             error("INVALID_GATE", f"quality_gates[{i}]", "gate must be a mapping")
