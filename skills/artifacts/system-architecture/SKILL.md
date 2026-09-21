@@ -51,7 +51,7 @@ Do not mine implementation code as a substitute for accepted architecture.
 
 Stop when:
 
-- architecture depends on an unresolved product/domain decision;
+- Architecture Driver Closure is incomplete or contains an unresolved material Question;\n- architecture depends on an unresolved product/domain decision;
 - a numeric quality target is required but not accepted;
 - two accepted upstream contracts demand incompatible structural guarantees;
 - the proposed architecture would silently change accepted observable behavior.
@@ -72,7 +72,7 @@ Useful knowledge may include:
 
 ## Acceptance checks
 
-- every structural choice traces to accepted upstream needs;
+- Architecture Driver Closure is complete for the selected scope;\n- every structural choice traces to accepted upstream needs;\n- every material complexity increase has explicit upstream justification;
 - no downstream interface/storage detail is promoted without architectural need;
 - no product/domain truth is re-owned;
 - dependency/consistency rules are explicit where implementation could otherwise
