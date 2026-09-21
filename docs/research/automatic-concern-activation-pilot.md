@@ -32,7 +32,7 @@ The experiment uses four classes:
 
 1. Baseline — minimal implementation-readiness questions for ordinary software products.
 2. Structural rules — machine signals such as human interface, persistence, security boundary, external dependency/source, observability or quality-design topology.
-3. Project facts — facts not safely inferable from generic topology, such as privacy applicability or a specific performance concern.
+3. Project facts — facts not safely inferable from generic topology, such as a specific performance concern or an explicitly established normative obligation.
 4. Applicability decisions — accepted NOT_APPLICABLE/DEFERRED decisions with evidence.
 
 No prose inspection is required by the activation engine.
@@ -59,7 +59,7 @@ The broader 60-concern result is intentional: once persistence, a security bound
 
 ## Nutrition
 
-The policy plus four explicit project facts activates 68 concerns.
+The policy plus the currently justified explicit project facts activates the Nutrition concern set without treating personal-data presence as a standalone governance/privacy obligation.
 
 Against the old manually maintained `required` research list, 13 of 16 are derived automatically or from explicit project facts.
 
@@ -77,10 +77,11 @@ Nutrition is a local single-user application. Generic runtime topology is suffic
 
 The experiment retains only facts that generic topology cannot safely infer:
 
-- governance.privacy — member/profile information makes privacy assessment relevant;
-- governance.data — persisted domain/source/user data makes project data governance relevant;
+- governance.data — persisted domain/source/user data makes project data-governance assessment relevant;
 - quality.performance.latency — interactive browser journeys make response time relevant even without a numeric target;
 - quality.performance.resource-efficiency — local execution makes bounded resource use relevant.
+
+`governance.privacy` is **not** activated merely because member/profile data exists. The dedicated data-governance/privacy research concluded that current Nutrition design has no material independently governed privacy/legal source and that a generic Privacy Authority must not be invented. Product/Domain/Data/Security retain their existing responsibilities; `OBLIGATION-ANALYSIS` activates only when a real normative source is introduced.
 
 These are activation facts, not coverage states.
 
@@ -120,7 +121,7 @@ Mitigation: use specific machine signals where available; treat broad Authority-
 
 ### Under-activation
 
-Some facts cannot be inferred from software topology: legal/regulatory scope, privacy/sensitivity, safety/harm, AI/ML autonomy, and explicit business SLOs. These require explicit project facts or upstream canonical requirements.
+Some facts cannot be inferred from software topology: legal/regulatory applicability, independently governed privacy/retention obligations, safety/harm, AI/ML autonomy, and explicit business SLOs. These require explicit upstream facts or accepted canonical requirements. Mere presence of personal data is not enough to manufacture a governance obligation.
 
 ### Circularity
 
