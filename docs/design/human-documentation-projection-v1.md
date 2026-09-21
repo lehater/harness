@@ -51,7 +51,7 @@ included when their declared canonical sources are inside the selected manifest.
 
 Inputs:
 - Engineering Graph;
-- Core realization/project projection;
+- exactly one project integration form: an accepted Core realization, or an authoritative source graph plus Harness projection;
 - selected Consumer;
 - optional explicit extra CapabilityIds;
 - optional Harness/project baseline identities;
@@ -70,6 +70,9 @@ The manifest contains:
 - unresolved required capabilities;
 - relevant unresolved Questions;
 - deterministic manifest digest.
+
+For source-graph integrations, Harness validates project/capability alignment
+for the selected Consumer before compiling the manifest.
 
 The compiler does not infer domain, architecture or product semantics from
 arbitrary prose.

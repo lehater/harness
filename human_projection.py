@@ -18,6 +18,7 @@ import yaml
 
 from engineering_graph import derive_profile, evaluate_engineering_target
 from harness import CoreError, capability_resolve, validate_model
+from integration_alignment import validate_project_alignment
 
 
 def _artifacts(model: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -694,14 +695,50 @@ def _load(path: str | Path) -> dict[str, Any]:
     return value
 
 
+def realize_projection_model(
+    engineering_graph: dict[str, Any],
+    *,
+    consumer_id: str,
+    core_model: dict[str, Any] | None = None,
+    source_graph: dict[str, Any] | None = None,
+    projection: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Resolve exactly one supported project-integration input into a Core model."""
+    if core_model is not None:
+        if source_graph is not None or projection is not None:
+            raise CoreError(
+                "human projection accepts either core_model or source_graph + projection, not both"
+            )
+        validate_model(core_model)
+        return core_model
+
+    if source_graph is None and projection is None:
+        raise CoreError(
+            "human projection requires either core_model or source_graph + projection"
+        )
+    if source_graph is None or projection is None:
+        raise CoreError(
+            "human projection source_graph and projection must be supplied together"
+        )
+
+    return validate_project_alignment(
+        source_graph,
+        projection,
+        engineering_graph,
+        target_consumer=consumer_id,
+    )["model"]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Harness human documentation projection compiler")
     sub = parser.add_subparsers(dest="command", required=True)
 
     compile_cmd = sub.add_parser("compile")
     compile_cmd.add_argument("engineering_graph")
-    compile_cmd.add_argument("core_model")
     compile_cmd.add_argument("consumer")
+    compile_cmd.add_argument("--core-model")
+    compile_cmd.add_argument("--source-graph")
+    compile_cmd.add_argument("--projection")
     compile_cmd.add_argument("--recipe")
     compile_cmd.add_argument(
         "--extra-capability",
@@ -731,9 +768,17 @@ def main() -> int:
 
     if args.command == "compile":
         recipe = _load(args.recipe) if args.recipe else None
+        engineering_graph = _load(args.engineering_graph)
+        model = realize_projection_model(
+            engineering_graph,
+            consumer_id=args.consumer,
+            core_model=_load(args.core_model) if args.core_model else None,
+            source_graph=_load(args.source_graph) if args.source_graph else None,
+            projection=_load(args.projection) if args.projection else None,
+        )
         manifest = compile_manifest(
-            _load(args.engineering_graph),
-            _load(args.core_model),
+            engineering_graph,
+            model,
             args.consumer,
             harness_version=args.harness_version,
             project_revision=args.project_revision,

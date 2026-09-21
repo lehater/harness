@@ -16,6 +16,7 @@ from harness import CoreError  # noqa: E402
 from human_projection import (  # noqa: E402
     compile_manifest,
     materialize_package,
+    realize_projection_model,
     resolve_visual_assets,
     validate_manifest_sources,
     validate_projection_ir,
@@ -46,6 +47,45 @@ def main() -> int:
     ir_template = load(ROOT / "spec/human-projection-acceptance/backend-review-ir.yaml")
 
     model = project_model(fixture["source_graph"], fixture["projection"])
+    direct_model = realize_projection_model(
+        fixture["engineering_graph"],
+        consumer_id="BACKEND-IMPLEMENTATION",
+        core_model=model,
+    )
+    projected_model = realize_projection_model(
+        fixture["engineering_graph"],
+        consumer_id="BACKEND-IMPLEMENTATION",
+        source_graph=fixture["source_graph"],
+        projection=fixture["projection"],
+    )
+    assert direct_model == model
+    assert projected_model == model
+    expect_error(
+        lambda: realize_projection_model(
+            fixture["engineering_graph"],
+            consumer_id="BACKEND-IMPLEMENTATION",
+        ),
+        "requires either core_model",
+    )
+    expect_error(
+        lambda: realize_projection_model(
+            fixture["engineering_graph"],
+            consumer_id="BACKEND-IMPLEMENTATION",
+            source_graph=fixture["source_graph"],
+        ),
+        "must be supplied together",
+    )
+    expect_error(
+        lambda: realize_projection_model(
+            fixture["engineering_graph"],
+            consumer_id="BACKEND-IMPLEMENTATION",
+            core_model=model,
+            source_graph=fixture["source_graph"],
+            projection=fixture["projection"],
+        ),
+        "not both",
+    )
+
     manifest = compile_manifest(
         fixture["engineering_graph"],
         model,
