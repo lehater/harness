@@ -363,6 +363,8 @@ def capability_claim_index(
                 evaluation.get("semantic_claims", {}).get("accepted", []) or []
             )
 
+    seen_claims: dict[str, set[tuple[str, str | None]]] = {}
+
     def add_claims(capability: str, values: list[Any]) -> None:
         for value in values:
             claim = _normalize_claim(value)
@@ -371,6 +373,10 @@ def capability_claim_index(
                 and claim["claim"] not in accepted_by_capability.get(capability, set())
             ):
                 continue
+            key = (claim["claim"], claim.get("subject"))
+            if key in seen_claims.setdefault(capability, set()):
+                continue
+            seen_claims[capability].add(key)
             result.setdefault(capability, []).append(claim)
 
     for item in bindings.get("bindings", []) or []:
