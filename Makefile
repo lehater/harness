@@ -31,6 +31,7 @@ harness-check:
 	python validators/validate_subject_obligations.py
 	python validators/validate_engineering_coverage.py
 	python validators/validate_repository_realization_design.py
+	python validators/validate_architecture_driver_closure.py
 	python validators/validate_coverage_blocker_transition.py
 	python validators/validate_coverage_production_contract_overlay.py
 	python validators/validate_semantic_acceptance.py

@@ -1,0 +1,17 @@
+version: 1
+kind: harness-architecture-driver-closure
+id: SIMPLE-BATCH-FIXTURE
+scope: mvp
+drivers:
+  - {concern: execution-mode, state: RESOLVED, decision: batch, source_refs: [REQ-001]}
+  - {concern: consumers, state: RESOLVED, decision: one-local-operator, source_refs: [REQ-001]}
+  - {concern: load-volume-frequency, state: RESOLVED, decision: one-file-per-day-up-to-100MB, source_refs: [REQ-002]}
+  - {concern: latency-freshness, state: RESOLVED, decision: complete-within-24h, source_refs: [REQ-002]}
+  - {concern: availability, state: NOT_APPLICABLE, rationale: no continuously available consumer}
+  - {concern: recovery-durability, state: NOT_APPLICABLE, rationale: rerun from immutable input is sufficient}
+  - {concern: growth-horizon, state: RESOLVED, decision: no material growth in accepted MVP horizon, source_refs: [REQ-003]}
+  - {concern: deployment-environment, state: RESOLVED, decision: local scheduled execution, source_refs: [REQ-001]}
+  - {concern: concurrency, state: NOT_APPLICABLE, rationale: one execution at a time}
+  - {concern: integration-boundaries, state: RESOLVED, decision: filesystem input and output only, source_refs: [REQ-001]}
+  - {concern: persistence-history, state: NOT_APPLICABLE, rationale: no durable history requirement}
+  - {concern: security-trust-boundary, state: RESOLVED, decision: local filesystem permissions and untrusted input validation, source_refs: [REQ-004]}
