@@ -1,7 +1,9 @@
 version: 1
-kind: repository-realization-pilot
-id: nutrition-management
-result: PASS
+kind: repository-realization-design
+id: NUTRITION-REPOSITORY-REALIZATION-PILOT
+status: accepted-pilot
+pilot_result: PASS
+
 facts:
   language: Python 3.14
   dependency_manager: uv
@@ -9,22 +11,56 @@ facts:
   solver: SCIP/PySCIPOpt
   shape: modular-monolith
   bounded_contexts: 4
-decisions:
-  repository_topology: single-repository-single-python-project
-  source_topology: package-safe-source-root-with-context-aligned-subpackages
-  composition_root: one-explicit-cross-context-composition-root
-  migration_topology: one-alembic-stream-with-explicit-context-ownership
-  dependency_environment: committed-uv-lock-and-locked-ci
-  authoritative_gate: pull-request-ci
+
+repository_topology: single-repository-single-python-project
+
+module_realizations:
+  - {semantic_owner: Nutrition Targeting, physical_root: "src/<package>/nutrition_targeting"}
+  - {semantic_owner: Food Knowledge, physical_root: "src/<package>/food_knowledge"}
+  - {semantic_owner: Market Catalog, physical_root: "src/<package>/market_catalog"}
+  - {semantic_owner: Purchase Planning, physical_root: "src/<package>/purchase_planning"}
+  - {semantic_owner: composition, physical_root: "src/<package>/composition"}
+  - {semantic_owner: presentation, physical_root: "src/<package>/presentation"}
+
+dependency_rules:
+  - rule: context internals depend inward from adapters/infrastructure to application to domain
+    enforcement: import/dependency rule checker
+  - rule: cross-context access uses provider application contracts and never peer persistence
+    enforcement: import/dependency rule checker
+  - rule: PySCIPOpt SQLAlchemy Starlette and other framework types do not cross accepted adapter boundaries
+    enforcement: architecture tests plus import/dependency rule checker
+
 obligations:
-  - {id: deterministic-formatting, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
-  - {id: linting, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
-  - {id: static-typing, applicability: REQUIRED, enforcement: concrete-tool-selected-by-project}
-  - {id: architecture-dependencies, applicability: REQUIRED, enforcement: mechanical-import-dependency-check}
-  - {id: tests, applicability: REQUIRED, enforcement: pytest-plus-browser-tests-where-applicable}
-  - {id: vulnerability-dependency-check, applicability: REQUIRED, enforcement: ci-scanner}
-  - {id: sbom-provenance, applicability: NOT_APPLICABLE, rationale: local MVP has no published distributable artifact or external obligation}
-freedoms:
-  - private-helper-layout
-  - exact-file-names-inside-context-packages
-  - test-helper-decomposition
+  - {id: deterministic-formatting, applicability: REQUIRED, enforcement: pinned formatter check in PR CI}
+  - {id: linting, applicability: REQUIRED, enforcement: pinned linter check in PR CI}
+  - {id: static-typing, applicability: REQUIRED, enforcement: pinned Python type checker in PR CI}
+  - {id: architecture-dependencies, applicability: REQUIRED, enforcement: deterministic dependency rules in PR CI}
+  - {id: tests, applicability: REQUIRED, enforcement: pytest and Playwright where applicable}
+  - {id: vulnerability-dependency-check, applicability: REQUIRED, enforcement: dependency vulnerability scan in PR CI}
+  - {id: secret-scanning, applicability: REQUIRED, enforcement: repository secret scanning/push protection or equivalent}
+  - {id: dead-code, applicability: DEFERRED, rationale: no independent first-MVP requirement; introduce only when signal quality justifies a blocking gate}
+  - {id: sbom-provenance, applicability: NOT_APPLICABLE, rationale: local MVP has no published distributable artifact or external provenance obligation}
+
+generated_artifacts:
+  - path: docs/generated/**
+    source_of_truth: canonical Harness/project design artifacts
+    regenerate: canonical Human Documentation Projection command
+
+environment:
+  reproducibility: REQUIRED
+  lock_or_equivalent: committed uv.lock plus pinned CI/runtime/tool versions
+
+quality_gates:
+  - id: pull-request
+    trigger: pull_request
+    blocking: true
+    command: project check entrypoint invoking format lint type architecture tests security/dependency checks
+  - id: release
+    trigger: release
+    blocking: true
+    command: clean package/install migration and representative end-to-end validation
+
+implementation_freedoms:
+  - private helper/file layout below accepted module roots
+  - exact test-helper decomposition
+  - formatter-compatible source layout
