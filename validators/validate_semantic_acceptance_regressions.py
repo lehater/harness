@@ -155,6 +155,18 @@ def test_coverage_gating_and_invalidation():
     result=capability_realization([graph,realization,accepted],"IMPLEMENTATION")
     assert {"project.http","project.frontend"} <= result["usable"]
 
+    # Claim-level gating: ACCEPTED capability evidence does not authorize claims
+    # omitted from the semantic evaluation.
+    from coverage_planner import capability_claim_index
+    bindings={"bindings":[{"capability":"project.http","semantic_claims":[
+        "engineering.interface.machine.contract",
+        "engineering.interface.machine.errors",
+    ]}]}
+    claims=capability_claim_index(bindings,[graph,realization,accepted])
+    assert claims["project.http"]==[
+        {"claim":"engineering.interface.machine.contract"}
+    ]
+
 
 def main():
     test_real_defect_regressions()
