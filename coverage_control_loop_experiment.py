@@ -25,7 +25,9 @@ def evaluate(
     semantic_claim_bindings: dict[str, Any],
     activation_overlay: dict[str, Any],
     project_docs: list[dict[str, Any]],
+    target_consumer: str | None = None,
 ) -> dict[str, Any]:
+    target_consumer = target_consumer or activation_overlay.get("consumer")
     activation = derive_activation(
         activation_policy,
         project_roles,
@@ -56,6 +58,7 @@ def evaluate(
         semantic_claim_bindings,
         planner_overlay,
         project_docs,
+        target_consumer,
     )
 
     activation_by_concern = {
@@ -87,6 +90,7 @@ def main() -> int:
     p.add_argument("semantic_claim_bindings")
     p.add_argument("activation_overlay")
     p.add_argument("project_docs", nargs="+")
+    p.add_argument("--consumer")
     args=p.parse_args()
 
     result=evaluate(
@@ -97,6 +101,7 @@ def main() -> int:
         load(args.semantic_claim_bindings),
         load(args.activation_overlay),
         [load(x) for x in args.project_docs],
+        args.consumer,
     )
     print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
     return 0
