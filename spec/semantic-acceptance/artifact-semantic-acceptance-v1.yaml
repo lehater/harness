@@ -1,0 +1,106 @@
+version: 1
+kind: harness-semantic-acceptance-contract
+id: artifact-semantic-acceptance/v1
+status: canonical
+
+purpose: >-
+  Define the minimal generated evidence boundary between candidate artifact
+  production and canonical capability realization. This is not a Core entity and
+  not a universal artifact ontology.
+
+contract:
+  input:
+    production:
+      required:
+        - authority
+        - capability
+      optional:
+        - semantic_claims
+        - owned_assertion_kinds
+        - obligations
+        - compatibility_obligations
+        - requires_semantic_review
+    obligations:
+      fields:
+        id: required
+        kind: optional
+        subject: optional
+        subjects: optional
+        min_count: optional
+        required_values: optional
+      rule: >-
+        Artifact skills derive finite obligations from accepted upstream scope.
+        Subject sets are used whenever completeness applies to multiple semantic
+        instances.
+    candidate_assertions:
+      fields:
+        id: required
+        kind: required
+        subject: optional
+        semantic_value: optional
+        derived_from: optional
+        decision_authority: optional
+      rule: >-
+        Only material assertions establishing the capability need machine
+        addressability. Arbitrary prose sentences do not.
+    source_assertions:
+      rule: >-
+        Use bounded accepted prerequisite closure; implementation code and legacy
+        documents are not semantic authority unless explicitly selected as
+        canonical inputs.
+
+  evaluation:
+    kind: harness-artifact-semantic-evaluation
+    required:
+      - artifact
+      - capability
+      - status
+      - obligations
+      - findings
+      - semantic_claims
+    statuses: [ACCEPTED, REJECTED]
+    acceptance_rule: >-
+      ACCEPTED requires all machine-addressable obligations satisfied, no
+      deterministic provenance/ownership/consistency finding, and accepted
+      semantic review when the production contract requires one.
+    claim_rule: >-
+      Only semantic claims explicitly listed under semantic_claims.accepted are
+      usable as Engineering Coverage proof.
+
+  findings:
+    deterministic:
+      - MISSING_OBLIGATION
+      - MISSING_SUBJECTS
+      - MISSING_VALUES
+      - UNKNOWN_PROVENANCE
+      - INVENTED_ASSERTION
+      - WRONG_AUTHORITY_OWNERSHIP
+      - SOURCE_FIDELITY_VIOLATION
+      - INTERNAL_CONTRADICTION
+      - CROSS_ARTIFACT_CONTRADICTION
+      - INCOMPATIBLE_CONSUMER_CONTRACT
+      - SEMANTIC_REVIEW_REQUIRED
+      - SEMANTIC_REVIEW_REJECTED
+
+integration:
+  legacy_mode: >-
+    A capability with no semantic-evaluation evidence retains pre-existing
+    realization behavior during migration.
+  opt_in_rule: >-
+    Once evaluation evidence exists for an artifact/capability, REJECTED evidence
+    prevents that provider from realizing the capability.
+  invalidation_rule: >-
+    A semantically invalid capability invalidates dependent produced capabilities
+    through Engineering Graph prerequisites until revalidation succeeds.
+  coverage_rule: >-
+    Engineering Coverage may use a semantic claim only from an ACCEPTED
+    evaluation that explicitly accepts that claim.
+  core_rule: >-
+    Harness Core remains unchanged. Semantic evaluation is generated evidence
+    above Core; unresolved decisions continue to be represented as Questions.
+
+non_goals:
+  - universal engineering ontology
+  - formal proof of arbitrary natural-language entailment
+  - independent verification of external scientific/legal/source truth
+  - mandatory assertion IDs for every prose sentence

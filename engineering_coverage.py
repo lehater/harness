@@ -244,6 +244,17 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             )
             continue
 
+        if action == "REVALIDATE_SEMANTICS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "capabilities": sorted(row.get("capabilities", []) or []),
+                    "causes": row.get("causes", {}),
+                }
+            )
+            continue
+
         if action in {"ASSIGN_AUTHORITY", "MODEL_PROOF_CONTRACT"}:
             others.append(
                 {
@@ -350,6 +361,7 @@ def evaluate_coverage(
     production_contract_overlay: dict[str, Any] | None = None,
     artifact_skill_registry: dict[str, Any] | None = None,
     canonical_source: dict[str, Any] | None = None,
+    semantic_evaluations: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     graph = _apply_production_contract_overlay(graph, production_contract_overlay)
     validate_engineering_graph(graph)
@@ -377,6 +389,8 @@ def evaluate_coverage(
 
     roles = _merge_authority_roles(standard_authority_roles, aliases, graph)
     project_docs = [graph, realized]
+    if semantic_evaluations is not None:
+        project_docs.append(semantic_evaluations)
 
     activation = derive_activation(
         activation_policy,
@@ -489,6 +503,7 @@ def evaluate_with_repository_policy(
     production_contract_overlay: dict[str, Any] | None = None,
     artifact_skill_registry: dict[str, Any] | None = None,
     canonical_source: dict[str, Any] | None = None,
+    semantic_evaluations: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if artifact_skill_registry is None:
         artifact_skill_registry = load(
@@ -510,6 +525,7 @@ def evaluate_with_repository_policy(
         production_contract_overlay=production_contract_overlay,
         artifact_skill_registry=artifact_skill_registry,
         canonical_source=canonical_source,
+        semantic_evaluations=semantic_evaluations,
     )
 
 
@@ -525,6 +541,10 @@ def main() -> int:
     parser.add_argument("--semantic-claim-bindings")
     parser.add_argument("--canonical-source")
     parser.add_argument("--production-contract-overlay")
+    parser.add_argument(
+        "--semantic-evaluations",
+        help="Generated semantic acceptance evidence document; may contain one evaluation or semantic_evaluations list.",
+    )
     args = parser.parse_args()
 
     result = evaluate_with_repository_policy(
@@ -548,6 +568,11 @@ def main() -> int:
         canonical_source=(
             load(args.canonical_source)
             if args.canonical_source
+            else None
+        ),
+        semantic_evaluations=(
+            load(args.semantic_evaluations)
+            if args.semantic_evaluations
             else None
         ),
     )
