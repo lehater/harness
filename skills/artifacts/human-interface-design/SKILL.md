@@ -86,6 +86,9 @@ A useful human-interface design includes:
 - Product/Domain/Security ownership is preserved;
 - downstream frontend architecture/component/test work can proceed without inventing material user-visible behavior;
 - applicable accessibility/usability coverage has been reviewed and material gaps are either accepted by their owning Authority or represented as Questions.
+- every displayed/edited domain fact maps to a current accepted provider semantic, not a superseded vocabulary;
+- every server-backed user action/read model is realizable by an accepted application/machine interface contract or is blocked as a Question;
+- when multiple upstream capabilities are jointly required, their compatibility is explicitly checked rather than inferred from independent existence;
 
 ## Registration
 
