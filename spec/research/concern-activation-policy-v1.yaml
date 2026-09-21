@@ -1,0 +1,173 @@
+version: 1
+kind: harness-concern-activation-policy
+id: software-engineering-concern-activation/v1-research
+status: research
+
+semantics:
+  - Activation means the concern must be decided for the selected project scope.
+  - Activation does not imply the concern is missing; coverage is evaluated separately.
+  - Rules may use structural machine-readable signals, never prose interpretation.
+  - Explicit project applicability decisions may override an activation only with accepted rationale/evidence.
+
+baseline:
+  # Minimal implementation-readiness questions for a software product.
+  - intent.scope
+  - intent.behavior
+  - architecture.structure
+  - architecture.boundaries
+  - application.failures
+  - engineering.error-handling
+  - verification.strategy
+  - verification.requirement-traceability
+  - verification.functional
+  - verification.architecture
+
+rules:
+  - id: HUMAN-INTERFACE
+    when:
+      knowledge_kinds_any: [human-interface-design, user-journey-design]
+      capability_contains_any: [.frontend., .ui-, .human-interface, .user-journeys]
+    activate:
+      - interface.human.journeys
+      - interface.human.usability
+      - interface.human.accessibility
+      - interface.human.responsiveness
+      - interface.human.i18n
+      - verification.interface.human
+
+  - id: MACHINE-INTERFACE
+    when:
+      knowledge_kinds_any: [interface-contract]
+      capability_contains_any: [.interface.cli, .http-contract, .application-contracts, .machine-interface]
+    activate:
+      - interface.machine.contract
+      - interface.machine.errors
+      - interface.machine.compatibility
+      - verification.interface.machine
+
+  - id: PERSISTENT-DATA
+    when:
+      authority_roles_any: [data]
+      capability_contains_any: [.data-design, .persistence-model, .persistence]
+    activate:
+      - data.model
+      - data.integrity
+      - data.lifecycle
+      - data.classification
+      - reliability.durability
+      - delivery.migration
+      - verification.data
+
+  - id: DATA-PROVENANCE
+    when:
+      capability_contains_any: [source-identity, evidence-semantics, normalization-order, provenance]
+    activate:
+      - data.provenance
+      - data.reproducibility
+      - data.quality
+      - governance.audit
+
+  - id: SECURITY-BOUNDARY
+    when:
+      authority_roles_any: [security-architecture]
+      knowledge_kinds_any: [security-architecture]
+    activate:
+      - security.boundaries
+      - security.confidentiality
+      - security.integrity
+      - security.availability-abuse
+      - security.threat-analysis
+      - security.vulnerability-management
+      - security.secure-development
+      - verification.security
+
+  - id: IDENTITY-AUTHORITY
+    when:
+      capability_contains_any: [identity, auth, authorization, access-policy, permission, grant]
+    activate:
+      - security.identity
+      - security.authorization
+      - security.accountability
+
+  - id: EXTERNAL-DEPENDENCIES
+    when:
+      capability_contains_any: [source-identity, external, dependency]
+    activate:
+      - dependency.inventory
+      - dependency.trust
+      - dependency.versioning
+      - dependency.license
+      - dependency.vulnerability
+      - reliability.dependency-failure
+
+  - id: RUNTIME-SERVICE
+    when:
+      capability_contains_any: [.serve, http-contract, .frontend.architecture, .deployment]
+      authority_roles_any: [architecture]
+    activate:
+      - operability.configuration
+      - operability.logging
+      - operability.health
+      - operability.incident
+      - reliability.availability
+      - reliability.recovery
+
+  - id: OBSERVABILITY-DESIGN
+    when:
+      capability_contains_any: [operability.observability, observability]
+    activate:
+      - operability.logging
+      - operability.metrics
+      - operability.tracing
+      - operability.health
+      - operability.alerting
+      - operability.incident
+
+  - id: QUALITY-DESIGN
+    when:
+      authority_roles_any: [quality]
+      capability_contains_any: [quality.constraints, quality-targets]
+    activate:
+      - intent.quality-targets
+      - verification.quality
+      - quality.performance.latency
+      - quality.performance.throughput
+      - quality.performance.resource-efficiency
+      - quality.performance.capacity
+      - quality.maintainability.modularity
+      - quality.maintainability.analysability
+      - quality.maintainability.modifiability
+      - quality.maintainability.testability
+
+  - id: MODULAR-COMPONENT-DESIGN
+    when:
+      authority_roles_any: [engineering]
+      knowledge_kinds_any: [component-design, engineering-policy]
+    activate:
+      - engineering.principles
+      - engineering.components
+      - engineering.code-quality
+      - quality.maintainability.modularity
+      - quality.maintainability.analysability
+      - quality.maintainability.modifiability
+      - quality.maintainability.testability
+
+  - id: RELEASE-DELIVERY
+    when:
+      capability_contains_any: [implementation-design, implementation.plan, delivery, migration]
+    activate:
+      - delivery.release
+      - delivery.rollback
+      - transition.revalidation
+
+manual_activation_classes:
+  - concern: governance.external-obligations
+    reason: Legal/regulatory/contractual applicability cannot be inferred safely from generic software topology alone.
+  - concern: governance.privacy
+    reason: Personal/sensitive-data applicability requires explicit project evidence or classification.
+  - concern: specialized.safety
+    reason: Harm potential requires domain/risk assessment.
+  - concern: specialized.ai
+    reason: AI/ML/agentic behavior requires explicit project classification.
+  - concern: specialized.regulated
+    reason: Sector regulation requires explicit project classification.
