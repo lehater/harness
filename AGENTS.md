@@ -60,6 +60,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
 - `docs/design/graph-doctor-v1.md` — canonical aggregate graph/model diagnostic contract.
+- `docs/design/human-documentation-projection-v1.md` — canonical source-bounded human documentation projection contract.
 - `profiles/**` — reusable starter Design Profiles.
 - `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.
 - `skills/artifacts/**` — active artifact-specific engineering procedures.
@@ -67,6 +68,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `harness.py` — Core v0 structural operations.
 - `target_state.py` — target-state evaluator above Core.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
+- `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
 - `workspace.py` — managed knowledge validation and rendering.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
@@ -77,6 +79,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `validators/validate_adapters.py` — adapter acceptance runner.
 - `validators/validate_target_state.py` — target-state acceptance runner.
 - `validators/validate_graph_doctor.py` — Graph Doctor v1 acceptance runner.
+- `validators/validate_human_projection.py` — Human Documentation Projection v1 acceptance runner.
 - `validators/validate_workspace.py` — managed-workspace acceptance runner.
 - `validators/validate_agent_layer.py` — agent-layer skill/profile contract validation.
 - `docs/methodology/**` — retained pre-Core material; not part of Core v0 consumer semantics.

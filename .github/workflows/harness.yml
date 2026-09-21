@@ -23,6 +23,7 @@ on:
       - "integration_alignment.py"
       - "authority_context.py"
       - "graph_doctor.py"
+      - "human_projection.py"
       - "agent_router.py"
       - "target_state.py"
       - "workspace.py"

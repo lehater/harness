@@ -1,0 +1,20 @@
+version: 1
+kind: harness-human-projection-ir
+manifest_digest: __DYNAMIC__
+documents:
+  - id: overview
+    sections:
+      - id: product-boundary
+        claims:
+          - text: Accepted product intent is supplied by the requirements provider.
+            sources: [REQUIREMENTS]
+      - id: architecture
+        claims:
+          - text: Accepted architecture is supplied by the architecture provider.
+            sources: [ARCHITECTURE]
+  - id: implementation
+    sections:
+      - id: implementation-design
+        claims:
+          - text: Implementation design is supplied by the implementation design provider.
+            sources: [IMPLEMENTATION-DESIGN]

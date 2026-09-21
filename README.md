@@ -158,3 +158,29 @@ python graph_doctor.py .harness/engineering-graph.yaml \
 ```
 
 See `docs/design/graph-doctor-v1.md`.
+
+
+## Human Documentation Projection
+
+`human_projection.py` derives a deterministic, Consumer-scoped documentation
+manifest from accepted Engineering Graph/Core knowledge, validates a
+project-owned presentation recipe, and materializes source-bounded narrative
+packages.
+
+Generated documentation remains disposable and non-canonical. Narrative claims
+must reference canonical artifacts allowed by the selected section; optional
+evidence validation binds claims to excerpts from current canonical sources.
+
+```sh
+python human_projection.py compile \
+  .harness/engineering-graph.yaml \
+  .harness/graph.yaml \
+  FRONTEND-IMPLEMENTATION \
+  --recipe docs/human-projection/frontend.yaml \
+  --source-root . \
+  --output-manifest /tmp/manifest.yaml \
+  --output-plan /tmp/plan.yaml
+```
+
+See `docs/design/human-documentation-projection-v1.md` and
+`skills/agent/human-documentation-projection/SKILL.md`.
