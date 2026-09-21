@@ -25,6 +25,8 @@ Accepted product/engineering requirements remain canonical semantic truth. A sub
 
 The obligation contract is canonical routing/classification knowledge because derivation from unconstrained prose is not algorithmically reliable. The Coverage evaluation and Coverage Map are generated projections.
 
+Subject/scope completeness is mandatory for every Coverage evaluation. Supplying a subject-obligation contract means the subject inventory is `REQUIRED`. When no contract is supplied, the project must explicitly declare `subject_inventory` for the selected Consumer/Scope as `REQUIRED`, `NOT_APPLICABLE`, `DEFERRED`, or `QUESTION`. Silence is a `MISSING` meta-completeness gap; it is never interpreted as “there are no subjects”.
+
 Every accepted requirement identity in the selected scope source must occur in at least one subject or in an explicit exclusion. Adding an accepted requirement therefore invalidates completion until classification is updated.
 
 This proof boundary is deliberate: Harness proves completeness over machine-addressable accepted scope atoms; it does not infer hidden subjects from free prose. Scope atoms should therefore be atomic with respect to independently decidable Consumer obligations. A broader umbrella requirement may reference several subjects, but classifying it into one subject is not evidence that its remaining semantics were considered. Where that distinction matters, Product/Use-Case design must expose stable atoms or an equivalent canonical decomposition before Coverage can prove subject completeness.
@@ -33,11 +35,17 @@ This proof boundary is deliberate: Harness proves completeness over machine-addr
 
 For every REQUIRED subject and concern, proof must match both accepted semantic claim and exact subject. A subjectless broad Capability cannot close a subject-scoped obligation.
 
-Allowed explicit dispositions are:
+Allowed explicit subject dispositions are:
 
 - `NOT_APPLICABLE`: terminal only with rationale;
 - `DEFERRED`: terminal according to project completion policy and only with rationale;
 - `QUESTION`: evaluates BLOCKED until resolved.
+
+The inventory itself follows the same explicitness rule. Without an obligation contract:
+- `subject_inventory: REQUIRED` means a subject-obligation contract is still missing;
+- `subject_inventory: NOT_APPLICABLE` or `DEFERRED` requires rationale;
+- `subject_inventory: QUESTION` requires rationale and a durable Question id;
+- no `subject_inventory` declaration produces `meta.subject-inventory = MISSING`.
 
 Consumer and Scope are exact keys of the obligation contract. Proof outside the selected Consumer capability closure cannot satisfy it.
 
@@ -68,5 +76,7 @@ These rules are discovery/activation mechanisms, not proof that the concern univ
 `completion_ready == true` is forbidden when either:
 
 - any activated concern is non-terminal; or
+- subject inventory applicability is undeclared;
+- a required subject inventory has no obligation contract;
 - any accepted scope atom is unclassified; or
 - any required subject-scoped obligation is non-terminal.
