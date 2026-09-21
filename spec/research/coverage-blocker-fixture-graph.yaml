@@ -1,0 +1,33 @@
+version: 1
+kind: harness-engineering-graph
+id: COVERAGE-BLOCKER-FIXTURE
+default_subject: FIXTURE
+
+authorities:
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own product requirements.
+    boundary:
+      semantic_cohesion: Product requirements.
+      independent_change: Requirements can change independently.
+      public_contract: Produces accepted requirements.
+    produces:
+      - capability: fixture.requirements
+        requires: []
+
+  - id: SECURITY-ANALYSIS
+    responsibility: Own threat analysis.
+    boundary:
+      semantic_cohesion: Security analysis.
+      independent_change: Threat analysis can change independently.
+      public_contract: Produces accepted threat analysis.
+    produces:
+      - capability: fixture.security.threat-analysis
+        semantic_claims: [engineering.security.threat-analysis]
+        requires:
+          - capability: fixture.requirements
+
+consumers:
+  - id: IMPLEMENTATION
+    purpose: Implement after accepted security analysis.
+    requires:
+      - capability: fixture.security.threat-analysis
