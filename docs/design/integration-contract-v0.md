@@ -97,6 +97,24 @@ Permanent project CI should verify the contract, not preserve pilot experiments.
 
 Large mutation scenarios used to prove Harness semantics belong in Harness acceptance tests. Consumer repositories should retain only assertions that express their own integration contract.
 
+## Implementation design closure
+
+For a selected implementation Consumer, coding authorization is a **derived conjunction** over existing contracts. It is not a new Core state, Stage, Gate or Readiness entity.
+
+A project may claim its design/documentation closure complete only when all applicable assertions are true:
+
+- the selected implementation Consumer target evaluates `COMPLETE`;
+- Engineering Coverage for the same Consumer/Scope has `completion_ready=true`, no remaining work and no blocking Question frontier;
+- subject/scope obligations are terminal for every accepted scope atom;
+- every canonical artifact in the selected closure has passed its owning semantic/structural acceptance contract;
+- accepted requirements have terminal verification dispositions, and every `TEST` disposition has an executable test contract when Test Design is applicable;
+- architecture-driver closure, repository realization and other conditional preconditions required by the selected closure pass their own validators;
+- project graph/realization diagnostics contain no blocking structural error;
+- project-native deterministic validators that justify registered semantic claims pass.
+
+The aggregate check is disposable derived evidence. It must not become another source of product/domain/architecture truth.
+
+A project should expose one normal local/CI command that fails if any of the applicable assertions above fail. Separate workflows may retain redundant checks, but a green structural target alone must never be presented as full implementation-documentation closure.
 ## Portability invariant
 
 Nutrition Management and NAPMS must be able to use the same Harness evaluator and result semantics. Nutrition may directly declare its Engineering Graph/Core realization. NAPMS may project them from its existing canonical graph and completeness/coverage policy. That difference is behind the project-owned adapter boundary.
