@@ -107,17 +107,38 @@ def realized_capabilities(
     return result
 
 
-def capability_claim_index(bindings: dict[str, Any], project_docs: list[dict[str, Any]]) -> dict[str, set[str]]:
-    result: dict[str, set[str]] = {}
+def _normalize_claim(item: Any) -> dict[str, str]:
+    if isinstance(item, str):
+        return {"claim": item}
+    if isinstance(item, dict) and isinstance(item.get("claim"), str):
+        result = {"claim": item["claim"]}
+        if item.get("subject") is not None:
+            result["subject"] = item["subject"]
+        return result
+    raise ValueError(f"invalid semantic claim: {item!r}")
+
+
+def capability_claim_index(
+    bindings: dict[str, Any],
+    project_docs: list[dict[str, Any]],
+) -> dict[str, list[dict[str, str]]]:
+    result: dict[str, list[dict[str, str]]] = {}
     for item in bindings.get("bindings", []) or []:
-        result.setdefault(item["capability"], set()).update(item.get("semantic_claims", []) or [])
+        capability=item["capability"]
+        result.setdefault(capability, []).extend(
+            _normalize_claim(value)
+            for value in item.get("semantic_claims", []) or []
+        )
     for doc in project_docs:
         for authority in doc.get("authorities", []) or []:
             for production in authority.get("produces", []) or []:
                 if isinstance(production, dict):
                     capability = production.get("capability")
                     if capability:
-                        result.setdefault(capability, set()).update(production.get("semantic_claims", []) or [])
+                        result.setdefault(capability, []).extend(
+                            _normalize_claim(value)
+                            for value in production.get("semantic_claims", []) or []
+                        )
     return result
 
 
@@ -163,10 +184,25 @@ def derive_plan(
     scope_roots = list(overlay.get("scope_roots", []) or [])
     realized_caps = realized_capabilities(project_docs, target_consumer, scope_roots)
 
+    scoped_caps: set[str] | None = None
+    if target_consumer:
+        closures = []
+        for doc in project_docs:
+            if doc.get("kind") != "harness-engineering-graph":
+                continue
+            consumer_scope = _consumer_closure(doc, target_consumer)
+            if scope_roots:
+                consumer_scope &= _capability_closure(doc, scope_roots)
+            closures.append(consumer_scope)
+        nonempty=[value for value in closures if value]
+        if nonempty:
+            scoped_caps=set().union(*nonempty)
+
     realized_claims: dict[str, list[str]] = {}
     for cap in sorted(realized_caps):
-        for claim in sorted(cap_claims.get(cap, set())):
-            realized_claims.setdefault(claim, []).append(cap)
+        for claim_info in cap_claims.get(cap, []):
+            if claim_info.get("subject") is None:
+                realized_claims.setdefault(claim_info["claim"], []).append(cap)
 
     explicit = {d["concern"]: d for d in overlay.get("decisions", []) or []}
     required = list(overlay.get("required", []) or [])
@@ -184,19 +220,44 @@ def derive_plan(
             continue
 
         accepted = sorted(proofs.get(concern, set()))
-        present = {
-            claim: realized_claims[claim]
-            for claim in accepted
-            if claim in realized_claims
-        }
-        if present:
-            rows.append({
-                "concern": concern,
-                "state": "COVERED",
-                "action": "NONE",
-                "proof": present,
-            })
-            continue
+
+        subject_instances = []
+        for cap, claims_for_cap in cap_claims.items():
+            if scoped_caps is not None and cap not in scoped_caps:
+                continue
+            for claim_info in claims_for_cap:
+                if claim_info["claim"] in accepted and claim_info.get("subject") is not None:
+                    subject_instances.append({
+                        "claim": claim_info["claim"],
+                        "subject": claim_info["subject"],
+                        "capability": cap,
+                        "realized": cap in realized_caps,
+                    })
+
+        if subject_instances:
+            missing_instances=[item for item in subject_instances if not item["realized"]]
+            if not missing_instances:
+                rows.append({
+                    "concern": concern,
+                    "state": "COVERED",
+                    "action": "NONE",
+                    "proof_instances": subject_instances,
+                })
+                continue
+        else:
+            present = {
+                claim: realized_claims[claim]
+                for claim in accepted
+                if claim in realized_claims
+            }
+            if present:
+                rows.append({
+                    "concern": concern,
+                    "state": "COVERED",
+                    "action": "NONE",
+                    "proof": present,
+                })
+                continue
 
         routes: dict[str, list[str]] = {}
         for claim in accepted:
@@ -212,13 +273,21 @@ def derive_plan(
                 "reason": "concern has no accepted semantic-claim proof contract",
             })
         elif routes:
-            rows.append({
+            row={
                 "concern": concern,
                 "state": "MISSING",
                 "action": "PRODUCE_KNOWLEDGE",
                 "accepted_semantic_claims": accepted,
                 "routes": routes,
-            })
+            }
+            if subject_instances:
+                row["missing_instances"]=[
+                    item for item in subject_instances if not item["realized"]
+                ]
+                row["covered_instances"]=[
+                    item for item in subject_instances if item["realized"]
+                ]
+            rows.append(row)
         else:
             rows.append({
                 "concern": concern,
