@@ -476,6 +476,30 @@ def derive_plan(
 
         accepted = sorted(proofs.get(concern, set()))
 
+        semantic_invalid_proofs = sorted(
+            {
+                cap
+                for cap, claims_for_cap in cap_claims.items()
+                if cap in provided_caps
+                and cap in realization.get("semantic_invalid", {})
+                for claim_info in claims_for_cap
+                if claim_info["claim"] in accepted
+            }
+        )
+        if semantic_invalid_proofs:
+            rows.append({
+                "concern": concern,
+                "state": "BLOCKED",
+                "action": "REVALIDATE_SEMANTICS",
+                "accepted_semantic_claims": accepted,
+                "capabilities": semantic_invalid_proofs,
+                "causes": {
+                    cap: realization["semantic_invalid"][cap]
+                    for cap in semantic_invalid_proofs
+                },
+            })
+            continue
+
         blocked_proof_questions = sorted(
             {
                 question
