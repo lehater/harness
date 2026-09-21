@@ -19,6 +19,7 @@ manually assemble activation -> proof -> routing stages.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,62 @@ def load(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a mapping")
     return value
+
+
+def _apply_production_contract_overlay(
+    graph: dict[str, Any],
+    overlay: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not overlay:
+        return graph
+
+    result = copy.deepcopy(graph)
+    authorities = {
+        item.get("id"): item
+        for item in result.get("authorities", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+    existing = {
+        production.get("capability")
+        for authority in authorities.values()
+        for production in authority.get("produces", []) or []
+        if isinstance(production, dict) and production.get("capability")
+    }
+
+    for item in overlay.get("productions", []) or []:
+        if not isinstance(item, dict):
+            raise ValueError("production contract overlay item must be a mapping")
+        authority_id = item.get("authority")
+        capability = item.get("capability")
+        semantic_claims = item.get("semantic_claims", []) or []
+        requires = item.get("requires", []) or []
+
+        if authority_id not in authorities:
+            raise ValueError(
+                f"production contract overlay references unknown Authority: {authority_id}"
+            )
+        if not isinstance(capability, str) or not capability:
+            raise ValueError("production contract overlay capability is required")
+        if capability in existing:
+            raise ValueError(
+                f"production contract overlay duplicates CapabilityId: {capability}"
+            )
+        if not semantic_claims:
+            raise ValueError(
+                f"production contract overlay {capability} must declare semantic_claims"
+            )
+
+        authorities[authority_id].setdefault("produces", []).append({
+            "capability": capability,
+            "semantic_claims": semantic_claims,
+            "requires": [
+                value if isinstance(value, dict) else {"capability": value}
+                for value in requires
+            ],
+        })
+        existing.add(capability)
+
+    return result
 
 
 def _merge_authority_roles(
@@ -220,7 +277,9 @@ def evaluate_coverage(
     authority_aliases: dict[str, Any] | None = None,
     project_overlay: dict[str, Any] | None = None,
     semantic_claim_bindings: dict[str, Any] | None = None,
+    production_contract_overlay: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    graph = _apply_production_contract_overlay(graph, production_contract_overlay)
     validate_engineering_graph(graph)
     realized = validate_realization(graph, realization)
 
@@ -336,6 +395,7 @@ def evaluate_with_repository_policy(
     authority_aliases: dict[str, Any] | None = None,
     project_overlay: dict[str, Any] | None = None,
     semantic_claim_bindings: dict[str, Any] | None = None,
+    production_contract_overlay: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return evaluate_coverage(
         graph=graph,
@@ -350,6 +410,7 @@ def evaluate_with_repository_policy(
         authority_aliases=authority_aliases,
         project_overlay=project_overlay,
         semantic_claim_bindings=semantic_claim_bindings,
+        production_contract_overlay=production_contract_overlay,
     )
 
 
@@ -363,6 +424,7 @@ def main() -> int:
     parser.add_argument("--authority-aliases")
     parser.add_argument("--overlay")
     parser.add_argument("--semantic-claim-bindings")
+    parser.add_argument("--production-contract-overlay")
     args = parser.parse_args()
 
     result = evaluate_with_repository_policy(
@@ -376,6 +438,11 @@ def main() -> int:
         semantic_claim_bindings=(
             load(args.semantic_claim_bindings)
             if args.semantic_claim_bindings
+            else None
+        ),
+        production_contract_overlay=(
+            load(args.production_contract_overlay)
+            if args.production_contract_overlay
             else None
         ),
     )
