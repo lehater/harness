@@ -69,7 +69,7 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         value = {"capability": value, "requires": []}
     if not isinstance(value, dict):
         raise CoreError(f"{where} must be a capability id or mapping")
-    unknown = set(value) - {"capability", "requires", "knowledge_kind"}
+    unknown = set(value) - {"capability", "requires", "knowledge_kind", "semantic_claims"}
     if unknown:
         raise CoreError(f"{where} has unknown fields: {sorted(unknown)}")
     capability = value.get("capability")
@@ -80,6 +80,14 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
         not isinstance(knowledge_kind, str) or not knowledge_kind
     ):
         raise CoreError(f"{where} knowledge_kind must be a non-empty string")
+    semantic_claims = value.get("semantic_claims", []) or []
+    if not isinstance(semantic_claims, list) or any(
+        not isinstance(item, str) or not item for item in semantic_claims
+    ):
+        raise CoreError(f"{where} semantic_claims must be a list of non-empty strings")
+    if len(semantic_claims) != len(set(semantic_claims)):
+        raise CoreError(f"{where} semantic_claims must be unique")
+
     result = {
         "capability": capability,
         "requires": _requirements(
@@ -87,6 +95,8 @@ def _production(value: object, authority_id: str) -> dict[str, Any]:
             f"production {capability}",
         ),
     }
+    if semantic_claims:
+        result["semantic_claims"] = semantic_claims
     if knowledge_kind is not None:
         result["knowledge_kind"] = knowledge_kind
     return result
