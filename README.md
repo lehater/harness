@@ -174,13 +174,17 @@ evidence validation binds claims to excerpts from current canonical sources.
 ```sh
 python human_projection.py compile \
   .harness/engineering-graph.yaml \
-  .harness/graph.yaml \
   FRONTEND-IMPLEMENTATION \
+  --core-model .harness/graph.yaml \
   --recipe docs/human-projection/frontend.yaml \
   --source-root . \
   --output-manifest /tmp/manifest.yaml \
   --output-plan /tmp/plan.yaml
 ```
+
+Projects whose canonical routing lives in a source graph may use
+`--source-graph ... --projection ...` instead of `--core-model`; Harness
+validates project/capability alignment for the selected Consumer before compiling.
 
 See `docs/design/human-documentation-projection-v1.md` and
 `skills/agent/human-documentation-projection/SKILL.md`.
