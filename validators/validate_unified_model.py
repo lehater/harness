@@ -92,12 +92,26 @@ def main() -> int:
                     "provides": ["example.independent-interface"],
                 }
             )
-            validate_project_alignment(
+            independent_model = validate_project_alignment(
                 independent_source,
                 independent_projection,
                 independent_graph,
                 target_consumer="BACKEND-IMPLEMENTATION",
+            )["model"]
+
+            scoped_interface = build_authority_context(
+                independent_graph,
+                independent_model,
+                "INTERFACE",
+                ["example.interface"],
             )
+            assert set(scoped_interface["access"]["write"]) == {
+                "docs/interface.yaml"
+            }
+            assert {
+                item["path"] for item in scoped_interface["owned_artifacts"]
+            } == {"docs/interface.yaml"}
+            assert "docs/independent-interface.yaml" not in scoped_interface["access"]["read"]
 
             context = build_authority_context(
                 graph, model, "IMPLEMENTATION-DESIGN"
