@@ -88,6 +88,7 @@ proofs:
     accepted_semantic_claims: [engineering.security.boundaries]
   security.identity:
     accepted_semantic_claims: [engineering.security.identity]
+    requires_semantic_evaluation: true
   security.authorization:
     accepted_semantic_claims: [engineering.security.authorization]
   security.confidentiality:

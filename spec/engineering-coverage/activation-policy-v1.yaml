@@ -54,6 +54,14 @@ rules:
       - interface.human.screen-composition
       - verification.interface.presentation
 
+  - id: FRONTEND-SECURITY-IDENTITY
+    match: all
+    when:
+      consumer_contains_any: [FRONTEND]
+      knowledge_kinds_any: [security-architecture]
+    activate:
+      - security.identity
+
   - id: MACHINE-INTERFACE
     when:
       knowledge_kinds_any: [interface-contract]
