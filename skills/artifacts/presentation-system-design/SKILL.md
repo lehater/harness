@@ -42,7 +42,7 @@ Read accepted project requirements, journeys, interface semantics, quality/oblig
 5. Define responsive/accessibility/localization defaults where applicable.
 6. Classify each consequential presentation choice as a material invariant, controlled freedom or ordinary implementation detail.
 7. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
-8. Define inheritance and local-deviation policy.
+8. Define inheritance and local-deviation policy. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
 9. Preserve implementation freedom for framework, CSS mechanics and private component structure.
 10. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
 11. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
@@ -106,6 +106,7 @@ A useful contract includes:
 - screens can inherit common presentation knowledge without copying it;
 - equivalent actions/states use equivalent patterns unless a deviation is justified;
 - design-system/vendor mechanics are not mistaken for project semantics;
+- external template/provider features cannot silently introduce product actions, routes, states or data semantics;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
 - downstream screen design can choose composition without inventing the application's common visual/interaction language;
 - every material presentation decision is constrained by canonical knowledge or explicitly classified as controlled freedom;
