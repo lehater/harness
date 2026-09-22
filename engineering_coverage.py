@@ -283,6 +283,21 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             )
             continue
 
+        if action == "VALIDATE_SEMANTICS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
+                    "capabilities": sorted(row.get("capabilities", []) or []),
+                    "accepted_semantic_claims": row.get(
+                        "accepted_semantic_claims", []
+                    ),
+                    "reason": row.get("reason"),
+                }
+            )
+            continue
+
         if action == "REVALIDATE_SEMANTICS":
             others.append(
                 {
@@ -291,6 +306,7 @@ def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     **({"subject": row["subject"]} if row.get("subject") is not None else {}),
                     "capabilities": sorted(row.get("capabilities", []) or []),
                     "causes": row.get("causes", {}),
+                    **({"reason": row["reason"]} if row.get("reason") else {}),
                 }
             )
             continue
