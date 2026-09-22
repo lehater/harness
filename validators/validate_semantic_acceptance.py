@@ -179,7 +179,9 @@ def test_coverage_gating_and_invalidation():
         [graph,realization],
         required_evaluation_claims={strict_claim},
     )
-    assert strict.get("project.http",[])==[]
+    assert {
+        item["claim"] for item in strict.get("project.http", [])
+    } == {"engineering.interface.machine.contract"}
 
     strict_accepted=dict(accepted)
     strict_accepted["semantic_claims"]={"accepted":[strict_claim]}
