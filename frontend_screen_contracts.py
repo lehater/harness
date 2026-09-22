@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any, Iterable
+import re
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete", "options", "head"}
 
@@ -31,6 +32,24 @@ def operation_ids(interface_contract: dict[str, Any] | None) -> set[str]:
     for item in interface_contract.get("operation_ids", []) or []:
         if isinstance(item, str) and item:
             result.add(item)
+    return result
+
+
+def operation_response_codes(interface_contract: dict[str, Any] | None) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = {}
+    if not interface_contract:
+        return result
+    for path_item in (interface_contract.get("paths", {}) or {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        for method, operation in path_item.items():
+            if method.lower() not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operation_id = operation.get("operationId")
+            if isinstance(operation_id, str) and operation_id:
+                result[operation_id] = {
+                    str(code) for code in (operation.get("responses", {}) or {}).keys()
+                }
     return result
 
 
@@ -74,6 +93,8 @@ def _validate_source(
     commands: set[str],
     findings: list[dict[str, Any]],
     context: str,
+    binding_operations: dict[tuple[str, str], str] | None = None,
+    response_codes: dict[str, set[str]] | None = None,
 ) -> None:
     values = source if isinstance(source, list) else [source]
     for value in values:
@@ -91,6 +112,19 @@ def _validate_source(
             _finding(findings, "UNKNOWN_COMMAND_REF", f"{context} references unknown command {root}", screen=screen)
         elif kind not in {"read", "command", "local", "navigation", "semantic"}:
             _finding(findings, "UNSUPPORTED_SOURCE_REF", f"{context} uses unsupported source kind {kind}", screen=screen)
+        elif kind in {"read", "command"} and root in (reads if kind == "read" else commands):
+            tail = value.split(":", 1)[1].split(".", 1)
+            if len(tail) == 2:
+                match = re.match(r"^(\d{3})(?:-|$)", tail[1])
+                if match and binding_operations is not None and response_codes is not None:
+                    operation_id = binding_operations.get((kind, root))
+                    if operation_id in response_codes and match.group(1) not in response_codes[operation_id]:
+                        _finding(
+                            findings,
+                            "UNSUPPORTED_OPERATION_OUTCOME",
+                            f"{context} references HTTP {match.group(1)} absent from {operation_id}",
+                            screen=screen,
+                        )
 
 
 def evaluate_frontend_screen_contracts(
@@ -103,6 +137,7 @@ def evaluate_frontend_screen_contracts(
     """Evaluate semantic closure without introducing framework/provider-specific semantics."""
     findings: list[dict[str, Any]] = []
     operations = operation_ids(interface_contract)
+    responses_by_operation = operation_response_codes(interface_contract)
     patterns = presentation.get("patterns", {}) or {}
     if not isinstance(patterns, dict):
         _finding(findings, "INVALID_PATTERN_CATALOGUE", "presentation patterns must be a mapping")
@@ -147,12 +182,15 @@ def evaluate_frontend_screen_contracts(
         reads = _ids(contract.get("reads", []) or [], screen=screen, kind="read", findings=findings)
         commands = _ids(contract.get("commands", []) or [], screen=screen, kind="command", findings=findings)
 
+        binding_operations: dict[tuple[str, str], str] = {}
         for kind, bindings in (("read", reads), ("command", commands)):
             for binding_id, binding in bindings.items():
                 operation_id = binding.get("operation_id")
                 if not isinstance(operation_id, str) or not operation_id:
                     _finding(findings, "MISSING_OPERATION_ID", f"{kind} {binding_id} requires operation_id", screen=screen)
-                elif interface_contract is not None and operation_id not in operations:
+                else:
+                    binding_operations[(kind, binding_id)] = operation_id
+                if isinstance(operation_id, str) and operation_id and interface_contract is not None and operation_id not in operations:
                     _finding(
                         findings,
                         "UNKNOWN_INTERFACE_OPERATION",
@@ -184,6 +222,8 @@ def evaluate_frontend_screen_contracts(
                         commands=set(commands),
                         findings=findings,
                         context=f"view_model.{field_id}",
+                        binding_operations=binding_operations,
+                        response_codes=responses_by_operation,
                     )
 
         capability_block = contract.get("capabilities")
@@ -212,6 +252,8 @@ def evaluate_frontend_screen_contracts(
                 commands=set(commands),
                 findings=findings,
                 context=f"capability.{capability_id}",
+                binding_operations=binding_operations,
+                response_codes=responses_by_operation,
             )
 
         excluded = {item for item in excluded_rows if isinstance(item, str) and item}
@@ -303,6 +345,8 @@ def evaluate_frontend_screen_contracts(
                     commands=set(commands),
                     findings=findings,
                     context=f"state.{state}",
+                    binding_operations=binding_operations,
+                    response_codes=responses_by_operation,
                 )
 
         verification = contract.get("verification")
