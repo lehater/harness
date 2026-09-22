@@ -86,6 +86,7 @@ SCREENS = {
         {
             "id": "RESOURCE-CATALOGUE",
             "purpose": "Locate/select Resources and start supported creation.",
+            "patterns": ["CATALOGUE", "STATUS"],
             "states": ["loading", "loaded", "empty", "validation-rejected", "error"],
             "semantic_contract": {
                 "reads": [
@@ -145,6 +146,7 @@ SCREENS = {
         {
             "id": "RESOURCE-DETAIL",
             "purpose": "Inspect one Resource and its history.",
+            "patterns": ["DETAIL"],
             "states": ["loading", "loaded", "not-found", "error"],
             "semantic_contract": {
                 "reads": [

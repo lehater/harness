@@ -132,6 +132,13 @@ def _validate_entity_collection_default(
         for item in (screen_row.get("patterns", []) or [])
         if isinstance(item, str) and item
     }
+    declared_patterns.update(
+        mapping.get("pattern")
+        for mapping in mappings
+        if isinstance(mapping, dict)
+        and isinstance(mapping.get("pattern"), str)
+        and mapping.get("pattern")
+    )
     if not isinstance(default, dict) or "CATALOGUE" not in declared_patterns:
         return
 
