@@ -325,6 +325,29 @@ def main() -> int:
     )
     assert "PRIMARY_CATALOGUE_STRUCTURED_LIST_WITHOUT_OVERRIDE" in codes(result)
 
+    nested_structured_list = deepcopy(structured_primary)
+    nested_structured_list["screens"][0]["regions"] = [
+        {
+            "id": "resources",
+            "role": "collection",
+            "priority": "primary",
+            "pattern": "DATA-TABLE",
+        },
+        {
+            "id": "relationships",
+            "role": "nested-relationship-collection",
+            "priority": "secondary",
+            "pattern": "STRUCTURED-LIST",
+        },
+    ]
+    result = evaluate_frontend_screen_contracts(
+        collection_defaults,
+        nested_structured_list,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "PRIMARY_CATALOGUE_STRUCTURED_LIST_WITHOUT_OVERRIDE" not in codes(result)
+
     wrong_drilldown = deepcopy(SCREENS)
     wrong_drilldown["screens"][0]["semantic_contract"]["capabilities"]["allowed"][0][
         "backed_by"
