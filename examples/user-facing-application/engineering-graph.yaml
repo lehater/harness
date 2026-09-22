@@ -88,6 +88,7 @@ authorities:
           - capability: example.machine-interface
       - capability: example.frontend.presentation-system
         knowledge_kind: presentation-system-design
+        semantic_claims: [engineering.interface.human.presentation-system]
         requires:
           - capability: example.requirements
           - capability: example.frontend.user-journeys
@@ -95,9 +96,11 @@ authorities:
           - capability: example.machine-interface
       - capability: example.frontend.screen-view-design
         knowledge_kind: screen-view-design
+        semantic_claims: [engineering.interface.human.screen-composition]
         requires:
           - capability: example.frontend.human-interface
           - capability: example.frontend.presentation-system
+          - capability: example.machine-interface
 
   - id: SYSTEM-ARCHITECTURE
     responsibility: Own frontend runtime and structural architecture.
