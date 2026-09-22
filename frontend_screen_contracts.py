@@ -127,15 +127,119 @@ def _validate_source(
                         )
 
 
+def evaluate_presentation_provider_contract(
+    presentation: dict[str, Any],
+    screen_design: dict[str, Any],
+    provider_contract: dict[str, Any],
+    *,
+    screen_ids: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Check that provider realization covers accepted patterns without owning semantics."""
+    findings: list[dict[str, Any]] = []
+    patterns = presentation.get("patterns", {}) or {}
+    if not isinstance(patterns, dict):
+        patterns = {}
+
+    provider = provider_contract.get("provider")
+    if not isinstance(provider, str) or not provider:
+        _finding(findings, "MISSING_PRESENTATION_PROVIDER", "presentation provider id is required")
+    if not (provider_contract.get("version") or provider_contract.get("ref")):
+        _finding(findings, "UNPINNED_PRESENTATION_PROVIDER", "presentation provider requires immutable version or ref")
+
+    default = (provider_contract.get("feature_policy") or {}).get("default")
+    if default != "deny":
+        _finding(
+            findings,
+            "UNSAFE_PROVIDER_FEATURE_DEFAULT",
+            "presentation provider feature_policy.default must be deny",
+        )
+
+    mappings = provider_contract.get("pattern_mappings", {}) or {}
+    if not isinstance(mappings, dict):
+        _finding(findings, "INVALID_PROVIDER_PATTERN_MAPPINGS", "provider pattern_mappings must be a mapping")
+        mappings = {}
+
+    required_patterns = {
+        item for item in (provider_contract.get("required_patterns", []) or [])
+        if isinstance(item, str) and item
+    }
+    for row in screen_design.get("screens", []) or []:
+        if not isinstance(row, dict):
+            continue
+        screen = row.get("id")
+        if screen_ids is not None and screen not in screen_ids:
+            continue
+        required_patterns.update(
+            item for item in (row.get("patterns", []) or [])
+            if isinstance(item, str) and item
+        )
+
+    for pattern_id, mapping in mappings.items():
+        if pattern_id not in patterns:
+            _finding(
+                findings,
+                "UNKNOWN_PROVIDER_PATTERN",
+                f"provider maps unknown presentation pattern {pattern_id}",
+            )
+        if not isinstance(mapping, dict):
+            _finding(
+                findings,
+                "INVALID_PROVIDER_PATTERN_MAPPING",
+                f"provider mapping for {pattern_id} must be a mapping",
+            )
+            continue
+        adapter = mapping.get("adapter")
+        if not isinstance(adapter, str) or not adapter:
+            _finding(
+                findings,
+                "MISSING_PROVIDER_ADAPTER",
+                f"provider mapping for {pattern_id} requires adapter",
+            )
+        primitives = mapping.get("provider_primitives")
+        if not isinstance(primitives, list) or not primitives or not all(
+            isinstance(item, str) and item for item in primitives
+        ):
+            _finding(
+                findings,
+                "MISSING_PROVIDER_PRIMITIVES",
+                f"provider mapping for {pattern_id} requires provider_primitives",
+            )
+        if mapping.get("enabled_features"):
+            _finding(
+                findings,
+                "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN",
+                f"provider mapping for {pattern_id} cannot enable product features; bind them in Screen/View semantics",
+            )
+
+    for pattern_id in sorted(required_patterns - set(mappings)):
+        _finding(
+            findings,
+            "MISSING_PROVIDER_PATTERN_MAPPING",
+            f"required presentation pattern {pattern_id} has no provider mapping",
+        )
+
+    return findings
+
+
 def evaluate_frontend_screen_contracts(
     presentation: dict[str, Any],
     screen_design: dict[str, Any],
     interface_contract: dict[str, Any] | None = None,
     *,
     screen_ids: set[str] | None = None,
+    provider_contract: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Evaluate semantic closure without introducing framework/provider-specific semantics."""
+    """Evaluate semantic closure while keeping provider realization subordinate to it."""
     findings: list[dict[str, Any]] = []
+    if provider_contract is not None:
+        findings.extend(
+            evaluate_presentation_provider_contract(
+                presentation,
+                screen_design,
+                provider_contract,
+                screen_ids=screen_ids,
+            )
+        )
     operations = operation_ids(interface_contract)
     responses_by_operation = operation_response_codes(interface_contract)
     patterns = presentation.get("patterns", {}) or {}
