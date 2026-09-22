@@ -83,6 +83,14 @@ A requirement may carry `subject` metadata for the derived target view. In v0, p
 
 Do not use one broad CapabilityId with different subjects and assume `subject` filters providers.
 
+The same rule applies to independently provable semantic claims. If one broad
+CapabilityId carries several claims but one claim has a materially different
+acceptance/evidence contract, prefer a narrower CapabilityId (which may be
+co-materialized by the same CanonicalArtifact) unless the semantic-evaluation
+contract explicitly supports partial-claim evaluation. Do not attach a strict
+claim to a broad capability and assume evaluation of that claim is isolated
+from the capability's other claims.
+
 ## Public capability liveness
 
 Every produced public CapabilityId must have a reason to exist in the selected Engineering Graph.
