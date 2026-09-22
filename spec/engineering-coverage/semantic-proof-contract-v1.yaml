@@ -60,6 +60,12 @@ proofs:
     accepted_semantic_claims: [engineering.interface.human.accessibility]
   interface.human.responsiveness:
     accepted_semantic_claims: [engineering.interface.human.responsiveness]
+  interface.human.presentation-system:
+    accepted_semantic_claims: [engineering.interface.human.presentation-system]
+    requires_semantic_evaluation: true
+  interface.human.screen-composition:
+    accepted_semantic_claims: [engineering.interface.human.screen-composition]
+    requires_semantic_evaluation: true
   interface.human.i18n:
     accepted_semantic_claims: [engineering.interface.human.i18n]
 
@@ -151,6 +157,9 @@ proofs:
     accepted_semantic_claims: [engineering.verification.interface.machine]
   verification.interface.human:
     accepted_semantic_claims: [engineering.verification.interface.human]
+  verification.interface.presentation:
+    accepted_semantic_claims: [engineering.verification.interface.presentation]
+    requires_semantic_evaluation: true
   verification.architecture:
     accepted_semantic_claims: [engineering.verification.architecture]
   verification.data:

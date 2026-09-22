@@ -44,6 +44,16 @@ rules:
       - interface.human.i18n
       - verification.interface.human
 
+  - id: FRONTEND-PRESENTATION
+    match: all
+    when:
+      consumer_contains_any: [FRONTEND]
+      knowledge_kinds_any: [presentation-system-design, screen-view-design]
+    activate:
+      - interface.human.presentation-system
+      - interface.human.screen-composition
+      - verification.interface.presentation
+
   - id: MACHINE-INTERFACE
     when:
       knowledge_kinds_any: [interface-contract]

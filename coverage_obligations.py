@@ -10,7 +10,9 @@ from coverage_planner import (
     capability_realization,
     concern_proofs,
     declared_capability_claim_index,
+    semantic_evaluation_required_claims,
 )
+from semantic_acceptance import evaluation_index
 
 
 TERMINAL_STATES = {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
@@ -212,8 +214,31 @@ def derive_subject_obligation_rows(
         obligations, source, consumer=consumer, scope=scope
     )
     proofs = concern_proofs(proof_contract)
+    strict_claims = semantic_evaluation_required_claims(proof_contract)
     declared = declared_capability_claim_index(capability_bindings, project_docs)
-    usable_claims = capability_claim_index(capability_bindings, project_docs)
+    usable_claims = capability_claim_index(
+        capability_bindings,
+        project_docs,
+        required_evaluation_claims=strict_claims,
+    )
+    evaluations = evaluation_index(project_docs)
+    evaluated_capabilities = {
+        evaluation.get("capability")
+        for evaluation in evaluations.values()
+        if isinstance(evaluation.get("capability"), str)
+        and evaluation.get("capability")
+    }
+    accepted_evaluation_claims: dict[str, set[str]] = {}
+    for evaluation in evaluations.values():
+        capability = evaluation.get("capability")
+        if (
+            isinstance(capability, str)
+            and capability
+            and evaluation.get("status") == "ACCEPTED"
+        ):
+            accepted_evaluation_claims.setdefault(capability, set()).update(
+                evaluation.get("semantic_claims", {}).get("accepted", []) or []
+            )
     realization = capability_realization(
         project_docs,
         consumer,
@@ -389,6 +414,61 @@ def derive_subject_obligation_rows(
                     }
                 )
                 continue
+
+            strict_accepted = set(accepted_claims) & strict_claims
+            if strict_accepted:
+                matching_provided = sorted(
+                    {
+                        cap
+                        for cap, claim in matching_declared
+                        if cap in provided_caps
+                        and claim["claim"] in strict_accepted
+                    }
+                )
+                unevaluated = sorted(
+                    cap for cap in matching_provided
+                    if cap not in evaluated_capabilities
+                )
+                if unevaluated:
+                    rows.append(
+                        {
+                            **base,
+                            "state": "MISSING",
+                            "action": "VALIDATE_SEMANTICS",
+                            "accepted_semantic_claims": accepted_claims,
+                            "capabilities": unevaluated,
+                            "reason": (
+                                "This subject concern requires explicit semantic "
+                                "acceptance evidence; provider existence alone is insufficient."
+                            ),
+                        }
+                    )
+                    continue
+
+                insufficient = sorted(
+                    cap
+                    for cap in matching_provided
+                    if not (
+                        accepted_evaluation_claims.get(cap, set())
+                        & strict_accepted
+                    )
+                )
+                if insufficient:
+                    rows.append(
+                        {
+                            **base,
+                            "state": "BLOCKED",
+                            "action": "REVALIDATE_SEMANTICS",
+                            "accepted_semantic_claims": accepted_claims,
+                            "capabilities": insufficient,
+                            "causes": {},
+                            "reason": (
+                                "Semantic evaluation exists but does not accept any "
+                                "claim that can prove this subject concern."
+                            ),
+                        }
+                    )
+                    continue
 
             candidates = []
             for cap, claim in matching_declared:

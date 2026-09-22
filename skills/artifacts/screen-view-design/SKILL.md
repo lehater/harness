@@ -37,13 +37,15 @@ For each required view:
 3. define semantic regions/sections/tabs/disclosures and their hierarchy;
 4. map displayed/edited data to accepted providers;
 5. define primary/secondary/destructive actions and their placement role;
-6. select reusable presentation/interaction patterns by id;
+6. select reusable presentation/interaction patterns by id and define their screen-specific nesting/slot composition where that structure affects hierarchy or visual intent;
 7. define local list/table/form/detail/search/filter/selection composition where applicable;
 8. define state variants: loading, empty, loaded, submitting, success, validation/auth/conflict/degraded/error states as applicable;
 9. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
 10. define focus/read-order consequences where composition changes;
-11. record local overrides only with rationale;
-12. route missing upstream semantics as Questions.
+11. attach accepted reference/evidence anchors to the regions or states they actually constrain;
+12. classify remaining choices as controlled freedom or ordinary implementation detail;
+13. record local overrides only with rationale;
+14. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -71,7 +73,7 @@ Machine-readable YAML/JSON is preferred when it can express:
 - screen id/purpose;
 - inherits;
 - regions with role, priority and content/action refs;
-- patterns;
+- patterns plus material nesting/slot composition;
 - states/variants;
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
@@ -88,6 +90,8 @@ The contract should be sufficient to generate review projections such as a scree
 - required states/actions/data are covered;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
+- listing a pattern id without the material screen-specific composition it requires is insufficient;
+- reference-backed regions/states declare what the reference constrains and what it does not;
 - framework/CSS implementation freedom remains.
 
 ## Registration

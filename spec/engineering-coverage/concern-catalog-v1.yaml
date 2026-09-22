@@ -65,6 +65,8 @@ concerns:
           - {id: interface.human.usability, title: Usability and interaction semantics}
           - {id: interface.human.accessibility, title: Accessibility}
           - {id: interface.human.responsiveness, title: Responsive/adaptive presentation}
+          - {id: interface.human.presentation-system, title: Shared presentation system and visual language}
+          - {id: interface.human.screen-composition, title: Screen/view composition}
           - {id: interface.human.i18n, title: Internationalization and localization}
 
   - id: data
@@ -160,6 +162,7 @@ concerns:
         children:
           - {id: verification.interface.machine, title: Machine-interface verification}
           - {id: verification.interface.human, title: Human-interface and journey verification}
+          - {id: verification.interface.presentation, title: Rendered presentation and composition verification}
       - {id: verification.architecture, title: Architecture constraints verification}
       - {id: verification.data, title: Data/evidence verification}
 
