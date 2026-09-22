@@ -139,6 +139,16 @@ def _validate_entity_collection_default(
         and isinstance(mapping.get("pattern"), str)
         and mapping.get("pattern")
     )
+    primary_collection_patterns = {
+        region.get("pattern")
+        for region in (screen_row.get("regions", []) or [])
+        if isinstance(region, dict)
+        and region.get("role") == "collection"
+        and region.get("priority") == "primary"
+        and isinstance(region.get("pattern"), str)
+        and region.get("pattern")
+    }
+    collection_patterns = primary_collection_patterns or declared_patterns
     if not isinstance(default, dict) or "CATALOGUE" not in declared_patterns:
         return
 
@@ -149,7 +159,7 @@ def _validate_entity_collection_default(
     if (
         isinstance(default_pattern, str)
         and default_pattern
-        and default_pattern not in declared_patterns
+        and default_pattern not in collection_patterns
         and not override
     ):
         _finding(
@@ -162,7 +172,7 @@ def _validate_entity_collection_default(
     structured_role = default.get("structured_list_role")
     if (
         structured_role
-        and "STRUCTURED-LIST" in declared_patterns
+        and "STRUCTURED-LIST" in collection_patterns
         and default_pattern != "STRUCTURED-LIST"
         and not override
     ):
