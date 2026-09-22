@@ -13,6 +13,37 @@ screens:
       - {id: actions, role: task-actions, priority: primary}
       - {id: history, role: secondary-content, priority: secondary}
     states: [loading, loaded, empty, validation-rejected, authorization-rejected, error]
+    semantic_contract:
+      reads:
+        - {id: detail, operation_id: getExample, projection: ExampleView}
+      commands:
+        - {id: save, operation_id: updateExample}
+      view_model:
+        id: ExampleDetailScreenModel
+        fields:
+          - {id: identity, source: read:detail.id}
+          - {id: facts, source: read:detail.facts}
+          - {id: history, source: read:detail.history}
+      capabilities:
+        allowed:
+          - {id: show-primary, backed_by: read:detail}
+          - {id: show-history, backed_by: read:detail}
+          - {id: edit, backed_by: command:save}
+        excluded: [delete]
+      pattern_mapping:
+        - pattern: DETAIL
+          feature_bindings: {show-primary: show-primary, show-history: show-history, edit: edit}
+      state_mapping:
+        loading: read:detail.pending
+        loaded: read:detail.200
+        empty: read:detail.200-empty
+        validation-rejected: command:save.422
+        authorization-rejected: command:save.403
+        error: [read:detail.failure, command:save.failure]
+      verification:
+        contract: [operation:getExample, operation:updateExample]
+        semantic: [example-detail-state-matrix]
+        rendered: [example-detail-reference-render]
     responsive:
       preserve: [facts, actions, history-access]
     overrides: []
