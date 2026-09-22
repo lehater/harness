@@ -168,6 +168,24 @@ Frontend Test Design derives observable oracles from accepted human-interface se
 
 Snapshot or visual-regression tests do not become semantic authority unless the corresponding visual invariant is intentionally canonical.
 
+## Presentation provider boundary
+
+Screen/View Design terminates at provider-neutral presentation pattern ids and authorized semantic capabilities. A concrete UI stack is selected downstream in Component Design.
+
+For a replaceable presentation provider, Component Design may define a small provider realization contract containing:
+
+- provider/version or immutable ref;
+- deny-by-default feature policy;
+- the presentation patterns required by the selected screen scope;
+- one project adapter owner per pattern;
+- the provider primitives used to realize that pattern.
+
+The provider contract does not re-declare product actions, routes, fields, permissions or screen states. Those remain upstream Screen/View semantics. Provider defaults that expose optional capabilities are disabled unless a Screen/View contract explicitly authorizes them.
+
+Do not create a universal UI framework or mirror a vendor component API. The seam is only the stable project pattern boundary needed to replace the presentation stack. Theme, vendor component props and copied template internals remain provider-specific realization.
+
+Harness may mechanically validate this closure when a target project supplies a provider contract. Missing provider mappings block realization of the selected screen scope; missing product semantics are still routed to their upstream owners.
+
 ## Design system
 
 A monolithic design-system capability is conditional.
