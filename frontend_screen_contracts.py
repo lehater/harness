@@ -222,6 +222,43 @@ def evaluate_frontend_screen_contracts(
         mappings = contract.get("pattern_mapping", []) or []
         if not isinstance(mappings, list) or not mappings:
             _finding(findings, "MISSING_PATTERN_MAPPING", "at least one presentation pattern mapping is required", screen=screen)
+            mappings = []
+        mapped_patterns = {
+            mapping.get("pattern")
+            for mapping in mappings
+            if isinstance(mapping, dict) and mapping.get("pattern")
+        }
+        declared_patterns = {
+            pattern
+            for pattern in (row.get("patterns", []) or [])
+            if isinstance(pattern, str) and pattern
+        }
+        for pattern in sorted(declared_patterns - mapped_patterns):
+            _finding(
+                findings,
+                "UNMAPPED_PRESENTATION_PATTERN",
+                f"declared pattern {pattern} has no semantic pattern mapping",
+                screen=screen,
+            )
+
+        declared_actions: set[str] = set()
+        primary_action = row.get("primary_action_role")
+        if isinstance(primary_action, str) and primary_action:
+            declared_actions.add(primary_action)
+        action_hierarchy = row.get("action_hierarchy") or {}
+        if isinstance(action_hierarchy, dict):
+            declared_actions.update(
+                value for value in action_hierarchy.values()
+                if isinstance(value, str) and value
+            )
+        for action in sorted(declared_actions - set(allowed)):
+            _finding(
+                findings,
+                "SCREEN_ACTION_NOT_AUTHORIZED",
+                f"declared screen action {action} has no allowed semantic capability",
+                screen=screen,
+            )
+
         for mapping in mappings:
             if not isinstance(mapping, dict):
                 _finding(findings, "INVALID_PATTERN_MAPPING", "pattern mapping must be a mapping", screen=screen)
