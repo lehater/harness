@@ -92,3 +92,10 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - Run validation and tests on that branch before integration.
 - Integrate completed work into `main` only through a pull request using squash merge.
 - Treat `main` as the reviewed, integrated baseline, not as a working branch.
+- Treat commits and CI runs as checkpoints, not as a per-file feedback mechanism.
+- Keep a pull request draft while exploring/debugging; inspect all known failures before committing the next fix batch.
+- Prefer one commit per coherent checkpoint. When repository APIs would create one commit per file, prefer a multi-file tree/commit operation.
+- During iteration, run the smallest deterministic affected checks; reserve the full PR gate set for coherent checkpoints and the final candidate.
+- For workflows triggered only by `ready_for_review`, make the ready transition only after the branch is stable. On failure, return to draft, batch fixes, then transition once again.
+- Do not move the branch head merely to poll or retrigger CI; rerun an existing workflow without content changes when supported.
+- Merge only from a stable head with all applicable required gates green.
