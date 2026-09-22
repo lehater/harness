@@ -41,9 +41,11 @@ Read accepted project requirements, journeys, interface semantics, quality/oblig
 4. Define typography/color/spacing/iconography roles and design tokens only when they carry stable reusable decisions.
 5. Define responsive/accessibility/localization defaults where applicable.
 6. Define inheritance and local-deviation policy.
-7. Preserve implementation freedom for framework, CSS mechanics and private component structure.
-8. Route missing upstream requirements or obligations as Questions.
-9. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
+7. When inheriting an external presentation baseline/template, pin an immutable version/ref, declare which facets are inherited and set provider feature activation to deny-by-default.
+8. Treat patterns as offered presentation features, never as authority to create search/filter/sort/edit/delete/bulk or other product capabilities.
+9. Preserve implementation freedom for framework, CSS mechanics and private component structure.
+10. Route missing upstream requirements or obligations as Questions.
+11. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
 
 ## Facets
 
@@ -95,6 +97,8 @@ A useful contract includes:
 - semantic token roles or constrained values when material;
 - responsive/accessibility defaults;
 - explicitly unconstrained details;
+- optional external baseline/provider id plus immutable version/ref, inherited facets and theme/override policy;
+- provider feature policy with default deny when a reusable template/provider offers optional behavior;
 - deviation policy: local override requires rationale and cannot silently weaken accepted semantics/obligations;
 - unresolved Questions.
 
@@ -103,6 +107,7 @@ A useful contract includes:
 - screens can inherit common presentation knowledge without copying it;
 - equivalent actions/states use equivalent patterns unless a deviation is justified;
 - design-system/vendor mechanics are not mistaken for project semantics;
+- an external template may offer optional features, but only Screen/View mappings backed by accepted semantic capabilities may activate them;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
 - downstream screen design can choose composition without inventing the application's common visual/interaction language.
 
