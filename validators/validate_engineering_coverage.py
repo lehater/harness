@@ -36,6 +36,48 @@ def subject_eval(core):
     )
 
 
+def frontend_presentation_eval(semantic_evaluations=None):
+    graph = load(ROOT / "examples/user-facing-application/engineering-graph.yaml")
+    realization = load(ROOT / "examples/user-facing-application/core-state-complete.yaml")
+    return evaluate_with_repository_policy(
+        graph=graph,
+        realization=realization,
+        consumer="FRONTEND-IMPLEMENTATION",
+        scope="example",
+        project_overlay={
+            "subject_inventory": {
+                "state": "NOT_APPLICABLE",
+                "rationale": "Coverage fixture validates shared frontend presentation concerns only.",
+            }
+        },
+        semantic_claim_bindings={
+            "version": 1,
+            "kind": "harness-semantic-claim-bindings",
+            "bindings": [
+                {
+                    "capability": "example.frontend.presentation-system",
+                    "semantic_claims": [
+                        "engineering.interface.human.presentation-system"
+                    ],
+                },
+                {
+                    "capability": "example.frontend.screen-view-design",
+                    "semantic_claims": [
+                        "engineering.interface.human.screen-composition"
+                    ],
+                },
+                {
+                    "capability": "example.frontend.verification",
+                    "semantic_claims": [
+                        "engineering.verification.interface.presentation"
+                    ],
+                },
+            ],
+        },
+        semantic_evaluations=semantic_evaluations,
+    )
+
+
 def main() -> int:
     mvp = scope_eval("fixture.mvp.implementation-design", "mvp")
     later = scope_eval("fixture.later.implementation-design", "later")
@@ -95,6 +137,77 @@ def main() -> int:
     # Standard Authority IDs are resolved without project aliases.
     assert partial["authority_roles"]["bindings"]["TACTICAL-DOMAIN-DESIGN"] == ["domain"]
     assert partial["authority_roles"]["bindings"]["IMPLEMENTATION-DESIGN"] == ["delivery"]
+
+    # Frontend presentation/composition cannot be declared complete merely
+    # because provider artifacts exist. These concerns require explicit semantic
+    # acceptance evidence.
+    presentation_missing = frontend_presentation_eval()
+    presentation_rows = {
+        row["concern"]: row for row in presentation_missing["rows"]
+    }
+    for concern, capability in {
+        "interface.human.presentation-system": "example.frontend.presentation-system",
+        "interface.human.screen-composition": "example.frontend.screen-view-design",
+        "verification.interface.presentation": "example.frontend.verification",
+    }.items():
+        assert concern in presentation_rows
+        assert presentation_rows[concern]["state"] == "MISSING"
+        assert presentation_rows[concern]["action"] == "VALIDATE_SEMANTICS"
+        assert presentation_rows[concern]["capabilities"] == [capability]
+        assert any(
+            item.get("rule") == "FRONTEND-PRESENTATION"
+            for item in presentation_rows[concern]["activation_provenance"]
+        )
+
+    accepted_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "EXAMPLE-PRESENTATION-SYSTEM",
+                "capability": "example.frontend.presentation-system",
+                "status": "ACCEPTED",
+                "semantic_claims": {
+                    "accepted": [
+                        "engineering.interface.human.presentation-system"
+                    ]
+                },
+            },
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "EXAMPLE-SCREEN-VIEW-DESIGN",
+                "capability": "example.frontend.screen-view-design",
+                "status": "ACCEPTED",
+                "semantic_claims": {
+                    "accepted": [
+                        "engineering.interface.human.screen-composition"
+                    ]
+                },
+            },
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "EXAMPLE-FRONTEND-VERIFICATION",
+                "capability": "example.frontend.verification",
+                "status": "ACCEPTED",
+                "semantic_claims": {
+                    "accepted": [
+                        "engineering.verification.interface.presentation"
+                    ]
+                },
+            },
+        ],
+    }
+    presentation_accepted = frontend_presentation_eval(accepted_evidence)
+    accepted_rows = {
+        row["concern"]: row for row in presentation_accepted["rows"]
+    }
+    for concern in (
+        "interface.human.presentation-system",
+        "interface.human.screen-composition",
+        "verification.interface.presentation",
+    ):
+        assert accepted_rows[concern]["state"] == "COVERED"
 
     print(
         "unified engineering coverage evaluator: ok "
