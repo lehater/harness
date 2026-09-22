@@ -35,15 +35,18 @@ For each required view:
 1. state purpose, covered task and entry/exit context;
 2. reference the inherited Presentation System;
 3. define semantic regions/sections/tabs/disclosures and their hierarchy;
-4. map displayed/edited data to accepted providers;
-5. define primary/secondary/destructive actions and their placement role;
-6. select reusable presentation/interaction patterns by id;
-7. define local list/table/form/detail/search/filter/selection composition where applicable;
-8. define state variants: loading, empty, loaded, submitting, success, validation/auth/conflict/degraded/error states as applicable;
-9. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
-10. define focus/read-order consequences where composition changes;
-11. record local overrides only with rationale;
-12. route missing upstream semantics as Questions.
+4. bind every server-backed read/query and command to an accepted machine-interface operation id;
+5. define the semantic Screen/View Model consumed by the view and map each field to read/command/local/navigation semantics;
+6. define allowed user-visible capabilities and the accepted semantics backing each capability; record notable exclusions;
+7. define primary/secondary/destructive actions and their placement role;
+8. select reusable presentation/interaction patterns by id and explicitly bind only provider/pattern features authorized by the screen capability allowlist;
+9. define local list/table/form/detail/search/filter/selection composition only when the capability is accepted upstream;
+10. define state variants and map every state/error/outcome to accepted read/command/local semantics;
+11. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
+12. define focus/read-order consequences where composition changes;
+13. define contract, semantic and rendered verification obligations;
+14. record local overrides only with rationale;
+15. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -71,8 +74,11 @@ Machine-readable YAML/JSON is preferred when it can express:
 - screen id/purpose;
 - inherits;
 - regions with role, priority and content/action refs;
-- patterns;
-- states/variants;
+- read/query and command operation bindings;
+- semantic Screen/View Model fields and source mappings;
+- allowed capabilities with semantic backing and notable exclusions;
+- presentation pattern feature bindings; provider/template features are deny-by-default unless explicitly bound;
+- states/variants and machine/local outcome mappings;
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
 - overrides with rationale;
@@ -85,7 +91,11 @@ The contract should be sufficient to generate review projections such as a scree
 - every required user-facing view has a contract or explicit non-applicability;
 - every screen references one Presentation System;
 - repeated presentation knowledge is inherited, not copied;
-- required states/actions/data are covered;
+- required states/actions/data are covered and trace to accepted operation/local/navigation semantics;
+- raw transport DTO shape is not used as the screen semantic model by default;
+- every enabled presentation-provider feature maps to an explicitly allowed screen capability;
+- unbound template/provider features remain disabled, so a template cannot create product behavior;
+- contract, semantic and rendered verification obligations are explicit;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
 - framework/CSS implementation freedom remains.
