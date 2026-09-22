@@ -376,12 +376,14 @@ def declared_capability_claim_index(
 def capability_claim_index(
     bindings: dict[str, Any],
     project_docs: list[dict[str, Any]],
+    required_evaluation_claims: set[str] | None = None,
 ) -> dict[str, list[dict[str, str]]]:
     """Return only claims usable as Coverage proof.
 
-    Legacy capabilities without semantic evaluation retain declared claims.
-    Once capability-specific evaluation exists, only explicitly accepted claims
-    remain usable.
+    Legacy capabilities without semantic evaluation retain declared claims,
+    except for claims whose proof contract explicitly requires semantic
+    evaluation. Once capability-specific evaluation exists, only explicitly
+    accepted claims remain usable.
     """
     declared = declared_capability_claim_index(bindings, project_docs)
     evaluated_capabilities: set[str] = set()
@@ -397,22 +399,36 @@ def capability_claim_index(
                 evaluation.get("semantic_claims", {}).get("accepted", []) or []
             )
 
+    required = set(required_evaluation_claims or set())
     result: dict[str, list[dict[str, str]]] = {}
     for capability, claims in declared.items():
         for claim in claims:
+            claim_name = claim["claim"]
+            if claim_name in required and capability not in evaluated_capabilities:
+                continue
             if (
                 capability in evaluated_capabilities
-                and claim["claim"] not in accepted_by_capability.get(capability, set())
+                and claim_name not in accepted_by_capability.get(capability, set())
             ):
                 continue
             result.setdefault(capability, []).append(claim)
     return result
+
 
 def concern_proofs(contract: dict[str, Any]) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
     for concern, spec in (contract.get("proofs", {}) or {}).items():
         result[concern] = set(spec.get("accepted_semantic_claims", []) or [])
     return result
+
+
+def semantic_evaluation_required_claims(contract: dict[str, Any]) -> set[str]:
+    required: set[str] = set()
+    for spec in (contract.get("proofs", {}) or {}).values():
+        if not isinstance(spec, dict) or not spec.get("requires_semantic_evaluation"):
+            continue
+        required.update(spec.get("accepted_semantic_claims", []) or [])
+    return required
 
 
 def role_claims(contract: dict[str, Any]) -> dict[str, set[str]]:
@@ -449,7 +465,30 @@ def derive_plan(
     declared_cap_claims = declared_capability_claim_index(
         capability_bindings, project_docs
     )
-    cap_claims = capability_claim_index(capability_bindings, project_docs)
+    strict_claims = semantic_evaluation_required_claims(proof_contract)
+    cap_claims = capability_claim_index(
+        capability_bindings,
+        project_docs,
+        required_evaluation_claims=strict_claims,
+    )
+    evaluations = evaluation_index(project_docs)
+    evaluated_capabilities = {
+        evaluation.get("capability")
+        for evaluation in evaluations.values()
+        if isinstance(evaluation.get("capability"), str)
+        and evaluation.get("capability")
+    }
+    accepted_evaluation_claims: dict[str, set[str]] = {}
+    for evaluation in evaluations.values():
+        capability = evaluation.get("capability")
+        if (
+            isinstance(capability, str)
+            and capability
+            and evaluation.get("status") == "ACCEPTED"
+        ):
+            accepted_evaluation_claims.setdefault(capability, set()).update(
+                evaluation.get("semantic_claims", {}).get("accepted", []) or []
+            )
     scope_roots = list(overlay.get("scope_roots", []) or [])
     extension_capabilities = set(
         overlay.get("coverage_extension_capabilities", []) or []
@@ -600,6 +639,61 @@ def derive_plan(
                     "state": "COVERED",
                     "action": "NONE",
                     "proof": present,
+                })
+                continue
+
+        strict_accepted = set(accepted) & strict_claims
+        if strict_accepted:
+            matching_provided = sorted(
+                {
+                    cap
+                    for cap, claims_for_cap in declared_cap_claims.items()
+                    if cap in provided_caps
+                    and (scoped_caps is None or cap in scoped_caps)
+                    and any(
+                        claim_info["claim"] in strict_accepted
+                        for claim_info in claims_for_cap
+                    )
+                }
+            )
+            unevaluated = sorted(
+                cap for cap in matching_provided
+                if cap not in evaluated_capabilities
+            )
+            if unevaluated:
+                rows.append({
+                    "concern": concern,
+                    "state": "MISSING",
+                    "action": "VALIDATE_SEMANTICS",
+                    "accepted_semantic_claims": accepted,
+                    "capabilities": unevaluated,
+                    "reason": (
+                        "This concern requires explicit semantic acceptance evidence; "
+                        "provider existence alone is insufficient."
+                    ),
+                })
+                continue
+
+            insufficient = sorted(
+                cap
+                for cap in matching_provided
+                if not (
+                    accepted_evaluation_claims.get(cap, set())
+                    & strict_accepted
+                )
+            )
+            if insufficient:
+                rows.append({
+                    "concern": concern,
+                    "state": "BLOCKED",
+                    "action": "REVALIDATE_SEMANTICS",
+                    "accepted_semantic_claims": accepted,
+                    "capabilities": insufficient,
+                    "causes": {},
+                    "reason": (
+                        "Semantic evaluation exists but does not accept any claim "
+                        "that can prove this concern."
+                    ),
                 })
                 continue
 
