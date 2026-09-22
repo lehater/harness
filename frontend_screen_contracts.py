@@ -53,6 +53,269 @@ def operation_response_codes(interface_contract: dict[str, Any] | None) -> dict[
     return result
 
 
+def operation_query_parameters(interface_contract: dict[str, Any] | None) -> dict[str, set[str]]:
+    """Extract accepted query parameter names for each OpenAPI operation."""
+    result: dict[str, set[str]] = {}
+    if not interface_contract:
+        return result
+    component_parameters = (
+        ((interface_contract.get("components") or {}).get("parameters") or {})
+        if isinstance(interface_contract.get("components"), dict)
+        else {}
+    )
+
+    def parameter_row(value: Any) -> dict[str, Any] | None:
+        if not isinstance(value, dict):
+            return None
+        ref = value.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/components/parameters/"):
+            resolved = component_parameters.get(ref.rsplit("/", 1)[-1])
+            return resolved if isinstance(resolved, dict) else None
+        return value
+
+    for path_item in (interface_contract.get("paths", {}) or {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        inherited = path_item.get("parameters", []) or []
+        for method, operation in path_item.items():
+            if method.lower() not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operation_id = operation.get("operationId")
+            if not isinstance(operation_id, str) or not operation_id:
+                continue
+            names: set[str] = set()
+            for raw in [*inherited, *((operation.get("parameters", []) or []))]:
+                parameter = parameter_row(raw)
+                if not parameter or parameter.get("in") != "query":
+                    continue
+                name = parameter.get("name")
+                if isinstance(name, str) and name:
+                    names.add(name)
+            result[operation_id] = names
+    return result
+
+
+def _has_override_rationale(screen_row: dict[str, Any]) -> bool:
+    candidates: list[Any] = []
+    override = screen_row.get("override")
+    if override is not None:
+        candidates.append(override)
+    overrides = screen_row.get("overrides", []) or []
+    if isinstance(overrides, list):
+        candidates.extend(overrides)
+    elif overrides is not None:
+        candidates.append(overrides)
+    return any(
+        isinstance(item, dict)
+        and isinstance(item.get("rationale"), str)
+        and bool(item["rationale"].strip())
+        for item in candidates
+    )
+
+
+def _validate_entity_collection_default(
+    *,
+    presentation: dict[str, Any],
+    screen_row: dict[str, Any],
+    screen: str,
+    contract: dict[str, Any],
+    reads: dict[str, dict[str, Any]],
+    allowed: dict[str, dict[str, Any]],
+    mappings: list[Any],
+    binding_operations: dict[tuple[str, str], str],
+    query_parameters_by_operation: dict[str, set[str]],
+    findings: list[dict[str, Any]],
+) -> None:
+    default = presentation.get("entity_collection_default")
+    declared_patterns = {
+        item
+        for item in (screen_row.get("patterns", []) or [])
+        if isinstance(item, str) and item
+    }
+    declared_patterns.update(
+        mapping.get("pattern")
+        for mapping in mappings
+        if isinstance(mapping, dict)
+        and isinstance(mapping.get("pattern"), str)
+        and mapping.get("pattern")
+    )
+    if not isinstance(default, dict) or "CATALOGUE" not in declared_patterns:
+        return
+
+    override = _has_override_rationale(screen_row)
+    catalogue = default.get("catalogue") or {}
+    detail = default.get("detail") or {}
+    default_pattern = catalogue.get("default_pattern")
+    if (
+        isinstance(default_pattern, str)
+        and default_pattern
+        and default_pattern not in declared_patterns
+        and not override
+    ):
+        _finding(
+            findings,
+            "PRIMARY_CATALOGUE_REQUIRES_DEFAULT_PATTERN",
+            f"primary entity catalogue requires {default_pattern} or an explicit override with rationale",
+            screen=screen,
+        )
+
+    structured_role = default.get("structured_list_role")
+    if (
+        structured_role
+        and "STRUCTURED-LIST" in declared_patterns
+        and default_pattern != "STRUCTURED-LIST"
+        and not override
+    ):
+        _finding(
+            findings,
+            "PRIMARY_CATALOGUE_STRUCTURED_LIST_WITHOUT_OVERRIDE",
+            "STRUCTURED-LIST is not the accepted primary entity catalogue pattern without an explicit override with rationale",
+            screen=screen,
+        )
+
+    expected_controls = catalogue.get("default_query_controls", []) or []
+    expected_capabilities = {
+        "search": "search",
+        "attribute-filter": "filter",
+        "sort": "sort",
+    }
+    for control in expected_controls:
+        capability = expected_capabilities.get(control)
+        if capability and capability not in allowed and not override:
+            _finding(
+                findings,
+                "MISSING_DEFAULT_CATALOGUE_CAPABILITY",
+                f"primary entity catalogue is missing accepted default capability {capability}",
+                screen=screen,
+            )
+
+    scaling = catalogue.get("scaling_controls", []) or []
+    if (
+        "pagination-or-virtualization" in scaling
+        and not ({"pagination", "virtualization"} & set(allowed))
+        and not override
+    ):
+        _finding(
+            findings,
+            "MISSING_CATALOGUE_SCALING_CAPABILITY",
+            "primary entity catalogue requires pagination or virtualization",
+            screen=screen,
+        )
+
+    open_capability: str | None = None
+    inline_edit_capability: str | None = None
+    for mapping in mappings:
+        if not isinstance(mapping, dict):
+            continue
+        feature_bindings = mapping.get("feature_bindings", {}) or {}
+        if not isinstance(feature_bindings, dict):
+            continue
+        for feature, capability in feature_bindings.items():
+            if feature in {"open-item", "open-row"} and isinstance(capability, str):
+                open_capability = capability
+            if (
+                isinstance(feature, str)
+                and "edit" in feature
+                and isinstance(capability, str)
+                and mapping.get("pattern") == default_pattern
+            ):
+                inline_edit_capability = capability
+
+    navigation = allowed.get(open_capability or "", {}).get("backed_by")
+    general_to_specific = default.get("navigation_model") == "general-to-specific"
+    if (
+        general_to_specific
+        and (
+            not isinstance(navigation, str)
+            or not navigation.startswith("navigation:")
+            or "detail" not in navigation.lower()
+        )
+        and not override
+    ):
+        _finding(
+            findings,
+            "PRIMARY_CATALOGUE_MISSING_DETAIL_DRILLDOWN",
+            "primary entity catalogue row opening must transition to a dedicated detail navigation target",
+            screen=screen,
+        )
+
+    if inline_edit_capability is not None:
+        backing = allowed.get(inline_edit_capability, {}).get("backed_by")
+        if not isinstance(backing, str) or not backing.startswith("command:"):
+            _finding(
+                findings,
+                "PRIMARY_CATALOGUE_INLINE_EDIT_NOT_COMMAND_BACKED",
+                "primary catalogue inline edit must be backed by an accepted command capability",
+                screen=screen,
+            )
+        if detail.get("inline_editing") == "explicit-override-only" and not override:
+            _finding(
+                findings,
+                "PRIMARY_CATALOGUE_INLINE_EDIT_REQUIRES_OVERRIDE",
+                "primary catalogue inline edit requires an explicit Screen/View override with rationale",
+                screen=screen,
+            )
+
+    query_reads = [
+        binding
+        for binding in reads.values()
+        if isinstance(binding.get("query"), dict) and binding.get("query")
+    ]
+    query_expected = bool(expected_controls or scaling)
+    if query_expected and not query_reads and not override:
+        _finding(
+            findings,
+            "MISSING_CATALOGUE_QUERY_CONTRACT",
+            "primary entity catalogue query controls require an accepted read query contract",
+            screen=screen,
+        )
+        return
+
+    for binding in query_reads:
+        query = binding.get("query") or {}
+        operation_id = binding.get("operation_id")
+        if isinstance(operation_id, str) and operation_id in query_parameters_by_operation:
+            missing = sorted(set(query) - query_parameters_by_operation[operation_id])
+            for parameter in missing:
+                _finding(
+                    findings,
+                    "CATALOGUE_QUERY_PARAMETER_NOT_IN_INTERFACE",
+                    f"accepted catalogue query field {parameter} is absent from operation {operation_id}",
+                    screen=screen,
+                )
+
+        if "search" in allowed and "search" not in query:
+            _finding(
+                findings,
+                "CATALOGUE_SEARCH_NOT_IN_QUERY_CONTRACT",
+                "allowed catalogue search capability is missing query.search semantics",
+                screen=screen,
+            )
+        if "sort" in allowed and not {"sortBy", "sortDirection"} <= set(query):
+            _finding(
+                findings,
+                "CATALOGUE_SORT_NOT_IN_QUERY_CONTRACT",
+                "allowed catalogue sort capability requires sortBy and sortDirection semantics",
+                screen=screen,
+            )
+        if "pagination" in allowed and not {"page", "pageSize"} <= set(query):
+            _finding(
+                findings,
+                "CATALOGUE_PAGING_NOT_IN_QUERY_CONTRACT",
+                "allowed catalogue pagination capability requires page and pageSize semantics",
+                screen=screen,
+            )
+        if "filter" in allowed:
+            reserved = {"search", "sortBy", "sortDirection", "page", "pageSize"}
+            if not (set(query) - reserved):
+                _finding(
+                    findings,
+                    "CATALOGUE_FILTER_NOT_IN_QUERY_CONTRACT",
+                    "allowed catalogue filter capability requires at least one accepted attribute query field",
+                    screen=screen,
+                )
+
+
 def _finding(findings: list[dict[str, Any]], code: str, detail: str, *, screen: str | None = None) -> None:
     row = {"code": code, "detail": detail}
     if screen:
@@ -127,17 +390,122 @@ def _validate_source(
                         )
 
 
+def evaluate_presentation_provider_contract(
+    presentation: dict[str, Any],
+    screen_design: dict[str, Any],
+    provider_contract: dict[str, Any],
+    *,
+    screen_ids: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Check that provider realization covers accepted patterns without owning semantics."""
+    findings: list[dict[str, Any]] = []
+    patterns = presentation.get("patterns", {}) or {}
+    if not isinstance(patterns, dict):
+        patterns = {}
+
+    provider = provider_contract.get("provider")
+    if not isinstance(provider, str) or not provider:
+        _finding(findings, "MISSING_PRESENTATION_PROVIDER", "presentation provider id is required")
+    if not (provider_contract.get("version") or provider_contract.get("ref")):
+        _finding(findings, "UNPINNED_PRESENTATION_PROVIDER", "presentation provider requires immutable version or ref")
+
+    default = (provider_contract.get("feature_policy") or {}).get("default")
+    if default != "deny":
+        _finding(
+            findings,
+            "UNSAFE_PROVIDER_FEATURE_DEFAULT",
+            "presentation provider feature_policy.default must be deny",
+        )
+
+    mappings = provider_contract.get("pattern_mappings", {}) or {}
+    if not isinstance(mappings, dict):
+        _finding(findings, "INVALID_PROVIDER_PATTERN_MAPPINGS", "provider pattern_mappings must be a mapping")
+        mappings = {}
+
+    required_patterns = {
+        item for item in (provider_contract.get("required_patterns", []) or [])
+        if isinstance(item, str) and item
+    }
+    for row in screen_design.get("screens", []) or []:
+        if not isinstance(row, dict):
+            continue
+        screen = row.get("id")
+        if screen_ids is not None and screen not in screen_ids:
+            continue
+        required_patterns.update(
+            item for item in (row.get("patterns", []) or [])
+            if isinstance(item, str) and item
+        )
+
+    for pattern_id, mapping in mappings.items():
+        if pattern_id not in patterns:
+            _finding(
+                findings,
+                "UNKNOWN_PROVIDER_PATTERN",
+                f"provider maps unknown presentation pattern {pattern_id}",
+            )
+        if not isinstance(mapping, dict):
+            _finding(
+                findings,
+                "INVALID_PROVIDER_PATTERN_MAPPING",
+                f"provider mapping for {pattern_id} must be a mapping",
+            )
+            continue
+        adapter = mapping.get("adapter")
+        if not isinstance(adapter, str) or not adapter:
+            _finding(
+                findings,
+                "MISSING_PROVIDER_ADAPTER",
+                f"provider mapping for {pattern_id} requires adapter",
+            )
+        primitives = mapping.get("provider_primitives")
+        if not isinstance(primitives, list) or not primitives or not all(
+            isinstance(item, str) and item for item in primitives
+        ):
+            _finding(
+                findings,
+                "MISSING_PROVIDER_PRIMITIVES",
+                f"provider mapping for {pattern_id} requires provider_primitives",
+            )
+        if mapping.get("enabled_features"):
+            _finding(
+                findings,
+                "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN",
+                f"provider mapping for {pattern_id} cannot enable product features; bind them in Screen/View semantics",
+            )
+
+    for pattern_id in sorted(required_patterns - set(mappings)):
+        _finding(
+            findings,
+            "MISSING_PROVIDER_PATTERN_MAPPING",
+            f"required presentation pattern {pattern_id} has no provider mapping",
+        )
+
+    return findings
+
+
 def evaluate_frontend_screen_contracts(
     presentation: dict[str, Any],
     screen_design: dict[str, Any],
     interface_contract: dict[str, Any] | None = None,
     *,
     screen_ids: set[str] | None = None,
+    provider_contract: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Evaluate semantic closure without introducing framework/provider-specific semantics."""
+    """Evaluate semantic closure while keeping provider realization subordinate to it."""
     findings: list[dict[str, Any]] = []
+    if provider_contract is not None:
+        findings.extend(
+            evaluate_presentation_provider_contract(
+                presentation,
+                screen_design,
+                provider_contract,
+                screen_ids=screen_ids,
+            )
+        )
     operations = operation_ids(interface_contract)
     responses_by_operation = operation_response_codes(interface_contract)
+    query_parameters_by_operation = operation_query_parameters(interface_contract)
     patterns = presentation.get("patterns", {}) or {}
     if not isinstance(patterns, dict):
         _finding(findings, "INVALID_PATTERN_CATALOGUE", "presentation patterns must be a mapping")
@@ -328,6 +696,19 @@ def evaluate_frontend_screen_contracts(
                         f"{pattern_id}.{feature} maps to non-allowed capability {capability_id}",
                         screen=screen,
                     )
+
+        _validate_entity_collection_default(
+            presentation=presentation,
+            screen_row=row,
+            screen=screen,
+            contract=contract,
+            reads=reads,
+            allowed=allowed,
+            mappings=mappings,
+            binding_operations=binding_operations,
+            query_parameters_by_operation=query_parameters_by_operation,
+            findings=findings,
+        )
 
         states = row.get("states", []) or []
         state_mapping = contract.get("state_mapping")

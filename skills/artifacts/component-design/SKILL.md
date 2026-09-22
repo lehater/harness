@@ -39,6 +39,23 @@ Read the accepted upstream architecture/application/interface/data/policy knowle
 14. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
 15. Produce project-native Component Design, semantically accept/register, then reevaluate.
 
+## Frontend presentation-provider specialization
+
+When accepted frontend Screen/View Design selects provider-neutral presentation patterns and the implementation stack selects a concrete UI provider:
+
+1. keep Screen/View semantics as the authority for data, actions, states, navigation and allowed/excluded capabilities;
+2. define only the smallest provider adapter seam required to realize those accepted patterns;
+3. pin the provider major/version or immutable baseline used for realization;
+4. make optional provider/template features deny-by-default;
+5. map each required presentation pattern to a project adapter and concrete provider primitives;
+6. keep vendor theme, component props and template composition inside the provider implementation;
+7. do not reproduce the vendor component API behind project wrappers;
+8. verify that replacing the provider changes adapters/theme/rendered evidence, not product semantics or HTTP contracts.
+
+A copied vendor template is implementation source/reference, not product authority. If the template exposes a search, sort, pagination, destructive action, route or field absent from accepted Screen/View semantics, the adapter omits/disables it.
+
+When the accepted Presentation System defines the default entity catalogue drill-down, do not remove its table/query/detail behavior merely because the current HTTP/query contract is weaker. Route the missing search/filter/sort/paging semantics as an upstream Interface/Application question or implementation prerequisite. Provider capability never authorizes those semantics by itself, but a missing backend/query contract also does not silently cancel an accepted presentation default.
+
 ## Applicability discipline
 
 Do not introduce a pattern merely because it is common.

@@ -42,6 +42,29 @@ PRESENTATION = {
     },
 }
 
+
+PROVIDER = {
+    "kind": "frontend-presentation-provider-contract",
+    "provider": "fixture-ui",
+    "version": "1.2.3",
+    "feature_policy": {"default": "deny"},
+    "required_patterns": ["CATALOGUE", "DETAIL", "STATUS"],
+    "pattern_mappings": {
+        "CATALOGUE": {
+            "adapter": "FixtureCatalogue",
+            "provider_primitives": ["FixtureTable", "FixtureButton"],
+        },
+        "DETAIL": {
+            "adapter": "FixtureDetail",
+            "provider_primitives": ["FixtureStack"],
+        },
+        "STATUS": {
+            "adapter": "FixtureStatus",
+            "provider_primitives": ["FixtureAlert"],
+        },
+    },
+}
+
 OPENAPI = {
     "openapi": "3.1.0",
     "paths": {
@@ -63,6 +86,7 @@ SCREENS = {
         {
             "id": "RESOURCE-CATALOGUE",
             "purpose": "Locate/select Resources and start supported creation.",
+            "patterns": ["CATALOGUE", "STATUS"],
             "states": ["loading", "loaded", "empty", "validation-rejected", "error"],
             "semantic_contract": {
                 "reads": [
@@ -122,6 +146,7 @@ SCREENS = {
         {
             "id": "RESOURCE-DETAIL",
             "purpose": "Inspect one Resource and its history.",
+            "patterns": ["DETAIL"],
             "states": ["loading", "loaded", "not-found", "error"],
             "semantic_contract": {
                 "reads": [
@@ -183,8 +208,60 @@ def main() -> int:
         SCREENS,
         OPENAPI,
         screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        provider_contract=PROVIDER,
     )
     assert accepted["status"] == "ACCEPTED", accepted
+
+    missing_provider_pattern = deepcopy(PROVIDER)
+    del missing_provider_pattern["pattern_mappings"]["DETAIL"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        provider_contract=missing_provider_pattern,
+    )
+    assert "MISSING_PROVIDER_PATTERN_MAPPING" in codes(result)
+
+    provider_invents_feature = deepcopy(PROVIDER)
+    provider_invents_feature["pattern_mappings"]["CATALOGUE"]["enabled_features"] = ["search"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=provider_invents_feature,
+    )
+    assert "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN" in codes(result)
+
+    unsafe_provider = deepcopy(PROVIDER)
+    unsafe_provider["feature_policy"]["default"] = "allow"
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=unsafe_provider,
+    )
+    assert "UNSAFE_PROVIDER_FEATURE_DEFAULT" in codes(result)
+
+    incomplete_provider = deepcopy(PROVIDER)
+    del incomplete_provider["pattern_mappings"]["DETAIL"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=incomplete_provider,
+    )
+    assert "MISSING_PROVIDER_PATTERN_MAPPING" in codes(result)
+
+    provider_invents_feature = deepcopy(PROVIDER)
+    provider_invents_feature["pattern_mappings"]["CATALOGUE"]["enabled_features"] = ["search"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=provider_invents_feature,
+    )
+    assert "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN" in codes(result)
 
     unsafe = deepcopy(PRESENTATION)
     unsafe["external_baseline"]["feature_policy"]["default"] = "allow"
@@ -215,6 +292,99 @@ def main() -> int:
     no_rendered_proof["screens"][1]["semantic_contract"]["verification"]["rendered"] = []
     result = evaluate_frontend_screen_contracts(PRESENTATION, no_rendered_proof, OPENAPI)
     assert "INCOMPLETE_VERIFICATION_CONTRACT" in codes(result)
+
+    collection_defaults = deepcopy(PRESENTATION)
+    collection_defaults["entity_collection_default"] = {
+        "navigation_model": "general-to-specific",
+        "catalogue": {
+            "default_pattern": "DATA-TABLE",
+            "default_query_controls": ["search", "attribute-filter", "sort"],
+            "scaling_controls": ["pagination-or-virtualization"],
+        },
+        "detail": {"inline_editing": "explicit-override-only"},
+        "structured_list_role": "nested/secondary only",
+    }
+    missing_collection_defaults = evaluate_frontend_screen_contracts(
+        collection_defaults,
+        SCREENS,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "PRIMARY_CATALOGUE_REQUIRES_DEFAULT_PATTERN" in codes(
+        missing_collection_defaults
+    )
+    assert "MISSING_CATALOGUE_QUERY_CONTRACT" in codes(missing_collection_defaults)
+
+    structured_primary = deepcopy(SCREENS)
+    structured_primary["screens"][0]["patterns"].append("STRUCTURED-LIST")
+    result = evaluate_frontend_screen_contracts(
+        collection_defaults,
+        structured_primary,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "PRIMARY_CATALOGUE_STRUCTURED_LIST_WITHOUT_OVERRIDE" in codes(result)
+
+    wrong_drilldown = deepcopy(SCREENS)
+    wrong_drilldown["screens"][0]["semantic_contract"]["capabilities"]["allowed"][0][
+        "backed_by"
+    ] = "navigation:resource-catalogue"
+    detail_default = deepcopy(PRESENTATION)
+    detail_default["entity_collection_default"] = {
+        "navigation_model": "general-to-specific",
+        "catalogue": {
+            "default_pattern": "CATALOGUE",
+            "default_query_controls": [],
+            "scaling_controls": [],
+        },
+        "detail": {"inline_editing": "explicit-override-only"},
+    }
+    result = evaluate_frontend_screen_contracts(
+        detail_default,
+        wrong_drilldown,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "PRIMARY_CATALOGUE_MISSING_DETAIL_DRILLDOWN" in codes(result)
+
+    query_screen = deepcopy(SCREENS)
+    query_screen["screens"][0]["semantic_contract"]["reads"][0]["query"] = {
+        "search": {"source": "local:query.search"}
+    }
+    query_screen["screens"][0]["semantic_contract"]["capabilities"]["allowed"].append(
+        {"id": "search", "backed_by": "read:catalogue"}
+    )
+    query_screen["screens"][0]["semantic_contract"]["pattern_mapping"][0][
+        "feature_bindings"
+    ]["search"] = "search"
+    query_default = deepcopy(detail_default)
+    query_default["entity_collection_default"]["catalogue"][
+        "default_query_controls"
+    ] = ["search"]
+    result = evaluate_frontend_screen_contracts(
+        query_default,
+        query_screen,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "CATALOGUE_QUERY_PARAMETER_NOT_IN_INTERFACE" in codes(result)
+
+    inline_edit_presentation = deepcopy(detail_default)
+    inline_edit_presentation["patterns"]["CATALOGUE"]["features"].append("edit-row")
+    inline_edit_screen = deepcopy(SCREENS)
+    inline_edit_screen["screens"][0]["semantic_contract"]["capabilities"]["allowed"].append(
+        {"id": "edit-resource", "backed_by": "command:create-resource"}
+    )
+    inline_edit_screen["screens"][0]["semantic_contract"]["pattern_mapping"][0][
+        "feature_bindings"
+    ]["edit-row"] = "edit-resource"
+    result = evaluate_frontend_screen_contracts(
+        inline_edit_presentation,
+        inline_edit_screen,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE"},
+    )
+    assert "PRIMARY_CATALOGUE_INLINE_EDIT_REQUIRES_OVERRIDE" in codes(result)
 
     evidence = semantic_evaluation(
         accepted,

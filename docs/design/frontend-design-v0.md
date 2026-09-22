@@ -104,6 +104,20 @@ Typical facets include hierarchy, density, typography/color/spacing roles, layou
 
 This is design knowledge. A UI component library remains a downstream reusable implementation asset unless explicitly granted canonical contract status.
 
+#### Default entity collection drill-down
+
+For a primary collection of stable product entities, the Presentation System should default to an outside-in interaction model unless accepted product/interface semantics explicitly require another task shape:
+
+1. enter through an entity catalogue rather than directly into an arbitrary instance;
+2. render the primary collection as a data table with stable identity plus task-relevant distinguishing attributes;
+3. provide collection query controls by default: search, attribute filtering and sorting, with pagination/virtualization when collection size requires it;
+4. selecting/opening a row navigates to a dedicated detail view for that entity instance;
+5. the detail view presents the full accepted instance state and is the default place for entity editing/state-changing commands;
+6. inline table editing is not the default and requires explicit Screen/View authorization;
+7. structured lists are for nested, secondary, relationship or otherwise non-comparative repeated records by default, not the primary entity catalogue.
+
+If the accepted query/API contract does not yet support the required collection controls, treat that as an upstream engineering-knowledge gap to resolve. Do not silently downgrade the catalogue to an unfiltered client-only list, and do not invent client-side filtering over partial data. Any deviation from the catalogue-table-detail default requires an explicit Screen/View override with rationale.
+
 ### screen-view-design
 
 Owner: INTERFACE-DESIGN.
@@ -151,6 +165,34 @@ Typical decisions include:
 Do not introduce a new `frontend-architecture` knowledge kind unless repeated consumer evidence shows the generic system-architecture procedure is insufficient.
 
 Security-critical browser/session decisions are not frontend implementation conventions. If authentication acquisition, credential storage, refresh, logout or invalidation semantics are missing, create a Question to SECURITY-ARCHITECTURE and block downstream frontend architecture.
+
+## Presentation provider realization
+
+Presentation providers such as Material UI belong to downstream realization, not Human Interface or Screen/View semantic ownership.
+
+The dependency is:
+
+```
+HTTP/interface contracts
+        ↓
+frontend query/command + semantic Screen/View Model
+        ↓
+Screen/View semantics
+        ↓
+provider-neutral Presentation System patterns
+        ↓
+Component Design: presentation-provider mapping/adapter
+        ↓
+provider theme/components/templates
+        ↓
+rendered UI
+```
+
+Component Design owns the provider mapping because it is an implementation-facing dependency decision. Screen/View Design remains provider-neutral and authorizes the product-visible capabilities that a provider realization may expose.
+
+A provider contract should identify the selected provider/version, map accepted Presentation System patterns to provider adapters/primitives, and use a deny-by-default feature policy. The provider cannot authorize search, filtering, sorting, pagination, editing, deletion or any other product capability merely because a template/component supports it.
+
+Provider abstraction should stay narrow. Do not mirror the provider component API or build a universal UI framework. Introduce seams only for project patterns or dependencies whose replacement would otherwise force product/application semantic changes.
 
 ## Frontend component and test design
 
