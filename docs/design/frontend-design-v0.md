@@ -152,6 +152,34 @@ Do not introduce a new `frontend-architecture` knowledge kind unless repeated co
 
 Security-critical browser/session decisions are not frontend implementation conventions. If authentication acquisition, credential storage, refresh, logout or invalidation semantics are missing, create a Question to SECURITY-ARCHITECTURE and block downstream frontend architecture.
 
+## Presentation provider realization
+
+Presentation providers such as Material UI belong to downstream realization, not Human Interface or Screen/View semantic ownership.
+
+The dependency is:
+
+```
+HTTP/interface contracts
+        ↓
+frontend query/command + semantic Screen/View Model
+        ↓
+Screen/View semantics
+        ↓
+provider-neutral Presentation System patterns
+        ↓
+Component Design: presentation-provider mapping/adapter
+        ↓
+provider theme/components/templates
+        ↓
+rendered UI
+```
+
+Component Design owns the provider mapping because it is an implementation-facing dependency decision. Screen/View Design remains provider-neutral and authorizes the product-visible capabilities that a provider realization may expose.
+
+A provider contract should identify the selected provider/version, map accepted Presentation System patterns to provider adapters/primitives, and use a deny-by-default feature policy. The provider cannot authorize search, filtering, sorting, pagination, editing, deletion or any other product capability merely because a template/component supports it.
+
+Provider abstraction should stay narrow. Do not mirror the provider component API or build a universal UI framework. Introduce seams only for project patterns or dependencies whose replacement would otherwise force product/application semantic changes.
+
 ## Frontend component and test design
 
 Reuse existing `component-design`, `verification-strategy`, `test-design` and `implementation-design` knowledge kinds with frontend-scoped capabilities.
