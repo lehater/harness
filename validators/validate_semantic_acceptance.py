@@ -168,6 +168,28 @@ def test_coverage_gating_and_invalidation():
         {"claim":"engineering.interface.machine.contract"}
     ]
 
+    # Selected proof claims may require explicit semantic evidence even while
+    # legacy claims retain migration-compatible provider semantics.
+    strict_bindings={"bindings":[{"capability":"project.http","semantic_claims":[
+        "engineering.interface.human.presentation-system"
+    ]}]}
+    strict_claim="engineering.interface.human.presentation-system"
+    strict=capability_claim_index(
+        strict_bindings,
+        [graph,realization],
+        required_evaluation_claims={strict_claim},
+    )
+    assert strict.get("project.http",[])==[]
+
+    strict_accepted=dict(accepted)
+    strict_accepted["semantic_claims"]={"accepted":[strict_claim]}
+    strict=capability_claim_index(
+        strict_bindings,
+        [graph,realization,strict_accepted],
+        required_evaluation_claims={strict_claim},
+    )
+    assert strict["project.http"]==[{"claim":strict_claim}]
+
 
 
 def test_engineering_coverage_evidence_input():
