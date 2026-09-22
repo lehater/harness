@@ -44,7 +44,6 @@ PRESENTATION = {
 
 
 PROVIDER = {
-    "version": 1,
     "kind": "frontend-presentation-provider-contract",
     "provider": "fixture-ui",
     "version": "1.2.3",
