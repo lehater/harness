@@ -95,6 +95,10 @@ The contract should be sufficient to generate review projections such as a scree
 - repeated presentation knowledge is inherited, not copied;
 - required states/actions/data are covered and trace to accepted operation/local/navigation semantics;
 - enabled provider/template features do not create capabilities absent from accepted screen semantics;
+- when the inherited Presentation System declares an entity-collection default, each primary entity catalogue follows that general-to-specific model or records an explicit override with rationale;
+- primary entity catalogue query controls are backed by accepted read-query semantics whose fields exist in the bound machine-interface operation; client-only search/filter/sort over partial pages is not accepted;
+- primary catalogue row opening resolves to a dedicated detail navigation capability by default;
+- inline editing in a primary catalogue is accepted only when command-backed and explicitly authorized by a Screen/View override with rationale when the inherited Presentation System requires one;
 - declared server-backed states do not reference impossible operation outcomes;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
