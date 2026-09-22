@@ -46,11 +46,11 @@ OPENAPI = {
     "openapi": "3.1.0",
     "paths": {
         "/v1/resources": {
-            "get": {"operationId": "listResources"},
-            "post": {"operationId": "createResource"},
+            "get": {"operationId": "listResources", "responses": {"200": {}}},
+            "post": {"operationId": "createResource", "responses": {"201": {}, "403": {}, "409": {}, "422": {}}},
         },
         "/v1/resources/{resourceRef}": {
-            "get": {"operationId": "getResource"},
+            "get": {"operationId": "getResource", "responses": {"200": {}, "403": {}, "404": {}}},
         },
     },
 }
@@ -205,6 +205,11 @@ def main() -> int:
     del unmapped_state["screens"][1]["semantic_contract"]["state_mapping"]["not-found"]
     result = evaluate_frontend_screen_contracts(PRESENTATION, unmapped_state, OPENAPI)
     assert "UNMAPPED_SCREEN_STATE" in codes(result)
+
+    impossible_outcome = deepcopy(SCREENS)
+    impossible_outcome["screens"][0]["semantic_contract"]["state_mapping"]["validation-rejected"] = "command:create-resource.404"
+    result = evaluate_frontend_screen_contracts(PRESENTATION, impossible_outcome, OPENAPI)
+    assert "UNSUPPORTED_OPERATION_OUTCOME" in codes(result)
 
     no_rendered_proof = deepcopy(SCREENS)
     no_rendered_proof["screens"][1]["semantic_contract"]["verification"]["rendered"] = []
