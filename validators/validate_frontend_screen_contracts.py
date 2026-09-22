@@ -42,6 +42,30 @@ PRESENTATION = {
     },
 }
 
+
+PROVIDER = {
+    "version": 1,
+    "kind": "frontend-presentation-provider-contract",
+    "provider": "fixture-ui",
+    "version": "1.2.3",
+    "feature_policy": {"default": "deny"},
+    "required_patterns": ["CATALOGUE", "DETAIL", "STATUS"],
+    "pattern_mappings": {
+        "CATALOGUE": {
+            "adapter": "FixtureCatalogue",
+            "provider_primitives": ["FixtureTable", "FixtureButton"],
+        },
+        "DETAIL": {
+            "adapter": "FixtureDetail",
+            "provider_primitives": ["FixtureStack"],
+        },
+        "STATUS": {
+            "adapter": "FixtureStatus",
+            "provider_primitives": ["FixtureAlert"],
+        },
+    },
+}
+
 OPENAPI = {
     "openapi": "3.1.0",
     "paths": {
@@ -183,8 +207,30 @@ def main() -> int:
         SCREENS,
         OPENAPI,
         screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        provider_contract=PROVIDER,
     )
     assert accepted["status"] == "ACCEPTED", accepted
+
+    missing_provider_pattern = deepcopy(PROVIDER)
+    del missing_provider_pattern["pattern_mappings"]["DETAIL"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        provider_contract=missing_provider_pattern,
+    )
+    assert "MISSING_PROVIDER_PATTERN_MAPPING" in codes(result)
+
+    provider_invents_feature = deepcopy(PROVIDER)
+    provider_invents_feature["pattern_mappings"]["CATALOGUE"]["enabled_features"] = ["search"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=provider_invents_feature,
+    )
+    assert "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN" in codes(result)
 
     unsafe = deepcopy(PRESENTATION)
     unsafe["external_baseline"]["feature_policy"]["default"] = "allow"
