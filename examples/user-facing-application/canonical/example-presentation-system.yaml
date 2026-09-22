@@ -5,6 +5,13 @@ status: CURRENT
 
 scope: user-facing application
 
+external_baseline:
+  provider: example-ui
+  artifact: detail-template
+  version: 1.0.0
+  feature_policy:
+    default: deny
+
 principles:
   hierarchy: One clear task context and primary action role per view.
   consistency: Equivalent actions and states use equivalent reusable patterns.
@@ -13,9 +20,12 @@ principles:
 patterns:
   DETAIL:
     regions: [context, primary-content, actions, secondary-content]
+    features: [show-primary, show-history, edit, delete]
   FORM:
+    features: [edit, submit, cancel]
     rules: [labels-before-controls, field-errors-near-fields, error-summary-on-rejection]
   STATUS:
+    features: [loading, empty, error]
     rules: [semantic-text-not-color-only, non-modal-for-routine-status]
 
 responsive:
