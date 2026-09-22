@@ -114,6 +114,16 @@ A screen contract identifies inherited presentation system, regions/sections/tab
 
 Structured YAML/JSON is preferred when sufficient. Wireframes, prototypes, Figma frames and Storybook stories may be generated projections.
 
+## Screen semantic closure
+
+Screen/View Design is also the canonical closure point between machine-interface operations and presentation realization. A user-facing screen is not complete merely because a Screen/View artifact and Presentation System exist.
+
+For server-backed screens, the contract records accepted read/query and command operation ids, a semantic Screen/View Model, state/error outcome mapping, allowed capabilities, presentation feature bindings and verification obligations. The executable frontend adapter maps transport/query representations into the Screen/View Model; private component props remain Component Design/implementation concerns.
+
+External presentation templates are reusable providers, not semantic authority. A version-pinned baseline may replace hand-authored low-level visual rules, but optional provider features are deny-by-default and must be explicitly bound to accepted screen capabilities. This prevents demo routes, entities, search/filter/sort/pagination/bulk/edit/delete behavior or other template affordances from entering product semantics implicitly.
+
+This refinement adds no Authority or frontend-specific Core entity family. See `docs/research/frontend-screen-contract-layer-v1.md` and `frontend_screen_contracts.py`.
+
 ## Human-interface quality analysis
 
 Accessibility/usability coverage remains a cross-Authority analysis, not a new Authority.
