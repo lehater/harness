@@ -54,22 +54,6 @@ When accepted frontend Screen/View Design selects provider-neutral presentation 
 
 A copied vendor template is implementation source/reference, not product authority. If the template exposes a search, sort, pagination, destructive action, route or field absent from accepted Screen/View semantics, the adapter omits/disables it.
 
-## Frontend presentation-provider realization
-
-When accepted Screen/View Design selects provider-neutral presentation patterns, Component Design owns the implementation-facing mapping to the selected presentation provider.
-
-Define only the seam required by current variation:
-
-- provider identity/version and installation boundary;
-- pattern-to-adapter mapping;
-- provider primitives used to realize each accepted pattern;
-- theme/composition integration and routing ownership where implementation-facing;
-- structural rules proving feature code consumes provider-neutral screen/application semantics rather than provider-specific product meaning.
-
-The provider adapter may realize capabilities already authorized by Screen/View Design. It must not enable provider/template features merely because the library exposes them. Provider feature policy is deny-by-default; product capabilities remain owned by Human Interface/Screen semantics.
-
-Do not duplicate a provider's component API behind one wrapper per component. Wrap only stable project patterns or boundaries whose replacement would otherwise leak provider-specific dependencies through feature/application code.
-
 ## Applicability discipline
 
 Do not introduce a pattern merely because it is common.
