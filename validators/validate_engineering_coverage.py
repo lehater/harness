@@ -55,6 +55,12 @@ def frontend_presentation_eval(semantic_evaluations=None):
             "kind": "harness-semantic-claim-bindings",
             "bindings": [
                 {
+                    "capability": "example.security-architecture",
+                    "semantic_claims": [
+                        "engineering.security.identity"
+                    ],
+                },
+                {
                     "capability": "example.frontend.presentation-system",
                     "semantic_claims": [
                         "engineering.interface.human.presentation-system"
@@ -138,14 +144,15 @@ def main() -> int:
     assert partial["authority_roles"]["bindings"]["TACTICAL-DOMAIN-DESIGN"] == ["domain"]
     assert partial["authority_roles"]["bindings"]["IMPLEMENTATION-DESIGN"] == ["delivery"]
 
-    # Frontend presentation/composition cannot be declared complete merely
-    # because provider artifacts exist. These concerns require explicit semantic
-    # acceptance evidence.
+    # Frontend identity and presentation/composition cannot be declared complete
+    # merely because provider artifacts exist. These concerns require explicit
+    # semantic acceptance evidence.
     presentation_missing = frontend_presentation_eval()
     presentation_rows = {
         row["concern"]: row for row in presentation_missing["rows"]
     }
     for concern, capability in {
+        "security.identity": "example.security-architecture",
         "interface.human.presentation-system": "example.frontend.presentation-system",
         "interface.human.screen-composition": "example.frontend.screen-view-design",
         "verification.interface.presentation": "example.frontend.verification",
@@ -154,8 +161,13 @@ def main() -> int:
         assert presentation_rows[concern]["state"] == "MISSING"
         assert presentation_rows[concern]["action"] == "VALIDATE_SEMANTICS"
         assert presentation_rows[concern]["capabilities"] == [capability]
+        expected_rule = (
+            "FRONTEND-SECURITY-IDENTITY"
+            if concern == "security.identity"
+            else "FRONTEND-PRESENTATION"
+        )
         assert any(
-            item.get("rule") == "FRONTEND-PRESENTATION"
+            item.get("rule") == expected_rule
             for item in presentation_rows[concern]["activation_provenance"]
         )
 
@@ -163,6 +175,17 @@ def main() -> int:
         "version": 1,
         "kind": "harness-semantic-evaluation-set",
         "semantic_evaluations": [
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "EXAMPLE-SECURITY",
+                "capability": "example.security-architecture",
+                "status": "ACCEPTED",
+                "semantic_claims": {
+                    "accepted": [
+                        "engineering.security.identity"
+                    ]
+                },
+            },
             {
                 "kind": "harness-artifact-semantic-evaluation",
                 "artifact": "EXAMPLE-PRESENTATION-SYSTEM",
@@ -203,6 +226,7 @@ def main() -> int:
         row["concern"]: row for row in presentation_accepted["rows"]
     }
     for concern in (
+        "security.identity",
         "interface.human.presentation-system",
         "interface.human.screen-composition",
         "verification.interface.presentation",

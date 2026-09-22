@@ -29,11 +29,12 @@ Use accepted design as truth. Do not infer requirements from current authenticat
 3. Define trusted identity sources and caller-vs-server ownership of security-critical facts.
 4. Define admission/enforcement placement and fail-open/fail-closed behavior where applicable.
 5. Define applicable credential/session validity, rotation/invalidation and protection requirements.
-6. Define protection requirements for secrets, sensitive data, transport and cryptographic/key boundaries only where an accepted threat/deployment need exists.
-7. Route configuration source/topology to System/Deployment while retaining security lifecycle/protection constraints.
-8. State NOT_APPLICABLE decisions explicitly; do not manufacture authentication, encryption or secret infrastructure.
-9. State implementation freedoms and downstream consumers.
-10. Produce/register the smallest project-native artifact and route remaining gaps as Questions.
+6. When an authenticated browser/client consumes a protected API, explicitly define credential acquisition, runtime/storage location, expiry/renewal behavior, logout/invalidation and recovery after credential rejection; if authenticated browser identity is not applicable, state that explicitly with rationale.
+7. Define protection requirements for secrets, sensitive data, transport and cryptographic/key boundaries only where an accepted threat/deployment need exists.
+8. Route configuration source/topology to System/Deployment while retaining security lifecycle/protection constraints.
+9. State NOT_APPLICABLE decisions explicitly; do not manufacture authentication, encryption or secret infrastructure.
+10. State implementation freedoms and downstream consumers.
+11. Produce/register the smallest project-native artifact and route remaining gaps as Questions.
 
 ## Stop conditions
 
@@ -50,6 +51,7 @@ Produce a project-native security architecture contract covering applicable trus
 - every security control requirement has an accepted threat/trust rationale;
 - NOT_APPLICABLE is allowed and justified;
 - framework defaults are not treated as accepted security decisions;
+- authenticated browser/client identity, when applicable, has explicit acquisition, storage/runtime lifetime, expiry/renewal, logout/invalidation and rejection-recovery semantics;
 - coding can proceed without inventing trust, identity, admission or credential/protection semantics.
 
 ## Registration

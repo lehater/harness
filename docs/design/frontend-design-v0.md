@@ -166,6 +166,8 @@ Do not introduce a new `frontend-architecture` knowledge kind unless repeated co
 
 Security-critical browser/session decisions are not frontend implementation conventions. If authentication acquisition, credential storage, refresh, logout or invalidation semantics are missing, create a Question to SECURITY-ARCHITECTURE and block downstream frontend architecture.
 
+For a frontend consumer with an applicable Security Architecture, Engineering Coverage activates `security.identity`. That concern requires explicit semantic acceptance evidence rather than artifact-presence proof. A project-native evaluator should accept the identity claim only after applicable browser/client credential acquisition, storage/runtime lifetime, expiry/renewal, logout/invalidation and rejection-recovery semantics are explicit, or after identity is explicitly accepted as not applicable.
+
 ## Presentation provider realization
 
 Presentation providers such as Material UI belong to downstream realization, not Human Interface or Screen/View semantic ownership.
@@ -234,7 +236,8 @@ The acceptance fixture in `examples/user-facing-application/**` verifies that:
 6. Component Design and Verification may become parallel frontiers;
 7. Test Design and Implementation Design follow;
 8. the consumer reaches COMPLETE only when its declared closure is realized;
-9. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work.
+9. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work;
+10. frontend Security Architecture cannot cover `security.identity` by artifact presence alone; explicit semantic acceptance evidence is required.
 
 ## Evidence for this boundary
 
