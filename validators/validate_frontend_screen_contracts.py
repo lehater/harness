@@ -232,6 +232,36 @@ def main() -> int:
     )
     assert "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN" in codes(result)
 
+    unsafe_provider = deepcopy(PROVIDER)
+    unsafe_provider["feature_policy"]["default"] = "allow"
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=unsafe_provider,
+    )
+    assert "UNSAFE_PROVIDER_FEATURE_DEFAULT" in codes(result)
+
+    incomplete_provider = deepcopy(PROVIDER)
+    del incomplete_provider["pattern_mappings"]["DETAIL"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=incomplete_provider,
+    )
+    assert "MISSING_PROVIDER_PATTERN_MAPPING" in codes(result)
+
+    provider_invents_feature = deepcopy(PROVIDER)
+    provider_invents_feature["pattern_mappings"]["CATALOGUE"]["enabled_features"] = ["search"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        SCREENS,
+        OPENAPI,
+        provider_contract=provider_invents_feature,
+    )
+    assert "PROVIDER_FEATURE_ENABLEMENT_FORBIDDEN" in codes(result)
+
     unsafe = deepcopy(PRESENTATION)
     unsafe["external_baseline"]["feature_policy"]["default"] = "allow"
     result = evaluate_frontend_screen_contracts(unsafe, SCREENS, OPENAPI)
