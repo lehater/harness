@@ -45,6 +45,8 @@ roles:
       - engineering.interface.human.usability
       - engineering.interface.human.accessibility
       - engineering.interface.human.responsiveness
+      - engineering.interface.human.presentation-system
+      - engineering.interface.human.screen-composition
       - engineering.interface.human.i18n
 
   data:
@@ -108,6 +110,7 @@ roles:
       - engineering.verification.reliability
       - engineering.verification.interface.machine
       - engineering.verification.interface.human
+      - engineering.verification.interface.presentation
       - engineering.verification.architecture
       - engineering.verification.data
       - engineering.transition.revalidation
