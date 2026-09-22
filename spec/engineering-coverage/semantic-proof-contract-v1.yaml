@@ -54,6 +54,10 @@ proofs:
     accepted_semantic_claims: [engineering.interface.machine.compatibility]
   interface.human.journeys:
     accepted_semantic_claims: [engineering.interface.human.journeys]
+  interface.human.presentation-system:
+    accepted_semantic_claims: [engineering.interface.human.presentation-system]
+  interface.human.screen-composition:
+    accepted_semantic_claims: [engineering.interface.human.screen-composition]
   interface.human.usability:
     accepted_semantic_claims: [engineering.interface.human.usability]
   interface.human.accessibility:
