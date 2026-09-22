@@ -1,0 +1,397 @@
+#!/usr/bin/env python3
+"""Provider-neutral semantic closure checks for frontend Screen/View contracts."""
+from __future__ import annotations
+
+from typing import Any, Iterable
+import re
+
+HTTP_METHODS = {"get", "post", "put", "patch", "delete", "options", "head"}
+
+
+def operation_ids(interface_contract: dict[str, Any] | None) -> set[str]:
+    """Extract stable operation ids from OpenAPI or a small generic operation catalogue."""
+    if not interface_contract:
+        return set()
+    result: set[str] = set()
+    for path_item in (interface_contract.get("paths", {}) or {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        for method, operation in path_item.items():
+            if method.lower() not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operation_id = operation.get("operationId")
+            if isinstance(operation_id, str) and operation_id:
+                result.add(operation_id)
+    for item in interface_contract.get("operations", []) or []:
+        if isinstance(item, str) and item:
+            result.add(item)
+        elif isinstance(item, dict):
+            operation_id = item.get("operation_id") or item.get("operationId") or item.get("id")
+            if isinstance(operation_id, str) and operation_id:
+                result.add(operation_id)
+    for item in interface_contract.get("operation_ids", []) or []:
+        if isinstance(item, str) and item:
+            result.add(item)
+    return result
+
+
+def operation_response_codes(interface_contract: dict[str, Any] | None) -> dict[str, set[str]]:
+    result: dict[str, set[str]] = {}
+    if not interface_contract:
+        return result
+    for path_item in (interface_contract.get("paths", {}) or {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        for method, operation in path_item.items():
+            if method.lower() not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operation_id = operation.get("operationId")
+            if isinstance(operation_id, str) and operation_id:
+                result[operation_id] = {
+                    str(code) for code in (operation.get("responses", {}) or {}).keys()
+                }
+    return result
+
+
+def _finding(findings: list[dict[str, Any]], code: str, detail: str, *, screen: str | None = None) -> None:
+    row = {"code": code, "detail": detail}
+    if screen:
+        row["screen"] = screen
+    findings.append(row)
+
+
+def _ids(rows: Iterable[Any], *, screen: str, kind: str, findings: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            _finding(findings, "INVALID_BINDING", f"{kind} binding must be a mapping", screen=screen)
+            continue
+        item_id = row.get("id")
+        if not isinstance(item_id, str) or not item_id:
+            _finding(findings, "MISSING_BINDING_ID", f"{kind} binding id is required", screen=screen)
+            continue
+        if item_id in result:
+            _finding(findings, "DUPLICATE_BINDING_ID", f"duplicate {kind} binding {item_id}", screen=screen)
+            continue
+        result[item_id] = row
+    return result
+
+
+def _source_root(source: str) -> tuple[str, str] | None:
+    if ":" not in source:
+        return None
+    kind, rest = source.split(":", 1)
+    root = rest.split(".", 1)[0]
+    return kind, root
+
+
+def _validate_source(
+    source: Any,
+    *,
+    screen: str,
+    reads: set[str],
+    commands: set[str],
+    findings: list[dict[str, Any]],
+    context: str,
+    binding_operations: dict[tuple[str, str], str] | None = None,
+    response_codes: dict[str, set[str]] | None = None,
+) -> None:
+    values = source if isinstance(source, list) else [source]
+    for value in values:
+        if not isinstance(value, str) or not value:
+            _finding(findings, "INVALID_SOURCE_REF", f"{context} requires a non-empty source reference", screen=screen)
+            continue
+        parsed = _source_root(value)
+        if parsed is None:
+            _finding(findings, "INVALID_SOURCE_REF", f"{context} source must use kind:id form: {value}", screen=screen)
+            continue
+        kind, root = parsed
+        if kind == "read" and root not in reads:
+            _finding(findings, "UNKNOWN_READ_REF", f"{context} references unknown read {root}", screen=screen)
+        elif kind == "command" and root not in commands:
+            _finding(findings, "UNKNOWN_COMMAND_REF", f"{context} references unknown command {root}", screen=screen)
+        elif kind not in {"read", "command", "local", "navigation", "semantic"}:
+            _finding(findings, "UNSUPPORTED_SOURCE_REF", f"{context} uses unsupported source kind {kind}", screen=screen)
+        elif kind in {"read", "command"} and root in (reads if kind == "read" else commands):
+            tail = value.split(":", 1)[1].split(".", 1)
+            if len(tail) == 2:
+                match = re.match(r"^(\d{3})(?:-|$)", tail[1])
+                if match and binding_operations is not None and response_codes is not None:
+                    operation_id = binding_operations.get((kind, root))
+                    if operation_id in response_codes and match.group(1) not in response_codes[operation_id]:
+                        _finding(
+                            findings,
+                            "UNSUPPORTED_OPERATION_OUTCOME",
+                            f"{context} references HTTP {match.group(1)} absent from {operation_id}",
+                            screen=screen,
+                        )
+
+
+def evaluate_frontend_screen_contracts(
+    presentation: dict[str, Any],
+    screen_design: dict[str, Any],
+    interface_contract: dict[str, Any] | None = None,
+    *,
+    screen_ids: set[str] | None = None,
+) -> dict[str, Any]:
+    """Evaluate semantic closure without introducing framework/provider-specific semantics."""
+    findings: list[dict[str, Any]] = []
+    operations = operation_ids(interface_contract)
+    responses_by_operation = operation_response_codes(interface_contract)
+    patterns = presentation.get("patterns", {}) or {}
+    if not isinstance(patterns, dict):
+        _finding(findings, "INVALID_PATTERN_CATALOGUE", "presentation patterns must be a mapping")
+        patterns = {}
+
+    baseline = presentation.get("external_baseline")
+    if baseline is not None:
+        if not isinstance(baseline, dict):
+            _finding(findings, "INVALID_EXTERNAL_BASELINE", "external_baseline must be a mapping")
+        else:
+            if not baseline.get("provider") or not baseline.get("artifact"):
+                _finding(findings, "UNPINNED_EXTERNAL_BASELINE", "external baseline requires provider and artifact")
+            if not (baseline.get("version") or baseline.get("ref")):
+                _finding(findings, "UNPINNED_EXTERNAL_BASELINE", "external baseline requires immutable version or ref")
+            default = (baseline.get("feature_policy") or {}).get("default")
+            if default != "deny":
+                _finding(
+                    findings,
+                    "UNSAFE_PROVIDER_FEATURE_DEFAULT",
+                    "external baseline feature_policy.default must be deny",
+                )
+
+    screens = screen_design.get("screens", []) or []
+    evaluated: list[str] = []
+    for row in screens:
+        if not isinstance(row, dict):
+            _finding(findings, "INVALID_SCREEN", "screen entry must be a mapping")
+            continue
+        screen = row.get("id")
+        if not isinstance(screen, str) or not screen:
+            _finding(findings, "MISSING_SCREEN_ID", "screen id is required")
+            continue
+        if screen_ids is not None and screen not in screen_ids:
+            continue
+        evaluated.append(screen)
+
+        contract = row.get("semantic_contract")
+        if not isinstance(contract, dict):
+            _finding(findings, "MISSING_SEMANTIC_CONTRACT", "screen semantic_contract is required", screen=screen)
+            continue
+
+        reads = _ids(contract.get("reads", []) or [], screen=screen, kind="read", findings=findings)
+        commands = _ids(contract.get("commands", []) or [], screen=screen, kind="command", findings=findings)
+
+        binding_operations: dict[tuple[str, str], str] = {}
+        for kind, bindings in (("read", reads), ("command", commands)):
+            for binding_id, binding in bindings.items():
+                operation_id = binding.get("operation_id")
+                if not isinstance(operation_id, str) or not operation_id:
+                    _finding(findings, "MISSING_OPERATION_ID", f"{kind} {binding_id} requires operation_id", screen=screen)
+                else:
+                    binding_operations[(kind, binding_id)] = operation_id
+                if isinstance(operation_id, str) and operation_id and interface_contract is not None and operation_id not in operations:
+                    _finding(
+                        findings,
+                        "UNKNOWN_INTERFACE_OPERATION",
+                        f"{kind} {binding_id} references absent operationId {operation_id}",
+                        screen=screen,
+                    )
+
+        view_model = contract.get("view_model")
+        if not isinstance(view_model, dict) or not view_model.get("id"):
+            _finding(findings, "MISSING_VIEW_MODEL", "semantic view_model with id is required", screen=screen)
+        else:
+            fields = view_model.get("fields", []) or []
+            if not isinstance(fields, list) or not fields:
+                _finding(findings, "EMPTY_VIEW_MODEL", "view_model fields are required", screen=screen)
+            else:
+                field_ids: set[str] = set()
+                for field in fields:
+                    if not isinstance(field, dict) or not field.get("id"):
+                        _finding(findings, "INVALID_VIEW_MODEL_FIELD", "view_model field requires id", screen=screen)
+                        continue
+                    field_id = field["id"]
+                    if field_id in field_ids:
+                        _finding(findings, "DUPLICATE_VIEW_MODEL_FIELD", f"duplicate view_model field {field_id}", screen=screen)
+                    field_ids.add(field_id)
+                    _validate_source(
+                        field.get("source"),
+                        screen=screen,
+                        reads=set(reads),
+                        commands=set(commands),
+                        findings=findings,
+                        context=f"view_model.{field_id}",
+                        binding_operations=binding_operations,
+                        response_codes=responses_by_operation,
+                    )
+
+        capability_block = contract.get("capabilities")
+        if not isinstance(capability_block, dict):
+            _finding(findings, "MISSING_CAPABILITY_POLICY", "semantic capabilities allow/exclude policy is required", screen=screen)
+            allowed_rows = []
+            excluded_rows = []
+        else:
+            allowed_rows = capability_block.get("allowed", []) or []
+            excluded_rows = capability_block.get("excluded", []) or []
+
+        allowed: dict[str, dict[str, Any]] = {}
+        for capability in allowed_rows:
+            if not isinstance(capability, dict) or not capability.get("id"):
+                _finding(findings, "INVALID_ALLOWED_CAPABILITY", "allowed capability requires id and backed_by", screen=screen)
+                continue
+            capability_id = capability["id"]
+            if capability_id in allowed:
+                _finding(findings, "DUPLICATE_ALLOWED_CAPABILITY", f"duplicate allowed capability {capability_id}", screen=screen)
+                continue
+            allowed[capability_id] = capability
+            _validate_source(
+                capability.get("backed_by"),
+                screen=screen,
+                reads=set(reads),
+                commands=set(commands),
+                findings=findings,
+                context=f"capability.{capability_id}",
+                binding_operations=binding_operations,
+                response_codes=responses_by_operation,
+            )
+
+        excluded = {item for item in excluded_rows if isinstance(item, str) and item}
+        overlap = set(allowed) & excluded
+        for capability_id in sorted(overlap):
+            _finding(findings, "CAPABILITY_ALLOW_EXCLUDE_CONFLICT", f"{capability_id} is both allowed and excluded", screen=screen)
+
+        mappings = contract.get("pattern_mapping", []) or []
+        if not isinstance(mappings, list) or not mappings:
+            _finding(findings, "MISSING_PATTERN_MAPPING", "at least one presentation pattern mapping is required", screen=screen)
+            mappings = []
+        mapped_patterns = {
+            mapping.get("pattern")
+            for mapping in mappings
+            if isinstance(mapping, dict) and mapping.get("pattern")
+        }
+        declared_patterns = {
+            pattern
+            for pattern in (row.get("patterns", []) or [])
+            if isinstance(pattern, str) and pattern
+        }
+        for pattern in sorted(declared_patterns - mapped_patterns):
+            _finding(
+                findings,
+                "UNMAPPED_PRESENTATION_PATTERN",
+                f"declared pattern {pattern} has no semantic pattern mapping",
+                screen=screen,
+            )
+
+        declared_actions: set[str] = set()
+        primary_action = row.get("primary_action_role")
+        if isinstance(primary_action, str) and primary_action:
+            declared_actions.add(primary_action)
+        action_hierarchy = row.get("action_hierarchy") or {}
+        if isinstance(action_hierarchy, dict):
+            declared_actions.update(
+                value for value in action_hierarchy.values()
+                if isinstance(value, str) and value
+            )
+        for action in sorted(declared_actions - set(allowed)):
+            _finding(
+                findings,
+                "SCREEN_ACTION_NOT_AUTHORIZED",
+                f"declared screen action {action} has no allowed semantic capability",
+                screen=screen,
+            )
+
+        for mapping in mappings:
+            if not isinstance(mapping, dict):
+                _finding(findings, "INVALID_PATTERN_MAPPING", "pattern mapping must be a mapping", screen=screen)
+                continue
+            pattern_id = mapping.get("pattern")
+            if pattern_id not in patterns:
+                _finding(findings, "UNKNOWN_PRESENTATION_PATTERN", f"unknown pattern {pattern_id}", screen=screen)
+                continue
+            offered = {
+                item
+                for item in (patterns.get(pattern_id, {}) or {}).get("features", []) or []
+                if isinstance(item, str) and item
+            }
+            feature_bindings = mapping.get("feature_bindings", {}) or {}
+            if not isinstance(feature_bindings, dict):
+                _finding(findings, "INVALID_FEATURE_BINDINGS", f"{pattern_id} feature_bindings must be a mapping", screen=screen)
+                continue
+            for feature, capability_id in feature_bindings.items():
+                if offered and feature not in offered:
+                    _finding(findings, "UNKNOWN_PATTERN_FEATURE", f"{pattern_id} does not offer feature {feature}", screen=screen)
+                if capability_id not in allowed:
+                    _finding(
+                        findings,
+                        "PRESENTATION_FEATURE_NOT_AUTHORIZED",
+                        f"{pattern_id}.{feature} maps to non-allowed capability {capability_id}",
+                        screen=screen,
+                    )
+
+        states = row.get("states", []) or []
+        state_mapping = contract.get("state_mapping")
+        if states and not isinstance(state_mapping, dict):
+            _finding(findings, "MISSING_STATE_MAPPING", "state_mapping is required for declared screen states", screen=screen)
+        elif isinstance(state_mapping, dict):
+            missing_states = [state for state in states if state not in state_mapping]
+            for state in missing_states:
+                _finding(findings, "UNMAPPED_SCREEN_STATE", f"state {state} has no semantic source", screen=screen)
+            for state, source in state_mapping.items():
+                _validate_source(
+                    source,
+                    screen=screen,
+                    reads=set(reads),
+                    commands=set(commands),
+                    findings=findings,
+                    context=f"state.{state}",
+                    binding_operations=binding_operations,
+                    response_codes=responses_by_operation,
+                )
+
+        verification = contract.get("verification")
+        if not isinstance(verification, dict):
+            _finding(findings, "MISSING_VERIFICATION_CONTRACT", "verification contract is required", screen=screen)
+        else:
+            for key in ("contract", "semantic", "rendered"):
+                value = verification.get(key)
+                if not isinstance(value, list) or not value:
+                    _finding(findings, "INCOMPLETE_VERIFICATION_CONTRACT", f"verification.{key} requires at least one proof obligation", screen=screen)
+
+    if screen_ids is not None:
+        missing = sorted(screen_ids - set(evaluated))
+        for screen in missing:
+            _finding(findings, "MISSING_REQUIRED_SCREEN", "required screen not found in screen design", screen=screen)
+
+    return {
+        "version": 1,
+        "kind": "harness-frontend-screen-contract-evaluation",
+        "status": "ACCEPTED" if not findings else "REJECTED",
+        "screens_evaluated": sorted(evaluated),
+        "operation_ids": sorted(operations),
+        "findings": findings,
+    }
+
+
+def semantic_evaluation(
+    result: dict[str, Any],
+    *,
+    artifact: str,
+    capability: str,
+    semantic_claims: list[str],
+) -> dict[str, Any]:
+    """Adapt a screen-contract evaluation to Harness semantic-acceptance evidence."""
+    accepted = semantic_claims if result.get("status") == "ACCEPTED" else []
+    return {
+        "version": 1,
+        "kind": "harness-artifact-semantic-evaluation",
+        "artifact": artifact,
+        "capability": capability,
+        "status": result.get("status"),
+        "obligations": {
+            "expected": ["screen-semantic-closure"],
+            "satisfied": ["screen-semantic-closure"] if accepted else [],
+        },
+        "findings": list(result.get("findings", [])),
+        "semantic_claims": {"accepted": accepted},
+    }

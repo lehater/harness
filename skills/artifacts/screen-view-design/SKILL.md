@@ -35,17 +35,20 @@ For each required view:
 1. state purpose, covered task and entry/exit context;
 2. reference the inherited Presentation System;
 3. define semantic regions/sections/tabs/disclosures and their hierarchy;
-4. map displayed/edited data to accepted providers;
-5. define primary/secondary/destructive actions and their placement role;
-6. select reusable presentation/interaction patterns by id and define their screen-specific nesting/slot composition where that structure affects hierarchy or visual intent;
-7. define local list/table/form/detail/search/filter/selection composition where applicable;
-8. define state variants: loading, empty, loaded, submitting, success, validation/auth/conflict/degraded/error states as applicable;
-9. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
-10. define focus/read-order consequences where composition changes;
-11. attach accepted reference/evidence anchors to the regions or states they actually constrain;
-12. classify remaining choices as controlled freedom or ordinary implementation detail;
-13. record local overrides only with rationale;
-14. route missing upstream semantics as Questions.
+4. map displayed/edited data to accepted providers and, for server-backed behavior, bind reads/commands to stable machine-interface operation ids;
+5. define the semantic Screen/View Model consumed by the view when transport/query shape is not itself the intended UI semantic contract;
+6. define allowed user-visible capabilities and their backing read/command/navigation/local semantics; record material exclusions;
+7. define primary/secondary/destructive actions and their placement role;
+8. select reusable presentation/interaction patterns by id and explicitly bind provider/pattern features only when authorized by accepted screen semantics;
+9. define local list/table/form/detail/search/filter/selection composition where applicable and backed upstream;
+10. define state variants and map material server outcomes to accepted operation outcomes rather than inventing impossible states;
+11. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
+12. define focus/read-order consequences where composition changes;
+13. attach accepted reference/evidence anchors to the regions or states they actually constrain;
+14. define verification obligations for contract/semantic/rendered realization when material;
+15. classify remaining choices as controlled freedom or ordinary implementation detail;
+16. record local overrides only with rationale;
+17. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -73,8 +76,11 @@ Machine-readable YAML/JSON is preferred when it can express:
 - screen id/purpose;
 - inherits;
 - regions with role, priority and content/action refs;
-- patterns plus material nesting/slot composition;
-- states/variants;
+- read/query and command operation bindings where server-backed;
+- semantic Screen/View Model/source mappings when material;
+- allowed capabilities with backing semantics and material exclusions;
+- patterns plus material nesting/slot composition and authorized feature bindings;
+- states/variants and material outcome mappings;
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
 - overrides with rationale;
@@ -87,7 +93,9 @@ The contract should be sufficient to generate review projections such as a scree
 - every required user-facing view has a contract or explicit non-applicability;
 - every screen references one Presentation System;
 - repeated presentation knowledge is inherited, not copied;
-- required states/actions/data are covered;
+- required states/actions/data are covered and trace to accepted operation/local/navigation semantics;
+- enabled provider/template features do not create capabilities absent from accepted screen semantics;
+- declared server-backed states do not reference impossible operation outcomes;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
 - listing a pattern id without the material screen-specific composition it requires is insufficient;
