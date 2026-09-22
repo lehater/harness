@@ -54,6 +54,8 @@ When accepted frontend Screen/View Design selects provider-neutral presentation 
 
 A copied vendor template is implementation source/reference, not product authority. If the template exposes a search, sort, pagination, destructive action, route or field absent from accepted Screen/View semantics, the adapter omits/disables it.
 
+When the accepted Presentation System defines the default entity catalogue drill-down, do not remove its table/query/detail behavior merely because the current HTTP/query contract is weaker. Route the missing search/filter/sort/paging semantics as an upstream Interface/Application question or implementation prerequisite. Provider capability never authorizes those semantics by itself, but a missing backend/query contract also does not silently cancel an accepted presentation default.
+
 ## Applicability discipline
 
 Do not introduce a pattern merely because it is common.
