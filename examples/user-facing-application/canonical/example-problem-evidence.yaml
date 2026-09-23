@@ -1,0 +1,10 @@
+version: 1
+kind: problem-evidence
+id: EXAMPLE-PROBLEM-EVIDENCE
+
+problem: Users need a bounded application task whose interface is explainable from human work rather than backend entities alone.
+actors: [example-user]
+desired_outcome: Complete the accepted goal with traceable task and interface provenance.
+evidence:
+  - {id: EXAMPLE-EVIDENCE-1, source: acceptance-fixture}
+scope: user-facing-application example

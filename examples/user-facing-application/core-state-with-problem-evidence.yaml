@@ -1,0 +1,7 @@
+authorities: []
+artifacts:
+  - id: EXAMPLE-PROBLEM-EVIDENCE
+    path: examples/user-facing-application/canonical/example-problem-evidence.yaml
+    authority: DISCOVERY
+    provides: [example.problem-evidence]
+questions: []

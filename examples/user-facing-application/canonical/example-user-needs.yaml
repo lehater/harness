@@ -1,0 +1,15 @@
+version: 1
+kind: user-needs
+id: EXAMPLE-USER-NEEDS
+
+context_of_use:
+  users: [example-user]
+  environment: browser-based user-facing application
+goals:
+  - {id: GOAL-1, outcome: Complete the accepted example task.}
+user_needs:
+  - id: NEED-1
+    goal_ref: GOAL-1
+    statement: The user needs task-relevant information and supported actions without relying on backend implementation knowledge.
+    evidence_refs: [EXAMPLE-EVIDENCE-1]
+sufficiency_review: {status: ACCEPTED, rationale: One bounded fixture goal has explicit accepted need coverage.}

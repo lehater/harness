@@ -4,6 +4,21 @@ id: USER-FACING-APPLICATION-EXAMPLE
 default_subject: EXAMPLE-USER-FACING-APPLICATION
 
 authorities:
+  - id: DISCOVERY
+    responsibility: Own accepted problem evidence, context of use, user goals and user needs without deciding normative product behavior or interface realization.
+    boundary:
+      semantic_cohesion: Problem-space evidence and solution-independent user needs.
+      independent_change: Context and user needs can be refined before normative product requirements or solution design changes.
+      public_contract: Provides accepted problem evidence and user-needs knowledge to requirements and application design.
+    produces:
+      - capability: example.problem-evidence
+        knowledge_kind: problem-evidence
+        requires: []
+      - capability: example.user-needs
+        knowledge_kind: user-needs
+        requires:
+          - capability: example.problem-evidence
+
   - id: PRODUCT-REQUIREMENTS
     responsibility: Own accepted user-facing application product behavior and acceptance intent.
     boundary:
@@ -13,7 +28,8 @@ authorities:
     produces:
       - capability: example.requirements
         knowledge_kind: product-requirements
-        requires: []
+        requires:
+          - capability: example.user-needs
 
   - id: DOMAIN-USE-CASE-DESIGN
     responsibility: Own accepted domain/use-case behavior consumed by the selected frontend journey.
@@ -34,9 +50,16 @@ authorities:
       independent_change: Journey composition can evolve without selecting UI structure.
       public_contract: Provides accepted user journeys to Interface Design.
     produces:
+      - capability: example.frontend.task-model
+        knowledge_kind: task-model
+        requires:
+          - capability: example.user-needs
+          - capability: example.requirements
+          - capability: example.domain-use-cases
       - capability: example.frontend.user-journeys
         knowledge_kind: user-journey-design
         requires:
+          - capability: example.frontend.task-model
           - capability: example.requirements
           - capability: example.domain-use-cases
 
@@ -83,6 +106,7 @@ authorities:
         requires:
           - capability: example.requirements
           - capability: example.domain-use-cases
+          - capability: example.frontend.task-model
           - capability: example.frontend.user-journeys
           - capability: example.security-architecture
           - capability: example.machine-interface
