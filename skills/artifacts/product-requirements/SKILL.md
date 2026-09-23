@@ -38,14 +38,14 @@ decision was accepted merely because current code behaves that way.
 1. Confirm all grouped capabilities are actionable CREATE under one Product
    Requirements Authority and subject.
 2. Enumerate the relevant source/evidence statements before drafting requirements.
-3. Classify each statement as requirement-bearing, rationale/context, example, prior derived design, duplicate, out-of-scope or unresolved.
+3. Classify each statement as requirement-bearing, rationale/context, example, prior derived design, duplicate, out-of-scope or unresolved. Classify by semantic ownership, not by who most recently said or confirmed the statement: stakeholder confirmation of a Domain/Architecture/Interface decision does not make it a Product Requirement.
 4. For requirement-bearing statements:
    - preserve all observable constraints, including scope, time, cardinality, negative conditions and NOT_REQUIRED decisions;
    - split compound statements into independently verifiable atomic requirements;
    - merge only true semantic duplicates;
    - do not discard an observable constraint merely because the same sentence also contains design vocabulary.
 5. Reconcile conflicts. If two accepted sources imply incompatible product behavior, create a Product Requirements Question and stop the affected capability.
-6. Normalize the accepted result into product-level observable requirements without importing Domain/Architecture/API/Data choices.
+6. Normalize the accepted result into product-level observable requirements without importing Domain/Architecture/API/Data choices. When a mixed statement contains both observable intent and a downstream realization choice, preserve the observable constraint and route the realization choice to its owning downstream Authority. If nothing observable remains after removing the realization choice, do not manufacture a Product Requirement from it.
 7. Define acceptance semantics/examples sufficient for downstream design to know what success means.
 8. Preserve scope boundaries and non-goals.
 9. Keep source/evidence semantics distinct from accepted product decisions.
@@ -58,7 +58,8 @@ decision was accepted merely because current code behaves that way.
 16. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing IDs.
 17. Review the resulting requirement list against the enumerated source/evidence set; no requirement-bearing source statement may disappear silently.
 18. Run `workspace.py validate-artifact` on the candidate.
-19. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
+19. When machine-addressable semantic acceptance is used, require explicit Authority ownership for candidate/source assertions and constrain admitted source Authorities to the accepted upstream production contract plus Product Requirements itself. Do not admit Domain, Architecture, Interface, Data or Implementation decisions as requirement evidence merely because they are available or stakeholder-confirmed.
+20. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
 
 ## Stop conditions
 
@@ -68,7 +69,8 @@ Create or preserve a Product Requirements Question when:
 - an observable behavior choice materially changes product meaning and has not
   been decided;
 - a numeric/quality constraint is required but unknown;
-- acceptance cannot be stated without deciding an upstream product fact.
+- acceptance cannot be stated without deciding an upstream product fact;
+- the proposed requirement can only be justified by an already-derived downstream design decision rather than an independent observable product need/choice.
 
 Route downstream instead of deciding here when the unresolved issue is semantic
 domain ownership, architecture, interface representation, persistence or
@@ -105,7 +107,7 @@ Requirement IDs identify the accepted requirement, not its document position or 
 - statements describe what the product must achieve, not how it is implemented;
 - acceptance semantics are concrete enough for downstream design/verification;
 - non-goals prevent accidental scope expansion;
-- Domain/Architecture/Interface decisions remain downstream;
+- Domain/Architecture/Interface decisions remain downstream and are not promoted upstream through wording, provenance shortcuts or stakeholder reconfirmation;
 - unknown quality targets are not fabricated;
 - the artifact genuinely provides every grouped CapabilityId being registered.
 

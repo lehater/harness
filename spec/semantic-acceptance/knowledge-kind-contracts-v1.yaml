@@ -1,0 +1,73 @@
+version: 1
+kind: harness-knowledge-kind-semantic-contracts
+id: knowledge-kind-semantic-contracts/v1
+status: canonical
+
+defaults:
+  requires_assertion_authority: true
+  requires_source_authority: true
+  requires_semantic_review: true
+  required_review_checks:
+    - source-discipline
+    - authority-boundary
+    - no-invention
+
+contracts:
+  - knowledge_kind: problem-evidence
+    required_review_checks: [evidence-not-solution]
+  - knowledge_kind: user-needs
+    required_review_checks: [need-not-normative-solution]
+  - knowledge_kind: product-requirements
+    required_review_checks:
+      - observable-product-level
+      - no-downstream-design-promotion
+  - knowledge_kind: strategic-domain-design
+    required_review_checks: [strategic-not-tactical]
+  - knowledge_kind: domain-use-case
+    required_review_checks: [behavior-not-tactical]
+  - knowledge_kind: application-design
+    required_review_checks: [orchestration-not-domain-reownership]
+  - knowledge_kind: task-model
+    required_review_checks: [task-not-screen-design]
+  - knowledge_kind: user-journey-design
+    required_review_checks: [journey-not-screen-design]
+  - knowledge_kind: quality-design
+    required_review_checks: [no-invented-quality-target]
+  - knowledge_kind: system-architecture
+    required_review_checks: [architecture-not-product-requirement]
+  - knowledge_kind: security-architecture
+    required_review_checks: [security-architecture-not-product-policy]
+  - knowledge_kind: interface-contract
+    required_review_checks: [preserve-upstream-semantics]
+  - knowledge_kind: human-interface-design
+    required_review_checks: [interaction-not-product-requirement]
+  - knowledge_kind: presentation-system-design
+    required_review_checks: [presentation-not-domain-semantics]
+  - knowledge_kind: screen-view-design
+    required_review_checks: [screen-not-product-semantics]
+  - knowledge_kind: data-design
+    required_review_checks: [storage-not-semantic-owner]
+  - knowledge_kind: operability-design
+    required_review_checks: [evidence-not-semantic-owner]
+  - knowledge_kind: security-analysis
+    required_review_checks: [analysis-not-architecture-owner]
+  - knowledge_kind: engineering-policy
+    required_review_checks: [policy-not-product-domain-owner]
+  - knowledge_kind: component-design
+    required_review_checks: [component-not-upstream-owner]
+  - knowledge_kind: test-design
+    required_review_checks: [test-not-semantic-owner]
+  - knowledge_kind: implementation-design
+    required_review_checks: [implementation-not-upstream-owner]
+  - knowledge_kind: acceptance-scenarios
+    required_review_checks: [scenario-not-semantic-owner]
+  - knowledge_kind: domain-model
+    required_review_checks: [domain-model-authority-boundary]
+  - knowledge_kind: verification-strategy
+    required_review_checks: [verification-not-semantic-owner]
+  - knowledge_kind: pinned-source-entity-set
+    required_review_checks: [exact-pinned-source]
+  - knowledge_kind: source-classification-registry
+    required_review_checks: [classification-not-heuristic]
+  - knowledge_kind: source-coverage-audit
+    required_review_checks: [source-disposition-complete]

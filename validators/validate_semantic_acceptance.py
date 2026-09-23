@@ -119,6 +119,142 @@ def test_real_defect_regressions():
     assert r["status"]=="REJECTED" and "SOURCE_FIDELITY_VIOLATION" in codes(r)
 
 
+
+def test_authority_direction_regressions():
+    # NAPMS regression: a Domain decision must not be promoted into Product
+    # Requirements merely because it was later confirmed by a stakeholder.
+    contract = {
+        "authority": "PRODUCT-REQUIREMENTS",
+        "owned_assertion_kinds": ["product-requirement"],
+        "allowed_source_authorities": [
+            "PROBLEM-EVIDENCE",
+            "USER-NEEDS",
+            "PRODUCT-REQUIREMENTS",
+        ],
+        "requires_source_authority": True,
+        "requires_assertion_authority": True,
+        "semantic_claims": ["engineering.product.requirements"],
+    }
+    sources = {
+        "semantic_assertions": [
+            {
+                "id": "DOMAIN-RESOURCE-OWNERSHIP",
+                "kind": "domain-decision",
+                "subject": "access-request-admission",
+                "semantic_value": (
+                    "access.request is evaluated against the source Resource "
+                    "current owning OrganizationalUnit"
+                ),
+                "decision_authority": "DOMAIN-DESIGN",
+            }
+        ]
+    }
+    candidate = {
+        "id": "PRODUCT-REQUIREMENTS",
+        "capability": "engineering.product.requirements",
+        "semantic_assertions": [
+            {
+                "id": "REQ-ACCESS-REQUEST",
+                "kind": "product-requirement",
+                "subject": "access-request-admission",
+                "semantic_value": (
+                    "access.request authority includes the source Resource "
+                    "current owning OrganizationalUnit"
+                ),
+                "derived_from": ["DOMAIN-RESOURCE-OWNERSHIP"],
+                "decision_authority": "PRODUCT-REQUIREMENTS",
+            }
+        ],
+    }
+    result = evaluate_artifact(contract, sources, candidate)
+    assert result["status"] == "REJECTED"
+    assert "SOURCE_AUTHORITY_VIOLATION" in codes(result)
+
+    # A Product Requirement may be normalized from an admitted upstream User
+    # Need while remaining owned by Product Requirements.
+    sources = {
+        "semantic_assertions": [
+            {
+                "id": "NEED-AUTHORIZED-SOURCE",
+                "kind": "user-need",
+                "subject": "access-request-admission",
+                "semantic_value": (
+                    "Only an authorized source-side actor may initiate access"
+                ),
+                "decision_authority": "USER-NEEDS",
+            }
+        ]
+    }
+    candidate["semantic_assertions"][0] = {
+        "id": "REQ-ACCESS-REQUEST",
+        "kind": "product-requirement",
+        "subject": "access-request-admission",
+        "semantic_value": (
+            "The product shall reject connectivity request submission when "
+            "the actor is not authorized to act for the source side"
+        ),
+        "derived_from": ["NEED-AUTHORIZED-SOURCE"],
+        "decision_authority": "PRODUCT-REQUIREMENTS",
+    }
+    result = evaluate_artifact(contract, sources, candidate)
+    assert result["status"] == "ACCEPTED"
+
+    # Once authority-direction checking is enabled, opaque provenance is
+    # insufficient: Harness must know who owns the source semantics.
+    sources["semantic_assertions"][0].pop("decision_authority")
+    result = evaluate_artifact(contract, sources, candidate)
+    assert result["status"] == "REJECTED"
+    assert "UNKNOWN_SOURCE_AUTHORITY" in codes(result)
+
+    # The candidate assertion itself must also be owned by the producing
+    # Authority when the production contract requires explicit ownership.
+    sources["semantic_assertions"][0]["decision_authority"] = "USER-NEEDS"
+    candidate["semantic_assertions"][0].pop("decision_authority")
+    result = evaluate_artifact(contract, sources, candidate)
+    assert result["status"] == "REJECTED"
+    assert "MISSING_DECISION_AUTHORITY" in codes(result)
+
+
+    # Two Authorities must not silently claim ownership of the same
+    # machine-addressable semantic assertion kind+subject.
+    ownership_contract = {
+        "authority": "DOMAIN-A",
+        "allowed_source_authorities": ["DOMAIN-A", "DOMAIN-B"],
+        "requires_source_authority": True,
+        "requires_assertion_authority": True,
+    }
+    ownership_sources = {
+        "semantic_assertions": [
+            {
+                "id": "B-IDENTITY",
+                "kind": "domain-invariant",
+                "subject": "Resource.identity",
+                "semantic_value": "stable",
+                "decision_authority": "DOMAIN-B",
+            }
+        ]
+    }
+    ownership_candidate = {
+        "id": "DOMAIN-A",
+        "capability": "domain.a",
+        "semantic_assertions": [
+            {
+                "id": "A-IDENTITY",
+                "kind": "domain-invariant",
+                "subject": "Resource.identity",
+                "semantic_value": "stable",
+                "derived_from": ["B-IDENTITY"],
+                "decision_authority": "DOMAIN-A",
+            }
+        ],
+    }
+    result = evaluate_artifact(
+        ownership_contract, ownership_sources, ownership_candidate
+    )
+    assert result["status"] == "REJECTED"
+    assert "CROSS_AUTHORITY_OWNERSHIP_CONFLICT" in codes(result)
+
+
 def test_coverage_gating_and_invalidation():
     graph={
         "kind":"harness-engineering-graph",
@@ -237,9 +373,13 @@ def test_engineering_coverage_evidence_input():
 
 def main():
     test_real_defect_regressions()
+    test_authority_direction_regressions()
     test_coverage_gating_and_invalidation()
     test_engineering_coverage_evidence_input()
-    print("semantic acceptance: PASS (real defect regressions + gating/invalidation)")
+    print(
+        "semantic acceptance: PASS "
+        "(real defect regressions + authority direction + gating/invalidation)"
+    )
     return 0
 
 

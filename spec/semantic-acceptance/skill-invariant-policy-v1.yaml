@@ -1,0 +1,58 @@
+version: 1
+kind: harness-skill-invariant-policy
+id: skill-invariant-policy/v1
+status: canonical
+
+enforced:
+  - {knowledge_kind: problem-evidence, skill: skills/artifacts/problem-evidence/SKILL.md}
+  - {knowledge_kind: user-needs, skill: skills/artifacts/user-needs/SKILL.md}
+  - {knowledge_kind: product-requirements, skill: skills/artifacts/product-requirements/SKILL.md}
+  - {knowledge_kind: strategic-domain-design, skill: skills/artifacts/strategic-domain-design/SKILL.md}
+  - {knowledge_kind: domain-use-case, skill: skills/artifacts/domain-use-case/SKILL.md}
+  - {knowledge_kind: application-design, skill: skills/artifacts/application-design/SKILL.md}
+  - {knowledge_kind: task-model, skill: skills/artifacts/task-model/SKILL.md}
+  - {knowledge_kind: user-journey-design, skill: skills/artifacts/user-journey-design/SKILL.md}
+  - {knowledge_kind: quality-design, skill: skills/artifacts/quality-design/SKILL.md}
+  - {knowledge_kind: system-architecture, skill: skills/artifacts/system-architecture/SKILL.md}
+  - {knowledge_kind: security-architecture, skill: skills/artifacts/security-architecture/SKILL.md}
+  - {knowledge_kind: interface-contract, skill: skills/artifacts/interface-contract/SKILL.md}
+  - {knowledge_kind: human-interface-design, skill: skills/artifacts/human-interface-design/SKILL.md}
+  - {knowledge_kind: presentation-system-design, skill: skills/artifacts/presentation-system-design/SKILL.md}
+  - {knowledge_kind: screen-view-design, skill: skills/artifacts/screen-view-design/SKILL.md}
+  - {knowledge_kind: data-design, skill: skills/artifacts/data-design/SKILL.md}
+  - {knowledge_kind: operability-design, skill: skills/artifacts/operability-design/SKILL.md}
+  - {knowledge_kind: security-analysis, skill: skills/artifacts/security-analysis/SKILL.md}
+  - {knowledge_kind: engineering-policy, skill: skills/artifacts/engineering-policy/SKILL.md}
+  - {knowledge_kind: component-design, skill: skills/artifacts/component-design/SKILL.md}
+  - {knowledge_kind: test-design, skill: skills/artifacts/test-design/SKILL.md}
+  - {knowledge_kind: implementation-design, skill: skills/artifacts/implementation-design/SKILL.md}
+  - {knowledge_kind: acceptance-scenarios, skill: skills/artifacts/acceptance-scenarios/SKILL.md}
+  - {knowledge_kind: domain-model, skill: skills/artifacts/domain-model/SKILL.md}
+  - {knowledge_kind: verification-strategy, skill: skills/artifacts/verification-strategy/SKILL.md}
+  - {knowledge_kind: pinned-source-entity-set, skill: skills/artifacts/pinned-source-entity-set/SKILL.md}
+  - {knowledge_kind: source-classification-registry, skill: skills/artifacts/source-classification-registry/SKILL.md}
+  - {knowledge_kind: source-coverage-audit, skill: skills/artifacts/source-coverage-audit/SKILL.md}
+
+judgement_only:
+  - skill: skills/artifacts/change-transition-design/SKILL.md
+    rationale: Conditional transition artifact is not currently a registered routed knowledge kind; projects must model a production contract before it can provide a capability.
+  - skill: skills/artifacts/concurrency-consistency-analysis/SKILL.md
+    rationale: Cross-Authority analysis routes gaps and intentionally owns no semantic capability by default.
+  - skill: skills/artifacts/data-evidence-analysis/SKILL.md
+    rationale: Evidence analysis is a coverage lens and intentionally does not become a semantic owner.
+  - skill: skills/artifacts/data-governance-lifecycle-analysis/SKILL.md
+    rationale: Analysis routes lifecycle policy decisions to existing Authorities and owns no default capability.
+  - skill: skills/artifacts/external-dependency-analysis/SKILL.md
+    rationale: Dependency evidence analysis is non-owning unless a project later demonstrates an independent production contract.
+  - skill: skills/artifacts/human-interface-quality-analysis/SKILL.md
+    rationale: Cross-Authority quality analysis routes obligations and does not own Product or Interface semantics.
+  - skill: skills/artifacts/internationalization-localization-analysis/SKILL.md
+    rationale: Cross-Authority localization analysis routes decisions and has no default semantic owner.
+  - skill: skills/artifacts/obligation-analysis/SKILL.md
+    rationale: Normative-source analysis routes constrained meaning to existing Authorities rather than owning the routed requirement.
+  - skill: skills/artifacts/performance-capacity-analysis/SKILL.md
+    rationale: Analysis routes targets and realization choices to Product, Quality, System, Data and Implementation.
+  - skill: skills/artifacts/recovery-continuity-analysis/SKILL.md
+    rationale: Analysis routes recovery semantics to existing Authorities and has no default production capability.
+  - skill: skills/artifacts/reliability-analysis/SKILL.md
+    rationale: Analysis intentionally does not create a generic Reliability Authority or capability.

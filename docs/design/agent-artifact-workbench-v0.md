@@ -176,11 +176,12 @@ Before registering `provides`, the agent must establish all of the following:
 1. **Authority** — the artifact belongs to the Authority named by the expectation.
 2. **Capability fit** — the artifact actually answers the required knowledge capability rather than merely resembling the requested document type.
 3. **Source discipline** — accepted statements are supported by canonical project sources, explicit user decisions, or deterministic derivation from them.
-4. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
-5. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
-6. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
-7. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
-8. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
+4. **Authority direction** — when the production contract requires machine-addressable source ownership, every source assertion identifies its owning Authority and only admitted upstream/same-Authority sources may justify the candidate. Restating or reconfirming a downstream decision does not promote it into upstream truth.
+5. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
+6. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
+7. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
+8. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
+9. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
 Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
 
@@ -304,3 +305,55 @@ Every artifact skill should state:
 - **Human projection** — what generated document the renderer produces.
 
 Do not make skills generic document writers. Their purpose is to obtain trustworthy engineering knowledge.
+
+
+## Mandatory strict admission for routed artifact skills
+
+The prose skill contract is not itself evidence that the skill was obeyed.
+
+For every production whose `knowledge_kind` is registered in
+`skills/artifact-skill-registry-v0.yaml`, full engineering closure requires
+strict semantic admission through `semantic_admission.py`.
+
+The admission boundary composes:
+
+1. the Engineering Graph production contract;
+2. the derived Authority execution context;
+3. canonical read/write provenance;
+4. source-Authority direction derived from direct production prerequisites;
+5. the knowledge-kind semantic-review contract;
+6. deterministic semantic acceptance;
+7. a capability acceptance identity and exact prerequisite acceptance baseline.
+
+A routed skill may not satisfy full closure merely because a file exists, a
+schema validates, or a bare semantic evaluation is absent. Migration/static
+evaluation may retain legacy provider behavior, but `semantic_closure.py`
+fails closed for missing admission evidence.
+
+Semantic review is intentionally used for rules that cannot be proven from
+structure alone, such as whether Product Requirements stayed at observable
+product level instead of importing a downstream Domain/Architecture choice.
+The machine-enforced invariant is that this review is mandatory and that its
+required checks are explicit.
+
+Every active artifact skill is classified by
+`spec/semantic-acceptance/skill-invariant-policy-v1.yaml` as either:
+
+- `ENFORCED` through a routed knowledge-kind admission contract; or
+- intentionally judgement-only/non-owning with an explicit rationale.
+
+An unclassified active skill is a Harness validation failure.
+
+## Semantic currentness
+
+Accepted knowledge is not permanently current.
+
+`capability_lifecycle.py` records one acceptance identity per selected
+Capability and the exact prerequisite acceptance identities against which it was
+accepted. If an upstream identity changes, the direct consumer becomes
+`STALE` and is exposed as `REVALIDATE`; further downstream work remains
+non-current until revalidation restores the chain.
+
+`semantic_closure.py` requires both an ACCEPTED strict admission and CURRENT
+lifecycle assertion for every capability in the selected Consumer closure.
+Structural `COMPLETE` without those proofs is not full engineering closure.

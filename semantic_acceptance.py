@@ -106,11 +106,44 @@ def evaluate_artifact(
 
     allowed_authority = contract.get("authority")
     allowed_kinds = set(contract.get("owned_assertion_kinds", []) or [])
+    allowed_source_authorities = set(
+        contract.get("allowed_source_authorities", []) or []
+    )
+    requires_source_authority = bool(contract.get("requires_source_authority"))
+    requires_assertion_authority = bool(
+        contract.get("requires_assertion_authority")
+    )
 
     seen: dict[tuple[str, str | None], dict[str, Any]] = {}
     for assertion in assertions:
         assertion_id = assertion.get("id", "<unknown>")
         kind = assertion.get("kind")
+        assertion_authority = assertion.get("decision_authority")
+
+        if requires_assertion_authority and (
+            not isinstance(assertion_authority, str)
+            or not assertion_authority.strip()
+        ):
+            findings.append(
+                {
+                    "code": "MISSING_DECISION_AUTHORITY",
+                    "assertion": assertion_id,
+                }
+            )
+        elif (
+            isinstance(assertion_authority, str)
+            and assertion_authority
+            and allowed_authority is not None
+            and assertion_authority != allowed_authority
+        ):
+            findings.append(
+                {
+                    "code": "WRONG_AUTHORITY_OWNERSHIP",
+                    "assertion": assertion_id,
+                    "authority": assertion_authority,
+                    "expected_authority": allowed_authority,
+                }
+            )
 
         if allowed_kinds and kind not in allowed_kinds:
             findings.append(
@@ -139,6 +172,54 @@ def evaluate_artifact(
                     }
                 )
                 continue
+
+            source_authority = source.get("decision_authority")
+            if requires_source_authority and (
+                not isinstance(source_authority, str)
+                or not source_authority.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "UNKNOWN_SOURCE_AUTHORITY",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                    }
+                )
+            elif (
+                allowed_source_authorities
+                and isinstance(source_authority, str)
+                and source_authority
+                and source_authority not in allowed_source_authorities
+            ):
+                findings.append(
+                    {
+                        "code": "SOURCE_AUTHORITY_VIOLATION",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                        "source_authority": source_authority,
+                        "allowed_source_authorities": sorted(
+                            allowed_source_authorities
+                        ),
+                    }
+                )
+
+            if (
+                semantic_key(source) == semantic_key(assertion)
+                and isinstance(source_authority, str)
+                and source_authority
+                and isinstance(assertion_authority, str)
+                and assertion_authority
+                and source_authority != assertion_authority
+            ):
+                findings.append(
+                    {
+                        "code": "CROSS_AUTHORITY_OWNERSHIP_CONFLICT",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                        "assertion_authority": assertion_authority,
+                        "source_authority": source_authority,
+                    }
+                )
 
             if (
                 semantic_key(source) == semantic_key(assertion)
@@ -212,6 +293,29 @@ def evaluate_artifact(
     if contract.get("requires_semantic_review"):
         if not isinstance(review, dict) or review.get("status") != "ACCEPTED":
             findings.append({"code": "SEMANTIC_REVIEW_REQUIRED"})
+
+    required_review_checks = set(
+        contract.get("required_semantic_review_checks", []) or []
+    )
+    if required_review_checks:
+        completed_checks = set()
+        if isinstance(review, dict):
+            checks = review.get("checks", []) or []
+            if isinstance(checks, list):
+                completed_checks = {
+                    value for value in checks
+                    if isinstance(value, str) and value
+                }
+        missing_review_checks = sorted(
+            required_review_checks - completed_checks
+        )
+        if missing_review_checks:
+            findings.append(
+                {
+                    "code": "SEMANTIC_REVIEW_CHECKS_MISSING",
+                    "checks": missing_review_checks,
+                }
+            )
     if isinstance(review, dict) and review.get("status") == "REJECTED":
         findings.append(
             {
