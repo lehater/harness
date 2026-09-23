@@ -496,6 +496,42 @@ def main() -> int:
     )
     assert "UNEXPOSED_COMMAND_SEMANTICS" in codes(result)
 
+
+    composite_reference = deepcopy(strict)
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["identity"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["submitted_value"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        composite_reference,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert result["status"] == "ACCEPTED", result
+
+    candidate_read_source = deepcopy(strict)
+    candidate_read_source["screens"][0]["semantic_contract"]["references"][0]["candidates"] = {
+        "source": "read:catalogue.items",
+        "mode": "independent",
+        "search": "bounded-current-read",
+    }
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        candidate_read_source,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert result["status"] == "ACCEPTED", result
+
     missing_candidates = deepcopy(strict)
     del missing_candidates["screens"][0]["semantic_contract"]["references"][0]["candidates"]
     result = evaluate_frontend_screen_contracts(

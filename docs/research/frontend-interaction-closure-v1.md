@@ -98,6 +98,8 @@ references:
 Dependent selection adds `mode: dependent` and non-empty `depends_on`.
 Workflow-constrained selection uses `mode: workflow`; its candidate source must itself be authoritative for the task-oriented candidate set.
 
+A task-oriented candidate may use a **composite stable identity** when several submitted references form one meaningful selection. In that case `identity` and `submitted_value` may be non-empty lists. This is preferred over multiple dependent pickers when the application layer already owns admissibility of the whole tuple.
+
 Screen composition binds a concrete reference interaction through a contract id rather than re-inventing candidate semantics locally.
 
 ### Outcomes
@@ -179,7 +181,7 @@ NAPMS supplies those concrete values.
 | Edit/Rename Component | accepted domain/application mutation command + machine operation | BLOCKED while absent |
 | Direct detail navigation | canonical route, parent, direct-link behavior, readable reference presentation | BLOCKED |
 
-The important Access Request assertion is that four independent UUID inputs cannot satisfy a workflow reference contract. The project must materialize an authoritative workflow candidate source/dependency contract.
+The important Access Request assertion is that four independent UUID inputs cannot satisfy a workflow reference contract. Prefer one authoritative composite Access Request candidate when the application layer owns admissibility of the tuple; use dependent selections only when the user task genuinely requires staged choice.
 
 ## Projections
 

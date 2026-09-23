@@ -105,7 +105,7 @@ The contract should be sufficient to generate review projections such as a scree
 - inline editing in a primary catalogue is accepted only when command-backed and explicitly authorized by a Screen/View override with rationale when the inherited Presentation System requires one;
 - declared server-backed states do not reference impossible operation outcomes;
 - every accepted machine-operation response has user-visible state/transition semantics or a justified explicit exclusion;
-- every selection reference has an authoritative candidate source, explicit search/bounded-set semantics and submitted stable identity; dependent/workflow selections declare their dependencies rather than relying on implementation inference;
+- every selection reference has an authoritative candidate source, explicit search/bounded-set semantics and submitted stable identity; composite task subjects may use a non-empty list of stable identity parts; dependent/workflow selections declare their dependencies rather than relying on implementation inference;
 - authoring/workflow routes have deterministic parent, direct-link, success and cancel behavior;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;

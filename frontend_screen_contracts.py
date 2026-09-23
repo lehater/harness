@@ -525,6 +525,7 @@ def _validate_reference_contracts(
     row: dict[str, Any],
     contract: dict[str, Any],
     screen: str,
+    reads: dict[str, dict[str, Any]],
     commands: dict[str, dict[str, Any]],
     operations: set[str],
     findings: list[dict[str, Any]],
@@ -545,11 +546,18 @@ def _validate_reference_contracts(
                 screen=screen,
             )
         identity = reference.get("identity")
-        if not isinstance(identity, str) or not identity:
+        has_identity = (
+            isinstance(identity, str)
+            and bool(identity)
+            or isinstance(identity, list)
+            and bool(identity)
+            and all(isinstance(item, str) and item for item in identity)
+        )
+        if not has_identity:
             _finding(
                 findings,
                 "MISSING_REFERENCE_IDENTITY",
-                f"reference {reference_id} requires stable identity semantics",
+                f"reference {reference_id} requires stable identity semantics; composite identity may be a non-empty list",
                 screen=screen,
             )
 
@@ -630,6 +638,15 @@ def _validate_reference_contracts(
                         "UNKNOWN_REFERENCE_CANDIDATE_OPERATION",
                         f"selection reference {reference_id} references absent operationId {operation_id}",
                         screen=screen,
+                    )
+                if isinstance(source, str) and source:
+                    _validate_source(
+                        source,
+                        screen=screen,
+                        reads=set(reads),
+                        commands=set(commands),
+                        findings=findings,
+                        context=f"reference.{reference_id}.candidates.source",
                     )
                 search = candidates.get("search")
                 if not isinstance(search, str) or not search:
@@ -843,6 +860,7 @@ def _validate_interaction_closure(
         row=row,
         contract=contract,
         screen=screen,
+        reads=reads,
         commands=commands,
         operations=operations,
         findings=findings,
