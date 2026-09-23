@@ -23,6 +23,13 @@ or interface structure.
 - observed current work/tasks where available;
 - material physical, technical, social or organizational context.
 
+## Read boundary
+
+Read only accepted evidence needed to establish users, context, goals, observed work
+and User Needs. Existing requirements, domain models, interfaces and implementation
+may be read only to detect conflicts; they do not become evidence that a User Need
+exists merely because a downstream design already assumes it.
+
 ## Procedure
 
 1. Identify affected users/actors and selected context of use.
@@ -66,3 +73,9 @@ stakeholder input. Do not infer missing needs from UI, API, domain entities or c
 
 Register under DISCOVERY. Dependencies include accepted Problem Evidence and other
 canonical evidence actually consumed.
+
+## Human projection
+
+Prefer a concise Context-of-Use and User-Needs table with evidence references.
+Journey maps, personas or service-blueprint views are optional projections unless
+the target project explicitly assigns them canonical contract meaning.

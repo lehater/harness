@@ -24,6 +24,13 @@ navigation, layout or frontend technology.
 - accepted Domain Use-Case/tactical semantics needed by selected goals;
 - accepted security/policy constraints where they change observable work.
 
+## Read boundary
+
+Read accepted User Needs, normative requirements and owner-defined domain/security
+semantics needed to model intended work. Existing screens, routes, components,
+controllers or API shapes are not task authority and must not be used to infer
+missing human tasks.
+
 ## Procedure
 
 1. Select an accepted user goal and its User Needs/User Requirements.
@@ -73,3 +80,9 @@ information/decision semantics are unresolved. Do not choose screens to fill gap
 
 Register under APPLICATION-DESIGN. Dependencies include accepted User Needs,
 Product Requirements and Domain semantics actually consumed.
+
+## Human projection
+
+Prefer a goal/task tree or table showing decomposition, responsibility, required
+information/decisions and outcomes. User journeys are downstream scenario
+projections and screen/navigation diagrams remain Interface Design projections.
