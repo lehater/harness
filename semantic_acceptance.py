@@ -106,11 +106,44 @@ def evaluate_artifact(
 
     allowed_authority = contract.get("authority")
     allowed_kinds = set(contract.get("owned_assertion_kinds", []) or [])
+    allowed_source_authorities = set(
+        contract.get("allowed_source_authorities", []) or []
+    )
+    requires_source_authority = bool(contract.get("requires_source_authority"))
+    requires_assertion_authority = bool(
+        contract.get("requires_assertion_authority")
+    )
 
     seen: dict[tuple[str, str | None], dict[str, Any]] = {}
     for assertion in assertions:
         assertion_id = assertion.get("id", "<unknown>")
         kind = assertion.get("kind")
+        assertion_authority = assertion.get("decision_authority")
+
+        if requires_assertion_authority and (
+            not isinstance(assertion_authority, str)
+            or not assertion_authority.strip()
+        ):
+            findings.append(
+                {
+                    "code": "MISSING_DECISION_AUTHORITY",
+                    "assertion": assertion_id,
+                }
+            )
+        elif (
+            isinstance(assertion_authority, str)
+            and assertion_authority
+            and allowed_authority is not None
+            and assertion_authority != allowed_authority
+        ):
+            findings.append(
+                {
+                    "code": "WRONG_AUTHORITY_OWNERSHIP",
+                    "assertion": assertion_id,
+                    "authority": assertion_authority,
+                    "expected_authority": allowed_authority,
+                }
+            )
 
         if allowed_kinds and kind not in allowed_kinds:
             findings.append(
@@ -139,6 +172,36 @@ def evaluate_artifact(
                     }
                 )
                 continue
+
+            source_authority = source.get("decision_authority")
+            if requires_source_authority and (
+                not isinstance(source_authority, str)
+                or not source_authority.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "UNKNOWN_SOURCE_AUTHORITY",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                    }
+                )
+            elif (
+                allowed_source_authorities
+                and isinstance(source_authority, str)
+                and source_authority
+                and source_authority not in allowed_source_authorities
+            ):
+                findings.append(
+                    {
+                        "code": "SOURCE_AUTHORITY_VIOLATION",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                        "source_authority": source_authority,
+                        "allowed_source_authorities": sorted(
+                            allowed_source_authorities
+                        ),
+                    }
+                )
 
             if (
                 semantic_key(source) == semantic_key(assertion)

@@ -20,6 +20,9 @@ contract:
         - obligations
         - compatibility_obligations
         - requires_semantic_review
+        - allowed_source_authorities
+        - requires_source_authority
+        - requires_assertion_authority
     obligations:
       fields:
         id: required
@@ -44,10 +47,17 @@ contract:
         Only material assertions establishing the capability need machine
         addressability. Arbitrary prose sentences do not.
     source_assertions:
+      fields:
+        decision_authority: conditionally-required
       rule: >-
         Use bounded accepted prerequisite closure; implementation code and legacy
         documents are not semantic authority unless explicitly selected as
-        canonical inputs.
+        canonical inputs. When requires_source_authority is true, every referenced
+        source assertion must identify its decision Authority. When
+        allowed_source_authorities is non-empty, a candidate may derive semantics
+        only from assertions owned by one of those Authorities. This prevents a
+        downstream design decision from being promoted into upstream truth merely
+        by restating it.
 
   evaluation:
     kind: harness-artifact-semantic-evaluation
@@ -73,7 +83,10 @@ contract:
       - MISSING_SUBJECTS
       - MISSING_VALUES
       - UNKNOWN_PROVENANCE
+      - UNKNOWN_SOURCE_AUTHORITY
+      - SOURCE_AUTHORITY_VIOLATION
       - INVENTED_ASSERTION
+      - MISSING_DECISION_AUTHORITY
       - WRONG_AUTHORITY_OWNERSHIP
       - SOURCE_FIDELITY_VIOLATION
       - INTERNAL_CONTRADICTION
@@ -92,6 +105,12 @@ integration:
   invalidation_rule: >-
     A semantically invalid capability invalidates dependent produced capabilities
     through Engineering Graph prerequisites until revalidation succeeds.
+  authority_direction_rule: >-
+    When an artifact production contract opts into source-Authority checking,
+    unknown or disallowed source ownership rejects the candidate capability.
+    Stakeholder confirmation does not change which Authority owns the meaning of
+    a statement; a downstream decision must stay downstream unless Product
+    Requirements independently accepts an observable product choice.
   coverage_rule: >-
     Engineering Coverage may use a semantic claim only from an ACCEPTED
     evaluation that explicitly accepts that claim.

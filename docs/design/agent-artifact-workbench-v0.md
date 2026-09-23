@@ -176,11 +176,12 @@ Before registering `provides`, the agent must establish all of the following:
 1. **Authority** — the artifact belongs to the Authority named by the expectation.
 2. **Capability fit** — the artifact actually answers the required knowledge capability rather than merely resembling the requested document type.
 3. **Source discipline** — accepted statements are supported by canonical project sources, explicit user decisions, or deterministic derivation from them.
-4. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
-5. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
-6. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
-7. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
-8. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
+4. **Authority direction** — when the production contract requires machine-addressable source ownership, every source assertion identifies its owning Authority and only admitted upstream/same-Authority sources may justify the candidate. Restating or reconfirming a downstream decision does not promote it into upstream truth.
+5. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
+6. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
+7. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
+8. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
+9. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
 Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
 
