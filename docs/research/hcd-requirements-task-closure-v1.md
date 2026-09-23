@@ -37,7 +37,9 @@ Problem Evidence
 4. accepted requirements/domain prerequisites expose Task Model before Journey;
 5. Task Model exposes User Journey;
 6. an already-materialized Requirements provider cannot bypass missing User Needs;
-7. an already-materialized Journey provider cannot bypass missing Task Model.
+7. an already-materialized Journey provider cannot bypass missing Task Model;
+8. independent branches such as Security/Quality may remain actionable: causal
+   blocking applies to dependent downstream knowledge, not to the whole graph.
 
 ## Core decision
 
@@ -50,4 +52,5 @@ the selected Consumer closure.
 
 The complete user-facing fixture remains COMPLETE after materializing the new
 knowledge, while deleting User Needs or Task Model routes CREATE to the correct
-existing Authority and keeps downstream work pending.
+existing Authority and keeps the dependent Journey/Interface chain pending.
+Independent graph branches remain free to progress.
