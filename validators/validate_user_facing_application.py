@@ -12,6 +12,10 @@ GRAPH = load_yaml(EXAMPLE / "engineering-graph.yaml")
 REGISTRY = load_yaml(ROOT / "skills" / "artifact-skill-registry-v0.yaml")
 
 CASES = [
+    ("core-state-empty.yaml", "problem-evidence", "DISCOVERY"),
+    ("core-state-with-problem-evidence.yaml", "user-needs", "DISCOVERY"),
+    ("core-state-with-user-needs.yaml", "product-requirements", "PRODUCT-REQUIREMENTS"),
+    ("core-state-before-task-model.yaml", "task-model", "APPLICATION-DESIGN"),
     ("core-state-upstream.yaml", "user-journey-design", "APPLICATION-DESIGN"),
     ("core-state-with-interface.yaml", "presentation-system-design", "INTERFACE-DESIGN"),
     ("core-state-with-ui-foundations.yaml", "screen-view-design", "INTERFACE-DESIGN"),
@@ -33,6 +37,44 @@ def main() -> None:
 
     for state_name, knowledge_kind, authority in CASES:
         assert_single_frontier(state_name, knowledge_kind, authority)
+
+    # Regression: a materialized Requirements provider cannot bypass its newly
+    # declared User Needs predecessor. Downstream requirement consumers remain pending.
+    legacy_requirements = load_yaml(
+        EXAMPLE / "core-state-legacy-requirements-without-user-needs.yaml"
+    )
+    legacy_requirements_frontier = route_create_work(
+        GRAPH, "FRONTEND-IMPLEMENTATION", legacy_requirements, REGISTRY
+    )
+    assert legacy_requirements_frontier["target_status"] == "READY", legacy_requirements_frontier
+    assert {
+        (item["knowledge_kind"], item["authority"])
+        for item in legacy_requirements_frontier["routed"]
+    } == {("user-needs", "DISCOVERY")}, legacy_requirements_frontier
+
+    # Regression: a materialized Journey provider cannot substitute for Task Model.
+    # Interface Design stays downstream until the task-model predecessor is accepted.
+    legacy_journeys = load_yaml(
+        EXAMPLE / "core-state-legacy-journeys-without-task-model.yaml"
+    )
+    legacy_journeys_frontier = route_create_work(
+        GRAPH, "FRONTEND-IMPLEMENTATION", legacy_journeys, REGISTRY
+    )
+    assert legacy_journeys_frontier["target_status"] == "READY", legacy_journeys_frontier
+    legacy_journeys_routed = {
+        (item["knowledge_kind"], item["authority"])
+        for item in legacy_journeys_frontier["routed"]
+    }
+    assert ("task-model", "APPLICATION-DESIGN") in legacy_journeys_routed, legacy_journeys_frontier
+    assert not any(
+        item["knowledge_kind"] in {
+            "user-journey-design",
+            "human-interface-design",
+            "presentation-system-design",
+            "screen-view-design",
+        }
+        for item in legacy_journeys_frontier["routed"]
+    ), legacy_journeys_frontier
 
     # Human Interface semantics and the shared Presentation System are independent
     # once journeys/upstream constraints are known; both must close before screen design.

@@ -6,6 +6,9 @@ routes:
   - knowledge_kind: problem-evidence
     skill: skills/artifacts/problem-evidence/SKILL.md
 
+  - knowledge_kind: user-needs
+    skill: skills/artifacts/user-needs/SKILL.md
+
   - knowledge_kind: product-requirements
     skill: skills/artifacts/product-requirements/SKILL.md
 
@@ -17,6 +20,9 @@ routes:
 
   - knowledge_kind: application-design
     skill: skills/artifacts/application-design/SKILL.md
+
+  - knowledge_kind: task-model
+    skill: skills/artifacts/task-model/SKILL.md
 
   - knowledge_kind: user-journey-design
     skill: skills/artifacts/user-journey-design/SKILL.md
