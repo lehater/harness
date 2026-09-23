@@ -41,14 +41,16 @@ For each required view:
 7. define primary/secondary/destructive actions and their placement role;
 8. select reusable presentation/interaction patterns by id and explicitly bind provider/pattern features only when authorized by accepted screen semantics;
 9. define local list/table/form/detail/search/filter/selection composition where applicable and backed upstream;
-10. define state variants and map material server outcomes to accepted operation outcomes rather than inventing impossible states;
-11. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
-12. define focus/read-order consequences where composition changes;
-13. attach accepted reference/evidence anchors to the regions or states they actually constrain;
-14. define verification obligations for contract/semantic/rendered realization when material;
-15. classify remaining choices as controlled freedom or ordinary implementation detail;
-16. record local overrides only with rationale;
-17. route missing upstream semantics as Questions.
+10. define state variants and map every material machine-operation outcome to a user-visible state/transition or an explicit non-applicable rationale; do not let an accepted response disappear into a generic implementation fallback;
+11. when a displayed or edited value is an entity reference, define stable identity, human-readable display identity, candidate source/search semantics, dependency semantics for dependent/workflow selection, submitted stable value and owning command;
+12. trace the screen to accepted user tasks and require deterministic entry/parent/direct-link semantics from the canonical navigation contract; authoring/workflow routes require explicit success and cancel transitions or justified non-applicability;
+13. define responsive transformations by semantic effect, not CSS breakpoint mechanics;
+14. define focus/read-order consequences where composition changes;
+15. attach accepted reference/evidence anchors to the regions or states they actually constrain;
+16. define verification obligations for contract/semantic/rendered realization when material;
+17. classify remaining choices as controlled freedom or ordinary implementation detail;
+18. record local overrides only with rationale;
+19. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -80,7 +82,9 @@ Machine-readable YAML/JSON is preferred when it can express:
 - semantic Screen/View Model/source mappings when material;
 - allowed capabilities with backing semantics and material exclusions;
 - patterns plus material nesting/slot composition and authorized feature bindings;
-- states/variants and material outcome mappings;
+- task references plus canonical navigation entry/parent/direct-link and success/cancel semantics;
+- reference interaction contracts for every material displayed/selected entity reference;
+- states/variants plus exhaustive material operation-outcome mappings or justified exclusions;
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
 - overrides with rationale;
@@ -100,6 +104,9 @@ The contract should be sufficient to generate review projections such as a scree
 - primary catalogue row opening resolves to a dedicated detail navigation capability by default;
 - inline editing in a primary catalogue is accepted only when command-backed and explicitly authorized by a Screen/View override with rationale when the inherited Presentation System requires one;
 - declared server-backed states do not reference impossible operation outcomes;
+- every accepted machine-operation response has user-visible state/transition semantics or a justified explicit exclusion;
+- every selection reference has an authoritative candidate source, explicit search/bounded-set semantics and submitted stable identity; composite task subjects may use a non-empty list of stable identity parts; dependent/workflow selections declare their dependencies rather than relying on implementation inference;
+- authoring/workflow routes have deterministic parent, direct-link, success and cancel behavior;
 - local deviation is explicit and justified;
 - composition is concrete enough that implementation does not need to invent material hierarchy/pattern/layout decisions;
 - listing a pattern id without the material screen-specific composition it requires is insufficient;

@@ -33,13 +33,15 @@ Read canonical sources needed to establish user-visible interaction semantics. E
 7. Define validation, confirmation, cancellation, retry and destructive-action safeguards where accepted semantics require them.
 8. Define semantic interaction patterns and focus/keyboard/input behavior where applicable.
 9. Define responsive/adaptive behavior only where supported platform constraints require it.
-10. Map machine/application outcomes to user-visible semantic outcomes without exposing transport codes as product meaning.
-11. Identify where shared presentation or concrete screen composition remains materially undecided. Route reusable application-level presentation choices to `presentation-system-design` and concrete view composition to `screen-view-design`; do not silently absorb those decisions into this artifact.
-12. Low-fidelity diagrams may illustrate accepted semantics, but presentation hierarchy/layout belongs to the downstream presentation/screen contracts when it is material.
-13. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
-14. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
-15. Route missing product/domain/security/quality decisions upstream as Questions.
-16. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
+10. Map machine/application outcomes to user-visible semantic outcomes without exposing transport codes as product meaning; require every accepted outcome to be represented or explicitly declared non-applicable.
+11. For every user-facing entity reference, define stable technical identity, recognizable display identity when one exists, candidate-source/search semantics for selection, dependency semantics for dependent/workflow choices, and the stable value submitted to the authoritative command.
+12. Define canonical entry/parent/direct-link behavior and success/cancel transitions for authoring/workflow contexts; browser history is an implementation convenience, not navigation authority.
+13. Identify where shared presentation or concrete screen composition remains materially undecided. Route reusable application-level presentation choices to `presentation-system-design` and concrete view composition to `screen-view-design`; do not silently absorb those decisions into this artifact.
+14. Low-fidelity diagrams may illustrate accepted semantics, but presentation hierarchy/layout belongs to the downstream presentation/screen contracts when it is material.
+15. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
+16. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
+17. Route missing product/domain/security/quality decisions upstream as Questions.
+18. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
 
 ## Stop conditions
 
@@ -62,6 +64,8 @@ A useful human-interface design includes:
 - view states;
 - state transitions;
 - actions and interaction outcomes;
+- reference display/selection/dependency semantics;
+- deterministic entry/parent/direct-link plus success/cancel navigation semantics;
 - validation/error/recovery representation;
 - semantic interaction patterns;
 - authorization-sensitive visibility/interaction behavior;

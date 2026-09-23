@@ -78,6 +78,30 @@ OPENAPI = {
     },
 }
 
+
+NAVIGATION = {
+    "version": 1,
+    "kind": "ui-navigation-model",
+    "journeys": [{"id": "RESOURCE-MANAGEMENT"}],
+    "routes": [
+        {
+            "path": "/resources",
+            "workspace": "RESOURCE-CATALOGUE",
+            "parent": {
+                "state": "not-applicable",
+                "rationale": "top-level fixture workspace",
+            },
+            "direct_link": "canonical",
+        },
+        {
+            "path": "/resources/{resourceRef}",
+            "workspace": "RESOURCE-DETAIL",
+            "parent": "navigation:resource-catalogue",
+            "direct_link": "canonical",
+        },
+    ],
+}
+
 SCREENS = {
     "version": 1,
     "kind": "screen-view-design",
@@ -409,6 +433,170 @@ def main() -> int:
     )
     assert "PRIMARY_CATALOGUE_INLINE_EDIT_REQUIRES_OVERRIDE" in codes(result)
 
+
+
+    strict = deepcopy(SCREENS)
+    strict["screens"][0]["semantic_contract"]["task_refs"] = ["RESOURCE-MANAGEMENT"]
+    strict["screens"][0]["semantic_contract"]["outcome_mapping"] = {
+        "command:create-resource.201": "navigation:resource-detail",
+        "command:create-resource.403": "state:error",
+        "command:create-resource.409": "state:error",
+    }
+    strict["screens"][0]["semantic_contract"]["references"] = [
+        {
+            "id": "related-resource",
+            "use": "selection",
+            "identity": "resourceRef",
+            "display": {
+                "primary": "displayName",
+                "technical_identity": "resourceRef",
+            },
+            "candidates": {
+                "operation_id": "listResources",
+                "mode": "independent",
+                "search": "server-backed",
+            },
+            "submitted_value": "resourceRef",
+            "submits_to": "command:create-resource",
+        }
+    ]
+    strict["screens"][0]["composition"] = {
+        "fixture-field": {
+            "id": "related-resource",
+            "selection": {"contract": "related-resource"},
+        }
+    }
+    strict["screens"][1]["semantic_contract"]["task_refs"] = ["RESOURCE-MANAGEMENT"]
+    strict["screens"][1]["semantic_contract"]["outcome_mapping"] = {
+        "read:resource-detail.403": "state:error",
+    }
+    strict_result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        strict,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert strict_result["status"] == "ACCEPTED", strict_result
+
+    missing_action = deepcopy(strict)
+    missing_action["screens"][0]["semantic_contract"]["capabilities"]["allowed"] = [
+        row
+        for row in missing_action["screens"][0]["semantic_contract"]["capabilities"]["allowed"]
+        if row["id"] != "create-resource"
+    ]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        missing_action,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert "UNEXPOSED_COMMAND_SEMANTICS" in codes(result)
+
+
+    composite_reference = deepcopy(strict)
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["identity"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["display"]["technical_identity"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["submitted_value"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        composite_reference,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert result["status"] == "ACCEPTED", result
+
+    candidate_read_source = deepcopy(strict)
+    candidate_read_source["screens"][0]["semantic_contract"]["references"][0]["candidates"] = {
+        "source": "read:catalogue.items",
+        "mode": "independent",
+        "search": "bounded-current-read",
+    }
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        candidate_read_source,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert result["status"] == "ACCEPTED", result
+
+    missing_candidates = deepcopy(strict)
+    del missing_candidates["screens"][0]["semantic_contract"]["references"][0]["candidates"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        missing_candidates,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert "MISSING_REFERENCE_CANDIDATES" in codes(result)
+
+    missing_dependency = deepcopy(strict)
+    missing_dependency["screens"][0]["semantic_contract"]["references"][0]["candidates"]["mode"] = "dependent"
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        missing_dependency,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert "MISSING_REFERENCE_DEPENDENCY" in codes(result)
+
+    missing_outcome = deepcopy(strict)
+    del missing_outcome["screens"][0]["semantic_contract"]["outcome_mapping"]["command:create-resource.409"]
+    strict_missing_outcome_result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        missing_outcome,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert "UNMAPPED_OPERATION_OUTCOME" in codes(strict_missing_outcome_result)
+
+    missing_task = deepcopy(strict)
+    missing_task["screens"][0]["semantic_contract"]["task_refs"] = ["UNKNOWN-TASK"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        missing_task,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=NAVIGATION,
+        require_interaction_closure=True,
+    )
+    assert "UNKNOWN_TASK_REF" in codes(result)
+
+    incomplete_navigation = deepcopy(NAVIGATION)
+    incomplete_navigation["routes"][0]["mode"] = "create"
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        strict,
+        OPENAPI,
+        screen_ids={"RESOURCE-CATALOGUE", "RESOURCE-DETAIL"},
+        navigation_contract=incomplete_navigation,
+        require_interaction_closure=True,
+    )
+    assert "MISSING_ROUTE_SUCCESS" in codes(result)
+    assert "MISSING_ROUTE_CANCEL" in codes(result)
+
     evidence = semantic_evaluation(
         accepted,
         artifact="SCREENS",
@@ -421,7 +609,7 @@ def main() -> int:
     ]
 
     rejected_evidence = semantic_evaluation(
-        evaluate_frontend_screen_contracts(PRESENTATION, absent_query, OPENAPI),
+        strict_missing_outcome_result,
         artifact="SCREENS",
         capability="frontend.screen-view",
         semantic_claims=["engineering.interface.human.screen-composition"],
