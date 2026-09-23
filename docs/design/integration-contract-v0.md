@@ -170,3 +170,36 @@ Names such as `*-pilot`, experimental mutation workflows, research findings and 
 ## Versioning
 
 This is Integration Contract v0. Breaking changes to the logical Engineering Graph/Core boundary require an explicit contract revision and consumer migration. Additive tooling or new distribution mechanisms do not by themselves change the semantic contract.
+
+
+## Strict semantic admission and currentness
+
+Structural Core/Target-State evaluation remains backward compatible for
+migration and graph inspection. It is no longer sufficient by itself to claim
+full implementation-documentation closure for routed engineering knowledge.
+
+For every selected Consumer capability whose `knowledge_kind` is registered
+to an active artifact skill:
+
+- a provider must have ACCEPTED strict semantic-admission evidence;
+- the admission must derive allowed source Authorities from the Engineering
+  Graph production prerequisites rather than from a hand-maintained allowlist;
+- referenced canonical source assertions must identify their source artifact and
+  agree with its Authority ownership;
+- candidate writes and canonical references must stay inside the derived
+  Authority execution context;
+- required judgement checks from the knowledge-kind semantic contract must be
+  explicitly accepted;
+- the provider must have a CURRENT capability lifecycle assertion whose
+  acceptance identity matches the semantic admission;
+- its recorded prerequisite acceptance identities must match the currently
+  selected prerequisite identities.
+
+Missing admission evidence is not interpreted as semantic rejection; it is
+insufficient proof for strict closure. Upstream supersession makes direct
+consumers STALE/REVALIDATE and prevents downstream CURRENT closure until their
+owning Authorities revalidate.
+
+The canonical strict check is `semantic_closure.py`. Projects may wrap it in
+their own CI entrypoint, but a green structural target alone must not be
+presented as full engineering closure.

@@ -20,6 +20,7 @@ contract:
         - obligations
         - compatibility_obligations
         - requires_semantic_review
+        - required_semantic_review_checks
         - allowed_source_authorities
         - requires_source_authority
         - requires_assertion_authority
@@ -43,6 +44,7 @@ contract:
         semantic_value: optional
         derived_from: optional
         decision_authority: optional
+        source_artifact: optional-for-source-assertions
       rule: >-
         Only material assertions establishing the capability need machine
         addressability. Arbitrary prose sentences do not.
@@ -88,17 +90,20 @@ contract:
       - INVENTED_ASSERTION
       - MISSING_DECISION_AUTHORITY
       - WRONG_AUTHORITY_OWNERSHIP
+      - CROSS_AUTHORITY_OWNERSHIP_CONFLICT
       - SOURCE_FIDELITY_VIOLATION
       - INTERNAL_CONTRADICTION
       - CROSS_ARTIFACT_CONTRADICTION
       - INCOMPATIBLE_CONSUMER_CONTRACT
       - SEMANTIC_REVIEW_REQUIRED
+      - SEMANTIC_REVIEW_CHECKS_MISSING
       - SEMANTIC_REVIEW_REJECTED
 
 integration:
   legacy_mode: >-
-    A capability with no semantic-evaluation evidence retains pre-existing
-    realization behavior during migration.
+    A capability with no semantic-evaluation evidence may retain pre-existing
+    structural realization behavior during migration, but it cannot satisfy the
+    strict semantic/currentness closure used to claim full engineering closure.
   opt_in_rule: >-
     Once evaluation evidence exists for an artifact/capability, REJECTED evidence
     prevents that provider from realizing the capability.
@@ -111,6 +116,12 @@ integration:
     Stakeholder confirmation does not change which Authority owns the meaning of
     a statement; a downstream decision must stay downstream unless Product
     Requirements independently accepts an observable product choice.
+  strict_admission_rule: >-
+    Routed artifact production must use the strict semantic-admission path when
+    full engineering closure is claimed. That path derives admissible source
+    Authorities from Engineering Graph prerequisites, validates canonical
+    read/write provenance, requires the knowledge-kind semantic review contract,
+    and records a capability acceptance identity plus prerequisite baseline.
   coverage_rule: >-
     Engineering Coverage may use a semantic claim only from an ACCEPTED
     evaluation that explicitly accepts that claim.

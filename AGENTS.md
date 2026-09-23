@@ -61,6 +61,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
 - `docs/design/graph-doctor-v1.md` — canonical aggregate graph/model diagnostic contract.
+- `docs/design/capability-lifecycle-projection-v1.md` — canonical Capability acceptance-baseline currentness contract.
 - `docs/design/human-documentation-projection-v1.md` — canonical source-bounded human documentation projection contract.
 - `profiles/**` — reusable starter Design Profiles.
 - `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.

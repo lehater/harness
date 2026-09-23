@@ -205,6 +205,24 @@ def evaluate_artifact(
 
             if (
                 semantic_key(source) == semantic_key(assertion)
+                and isinstance(source_authority, str)
+                and source_authority
+                and isinstance(assertion_authority, str)
+                and assertion_authority
+                and source_authority != assertion_authority
+            ):
+                findings.append(
+                    {
+                        "code": "CROSS_AUTHORITY_OWNERSHIP_CONFLICT",
+                        "assertion": assertion_id,
+                        "source": source_id,
+                        "assertion_authority": assertion_authority,
+                        "source_authority": source_authority,
+                    }
+                )
+
+            if (
+                semantic_key(source) == semantic_key(assertion)
                 and source.get("semantic_value") is not None
                 and assertion.get("semantic_value") != source.get("semantic_value")
             ):
@@ -275,6 +293,29 @@ def evaluate_artifact(
     if contract.get("requires_semantic_review"):
         if not isinstance(review, dict) or review.get("status") != "ACCEPTED":
             findings.append({"code": "SEMANTIC_REVIEW_REQUIRED"})
+
+    required_review_checks = set(
+        contract.get("required_semantic_review_checks", []) or []
+    )
+    if required_review_checks:
+        completed_checks = set()
+        if isinstance(review, dict):
+            checks = review.get("checks", []) or []
+            if isinstance(checks, list):
+                completed_checks = {
+                    value for value in checks
+                    if isinstance(value, str) and value
+                }
+        missing_review_checks = sorted(
+            required_review_checks - completed_checks
+        )
+        if missing_review_checks:
+            findings.append(
+                {
+                    "code": "SEMANTIC_REVIEW_CHECKS_MISSING",
+                    "checks": missing_review_checks,
+                }
+            )
     if isinstance(review, dict) and review.get("status") == "REJECTED":
         findings.append(
             {

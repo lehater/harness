@@ -215,6 +215,46 @@ def test_authority_direction_regressions():
     assert "MISSING_DECISION_AUTHORITY" in codes(result)
 
 
+    # Two Authorities must not silently claim ownership of the same
+    # machine-addressable semantic assertion kind+subject.
+    ownership_contract = {
+        "authority": "DOMAIN-A",
+        "allowed_source_authorities": ["DOMAIN-A", "DOMAIN-B"],
+        "requires_source_authority": True,
+        "requires_assertion_authority": True,
+    }
+    ownership_sources = {
+        "semantic_assertions": [
+            {
+                "id": "B-IDENTITY",
+                "kind": "domain-invariant",
+                "subject": "Resource.identity",
+                "semantic_value": "stable",
+                "decision_authority": "DOMAIN-B",
+            }
+        ]
+    }
+    ownership_candidate = {
+        "id": "DOMAIN-A",
+        "capability": "domain.a",
+        "semantic_assertions": [
+            {
+                "id": "A-IDENTITY",
+                "kind": "domain-invariant",
+                "subject": "Resource.identity",
+                "semantic_value": "stable",
+                "derived_from": ["B-IDENTITY"],
+                "decision_authority": "DOMAIN-A",
+            }
+        ],
+    }
+    result = evaluate_artifact(
+        ownership_contract, ownership_sources, ownership_candidate
+    )
+    assert result["status"] == "REJECTED"
+    assert "CROSS_AUTHORITY_OWNERSHIP_CONFLICT" in codes(result)
+
+
 def test_coverage_gating_and_invalidation():
     graph={
         "kind":"harness-engineering-graph",
