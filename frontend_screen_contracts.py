@@ -400,6 +400,466 @@ def _validate_source(
                         )
 
 
+
+def _explicit_not_applicable(value: Any) -> bool:
+    return (
+        isinstance(value, dict)
+        and value.get("state") == "not-applicable"
+        and isinstance(value.get("rationale"), str)
+        and bool(value["rationale"].strip())
+    )
+
+
+def _navigation_task_ids(navigation_contract: dict[str, Any] | None) -> set[str]:
+    if not navigation_contract:
+        return set()
+    return {
+        row.get("id")
+        for row in (navigation_contract.get("journeys", []) or [])
+        if isinstance(row, dict) and isinstance(row.get("id"), str) and row.get("id")
+    }
+
+
+def _validate_navigation_closure(
+    navigation_contract: dict[str, Any] | None,
+    *,
+    screen_ids: set[str],
+    findings: list[dict[str, Any]],
+) -> None:
+    if not isinstance(navigation_contract, dict):
+        _finding(
+            findings,
+            "MISSING_NAVIGATION_CONTRACT",
+            "strict frontend interaction closure requires a canonical navigation contract",
+        )
+        return
+
+    routes = navigation_contract.get("routes", []) or []
+    if not isinstance(routes, list):
+        _finding(findings, "INVALID_NAVIGATION_ROUTES", "navigation routes must be a list")
+        return
+
+    covered: set[str] = set()
+    for route in routes:
+        if not isinstance(route, dict):
+            _finding(findings, "INVALID_NAVIGATION_ROUTE", "navigation route must be a mapping")
+            continue
+        workspace = route.get("workspace")
+        if workspace not in screen_ids:
+            continue
+        covered.add(workspace)
+        path = route.get("path")
+        context = f"route {path or '<unknown>'}"
+        parent = route.get("parent")
+        if not (
+            isinstance(parent, str)
+            and bool(parent.strip())
+            or _explicit_not_applicable(parent)
+        ):
+            _finding(
+                findings,
+                "MISSING_ROUTE_PARENT",
+                f"{context} requires deterministic parent navigation or explicit not-applicable rationale",
+                screen=workspace,
+            )
+        direct_link = route.get("direct_link")
+        if not (
+            isinstance(direct_link, str)
+            and bool(direct_link.strip())
+            or _explicit_not_applicable(direct_link)
+        ):
+            _finding(
+                findings,
+                "MISSING_DIRECT_LINK_SEMANTICS",
+                f"{context} requires explicit direct-link behavior",
+                screen=workspace,
+            )
+
+        if route.get("mode"):
+            for key, code in (
+                ("success", "MISSING_ROUTE_SUCCESS"),
+                ("cancel", "MISSING_ROUTE_CANCEL"),
+            ):
+                value = route.get(key)
+                if not (
+                    isinstance(value, str)
+                    and bool(value.strip())
+                    or _explicit_not_applicable(value)
+                ):
+                    _finding(
+                        findings,
+                        code,
+                        f"{context} mode {route.get('mode')} requires explicit {key} transition or not-applicable rationale",
+                        screen=workspace,
+                    )
+
+    for screen in sorted(screen_ids - covered):
+        _finding(
+            findings,
+            "MISSING_SCREEN_ROUTE",
+            "strict frontend interaction closure requires at least one canonical route for the screen",
+            screen=screen,
+        )
+
+
+def _walk_reference_bindings(value: Any, *, path: str = "composition") -> list[tuple[str, str | None, str]]:
+    result: list[tuple[str, str | None, str]] = []
+    if isinstance(value, dict):
+        selection = value.get("selection")
+        if selection is not None:
+            contract_id = selection.get("contract") if isinstance(selection, dict) else None
+            result.append(("selection", contract_id if isinstance(contract_id, str) else None, path))
+        if "primary" in value and "technical_identity" in value:
+            contract_id = value.get("reference_contract")
+            result.append(("display", contract_id if isinstance(contract_id, str) else None, path))
+        for key, child in value.items():
+            result.extend(_walk_reference_bindings(child, path=f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            result.extend(_walk_reference_bindings(child, path=f"{path}[{index}]"))
+    return result
+
+
+def _validate_reference_contracts(
+    *,
+    row: dict[str, Any],
+    contract: dict[str, Any],
+    screen: str,
+    commands: dict[str, dict[str, Any]],
+    operations: set[str],
+    findings: list[dict[str, Any]],
+) -> None:
+    raw = contract.get("references", []) or []
+    if not isinstance(raw, list):
+        _finding(findings, "INVALID_REFERENCE_CONTRACTS", "semantic_contract.references must be a list", screen=screen)
+        raw = []
+
+    references = _ids(raw, screen=screen, kind="reference", findings=findings)
+    for reference_id, reference in references.items():
+        use = reference.get("use")
+        if use not in {"display", "selection", "display-selection"}:
+            _finding(
+                findings,
+                "INVALID_REFERENCE_USE",
+                f"reference {reference_id} requires use display, selection or display-selection",
+                screen=screen,
+            )
+        identity = reference.get("identity")
+        if not isinstance(identity, str) or not identity:
+            _finding(
+                findings,
+                "MISSING_REFERENCE_IDENTITY",
+                f"reference {reference_id} requires stable identity semantics",
+                screen=screen,
+            )
+
+        display = reference.get("display")
+        if not isinstance(display, dict):
+            _finding(
+                findings,
+                "MISSING_REFERENCE_DISPLAY",
+                f"reference {reference_id} requires human-readable display semantics or explicit stable-identity-only rationale",
+                screen=screen,
+            )
+        else:
+            primary = display.get("primary")
+            stable_only = display.get("stable_identity_only") is True
+            has_primary = isinstance(primary, str) and bool(primary) or (
+                isinstance(primary, list)
+                and bool(primary)
+                and all(isinstance(item, str) and item for item in primary)
+            )
+            if not has_primary and not (
+                stable_only
+                and isinstance(display.get("rationale"), str)
+                and bool(display["rationale"].strip())
+            ):
+                _finding(
+                    findings,
+                    "MISSING_REFERENCE_DISPLAY_IDENTITY",
+                    f"reference {reference_id} requires display.primary or justified stable_identity_only",
+                    screen=screen,
+                )
+            if not isinstance(display.get("technical_identity"), str) or not display.get("technical_identity"):
+                _finding(
+                    findings,
+                    "MISSING_REFERENCE_TECHNICAL_IDENTITY",
+                    f"reference {reference_id} requires display.technical_identity",
+                    screen=screen,
+                )
+
+        if use in {"selection", "display-selection"}:
+            candidates = reference.get("candidates")
+            if not isinstance(candidates, dict):
+                _finding(
+                    findings,
+                    "MISSING_REFERENCE_CANDIDATES",
+                    f"selection reference {reference_id} requires candidate-source semantics",
+                    screen=screen,
+                )
+            else:
+                mode = candidates.get("mode")
+                if mode not in {"independent", "dependent", "workflow"}:
+                    _finding(
+                        findings,
+                        "INVALID_REFERENCE_CANDIDATE_MODE",
+                        f"selection reference {reference_id} requires independent, dependent or workflow candidate mode",
+                        screen=screen,
+                    )
+                operation_id = candidates.get("operation_id")
+                source = candidates.get("source")
+                if not (
+                    isinstance(operation_id, str)
+                    and operation_id
+                    or isinstance(source, str)
+                    and source
+                ):
+                    _finding(
+                        findings,
+                        "MISSING_REFERENCE_CANDIDATE_SOURCE",
+                        f"selection reference {reference_id} requires candidates.operation_id or candidates.source",
+                        screen=screen,
+                    )
+                if (
+                    isinstance(operation_id, str)
+                    and operation_id
+                    and operation_id not in operations
+                ):
+                    _finding(
+                        findings,
+                        "UNKNOWN_REFERENCE_CANDIDATE_OPERATION",
+                        f"selection reference {reference_id} references absent operationId {operation_id}",
+                        screen=screen,
+                    )
+                search = candidates.get("search")
+                if not isinstance(search, str) or not search:
+                    _finding(
+                        findings,
+                        "MISSING_REFERENCE_SEARCH_SEMANTICS",
+                        f"selection reference {reference_id} requires explicit search/bounded-candidate semantics",
+                        screen=screen,
+                    )
+                depends_on = candidates.get("depends_on", []) or []
+                if mode in {"dependent", "workflow"} and not (
+                    isinstance(depends_on, list)
+                    and depends_on
+                    and all(isinstance(item, str) and item for item in depends_on)
+                ):
+                    _finding(
+                        findings,
+                        "MISSING_REFERENCE_DEPENDENCY",
+                        f"{mode} reference {reference_id} requires explicit depends_on semantics",
+                        screen=screen,
+                    )
+
+            submitted = reference.get("submitted_value")
+            if not (
+                isinstance(submitted, str)
+                and submitted
+                or isinstance(submitted, list)
+                and submitted
+                and all(isinstance(item, str) and item for item in submitted)
+            ):
+                _finding(
+                    findings,
+                    "MISSING_REFERENCE_SUBMITTED_VALUE",
+                    f"selection reference {reference_id} requires submitted stable identity field(s)",
+                    screen=screen,
+                )
+            _validate_source(
+                reference.get("submits_to"),
+                screen=screen,
+                reads=set(),
+                commands=set(commands),
+                findings=findings,
+                context=f"reference.{reference_id}.submits_to",
+            )
+
+    for reference_id, reference in references.items():
+        candidates = reference.get("candidates")
+        if not isinstance(candidates, dict):
+            continue
+        for dependency in candidates.get("depends_on", []) or []:
+            if dependency not in references:
+                _finding(
+                    findings,
+                    "UNKNOWN_REFERENCE_DEPENDENCY",
+                    f"reference {reference_id} depends on unknown reference {dependency}",
+                    screen=screen,
+                )
+
+    for binding_kind, contract_id, path in _walk_reference_bindings(row.get("composition", {})):
+        if not contract_id:
+            _finding(
+                findings,
+                "MISSING_REFERENCE_BINDING",
+                f"{path} declares {binding_kind} reference interaction without a reference contract id",
+                screen=screen,
+            )
+        elif contract_id not in references:
+            _finding(
+                findings,
+                "UNKNOWN_REFERENCE_BINDING",
+                f"{path} references unknown semantic reference contract {contract_id}",
+                screen=screen,
+            )
+
+
+def _collect_strings(value: Any) -> list[str]:
+    result: list[str] = []
+    if isinstance(value, str):
+        result.append(value)
+    elif isinstance(value, dict):
+        for child in value.values():
+            result.extend(_collect_strings(child))
+    elif isinstance(value, list):
+        for child in value:
+            result.extend(_collect_strings(child))
+    return result
+
+
+def _validate_operation_outcome_coverage(
+    *,
+    contract: dict[str, Any],
+    screen: str,
+    reads: dict[str, dict[str, Any]],
+    commands: dict[str, dict[str, Any]],
+    binding_operations: dict[tuple[str, str], str],
+    response_codes: dict[str, set[str]],
+    allowed: dict[str, dict[str, Any]],
+    findings: list[dict[str, Any]],
+) -> None:
+    explicit_sources = set(_collect_strings(contract.get("state_mapping", {})))
+    outcome_mapping = contract.get("outcome_mapping", {}) or {}
+    if not isinstance(outcome_mapping, dict):
+        _finding(findings, "INVALID_OUTCOME_MAPPING", "semantic_contract.outcome_mapping must be a mapping", screen=screen)
+        outcome_mapping = {}
+    for source in outcome_mapping:
+        _validate_source(
+            source,
+            screen=screen,
+            reads=set(reads),
+            commands=set(commands),
+            findings=findings,
+            context="outcome_mapping",
+            binding_operations=binding_operations,
+            response_codes=response_codes,
+        )
+        if isinstance(source, str):
+            explicit_sources.add(source)
+
+    exclusions = contract.get("outcome_exclusions", []) or []
+    excluded_sources: set[str] = set()
+    if not isinstance(exclusions, list):
+        _finding(findings, "INVALID_OUTCOME_EXCLUSIONS", "semantic_contract.outcome_exclusions must be a list", screen=screen)
+        exclusions = []
+    for exclusion in exclusions:
+        if not isinstance(exclusion, dict):
+            _finding(findings, "INVALID_OUTCOME_EXCLUSION", "outcome exclusion must be a mapping", screen=screen)
+            continue
+        source = exclusion.get("source")
+        rationale = exclusion.get("rationale")
+        if not isinstance(source, str) or not source:
+            _finding(findings, "INVALID_OUTCOME_EXCLUSION", "outcome exclusion requires source", screen=screen)
+            continue
+        if not isinstance(rationale, str) or not rationale.strip():
+            _finding(findings, "MISSING_OUTCOME_EXCLUSION_RATIONALE", f"{source} exclusion requires rationale", screen=screen)
+        _validate_source(
+            source,
+            screen=screen,
+            reads=set(reads),
+            commands=set(commands),
+            findings=findings,
+            context="outcome_exclusion",
+            binding_operations=binding_operations,
+            response_codes=response_codes,
+        )
+        excluded_sources.add(source)
+
+    for kind, bindings in (("read", reads), ("command", commands)):
+        for binding_id in bindings:
+            operation_id = binding_operations.get((kind, binding_id))
+            if not operation_id:
+                continue
+            for code in sorted(response_codes.get(operation_id, set())):
+                prefix = f"{kind}:{binding_id}.{code}"
+                if not any(source.startswith(prefix) for source in explicit_sources | excluded_sources):
+                    _finding(
+                        findings,
+                        "UNMAPPED_OPERATION_OUTCOME",
+                        f"{kind} {binding_id} operation {operation_id} response {code} has no UI state/transition or explicit non-applicable rationale",
+                        screen=screen,
+                    )
+
+    command_backings = {
+        parsed[1]
+        for capability in allowed.values()
+        for parsed in [_source_root(capability.get("backed_by")) if isinstance(capability.get("backed_by"), str) else None]
+        if parsed is not None and parsed[0] == "command"
+    }
+    for command_id in sorted(set(commands) - command_backings):
+        _finding(
+            findings,
+            "UNEXPOSED_COMMAND_SEMANTICS",
+            f"command {command_id} has no allowed user-visible capability",
+            screen=screen,
+        )
+
+
+def _validate_interaction_closure(
+    *,
+    row: dict[str, Any],
+    contract: dict[str, Any],
+    screen: str,
+    navigation_contract: dict[str, Any] | None,
+    operations: set[str],
+    reads: dict[str, dict[str, Any]],
+    commands: dict[str, dict[str, Any]],
+    binding_operations: dict[tuple[str, str], str],
+    response_codes: dict[str, set[str]],
+    allowed: dict[str, dict[str, Any]],
+    findings: list[dict[str, Any]],
+) -> None:
+    task_refs = contract.get("task_refs", []) or []
+    if not (
+        isinstance(task_refs, list)
+        and task_refs
+        and all(isinstance(item, str) and item for item in task_refs)
+    ):
+        _finding(findings, "MISSING_TASK_TRACE", "strict frontend interaction closure requires semantic_contract.task_refs", screen=screen)
+    else:
+        accepted = _navigation_task_ids(navigation_contract)
+        if accepted:
+            for task_ref in task_refs:
+                if task_ref not in accepted:
+                    _finding(
+                        findings,
+                        "UNKNOWN_TASK_REF",
+                        f"task ref {task_ref} is absent from the accepted journey/task inventory",
+                        screen=screen,
+                    )
+
+    _validate_reference_contracts(
+        row=row,
+        contract=contract,
+        screen=screen,
+        commands=commands,
+        operations=operations,
+        findings=findings,
+    )
+    _validate_operation_outcome_coverage(
+        contract=contract,
+        screen=screen,
+        reads=reads,
+        commands=commands,
+        binding_operations=binding_operations,
+        response_codes=response_codes,
+        allowed=allowed,
+        findings=findings,
+    )
+
+
+
 def evaluate_presentation_provider_contract(
     presentation: dict[str, Any],
     screen_design: dict[str, Any],
@@ -501,6 +961,8 @@ def evaluate_frontend_screen_contracts(
     *,
     screen_ids: set[str] | None = None,
     provider_contract: dict[str, Any] | None = None,
+    navigation_contract: dict[str, Any] | None = None,
+    require_interaction_closure: bool = False,
 ) -> dict[str, Any]:
     """Evaluate semantic closure while keeping provider realization subordinate to it."""
     findings: list[dict[str, Any]] = []
@@ -639,6 +1101,21 @@ def evaluate_frontend_screen_contracts(
         for capability_id in sorted(overlap):
             _finding(findings, "CAPABILITY_ALLOW_EXCLUDE_CONFLICT", f"{capability_id} is both allowed and excluded", screen=screen)
 
+        if require_interaction_closure:
+            _validate_interaction_closure(
+                row=row,
+                contract=contract,
+                screen=screen,
+                navigation_contract=navigation_contract,
+                operations=operations,
+                reads=reads,
+                commands=commands,
+                binding_operations=binding_operations,
+                response_codes=responses_by_operation,
+                allowed=allowed,
+                findings=findings,
+            )
+
         mappings = contract.get("pattern_mapping", []) or []
         if not isinstance(mappings, list) or not mappings:
             _finding(findings, "MISSING_PATTERN_MAPPING", "at least one presentation pattern mapping is required", screen=screen)
@@ -753,6 +1230,13 @@ def evaluate_frontend_screen_contracts(
         missing = sorted(screen_ids - set(evaluated))
         for screen in missing:
             _finding(findings, "MISSING_REQUIRED_SCREEN", "required screen not found in screen design", screen=screen)
+
+    if require_interaction_closure:
+        _validate_navigation_closure(
+            navigation_contract,
+            screen_ids=set(evaluated),
+            findings=findings,
+        )
 
     return {
         "version": 1,

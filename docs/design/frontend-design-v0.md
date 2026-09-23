@@ -146,6 +146,28 @@ Discovered gaps are routed to their semantic owners:
 
 A persistent quality/conformance CapabilityId is added only when the target project has an independently consumed durable contract.
 
+
+### Frontend interaction semantic closure
+
+Task, action, reference, navigation and outcome semantics do not form a new Authority or five independent mandatory knowledge kinds.
+
+- accepted user tasks remain owned by APPLICATION-DESIGN through `user-journey-design`;
+- navigation, actions, reference interaction and user-visible outcome semantics remain owned by INTERFACE-DESIGN through `human-interface-design`;
+- concrete screen realization remains owned by `screen-view-design`;
+- Domain/Application/Security/Machine Interface remain authoritative for business mutability, authorization, stable identities, commands and machine outcomes.
+
+For implementation-facing closure, the provider-neutral Screen/View evaluator may run in strict interaction-closure mode. In that mode it verifies:
+
+1. every screen traces to an accepted task/journey;
+2. every declared command is exposed through an accepted user-visible capability and every screen action is backed by read/command/navigation/local semantics;
+3. user-facing references declare stable identity, human-readable display identity or a justified stable-identity-only exception, candidate source/search semantics, dependency semantics for dependent/workflow selection, and submitted stable values;
+4. every accepted machine-operation response maps to a UI state/transition or an explicit non-applicable rationale;
+5. every canonical route has deterministic parent and direct-link behavior; authoring/workflow modes additionally define success and cancel transitions or justified non-applicability.
+
+These are semantic-acceptance checks on existing Interface Design knowledge. A rejected evaluation makes the Screen/View capability unusable, so downstream frontend architecture/component/test/implementation capabilities remain blocked through ordinary Engineering Graph dependency semantics.
+
+Visual task maps, workspace maps, action matrices, reference dependency maps and state-transition maps are generated projections of these contracts, never independent semantic authorities.
+
 ## Frontend architecture
 
 Use ordinary SYSTEM-ARCHITECTURE production for frontend-scoped architecture.
