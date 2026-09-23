@@ -502,6 +502,10 @@ def main() -> int:
         "resourceRef",
         "relatedResourceRef",
     ]
+    composite_reference["screens"][0]["semantic_contract"]["references"][0]["display"]["technical_identity"] = [
+        "resourceRef",
+        "relatedResourceRef",
+    ]
     composite_reference["screens"][0]["semantic_contract"]["references"][0]["submitted_value"] = [
         "resourceRef",
         "relatedResourceRef",

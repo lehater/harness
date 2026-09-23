@@ -588,11 +588,19 @@ def _validate_reference_contracts(
                     f"reference {reference_id} requires display.primary or justified stable_identity_only",
                     screen=screen,
                 )
-            if not isinstance(display.get("technical_identity"), str) or not display.get("technical_identity"):
+            technical_identity = display.get("technical_identity")
+            has_technical_identity = (
+                isinstance(technical_identity, str)
+                and bool(technical_identity)
+                or isinstance(technical_identity, list)
+                and bool(technical_identity)
+                and all(isinstance(item, str) and item for item in technical_identity)
+            )
+            if not has_technical_identity:
                 _finding(
                     findings,
                     "MISSING_REFERENCE_TECHNICAL_IDENTITY",
-                    f"reference {reference_id} requires display.technical_identity",
+                    f"reference {reference_id} requires display.technical_identity; composite identity may be a non-empty list",
                     screen=screen,
                 )
 
