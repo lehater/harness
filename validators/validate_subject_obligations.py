@@ -23,7 +23,7 @@ GRAPH={
     "id":"OBLIGATION-FIXTURE",
     "authorities":[
         {
-            "id":"INTERFACE-DESIGN",
+            "id":"MACHINE-INTERFACE-DESIGN",
             "produces":[
                 {
                     "capability":"fixture.ui.resource",
@@ -207,7 +207,7 @@ def main():
             "capability":"fixture.ui.application",
             "claim":"engineering.interface.human.journeys",
             "subject":"Application",
-            "authority":"INTERFACE-DESIGN",
+            "authority":"MACHINE-INTERFACE-DESIGN",
             "knowledge_kind":None,
             "requires":[],
             "missing_prerequisites":[],
