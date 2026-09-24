@@ -1,6 +1,6 @@
 ---
 name: implementation-design
-description: "Use for actionable CREATE work requiring implementation plan, slicing, migration concerns or completion criteria after upstream design is accepted. Translate accepted design into bounded executable work without reopening or inventing product/domain/architecture decisions."
+description: "Use for actionable CREATE work requiring implementation plan, slicing, repository realization or completion criteria after upstream design is accepted. Translate accepted design into bounded executable work without reopening or inventing product/domain/architecture decisions."
 ---
 
 # Implementation Design

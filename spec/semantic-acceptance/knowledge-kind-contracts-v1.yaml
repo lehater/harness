@@ -21,8 +21,12 @@ contracts:
     required_review_checks:
       - observable-product-level
       - no-downstream-design-promotion
-  - knowledge_kind: strategic-domain-design
-    required_review_checks: [strategic-not-tactical]
+  - knowledge_kind: domain-strategy
+    required_review_checks: [domain-strategy-not-model-context-or-tactical]
+  - knowledge_kind: model-context-strategy
+    required_review_checks: [model-context-not-domain-investment-or-tactical]
+  - knowledge_kind: concurrency-consistency-design
+    required_review_checks: [consistency-not-domain-or-topology-owner]
   - knowledge_kind: domain-use-case
     required_review_checks: [behavior-not-tactical]
   - knowledge_kind: application-design

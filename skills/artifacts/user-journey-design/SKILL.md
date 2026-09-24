@@ -7,7 +7,7 @@ description: "Use for actionable CREATE work requiring a canonical user-task/jou
 
 ## Trigger
 
-Use when actionable work has `knowledge_kind: user-journey-design` and Application Design must make user-goal-oriented interaction explicit before Interface Design.
+Use when actionable work has `knowledge_kind: user-journey-design` and Application Design must make user-goal-oriented interaction explicit before Human Interface Design.
 
 ## Inputs
 
@@ -74,7 +74,7 @@ A journey is not a screen flow.
 - no screen/page/modal decision is used as product semantics;
 - alternate and failure paths are represented when materially observable;
 - domain and authorization ownership remains upstream;
-- the result is sufficient for Interface Design to choose interaction/navigation structure without inventing product behavior.
+- the result is sufficient for Human Interface Design to choose interaction/navigation structure without inventing product behavior.
 
 ## Registration
 
@@ -82,4 +82,4 @@ Register under Application Design and provide only the user-journey capability a
 
 ## Human projection
 
-Prefer a concise goal-oriented journey narrative or state/interaction table. Screen diagrams remain downstream Interface Design projections.
+Prefer a concise goal-oriented journey narrative or state/interaction table. Screen diagrams remain downstream Human Interface Design projections.

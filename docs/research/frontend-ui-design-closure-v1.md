@@ -31,7 +31,7 @@ Owns actor/goal/task flow, alternatives and completion without deciding screens.
 
 ### B. Human Interface Design
 
-Already canonical under INTERFACE-DESIGN.
+Already canonical under HUMAN-INTERFACE-DESIGN.
 
 Owns information architecture, navigation, view boundaries, visible states, actions, transitions, validation/recovery, authorization-sensitive interaction, accessibility interaction semantics and adaptive semantics.
 
@@ -39,7 +39,7 @@ It answers **what the human interaction means**.
 
 ### C. Presentation System Design
 
-New knowledge kind under INTERFACE-DESIGN.
+New knowledge kind under HUMAN-INTERFACE-DESIGN.
 
 Owns reusable application-level presentation choices inherited by screens:
 - hierarchy/density/layout principles;
@@ -56,7 +56,7 @@ This is broader than Visual Style and smaller than a vendor-style Design System.
 
 ### D. Screen / View Design
 
-New knowledge kind under INTERFACE-DESIGN.
+New knowledge kind under HUMAN-INTERFACE-DESIGN.
 
 Owns local composition:
 - regions/sections/tabs/disclosures;
@@ -256,7 +256,7 @@ P3:
 ## Rejected alternatives
 
 - **One monolithic DESIGN-SYSTEM capability**: mixes visual foundations, interaction patterns, components and governance; poor applicability.
-- **New UI/UX Authority**: no independent semantic ownership/lifecycle beyond INTERFACE-DESIGN.
+- **New UI/UX Authority**: no independent semantic ownership/lifecycle beyond HUMAN-INTERFACE-DESIGN.
 - **Put all composition in Human Interface Design**: preserves current blind spot because shared vs local presentation knowledge is not separately complete.
 - **Pixel-perfect canonical screens/Figma**: overconstrains implementation and makes a tool/file format the authority.
 - **One capability per UI facet**: excessive graph/checklist complexity; facets should activate only when independently consumed/decidable.
@@ -264,7 +264,7 @@ P3:
 
 ## Minimal Harness change-set
 
-1. add `presentation-system-design` and `screen-view-design` knowledge kinds, both owned by INTERFACE-DESIGN;
+1. add `presentation-system-design` and `screen-view-design` knowledge kinds, both owned by HUMAN-INTERFACE-DESIGN;
 2. register skills for each;
 3. make frontend example graph require Presentation System + Screen/View closure before architecture;
 4. extend verification/test dependencies to accepted screen/presentation contracts;

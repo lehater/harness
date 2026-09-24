@@ -7,7 +7,7 @@ description: "Use for actionable CREATE work that makes architecture-significant
 
 ## Trigger
 
-Use when actionable work has `knowledge_kind: quality-design` and performance, availability, scale, consistency, reliability or another realization quality constraint needs independent pre-code ownership.
+Use when actionable work has `knowledge_kind: quality-design` and performance, availability, scale, staleness tolerance, reliability or another realization quality constraint needs independent pre-code ownership.
 
 ## Inputs
 
@@ -25,9 +25,9 @@ Start from accepted consumer/product/design needs. Existing benchmarks, infrastr
 1. Enumerate quality dimensions that can materially constrain realization for the selected scope.
 2. Trace each applicable constraint to an accepted upstream need or external constraint.
 3. Express measurable target/boundary only when evidence supplies one; never invent latency, throughput, availability, RPO/RTO or dataset scale.
-4. For correctness-adjacent concerns (consistency, boundedness, degradation, recovery), separate semantic requirement from implementation mechanism.
+4. For correctness-adjacent concerns (staleness tolerance, boundedness, degradation, recovery), own only measurable/qualitative quality targets. Route interacting-execution correctness semantics to CONCURRENCY-CONSISTENCY-DESIGN and separate every target from its implementation mechanism.
 5. Classify non-applicable or currently unquantified concerns explicitly; use DEFERRED_NONBLOCKING only with a reopening condition and when current implementation does not need the missing value.
-6. Route product-visible policy upstream, runtime evidence to Operability, structural response to System, physical realization to Data/Implementation and proof to Verification.
+6. Route product-visible policy upstream, runtime evidence to Operability, structural response to System, concurrent-state correctness to CONCURRENCY-CONSISTENCY-DESIGN, physical realization to Data/Implementation and proof to Verification.
 7. State implementation freedoms.
 8. Produce/register the project-native quality contract and reevaluate.
 
@@ -40,7 +40,7 @@ Stop and create/route a Question when implementation needs a numeric or qualitat
 Useful content may include:
 - applicable quality constraints;
 - measurable targets/boundaries when accepted;
-- consistency/reliability/capacity constraints;
+- staleness/reliability/capacity and other quality constraints;
 - NOT_APPLICABLE/DEFERRED_NONBLOCKING decisions with reopening conditions;
 - downstream architecture/operability/verification obligations;
 - implementation freedoms;

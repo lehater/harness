@@ -1,0 +1,56 @@
+version: 1
+kind: authority-applicability-granularity-research
+id: AUTHORITY-APPLICABILITY-GRANULARITY-V1
+hypothesis: Authority is a safe project applicability unit only when independently applicable decision families do not hide behind one authority boundary.
+tests:
+  split_signal_requires: [independent_applicability, independent_decision_identity, independent_accepted_knowledge, independent_consumers, independent_lifecycle]
+findings:
+  - authority: STRATEGIC-DOMAIN-DESIGN
+    verdict: SPLIT_CANDIDATE
+    families:
+      - id: domain-strategy
+        outputs: [domain.subdomain-landscape, domain.strategic-classification]
+        consumers: [model-context-strategy, system-architecture, tactical-domain-design]
+      - id: model-context-strategy
+        outputs: [domain.model-context-strategy]
+        consumers: [tactical-domain-design, application-design, interface-design]
+    independent_applicability_examples: [domain-strategy-na_context-required, domain-strategy-required_context-na]
+    rationale: Problem-space strategy and model-language applicability have distinct evidence, outputs, consumers and lifecycles.
+  - authority: SECURITY-ARCHITECTURE
+    verdict: KEEP
+    families: [{id: security-architecture, outputs: [security.architecture]}]
+    rationale: Trust, identity, admission and protection decisions form one security structure; selective downstream consumption does not prove separate authorities.
+  - authority: DATA-DESIGN
+    verdict: KEEP
+    families: [{id: persistence-design, outputs: [data.persistence-contract]}]
+    rationale: Optional replication or recovery aspects refine the same physical persistence ownership unless they develop independent accepted contracts and consumers.
+  - authority: QUALITY-DESIGN
+    verdict: WATCH
+    families:
+      - {id: performance-capacity, outputs: [quality.performance-contract]}
+      - {id: availability-reliability, outputs: [quality.reliability-contract]}
+    rationale: Independent applicability is plausible, but current research has not yet proven separate ownership rather than one coherent quality-constraint authority.
+  - authority: OPERABILITY-DESIGN
+    verdict: KEEP
+    families: [{id: runtime-evidence, outputs: [operability.runtime-evidence-contract]}]
+    rationale: Health, correlation and dependency visibility are facets of one diagnosability contract.
+  - authority: CHANGE-TRANSITION-DESIGN
+    verdict: KEEP
+    families: [{id: transition-validity, outputs: [change.transition-contract]}]
+    rationale: Compatibility windows, ordering, rollback/roll-forward and retirement conditions jointly define transition validity.
+  - authority: TEST-DESIGN
+    verdict: KEEP
+    families: [{id: executable-test-contract, outputs: [test.executable-contract]}]
+    rationale: Different oracle forms are refinements of one executable-test decision family.
+  - authority: SYSTEM-ARCHITECTURE
+    verdict: WATCH
+    families:
+      - {id: system-topology, outputs: [system.architecture]}
+      - {id: concurrency-consistency, outputs: [concurrency.consistency-contract]}
+    rationale: Current catalog folds dependency/consistency rules into System Architecture, while cross-domain research shows concurrent-state semantics can activate independently; this needs explicit boundary testing before registry canonicalization.
+conclusion:
+  registry_unit: authority
+  safe_only_after_boundary_audit: true
+  capability_partial_consumption_is_normal: true
+  independently_applicable_decision_families_inside_authority_are_split_signal: true
+  do_not_add_partial_authority_status: true

@@ -38,10 +38,11 @@ def main() -> int:
                 "semantic_cohesion",
                 "independent_change",
                 "public_contract",
+                "applicability_atomicity",
             ]:
                 raise ValueError(
                     "atomicity_test must be semantic_cohesion, "
-                    "independent_change, public_contract"
+                    "independent_change, public_contract, applicability_atomicity"
                 )
 
             seen: set[str] = set()

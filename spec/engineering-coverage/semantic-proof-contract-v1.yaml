@@ -32,8 +32,6 @@ proofs:
     accepted_semantic_claims: [engineering.application.orchestration]
   application.failures:
     accepted_semantic_claims: [engineering.application.failures]
-  application.idempotency:
-    accepted_semantic_claims: [engineering.application.idempotency]
 
   architecture.structure:
     accepted_semantic_claims: [engineering.architecture.structure]

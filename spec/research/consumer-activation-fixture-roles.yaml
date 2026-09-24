@@ -5,6 +5,6 @@ bindings:
   PRODUCT-REQUIREMENTS: [product]
   SYSTEM-ARCHITECTURE: [architecture, reliability]
   DATA-DESIGN: [data]
-  INTERFACE-DESIGN: [interface]
+  MACHINE-INTERFACE-DESIGN: [interface]
   SECURITY-ARCHITECTURE: [security-architecture]
   IMPLEMENTATION-DESIGN: [delivery]

@@ -1,0 +1,126 @@
+version: 1
+kind: harness-reference-applicability-research
+id: REFERENCE-APPLICABILITY-PROJECT-GRAPH-V1
+
+states: [REQUIRED, NOT_APPLICABLE, UNRESOLVED]
+
+invariants:
+  - id: assessed-not-omitted
+    rule: Every evaluated reference obligation has an explicit assessment result.
+  - id: na-is-proven
+    rule: NOT_APPLICABLE requires evidence, rationale, evidence dependencies and reopening conditions.
+  - id: required-is-live
+    rule: REQUIRED identifies accepted knowledge and a concrete consumer or terminal reason.
+  - id: unresolved-is-visible
+    rule: UNRESOLVED identifies a blocking question or obligation.
+  - id: invalidation-is-explicit
+    rule: Every assessment declares reopening conditions tied to upstream evidence.
+  - id: no-simple-project-proof
+    rule: Project size or subjective simplicity is never sufficient applicability or merge evidence.
+
+cases:
+  - id: ddd-model-context-required
+    domain: ddd
+    obligation: model-context-strategy
+    status: REQUIRED
+    evidence: [multiple-model-languages, cross-model-translation]
+    depends_on_evidence: [domain-landscape]
+    rationale: Independent model applicability and translation decisions are material.
+    produces: domain.model-context-strategy
+    consumer: tactical-domain-model
+    consumer_output: domain.tactical-model
+    reopening_conditions: [model-boundaries-change, domain-landscape-changes]
+
+  - id: ddd-no-artificial-bounded-context
+    domain: ddd
+    obligation: model-context-strategy
+    status: NOT_APPLICABLE
+    evidence: [one-coherent-model-language, no-independent-model-consumer]
+    depends_on_evidence: [accepted-product-domain-evidence]
+    rationale: No material independent model-boundary decision is present.
+    reopening_conditions: [second-model-language-appears, translation-boundary-appears]
+
+  - id: concurrency-required
+    domain: concurrency
+    obligation: concurrent-state-semantics
+    status: REQUIRED
+    evidence: [parallel-workers, shared-money-invariant, retries]
+    depends_on_evidence: [runtime-topology, domain-invariants]
+    rationale: Parallel mutation and retries make atomicity/idempotency decisions material.
+    produces: concurrency.consistency-contract
+    consumer: implementation-design
+    consumer_output: implementation.plan
+    reopening_conditions: [runtime-topology-changes, mutation-model-changes]
+
+  - id: distributed-na
+    domain: distributed-systems
+    obligation: distributed-failure-semantics
+    status: NOT_APPLICABLE
+    evidence: [single-process, no-remote-runtime-dependency, no-replicated-state]
+    depends_on_evidence: [system-topology]
+    rationale: No remote partial-failure or distributed coordination decision exists.
+    reopening_conditions: [remote-runtime-dependency-added, multiple-processes-added, replicated-state-added]
+
+  - id: security-required
+    domain: security
+    obligation: trust-admission-protection
+    status: REQUIRED
+    evidence: [external-psp, credentials, privileged-operation]
+    depends_on_evidence: [interface-topology, product-policy]
+    rationale: Trust, credential protection and admission decisions are independently material.
+    produces: security.architecture
+    consumer: implementation-design
+    consumer_output: implementation.plan
+    reopening_conditions: [trust-boundary-changes, identity-model-changes]
+
+  - id: persistence-na
+    domain: data
+    obligation: physical-persistence-design
+    status: NOT_APPLICABLE
+    evidence: [ephemeral-in-memory-state, no-durable-recovery-requirement]
+    depends_on_evidence: [product-state-requirements]
+    rationale: No durable representation or recovery decision is required.
+    reopening_conditions: [durability-required, restart-survival-required, audit-history-required]
+
+  - id: quality-required
+    domain: performance-quality
+    obligation: capacity-latency-design
+    status: REQUIRED
+    evidence: [accepted-latency-slo, peak-throughput-target]
+    depends_on_evidence: [product-quality-requirements]
+    rationale: Architecture and verification require measurable realization constraints.
+    produces: quality.performance-contract
+    consumer: system-architecture
+    consumer_output: system.architecture
+    reopening_conditions: [slo-changes, workload-envelope-changes]
+
+  - id: operability-unresolved
+    domain: operability
+    obligation: runtime-evidence-contract
+    status: UNRESOLVED
+    evidence: [production-runtime, external-dependencies]
+    depends_on_evidence: [runtime-topology]
+    rationale: Runtime diagnosis is likely material but required evidence classes are not yet accepted.
+    question: What runtime evidence is required to diagnose dependency and lifecycle failures?
+    reopening_conditions: [operability-requirements-accepted, runtime-topology-changes]
+
+  - id: transition-required
+    domain: migration-change
+    obligation: transition-validity
+    status: REQUIRED
+    evidence: [mixed-version-window, irreversible-data-write, separate-schema-migration]
+    depends_on_evidence: [source-state, target-state, deployment-topology]
+    rationale: Endpoint designs do not determine valid coexistence, ordering or recovery.
+    produces: change.transition-contract
+    consumer: implementation-design
+    consumer_output: implementation.plan
+    reopening_conditions: [deployment-strategy-changes, source-or-target-state-changes]
+
+  - id: test-design-na
+    domain: verification
+    obligation: executable-test-contract
+    status: NOT_APPLICABLE
+    evidence: [verification-scenarios-already-specify-precondition-operation-oracle]
+    depends_on_evidence: [verification-strategy]
+    rationale: No independently valuable executable-oracle decision remains.
+    reopening_conditions: [new-state-machine-obligation, oracle-ambiguity-discovered]

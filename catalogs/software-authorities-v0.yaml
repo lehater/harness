@@ -8,6 +8,7 @@ principles:
     - semantic_cohesion
     - independent_change
     - public_contract
+    - applicability_atomicity
   notes:
     - An Authority owns a coherent kind of engineering decision, not a stage, team, document or domain subject.
     - Catalog entries are reference boundaries. A project instantiates only applicable Authorities and must justify merges or splits with the same atomicity test.
@@ -24,7 +25,7 @@ authorities:
       public_contract: Provides accepted problem evidence and unresolved discovery questions.
     split_when:
       - Independent evidence domains have different decision owners and public consumers.
-    merge_guidance: May be merged with PRODUCT-REQUIREMENTS only when problem evidence is trivial and has no independent lifecycle or provenance value.
+    merge_guidance: May be merged with PRODUCT-REQUIREMENTS only when problem evidence has no independently consumed knowledge contract, lifecycle or provenance value.
 
   - id: PRODUCT-REQUIREMENTS
     class: baseline
@@ -36,15 +37,25 @@ authorities:
     split_when:
       - Product policy and externally observable requirements have independent owners or change lifecycles.
 
-  - id: STRATEGIC-DOMAIN-DESIGN
+  - id: DOMAIN-STRATEGY
     class: conditional
-    applies_when: The product has non-trivial semantic ownership boundaries, multiple domain capabilities or independent domain lifecycles.
-    responsibility: Own semantic decomposition, domain responsibility boundaries and relationships between independently modeled domain areas.
+    applies_when: Strategic classification of domain responsibilities, investment or subdomain relationships carries material engineering consequences.
+    responsibility: Own problem-space domain decomposition, subdomain landscape, strategic classification and domain investment intent without deciding model-language boundaries or tactical structures.
     boundary:
-      semantic_cohesion: Decisions about domain partitioning and public semantic relationships.
-      independent_change: Strategic decomposition can evolve without directly selecting tactical structures or technical architecture.
-      public_contract: Provides accepted semantic ownership boundaries and context relationships.
-    merge_guidance: For a simple domain with one coherent semantic owner, this may collapse into a single DOMAIN-DESIGN Authority.
+      semantic_cohesion: Strategic decisions about domain responsibilities and investment.
+      independent_change: Strategic classification can change without redefining model-context relationships or tactical realization.
+      public_contract: Provides accepted subdomain landscape and strategic classification to relevant downstream consumers.
+    merge_guidance: Omit when no independently valuable domain-strategy decision exists.
+
+  - id: MODEL-CONTEXT-STRATEGY
+    class: conditional
+    applies_when: Multiple model languages or independently modeled semantic contexts require explicit applicability, relationship or translation decisions.
+    responsibility: Own where models/languages apply and how independently modeled contexts relate or translate without re-owning domain investment strategy or tactical internals.
+    boundary:
+      semantic_cohesion: Model-language applicability, context relationships and translation contracts.
+      independent_change: Context boundaries and translations can change while strategic domain classification remains stable.
+      public_contract: Provides accepted model-context and translation knowledge to tactical, application and interface consumers.
+    merge_guidance: Omit when one coherent model applies and no independent context-boundary contract is material.
 
   - id: DOMAIN-USE-CASE-DESIGN
     class: conditional
@@ -58,13 +69,13 @@ authorities:
 
   - id: TACTICAL-DOMAIN-DESIGN
     class: conditional
-    applies_when: Domain identities, lifecycles, invariants or domain operations carry non-trivial semantics.
+    applies_when: Domain identities, lifecycles, invariants or domain operations carry material semantics.
     responsibility: Own tactical domain language, identities, lifecycles, invariants, decisions and public domain semantics.
     boundary:
       semantic_cohesion: Decisions about how accepted domain behavior is modeled semantically.
       independent_change: Tactical semantics can evolve behind stable strategic/use-case contracts without selecting storage or transport.
       public_contract: Provides accepted tactical domain semantics to application and technical design.
-    merge_guidance: For transactionally simple products without meaningful domain invariants, a lighter DOMAIN-DESIGN Authority may be sufficient.
+    merge_guidance: When no material tactical identity, lifecycle or invariant decision exists, a lighter domain ownership boundary may be sufficient.
 
   - id: APPLICATION-DESIGN
     class: conditional
@@ -77,11 +88,21 @@ authorities:
 
   - id: SYSTEM-ARCHITECTURE
     class: baseline
-    responsibility: Own system structure, runtime boundaries, dependency/consistency rules and technical interaction topology.
+    responsibility: Own system structure, runtime boundaries, dependency topology and technical interaction topology.
     boundary:
       semantic_cohesion: Structural and runtime decisions that constrain implementation.
       independent_change: Architecture can evolve behind stable product/domain contracts without changing their semantic ownership.
       public_contract: Provides accepted system topology and architectural constraints.
+
+  - id: CONCURRENCY-CONSISTENCY-DESIGN
+    class: conditional
+    applies_when: Multiple executions can interact with correctness-constrained state and correctness depends on ordering, isolation, atomicity, conflict, retry/idempotency or consistency semantics.
+    responsibility: Own concurrent-state correctness contracts without re-owning domain invariants, storage representation or system topology.
+    boundary:
+      semantic_cohesion: Ordering, isolation, atomicity, conflict, retry/idempotency and consistency semantics for interacting executions.
+      independent_change: Concurrency semantics can change when execution/delivery behavior changes while system decomposition remains stable.
+      public_contract: Provides accepted concurrency/consistency constraints to data, component, implementation and verification consumers.
+    merge_guidance: Omit when executions cannot materially interact or interaction cannot affect correctness.
 
   - id: SECURITY-ARCHITECTURE
     class: conditional
@@ -91,16 +112,25 @@ authorities:
       semantic_cohesion: Decisions about security trust boundaries, trusted identity, credential/session protection, admission and enforcement structure.
       independent_change: Security architecture can evolve independently from product/domain entitlement semantics, interface representation and later threat analysis.
       public_contract: Provides accepted security constraints to system/interface/data/component/operability/verification/implementation consumers without re-owning their semantics.
-    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when security decisions are simple and have no independent lifecycle or public consumers. Security concerns alone do not require this Authority; a local/trusted runtime may need SECURITY-ANALYSIS without a separate SECURITY-ARCHITECTURE instance.
+    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when security decisions have no independent accepted knowledge interface, lifecycle or public consumers. Security concerns alone do not require this Authority; a local/trusted runtime may need SECURITY-ANALYSIS without a separate SECURITY-ARCHITECTURE instance.
 
-  - id: INTERFACE-DESIGN
+  - id: MACHINE-INTERFACE-DESIGN
     class: conditional
-    applies_when: The system exposes machine or human interfaces whose representation/interaction decisions need independent ownership.
-    responsibility: Own supported external interface contracts and shared technical representations.
+    applies_when: The system exposes machine-consumed interfaces whose interaction or representation contract requires independent ownership.
+    responsibility: Own supported external machine interaction and representation contracts.
     boundary:
-      semantic_cohesion: Decisions about external interaction and representation.
-      independent_change: Interface contracts can evolve while preserving accepted domain/product semantics.
-      public_contract: Provides canonical machine/user interface contracts.
+      semantic_cohesion: Machine-consumed protocol, API, message and representation semantics.
+      independent_change: Machine interface contracts can evolve while preserving accepted product/domain semantics and human interaction design.
+      public_contract: Provides canonical machine interface contracts to integrations and technical consumers.
+
+  - id: HUMAN-INTERFACE-DESIGN
+    class: conditional
+    applies_when: Human interaction, information/navigation structure or presentation/view composition requires independent ownership.
+    responsibility: Own human interaction semantics and presentation/view composition without re-owning product behavior or machine interface contracts.
+    boundary:
+      semantic_cohesion: Human interaction, information/navigation structure, presentation system and screen/view composition.
+      independent_change: Human interface realization can evolve while product/domain and machine-interface semantics remain stable.
+      public_contract: Provides accepted human-interface and presentation/view contracts to architecture, component, implementation and test consumers.
 
   - id: DATA-DESIGN
     class: conditional
@@ -110,17 +140,17 @@ authorities:
       semantic_cohesion: Decisions about durable physical data representation and constraints.
       independent_change: Storage design can evolve behind stable domain/application contracts.
       public_contract: Provides accepted persistence model and storage constraints.
-    merge_guidance: May stay inside SYSTEM-ARCHITECTURE for simple persistence with no independent constraints.
+    merge_guidance: May stay inside SYSTEM-ARCHITECTURE when persistence has no independent accepted constraints, consumers or lifecycle.
 
   - id: QUALITY-DESIGN
     class: conditional
-    applies_when: Architecture-significant performance, availability, scale, consistency or other quality constraints require explicit decisions.
+    applies_when: Architecture-significant performance, availability, scale, staleness tolerance or other quality constraints require explicit decisions.
     responsibility: Own explicit realization quality constraints derived from accepted product/design truth.
     boundary:
       semantic_cohesion: Cross-cutting non-functional constraints on realization.
       independent_change: Quality constraints can evolve without reallocating semantic ownership.
       public_contract: Provides measurable or explicitly unresolved quality constraints to architecture, implementation and verification.
-    merge_guidance: Simple quality expectations may remain PRODUCT-REQUIREMENTS when they do not need independent design work.
+    merge_guidance: Quality expectations may remain PRODUCT-REQUIREMENTS when they do not form an independently consumed realization-constraint contract.
 
   - id: SECURITY-ANALYSIS
     class: conditional
@@ -149,7 +179,7 @@ authorities:
       semantic_cohesion: Permitted intermediate/coexistence states, transition ordering, compatibility windows, irreversible points, progression gates, recovery paths and retirement conditions.
       independent_change: Transition strategy can change while accepted source and target states remain stable and can survive changes in deployment/migration tooling.
       public_contract: Provides transition constraints to implementation, verification/test and operability while routing missing endpoint semantics to their owners.
-    merge_guidance: Omit for trivial atomic replacement with no material intermediate state; deployment, release, migration and compatibility mechanisms alone do not justify separate Authorities.
+    merge_guidance: Omit for atomic replacement with no material intermediate state; deployment, release, migration and compatibility mechanisms alone do not justify separate Authorities.
 
   - id: OPERABILITY-DESIGN
     class: conditional
@@ -179,7 +209,7 @@ authorities:
       semantic_cohesion: Public component responsibilities, consumer/provider contracts, dependency direction, abstraction ownership and composition/mapping boundaries.
       independent_change: Component realization can evolve behind accepted architecture/application/interface contracts without changing their semantics.
       public_contract: Provides code-design boundaries sufficient for implementation agents to avoid inventing architecturally significant structure.
-    merge_guidance: May remain inside APPLICATION-DESIGN or IMPLEMENTATION-DESIGN for simple systems where component structure has no independently valuable contract.
+    merge_guidance: May remain inside APPLICATION-DESIGN or IMPLEMENTATION-DESIGN when component structure has no independently valuable accepted contract or consumer.
 
   - id: TEST-DESIGN
     class: conditional
@@ -193,7 +223,7 @@ authorities:
 
   - id: IMPLEMENTATION-DESIGN
     class: baseline
-    responsibility: Own implementation slicing, sequencing, repository realization, concrete toolchain/gate wiring, migration concerns and completion criteria after upstream engineering decisions are available.
+    responsibility: Own implementation slicing, sequencing, repository realization, concrete toolchain/gate wiring and completion criteria after upstream engineering decisions are available.
     boundary:
       semantic_cohesion: Decisions about how accepted design will be realized as bounded implementation work and a reproducible physical codebase/toolchain.
       independent_change: Realization order, physical mapping and replaceable tools can change without redefining upstream truth when accepted boundaries and obligations remain satisfied.

@@ -23,6 +23,14 @@ baseline:
   - verification.architecture
 
 rules:
+  - id: CONCURRENCY-CONSISTENCY
+    when:
+      knowledge_kinds_any: [concurrency-consistency-design]
+      capability_contains_any: [concurrency-consistency, consistency-contract]
+    activate:
+      - reliability.consistency
+      - reliability.retry-idempotency
+
   - id: SOFTWARE-IMPLEMENTATION-STRUCTURE
     when:
       consumer_contains_any: [IMPLEMENTATION]

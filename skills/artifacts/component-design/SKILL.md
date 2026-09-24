@@ -12,7 +12,7 @@ Use when actionable CREATE work has `knowledge_kind: component-design`.
 ## Inputs
 
 - actionable Component Design capability;
-- accepted architecture, application, data and interface design;
+- accepted architecture, application, data, machine-interface and human-interface design as applicable;\n- accepted concurrency/consistency design when component correctness depends on interacting executions;
 - accepted implementation stack where technology affects boundary design;
 - accepted project Engineering Policy/design constraints when present;
 - existing code only as evidence of current realization, never as authority over accepted design.

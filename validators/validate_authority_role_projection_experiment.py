@@ -21,7 +21,7 @@ def main() -> int:
 
     assert not cli["unresolved_authorities"], cli["unresolved_authorities"]
     assert not ui["unresolved_authorities"], ui["unresolved_authorities"]
-    assert cli["bindings"]["SYSTEM-ARCHITECTURE"] == ["architecture","reliability"]
+    assert cli["bindings"]["SYSTEM-ARCHITECTURE"] == ["architecture"]
     assert ui["bindings"]["SECURITY-ARCHITECTURE"] == ["security-architecture"]
     assert ui["bindings"]["QUALITY-DESIGN"] == ["quality"]
 

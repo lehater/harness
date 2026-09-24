@@ -1,0 +1,171 @@
+version: 1
+kind: harness-authority-boundary-research
+id: AUTHORITY-KNOWLEDGE-FLOW-V1
+
+cases:
+  - id: product-to-architecture
+    expect: PASS
+    authorities:
+      - id: PRODUCT
+        decisions: [accepted-product-behavior]
+        outputs:
+          - capability: product.requirements
+            consumers:
+              - authority: ARCHITECTURE
+                output: system.architecture
+                necessity: Architecture cannot choose a valid realization without accepted behavior and constraints.
+                encapsulation: Architecture consumes accepted requirements and does not co-own product intent.
+      - id: ARCHITECTURE
+        decisions: [system-structure]
+        outputs:
+          - capability: system.architecture
+            terminal_reason: Accepted architecture is a selected implementation-consumer prerequisite.
+
+  - id: parallel-independent-authorities
+    expect: PASS
+    authorities:
+      - id: SECURITY
+        decisions: [trust-boundaries]
+        outputs:
+          - capability: security.constraints
+            consumers:
+              - authority: IMPLEMENTATION
+                output: implementation.ready
+                necessity: Implementation must preserve accepted trust constraints.
+                encapsulation: Implementation consumes constraints without deciding trust policy.
+      - id: DATA
+        decisions: [storage-representation]
+        outputs:
+          - capability: data.persistence
+            consumers:
+              - authority: IMPLEMENTATION
+                output: implementation.ready
+                necessity: Implementation needs accepted persistence constraints.
+                encapsulation: Implementation consumes persistence design without re-owning storage semantics.
+      - id: IMPLEMENTATION
+        decisions: [realization-plan]
+        outputs:
+          - capability: implementation.ready
+            terminal_reason: Terminal implementation consumer.
+    forbidden_edges:
+      - [SECURITY, DATA]
+      - [DATA, SECURITY]
+
+  - id: coherent-multiple-outputs
+    expect: PASS
+    authorities:
+      - id: PRODUCT
+        decisions: [product-intent-and-acceptance]
+        outputs:
+          - capability: product.intent
+            consumers:
+              - authority: ARCHITECTURE
+                output: architecture.topology
+                necessity: Topology must realize accepted product intent.
+                encapsulation: Architecture consumes intent without owning it.
+          - capability: product.acceptance
+            consumers:
+              - authority: VERIFICATION
+                output: verification.strategy
+                necessity: Verification needs accepted observable expectations.
+                encapsulation: Verification derives evidence obligations without redefining acceptance.
+      - id: ARCHITECTURE
+        decisions: [system-topology]
+        outputs:
+          - capability: architecture.topology
+            terminal_reason: Terminal architecture target for this fixture.
+      - id: VERIFICATION
+        decisions: [verification-evidence]
+        outputs:
+          - capability: verification.strategy
+            terminal_reason: Terminal verification target for this fixture.
+
+  - id: explicit-terminal-knowledge
+    expect: PASS
+    authorities:
+      - id: DISCOVERY
+        decisions: [problem-observation]
+        outputs:
+          - capability: discovery.evidence
+            terminal_reason: Research-only target intentionally ends at accepted problem evidence.
+
+  - id: analysis-remains-private
+    expect: PASS
+    authorities:
+      - id: ARCHITECTURE
+        decisions: [system-structure]
+        outputs:
+          - capability: architecture.accepted
+            terminal_reason: Architecture target.
+        private_analyses:
+          - concurrency-consistency-analysis
+
+  - id: prose-only-fake-authority
+    expect: FAIL
+    authorities:
+      - id: DOMAIN-STRATEGY
+        decisions: [classify-domain-strategy]
+        outputs: []
+
+  - id: dead-public-output
+    expect: FAIL
+    authorities:
+      - id: QUALITY
+        decisions: [quality-analysis]
+        outputs:
+          - capability: quality.analysis
+
+  - id: conceptual-relatedness-is-not-dependency
+    expect: FAIL
+    authorities:
+      - id: SUBDOMAIN
+        decisions: [subdomain-decomposition]
+        outputs:
+          - capability: domain.landscape
+            consumers:
+              - authority: CONTEXT
+                output: context.boundaries
+                necessity: Related DDD concepts.
+                encapsulation: Context design and subdomain design are semantically related.
+      - id: CONTEXT
+        decisions: [context-boundaries]
+        outputs:
+          - capability: context.boundaries
+            terminal_reason: Tactical modeling input.
+    invalid_edge_markers: [Related, related, similar, next-step, follows]
+
+  - id: joint-ownership-leak
+    expect: FAIL
+    authorities:
+      - id: A
+        decisions: [shared-decision]
+        outputs:
+          - capability: a.output
+            consumers:
+              - authority: B
+                output: b.output
+                necessity: B needs A output.
+                encapsulation: B must participate in and co-own A internal decision.
+      - id: B
+        decisions: [consumer-decision]
+        outputs:
+          - capability: b.output
+            terminal_reason: Terminal output.
+    forbidden_encapsulation_markers: [co-own, participate in]
+
+  - id: missing-consumer-output
+    expect: FAIL
+    authorities:
+      - id: A
+        decisions: [decision-a]
+        outputs:
+          - capability: a.output
+            consumers:
+              - authority: B
+                necessity: B needs it.
+                encapsulation: B consumes accepted A output.
+      - id: B
+        decisions: [decision-b]
+        outputs:
+          - capability: b.output
+            terminal_reason: Terminal output.

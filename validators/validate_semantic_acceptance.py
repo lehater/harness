@@ -17,7 +17,7 @@ def codes(result):
 def test_real_defect_regressions():
     # NAPMS: stale Resource UI semantics vs current domain truth.
     contract = {
-        "authority": "INTERFACE-DESIGN",
+        "authority": "HUMAN-INTERFACE-DESIGN",
         "owned_assertion_kinds": ["ui-fact"],
         "obligations": [{"id": "scope", "kind": "ui-fact", "subject": "Resource.scope"}],
         "semantic_claims": ["engineering.interface.human.journeys"],
@@ -38,19 +38,19 @@ def test_real_defect_regressions():
     # NAPMS: HTTP interface misses required Resource curation operations.
     required=["registerResource","addEndpoint","setEndpointAddress","clearEndpointAddress",
               "setSite","setResponsibility","getResourceHistory"]
-    contract={"authority":"INTERFACE-DESIGN","owned_assertion_kinds":["operation"],
+    contract={"authority":"MACHINE-INTERFACE-DESIGN","owned_assertion_kinds":["operation"],
               "obligations":[{"id":"resource-ops","kind":"operation","subjects":required}],
               "semantic_claims":["engineering.interface.machine.contract"]}
     candidate={"id":"OPENAPI","capability":"engineering.interface.http-contract",
                "semantic_assertions":[
-                   {"id":x,"kind":"operation","subject":x,"decision_authority":"INTERFACE-DESIGN"}
+                   {"id":x,"kind":"operation","subject":x,"decision_authority":"MACHINE-INTERFACE-DESIGN"}
                    for x in ["registerResource","addEndpoint","setEndpointAddress"]
                ]}
     r=evaluate_artifact(contract,{"semantic_assertions":[]},candidate)
     assert r["status"]=="REJECTED" and "MISSING_SUBJECTS" in codes(r)
 
     # NAPMS: UI-required server interaction is absent from OpenAPI.
-    contract={"authority":"INTERFACE-DESIGN","owned_assertion_kinds":["ui-operation"],
+    contract={"authority":"HUMAN-INTERFACE-DESIGN","owned_assertion_kinds":["ui-operation"],
               "obligations":[{"id":"detail","kind":"ui-operation","subject":"getResourceDetail"}],
               "compatibility_obligations":[{"id":"ui-http","left_kind":"ui-operation","right_kind":"http-operation"}]}
     sources={"semantic_assertions":[
@@ -58,19 +58,19 @@ def test_real_defect_regressions():
     ]}
     candidate={"id":"RESOURCE-DETAIL-UI","capability":"engineering.frontend.human-interface",
                "semantic_assertions":[
-        {"id":"UI-GET","kind":"ui-operation","subject":"getResourceDetail","decision_authority":"INTERFACE-DESIGN"}
+        {"id":"UI-GET","kind":"ui-operation","subject":"getResourceDetail","decision_authority":"HUMAN-INTERFACE-DESIGN"}
     ]}
     r=evaluate_artifact(contract,sources,candidate)
     assert r["status"]=="REJECTED" and "INCOMPATIBLE_CONSUMER_CONTRACT" in codes(r)
 
     # NAPMS: required 413 is absent.
-    contract={"authority":"INTERFACE-DESIGN","owned_assertion_kinds":["error"],
+    contract={"authority":"MACHINE-INTERFACE-DESIGN","owned_assertion_kinds":["error"],
               "obligations":[{"id":"errors","kind":"error","subject":"http",
                               "required_values":["401","403","409","413","422","503"]}]}
     candidate={"id":"OPENAPI","capability":"engineering.interface.http-contract",
                "semantic_assertions":[
         {"id":f"E-{v}","kind":"error","subject":"http","semantic_value":v,
-         "decision_authority":"INTERFACE-DESIGN"}
+         "decision_authority":"MACHINE-INTERFACE-DESIGN"}
         for v in ["401","403","409","422","503"]
     ]}
     r=evaluate_artifact(contract,{"semantic_assertions":[]},candidate)

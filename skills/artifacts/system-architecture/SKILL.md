@@ -1,6 +1,6 @@
 ---
 name: system-architecture
-description: "Use for actionable CREATE work requiring accepted system/application architecture. Define structural/runtime boundaries, dependency and consistency rules from accepted upstream semantics without inventing product/domain behavior or prematurely owning interface/persistence details."
+description: "Use for actionable CREATE work requiring accepted system/application architecture. Define structural/runtime boundaries and dependency topology from accepted upstream semantics without inventing product/domain behavior or prematurely owning interface/persistence details."
 ---
 
 # System Architecture
@@ -26,7 +26,6 @@ Read only canonical upstream knowledge needed to decide:
 - system/runtime structure;
 - application/module boundaries;
 - dependency and interaction rules;
-- consistency/transaction boundaries;
 - cross-owner resolution/orchestration constraints;
 - architecture-driving scale/runtime facts whose plausible alternatives could change topology.
 
@@ -39,7 +38,7 @@ Before choosing topology, classify the architecture-driving input concerns defin
 Do not interpret silence as `NOT_APPLICABLE`.
 
 If a plausible answer to an unknown could materially change execution mode, runtime
-topology, deployment, persistence, concurrency, integration or trust boundaries,
+topology, deployment, persistence, integration or trust boundaries,
 route a Question to the owning upstream Authority and stop. Ask only unresolved
 material questions; do not force a universal NFR questionnaire.
 
@@ -53,7 +52,7 @@ material questions; do not force a universal NFR questionnaire.
 6. Justify every material increase in runtime, deployment, coordination or operational complexity with an accepted driver, constraint or material risk.
 7. Compare materially different candidates only when uncertainty/risk makes the choice consequential; do not perform heavyweight trade-off analysis for a trivially sufficient topology.
 8. Define component/module/application boundaries and allowed dependency directions.
-9. Define interaction and consistency rules where cross-boundary behavior matters.
+9. Define technical interaction topology where cross-boundary behavior matters. Route material ordering, isolation, atomicity, conflict, retry/idempotency or consistency semantics to CONCURRENCY-CONSISTENCY-DESIGN.
 10. Define explicit architectural non-goals and reopening conditions.
 11. Keep transport, UI and physical persistence details downstream unless they are architecture-significant constraints.
 12. Produce the target repository's canonical architecture artifact(s).
@@ -81,7 +80,6 @@ Useful knowledge may include:
 - material candidate/trade-off rationale where needed;
 - module/application boundaries;
 - dependency rules;
-- consistency/transaction rules;
 - orchestration responsibilities;
 - explicit non-goals/evolution/reopening constraints.
 
@@ -93,7 +91,8 @@ Useful knowledge may include:
 - a materially simpler satisfying topology is not rejected without an explicit trade-off;
 - no downstream interface/storage detail is promoted without architectural need;
 - no product/domain truth is re-owned;
-- dependency/consistency rules are explicit where implementation could otherwise invent them;
+- dependency topology is explicit where implementation could otherwise invent it;
+- material concurrent-state correctness semantics are routed to CONCURRENCY-CONSISTENCY-DESIGN rather than owned here;
 - unresolved upstream semantics remain Questions.
 
 ## Registration

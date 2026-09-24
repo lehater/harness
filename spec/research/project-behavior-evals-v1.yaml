@@ -1,0 +1,62 @@
+version: 1
+kind: harness-project-behavior-evals
+id: PROJECT-BEHAVIOR-EVALS-V1
+
+rules:
+  forbidden_justifications: [simple-project, small-project, trivial-project]
+  required_context_fields: [obligation, project_evidence, acceptance_contract, relevant_skill]
+  context_policy: selective
+
+scenarios:
+  - id: crud-single-process
+    evidence: [single-process, local-database, no-parallel-workers, no-remote-runtime-dependency, one-coherent-domain-model]
+    expect:
+      required: [product-requirements, system-architecture, verification-design]
+      not_applicable: [distributed-failure-semantics, concurrent-state-semantics, model-context-strategy]
+      unresolved: []
+      forbidden_capabilities: [distributed.coordination, domain.context-map]
+      context_topics: [system-topology, persistence, verification]
+
+  - id: payments-concurrency
+    evidence: [parallel-processing, retries, money-invariants, external-psp, reconciliation, durable-ledger]
+    expect:
+      required: [concurrent-state-semantics, trust-admission-protection, physical-persistence-design, runtime-evidence-contract, verification-design]
+      not_applicable: []
+      unresolved: [reconciliation-authority]
+      required_capabilities: [concurrency.consistency-contract, security.architecture, data.persistence-contract]
+      context_topics: [concurrency, consistency, security, persistence, reconciliation]
+
+  - id: multi-model-domain
+    evidence: [multiple-model-languages, translation-boundary, independent-model-lifecycle]
+    expect:
+      required: [model-context-strategy, tactical-domain-model]
+      not_applicable: []
+      unresolved: []
+      forbidden_inferences: [product-capability-is-bounded-context, subdomain-is-bounded-context]
+      required_capabilities: [domain.model-context-strategy]
+      context_topics: [domain-strategy, model-context, tactical-domain-model]
+
+  - id: security-heavy-service
+    evidence: [internet-facing, privileged-operations, credentials, pii, external-identity-provider]
+    expect:
+      required: [trust-admission-protection, security-coverage-analysis, runtime-evidence-contract, verification-design]
+      not_applicable: []
+      unresolved: []
+      context_topics: [security, interface, data-governance, operability, verification]
+
+  - id: legacy-migration
+    evidence: [existing-state, target-state, mixed-version-window, irreversible-data-transform, rollback-not-proven]
+    expect:
+      required: [transition-validity, physical-persistence-design, verification-design]
+      not_applicable: []
+      unresolved: [rollback-or-rollforward-policy]
+      required_capabilities: [change.transition-contract]
+      context_topics: [change-transition, persistence, verification, operability]
+
+  - id: ephemeral-cli
+    evidence: [single-process, ephemeral-in-memory-state, no-network, no-durable-recovery-requirement]
+    expect:
+      required: [product-requirements, verification-design]
+      not_applicable: [distributed-failure-semantics, physical-persistence-design, runtime-evidence-contract]
+      unresolved: []
+      context_topics: [product, verification]

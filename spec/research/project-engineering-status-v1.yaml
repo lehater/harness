@@ -1,0 +1,38 @@
+version: 1
+kind: harness-project-engineering-status-research
+id: PROJECT-ENGINEERING-STATUS-V1
+applicability_states: [UNASSESSED, REQUIRED, NOT_APPLICABLE, UNRESOLVED]
+forbidden_applicability_states: [PARTIALLY_APPLICABLE]
+registry:
+  identity: authority_id
+  default: UNASSESSED
+  copy_authority_definition: false
+  stored_assessment_fields: [authority_id, applicability, evidence, rationale, depends_on_evidence, reopening_conditions]
+  forbidden_stored_fields: [completion, operational_status]
+operational_projection:
+  applies_to: REQUIRED
+  derived_from: [engineering-graph, core-providers, questions, lifecycle-evidence]
+  states: [NOT_STARTED, IN_PROGRESS, BLOCKED, COMPLETE, STALE]
+  persisted: false
+rules:
+  non_unassessed_requires: [evidence, rationale, depends_on_evidence, reopening_conditions]
+  unresolved_requires_question: true
+  not_applicable_from_silence: false
+  partial_applicability: forbidden
+  reassess_when_evidence_dependency_changes: true
+fixture:
+  catalog: [PRODUCT-REQUIREMENTS, DOMAIN-STRATEGY, MODEL-CONTEXT-STRATEGY, SYSTEM-ARCHITECTURE, SECURITY-ARCHITECTURE, DATA-DESIGN]
+  records:
+    - {authority_id: PRODUCT-REQUIREMENTS, applicability: REQUIRED, evidence: [accepted-product-scope], rationale: Product behavior must be specified, depends_on_evidence: [project-goal], reopening_conditions: [project-goal-changes], runtime: [SATISFIED]}
+    - {authority_id: DOMAIN-STRATEGY, applicability: UNASSESSED, evidence: [], rationale: null, depends_on_evidence: [], reopening_conditions: [], runtime: []}
+    - {authority_id: MODEL-CONTEXT-STRATEGY, applicability: NOT_APPLICABLE, evidence: [one-coherent-model-language], rationale: No independent model-context boundary or translation contract is material, depends_on_evidence: [accepted-domain-evidence], reopening_conditions: [second-model-language-or-translation-boundary-appears], runtime: []}
+    - {authority_id: SYSTEM-ARCHITECTURE, applicability: REQUIRED, evidence: [runtime-boundary], rationale: Runtime topology must be decided, depends_on_evidence: [product-runtime-needs], reopening_conditions: [runtime-needs-change], runtime: [SATISFIED, CREATE]}
+    - {authority_id: SECURITY-ARCHITECTURE, applicability: UNRESOLVED, evidence: [external-identity-provider], rationale: Trust boundary evidence exists but admission semantics are unresolved, depends_on_evidence: [interface-topology], reopening_conditions: [identity-model-accepted], question: Q-SECURITY-ADMISSION, runtime: []}
+    - {authority_id: DATA-DESIGN, applicability: UNASSESSED, evidence: [], rationale: null, depends_on_evidence: [], reopening_conditions: [], runtime: []}
+  expected:
+    - [PRODUCT-REQUIREMENTS, REQUIRED, COMPLETE]
+    - [DOMAIN-STRATEGY, UNASSESSED, null]
+    - [MODEL-CONTEXT-STRATEGY, NOT_APPLICABLE, null]
+    - [SYSTEM-ARCHITECTURE, REQUIRED, IN_PROGRESS]
+    - [SECURITY-ARCHITECTURE, UNRESOLVED, null]
+    - [DATA-DESIGN, UNASSESSED, null]

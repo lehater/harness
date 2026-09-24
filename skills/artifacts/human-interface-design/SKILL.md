@@ -7,11 +7,11 @@ description: "Use for actionable CREATE work requiring implementation-independen
 
 ## Trigger
 
-Use when actionable work has `knowledge_kind: human-interface-design` and Interface Design must define a supported human interaction boundary.
+Use when actionable work has `knowledge_kind: human-interface-design` and Human Interface Design must define a supported human interaction boundary.
 
 ## Inputs
 
-- actionable grouped work and Interface Design Authority;
+- actionable grouped work and Human Interface Design Authority;
 - accepted Product Requirements;
 - accepted user-journey/application semantics;
 - accepted Domain outcomes used by the interface;
@@ -37,7 +37,7 @@ Read canonical sources needed to establish user-visible interaction semantics. E
 11. Identify where shared presentation or concrete screen composition remains materially undecided. Route reusable application-level presentation choices to `presentation-system-design` and concrete view composition to `screen-view-design`; do not silently absorb those decisions into this artifact.
 12. Low-fidelity diagrams may illustrate accepted semantics, but presentation hierarchy/layout belongs to the downstream presentation/screen contracts when it is material.
 13. Preserve implementation freedom for framework, CSS mechanics, private component structure, local state library and helper decomposition.
-14. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Interface Design.
+14. Before acceptance, apply `human-interface-quality-analysis` when the selected surface is user-facing. Treat it as a cross-Authority coverage lens: route discovered Product/Interface/Quality/Obligation/Verification gaps to their owners and do not absorb them into Human Interface Design.
 15. Route missing product/domain/security/quality decisions upstream as Questions.
 16. Produce the project-native human-interface artifact, semantically accept/register and reevaluate.
 
@@ -85,7 +85,7 @@ A useful human-interface design includes:
 
 ## Registration
 
-Register under Interface Design and provide all grouped human-interface capabilities genuinely materialized. Dependencies include the canonical journeys and upstream semantic/security constraints actually consumed.
+Register under HUMAN-INTERFACE-DESIGN and provide all grouped human-interface capabilities genuinely materialized. Dependencies include the canonical journeys and upstream semantic/security constraints actually consumed.
 
 ## Human projection
 
