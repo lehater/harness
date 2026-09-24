@@ -38,7 +38,6 @@ concerns:
       - {id: application.use-cases, title: Use cases and journeys}
       - {id: application.orchestration, title: Orchestration and transaction boundaries}
       - {id: application.failures, title: Application failure semantics}
-      - {id: application.idempotency, title: Idempotency and duplicate handling}
 
   - id: architecture
     title: Architecture
