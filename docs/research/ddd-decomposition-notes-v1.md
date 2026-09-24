@@ -38,11 +38,11 @@ The conservative model is:
 - allow one STRATEGIC-DOMAIN-DESIGN Authority to own both when cohesive;
 - permit an Authority split only when knowledge-flow and independent-change evidence proves separate ownership/lifecycles;
 - when domain-strategy knowledge exists, model-context design consumes it;
-- do not force simple projects to manufacture a subdomain taxonomy;
+- do not manufacture a subdomain taxonomy when no material domain-strategy decision requires it;
 - reject Product Capability → Bounded Context renaming without model/language-boundary evidence.
 
 ## Falsification cases
 
 The method must reject automatic Subdomain → Bounded Context mapping, capability groups renamed as contexts, strategic classification used as proof of a model boundary, premature tactical aggregate design in a non-trivial multi-model domain, and technical architecture treated as domain ownership merely because DDD discusses it.
 
-It must allow simple one-context domains, multiple subdomains in one model context when justified, one subdomain represented by multiple contexts, independent evolution of domain strategy and context boundaries, and tactical evolution behind a stable context contract.
+It must allow one coherent model with no independent context-boundary decision, multiple subdomains in one model context when justified, one subdomain represented by multiple contexts, independent evolution of domain strategy and context boundaries, and tactical evolution behind a stable context contract.
