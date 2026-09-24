@@ -1,13 +1,13 @@
 ---
 name: application-design
-description: "Use for actionable CREATE work that composes accepted domain/product behavior into application commands, queries, orchestration and consistency semantics without re-owning domain truth or selecting infrastructure."
+description: "Use for actionable CREATE work that composes accepted domain/product behavior into application commands, queries and orchestration semantics without re-owning domain truth or selecting infrastructure."
 ---
 
 # Application Design
 
 ## Trigger
 
-Use when actionable work has `knowledge_kind: application-design` and accepted behavior spans multiple domain responsibilities, requires orchestration, application-level materialization or explicit command/query consistency semantics.
+Use when actionable work has `knowledge_kind: application-design` and accepted behavior spans multiple domain responsibilities, requires orchestration, application-level materialization or explicit command/query orchestration semantics.
 
 ## Inputs
 
@@ -27,7 +27,7 @@ Use accepted owner contracts. Do not infer application semantics from controller
 3. Define orchestration order only where it affects accepted validity, atomicity, time or failure meaning.
 4. Define cross-owner reference validation and snapshot/currentness requirements without selecting database/API mechanics unless upstream architecture already constrains them.
 5. Define application outcomes: success, domain rejection, unresolved result, dependency failure and cancellation where material.
-6. Define idempotency/concurrency/application-time semantics only when accepted behavior requires them; route physical locking/isolation representation to Data/System.
+6. Define application-level orchestration, continuation and semantic atomicity only when accepted behavior requires them. Route interacting-execution ordering, isolation, conflict, retry/idempotency and consistency correctness to CONCURRENCY-CONSISTENCY-DESIGN; route physical realization to Data Design.
 7. Keep domain invariants in Domain ownership, external representation in Interface, trust/protection in Security and runtime topology in System.
 8. State implementation freedoms and explicit NOT_APPLICABLE choices.
 9. Route missing upstream semantics as Questions rather than filling them with application conventions.
@@ -52,7 +52,7 @@ Useful content may include:
 
 - application composition never becomes a second domain owner;
 - each write has explicit semantic ownership;
-- cross-owner consistency is sufficient for downstream architecture/data design;
+- cross-owner orchestration semantics are sufficient for downstream architecture; applicable concurrent-state correctness is supplied by CONCURRENCY-CONSISTENCY-DESIGN rather than invented here;
 - failure/unresolved distinctions match accepted behavior;
 - no infrastructure default is promoted to semantic truth.
 - every selected journey action is covered by an explicit application operation or an explicit upstream disposition;
