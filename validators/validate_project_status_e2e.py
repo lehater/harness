@@ -35,3 +35,17 @@ assert p["PRODUCT-REQUIREMENTS"]["operational_status"]=="IN_PROGRESS"
 assert p["SECURITY-ARCHITECTURE"]["operational_status"] is None
 assert p["OPERABILITY-DESIGN"]["operational_status"] is None
 print("project status end-to-end: OK")
+
+
+# Authority split migration never propagates old applicability blindly.
+old_catalog={"authorities":[{"id":"INTERFACE-DESIGN"}]}
+old_reg={"assessments":[{"authority_id":"INTERFACE-DESIGN","applicability":"REQUIRED",
+ "evidence":["legacy-interface"],"rationale":"Legacy accepted interface knowledge.",
+ "depends_on_evidence":["legacy-interface"],"reopening_conditions":["interface semantics change"]}]}
+new_catalog={"authorities":[{"id":"MACHINE-INTERFACE-DESIGN"},{"id":"HUMAN-INTERFACE-DESIGN"}]}
+migrated=bootstrap_registry(new_catalog,old_reg,authority_migrations={"INTERFACE-DESIGN":["MACHINE-INTERFACE-DESIGN","HUMAN-INTERFACE-DESIGN"]})
+m={r["authority_id"]:r for r in migrated["assessments"]}
+assert m["MACHINE-INTERFACE-DESIGN"]["applicability"]=="UNASSESSED"
+assert m["HUMAN-INTERFACE-DESIGN"]["applicability"]=="UNASSESSED"
+assert migrated["migration_conflicts"][0]["resolution"]=="MANUAL-DECISION"
+print("authority split migration: OK")
