@@ -48,7 +48,7 @@ authorities:
     boundary:
       semantic_cohesion: Goal-oriented application interaction and orchestration.
       independent_change: Journey composition can evolve without selecting UI structure.
-      public_contract: Provides accepted user journeys to Interface Design.
+      public_contract: Provides accepted user journeys to Human Interface Design.
     produces:
       - capability: example.frontend.task-model
         knowledge_kind: task-model
