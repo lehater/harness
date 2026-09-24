@@ -18,9 +18,10 @@ assert rows["OPERABILITY-DESIGN"]["applicability"]=="UNASSESSED"
 assert not validate_registry(catalog,reg)
 
 # Idempotent reconcile preserves accepted assessment.
-rows["OPERABILITY-DESIGN"]={"authority_id":"OPERABILITY-DESIGN","applicability":"NOT_APPLICABLE",
+accepted_na={"authority_id":"OPERABILITY-DESIGN","applicability":"NOT_APPLICABLE",
  "evidence":["no-runtime"],"rationale":"No production runtime exists.",
  "depends_on_evidence":["deployment-model"],"reopening_conditions":["production runtime introduced"]}
+reg["assessments"]=[accepted_na if r["authority_id"]=="OPERABILITY-DESIGN" else r for r in reg["assessments"]]
 reg2=bootstrap_registry(catalog,reg,core)
 assert {r["authority_id"]:r for r in reg2["assessments"]}["OPERABILITY-DESIGN"]["applicability"]=="NOT_APPLICABLE"
 
