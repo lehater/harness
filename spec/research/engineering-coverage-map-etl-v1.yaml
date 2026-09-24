@@ -33,9 +33,9 @@ rows:
   - {concern: application.use-cases, state: COVERED, evidence: [single-batch-flow]}
   - {concern: application.orchestration, state: COVERED, evidence: [parse-normalize-validate-emit]}
   - {concern: application.failures, state: COVERED, evidence: [exit-and-error-contract]}
-  - concern: application.idempotency
+  - concern: reliability.retry-idempotency
     state: NOT_APPLICABLE
-    rationale: Pure file transformation has no state-changing command retry semantics.
+    rationale: Pure file transformation has no interacting state-changing execution whose retry or duplication can alter correctness.
     evidence: [accepted-execution-model]
 
   - {concern: architecture.structure, state: COVERED, evidence: [single-process-local-files]}
