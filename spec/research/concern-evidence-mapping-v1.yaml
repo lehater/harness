@@ -81,7 +81,7 @@ mappings:
     artifact_kinds: [physical-persistence-model]
     capability_contains: [data-design, data.persistence-model]
   data.integrity:
-    artifact_kinds: [physical-persistence-model, quality-requirements, application-architecture-rules]
+    artifact_kinds: [physical-persistence-model]
     capability_contains: [data-design]
   data.quality:
     artifact_kinds: [quality-requirements]
