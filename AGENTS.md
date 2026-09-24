@@ -16,6 +16,8 @@ The current operating model is agent-driven. `docs/design/agent-artifact-workben
 
 When Harness is used with another repository:
 
+Before substantial engineering work, ensure the target repository has a current Harness realization. If realization is absent, outdated or unknown, use `skills/agent/project-bootstrap-reconcile/SKILL.md`; do not manually recreate Harness-owned structural state. Use `skills/agent/project-engineering-status/SKILL.md` when project-wide engineering status is requested.
+
 1. read `docs/design/core-v0.md`;
 2. read the target repository's own instructions and identify the selected task/scope;
 3. choose or adapt the smallest justified Design Profile, using `skills/agent/design-profile/SKILL.md` when needed;
