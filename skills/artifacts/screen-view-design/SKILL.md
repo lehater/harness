@@ -9,7 +9,7 @@ description: "Use for implementation-independent composition of concrete screens
 
 Use when a user-facing implementation needs concrete view composition and Human Interface semantics alone would leave material UI decisions to the implementer.
 
-Owner: INTERFACE-DESIGN.
+Owner: HUMAN-INTERFACE-DESIGN.
 
 ## Responsibility
 
@@ -108,7 +108,7 @@ The contract should be sufficient to generate review projections such as a scree
 
 ## Registration
 
-Register under INTERFACE-DESIGN and provide the screen/view capabilities actually materialized. Dependencies include the Human Interface contract, inherited Presentation System and upstream semantic contracts genuinely consumed.
+Register under HUMAN-INTERFACE-DESIGN and provide the screen/view capabilities actually materialized. Dependencies include the Human Interface contract, inherited Presentation System and upstream semantic contracts genuinely consumed.
 
 ## Human projection
 
