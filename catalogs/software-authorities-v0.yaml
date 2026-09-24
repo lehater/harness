@@ -92,7 +92,17 @@ authorities:
     boundary:
       semantic_cohesion: Structural and runtime decisions that constrain implementation.
       independent_change: Architecture can evolve behind stable product/domain contracts without changing their semantic ownership.
-      public_contract: Provides accepted system topology and architectural constraints.\n\n  - id: CONCURRENCY-CONSISTENCY-DESIGN\n    class: conditional\n    applies_when: Multiple executions can interact with correctness-constrained state and correctness depends on ordering, isolation, atomicity, conflict, retry/idempotency or consistency semantics.\n    responsibility: Own concurrent-state correctness contracts without re-owning domain invariants, storage representation or system topology.\n    boundary:\n      semantic_cohesion: Ordering, isolation, atomicity, conflict, retry/idempotency and consistency semantics for interacting executions.\n      independent_change: Concurrency semantics can change when execution/delivery behavior changes while system decomposition remains stable.\n      public_contract: Provides accepted concurrency/consistency constraints to data, component, implementation and verification consumers.\n    merge_guidance: Omit when executions cannot materially interact or interaction cannot affect correctness.
+      public_contract: Provides accepted system topology and architectural constraints.
+
+  - id: CONCURRENCY-CONSISTENCY-DESIGN
+    class: conditional
+    applies_when: Multiple executions can interact with correctness-constrained state and correctness depends on ordering, isolation, atomicity, conflict, retry/idempotency or consistency semantics.
+    responsibility: Own concurrent-state correctness contracts without re-owning domain invariants, storage representation or system topology.
+    boundary:
+      semantic_cohesion: Ordering, isolation, atomicity, conflict, retry/idempotency and consistency semantics for interacting executions.
+      independent_change: Concurrency semantics can change when execution/delivery behavior changes while system decomposition remains stable.
+      public_contract: Provides accepted concurrency/consistency constraints to data, component, implementation and verification consumers.
+    merge_guidance: Omit when executions cannot materially interact or interaction cannot affect correctness.
 
   - id: SECURITY-ARCHITECTURE
     class: conditional
