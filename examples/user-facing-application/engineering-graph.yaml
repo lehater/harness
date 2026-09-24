@@ -88,19 +88,13 @@ authorities:
         requires:
           - capability: example.requirements
 
-  - id: INTERFACE-DESIGN
-    responsibility: Own supported machine and human external interaction contracts.
+  - id: MACHINE-INTERFACE-DESIGN
+    responsibility: Own supported machine interaction and representation contracts.
     boundary:
-      semantic_cohesion: External interaction and representation semantics.
-      independent_change: Interface representation can change behind stable product/domain semantics.
-      public_contract: Provides canonical machine and human interface contracts.
+      semantic_cohesion: Machine interaction and representation semantics.
+      independent_change: Machine interface can evolve behind stable product/domain semantics.
+      public_contract: Provides canonical machine interface contracts.
     produces:
-      - capability: example.machine-interface
-        knowledge_kind: interface-contract
-        requires:
-          - capability: example.requirements
-          - capability: example.domain-use-cases
-          - capability: example.security-architecture
       - capability: example.frontend.human-interface
         knowledge_kind: human-interface-design
         requires:
