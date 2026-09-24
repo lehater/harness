@@ -95,6 +95,20 @@ authorities:
       independent_change: Machine interface can evolve behind stable product/domain semantics.
       public_contract: Provides canonical machine interface contracts.
     produces:
+      - capability: example.machine-interface
+        knowledge_kind: interface-contract
+        requires:
+          - capability: example.requirements
+          - capability: example.domain-use-cases
+          - capability: example.security-architecture
+
+  - id: HUMAN-INTERFACE-DESIGN
+    responsibility: Own human interaction semantics, presentation system and screen/view composition.
+    boundary:
+      semantic_cohesion: Human interaction, information/navigation and presentation/view semantics.
+      independent_change: Human interface can evolve behind stable product/domain and machine-interface contracts.
+      public_contract: Provides canonical human-interface contracts.
+    produces:
       - capability: example.frontend.human-interface
         knowledge_kind: human-interface-design
         requires:
