@@ -39,7 +39,7 @@ authorities:
         requires:
           - capability: fixture.architecture
 
-  - id: INTERFACE-DESIGN
+  - id: MACHINE-INTERFACE-DESIGN
     responsibility: Own later human interface.
     boundary:
       semantic_cohesion: Later human interface.
