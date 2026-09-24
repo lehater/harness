@@ -26,6 +26,8 @@ roles:
       - engineering.application.use-cases
       - engineering.application.orchestration
       - engineering.application.failures
+      - engineering.reliability.failure-semantics
+      - engineering.reliability.dependency-failure
 
   architecture:
     can_produce_claims:
@@ -58,6 +60,7 @@ roles:
       - engineering.data.reproducibility
       - engineering.data.classification
       - engineering.reliability.durability
+      - engineering.reliability.durability
       - engineering.governance.data
 
   security-architecture:
@@ -76,16 +79,10 @@ roles:
       - engineering.security.vulnerability-management
       - engineering.security.secure-development
 
-  reliability:
+  concurrency:
     can_produce_claims:
-      - engineering.reliability.failure-semantics
-      - engineering.reliability.availability
-      - engineering.reliability.fault-tolerance
-      - engineering.reliability.recovery
       - engineering.reliability.consistency
       - engineering.reliability.retry-idempotency
-      - engineering.reliability.durability
-      - engineering.reliability.dependency-failure
 
   operability:
     can_produce_claims:
@@ -169,6 +166,9 @@ roles:
       - engineering.quality.flexibility.scalability
       - engineering.quality.flexibility.installability
       - engineering.quality.flexibility.replaceability
+      - engineering.reliability.availability
+      - engineering.reliability.fault-tolerance
+      - engineering.reliability.recovery
 
   transition:
     can_produce_claims:
