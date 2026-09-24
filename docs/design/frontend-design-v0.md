@@ -45,7 +45,7 @@ Existing Authorities remain sufficient:
 - PRODUCT-REQUIREMENTS owns users, outcomes, scope and externally observable product behavior.
 - DOMAIN / DOMAIN-USE-CASE-DESIGN owns domain language, states, invariants and business outcomes.
 - APPLICATION-DESIGN owns user-goal/application journeys and orchestration before screen decisions.
-- INTERFACE-DESIGN owns information architecture, navigation, user-visible interaction semantics, reusable presentation-system decisions and concrete screen/view composition.
+- HUMAN-INTERFACE-DESIGN owns information architecture, navigation, user-visible interaction semantics, reusable presentation-system decisions and concrete screen/view composition.
 - SYSTEM-ARCHITECTURE owns frontend runtime boundaries, client/server responsibility, state/cache ownership when architectural, and dependency topology.
 - SECURITY-ARCHITECTURE owns authentication/session trust boundaries and credential lifecycle.
 - QUALITY-DESIGN owns measurable architecture-significant frontend quality constraints.
@@ -72,7 +72,7 @@ A journey is not a screen flow.
 
 ### human-interface-design
 
-Owner: INTERFACE-DESIGN.
+Owner: HUMAN-INTERFACE-DESIGN.
 
 Purpose: materialize implementation-independent human-interface semantics from accepted journeys and upstream product/domain/security knowledge.
 
@@ -96,7 +96,7 @@ It must preserve implementation freedom for framework, CSS mechanics, private co
 
 ### presentation-system-design
 
-Owner: INTERFACE-DESIGN.
+Owner: HUMAN-INTERFACE-DESIGN.
 
 Purpose: define reusable application-level presentation knowledge once so every screen inherits a consistent visual/interaction language instead of re-deciding it locally.
 
@@ -120,7 +120,7 @@ If the accepted query/API contract does not yet support the required collection 
 
 ### screen-view-design
 
-Owner: INTERFACE-DESIGN.
+Owner: HUMAN-INTERFACE-DESIGN.
 
 Purpose: define implementation-independent composition for each required screen/view after interaction semantics and a Presentation System are known.
 
@@ -229,7 +229,7 @@ A user-facing implementation consumer explicitly requires the frontend closure. 
 The acceptance fixture in `examples/user-facing-application/**` verifies that:
 
 1. missing journey knowledge routes to APPLICATION-DESIGN;
-2. missing human-interface knowledge routes to INTERFACE-DESIGN;
+2. missing human-interface knowledge routes to HUMAN-INTERFACE-DESIGN;
 3. reusable Presentation System knowledge and concrete Screen/View Design are required before frontend architecture;
 4. every required screen inherits the shared Presentation System and local deviations are explicit;
 5. frontend architecture follows accepted interface/security/quality inputs;
