@@ -144,7 +144,7 @@ authorities:
 
   - id: QUALITY-DESIGN
     class: conditional
-    applies_when: Architecture-significant performance, availability, scale, consistency or other quality constraints require explicit decisions.
+    applies_when: Architecture-significant performance, availability, scale, staleness tolerance or other quality constraints require explicit decisions.
     responsibility: Own explicit realization quality constraints derived from accepted product/design truth.
     boundary:
       semantic_cohesion: Cross-cutting non-functional constraints on realization.
