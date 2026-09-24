@@ -60,7 +60,6 @@ roles:
       - engineering.data.reproducibility
       - engineering.data.classification
       - engineering.reliability.durability
-      - engineering.reliability.durability
       - engineering.governance.data
 
   security-architecture:
