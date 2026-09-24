@@ -50,7 +50,7 @@ def test_real_defect_regressions():
     assert r["status"]=="REJECTED" and "MISSING_SUBJECTS" in codes(r)
 
     # NAPMS: UI-required server interaction is absent from OpenAPI.
-    contract={"authority":"INTERFACE-DESIGN","owned_assertion_kinds":["ui-operation"],
+    contract={"authority":"HUMAN-INTERFACE-DESIGN","owned_assertion_kinds":["ui-operation"],
               "obligations":[{"id":"detail","kind":"ui-operation","subject":"getResourceDetail"}],
               "compatibility_obligations":[{"id":"ui-http","left_kind":"ui-operation","right_kind":"http-operation"}]}
     sources={"semantic_assertions":[
