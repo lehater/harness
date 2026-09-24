@@ -43,9 +43,6 @@ mappings:
     capability_contains: [application-design]
   application.failures:
     artifact_kinds: [application-architecture-rules, quality-requirements]
-  application.idempotency:
-    artifact_kinds: [application-architecture-rules]
-
   architecture.structure:
     artifact_kinds: [structural-architecture]
     capability_contains: [.architecture]
@@ -122,10 +119,11 @@ mappings:
     artifact_kinds: [application-architecture-rules, security-architecture]
     capability_contains: [verification-design]
   reliability.consistency:
-    artifact_kinds: [application-architecture-rules, physical-persistence-model, quality-requirements]
-    capability_contains: [data-design]
+    artifact_kinds: [concurrency-consistency-design]
+    capability_contains: [concurrency-consistency-design]
   reliability.retry-idempotency:
-    artifact_kinds: [application-architecture-rules]
+    artifact_kinds: [concurrency-consistency-design]
+    capability_contains: [concurrency-consistency-design]
   reliability.durability:
     artifact_kinds: [physical-persistence-model]
     capability_contains: [data-design]
