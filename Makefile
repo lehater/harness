@@ -10,6 +10,7 @@ harness-check:
 	python validators/validate_ddd_authority_research.py
 	python validators/validate_reference_applicability_research.py
 	python validators/validate_project_behavior_evals.py
+	python validators/validate_project_engineering_status.py
 	python validators/validate_agent_router.py
 	python validators/validate_workspace.py
 	python validators/validate_agent_layer.py
