@@ -43,7 +43,7 @@ authorities:
         requires:
           - capability: csv-deduplicator.product-intent
 
-  - id: INTERFACE-DESIGN
+  - id: HUMAN-INTERFACE-DESIGN
     responsibility: Own the supported command-line interface contract.
     boundary:
       semantic_cohesion: Decisions about user-facing command arguments, outputs and errors.
