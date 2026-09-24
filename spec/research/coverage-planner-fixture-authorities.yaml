@@ -4,5 +4,5 @@ project: DERIVATION-FIXTURE
 status: research
 bindings:
   DATA: [data]
-  RELIABILITY: [reliability]
+  RELIABILITY: [quality]
   OPERABILITY: [operability]
