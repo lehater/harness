@@ -91,7 +91,8 @@ Useful knowledge may include:
 - a materially simpler satisfying topology is not rejected without an explicit trade-off;
 - no downstream interface/storage detail is promoted without architectural need;
 - no product/domain truth is re-owned;
-- dependency topology is explicit where implementation could otherwise invent it;\n- material concurrent-state correctness semantics are routed to CONCURRENCY-CONSISTENCY-DESIGN rather than owned here;
+- dependency topology is explicit where implementation could otherwise invent it;
+- material concurrent-state correctness semantics are routed to CONCURRENCY-CONSISTENCY-DESIGN rather than owned here;
 - unresolved upstream semantics remain Questions.
 
 ## Registration
