@@ -17,8 +17,8 @@ CASES = [
     ("core-state-with-user-needs.yaml", "product-requirements", "PRODUCT-REQUIREMENTS"),
     ("core-state-before-task-model.yaml", "task-model", "APPLICATION-DESIGN"),
     ("core-state-upstream.yaml", "user-journey-design", "APPLICATION-DESIGN"),
-    ("core-state-with-interface.yaml", "presentation-system-design", "INTERFACE-DESIGN"),
-    ("core-state-with-ui-foundations.yaml", "screen-view-design", "INTERFACE-DESIGN"),
+    ("core-state-with-interface.yaml", "presentation-system-design", "HUMAN-INTERFACE-DESIGN"),
+    ("core-state-with-ui-foundations.yaml", "screen-view-design", "HUMAN-INTERFACE-DESIGN"),
     ("core-state-with-screen-view.yaml", "system-architecture", "SYSTEM-ARCHITECTURE"),
 ]
 
@@ -88,8 +88,8 @@ def main() -> None:
         for item in journeys_frontier["routed"]
     }
     assert actual_journeys == {
-        ("human-interface-design", "INTERFACE-DESIGN"),
-        ("presentation-system-design", "INTERFACE-DESIGN"),
+        ("human-interface-design", "HUMAN-INTERFACE-DESIGN"),
+        ("presentation-system-design", "HUMAN-INTERFACE-DESIGN"),
     }, journeys_frontier
     assert not journeys_frontier["unrouted"], journeys_frontier["unrouted"]
 
