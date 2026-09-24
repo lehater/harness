@@ -9,7 +9,7 @@ bindings:
   SECURITY-ARCHITECTURE: [security-architecture]
   QUALITY-DESIGN: [quality]
   MACHINE-INTERFACE-DESIGN: [interface]
-  SYSTEM-ARCHITECTURE: [architecture, reliability]
+  SYSTEM-ARCHITECTURE: [architecture]
   COMPONENT-DESIGN: [engineering]
   VERIFICATION-DESIGN: [verification]
   TEST-DESIGN: [verification]
