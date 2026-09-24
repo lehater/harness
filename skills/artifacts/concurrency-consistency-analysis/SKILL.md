@@ -23,7 +23,7 @@ Accepted design is authority. Production code, database isolation defaults, ORM 
 2. Generate applicable overlap, duplicate, reordering, stale-read, partial-progress and saturation scenarios.
 3. Identify authoritative state/invariant for each scenario.
 4. Identify the Authority owning that state/invariant/outcome.
-5. State required atomicity, observation, ordering, conflict and continuation semantics.
+5. Detect required atomicity, observation, ordering, conflict and continuation semantics; route interacting-execution correctness semantics to CONCURRENCY-CONSISTENCY-DESIGN rather than accepting them here.
 6. State capacity-pressure behavior where it can be externally meaningful.
 7. Classify COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING or QUESTION.
 8. Route Questions; do not repair missing semantics in this analysis.
@@ -34,8 +34,8 @@ Accepted design is authority. Production code, database isolation defaults, ORM 
 ## Ownership routing
 
 - competing business effects, merge/win/reject validity, invariant -> Domain/Application;
-- transaction/use-case atomicity and continuation -> Application;
-- public conflict/version/order/overload representation -> Interface;
+- application workflow continuation and domain-level all-or-nothing meaning -> Application;\n- interacting-execution ordering, isolation, atomicity, conflict, retry/idempotency and consistency correctness -> CONCURRENCY-CONSISTENCY-DESIGN;
+- public machine conflict/version/order/overload representation -> MACHINE-INTERFACE-DESIGN;\n- human-visible conflict/recovery interaction -> HUMAN-INTERFACE-DESIGN;
 - physical uniqueness, isolation, locking/version representation -> Data;
 - partition, queue, admission, isolation and coordination topology -> System Architecture;
 - staleness/latency/capacity/headroom targets -> Quality;
@@ -81,7 +81,7 @@ The analysis artifact is not automatically a Capability.
 
 ## Registration
 
-This skill is evidence against creating a generic CONCURRENCY-DESIGN/CONSISTENCY-DESIGN/ORDERING-DESIGN/BACKPRESSURE-DESIGN Authority from the currently demonstrated semantics. Any future independently owned decision boundary requires a new atomicity test.
+This skill remains a non-owning coverage lens. It may discover work for CONCURRENCY-CONSISTENCY-DESIGN, but does not itself provide that Authority's accepted capability. Backpressure/capacity concerns that do not belong to concurrent-state correctness continue to route to their existing owners.
 
 
 ## Acceptance checks
