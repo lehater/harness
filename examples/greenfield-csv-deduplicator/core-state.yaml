@@ -24,7 +24,7 @@ artifacts:
       - PRODUCT-REQUIREMENTS
 
   - id: CLI-CONTRACT
-    authority: INTERFACE-DESIGN
+    authority: MACHINE-INTERFACE-DESIGN
     path: examples/greenfield-csv-deduplicator/artifacts/cli-contract.md
     provides:
       - csv-deduplicator.cli-contract
