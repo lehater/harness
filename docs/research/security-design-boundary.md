@@ -26,7 +26,7 @@ A checklist item is not automatically an Authority, Capability, requirement, or 
 | Who may perform a business action | PRODUCT / DOMAIN | Own the semantic entitlement or policy. |
 | Identity/trust boundaries and authentication architecture | SECURITY-ARCHITECTURE | Select trusted identities, admission boundaries and enforcement structure. |
 | Authorization enforcement placement | SECURITY-ARCHITECTURE with DOMAIN/PRODUCT semantics upstream | Preserve semantic policy while selecting enforcement boundary. |
-| Public 401/403/error representation | INTERFACE-DESIGN | Represent accepted security outcomes externally. |
+| Public 401/403/error representation | MACHINE-INTERFACE-DESIGN | Represent accepted security outcomes externally. |
 | Session/token lifecycle | SECURITY-ARCHITECTURE, with interface/runtime consequences | Own security lifecycle unless product semantics independently constrain it. |
 | Sensitive-data classification/disclosure rule | SECURITY-ARCHITECTURE or project security policy; DATA/INTERFACE/OPERABILITY consume it | Security owns protection requirement, consumers own their representation/evidence. |
 | Physical persistence representation | DATA-DESIGN | Security supplies protection constraints; Data owns storage realization contract. |
