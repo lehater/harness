@@ -70,7 +70,7 @@ concerns:
     title: Data and evidence
     children:
       - {id: data.model, title: Data model and ownership}
-      - {id: data.integrity, title: Integrity and consistency}
+      - {id: data.integrity, title: Physical data integrity and storage constraints}
       - {id: data.lifecycle, title: Retention, deletion and lifecycle}
       - {id: data.quality, title: Data quality}
       - {id: data.provenance, title: Lineage and provenance}
