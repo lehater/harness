@@ -31,7 +31,7 @@ artifacts:
     depends_on: [EXAMPLE-REQUIREMENTS]
   - id: EXAMPLE-MACHINE-INTERFACE
     path: examples/user-facing-application/canonical/example-machine-interface.yaml
-    authority: INTERFACE-DESIGN
+    authority: HUMAN-INTERFACE-DESIGN
     provides: [example.machine-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
   - id: EXAMPLE-TASK-MODEL
@@ -46,12 +46,12 @@ artifacts:
     depends_on: [EXAMPLE-TASK-MODEL, EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
   - id: EXAMPLE-HUMAN-INTERFACE
     path: examples/user-facing-application/canonical/example-human-interface.yaml
-    authority: INTERFACE-DESIGN
+    authority: HUMAN-INTERFACE-DESIGN
     provides: [example.frontend.human-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-TASK-MODEL, EXAMPLE-FRONTEND-JOURNEYS, EXAMPLE-SECURITY, EXAMPLE-MACHINE-INTERFACE]
   - id: EXAMPLE-PRESENTATION-SYSTEM
     path: examples/user-facing-application/canonical/example-presentation-system.yaml
-    authority: INTERFACE-DESIGN
+    authority: HUMAN-INTERFACE-DESIGN
     provides: [example.frontend.presentation-system]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-FRONTEND-JOURNEYS, EXAMPLE-QUALITY, EXAMPLE-MACHINE-INTERFACE]
 questions: []
