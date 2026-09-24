@@ -61,3 +61,13 @@ Before merge:
 - bootstrap/reconcile has split-ID migration tests;
 - all repository validators pass;
 - no old Authority ID remains in canonical/runtime configuration except explicit migration compatibility fixtures/docs.
+
+
+## Consistency review note
+
+Post-migration semantic review found and corrected three drift classes before tests:
+- catalog serialization accidentally contained literal escaped newlines around CONCURRENCY-CONSISTENCY-DESIGN;
+- SYSTEM-ARCHITECTURE skill still claimed consistency/transaction ownership after the split;
+- interface-contract and human-interface skills still used the former combined Interface Design ownership language.
+
+These are migration defects, not new boundary decisions.
