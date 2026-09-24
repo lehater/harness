@@ -9,7 +9,7 @@ description: "Use for shared application-level presentation decisions that scree
 
 Use when a user-facing application needs reusable presentation decisions whose absence would force screen implementers to invent inconsistent UI/UX choices.
 
-Owner: INTERFACE-DESIGN.
+Owner: HUMAN-INTERFACE-DESIGN.
 
 ## Responsibility
 
@@ -114,7 +114,7 @@ A useful contract includes:
 
 ## Registration
 
-Register under INTERFACE-DESIGN and provide only the presentation-system capabilities actually materialized. Dependencies include the accepted journeys, interface/quality/obligation inputs genuinely consumed.
+Register under HUMAN-INTERFACE-DESIGN and provide only the presentation-system capabilities actually materialized. Dependencies include the accepted journeys, interface/quality/obligation inputs genuinely consumed.
 
 ## Human projection
 
