@@ -113,9 +113,9 @@ The research supports **splitting the current strategic decision space conceptua
 The safer Harness interpretation is:
 
 - introduce distinct capability families for **domain strategy** and **model-context strategy**;
-- allow them to be owned by one STRATEGIC-DOMAIN-DESIGN Authority when the project is simple/cohesive;
+- allow them to be owned by one STRATEGIC-DOMAIN-DESIGN Authority when they form one coherent ownership boundary with no independently consumed knowledge interface/lifecycle;
 - permit an Authority split when the knowledge-flow/independent-change evidence demonstrates separate ownership/lifecycles;
-- require model-context outputs to consume accepted domain strategy when such strategy exists, but do not require every simple project to manufacture subdomain taxonomy;
+- require model-context outputs to consume accepted domain strategy when such strategy exists, but do not manufacture subdomain taxonomy when no material domain-strategy decision requires it;
 - prohibit capability/product-feature lists from being relabeled as Bounded Contexts without model/language-boundary evidence.
 
 This preserves Harness's project-specific atomicity principle while fixing the current conflation.
@@ -131,7 +131,7 @@ The method must reject:
 - Layered Architecture as domain semantic ownership merely because it appears in DDD literature.
 
 It must allow:
-- simple domain: one strategic owner and one model context;
+- one coherent model with no independent context-boundary decision;
 - multiple subdomains represented inside one model context when justified;
 - one subdomain represented by multiple Bounded Contexts when language/model consistency requires it;
 - Bounded Context changes without reclassifying subdomains;
