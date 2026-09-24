@@ -2,7 +2,7 @@ version: 1
 kind: harness-core-model
 authorities:
   - {id: DATA-DESIGN}
-  - {id: INTERFACE-DESIGN}
+  - {id: MACHINE-INTERFACE-DESIGN}
 artifacts:
   - id: MVP-DATA
     authority: DATA-DESIGN
@@ -10,7 +10,7 @@ artifacts:
     provides: [fixture.mvp.data-design]
     depends_on: []
   - id: LATER-HUMAN
-    authority: INTERFACE-DESIGN
+    authority: MACHINE-INTERFACE-DESIGN
     path: later-human.yaml
     provides: [fixture.later.human-interface]
     depends_on: []
