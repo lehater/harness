@@ -1,6 +1,6 @@
 ---
 name: interface-contract
-description: "Use for actionable CREATE work requiring a supported external interface contract such as CLI, HTTP/API, file exchange or user interaction. Define representation and interaction semantics from accepted product/domain/architecture truth without becoming domain or persistence authority."
+description: "Use for actionable CREATE work requiring a supported external interface contract such as CLI, HTTP/API, message protocol or file exchange. Define representation and interaction semantics from accepted product/domain/architecture truth without becoming domain or persistence authority."
 ---
 
 # Interface Contract
@@ -8,12 +8,12 @@ description: "Use for actionable CREATE work requiring a supported external inte
 ## Trigger
 
 Use when actionable grouped artifact work has `knowledge_kind:
-interface-contract` and the Interface Design Authority must define a supported
-external machine/user boundary.
+interface-contract` and the Machine Interface Design Authority must define a supported
+external machine-consumed boundary.
 
 ## Inputs
 
-- actionable grouped work and Interface Design Authority;
+- actionable grouped work and Machine Interface Design Authority;
 - accepted Product Requirements/acceptance semantics;
 - accepted domain/application semantics needed at the boundary;
 - accepted System/Security Architecture constraints.
@@ -56,8 +56,7 @@ Stop when:
 
 ## Output contract
 
-Use the natural target format: OpenAPI, CLI contract, schema, UI interaction
-contract, file-format contract or another project-native representation.
+Use the natural target format: OpenAPI, CLI contract, message/schema contract or file-format contract or another project-native representation.
 
 Do not force all interface forms into one Harness schema.
 
@@ -75,7 +74,7 @@ Do not force all interface forms into one Harness schema.
 
 ## Registration
 
-Register accepted interface artifact(s) under Interface Design and provide all
+Register accepted interface artifact(s) under MACHINE-INTERFACE-DESIGN and provide all
 grouped capabilities genuinely materialized by them.
 
 ## Human projection
