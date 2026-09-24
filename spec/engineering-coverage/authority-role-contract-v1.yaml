@@ -26,7 +26,6 @@ roles:
       - engineering.application.use-cases
       - engineering.application.orchestration
       - engineering.application.failures
-      - engineering.application.idempotency
 
   architecture:
     can_produce_claims:
