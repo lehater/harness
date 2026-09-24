@@ -17,12 +17,18 @@ def load(path):
 def catalog_ids(catalog):
     return [a["id"] for a in catalog.get("authorities", [])]
 
-def bootstrap_registry(catalog, existing=None, core=None):
+def bootstrap_registry(catalog, existing=None, core=None, authority_migrations=None):
     existing = existing or {}
     records = {r["authority_id"]: dict(r) for r in existing.get("assessments", [])}
     artifact_authorities = {a.get("authority") for a in (core or {}).get("artifacts", [])}
     unresolved_authorities = {q.get("authority") for q in (core or {}).get("questions", []) if q.get("resolution") is None}
     result = []
+    migrations = authority_migrations or {}
+    retired = {old for old in migrations if old not in catalog_ids(catalog)}
+    conflicts = []
+    for old in retired:
+        if old in records and records[old].get("applicability") != "UNASSESSED":
+            conflicts.append({"retired_authority": old, "previous_assessment": records[old], "replacements": migrations[old], "resolution": "MANUAL-DECISION"})
     for authority_id in catalog_ids(catalog):
         if authority_id in records:
             result.append(records[authority_id]); continue
@@ -42,7 +48,9 @@ def bootstrap_registry(catalog, existing=None, core=None):
                            "reopening_conditions": ["question is resolved or project evidence changes"]})
         else:
             result.append({"authority_id": authority_id, "applicability": "UNASSESSED"})
-    return {"version": 1, "kind": "harness-project-authority-assessments", "assessments": result}
+    out = {"version": 1, "kind": "harness-project-authority-assessments", "assessments": result}
+    if conflicts: out["migration_conflicts"] = conflicts
+    return out
 
 def validate_registry(catalog, registry):
     expected = set(catalog_ids(catalog)); rows = registry.get("assessments", [])
