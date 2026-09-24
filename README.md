@@ -41,7 +41,7 @@ See `docs/design/engineering-graph-v0.md`. The repository integration boundary i
 
 ## User-facing/frontend design
 
-User-facing applications use the same Engineering Graph and Core semantics as backend work. Harness adds reusable `user-journey-design` and `human-interface-design` production procedures while retaining Application Design, Interface Design, System Architecture, Security, Component, Verification, Test and Implementation ownership boundaries.
+User-facing applications use the same Engineering Graph and Core semantics as backend work. Harness adds reusable `user-journey-design` and `human-interface-design` production procedures while retaining Application Design, Machine/Human Interface Design, System Architecture, Security, Component, Verification, Test and Implementation ownership boundaries.
 
 See `docs/design/frontend-design-v0.md` and the executable `examples/user-facing-application/**` fixture.
 
