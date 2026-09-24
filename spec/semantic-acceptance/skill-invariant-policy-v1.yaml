@@ -7,7 +7,9 @@ enforced:
   - {knowledge_kind: problem-evidence, skill: skills/artifacts/problem-evidence/SKILL.md}
   - {knowledge_kind: user-needs, skill: skills/artifacts/user-needs/SKILL.md}
   - {knowledge_kind: product-requirements, skill: skills/artifacts/product-requirements/SKILL.md}
-  - {knowledge_kind: strategic-domain-design, skill: skills/artifacts/strategic-domain-design/SKILL.md}
+  - {knowledge_kind: domain-strategy, skill: skills/artifacts/domain-strategy/SKILL.md}
+  - {knowledge_kind: model-context-strategy, skill: skills/artifacts/model-context-strategy/SKILL.md}
+  - {knowledge_kind: concurrency-consistency-design, skill: skills/artifacts/concurrency-consistency-design/SKILL.md}
   - {knowledge_kind: domain-use-case, skill: skills/artifacts/domain-use-case/SKILL.md}
   - {knowledge_kind: application-design, skill: skills/artifacts/application-design/SKILL.md}
   - {knowledge_kind: task-model, skill: skills/artifacts/task-model/SKILL.md}
