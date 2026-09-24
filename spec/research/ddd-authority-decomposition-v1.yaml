@@ -1,0 +1,127 @@
+version: 1
+kind: harness-ddd-authority-research
+id: DDD-AUTHORITY-DECOMPOSITION-V1
+
+classes:
+  public-domain-strategy: STRATEGIC-DOMAIN-DESIGN
+  public-context-strategy: STRATEGIC-DOMAIN-DESIGN
+  public-tactical-model: TACTICAL-DOMAIN-DESIGN
+  context-relationship-pattern: STRATEGIC-DOMAIN-DESIGN
+  modeling-practice: null
+  external-authority: null
+
+patterns:
+  # I. Putting the Model to Work
+  - {name: Bounded Context, class: public-context-strategy}
+  - {name: Ubiquitous Language, class: modeling-practice}
+  - {name: Continuous Integration, class: modeling-practice}
+  - {name: Model-Driven Design, class: modeling-practice}
+  - {name: Hands-on Modelers, class: modeling-practice}
+  - {name: Refactoring Toward Deeper Insight, class: modeling-practice}
+
+  # II. Building Blocks
+  - {name: Layered Architecture, class: external-authority, owner: SYSTEM-ARCHITECTURE}
+  - {name: Entity, class: public-tactical-model}
+  - {name: Value Object, class: public-tactical-model}
+  - {name: Domain Event, class: public-tactical-model}
+  - {name: Service, class: public-tactical-model}
+  - {name: Module, class: public-tactical-model}
+  - {name: Aggregate, class: public-tactical-model}
+  - {name: Repository, class: public-tactical-model}
+  - {name: Factory, class: public-tactical-model}
+
+  # III. Supple Design
+  - {name: Intention-Revealing Interfaces, class: modeling-practice}
+  - {name: Side-Effect-Free Functions, class: modeling-practice}
+  - {name: Assertions, class: modeling-practice}
+  - {name: Standalone Classes, class: modeling-practice}
+  - {name: Closure of Operations, class: modeling-practice}
+  - {name: Declarative Design, class: modeling-practice}
+  - {name: Drawing on Established Formalisms, class: modeling-practice}
+  - {name: Conceptual Contours, class: modeling-practice}
+
+  # IV. Context Mapping
+  - {name: Context Map, class: public-context-strategy}
+  - {name: Partnership, class: context-relationship-pattern}
+  - {name: Shared Kernel, class: context-relationship-pattern}
+  - {name: Customer/Supplier Development, class: context-relationship-pattern}
+  - {name: Conformist, class: context-relationship-pattern}
+  - {name: Anticorruption Layer, class: context-relationship-pattern}
+  - {name: Open-host Service, class: context-relationship-pattern}
+  - {name: Published Language, class: context-relationship-pattern}
+  - {name: Separate Ways, class: context-relationship-pattern}
+  - {name: Big Ball of Mud, class: public-context-strategy}
+
+  # V. Distillation
+  - {name: Core Domain, class: public-domain-strategy}
+  - {name: Generic Subdomains, class: public-domain-strategy}
+  - {name: Domain Vision Statement, class: public-domain-strategy}
+  - {name: Highlighted Core, class: modeling-practice}
+  - {name: Cohesive Mechanisms, class: modeling-practice}
+  - {name: Segregated Core, class: modeling-practice}
+  - {name: Abstract Core, class: modeling-practice}
+
+  # VI. Large-scale Structure
+  - {name: Evolving Order, class: modeling-practice}
+  - {name: System Metaphor, class: modeling-practice}
+  - {name: Responsibility Layers, class: modeling-practice}
+  - {name: Knowledge Level, class: modeling-practice}
+  - {name: Pluggable Component Framework, class: external-authority, owner: SYSTEM-ARCHITECTURE}
+
+knowledge_flows:
+  - producer: domain-strategy
+    output: domain.landscape
+    consumer: model-context-strategy
+    consumer_output: domain.context-boundaries
+    necessity: Context boundary design needs accepted problem-space responsibilities when non-trivial domain decomposition exists.
+    encapsulation: Context design consumes the landscape but owns model/language applicability rather than subdomain identity.
+  - producer: model-context-strategy
+    output: domain.context-boundaries
+    consumer: tactical-domain-model
+    consumer_output: domain.tactical-model
+    necessity: Tactical semantics require a declared model/language applicability boundary in a non-trivial multi-model domain.
+    encapsulation: Tactical modeling consumes the context boundary without redefining context ownership.
+  - producer: tactical-domain-model
+    output: domain.tactical-model
+    consumer: implementation-design
+    consumer_output: implementation.plan
+    necessity: Implementation must realize accepted identities, invariants, events and aggregate semantics without inventing domain rules.
+    encapsulation: Implementation consumes tactical semantics without owning domain meaning.
+
+boundary_variants:
+  - id: simple-one-context
+    expect: PASS
+    domain_strategy: optional
+    subdomains: 1
+    contexts: 1
+    rationale: One coherent model/language may need no separately materialized strategic decomposition.
+  - id: multiple-subdomains-one-context
+    expect: PASS
+    subdomains: 3
+    contexts: 1
+    rationale: Multiple problem-space responsibilities do not prove multiple model/language boundaries.
+  - id: one-subdomain-multiple-contexts
+    expect: PASS
+    subdomains: 1
+    contexts: 2
+    rationale: Distinct models/languages may coexist for one business subdomain.
+  - id: automatic-one-to-one
+    expect: FAIL
+    subdomains: 4
+    contexts: 4
+    rationale: one subdomain equals one bounded context
+    invalid_reason_markers: ["equals", "1:1", "automatically"]
+  - id: capabilities-renamed-contexts
+    expect: FAIL
+    contexts_source: product-capabilities
+    rationale: Context names copied from product capability groups without model/language boundary evidence.
+  - id: context-change-stable-domain-strategy
+    expect: PASS
+    domain_strategy_changed: false
+    context_boundaries_changed: true
+    rationale: Model boundaries can evolve independently behind a stable problem-space decomposition.
+  - id: domain-strategy-change-stable-context
+    expect: PASS
+    domain_strategy_changed: true
+    context_boundaries_changed: false
+    rationale: Strategic classification can change without mechanically changing a valid model boundary.
