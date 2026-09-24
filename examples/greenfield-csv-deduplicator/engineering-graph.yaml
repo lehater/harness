@@ -43,10 +43,10 @@ authorities:
         requires:
           - capability: csv-deduplicator.product-intent
 
-  - id: HUMAN-INTERFACE-DESIGN
-    responsibility: Own the supported command-line interface contract.
+  - id: MACHINE-INTERFACE-DESIGN
+    responsibility: Own the supported interoperable command-line interface contract.
     boundary:
-      semantic_cohesion: Decisions about user-facing command arguments, outputs and errors.
+      semantic_cohesion: Decisions about command syntax, arguments, exit codes, stdout/stderr and machine-consumable errors.
       independent_change: CLI representation can evolve while product semantics remain stable.
       public_contract: Produces the canonical CLI contract.
     produces:
