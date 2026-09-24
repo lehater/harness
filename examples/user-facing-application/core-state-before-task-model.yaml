@@ -31,7 +31,7 @@ artifacts:
     depends_on: [EXAMPLE-REQUIREMENTS]
   - id: EXAMPLE-MACHINE-INTERFACE
     path: examples/user-facing-application/canonical/example-machine-interface.yaml
-    authority: HUMAN-INTERFACE-DESIGN
+    authority: MACHINE-INTERFACE-DESIGN
     provides: [example.machine-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
 questions: []
