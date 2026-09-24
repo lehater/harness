@@ -23,7 +23,7 @@ Activated unresolved concerns in the current research overlay: 9.
 
 | Concern | Derived planning result | Route |
 |---|---|---|
-| interface.human.journeys | MISSING | INTERFACE-DESIGN |
+| interface.human.journeys | MISSING | HUMAN-INTERFACE-DESIGN |
 | verification.interface.human | MISSING | VERIFICATION-DESIGN |
 | data.lifecycle | MISSING | DATA-DESIGN |
 | data.classification | MISSING | DATA-DESIGN |
