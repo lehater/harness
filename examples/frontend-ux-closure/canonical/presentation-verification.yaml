@@ -1,0 +1,4 @@
+version: 1
+kind: verification-strategy
+id: FRONTEND-UX-PRESENTATION-VERIFICATION
+objectives: [prove-topology-required-views-have-screen-contracts, prove-presentation-realization]

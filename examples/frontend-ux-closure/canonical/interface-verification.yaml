@@ -1,0 +1,4 @@
+version: 1
+kind: verification-strategy
+id: FRONTEND-UX-INTERFACE-VERIFICATION
+objectives: [prove-task-interaction-topology-closure, validate-findability-before-screen-realization]

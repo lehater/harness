@@ -1,0 +1,58 @@
+authorities: []
+artifacts:
+  - id: TASK-MODEL
+    path: examples/frontend-ux-closure/canonical/task-model.yaml
+    authority: APPLICATION-DESIGN
+    provides: [experiment.frontend.task-model]
+    depends_on: []
+  - id: JOURNEYS
+    path: examples/frontend-ux-closure/canonical/user-journeys.yaml
+    authority: APPLICATION-DESIGN
+    provides: [experiment.frontend.user-journeys]
+    depends_on: [TASK-MODEL]
+  - id: CONCEPTUAL
+    path: examples/frontend-ux-closure/canonical/conceptual-interface-model.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.conceptual-model]
+    depends_on: [TASK-MODEL, JOURNEYS]
+  - id: IA
+    path: examples/frontend-ux-closure/canonical/information-architecture.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.information-architecture]
+    depends_on: [CONCEPTUAL, TASK-MODEL, JOURNEYS]
+  - id: INTERACTION
+    path: examples/frontend-ux-closure/canonical/interaction-design.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.interaction]
+    depends_on: [CONCEPTUAL, TASK-MODEL, JOURNEYS]
+  - id: TOPOLOGY
+    path: examples/frontend-ux-closure/canonical/interface-topology.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.topology]
+    depends_on: [IA, INTERACTION]
+  - id: PRESENTATION
+    path: examples/user-facing-application/canonical/example-presentation-system.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.presentation-system]
+    depends_on: [CONCEPTUAL, INTERACTION, TOPOLOGY]
+  - id: INTERFACE-VERIFICATION
+    path: examples/frontend-ux-closure/canonical/interface-verification.yaml
+    authority: VERIFICATION-DESIGN
+    provides: [experiment.frontend.interface-verification]
+    depends_on: [TASK-MODEL, IA, INTERACTION, TOPOLOGY]
+  - id: SCREENS
+    path: examples/user-facing-application/canonical/example-screen-view-design.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [experiment.frontend.screen-view]
+    depends_on: [TOPOLOGY, INTERACTION, PRESENTATION]
+  - id: PRESENTATION-VERIFICATION
+    path: examples/frontend-ux-closure/canonical/presentation-verification.yaml
+    authority: VERIFICATION-DESIGN
+    provides: [experiment.frontend.presentation-verification]
+    depends_on: [INTERFACE-VERIFICATION, PRESENTATION, SCREENS]
+  - id: IMPLEMENTATION
+    path: examples/frontend-ux-closure/canonical/implementation-plan.yaml
+    authority: IMPLEMENTATION-DESIGN
+    provides: [experiment.frontend.implementation-plan]
+    depends_on: [PRESENTATION-VERIFICATION]
+questions: []

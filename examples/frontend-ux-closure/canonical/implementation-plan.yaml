@@ -1,0 +1,4 @@
+version: 1
+kind: implementation-design
+id: FRONTEND-UX-IMPLEMENTATION
+slices: [realize-accepted-frontend-contracts]
