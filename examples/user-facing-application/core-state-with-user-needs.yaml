@@ -4,9 +4,11 @@ artifacts:
     path: examples/user-facing-application/canonical/example-problem-evidence.yaml
     authority: DISCOVERY
     provides: [example.problem-evidence]
+    depends_on: []
   - id: EXAMPLE-USER-NEEDS
     path: examples/user-facing-application/canonical/example-user-needs.yaml
     authority: DISCOVERY
     provides: [example.user-needs]
     depends_on: [EXAMPLE-PROBLEM-EVIDENCE]
-questions: []
+questions:
+  []

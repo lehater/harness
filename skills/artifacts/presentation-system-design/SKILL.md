@@ -20,8 +20,9 @@ This knowledge kind is design knowledge, not a component library and not framewo
 ## Inputs
 
 - accepted Product Requirements and users/tasks;
-- accepted user journeys;
-- accepted Human Interface semantics where already available;
+- accepted Task Model and user journeys;
+- accepted Conceptual Interface Model;
+- accepted Information Architecture, Interaction Design and Interface Topology where material to shared presentation;
 - channel/platform constraints;
 - branding/content constraints when applicable;
 - accessibility/usability obligations and Quality constraints;
@@ -31,7 +32,7 @@ Missing upstream facts that materially affect presentation become Questions.
 
 ## Read boundary
 
-Read accepted project requirements, journeys, interface semantics, quality/obligation constraints and existing canonical presentation contracts. Existing CSS, component code, screenshots, Figma files and vendor design-system defaults are evidence or implementation context, not authority unless explicitly declared canonical.
+Read accepted project requirements, tasks/journeys, conceptual/IA/interaction/topology semantics, quality/obligation constraints and existing canonical presentation contracts. Existing CSS, component code, screenshots, Figma files and vendor design-system defaults are evidence or implementation context, not authority unless explicitly declared canonical.
 
 ## Procedure
 
@@ -114,7 +115,7 @@ A useful contract includes:
 
 ## Registration
 
-Register under HUMAN-INTERFACE-DESIGN and provide only the presentation-system capabilities actually materialized. Dependencies include the accepted journeys, interface/quality/obligation inputs genuinely consumed.
+Register under HUMAN-INTERFACE-DESIGN and provide only the presentation-system capabilities actually materialized. Dependencies should reference the granular conceptual/IA/interaction/topology and quality/obligation inputs genuinely consumed; do not require a broad human-interface synthesis capability merely for compatibility.
 
 ## Human projection
 

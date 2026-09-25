@@ -2,215 +2,129 @@ version: 1
 kind: harness-engineering-graph
 id: USER-FACING-APPLICATION-EXAMPLE
 default_subject: EXAMPLE-USER-FACING-APPLICATION
-
 authorities:
   - id: DISCOVERY
-    responsibility: Own accepted problem evidence, context of use, user goals and user needs without deciding normative product behavior or interface realization.
-    boundary:
-      semantic_cohesion: Problem-space evidence and solution-independent user needs.
-      independent_change: Context and user needs can be refined before normative product requirements or solution design changes.
-      public_contract: Provides accepted problem evidence and user-needs knowledge to requirements and application design.
+    responsibility: Own accepted problem evidence, context of use, user goals and user needs.
+    boundary: {semantic_cohesion: Problem-space evidence and solution-independent user needs., independent_change: Context and needs can change before normative requirements or design., public_contract: Provides problem evidence and user-needs knowledge.}
     produces:
-      - capability: example.problem-evidence
-        knowledge_kind: problem-evidence
-        requires: []
+      - {capability: example.problem-evidence, knowledge_kind: problem-evidence, requires: []}
       - capability: example.user-needs
         knowledge_kind: user-needs
-        requires:
-          - capability: example.problem-evidence
-
+        requires: [{capability: example.problem-evidence}]
   - id: PRODUCT-REQUIREMENTS
-    responsibility: Own accepted user-facing application product behavior and acceptance intent.
-    boundary:
-      semantic_cohesion: Observable product intent and constraints.
-      independent_change: Product intent can change without deciding UI or technical realization.
-      public_contract: Provides accepted product requirements.
+    responsibility: Own accepted user-facing product behavior and acceptance intent.
+    boundary: {semantic_cohesion: Observable product intent and constraints., independent_change: Product intent can change without deciding interface realization., public_contract: Provides accepted product requirements.}
     produces:
       - capability: example.requirements
         knowledge_kind: product-requirements
-        requires:
-          - capability: example.user-needs
-
+        requires: [{capability: example.user-needs}]
   - id: DOMAIN-USE-CASE-DESIGN
-    responsibility: Own accepted domain/use-case behavior consumed by the selected frontend journey.
-    boundary:
-      semantic_cohesion: Observable domain behavior and outcomes.
-      independent_change: Domain semantics can evolve independently of interface realization.
-      public_contract: Provides accepted use-case semantics.
+    responsibility: Own accepted domain/use-case behavior consumed by the frontend.
+    boundary: {semantic_cohesion: Observable domain behavior and outcomes., independent_change: Domain semantics can evolve independently of interface realization., public_contract: Provides accepted use-case semantics.}
     produces:
       - capability: example.domain-use-cases
         knowledge_kind: domain-use-case
-        requires:
-          - capability: example.requirements
-
+        requires: [{capability: example.requirements}]
   - id: APPLICATION-DESIGN
-    responsibility: Own user-goal/application journey composition without deciding screens.
-    boundary:
-      semantic_cohesion: Goal-oriented application interaction and orchestration.
-      independent_change: Journey composition can evolve without selecting UI structure.
-      public_contract: Provides accepted user journeys to Human Interface Design.
+    responsibility: Own intended human work and user journeys without deciding interface structure.
+    boundary: {semantic_cohesion: Goal/task decomposition and journey composition., independent_change: Tasks and journeys can evolve before interface realization., public_contract: Provides Task Model and User Journey knowledge.}
     produces:
       - capability: example.frontend.task-model
         knowledge_kind: task-model
-        requires:
-          - capability: example.user-needs
-          - capability: example.requirements
-          - capability: example.domain-use-cases
+        requires: [{capability: example.user-needs}, {capability: example.requirements}, {capability: example.domain-use-cases}]
       - capability: example.frontend.user-journeys
         knowledge_kind: user-journey-design
-        requires:
-          - capability: example.frontend.task-model
-          - capability: example.requirements
-          - capability: example.domain-use-cases
-
+        requires: [{capability: example.frontend.task-model}, {capability: example.requirements}, {capability: example.domain-use-cases}]
   - id: SECURITY-ARCHITECTURE
     responsibility: Own trusted identity, admission and protection structure used by the frontend.
-    boundary:
-      semantic_cohesion: Security trust and admission decisions.
-      independent_change: Security structure can change behind stable product/domain semantics.
-      public_contract: Provides accepted security constraints to interface and architecture consumers.
+    boundary: {semantic_cohesion: Security trust and admission decisions., independent_change: Security structure can change behind stable product/domain semantics., public_contract: Provides accepted security constraints.}
     produces:
       - capability: example.security-architecture
         knowledge_kind: security-architecture
-        requires:
-          - capability: example.requirements
-          - capability: example.domain-use-cases
-
+        semantic_claims: [engineering.security.identity]
+        requires: [{capability: example.requirements}, {capability: example.domain-use-cases}]
   - id: QUALITY-DESIGN
     responsibility: Own accepted architecture-significant quality constraints.
-    boundary:
-      semantic_cohesion: Measurable or explicit quality constraints.
-      independent_change: Quality constraints can change independently of UI structure.
-      public_contract: Provides quality constraints to architecture and verification.
+    boundary: {semantic_cohesion: Measurable or explicit quality constraints., independent_change: Quality constraints can change independently of interface structure., public_contract: Provides quality constraints.}
     produces:
       - capability: example.quality-constraints
         knowledge_kind: quality-design
-        requires:
-          - capability: example.requirements
-
+        requires: [{capability: example.requirements}]
   - id: MACHINE-INTERFACE-DESIGN
     responsibility: Own supported machine interaction and representation contracts.
-    boundary:
-      semantic_cohesion: Machine interaction and representation semantics.
-      independent_change: Machine interface can evolve behind stable product/domain semantics.
-      public_contract: Provides canonical machine interface contracts.
+    boundary: {semantic_cohesion: Machine interaction and representation semantics., independent_change: Machine interface can evolve behind stable product/domain semantics., public_contract: Provides canonical machine interface contracts.}
     produces:
       - capability: example.machine-interface
         knowledge_kind: interface-contract
-        requires:
-          - capability: example.requirements
-          - capability: example.domain-use-cases
-          - capability: example.security-architecture
-
+        requires: [{capability: example.requirements}, {capability: example.domain-use-cases}, {capability: example.security-architecture}]
   - id: HUMAN-INTERFACE-DESIGN
-    responsibility: Own human interaction semantics, presentation system and screen/view composition.
-    boundary:
-      semantic_cohesion: Human interaction, information/navigation and presentation/view semantics.
-      independent_change: Human interface can evolve behind stable product/domain and machine-interface contracts.
-      public_contract: Provides canonical human-interface contracts.
+    responsibility: Own granular human-interface knowledge, shared presentation and local view composition.
+    boundary: {semantic_cohesion: User-facing conceptual, information, interaction, topology and presentation semantics., independent_change: Human-interface knowledge can evolve behind stable product/domain and machine contracts., public_contract: Provides independently addressable interface knowledge.}
     produces:
-      - capability: example.frontend.human-interface
-        knowledge_kind: human-interface-design
-        requires:
-          - capability: example.requirements
-          - capability: example.domain-use-cases
-          - capability: example.frontend.task-model
-          - capability: example.frontend.user-journeys
-          - capability: example.security-architecture
-          - capability: example.machine-interface
+      - capability: example.frontend.conceptual-model
+        knowledge_kind: conceptual-interface-model
+        semantic_claims: [engineering.interface.human.conceptual-model]
+        requires: [{capability: example.requirements}, {capability: example.domain-use-cases}, {capability: example.frontend.task-model}, {capability: example.frontend.user-journeys}, {capability: example.security-architecture}, {capability: example.machine-interface}]
+      - capability: example.frontend.information-architecture
+        knowledge_kind: information-architecture-design
+        semantic_claims: [engineering.interface.human.information-architecture]
+        requires: [{capability: example.frontend.conceptual-model}, {capability: example.frontend.task-model}, {capability: example.frontend.user-journeys}]
+      - capability: example.frontend.interaction
+        knowledge_kind: interaction-design
+        semantic_claims: [engineering.interface.human.interaction]
+        requires: [{capability: example.frontend.conceptual-model}, {capability: example.frontend.task-model}, {capability: example.frontend.user-journeys}, {capability: example.machine-interface}, {capability: example.security-architecture}]
+      - capability: example.frontend.topology
+        knowledge_kind: interface-topology-design
+        semantic_claims: [engineering.interface.human.navigation-topology]
+        requires: [{capability: example.frontend.information-architecture}, {capability: example.frontend.interaction}]
       - capability: example.frontend.presentation-system
         knowledge_kind: presentation-system-design
-        requires:
-          - capability: example.requirements
-          - capability: example.frontend.user-journeys
-          - capability: example.quality-constraints
-          - capability: example.machine-interface
+        semantic_claims: [engineering.interface.human.presentation-system]
+        requires: [{capability: example.frontend.conceptual-model}, {capability: example.frontend.information-architecture}, {capability: example.frontend.interaction}, {capability: example.frontend.topology}, {capability: example.quality-constraints}]
       - capability: example.frontend.screen-view-design
         knowledge_kind: screen-view-design
-        requires:
-          - capability: example.frontend.human-interface
-          - capability: example.frontend.presentation-system
-
+        semantic_claims: [engineering.interface.human.screen-composition]
+        requires: [{capability: example.frontend.topology}, {capability: example.frontend.interaction}, {capability: example.frontend.presentation-system}, {capability: example.machine-interface}]
   - id: SYSTEM-ARCHITECTURE
     responsibility: Own frontend runtime and structural architecture.
-    boundary:
-      semantic_cohesion: Technical runtime structure and dependency topology.
-      independent_change: Technical architecture can evolve behind stable human-interface semantics.
-      public_contract: Provides frontend architecture constraints to component design.
+    boundary: {semantic_cohesion: Technical runtime structure and dependency topology., independent_change: Technical architecture can evolve behind stable interface semantics., public_contract: Provides frontend architecture constraints.}
     produces:
       - capability: example.frontend.architecture
         knowledge_kind: system-architecture
-        requires:
-          - capability: example.frontend.human-interface
-          - capability: example.frontend.presentation-system
-          - capability: example.frontend.screen-view-design
-          - capability: example.machine-interface
-          - capability: example.security-architecture
-          - capability: example.quality-constraints
-
+        requires: [{capability: example.frontend.topology}, {capability: example.frontend.presentation-system}, {capability: example.frontend.screen-view-design}, {capability: example.machine-interface}, {capability: example.security-architecture}, {capability: example.quality-constraints}]
   - id: COMPONENT-DESIGN
     responsibility: Own implementation-facing frontend component and dependency boundaries.
-    boundary:
-      semantic_cohesion: Public frontend component responsibilities and dependencies.
-      independent_change: Component decomposition can change behind stable interface and architecture contracts.
-      public_contract: Provides code-facing frontend structural contracts.
+    boundary: {semantic_cohesion: Public frontend component responsibilities and dependencies., independent_change: Component decomposition can change behind stable design contracts., public_contract: Provides code-facing frontend structural contracts.}
     produces:
       - capability: example.frontend.component-design
         knowledge_kind: component-design
-        requires:
-          - capability: example.frontend.human-interface
-          - capability: example.frontend.presentation-system
-          - capability: example.frontend.screen-view-design
-          - capability: example.frontend.architecture
-          - capability: example.machine-interface
-
+        requires: [{capability: example.frontend.screen-view-design}, {capability: example.frontend.architecture}, {capability: example.machine-interface}]
   - id: VERIFICATION-DESIGN
     responsibility: Own evidence proving accepted frontend behavior and structure.
-    boundary:
-      semantic_cohesion: Verification objectives and evidence obligations.
-      independent_change: Verification strategy can evolve independently of implementation mechanics.
-      public_contract: Provides frontend verification obligations.
+    boundary: {semantic_cohesion: Verification objectives and evidence obligations., independent_change: Verification strategy can evolve independently., public_contract: Provides early interface and later presentation/architecture verification obligations.}
     produces:
+      - capability: example.frontend.interface-verification
+        knowledge_kind: verification-strategy
+        requires: [{capability: example.frontend.task-model}, {capability: example.frontend.information-architecture}, {capability: example.frontend.interaction}, {capability: example.frontend.topology}]
       - capability: example.frontend.verification
         knowledge_kind: verification-strategy
-        requires:
-          - capability: example.requirements
-          - capability: example.frontend.human-interface
-          - capability: example.frontend.presentation-system
-          - capability: example.frontend.screen-view-design
-          - capability: example.frontend.architecture
-
+        semantic_claims: [engineering.verification.interface.presentation]
+        requires: [{capability: example.frontend.interface-verification}, {capability: example.requirements}, {capability: example.frontend.presentation-system}, {capability: example.frontend.screen-view-design}, {capability: example.frontend.architecture}]
   - id: TEST-DESIGN
     responsibility: Own executable frontend behavioral test contracts.
-    boundary:
-      semantic_cohesion: Preconditions, operations and observable UI oracles.
-      independent_change: Test semantics can survive frontend implementation refactoring.
-      public_contract: Provides executable frontend test contracts.
+    boundary: {semantic_cohesion: Preconditions operations and observable UI oracles., independent_change: Test semantics can survive implementation refactoring., public_contract: Provides executable frontend test contracts.}
     produces:
       - capability: example.frontend.test-design
         knowledge_kind: test-design
-        requires:
-          - capability: example.frontend.verification
-          - capability: example.frontend.human-interface
-          - capability: example.frontend.presentation-system
-          - capability: example.frontend.screen-view-design
-
+        requires: [{capability: example.frontend.verification}, {capability: example.frontend.interaction}, {capability: example.frontend.screen-view-design}]
   - id: IMPLEMENTATION-DESIGN
     responsibility: Own bounded frontend realization slicing after accepted design exists.
-    boundary:
-      semantic_cohesion: Realization slices and completion criteria.
-      independent_change: Implementation sequencing can change without redefining frontend semantics.
-      public_contract: Provides implementation-ready frontend work definition.
+    boundary: {semantic_cohesion: Realization slices and completion criteria., independent_change: Implementation sequencing can change without redefining frontend semantics., public_contract: Provides implementation-ready work definition.}
     produces:
       - capability: example.frontend.implementation-design
         knowledge_kind: implementation-design
-        requires:
-          - capability: example.frontend.component-design
-          - capability: example.frontend.verification
-          - capability: example.frontend.test-design
-
+        requires: [{capability: example.frontend.component-design}, {capability: example.frontend.verification}, {capability: example.frontend.test-design}]
 consumers:
   - id: FRONTEND-IMPLEMENTATION
-    purpose: Implement the selected user-facing application frontend without inventing user-visible or major structural decisions.
-    requires:
-      - capability: example.frontend.implementation-design
+    purpose: Implement the user-facing application without inventing user-visible or major structural decisions.
+    requires: [{capability: example.frontend.implementation-design}]

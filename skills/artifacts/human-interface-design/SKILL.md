@@ -5,6 +5,21 @@ description: "Use for actionable CREATE work requiring implementation-independen
 
 # Human Interface Design
 
+## Compatibility status
+
+This broad knowledge kind is retained for existing project graphs that intentionally model conceptual structure, information architecture, interaction semantics and interface topology as one public contract.
+
+For new or revalidated non-trivial frontend graphs, prefer the granular HUMAN-INTERFACE-DESIGN knowledge kinds:
+
+- `conceptual-interface-model`;
+- `information-architecture-design`;
+- `interaction-design`;
+- `interface-topology-design`.
+
+Do not require the broad capability downstream in addition to those granular contracts merely as a synthesis layer. A project may keep a human-readable synthesis projection without registering another public CapabilityId.
+
+Use this broad kind only when the project can justify that the bundled knowledge has no independently changing consumers/lifecycle for the selected scope.
+
 ## Trigger
 
 Use when actionable work has `knowledge_kind: human-interface-design` and Human Interface Design must define a supported human interaction boundary.

@@ -1,0 +1,8 @@
+version: 1
+kind: interface-topology-design
+id: EXAMPLE-INTERFACE-TOPOLOGY
+views:
+  - {id: APPLICATION-SHELL, responsibility: Preserve global application context around resource work., location_ref: APPLICATION, interaction_context_refs: [], structural: true, parent: ROOT, exits: [RESOURCE-CATALOGUE]}
+  - {id: RESOURCE-CATALOGUE, responsibility: Locate/select resources., location_ref: RESOURCES, interaction_context_refs: [RESOURCE-CATALOGUE-CONTEXT], parent: APPLICATION-SHELL, exits: [RESOURCE-DETAIL]}
+  - {id: RESOURCE-DETAIL, responsibility: Inspect one selected resource., location_ref: RESOURCE-DETAIL, interaction_context_refs: [RESOURCE-DETAIL-CONTEXT], parent: RESOURCE-CATALOGUE, exits: [RESOURCE-CATALOGUE]}
+non_view_contexts: []

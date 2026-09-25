@@ -36,53 +36,40 @@ def subject_eval(core):
     )
 
 
-def frontend_presentation_eval(semantic_evaluations=None):
+def granular_frontend_eval(semantic_evaluations=None):
     graph = load(ROOT / "examples/user-facing-application/engineering-graph.yaml")
     realization = load(ROOT / "examples/user-facing-application/core-state-complete.yaml")
     return evaluate_with_repository_policy(
         graph=graph,
         realization=realization,
         consumer="FRONTEND-IMPLEMENTATION",
-        scope="example",
+        scope="granular-frontend",
         project_overlay={
             "subject_inventory": {
                 "state": "NOT_APPLICABLE",
-                "rationale": "Coverage fixture validates shared frontend presentation concerns only.",
+                "rationale": "This fixture validates shared frontend knowledge concerns rather than per-screen subjects.",
             }
-        },
-        semantic_claim_bindings={
-            "version": 1,
-            "kind": "harness-semantic-claim-bindings",
-            "bindings": [
-                {
-                    "capability": "example.security-architecture",
-                    "semantic_claims": [
-                        "engineering.security.identity"
-                    ],
-                },
-                {
-                    "capability": "example.frontend.presentation-system",
-                    "semantic_claims": [
-                        "engineering.interface.human.presentation-system"
-                    ],
-                },
-                {
-                    "capability": "example.frontend.screen-view-design",
-                    "semantic_claims": [
-                        "engineering.interface.human.screen-composition"
-                    ],
-                },
-                {
-                    "capability": "example.frontend.verification",
-                    "semantic_claims": [
-                        "engineering.verification.interface.presentation"
-                    ],
-                },
-            ],
         },
         semantic_evaluations=semantic_evaluations,
     )
 
+
+def frontend_presentation_eval(semantic_evaluations=None):
+    graph = load(ROOT / "examples/frontend-legacy-compatibility/engineering-graph.yaml")
+    realization = load(ROOT / "examples/frontend-legacy-compatibility/core-state-complete.yaml")
+    return evaluate_with_repository_policy(
+        graph=graph,
+        realization=realization,
+        consumer="FRONTEND-IMPLEMENTATION",
+        scope="legacy-frontend",
+        project_overlay={
+            "subject_inventory": {
+                "state": "NOT_APPLICABLE",
+                "rationale": "Compatibility fixture validates migration and strict shared frontend claims.",
+            }
+        },
+        semantic_evaluations=semantic_evaluations,
+    )
 
 def main() -> int:
     mvp = scope_eval("fixture.mvp.implementation-design", "mvp")
@@ -144,6 +131,47 @@ def main() -> int:
     assert partial["authority_roles"]["bindings"]["TACTICAL-DOMAIN-DESIGN"] == ["domain"]
     assert partial["authority_roles"]["bindings"]["IMPLEMENTATION-DESIGN"] == ["delivery"]
 
+    # Granular frontend providers are structurally present but strict semantic
+    # claims remain unusable until explicit semantic acceptance evidence exists.
+    granular_missing = granular_frontend_eval()
+    granular_rows = {row["concern"]: row for row in granular_missing["rows"]}
+    granular_caps = {
+        "interface.human.conceptual-model": "example.frontend.conceptual-model",
+        "interface.human.information-architecture": "example.frontend.information-architecture",
+        "interface.human.interaction": "example.frontend.interaction",
+        "interface.human.navigation-topology": "example.frontend.topology",
+    }
+    for concern, capability in granular_caps.items():
+        assert granular_rows[concern]["state"] == "MISSING", granular_rows[concern]
+        assert granular_rows[concern]["action"] == "VALIDATE_SEMANTICS", granular_rows[concern]
+        assert granular_rows[concern]["capabilities"] == [capability], granular_rows[concern]
+
+    granular_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": f"ACCEPT-{capability}",
+                "capability": capability,
+                "status": "ACCEPTED",
+                "semantic_claims": {"accepted": [claim]},
+            }
+            for capability, claim in (
+                ("example.frontend.conceptual-model", "engineering.interface.human.conceptual-model"),
+                ("example.frontend.information-architecture", "engineering.interface.human.information-architecture"),
+                ("example.frontend.interaction", "engineering.interface.human.interaction"),
+                ("example.frontend.topology", "engineering.interface.human.navigation-topology"),
+            )
+        ],
+    }
+    granular_accepted = granular_frontend_eval(granular_evidence)
+    granular_accepted_rows = {
+        row["concern"]: row for row in granular_accepted["rows"]
+    }
+    for concern in granular_caps:
+        assert granular_accepted_rows[concern]["state"] == "COVERED", granular_accepted_rows[concern]
+
     # Frontend identity and presentation/composition cannot be declared complete
     # merely because provider artifacts exist. These concerns require explicit
     # semantic acceptance evidence.
@@ -151,11 +179,30 @@ def main() -> int:
     presentation_rows = {
         row["concern"]: row for row in presentation_missing["rows"]
     }
+
+    # Consumer-driven activation must surface missing granular frontend knowledge
+    # even when a legacy project graph only declares the broad human-interface
+    # capability. Reconcile remains non-destructive; Engineering Coverage is the
+    # independent migration/completeness lens.
+    for concern in (
+        "interface.human.conceptual-model",
+        "interface.human.information-architecture",
+        "interface.human.interaction",
+        "interface.human.navigation-topology",
+    ):
+        assert concern in presentation_rows, (concern, presentation_rows)
+        assert presentation_rows[concern]["state"] == "MISSING", presentation_rows[concern]
+        assert presentation_rows[concern]["action"] == "MODEL_PRODUCTION_CONTRACT", presentation_rows[concern]
+        routes = presentation_rows[concern].get("routes", {})
+        accepted = presentation_rows[concern]["accepted_semantic_claims"]
+        assert accepted, presentation_rows[concern]
+        for claim in accepted:
+            assert "HUMAN-INTERFACE-DESIGN" in routes.get(claim, []), presentation_rows[concern]
     for concern, capability in {
-        "security.identity": "example.security-architecture",
-        "interface.human.presentation-system": "example.frontend.presentation-system",
-        "interface.human.screen-composition": "example.frontend.screen-view-design",
-        "verification.interface.presentation": "example.frontend.verification",
+        "security.identity": "legacy.frontend.security",
+        "interface.human.presentation-system": "legacy.frontend.presentation-system",
+        "interface.human.screen-composition": "legacy.frontend.screen-view",
+        "verification.interface.presentation": "legacy.frontend.verification",
     }.items():
         assert concern in presentation_rows
         assert presentation_rows[concern]["state"] == "MISSING"
@@ -177,8 +224,8 @@ def main() -> int:
         "semantic_evaluations": [
             {
                 "kind": "harness-artifact-semantic-evaluation",
-                "artifact": "EXAMPLE-SECURITY",
-                "capability": "example.security-architecture",
+                "artifact": "LEGACY-SECURITY",
+                "capability": "legacy.frontend.security",
                 "status": "ACCEPTED",
                 "semantic_claims": {
                     "accepted": [
@@ -188,8 +235,8 @@ def main() -> int:
             },
             {
                 "kind": "harness-artifact-semantic-evaluation",
-                "artifact": "EXAMPLE-PRESENTATION-SYSTEM",
-                "capability": "example.frontend.presentation-system",
+                "artifact": "LEGACY-PRESENTATION",
+                "capability": "legacy.frontend.presentation-system",
                 "status": "ACCEPTED",
                 "semantic_claims": {
                     "accepted": [
@@ -199,8 +246,8 @@ def main() -> int:
             },
             {
                 "kind": "harness-artifact-semantic-evaluation",
-                "artifact": "EXAMPLE-SCREEN-VIEW-DESIGN",
-                "capability": "example.frontend.screen-view-design",
+                "artifact": "LEGACY-SCREEN",
+                "capability": "legacy.frontend.screen-view",
                 "status": "ACCEPTED",
                 "semantic_claims": {
                     "accepted": [
@@ -210,8 +257,8 @@ def main() -> int:
             },
             {
                 "kind": "harness-artifact-semantic-evaluation",
-                "artifact": "EXAMPLE-FRONTEND-VERIFICATION",
-                "capability": "example.frontend.verification",
+                "artifact": "LEGACY-VERIFICATION",
+                "capability": "legacy.frontend.verification",
                 "status": "ACCEPTED",
                 "semantic_claims": {
                     "accepted": [

@@ -61,7 +61,11 @@ concerns:
         title: Human interface
         children:
           - {id: interface.human.journeys, title: User journeys}
-          - {id: interface.human.usability, title: Usability and interaction semantics}
+          - {id: interface.human.conceptual-model, title: User-facing conceptual model}
+          - {id: interface.human.information-architecture, title: Information architecture and findability}
+          - {id: interface.human.interaction, title: Interaction semantics and state transitions}
+          - {id: interface.human.navigation-topology, title: Navigation and complete view topology}
+          - {id: interface.human.usability, title: Usability quality}
           - {id: interface.human.accessibility, title: Accessibility}
           - {id: interface.human.responsiveness, title: Responsive/adaptive presentation}
           - {id: interface.human.presentation-system, title: Shared presentation system and visual language}

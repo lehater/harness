@@ -30,6 +30,7 @@ on:
       - "Makefile"
       - "examples/greenfield-csv-deduplicator/**"
       - "examples/user-facing-application/**"
+      - "examples/frontend-legacy-compatibility/**"
       - ".github/workflows/harness.yml"
 
 jobs:

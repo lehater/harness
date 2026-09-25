@@ -1,0 +1,7 @@
+version: 1
+kind: interaction-design
+id: EXAMPLE-INTERACTION-DESIGN
+contexts:
+  - {id: RESOURCE-CATALOGUE-CONTEXT, task_refs: [TASK-FIND-RESOURCE], actions: [search, open-resource]}
+  - {id: RESOURCE-DETAIL-CONTEXT, task_refs: [TASK-INSPECT-RESOURCE], actions: [show-primary, show-history]}
+task_dispositions: []

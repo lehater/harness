@@ -65,24 +65,5 @@ artifacts:
     authority: HUMAN-INTERFACE-DESIGN
     provides: [example.frontend.topology]
     depends_on: [EXAMPLE-INFORMATION-ARCHITECTURE, EXAMPLE-INTERACTION-DESIGN]
-  - id: EXAMPLE-PRESENTATION-SYSTEM
-    path: examples/user-facing-application/canonical/example-presentation-system.yaml
-    authority: HUMAN-INTERFACE-DESIGN
-    provides: [example.frontend.presentation-system]
-    depends_on: [EXAMPLE-CONCEPTUAL-INTERFACE, EXAMPLE-INFORMATION-ARCHITECTURE, EXAMPLE-INTERACTION-DESIGN, EXAMPLE-INTERFACE-TOPOLOGY, EXAMPLE-QUALITY]
-  - id: EXAMPLE-INTERFACE-VERIFICATION
-    path: examples/user-facing-application/canonical/example-interface-verification.yaml
-    authority: VERIFICATION-DESIGN
-    provides: [example.frontend.interface-verification]
-    depends_on: [EXAMPLE-TASK-MODEL, EXAMPLE-INFORMATION-ARCHITECTURE, EXAMPLE-INTERACTION-DESIGN, EXAMPLE-INTERFACE-TOPOLOGY]
-  - id: EXAMPLE-SCREEN-VIEW-DESIGN
-    path: examples/user-facing-application/canonical/example-screen-view-design.yaml
-    authority: HUMAN-INTERFACE-DESIGN
-    provides: [example.frontend.screen-view-design]
-    depends_on: [EXAMPLE-INTERFACE-TOPOLOGY, EXAMPLE-INTERACTION-DESIGN, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-MACHINE-INTERFACE]
-  - id: EXAMPLE-FRONTEND-ARCHITECTURE
-    path: examples/user-facing-application/canonical/example-frontend-architecture.yaml
-    authority: SYSTEM-ARCHITECTURE
-    provides: [example.frontend.architecture]
-    depends_on: [EXAMPLE-INTERFACE-TOPOLOGY, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-SCREEN-VIEW-DESIGN, EXAMPLE-MACHINE-INTERFACE, EXAMPLE-SECURITY, EXAMPLE-QUALITY]
-questions: []
+questions:
+  []

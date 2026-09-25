@@ -43,6 +43,10 @@ roles:
       - engineering.interface.machine.errors
       - engineering.interface.machine.compatibility
       - engineering.interface.human.journeys
+      - engineering.interface.human.conceptual-model
+      - engineering.interface.human.information-architecture
+      - engineering.interface.human.interaction
+      - engineering.interface.human.navigation-topology
       - engineering.interface.human.usability
       - engineering.interface.human.accessibility
       - engineering.interface.human.responsiveness

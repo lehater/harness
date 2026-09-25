@@ -4,6 +4,7 @@ artifacts:
     path: examples/user-facing-application/canonical/example-problem-evidence.yaml
     authority: DISCOVERY
     provides: [example.problem-evidence]
+    depends_on: []
   - id: EXAMPLE-USER-NEEDS
     path: examples/user-facing-application/canonical/example-user-needs.yaml
     authority: DISCOVERY
@@ -19,9 +20,25 @@ artifacts:
     authority: DOMAIN-USE-CASE-DESIGN
     provides: [example.domain-use-cases]
     depends_on: [EXAMPLE-REQUIREMENTS]
+  - id: EXAMPLE-SECURITY
+    path: examples/user-facing-application/canonical/example-security.yaml
+    authority: SECURITY-ARCHITECTURE
+    provides: [example.security-architecture]
+    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
+  - id: EXAMPLE-QUALITY
+    path: examples/user-facing-application/canonical/example-quality.yaml
+    authority: QUALITY-DESIGN
+    provides: [example.quality-constraints]
+    depends_on: [EXAMPLE-REQUIREMENTS]
+  - id: EXAMPLE-MACHINE-INTERFACE
+    path: examples/user-facing-application/canonical/example-machine-interface.yaml
+    authority: MACHINE-INTERFACE-DESIGN
+    provides: [example.machine-interface]
+    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
   - id: EXAMPLE-FRONTEND-JOURNEYS
     path: examples/user-facing-application/canonical/example-frontend-journeys.yaml
     authority: APPLICATION-DESIGN
     provides: [example.frontend.user-journeys]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
-questions: []
+questions:
+  []

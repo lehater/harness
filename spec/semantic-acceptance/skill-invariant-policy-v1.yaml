@@ -18,6 +18,10 @@ enforced:
   - {knowledge_kind: system-architecture, skill: skills/artifacts/system-architecture/SKILL.md}
   - {knowledge_kind: security-architecture, skill: skills/artifacts/security-architecture/SKILL.md}
   - {knowledge_kind: interface-contract, skill: skills/artifacts/interface-contract/SKILL.md}
+  - {knowledge_kind: conceptual-interface-model, skill: skills/artifacts/conceptual-interface-model/SKILL.md}
+  - {knowledge_kind: information-architecture-design, skill: skills/artifacts/information-architecture-design/SKILL.md}
+  - {knowledge_kind: interaction-design, skill: skills/artifacts/interaction-design/SKILL.md}
+  - {knowledge_kind: interface-topology-design, skill: skills/artifacts/interface-topology-design/SKILL.md}
   - {knowledge_kind: human-interface-design, skill: skills/artifacts/human-interface-design/SKILL.md}
   - {knowledge_kind: presentation-system-design, skill: skills/artifacts/presentation-system-design/SKILL.md}
   - {knowledge_kind: screen-view-design, skill: skills/artifacts/screen-view-design/SKILL.md}

@@ -52,6 +52,18 @@ proofs:
     accepted_semantic_claims: [engineering.interface.machine.compatibility]
   interface.human.journeys:
     accepted_semantic_claims: [engineering.interface.human.journeys]
+  interface.human.conceptual-model:
+    accepted_semantic_claims: [engineering.interface.human.conceptual-model]
+    requires_semantic_evaluation: true
+  interface.human.information-architecture:
+    accepted_semantic_claims: [engineering.interface.human.information-architecture]
+    requires_semantic_evaluation: true
+  interface.human.interaction:
+    accepted_semantic_claims: [engineering.interface.human.interaction]
+    requires_semantic_evaluation: true
+  interface.human.navigation-topology:
+    accepted_semantic_claims: [engineering.interface.human.navigation-topology]
+    requires_semantic_evaluation: true
   interface.human.usability:
     accepted_semantic_claims: [engineering.interface.human.usability]
   interface.human.accessibility:
