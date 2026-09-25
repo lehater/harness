@@ -92,19 +92,19 @@ It also turned the previously manual site-map insight into canonical topology kn
 
 ## Remaining problems before canonicalization
 
-### P0 — Existing-project adoption/reconciliation is not solved
+### P0 — Existing-project adoption/reconciliation: resolved experimentally through Engineering Coverage
 
-The new capabilities work once a project Engineering Graph adopts them.
+A legacy project graph must not be silently rewritten merely because Harness reference policy evolved.
 
-However, a legacy project whose graph still jumps directly from Journeys to broad Human Interface will not automatically discover that the granular contracts are missing.
+The experiment now uses the existing Engineering Coverage mechanism as the independent migration/completeness lens:
 
-This is the same class of problem that allowed Prep to omit Task Model originally.
+- `FRONTEND` Consumer activation requires the granular human-interface concerns independently of pre-existing granular providers;
+- a legacy graph with only broad `human-interface-design` therefore receives `MISSING / MODEL_PRODUCTION_CONTRACT` rows for conceptual model, information architecture, interaction and navigation/topology;
+- the standard Authority-role mapping routes those missing semantic claims to HUMAN-INTERFACE-DESIGN;
+- `project-bootstrap-reconcile` is updated to run this Coverage diagnostic after conservative registry/graph reconciliation;
+- no Capability is inserted automatically.
 
-Before canonicalization, Harness needs a consumer/profile-level semantic obligation or migration diagnostic that can say, in effect:
-
-> this FRONTEND consumer has no disposition for required conceptual/IA/interaction/topology knowledge.
-
-It must diagnose the gap, not silently mutate the project graph.
+A regression test in `validate_engineering_coverage.py` proves the legacy broad frontend example cannot hide the new obligations.
 
 ### P1 — Screen/View subject coverage is still manually duplicated
 

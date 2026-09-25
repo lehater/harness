@@ -151,6 +151,25 @@ def main() -> int:
     presentation_rows = {
         row["concern"]: row for row in presentation_missing["rows"]
     }
+
+    # Consumer-driven activation must surface missing granular frontend knowledge
+    # even when a legacy project graph only declares the broad human-interface
+    # capability. Reconcile remains non-destructive; Engineering Coverage is the
+    # independent migration/completeness lens.
+    for concern in (
+        "interface.human.conceptual-model",
+        "interface.human.information-architecture",
+        "interface.human.interaction",
+        "interface.human.navigation-topology",
+    ):
+        assert concern in presentation_rows, (concern, presentation_rows)
+        assert presentation_rows[concern]["state"] == "MISSING", presentation_rows[concern]
+        assert presentation_rows[concern]["action"] == "MODEL_PRODUCTION_CONTRACT", presentation_rows[concern]
+        routes = presentation_rows[concern].get("routes", {})
+        accepted = presentation_rows[concern]["accepted_semantic_claims"]
+        assert accepted, presentation_rows[concern]
+        for claim in accepted:
+            assert "HUMAN-INTERFACE-DESIGN" in routes.get(claim, []), presentation_rows[concern]
     for concern, capability in {
         "security.identity": "example.security-architecture",
         "interface.human.presentation-system": "example.frontend.presentation-system",
