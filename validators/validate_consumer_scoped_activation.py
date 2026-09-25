@@ -48,6 +48,11 @@ def main():
     assert "data.lifecycle" not in f
 
     assert "architecture.structure" in b and "architecture.structure" in f
+    # Implementation structure is derived from implementation-design in the
+    # Consumer closure, not from a naming convention in the Consumer id.
+    assert "engineering.components" in b and "engineering.components" in f
+    assert "engineering.principles" in b and "engineering.principles" in f
+    assert "engineering.code-quality" in b and "engineering.code-quality" in f
     assert "delivery.release" in b and "delivery.release" in f
     assert "governance.data" in b and "governance.data" in f
     assert "quality.performance.latency" not in b

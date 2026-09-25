@@ -101,6 +101,8 @@ Large mutation scenarios used to prove Harness semantics belong in Harness accep
 
 For a selected implementation Consumer, coding authorization is a **derived conjunction** over existing contracts. It is not a new Core state, Stage, Gate or Readiness entity.
 
+An implementation Consumer is identified structurally: its recursive capability closure contains an `implementation-design` production. Consumer IDs and purpose prose are not semantic classifiers. A structurally `COMPLETE` Consumer without `implementation-design` may prove its own design/revalidation target, but it does not authorize production coding. Code created solely as a disposable prototype or evidence may intentionally use a smaller Consumer, provided the project does not treat that code as canonical production structure.
+
 A project may claim its design/documentation closure complete only when all applicable assertions are true:
 
 - the selected implementation Consumer target evaluates `COMPLETE`;

@@ -33,7 +33,7 @@ rules:
 
   - id: SOFTWARE-IMPLEMENTATION-STRUCTURE
     when:
-      consumer_contains_any: [IMPLEMENTATION]
+      knowledge_kinds_any: [implementation-design]
     activate:
       - engineering.principles
       - engineering.components

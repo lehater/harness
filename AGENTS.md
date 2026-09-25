@@ -20,6 +20,7 @@ Before substantial engineering work, ensure the target repository has a current 
 
 1. read `docs/design/core-v0.md`;
 2. read the target repository's own instructions and identify the selected task/scope;
+   If the selected work writes production implementation code, select a Consumer whose recursive capability closure contains `knowledge_kind: implementation-design`. Consumer names and purpose prose do not classify implementation intent, and a structurally `COMPLETE` non-implementation Consumer never authorizes production coding. Disposable prototype/evidence code may use a smaller Consumer only when the project explicitly keeps it noncanonical.
 3. choose or adapt the smallest justified Design Profile, using `skills/agent/design-profile/SKILL.md` when needed;
 4. use the target's declared Core model when present; otherwise use `skills/agent/bootstrap-existing-project/SKILL.md` to locate only the canonical artifacts required by that profile/scope;
 5. evaluate target state without inventing missing knowledge;

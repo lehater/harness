@@ -89,9 +89,34 @@ def main() -> None:
         load_yaml(EXAMPLE / "core-state-complete.yaml"),
     )
     assert complete["status"] == "COMPLETE", complete
+    assert complete["implementation_consumer"] is True, complete
     assert not complete["create"], complete
     assert not complete["wait"], complete
     assert not complete["pending"], complete
+
+    # Regression for the Prep failure shape: a design/revalidation Consumer may
+    # be structurally COMPLETE while still being the wrong target for coding.
+    revalidation_graph = {
+        **GRAPH,
+        "consumers": [
+            *GRAPH["consumers"],
+            {
+                "id": "DESIGN-REVALIDATION",
+                "purpose": "Revalidate accepted frontend design without authorizing implementation.",
+                "requires": [
+                    {"capability": "example.frontend.architecture"},
+                    {"capability": "example.frontend.verification"},
+                ],
+            },
+        ],
+    }
+    revalidation = evaluate_engineering_target(
+        revalidation_graph,
+        "DESIGN-REVALIDATION",
+        load_yaml(EXAMPLE / "core-state-complete.yaml"),
+    )
+    assert revalidation["status"] == "COMPLETE", revalidation
+    assert revalidation["implementation_consumer"] is False, revalidation
 
     print("user-facing application graph: PASS (granular frontend closure)")
 
