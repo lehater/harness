@@ -1,16 +1,9 @@
 version: 1
 kind: task-model
 id: EXAMPLE-TASK-MODEL
-
 goals:
-  - id: GOAL-1
-    need_refs: [NEED-1]
-    requirement_refs: [EXAMPLE-REQUIREMENTS]
+  - id: GOAL-MANAGE-RESOURCES
     tasks:
-      - id: TASK-1
-        responsibility: USER
-        outcome: The user performs the accepted task.
-        information_required: [task-relevant-current-state]
-        decisions: [select-intended-action]
-        system_support: [EXAMPLE-DOMAIN-USE-CASES]
-sufficiency_review: {status: ACCEPTED, rationale: One leaf task covers the one fixture goal.}
+      - {id: TASK-FIND-RESOURCE, responsibility: USER, outcome: User locates a resource.}
+      - {id: TASK-INSPECT-RESOURCE, responsibility: USER, outcome: User inspects a selected resource.}
+sufficiency_review: {status: ACCEPTED, rationale: Both USER tasks are represented.}

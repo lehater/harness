@@ -1,0 +1,9 @@
+version: 1
+kind: information-architecture-design
+id: EXAMPLE-INFORMATION-ARCHITECTURE
+locations:
+  - {id: APPLICATION, purpose: Preserve global application context and entry into resource work., concept_refs: [RESOURCE-BROWSING], scope: global}
+  - {id: RESOURCES, purpose: Locate resources., concept_refs: [RESOURCE, RESOURCE-BROWSING], scope: global}
+  - {id: RESOURCE-DETAIL, purpose: Inspect one resource., concept_refs: [RESOURCE], scope: contextual}
+relationships:
+  - {source: RESOURCES, target: RESOURCE-DETAIL, relation: drill-down}
