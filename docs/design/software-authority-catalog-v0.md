@@ -77,7 +77,7 @@ It remains experimental until exercised by the greenfield pilot and at least one
 
 Two conditional boundaries are supported when implementation agents need stronger constraints than architecture/application knowledge alone provides.
 
-`ENGINEERING-POLICY` owns project-selected normative engineering obligations. It is not a universal SOLID/Clean Architecture checklist. Reusable principles and production methods belong in skills; the project policy selects which obligations are actually normative and translates names such as DIP, ISP, KISS or CQS into reviewable project constraints.
+`ENGINEERING-POLICY` owns project-selected normative engineering obligations. It is not a universal SOLID/Clean Architecture checklist. Reusable principles and production methods belong in skills; the project policy selects which obligations are actually normative and translates names such as DIP, ISP, KISS or CQS into reviewable project constraints. Reusable guidance may recommend cohesion, composition, dependency inversion, provider isolation and evidence-based reuse, but a project must state concrete applicability and explicit non-rules before those recommendations become normative.
 
 `COMPONENT-DESIGN` owns implementation-facing responsibility, contract ownership, dependency direction, composition and representation-mapping boundaries. It should constrain architecturally significant code decisions while deliberately leaving private helpers, local algorithms and class/function representation free unless those choices carry accepted semantics.
 

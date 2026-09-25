@@ -33,6 +33,41 @@ Read accepted project architecture/requirements and organizational constraints n
 9. For user-facing scopes, useful selectable obligations may include task-first information architecture, explicit UI-state modeling, accepted domain language over DTO/framework terminology, recognition over recall, error prevention/recovery, consistency/continuity, progressive disclosure and an explicit accessibility baseline or conformance target. Translate only selected/applicable principles into reviewable obligations.
 10. Produce project-native policy, semantically accept/register and reevaluate.
 
+## Reusable engineering-discipline candidates
+
+The following are reusable guidance candidates, not universal project obligations.
+Select and translate only the items justified by the target project's actual
+boundaries and consumers:
+
+- prefer high cohesion and explicit ownership over shared catch-all modules;
+- minimize coupling and keep dependency direction reviewable;
+- prefer composition when reuse is collaboration/assembly rather than a true
+  substitutable subtype relationship;
+- use dependency inversion at meaningful external/replaceable boundaries rather
+  than introducing abstractions around every concrete dependency;
+- shape ports/contracts from consumer needs and keep them narrower than provider
+  APIs when possible;
+- isolate framework/vendor/transport representation at boundaries when allowing
+  it inward would make replacement or semantic ownership materially harder;
+- extract reuse around a stable repeated product/engineering concept, a real
+  multiple-consumer need, or a meaningful substitution seam rather than
+  speculative future reuse;
+- keep shared libraries free of feature-owned mutable state and domain truth
+  unless that ownership is explicitly accepted;
+- make state ownership/lifetime explicit before promoting state into global or
+  cross-feature storage;
+- test public/consumer-owned contracts and observable behavior rather than
+  private implementation structure by default;
+- use KISS/YAGNI as counterweights to SOLID/OCP so architecture discipline does
+  not become ceremonial indirection.
+
+For frontend provider replacement, a useful project policy may require
+provider-neutral product patterns and public component contracts while allowing
+provider primitives locally inside the provider/presentation implementation.
+Do not require one project wrapper per vendor primitive. A provider seam is
+justified when vendor API leakage would become a cross-feature/public contract
+or would force semantic/component changes during replacement.
+
 ## Stop conditions
 
 Stop when a proposed obligation would decide missing product/domain/architecture semantics, when applicability cannot be justified from accepted project context, or when named principles conflict without an accepted project priority.
@@ -43,9 +78,10 @@ Produce a project-native engineering policy stating selected obligations, forbid
 
 ## Acceptance checks
 
-- every normative principle is expressed as reviewable project obligation;
+- every normative principle is expressed as a concrete reviewable project obligation with stated applicability/rationale;
 - no methodology acronym is treated as self-interpreting acceptance evidence;
-- optional patterns are conditioned on demonstrated need;
+- optional patterns and abstractions are conditioned on demonstrated need rather than adopted as defaults;
+- explicit non-rules prevent guidance from being interpreted as universal mandatory patterns;
 - project semantics remain owned by their existing Authorities;
 - policy is usable by component/implementation review without evaluator-specific logic.
 
