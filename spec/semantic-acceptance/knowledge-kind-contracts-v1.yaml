@@ -43,6 +43,14 @@ contracts:
     required_review_checks: [security-architecture-not-product-policy]
   - knowledge_kind: interface-contract
     required_review_checks: [preserve-upstream-semantics]
+  - knowledge_kind: conceptual-interface-model
+    required_review_checks: [conceptual-interface-not-domain-model]
+  - knowledge_kind: information-architecture-design
+    required_review_checks: [information-structure-not-screen-layout]
+  - knowledge_kind: interaction-design
+    required_review_checks: [interaction-not-product-requirement]
+  - knowledge_kind: interface-topology-design
+    required_review_checks: [topology-not-screen-composition]
   - knowledge_kind: human-interface-design
     required_review_checks: [interaction-not-product-requirement]
   - knowledge_kind: presentation-system-design
