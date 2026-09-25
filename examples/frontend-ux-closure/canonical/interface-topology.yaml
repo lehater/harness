@@ -7,13 +7,13 @@ views:
     location_ref: APPLICATION
     interaction_context_refs: []
     structural: true
-    parent: APPLICATION-SHELL
+    parent: ROOT
     exits: [RESOURCE-CATALOGUE]
   - id: RESOURCE-CATALOGUE
     responsibility: Locate/select resources.
     location_ref: RESOURCES
     interaction_context_refs: [RESOURCE-CATALOGUE-CONTEXT]
-    parent: ROOT
+    parent: APPLICATION-SHELL
     exits: [RESOURCE-DETAIL]
   - id: RESOURCE-DETAIL
     responsibility: Inspect one selected resource.
