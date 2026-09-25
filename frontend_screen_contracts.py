@@ -113,6 +113,128 @@ def _has_override_rationale(screen_row: dict[str, Any]) -> bool:
     )
 
 
+def _validate_screen_composition(
+    *,
+    screen_row: dict[str, Any],
+    screen: str,
+    findings: list[dict[str, Any]],
+) -> None:
+    regions = screen_row.get("regions")
+    if not isinstance(regions, list) or not regions:
+        _finding(
+            findings,
+            "MISSING_SCREEN_REGIONS",
+            "screen requires explicit semantic regions/composition",
+            screen=screen,
+        )
+    else:
+        seen: set[str] = set()
+        for index, region in enumerate(regions):
+            if not isinstance(region, dict):
+                _finding(
+                    findings,
+                    "INVALID_SCREEN_REGION",
+                    f"screen region {index} must be a mapping",
+                    screen=screen,
+                )
+                continue
+            region_id = region.get("id")
+            if not isinstance(region_id, str) or not region_id.strip():
+                _finding(
+                    findings,
+                    "INVALID_SCREEN_REGION",
+                    f"screen region {index} requires id",
+                    screen=screen,
+                )
+            elif region_id in seen:
+                _finding(
+                    findings,
+                    "DUPLICATE_SCREEN_REGION",
+                    f"duplicate screen region {region_id}",
+                    screen=screen,
+                )
+            else:
+                seen.add(region_id)
+            for key in ("role", "priority"):
+                value = region.get(key)
+                if not isinstance(value, str) or not value.strip():
+                    _finding(
+                        findings,
+                        "INCOMPLETE_SCREEN_REGION",
+                        f"screen region {region_id or index} requires {key}",
+                        screen=screen,
+                    )
+
+    responsive = screen_row.get("responsive")
+    if not isinstance(responsive, dict):
+        _finding(
+            findings,
+            "MISSING_RESPONSIVE_CONTRACT",
+            "screen requires responsive transformations or explicit non-applicability",
+            screen=screen,
+        )
+        return
+
+    if responsive.get("not_applicable") is True:
+        rationale = responsive.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            _finding(
+                findings,
+                "RESPONSIVE_NON_APPLICABLE_REQUIRES_RATIONALE",
+                "responsive non-applicability requires rationale",
+                screen=screen,
+            )
+        return
+
+    transformations = responsive.get("transformations")
+    if not isinstance(transformations, list) or not transformations:
+        _finding(
+            findings,
+            "MISSING_RESPONSIVE_TRANSFORMATIONS",
+            "responsive contract requires at least one semantic transformation",
+            screen=screen,
+        )
+        return
+
+    for index, transformation in enumerate(transformations):
+        if not isinstance(transformation, dict):
+            _finding(
+                findings,
+                "INVALID_RESPONSIVE_TRANSFORMATION",
+                f"responsive transformation {index} must be a mapping",
+                screen=screen,
+            )
+            continue
+        condition = transformation.get("condition")
+        effects = transformation.get("effects")
+        focus_read_order = transformation.get("focus_read_order")
+        if not isinstance(condition, str) or not condition.strip():
+            _finding(
+                findings,
+                "INVALID_RESPONSIVE_TRANSFORMATION",
+                f"responsive transformation {index} requires condition",
+                screen=screen,
+            )
+        if (
+            not isinstance(effects, list)
+            or not effects
+            or not all(isinstance(item, str) and item.strip() for item in effects)
+        ):
+            _finding(
+                findings,
+                "INVALID_RESPONSIVE_TRANSFORMATION",
+                f"responsive transformation {index} requires semantic effects",
+                screen=screen,
+            )
+        if not isinstance(focus_read_order, str) or not focus_read_order.strip():
+            _finding(
+                findings,
+                "MISSING_RESPONSIVE_FOCUS_READ_ORDER",
+                f"responsive transformation {index} requires focus/read-order consequence",
+                screen=screen,
+            )
+
+
 def _validate_entity_collection_default(
     *,
     presentation: dict[str, Any],
@@ -551,6 +673,12 @@ def evaluate_frontend_screen_contracts(
         if screen_ids is not None and screen not in screen_ids:
             continue
         evaluated.append(screen)
+
+        _validate_screen_composition(
+            screen_row=row,
+            screen=screen,
+            findings=findings,
+        )
 
         contract = row.get("semantic_contract")
         if not isinstance(contract, dict):
