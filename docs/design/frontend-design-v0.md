@@ -10,27 +10,39 @@ Frontend completeness is consumer-specific.
 
 A frontend implementation consumer may require this knowledge closure:
 
-```
+```text
 Product Requirements
       ↓
-Domain / Use-case Design
+Domain / Use-case + Application Design
       ↓
-User Journey Design
+Task Model
       ↓
-Human Interface Design ─────┐
-      ↓                    │
-Presentation System Design │
-      ↓                    │
-Screen / View Design ◀─────┘
+User Journeys
       ↓
+Conceptual Interface Model
+      ├───────────────┐
+      ▼               ▼
+Information       Interaction
+Architecture      Design
+      └───────┬───────┘
+              ▼
+      Interface Topology
+          ├──────────────► early interface verification when applicable
+          ▼
+   Presentation System
+          │
+          ▼
+    Screen / View Design
+          │
+          ▼
 Frontend System Architecture
-      ↓
+          ↓
 Component Design + Verification Design
-      ↓
+          ↓
 Test Design
-      ↓
+          ↓
 Implementation Design
-      ↓
+          ↓
 Frontend Implementation
 ```
 
@@ -57,6 +69,12 @@ Do not create FRONTEND-DESIGN, UI-DESIGN, UX-DESIGN or ACCESSIBILITY-DESIGN Auth
 
 ## Active reusable knowledge kinds
 
+### task-model
+
+Owner: APPLICATION-DESIGN.
+
+Purpose: expose complete goal → task/subtask responsibility before concrete journeys or interface partitioning. USER work must be explicit enough that later Interaction/Topology coverage can prove no task disappeared silently.
+
 ### user-journey-design
 
 Owner: APPLICATION-DESIGN.
@@ -70,29 +88,39 @@ A journey establishes actor, goal, entry conditions, meaningful interactions, al
 
 A journey is not a screen flow.
 
-### human-interface-design
+### conceptual-interface-model
 
 Owner: HUMAN-INTERFACE-DESIGN.
 
-Purpose: materialize implementation-independent human-interface semantics from accepted journeys and upstream product/domain/security knowledge.
+Purpose: define the user-facing concepts, modes and shared visible state vocabulary required to make accepted product/application behavior understandable without copying the Domain Model mechanically.
 
-Canonical procedure:
-`skills/artifacts/human-interface-design/SKILL.md`.
+### information-architecture-design
 
-The result may establish:
+Owner: HUMAN-INTERFACE-DESIGN.
 
-- information architecture;
-- navigation;
-- view/screen boundaries;
-- user-visible state model;
-- state transitions;
-- actions;
-- validation/error/recovery semantics;
-- authorization-sensitive presentation;
-- focus/keyboard/input semantics where applicable;
-- responsive/adaptive semantics where accepted constraints require them.
+Purpose: define conceptual locations, grouping, hierarchy/cross-links, labels/taxonomy and findability independently of concrete page composition.
 
-It must preserve implementation freedom for framework, CSS mechanics, private component decomposition, state libraries and equivalent local realization choices.
+### interaction-design
+
+Owner: HUMAN-INTERFACE-DESIGN.
+
+Purpose: define USER actions, visible system responses, material states/transitions, recovery and input/focus semantics independently of final view partitioning.
+
+Information Architecture and Interaction Design may be produced in parallel after the Conceptual Interface Model when neither needs to invent the other's decisions.
+
+### interface-topology-design
+
+Owner: HUMAN-INTERFACE-DESIGN.
+
+Purpose: define the complete material view/frame inventory and navigation relationships that map accepted interaction contexts into accepted information locations.
+
+Task views carry interaction-context coverage. Material shells/workspaces may be explicit `structural: true` topology views without claiming USER tasks. Site maps/app maps/screen maps are projections from this knowledge.
+
+### human-interface-design — compatibility only
+
+Owner: HUMAN-INTERFACE-DESIGN.
+
+The broad `human-interface-design` kind remains registered for legacy/project-specific graphs that intentionally keep conceptual model, IA, interaction and topology knowledge inseparable. New/revalidated non-trivial frontend graphs should not add this capability merely as a synthesis layer on top of the granular contracts.
 
 ### presentation-system-design
 
@@ -226,18 +254,20 @@ Do not make every software application require human-interface knowledge.
 
 A user-facing implementation consumer explicitly requires the frontend closure. Backend or non-interactive consumers may require different closures from the same Engineering Graph.
 
-The acceptance fixture in `examples/user-facing-application/**` verifies that:
+The granular acceptance fixture in `examples/frontend-ux-closure/**` verifies that:
 
-1. missing journey knowledge routes to APPLICATION-DESIGN;
-2. missing human-interface knowledge routes to HUMAN-INTERFACE-DESIGN;
-3. reusable Presentation System knowledge and concrete Screen/View Design are required before frontend architecture;
-4. every required screen inherits the shared Presentation System and local deviations are explicit;
-5. frontend architecture follows accepted interface/security/quality inputs;
-6. Component Design and Verification may become parallel frontiers;
-7. Test Design and Implementation Design follow;
-8. the consumer reaches COMPLETE only when its declared closure is realized;
-9. an unresolved Security Architecture Question blocks the frontend consumer and suppresses downstream CREATE work;
-10. frontend Security Architecture cannot cover `security.identity` by artifact presence alone; explicit semantic acceptance evidence is required.
+1. Task Model precedes User Journeys;
+2. Conceptual Interface Model precedes independently addressable IA and Interaction Design;
+3. Interface Topology waits for IA + Interaction and proves USER task → interaction context → material view/frame closure;
+4. material structural shells/workspaces are explicit topology subjects rather than hidden in a sitemap projection;
+5. expected Screen/View subjects are derived from topology;
+6. missing or unexpected Screen/View subjects are rejected;
+7. granular conceptual/IA/interaction/topology claims require explicit semantic acceptance evidence rather than provider existence;
+8. Presentation System and Screen/View follow accepted topology/interaction knowledge;
+9. early interface verification may consume IA/Interaction/Topology without creating a production-graph cycle;
+10. the frontend consumer reaches COMPLETE only when its declared closure is realized.
+
+The older `examples/user-facing-application/**` fixture is retained deliberately as broad-interface compatibility and migration evidence. Engineering Coverage must surface missing granular concerns for that legacy graph rather than silently treating the broad provider as proof.
 
 ## Evidence for this boundary
 
@@ -250,12 +280,12 @@ The blind reconstruction recovered material user-visible semantics from accepted
 
 It also exposed a real missing browser authentication/session decision and successfully routed that gap back to SECURITY-ARCHITECTURE through the existing Question mechanism.
 
-Therefore no Core, Engineering Graph, target-state or agent-router semantic change is required for frontend design.
+The granular closure requires no new Core entity and no new frontend/UX Authority. It extends reusable knowledge kinds, concern/proof contracts and validation/coverage behavior while preserving the Engineering Graph/Core integration model.
 
 
-## Experimental granular human-interface closure
+## Granular human-interface closure
 
-The `research/frontend-ux-closure-v1` experiment tests a finer production topology inside the existing HUMAN-INTERFACE-DESIGN Authority. It does not add workflow stages, Core entities or UI/UX Authorities.
+The granular production topology lives inside the existing HUMAN-INTERFACE-DESIGN Authority. It does not add workflow stages, Core entities or UI/UX Authorities.
 
 Independently addressable knowledge:
 

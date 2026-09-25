@@ -41,9 +41,11 @@ See `docs/design/engineering-graph-v0.md`. The repository integration boundary i
 
 ## User-facing/frontend design
 
-User-facing applications use the same Engineering Graph and Core semantics as backend work. Harness adds reusable `user-journey-design` and `human-interface-design` production procedures while retaining Application Design, Machine/Human Interface Design, System Architecture, Security, Component, Verification, Test and Implementation ownership boundaries.
+User-facing applications use the same Engineering Graph and Core semantics as backend work. For non-trivial frontend scopes, Harness models independently addressable Task/Journey, Conceptual Interface, Information Architecture, Interaction, Interface Topology, Presentation System and Screen/View knowledge while retaining the existing Application Design, Human/Machine Interface Design, System Architecture, Security, Component, Verification, Test and Implementation Authority boundaries.
 
-See `docs/design/frontend-design-v0.md` and the executable `examples/user-facing-application/**` fixture.
+`human-interface-design` remains a compatibility knowledge kind for projects that deliberately keep conceptual/IA/interaction/topology semantics inseparable; new/revalidated frontend graphs should prefer the granular contracts when those knowledge kinds have independent consumers or lifecycle.
+
+See `docs/design/frontend-design-v0.md`. `examples/frontend-ux-closure/**` is the granular closure fixture; `examples/user-facing-application/**` remains a legacy broad-interface compatibility/migration fixture.
 
 ## Design target state
 

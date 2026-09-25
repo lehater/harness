@@ -7,7 +7,7 @@ description: "Use for implementation-independent composition of concrete screens
 
 ## Trigger
 
-Use when a user-facing implementation needs concrete view composition and Human Interface semantics alone would leave material UI decisions to the implementer.
+Use when accepted Interface Topology identifies material views whose local composition would otherwise be left to the implementer.
 
 Owner: HUMAN-INTERFACE-DESIGN.
 
@@ -17,16 +17,17 @@ Materialize each concrete screen/view as a composition contract that inherits an
 
 ## Inputs
 
-- accepted Human Interface Design;
+- accepted Interface Topology;
+- accepted Interaction Design;
 - accepted Presentation System;
-- accepted journeys/tasks;
+- accepted journeys/tasks and Information Architecture/Conceptual Interface context where needed;
 - domain/application/machine-interface contracts for displayed/edited data and actions;
 - security/authorization semantics;
 - applicable quality/accessibility/localization constraints.
 
 ## Read boundary
 
-Read accepted Human Interface semantics, Presentation System, upstream data/action/security contracts and applicable quality obligations. Existing frontend code, routes, screenshots or design-tool files are not authority unless explicitly declared canonical.
+Read accepted topology/interaction/presentation semantics, relevant conceptual/IA/task knowledge, upstream data/action/security contracts and applicable quality obligations. Existing frontend code, routes, screenshots or design-tool files are not authority unless explicitly declared canonical.
 
 ## Procedure
 
@@ -108,7 +109,7 @@ The contract should be sufficient to generate review projections such as a scree
 
 ## Registration
 
-Register under HUMAN-INTERFACE-DESIGN and provide the screen/view capabilities actually materialized. Dependencies include the Human Interface contract, inherited Presentation System and upstream semantic contracts genuinely consumed.
+Register under HUMAN-INTERFACE-DESIGN and provide the screen/view capabilities actually materialized. Dependencies include Interface Topology, Interaction Design, the inherited Presentation System and upstream semantic contracts genuinely consumed; a broad human-interface compatibility capability is not required.
 
 ## Human projection
 

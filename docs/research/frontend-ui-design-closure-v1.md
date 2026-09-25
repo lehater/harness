@@ -1,6 +1,6 @@
 # Research — Frontend UI/UX design closure v1
 
-Status: validated research candidate for canonicalization after CI.
+Status: historical research evidence. Superseded for current taxonomy by `docs/research/frontend-ux-knowledge-closure-v1.md` and `docs/design/frontend-design-v0.md` on the granular frontend UX research branch.
 
 ## Question
 
