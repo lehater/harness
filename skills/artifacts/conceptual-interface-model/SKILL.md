@@ -10,10 +10,13 @@ Use when actionable work has `knowledge_kind: conceptual-interface-model`.
 Owner: HUMAN-INTERFACE-DESIGN.
 
 ## Responsibility
-Define concepts, modes, user-visible state vocabulary and relationships the interface uses to make accepted product behavior understandable. This is not the tactical Domain Model and not a screen map.
+Define concepts, modes, shared user-visible state vocabulary and conceptual relationships the interface uses to make accepted product behavior understandable. This is not the tactical Domain Model and not a screen map.
 
 ## Inputs
 Accepted Product Requirements, Task Model, User Journeys, exposed Domain/Application semantics, and material security/policy distinctions.
+
+## Read boundary
+Read only accepted upstream knowledge needed to explain what users must recognize and distinguish. Existing routes, screens, components, screenshots and prototypes are evidence, not authority, unless explicitly declared canonical.
 
 ## Procedure
 1. Enumerate concepts the user must recognize to complete accepted tasks.
@@ -25,11 +28,17 @@ Accepted Product Requirements, Task Model, User Journeys, exposed Domain/Applica
 7. Route missing meaning as Questions.
 8. Produce/register the project-native contract and reevaluate.
 
+## Stop conditions
+Stop when a required user-facing concept, mode or state distinction cannot be justified from accepted Product/Domain/Application/Security knowledge.
+
 ## Output contract
-Concept ids and meaning/upstream refs; material modes; shared state vocabulary; conceptual relationships; unresolved Questions.
+Concept ids and meanings/upstream refs; material modes; shared state vocabulary; conceptual relationships; deliberately unconstrained navigation/screen details; unresolved Questions.
 
 ## Acceptance checks
 Every concept traces upstream; domain entities are not copied mechanically; modes are not authorization roles unless upstream says so; no navigation/page/layout decision is used as conceptual truth; downstream IA/Interaction can proceed without inventing concepts.
+
+## Registration
+Register under HUMAN-INTERFACE-DESIGN and provide only conceptual-interface capabilities actually materialized.
 
 ## Human projection
 Concept diagrams and vocabulary maps are projections, not required file formats.
