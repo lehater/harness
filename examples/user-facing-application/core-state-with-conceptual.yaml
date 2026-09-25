@@ -35,10 +35,20 @@ artifacts:
     authority: MACHINE-INTERFACE-DESIGN
     provides: [example.machine-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
+  - id: EXAMPLE-TASK-MODEL
+    path: examples/user-facing-application/canonical/example-task-model.yaml
+    authority: APPLICATION-DESIGN
+    provides: [example.frontend.task-model]
+    depends_on: [EXAMPLE-USER-NEEDS, EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
   - id: EXAMPLE-FRONTEND-JOURNEYS
     path: examples/user-facing-application/canonical/example-frontend-journeys.yaml
     authority: APPLICATION-DESIGN
     provides: [example.frontend.user-journeys]
-    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
+    depends_on: [EXAMPLE-TASK-MODEL, EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES]
+  - id: EXAMPLE-CONCEPTUAL-INTERFACE
+    path: examples/user-facing-application/canonical/example-conceptual-interface-model.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [example.frontend.conceptual-model]
+    depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-TASK-MODEL, EXAMPLE-FRONTEND-JOURNEYS, EXAMPLE-SECURITY, EXAMPLE-MACHINE-INTERFACE]
 questions:
   []

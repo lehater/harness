@@ -4,6 +4,7 @@ artifacts:
     path: examples/user-facing-application/canonical/example-problem-evidence.yaml
     authority: DISCOVERY
     provides: [example.problem-evidence]
+    depends_on: []
   - id: EXAMPLE-USER-NEEDS
     path: examples/user-facing-application/canonical/example-user-needs.yaml
     authority: DISCOVERY
@@ -34,4 +35,5 @@ artifacts:
     authority: MACHINE-INTERFACE-DESIGN
     provides: [example.machine-interface]
     depends_on: [EXAMPLE-REQUIREMENTS, EXAMPLE-DOMAIN-USE-CASES, EXAMPLE-SECURITY]
-questions: []
+questions:
+  []

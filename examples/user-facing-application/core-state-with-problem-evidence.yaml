@@ -4,4 +4,6 @@ artifacts:
     path: examples/user-facing-application/canonical/example-problem-evidence.yaml
     authority: DISCOVERY
     provides: [example.problem-evidence]
-questions: []
+    depends_on: []
+questions:
+  []
