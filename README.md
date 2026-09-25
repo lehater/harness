@@ -45,7 +45,7 @@ User-facing applications use the same Engineering Graph and Core semantics as ba
 
 `human-interface-design` remains a compatibility knowledge kind for projects that deliberately keep conceptual/IA/interaction/topology semantics inseparable; new/revalidated frontend graphs should prefer the granular contracts when those knowledge kinds have independent consumers or lifecycle.
 
-See `docs/design/frontend-design-v0.md`. `examples/frontend-ux-closure/**` is the granular closure fixture; `examples/user-facing-application/**` remains a legacy broad-interface compatibility/migration fixture.
+See `docs/design/frontend-design-v0.md`. `examples/user-facing-application/**` is the current granular full-stack frontend fixture; `examples/frontend-legacy-compatibility/**` is the minimal broad-interface migration/compatibility fixture.
 
 ## Design target state
 

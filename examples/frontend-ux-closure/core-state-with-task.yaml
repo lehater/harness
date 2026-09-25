@@ -1,8 +1,0 @@
-authorities: []
-artifacts:
-  - id: TASK-MODEL
-    path: examples/frontend-ux-closure/canonical/task-model.yaml
-    authority: APPLICATION-DESIGN
-    provides: [experiment.frontend.task-model]
-    depends_on: []
-questions: []

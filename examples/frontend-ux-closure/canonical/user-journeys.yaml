@@ -1,7 +1,0 @@
-version: 1
-kind: user-journey-design
-id: FRONTEND-UX-JOURNEYS
-journeys:
-  - id: JOURNEY-FIND-AND-INSPECT
-    task_refs: [TASK-FIND-RESOURCE, TASK-INSPECT-RESOURCE]
-    completion: Selected resource detail is visible.

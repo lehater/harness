@@ -254,7 +254,7 @@ Do not make every software application require human-interface knowledge.
 
 A user-facing implementation consumer explicitly requires the frontend closure. Backend or non-interactive consumers may require different closures from the same Engineering Graph.
 
-The granular acceptance fixture in `examples/frontend-ux-closure/**` verifies that:
+The granular full-stack acceptance fixture in `examples/user-facing-application/**` verifies that:
 
 1. Task Model precedes User Journeys;
 2. Conceptual Interface Model precedes independently addressable IA and Interaction Design;
@@ -267,7 +267,7 @@ The granular acceptance fixture in `examples/frontend-ux-closure/**` verifies th
 9. early interface verification may consume IA/Interaction/Topology without creating a production-graph cycle;
 10. the frontend consumer reaches COMPLETE only when its declared closure is realized.
 
-The older `examples/user-facing-application/**` fixture is retained deliberately as broad-interface compatibility and migration evidence. Engineering Coverage must surface missing granular concerns for that legacy graph rather than silently treating the broad provider as proof.
+The minimal `examples/frontend-legacy-compatibility/**` fixture exists only to verify broad-interface migration behavior. Engineering Coverage must surface missing granular concerns for that legacy graph rather than silently treating the broad provider as proof.
 
 ## Evidence for this boundary
 
