@@ -68,8 +68,14 @@ def main():
     r=evaluate_frontend_ux_closure(task,conceptual,bad_ia,interaction,topology)
     assert "UNKNOWN_CONCEPT_REF" in codes(r),r
 
-    presentation=load(ROOT/"examples"/"user-facing-application"/"canonical"/"example-presentation-system.yaml")
-    screens=load(ROOT/"examples"/"user-facing-application"/"canonical"/"example-screen-view-design.yaml")
+    # The expected Screen/View subject set is derived from topology, never hand-authored.
+    presentation={"patterns":{}}
+    screens={
+        "screens":[
+            {"id":"RESOURCE-CATALOGUE"},
+            {"id":"RESOURCE-DETAIL"},
+        ]
+    }
     r=evaluate_frontend_screen_contracts(presentation,screens,None,screen_ids=required_screen_ids(topology))
     assert "MISSING_REQUIRED_SCREEN" not in codes(r),r
 
