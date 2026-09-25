@@ -156,6 +156,14 @@ A screen contract identifies inherited presentation system, regions/sections/tab
 
 Structured YAML/JSON is preferred when sufficient. Wireframes, prototypes, Figma frames and Storybook stories may be generated projections.
 
+## Performance-sensitive presentation surfaces
+
+When a user-facing visualization, canvas, map, graph, dense table or other presentation surface has accepted measurable constraints for data size, frame/interaction latency, resource usage or graceful degradation, that knowledge belongs to QUALITY-DESIGN and must participate in the frontend consumer closure.
+
+Do not leave such constraints as an unregistered architecture note or prototype-only observation. If the constraint is independently consumed by frontend architecture/component/verification/implementation work, register a project Quality capability and make the dependent frontend capabilities require it.
+
+Screen/View Design owns the user-visible semantic consequences of degradation (for example, preserving relation type/direction access when decorative arrows or labels are reduced). Component/Implementation Design owns private renderer tactics such as instancing, batching, pixel ratio and force-engine details. Verification/Test Design owns representative workload evidence.
+
 ## Human-interface quality analysis
 
 Accessibility/usability coverage remains a cross-Authority analysis, not a new Authority.

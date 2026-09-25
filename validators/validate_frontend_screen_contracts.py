@@ -87,6 +87,23 @@ SCREENS = {
             "id": "RESOURCE-CATALOGUE",
             "purpose": "Locate/select Resources and start supported creation.",
             "patterns": ["CATALOGUE", "STATUS"],
+            "regions": [
+                {"id": "query", "role": "query-controls", "priority": "secondary"},
+                {"id": "collection", "role": "entity-collection", "priority": "primary"},
+                {"id": "feedback", "role": "operation-feedback", "priority": "supporting"},
+            ],
+            "responsive": {
+                "transformations": [
+                    {
+                        "condition": "narrow available width",
+                        "effects": [
+                            "query controls wrap above collection",
+                            "collection remains primary and labels remain visible",
+                        ],
+                        "focus_read_order": "query controls then collection then feedback",
+                    }
+                ]
+            },
             "states": ["loading", "loaded", "empty", "validation-rejected", "error"],
             "semantic_contract": {
                 "reads": [
@@ -147,6 +164,22 @@ SCREENS = {
             "id": "RESOURCE-DETAIL",
             "purpose": "Inspect one Resource and its history.",
             "patterns": ["DETAIL"],
+            "regions": [
+                {"id": "identity", "role": "identity-context", "priority": "primary"},
+                {"id": "current", "role": "primary-detail", "priority": "primary"},
+                {"id": "history", "role": "secondary-history", "priority": "secondary"},
+            ],
+            "responsive": {
+                "transformations": [
+                    {
+                        "condition": "narrow available width",
+                        "effects": [
+                            "history follows current detail instead of competing beside it",
+                        ],
+                        "focus_read_order": "identity then current detail then history",
+                    }
+                ]
+            },
             "states": ["loading", "loaded", "not-found", "error"],
             "semantic_contract": {
                 "reads": [
@@ -292,6 +325,27 @@ def main() -> int:
     no_rendered_proof["screens"][1]["semantic_contract"]["verification"]["rendered"] = []
     result = evaluate_frontend_screen_contracts(PRESENTATION, no_rendered_proof, OPENAPI)
     assert "INCOMPLETE_VERIFICATION_CONTRACT" in codes(result)
+
+    missing_regions = deepcopy(SCREENS)
+    del missing_regions["screens"][0]["regions"]
+    result = evaluate_frontend_screen_contracts(PRESENTATION, missing_regions, OPENAPI)
+    assert "MISSING_SCREEN_REGIONS" in codes(result)
+
+    missing_responsive = deepcopy(SCREENS)
+    del missing_responsive["screens"][0]["responsive"]
+    result = evaluate_frontend_screen_contracts(PRESENTATION, missing_responsive, OPENAPI)
+    assert "MISSING_RESPONSIVE_CONTRACT" in codes(result)
+
+    incomplete_responsive = deepcopy(SCREENS)
+    del incomplete_responsive["screens"][0]["responsive"]["transformations"][0][
+        "focus_read_order"
+    ]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION,
+        incomplete_responsive,
+        OPENAPI,
+    )
+    assert "MISSING_RESPONSIVE_FOCUS_READ_ORDER" in codes(result)
 
     collection_defaults = deepcopy(PRESENTATION)
     collection_defaults["entity_collection_default"] = {

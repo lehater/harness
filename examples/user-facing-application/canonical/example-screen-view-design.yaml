@@ -4,7 +4,38 @@ id: EXAMPLE-SCREEN-VIEW-DESIGN
 status: CURRENT
 inherits: EXAMPLE-PRESENTATION-SYSTEM
 screens:
-  - {id: APPLICATION-SHELL, purpose: Preserve global application context.}
-  - {id: RESOURCE-CATALOGUE, purpose: Locate and select resources.}
-  - {id: RESOURCE-DETAIL, purpose: Inspect one selected resource.}
-rules: [Every required screen inherits EXAMPLE-PRESENTATION-SYSTEM., Local deviations require rationale.]
+  - id: APPLICATION-SHELL
+    purpose: Preserve global application context.
+    regions:
+      - {id: global-navigation, role: navigation, priority: primary}
+      - {id: active-view, role: workspace, priority: primary}
+    responsive:
+      transformations:
+        - condition: narrow available width
+          effects: [global navigation compacts without hiding destinations]
+          focus_read_order: global navigation then active view
+  - id: RESOURCE-CATALOGUE
+    purpose: Locate and select resources.
+    regions:
+      - {id: query, role: query-controls, priority: secondary}
+      - {id: catalogue, role: entity-collection, priority: primary}
+    responsive:
+      transformations:
+        - condition: narrow available width
+          effects: [query controls wrap above the catalogue]
+          focus_read_order: query controls then catalogue
+  - id: RESOURCE-DETAIL
+    purpose: Inspect one selected resource.
+    regions:
+      - {id: identity, role: identity-context, priority: primary}
+      - {id: detail, role: primary-detail, priority: primary}
+      - {id: history, role: secondary-history, priority: secondary}
+    responsive:
+      transformations:
+        - condition: narrow available width
+          effects: [history follows primary detail in one reading column]
+          focus_read_order: identity then primary detail then history
+rules:
+  - Every required screen inherits EXAMPLE-PRESENTATION-SYSTEM.
+  - Every screen declares semantic regions and responsive transformations or explicit non-applicability.
+  - Local deviations require rationale.
