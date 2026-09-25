@@ -1,51 +1,70 @@
 # Evaluation — granular frontend UX knowledge closure
 
-Status: experimental evaluation after synthetic Harness validation and real Prep consumer test.
+Status: completed experimental evaluation. Candidate for canonicalization; no merge is authorized by this document.
 
 Branches:
 
 - Harness: `research/frontend-ux-closure-v1`
-- Prep: `research/frontend-ux-closure-v1`
+- Prep consumer test: `research/frontend-ux-closure-v1`
 
-No merge/canonicalization decision is made by this document.
+## Verdict
 
-## Result
+The experiment supports adopting the granular frontend UX knowledge model into Harness.
 
-The experiment supports the **direction** of splitting Human Interface knowledge into independently addressable capabilities while keeping one HUMAN-INTERFACE-DESIGN Authority.
+The central result is:
 
-The current patch should **not** be canonicalized as-is yet.
+> HUMAN-INTERFACE-DESIGN remains one Authority, but non-trivial frontend work benefits from independently addressable Conceptual Interface, Information Architecture, Interaction, Interface Topology, Presentation System and Screen/View knowledge contracts.
 
-Both final CI runs pass:
+No new Core entity, frontend workflow, UI/UX Authority or mandatory document format is required.
 
-- Harness `make harness-check`: PASS on `02770055e1f56d96520f44cda9da264957ef0d83`;
-- Prep full Validate workflow: PASS while pinned to that Harness SHA.
+A site map, app map, wireframe, Figma file or prototype remains a projection/evidence surface. Canonical completeness comes from machine-addressable knowledge dependencies.
 
-## What the experiment validated
+## Final dependency model
 
-### 1. Knowledge granularity is useful without Authority proliferation
+```text
+Product/Application semantics
+        ↓
+Task Model
+        ↓
+User Journeys
+        ↓
+Conceptual Interface Model
+        ├───────────────┐
+        ▼               ▼
+Information         Interaction
+Architecture        Design
+        └───────┬───────┘
+                ▼
+        Interface Topology
+        ├──────────────► early interface verification when applicable
+        ▼
+        Presentation System
+                ↓
+        Screen / View Design
+                ↓
+        downstream architecture/component/verification/implementation
+```
 
-The following knowledge kinds behaved as independently useful public contracts under the existing HUMAN-INTERFACE-DESIGN Authority:
+This is dependency topology, not a workflow/stage machine.
+
+## What was validated
+
+### Independent knowledge without Authority proliferation
+
+The following knowledge kinds carry materially different decisions under HUMAN-INTERFACE-DESIGN:
 
 - `conceptual-interface-model`;
 - `information-architecture-design`;
 - `interaction-design`;
-- `interface-topology-design`.
+- `interface-topology-design`;
+- existing `presentation-system-design`;
+- existing `screen-view-design`.
 
-Prep supplied materially different knowledge for each rather than four names for the same document.
+`human-interface-design` remains compatibility-only for projects that intentionally keep conceptual/IA/interaction/topology knowledge inseparable.
 
-### 2. Site/app maps can remain projections
+### Task → interaction → topology → screen completeness
 
-Prep's site map initially contained structural information that was not represented canonically: application shell, target workspace and curation workspace.
-
-The experiment added explicit `structural: true` topology views. After that change, the site map no longer needs to own extra semantic structure.
-
-Therefore the useful invariant is not “a sitemap file must exist”. It is:
-
-> all material task views and structural frames must be present in canonical Interface Topology; a sitemap/app map may visualize them.
-
-### 3. A completeness chain catches omissions that Screen/View validation alone cannot
-
-The executable closure is:
+Executable validation proves:
 
 ```text
 USER task
@@ -54,102 +73,115 @@ USER task
           -> required Screen/View subject
 ```
 
-The synthetic fixture proves failures for:
+Material shells/workspaces are represented as explicit `structural: true` topology views. They participate in navigation and Screen/View coverage without falsely claiming a USER task.
 
-- uncovered USER tasks;
-- interaction contexts lost before topology;
-- unknown conceptual references in IA;
-- missing topology-derived Screen/View subjects;
-- structural frames incorrectly claiming task interaction contexts.
+### Site/app maps remain projections
 
-### 4. Real-project use found Harness-model defects
+Prep exposed three structural frames that originally existed only in its site map:
 
-Prep exposed defects that the synthetic fixture initially missed:
+- Application Shell;
+- LearningTarget Workspace;
+- Curation Workspace.
 
-- Interaction Design was accidentally coupled to IA through `location_ref`, contradicting the intended parallel production branches. The evaluator and skill contract were corrected so Topology performs the placement/mapping.
-- Structural shells/workspaces were present in the human site map but absent from canonical topology. `structural: true` topology views were introduced.
-- These failures demonstrate that a real consumer project adds material evidence beyond self-validation of Harness.
+Those frames were moved into canonical Interface Topology. The site map can therefore remain a disposable/human-readable projection rather than a hidden semantic owner.
 
-### 5. The missing Prep Task Model was made explicit
+### IA and Interaction remain independent until Topology
 
-The old Prep graph skipped the Task Model even though the reference user-facing graph contains that capability.
+Real-project testing found an accidental dependency where Interaction contexts referenced IA locations despite IA and Interaction being intended parallel production branches.
 
-The experimental Prep graph now makes Task Model an explicit APPLICATION-DESIGN capability upstream of User Journeys and interface knowledge.
+The model was corrected:
 
-This improves task completeness reasoning before screen partitioning.
+- Interaction Design owns actions/responses/states and task coverage;
+- Information Architecture owns organization/findability;
+- Interface Topology maps accepted interaction contexts into accepted information locations/views.
 
-## Benefits observed in Prep
+### Existing-project migration gaps are detected non-destructively
 
-The new model separates questions that were previously conflated inside broad Human Interface prose:
+Reconciliation must not rewrite a project Engineering Graph merely because Harness reference policy changes.
 
-- what user-facing concepts/modes exist;
-- how information is grouped and found;
-- what the user does and how the system responds;
-- what views/frames exist and how they connect;
-- how each individual view is composed.
+Engineering Coverage now provides the independent migration/completeness lens:
 
-It also turned the previously manual site-map insight into canonical topology knowledge and made structural workspace frames machine-addressable.
+- a `FRONTEND` Consumer activates conceptual/IA/interaction/topology concerns even when the project graph has no granular providers;
+- the legacy broad user-facing fixture therefore produces `MISSING / MODEL_PRODUCTION_CONTRACT` for those concerns;
+- Authority-role routing identifies HUMAN-INTERFACE-DESIGN as the capable owner;
+- `project-bootstrap-reconcile` explicitly requires this Coverage diagnostic after conservative reconciliation;
+- no project Capability is silently inserted.
 
-## Remaining problems before canonicalization
+This closes the class of failure that previously allowed a project such as Prep to omit Task Model or another newly required semantic layer without an explicit diagnostic.
 
-### P0 — Existing-project adoption/reconciliation: resolved experimentally through Engineering Coverage
+### Topology → Screen/View subject coverage is generic
 
-A legacy project graph must not be silently rewritten merely because Harness reference policy evolved.
+Harness provides `evaluate_topology_screen_subject_coverage(topology, screen_subjects)`.
 
-The experiment now uses the existing Engineering Coverage mechanism as the independent migration/completeness lens:
+Interface Topology owns the expected subject set. Each project may extract Screen/View subject ids from its own canonical format through a project-owned adapter.
 
-- `FRONTEND` Consumer activation requires the granular human-interface concerns independently of pre-existing granular providers;
-- a legacy graph with only broad `human-interface-design` therefore receives `MISSING / MODEL_PRODUCTION_CONTRACT` rows for conceptual model, information architecture, interaction and navigation/topology;
-- the standard Authority-role mapping routes those missing semantic claims to HUMAN-INTERFACE-DESIGN;
-- `project-bootstrap-reconcile` is updated to run this Coverage diagnostic after conservative registry/graph reconciliation;
-- no Capability is inserted automatically.
+Prep embeds stable ids in its existing Screen/View Markdown and no longer maintains a duplicated coverage sidecar.
 
-A regression test in `validate_engineering_coverage.py` proves the legacy broad frontend example cannot hide the new obligations.
+### Semantic quality is not confused with structural closure
 
-### P1 — Screen/View subject coverage: resolved experimentally without a sidecar
+The four new interface concerns require semantic evaluation.
 
-Harness now provides a generic `evaluate_topology_screen_subject_coverage(topology, screen_subjects)` evaluator.
+Regression proves:
 
-The invariant is format-independent:
+- provider exists without semantic acceptance → `MISSING / VALIDATE_SEMANTICS`;
+- accepted semantic evidence for the capability/claim → `COVERED`.
 
-- Interface Topology owns the expected material view/frame subject set;
-- the project owns an adapter that extracts Screen/View subject ids from its canonical Screen/View artifact format;
-- Harness compares the two sets and rejects missing or unexpected subjects.
+The structural evaluator therefore proves closure/references, not that an IA is usable or a conceptual model is correct. Human/agent judgement and verification evidence remain separate as intended by Harness.
 
-Prep no longer needs a manually maintained `screen-view-subject-coverage.yaml`; stable view ids are embedded in its existing canonical Screen/View Markdown and extracted by the project integration adapter.
+## Real Prep consumer evidence
 
-This preserves the Integration Contract: Harness contains no Prep-specific parser, and project artifact format remains project-owned.
+Applying the model to Prep found defects that the synthetic fixture initially missed and improved the project model:
 
-### P1 — Broad `human-interface-design`: resolved as compatibility-only
+- missing explicit Task Model was corrected;
+- Learning/Curation concepts were separated from domain entities;
+- IA and Interaction were made independently addressable;
+- 19 material view/frame subjects were made canonical in Interface Topology;
+- three shared structural frames were made explicit;
+- Screen/View coverage is derived from topology rather than a sidecar;
+- broad `prep.human-interface` was removed from the experimental graph;
+- the human-interface prose document remains only a non-canonical synthesis projection.
 
-The experiment does not require a synthesis capability downstream of the granular contracts.
+Prep's product/domain semantics were not changed by this experiment.
 
-`human-interface-design` remains registered only for legacy/project-specific graphs that intentionally keep conceptual, IA, interaction and topology knowledge as one public contract. Its skill now states that new/revalidated non-trivial frontend graphs should prefer granular contracts and must not add a broad capability merely for synthesis.
+## Compatibility
 
-Prep removes `prep.human-interface` from its experimental Engineering Graph/Core; its human-interface summary remains a non-canonical projection.
+The broad `human-interface-design` knowledge kind remains registered for existing/project-specific graphs.
 
-This avoids duplicate truth while preserving backward compatibility for existing graphs.
+A legacy project has two valid paths after Harness upgrade:
 
-### P1 — Structural closure is not semantic-quality proof
+1. adopt granular capabilities; or
+2. intentionally retain one broad capability and declare/semantically accept the granular concern claims it genuinely owns.
 
-`frontend_interface_knowledge.py` currently proves reference integrity and completeness relationships. It does not prove that an IA grouping is usable, an interaction recovery path is sufficient, or a conceptual model matches users.
+Silence is not a third path: FRONTEND consumer coverage surfaces the missing concern contracts.
 
-That is intentional for structural closure, but the new concern claims are marked as requiring semantic evaluation. Canonicalization therefore needs a clear path for per-kind semantic acceptance evidence rather than treating structural validation as full UX quality proof.
+The legacy `examples/user-facing-application/**` fixture is intentionally retained to test that migration behavior.
 
-### P2 — Early verification topology needs policy refinement
+## Early verification
 
-The experiment demonstrates that early interface verification can exist before local Screen/View design without creating a graph cycle.
+The experiment proves that IA/findability/interaction/topology verification can exist before local Screen/View realization without introducing a graph cycle.
 
-That pattern is useful, but its exact placement should be consumer/project dependent. Harness should support early IA/findability/interaction verification rather than universally force a particular product-development sequence.
+This is supported, not universally mandated. Project/consumer evidence decides whether early verification is independently valuable.
+
+## Validation result
+
+At the final functional revision before this evaluation update:
+
+- Harness full `make harness-check`: PASS;
+- Prep full `Validate` workflow while pinned to the experimental Harness: PASS.
+
+The branch also passed after canonical-facing README/frontend-design/skill cleanup, eliminating the old broad-interface model from normative frontend guidance.
 
 ## Recommendation
 
-Do not merge the experiment as-is.
+The architectural experiment is successful.
 
-Retain the branch and proceed with a second research iteration focused on the four issues above, especially P0 legacy/reconciliation detection and P1 generic subject coverage.
+The current branch is a **canonicalization candidate** rather than a rejected or still-open research hypothesis.
 
-The central design hypothesis is supported:
+Before merge, the remaining work is procedural rather than architectural:
 
-> HUMAN-INTERFACE-DESIGN should own several independently addressable knowledge contracts, and Interface Topology should be the canonical completeness boundary for view/frame identity and navigation; site maps remain projections.
+- review the diff and migration note;
+- decide whether the new knowledge kinds/concerns should become current Harness policy;
+- if approved, merge/squash according to repository policy;
+- then reconcile consumer projects using conservative graph reconciliation plus Engineering Coverage.
 
-The remaining work is primarily Harness control/coverage integration and simplification, not a reversal of that knowledge model.
+No merge into `main` is performed without explicit authorization.
