@@ -431,6 +431,36 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
     return profile
 
 
+def consumer_knowledge_kinds(
+    graph: dict[str, Any],
+    target_consumer: str,
+) -> list[str]:
+    """Return the knowledge kinds in a Consumer's recursive capability closure."""
+    profile = derive_profile(graph, target_consumer)
+    productions = production_index(graph)
+    return sorted(
+        {
+            knowledge_kind
+            for expectation in profile["expectations"]
+            if (
+                knowledge_kind := productions[expectation["capability"]].get(
+                    "knowledge_kind"
+                )
+            )
+        }
+    )
+
+
+def is_implementation_consumer(
+    graph: dict[str, Any],
+    target_consumer: str,
+) -> bool:
+    """Implementation intent is structural, not a Consumer naming convention."""
+    return "implementation-design" in consumer_knowledge_kinds(
+        graph, target_consumer
+    )
+
+
 def realize_core_model(
     graph: dict[str, Any],
     model: dict[str, Any],
@@ -493,6 +523,9 @@ def evaluate_engineering_target(
     result = evaluate_target_state(profile, realized)
     return {
         "target": target_consumer,
+        "implementation_consumer": is_implementation_consumer(
+            graph, target_consumer
+        ),
         "profile": profile,
         **result,
     }

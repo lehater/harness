@@ -106,7 +106,7 @@ An already-consumed capability cannot also be declared terminal. This catches st
 
 A Consumer is a selected terminal target that consumes engineering knowledge but does not need to produce more engineering knowledge inside the selected graph.
 
-`IMPLEMENTATION` is the primary example, but it is not special. A project may target deployment preparation, interface implementation, verification design or another terminal consumer.
+Consumer IDs are labels, not semantic classifiers. A production implementation Consumer is identified structurally by an `implementation-design` production in its recursive capability closure. A structurally `COMPLETE` Consumer without that knowledge may validly prove a narrower design, audit, prototype or revalidation target, but it does not by itself authorize production coding. A project may also target deployment preparation, verification design or another terminal consumer.
 
 ## Document shape
 
@@ -139,8 +139,8 @@ authorities:
           - capability: example.problem
 
 consumers:
-  - id: IMPLEMENTATION
-    purpose: Build accepted behavior without inventing design decisions.
+  - id: DESIGN-BASELINE
+    purpose: Establish the accepted product baseline for a downstream design task.
     requires:
       - capability: example.requirements
 
@@ -163,10 +163,10 @@ A production contract may optionally declare `knowledge_kind`.
 The three identities have different purposes:
 
 - **CapabilityId** — project-specific accepted knowledge identity used by producer/consumer topology and Core providers;
-- **knowledge_kind** — repository-independent semantic class of knowledge used only by the agent execution layer;
+- **knowledge_kind** — repository-independent semantic class of knowledge used by reusable derived policies such as agent routing, strict semantic admission and Engineering Coverage; it is not Core state;
 - **artifact skill** — one registered procedure capable of forming that knowledge kind.
 
-Engineering Graph validation and target-state evaluation do not require `knowledge_kind`. A missing or unsupported kind leaves an actionable `CREATE` **unrouted**; it never changes `CREATE` into `WAIT` or `PENDING`.
+Engineering Graph validation and structural target-state evaluation do not generally require `knowledge_kind`. A missing or unsupported kind does not change `CREATE` into `WAIT` or `PENDING`, but reusable derived policies may be unable to classify or route that production. In particular, production coding is classified only when the selected Consumer closure includes `knowledge_kind: implementation-design`.
 
 `agent_router.py` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
 

@@ -38,7 +38,9 @@ contracts:
   - knowledge_kind: quality-design
     required_review_checks: [no-invented-quality-target]
   - knowledge_kind: system-architecture
-    required_review_checks: [architecture-not-product-requirement]
+    required_review_checks:
+      - architecture-not-product-requirement
+      - dependency-topology-explicit-where-material
   - knowledge_kind: security-architecture
     required_review_checks: [security-architecture-not-product-policy]
   - knowledge_kind: interface-contract
@@ -66,11 +68,16 @@ contracts:
   - knowledge_kind: engineering-policy
     required_review_checks: [policy-not-product-domain-owner]
   - knowledge_kind: component-design
-    required_review_checks: [component-not-upstream-owner]
+    required_review_checks:
+      - component-not-upstream-owner
+      - implementation-facing-boundaries-complete-for-scope
   - knowledge_kind: test-design
     required_review_checks: [test-not-semantic-owner]
   - knowledge_kind: implementation-design
-    required_review_checks: [implementation-not-upstream-owner]
+    required_review_checks:
+      - implementation-not-upstream-owner
+      - implementation-slices-explicit
+      - repository-realization-derived-from-accepted-boundaries
   - knowledge_kind: acceptance-scenarios
     required_review_checks: [scenario-not-semantic-owner]
   - knowledge_kind: domain-model

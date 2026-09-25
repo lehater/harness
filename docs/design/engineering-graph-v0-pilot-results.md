@@ -402,11 +402,16 @@ Core state:
 
 Removing or changing the skill registry does not change graph validation,
 derived closure, CREATE/WAIT/PENDING/COMPLETE, or Core realization. Missing
-`knowledge_kind` likewise leaves CREATE valid and merely makes agent execution
-UNROUTED.
+`knowledge_kind` likewise leaves structural CREATE valid, but may leave agent
+execution UNROUTED or prevent reusable derived policies from classifying the
+production. Current Engineering Coverage uses knowledge kinds as one
+machine-readable activation signal, and production coding classification uses
+`implementation-design` in the selected Consumer closure.
 
 Therefore keeping optional `knowledge_kind` on the production contract does
-not make Engineering Graph an execution workflow. Moving it into the skill
+not make Engineering Graph an execution workflow. Structural Core semantics
+remain CapabilityId-based; reusable policies may require a known kind for the
+specific classification they perform. Moving kind metadata into the skill
 registry would require project CapabilityIds to be enumerated in execution
 configuration and would couple reusable routing to project identity.
 
