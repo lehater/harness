@@ -36,6 +36,24 @@ def subject_eval(core):
     )
 
 
+def granular_frontend_eval(semantic_evaluations=None):
+    graph = load(ROOT / "examples/frontend-ux-closure/engineering-graph.yaml")
+    realization = load(ROOT / "examples/frontend-ux-closure/core-state-complete.yaml")
+    return evaluate_with_repository_policy(
+        graph=graph,
+        realization=realization,
+        consumer="FRONTEND-IMPLEMENTATION",
+        scope="granular-frontend",
+        project_overlay={
+            "subject_inventory": {
+                "state": "NOT_APPLICABLE",
+                "rationale": "This fixture validates shared frontend knowledge concerns rather than per-screen subjects.",
+            }
+        },
+        semantic_evaluations=semantic_evaluations,
+    )
+
+
 def frontend_presentation_eval(semantic_evaluations=None):
     graph = load(ROOT / "examples/user-facing-application/engineering-graph.yaml")
     realization = load(ROOT / "examples/user-facing-application/core-state-complete.yaml")
@@ -143,6 +161,47 @@ def main() -> int:
     # Standard Authority IDs are resolved without project aliases.
     assert partial["authority_roles"]["bindings"]["TACTICAL-DOMAIN-DESIGN"] == ["domain"]
     assert partial["authority_roles"]["bindings"]["IMPLEMENTATION-DESIGN"] == ["delivery"]
+
+    # Granular frontend providers are structurally present but strict semantic
+    # claims remain unusable until explicit semantic acceptance evidence exists.
+    granular_missing = granular_frontend_eval()
+    granular_rows = {row["concern"]: row for row in granular_missing["rows"]}
+    granular_caps = {
+        "interface.human.conceptual-model": "experiment.frontend.conceptual-model",
+        "interface.human.information-architecture": "experiment.frontend.information-architecture",
+        "interface.human.interaction": "experiment.frontend.interaction",
+        "interface.human.navigation-topology": "experiment.frontend.topology",
+    }
+    for concern, capability in granular_caps.items():
+        assert granular_rows[concern]["state"] == "MISSING", granular_rows[concern]
+        assert granular_rows[concern]["action"] == "VALIDATE_SEMANTICS", granular_rows[concern]
+        assert granular_rows[concern]["capabilities"] == [capability], granular_rows[concern]
+
+    granular_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": f"ACCEPT-{capability}",
+                "capability": capability,
+                "status": "ACCEPTED",
+                "semantic_claims": {"accepted": [claim]},
+            }
+            for capability, claim in (
+                ("experiment.frontend.conceptual-model", "engineering.interface.human.conceptual-model"),
+                ("experiment.frontend.information-architecture", "engineering.interface.human.information-architecture"),
+                ("experiment.frontend.interaction", "engineering.interface.human.interaction"),
+                ("experiment.frontend.topology", "engineering.interface.human.navigation-topology"),
+            )
+        ],
+    }
+    granular_accepted = granular_frontend_eval(granular_evidence)
+    granular_accepted_rows = {
+        row["concern"]: row for row in granular_accepted["rows"]
+    }
+    for concern in granular_caps:
+        assert granular_accepted_rows[concern]["state"] == "COVERED", granular_accepted_rows[concern]
 
     # Frontend identity and presentation/composition cannot be declared complete
     # merely because provider artifacts exist. These concerns require explicit
