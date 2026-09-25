@@ -4,7 +4,11 @@ from pathlib import Path
 import sys, yaml
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from frontend_interface_knowledge import evaluate_frontend_ux_closure, required_screen_ids
+from frontend_interface_knowledge import (
+    evaluate_frontend_ux_closure,
+    evaluate_topology_screen_subject_coverage,
+    required_screen_ids,
+)
 from frontend_screen_contracts import evaluate_frontend_screen_contracts
 from agent_router import load_yaml, route_create_work
 from engineering_graph import evaluate_engineering_target, validate_engineering_graph
@@ -75,6 +79,25 @@ def main():
     assert "UNKNOWN_CONCEPT_REF" in codes(r),r
 
     # The expected Screen/View subject set is derived from topology, never hand-authored.
+    subject_coverage=evaluate_topology_screen_subject_coverage(
+        topology,
+        {"APPLICATION-SHELL","RESOURCE-CATALOGUE","RESOURCE-DETAIL"},
+    )
+    assert subject_coverage["status"]=="ACCEPTED",subject_coverage
+
+    missing_subject_coverage=evaluate_topology_screen_subject_coverage(
+        topology,
+        {"APPLICATION-SHELL","RESOURCE-CATALOGUE"},
+    )
+    assert missing_subject_coverage["missing_subjects"]==["RESOURCE-DETAIL"],missing_subject_coverage
+    assert missing_subject_coverage["status"]=="REJECTED",missing_subject_coverage
+
+    unexpected_subject_coverage=evaluate_topology_screen_subject_coverage(
+        topology,
+        {"APPLICATION-SHELL","RESOURCE-CATALOGUE","RESOURCE-DETAIL","UNKNOWN-VIEW"},
+    )
+    assert unexpected_subject_coverage["unexpected_subjects"]==["UNKNOWN-VIEW"],unexpected_subject_coverage
+
     presentation={"patterns":{}}
     screens={
         "screens":[

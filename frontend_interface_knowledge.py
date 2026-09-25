@@ -47,6 +47,46 @@ def required_screen_ids(topology: dict[str, Any]) -> set[str]:
         and row.get("screen_required",True) is not False
     }
 
+def evaluate_topology_screen_subject_coverage(
+    topology: dict[str, Any],
+    screen_subjects: list[str] | set[str] | tuple[str, ...],
+) -> dict[str, Any]:
+    """Compare canonical topology subjects with project-native Screen/View subjects.
+
+    The project owns how Screen/View subjects are extracted from its canonical
+    artifact format. Harness owns the format-independent set comparison.
+    """
+    expected=required_screen_ids(topology)
+    actual={
+        item for item in screen_subjects
+        if isinstance(item,str) and item
+    }
+    missing=sorted(expected-actual)
+    unexpected=sorted(actual-expected)
+    findings=[]
+    if missing:
+        findings.append({
+            "code":"MISSING_TOPOLOGY_SCREEN_SUBJECT",
+            "message":"Topology-required views are missing Screen/View subjects.",
+            "subjects":missing,
+        })
+    if unexpected:
+        findings.append({
+            "code":"UNEXPECTED_SCREEN_SUBJECT",
+            "message":"Screen/View subjects exist outside canonical Interface Topology.",
+            "subjects":unexpected,
+        })
+    return {
+        "version":1,
+        "kind":"harness-topology-screen-subject-coverage",
+        "status":"ACCEPTED" if not findings else "REJECTED",
+        "expected_subjects":sorted(expected),
+        "actual_subjects":sorted(actual),
+        "missing_subjects":missing,
+        "unexpected_subjects":unexpected,
+        "findings":findings,
+    }
+
 def evaluate_frontend_ux_closure(task_model, conceptual_model, information_architecture, interaction_design, topology):
     findings=[]
     tasks=_task_rows(task_model)

@@ -106,15 +106,19 @@ The experiment now uses the existing Engineering Coverage mechanism as the indep
 
 A regression test in `validate_engineering_coverage.py` proves the legacy broad frontend example cannot hide the new obligations.
 
-### P1 — Screen/View subject coverage is still manually duplicated
+### P1 — Screen/View subject coverage: resolved experimentally without a sidecar
 
-Prep currently uses `docs/verification/screen-view-subject-coverage.yaml` to prove that every topology-derived view has a Screen/View disposition.
+Harness now provides a generic `evaluate_topology_screen_subject_coverage(topology, screen_subjects)` evaluator.
 
-That works, but it is manually maintained duplication.
+The invariant is format-independent:
 
-A canonical version should reuse a generic Harness subject-coverage mechanism or project-native adapter so expected topology subjects are compared with Screen/View subjects without a bespoke sidecar per project.
+- Interface Topology owns the expected material view/frame subject set;
+- the project owns an adapter that extracts Screen/View subject ids from its canonical Screen/View artifact format;
+- Harness compares the two sets and rejects missing or unexpected subjects.
 
-The topology must remain the source of the expected subject set.
+Prep no longer needs a manually maintained `screen-view-subject-coverage.yaml`; stable view ids are embedded in its existing canonical Screen/View Markdown and extracted by the project integration adapter.
+
+This preserves the Integration Contract: Harness contains no Prep-specific parser, and project artifact format remains project-owned.
 
 ### P1 — Broad `human-interface-design` now overlaps granular capabilities
 
