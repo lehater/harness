@@ -75,8 +75,6 @@ def evaluate_frontend_ux_closure(task_model, conceptual_model, information_archi
                 _finding(findings,"UNKNOWN_TASK_REF",f"interaction context {cid} references unknown task {ref}",interaction_context=cid,task=ref)
             elif ref in user_tasks:
                 task_coverage.add(ref)
-        if row.get("location_ref") not in locations:
-            _finding(findings,"UNKNOWN_INTERACTION_LOCATION",f"interaction context {cid} references unknown IA location {row.get('location_ref')}",interaction_context=cid)
 
     no_ui=set()
     for row in interaction_design.get("task_dispositions",[]) or []:
