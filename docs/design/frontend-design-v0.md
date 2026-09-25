@@ -269,8 +269,10 @@ A sitemap, app map, screen map, wireframe or Figma file remains a projection. Th
 ```text
 USER task
   -> interaction context or explicit no-ui disposition
-      -> topology view or explicit non-view disposition
+      -> topology task view or explicit non-view disposition
           -> Screen/View contract
+
+Material shared shells/workspace frames are explicit structural topology views (`structural: true`) so a site/app map can remain a projection without carrying extra canonical structure.
 ```
 
 The same VERIFICATION-DESIGN Authority may produce early interface verification from Task/IA/Interaction/Topology before local Screen/View composition, while later presentation verification depends on Presentation System + Screen/View. Feedback remains ordinary Questions/revalidation; the production graph stays acyclic.

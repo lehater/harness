@@ -32,8 +32,10 @@ The experiment models knowledge, not document formats.
 ```text
 USER task
   -> interaction context or no-ui disposition
-      -> topology view or non-view disposition
+      -> topology task view or non-view disposition
           -> expected Screen/View subject
+
+Structural shells/workspace frames that materially constrain navigation/composition are also explicit topology views, marked `structural: true`; they need no USER-task interaction ref but remain addressable Screen/View subjects.
 ```
 
 A missing link rejects semantic closure instead of allowing implementation to invent it.
