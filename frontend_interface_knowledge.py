@@ -100,8 +100,11 @@ def evaluate_frontend_ux_closure(task_model, conceptual_model, information_archi
         if row.get("location_ref") not in locations:
             _finding(findings,"UNKNOWN_VIEW_LOCATION",f"view {vid} references unknown IA location {row.get('location_ref')}",view=vid)
         refs=row.get("interaction_context_refs",[]) or []
-        if not isinstance(refs,list) or not refs:
-            _finding(findings,"MISSING_VIEW_INTERACTION_CONTEXT",f"view {vid} requires interaction_context_refs",view=vid)
+        structural=row.get("structural",False) is True
+        if (not isinstance(refs,list) or not refs) and not structural:
+            _finding(findings,"MISSING_VIEW_INTERACTION_CONTEXT",f"non-structural view {vid} requires interaction_context_refs",view=vid)
+        if structural and refs:
+            _finding(findings,"STRUCTURAL_VIEW_HAS_TASK_CONTEXT",f"structural view {vid} must not claim task interaction contexts",view=vid)
         for ref in refs:
             if ref not in contexts:
                 _finding(findings,"UNKNOWN_INTERACTION_CONTEXT_REF",f"view {vid} references unknown interaction context {ref}",view=vid,ref=ref)

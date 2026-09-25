@@ -50,12 +50,18 @@ def main():
     topology=load(EX/"interface-topology.yaml")
     result=evaluate_frontend_ux_closure(task,conceptual,ia,interaction,topology)
     assert result["status"]=="ACCEPTED",result
-    assert set(result["required_screen_ids"])=={"RESOURCE-CATALOGUE","RESOURCE-DETAIL"}
+    assert set(result["required_screen_ids"])=={"APPLICATION-SHELL","RESOURCE-CATALOGUE","RESOURCE-DETAIL"}
 
     bad=deepcopy(interaction)
     bad["contexts"]=[x for x in bad["contexts"] if x["id"]!="RESOURCE-DETAIL-CONTEXT"]
     r=evaluate_frontend_ux_closure(task,conceptual,ia,bad,topology)
     assert "UNCOVERED_USER_TASK" in codes(r),r
+
+    bad_structural=deepcopy(topology)
+    shell=next(x for x in bad_structural["views"] if x["id"]=="APPLICATION-SHELL")
+    shell["interaction_context_refs"]=["RESOURCE-CATALOGUE-CONTEXT"]
+    r=evaluate_frontend_ux_closure(task,conceptual,ia,interaction,bad_structural)
+    assert "STRUCTURAL_VIEW_HAS_TASK_CONTEXT" in codes(r),r
 
     bad_top=deepcopy(topology)
     bad_top["views"]=[x for x in bad_top["views"] if x["id"]!="RESOURCE-DETAIL"]
@@ -72,6 +78,7 @@ def main():
     presentation={"patterns":{}}
     screens={
         "screens":[
+            {"id":"APPLICATION-SHELL"},
             {"id":"RESOURCE-CATALOGUE"},
             {"id":"RESOURCE-DETAIL"},
         ]

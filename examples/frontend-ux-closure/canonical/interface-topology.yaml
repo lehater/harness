@@ -2,6 +2,13 @@ version: 1
 kind: interface-topology-design
 id: FRONTEND-UX-TOPOLOGY
 views:
+  - id: APPLICATION-SHELL
+    responsibility: Preserve global application context around resource work.
+    location_ref: APPLICATION
+    interaction_context_refs: []
+    structural: true
+    parent: APPLICATION-SHELL
+    exits: [RESOURCE-CATALOGUE]
   - id: RESOURCE-CATALOGUE
     responsibility: Locate/select resources.
     location_ref: RESOURCES
