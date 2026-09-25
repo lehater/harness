@@ -181,6 +181,10 @@ def main() -> int:
         "dependency-topology-explicit-where-material",
     } <= set(contract_index["system-architecture"]["required_review_checks"])
     assert {
+        "obligations-concrete-and-reviewable",
+        "optional-patterns-not-defaults",
+    } <= set(contract_index["engineering-policy"]["required_review_checks"])
+    assert {
         "implementation-facing-boundaries-complete-for-scope",
     } <= set(contract_index["component-design"]["required_review_checks"])
     assert {
