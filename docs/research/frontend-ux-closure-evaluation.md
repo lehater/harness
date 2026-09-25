@@ -120,18 +120,15 @@ Prep no longer needs a manually maintained `screen-view-subject-coverage.yaml`; 
 
 This preserves the Integration Contract: Harness contains no Prep-specific parser, and project artifact format remains project-owned.
 
-### P1 — Broad `human-interface-design` now overlaps granular capabilities
+### P1 — Broad `human-interface-design`: resolved as compatibility-only
 
-For migration compatibility, the experiment retained the old broad Human Interface capability downstream of conceptual/IA/interaction/topology.
+The experiment does not require a synthesis capability downstream of the granular contracts.
 
-Its independent public meaning is now weak.
+`human-interface-design` remains registered only for legacy/project-specific graphs that intentionally keep conceptual, IA, interaction and topology knowledge as one public contract. Its skill now states that new/revalidated non-trivial frontend graphs should prefer granular contracts and must not add a broad capability merely for synthesis.
 
-Before canonicalization choose one:
+Prep removes `prep.human-interface` from its experimental Engineering Graph/Core; its human-interface summary remains a non-canonical projection.
 
-1. define a genuinely independent synthesis/integration contract for broad Human Interface; or
-2. retire/deprecate the broad capability and let consumers depend on the granular contracts they actually need.
-
-Keeping both indefinitely risks duplicate truth.
+This avoids duplicate truth while preserving backward compatibility for existing graphs.
 
 ### P1 — Structural closure is not semantic-quality proof
 

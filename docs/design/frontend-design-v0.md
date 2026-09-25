@@ -276,3 +276,10 @@ Material shared shells/workspace frames are explicit structural topology views (
 ```
 
 The same VERIFICATION-DESIGN Authority may produce early interface verification from Task/IA/Interaction/Topology before local Screen/View composition, while later presentation verification depends on Presentation System + Screen/View. Feedback remains ordinary Questions/revalidation; the production graph stays acyclic.
+
+
+### Broad human-interface compatibility contract
+
+`human-interface-design` remains registered for legacy/project-specific graphs that deliberately keep conceptual, IA, interaction and topology knowledge inseparable.
+
+The granular frontend closure does **not** require an additional broad synthesis Capability. New graphs should depend directly on the granular capabilities they actually consume. Human-readable synthesis documents remain projections unless a project intentionally chooses the broad compatibility contract and can justify that boundary.
