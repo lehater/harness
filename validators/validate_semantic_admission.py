@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness import CoreError
-from semantic_admission import admit_artifact
+from semantic_admission import admit_artifact, knowledge_contract_index
 
 
 GRAPH = {
@@ -176,6 +176,17 @@ def main() -> int:
     contracts = load(
         "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
     )
+    contract_index = knowledge_contract_index(contracts)
+    assert {
+        "dependency-topology-explicit-where-material",
+    } <= set(contract_index["system-architecture"]["required_review_checks"])
+    assert {
+        "implementation-facing-boundaries-complete-for-scope",
+    } <= set(contract_index["component-design"]["required_review_checks"])
+    assert {
+        "implementation-slices-explicit",
+        "repository-realization-derived-from-accepted-boundaries",
+    } <= set(contract_index["implementation-design"]["required_review_checks"])
 
     result = admit_artifact(
         graph=GRAPH,

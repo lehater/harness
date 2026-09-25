@@ -63,7 +63,7 @@ Existing Authorities remain sufficient:
 - QUALITY-DESIGN owns measurable architecture-significant frontend quality constraints.
 - COMPONENT-DESIGN owns code-facing frontend component/port/dependency boundaries.
 - VERIFICATION-DESIGN and TEST-DESIGN own evidence and executable behavioral contracts.
-- IMPLEMENTATION-DESIGN owns bounded realization slicing.
+- IMPLEMENTATION-DESIGN owns bounded realization slicing and repository/module realization derived from accepted boundaries.
 
 Do not create FRONTEND-DESIGN, UI-DESIGN, UX-DESIGN or ACCESSIBILITY-DESIGN Authorities merely to group frontend work.
 
@@ -239,6 +239,16 @@ Component Design should prevent:
 Frontend Test Design derives observable oracles from accepted human-interface semantics. It may cover journeys, view-state transitions, navigation, validation/recovery, keyboard/focus behavior, permission-sensitive behavior and backend-outcome-to-UI-state mapping.
 
 Snapshot or visual-regression tests do not become semantic authority unless the corresponding visual invariant is intentionally canonical.
+
+## Prototype consumers
+
+A frontend prototype is not a Stage or special Core entity. Model it as an ordinary Consumer whose dependency closure matches the decisions the experiment is allowed to make.
+
+A disposable UX/presentation prototype may intentionally stop before production Component or Implementation Design when its code is evidence only and may be discarded. It must not silently become the canonical production structure.
+
+When prototype code is intended for production reuse, or the experiment must choose material module boundaries, state ownership, DTO/view-model mapping, renderer/provider abstractions or cross-module dependency direction, include the corresponding System Architecture and Component Design capabilities in that Consumer. Production coding additionally uses a Consumer whose recursive closure contains `implementation-design`.
+
+Promotion from prototype evidence to production code is therefore ordinary revalidation/adaptation against the production Consumer closure, not a workflow transition.
 
 ## Design system
 
