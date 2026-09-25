@@ -1,0 +1,13 @@
+version: 1
+kind: task-model
+id: FRONTEND-UX-TASK-MODEL
+goals:
+  - id: GOAL-MANAGE-RESOURCES
+    tasks:
+      - id: TASK-FIND-RESOURCE
+        responsibility: USER
+        outcome: User locates a resource.
+      - id: TASK-INSPECT-RESOURCE
+        responsibility: USER
+        outcome: User inspects a selected resource.
+sufficiency_review: {status: ACCEPTED, rationale: Both USER tasks are represented.}

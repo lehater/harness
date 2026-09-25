@@ -1,0 +1,7 @@
+version: 1
+kind: conceptual-interface-model
+id: FRONTEND-UX-CONCEPTUAL-MODEL
+concepts:
+  - {id: RESOURCE, meaning: A user-recognizable managed resource.}
+modes:
+  - {id: RESOURCE-BROWSING, purpose: Locate and inspect resources.}
