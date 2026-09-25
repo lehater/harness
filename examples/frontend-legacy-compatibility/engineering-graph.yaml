@@ -1,0 +1,42 @@
+version: 1
+kind: harness-engineering-graph
+id: FRONTEND-LEGACY-BROAD-COMPATIBILITY
+default_subject: FRONTEND-LEGACY-COMPATIBILITY
+authorities:
+  - id: SECURITY-ARCHITECTURE
+    responsibility: Own frontend identity semantics.
+    boundary: {semantic_cohesion: Identity semantics., independent_change: Identity decisions change independently., public_contract: Provides identity semantics.}
+    produces:
+      - {capability: legacy.frontend.security, knowledge_kind: security-architecture, semantic_claims: [engineering.security.identity], requires: []}
+  - id: HUMAN-INTERFACE-DESIGN
+    responsibility: Own legacy broad human-interface plus presentation/screen contracts.
+    boundary: {semantic_cohesion: Legacy bundled human-interface semantics., independent_change: Legacy UI knowledge may change behind upstream semantics., public_contract: Provides compatibility contracts for migration diagnostics.}
+    produces:
+      - {capability: legacy.frontend.human-interface, knowledge_kind: human-interface-design, requires: []}
+      - capability: legacy.frontend.presentation-system
+        knowledge_kind: presentation-system-design
+        semantic_claims: [engineering.interface.human.presentation-system]
+        requires: [{capability: legacy.frontend.human-interface}]
+      - capability: legacy.frontend.screen-view
+        knowledge_kind: screen-view-design
+        semantic_claims: [engineering.interface.human.screen-composition]
+        requires: [{capability: legacy.frontend.human-interface}, {capability: legacy.frontend.presentation-system}]
+  - id: VERIFICATION-DESIGN
+    responsibility: Own legacy frontend presentation verification.
+    boundary: {semantic_cohesion: Presentation verification evidence., independent_change: Verification can change independently., public_contract: Provides presentation verification semantics.}
+    produces:
+      - capability: legacy.frontend.verification
+        knowledge_kind: verification-strategy
+        semantic_claims: [engineering.verification.interface.presentation]
+        requires: [{capability: legacy.frontend.screen-view}]
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own terminal compatibility implementation planning.
+    boundary: {semantic_cohesion: Terminal realization planning., independent_change: Planning can change behind stable contracts., public_contract: Provides terminal implementation capability.}
+    produces:
+      - capability: legacy.frontend.implementation
+        knowledge_kind: implementation-design
+        requires: [{capability: legacy.frontend.security}, {capability: legacy.frontend.verification}]
+consumers:
+  - id: FRONTEND-IMPLEMENTATION
+    purpose: Exercise migration diagnostics for a legacy broad frontend graph.
+    requires: [{capability: legacy.frontend.implementation}]

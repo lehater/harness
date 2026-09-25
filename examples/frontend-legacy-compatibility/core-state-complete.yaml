@@ -1,0 +1,9 @@
+authorities: []
+artifacts:
+  - {id: LEGACY-SECURITY, path: examples/frontend-legacy-compatibility/security.yaml, authority: SECURITY-ARCHITECTURE, provides: [legacy.frontend.security], depends_on: []}
+  - {id: LEGACY-HUMAN-INTERFACE, path: examples/frontend-legacy-compatibility/human-interface.yaml, authority: HUMAN-INTERFACE-DESIGN, provides: [legacy.frontend.human-interface], depends_on: []}
+  - {id: LEGACY-PRESENTATION, path: examples/frontend-legacy-compatibility/presentation.yaml, authority: HUMAN-INTERFACE-DESIGN, provides: [legacy.frontend.presentation-system], depends_on: [LEGACY-HUMAN-INTERFACE]}
+  - {id: LEGACY-SCREEN, path: examples/frontend-legacy-compatibility/screens.yaml, authority: HUMAN-INTERFACE-DESIGN, provides: [legacy.frontend.screen-view], depends_on: [LEGACY-HUMAN-INTERFACE, LEGACY-PRESENTATION]}
+  - {id: LEGACY-VERIFICATION, path: examples/frontend-legacy-compatibility/verification.yaml, authority: VERIFICATION-DESIGN, provides: [legacy.frontend.verification], depends_on: [LEGACY-SCREEN]}
+  - {id: LEGACY-IMPLEMENTATION, path: examples/frontend-legacy-compatibility/implementation.yaml, authority: IMPLEMENTATION-DESIGN, provides: [legacy.frontend.implementation], depends_on: [LEGACY-SECURITY, LEGACY-VERIFICATION]}
+questions: []
