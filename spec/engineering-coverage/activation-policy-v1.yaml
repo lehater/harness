@@ -46,6 +46,10 @@ rules:
       capability_contains_any: [.frontend., .ui-, .human-interface, .user-journeys]
     activate:
       - interface.human.journeys
+      - interface.human.conceptual-model
+      - interface.human.information-architecture
+      - interface.human.interaction
+      - interface.human.navigation-topology
       - interface.human.usability
       - interface.human.accessibility
       - interface.human.responsiveness

@@ -251,3 +251,26 @@ The blind reconstruction recovered material user-visible semantics from accepted
 It also exposed a real missing browser authentication/session decision and successfully routed that gap back to SECURITY-ARCHITECTURE through the existing Question mechanism.
 
 Therefore no Core, Engineering Graph, target-state or agent-router semantic change is required for frontend design.
+
+
+## Experimental granular human-interface closure
+
+The `research/frontend-ux-closure-v1` experiment tests a finer production topology inside the existing HUMAN-INTERFACE-DESIGN Authority. It does not add workflow stages, Core entities or UI/UX Authorities.
+
+Independently addressable knowledge:
+
+- `conceptual-interface-model` — user-facing concepts, modes and shared visible state vocabulary;
+- `information-architecture-design` — information organization, conceptual locations, taxonomy/labels and findability;
+- `interaction-design` — actions, system responses, states/transitions and recovery;
+- `interface-topology-design` — complete view/context inventory and navigation relationships.
+
+A sitemap, app map, screen map, wireframe or Figma file remains a projection. The canonical completeness chain is:
+
+```text
+USER task
+  -> interaction context or explicit no-ui disposition
+      -> topology view or explicit non-view disposition
+          -> Screen/View contract
+```
+
+The same VERIFICATION-DESIGN Authority may produce early interface verification from Task/IA/Interaction/Topology before local Screen/View composition, while later presentation verification depends on Presentation System + Screen/View. Feedback remains ordinary Questions/revalidation; the production graph stays acyclic.
