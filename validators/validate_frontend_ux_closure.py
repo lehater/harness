@@ -6,12 +6,43 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from frontend_interface_knowledge import evaluate_frontend_ux_closure, required_screen_ids
 from frontend_screen_contracts import evaluate_frontend_screen_contracts
+from agent_router import load_yaml, route_create_work
+from engineering_graph import evaluate_engineering_target, validate_engineering_graph
 
-EX=ROOT/"examples"/"frontend-ux-closure"/"canonical"
+BASE=ROOT/"examples"/"frontend-ux-closure"
+EX=BASE/"canonical"
+GRAPH=load_yaml(BASE/"engineering-graph.yaml")
+REGISTRY=load_yaml(ROOT/"skills"/"artifact-skill-registry-v0.yaml")
 def load(p): return yaml.safe_load(p.read_text(encoding="utf-8"))
 def codes(r): return {x["code"] for x in r["findings"]}
 
 def main():
+    validate_engineering_graph(GRAPH)
+    expected=[
+        ("core-state-empty.yaml",{("task-model","APPLICATION-DESIGN")}),
+        ("core-state-with-task.yaml",{("user-journey-design","APPLICATION-DESIGN")}),
+        ("core-state-with-journeys.yaml",{("conceptual-interface-model","HUMAN-INTERFACE-DESIGN")}),
+        ("core-state-with-conceptual.yaml",{
+            ("information-architecture-design","HUMAN-INTERFACE-DESIGN"),
+            ("interaction-design","HUMAN-INTERFACE-DESIGN"),
+        }),
+        ("core-state-with-ia-interaction.yaml",{("interface-topology-design","HUMAN-INTERFACE-DESIGN")}),
+        ("core-state-with-topology.yaml",{
+            ("presentation-system-design","HUMAN-INTERFACE-DESIGN"),
+            ("verification-strategy","VERIFICATION-DESIGN"),
+        }),
+        ("core-state-with-foundations.yaml",{("screen-view-design","HUMAN-INTERFACE-DESIGN")}),
+        ("core-state-with-screen.yaml",{("verification-strategy","VERIFICATION-DESIGN")}),
+        ("core-state-with-verification.yaml",{("implementation-design","IMPLEMENTATION-DESIGN")}),
+    ]
+    for filename,want in expected:
+        routed=route_create_work(GRAPH,"FRONTEND-IMPLEMENTATION",load_yaml(BASE/filename),REGISTRY)
+        got={(x["knowledge_kind"],x["authority"]) for x in routed["routed"]}
+        assert got==want,(filename,got,routed)
+        assert not routed["unrouted"],(filename,routed["unrouted"])
+    complete=evaluate_engineering_target(GRAPH,"FRONTEND-IMPLEMENTATION",load_yaml(BASE/"core-state-complete.yaml"))
+    assert complete["status"]=="COMPLETE",complete
+
     task=load(EX/"task-model.yaml")
     conceptual=load(EX/"conceptual-interface-model.yaml")
     ia=load(EX/"information-architecture.yaml")
