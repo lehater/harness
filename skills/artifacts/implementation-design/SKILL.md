@@ -26,6 +26,22 @@ code/build structure needed to plan realization.
 Implementation code is evidence about current state, not authority over upstream
 semantics.
 
+## Decision exploration
+
+Before forming the candidate, run the `decision-explorer` agent skill against the accepted prerequisites and this knowledge kind's registered axes. The resulting noncanonical exploration evidence must exist before any preferred solution is selected.
+
+Before semantic acceptance, inspect the decision axes registered for
+`implementation-design`: slice boundaries, repository realization,
+dependency/tooling choices, migration/transition, verification enforcement, and
+delivery gates. Do not infer that the first repository/tooling realization is
+the only acceptable realization.
+
+At `EXPLORE` or deeper, challenge material choices with distinct alternatives
+and a counterfactual. Select among multiple viable implementation-owned
+alternatives only within project autonomy. Any option that would change accepted
+Product, Domain, Application, Architecture, Interface, Data, Security, or
+Quality semantics must be escalated to the owning Authority instead.
+
 ## Procedure
 
 1. Confirm all required upstream engineering knowledge is accepted/unblocked.

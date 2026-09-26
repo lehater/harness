@@ -1,0 +1,31 @@
+version: 1
+kind: harness-decision-exploration-contract
+id: decision-exploration/v1
+status: experimental
+
+purpose: >-
+  Define pre-choice evidence that required decision axes were actively challenged
+  before a candidate solution was selected. Exploration discovers alternative
+  classes; it does not choose, rank or disposition them.
+
+applicability: [APPLICABLE, NOT_APPLICABLE, UNRESOLVED]
+exploration_levels: [LOCAL, EXPLORE, RESEARCH, DEEP_RESEARCH]
+
+rules:
+  - Exploration is a separate input to semantic admission and precedes candidate choice.
+  - Exploration evidence must not contain selected, preferred, chosen or disposition fields.
+  - There is no NO_MATERIAL_DECISION escape hatch.
+  - An APPLICABLE axis must expose at least one discovered decision point.
+  - EXPLORE and deeper require at least two materially distinct alternatives per decision point.
+  - Material distinction is expressed through knowledge-kind-specific material dimensions.
+  - Required challenge strategies are knowledge-kind-specific and multiple independent probes are required at EXPLORE and deeper.
+  - NOT_APPLICABLE requires accepted canonical artifact evidence; free-text rationale is insufficient.
+  - UNRESOLVED applicability fails admission and must be resolved or routed through the owning Authority.
+  - RESEARCH and DEEP_RESEARCH add external evidence obligations.
+  - Exploration demonstrates process sufficiency, not exhaustive enumeration of every possible solution.
+
+non_goals:
+  - select a preferred solution
+  - decide viability against all constraints
+  - replace Authority ownership
+  - create Core state

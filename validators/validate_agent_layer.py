@@ -60,6 +60,12 @@ def _validate_agent_skills(errors: list[str]) -> int:
 
 
 def _validate_artifact_skills(errors: list[str]) -> int:
+    decision_governed = {
+        "application-design",
+        "domain-model",
+        "implementation-design",
+        "system-architecture",
+    }
     paths = _skill_files("artifacts")
     if not paths:
         errors.append("no active artifact skills under skills/artifacts/**")
@@ -89,6 +95,8 @@ def _validate_artifact_skills(errors: list[str]) -> int:
             errors.append(
                 f"artifact skill {path.relative_to(ROOT)} must define acceptance checks"
             )
+        if path.parent.name in decision_governed:
+            _require(path, text, ("## Decision exploration",), errors)
     return len(paths)
 
 

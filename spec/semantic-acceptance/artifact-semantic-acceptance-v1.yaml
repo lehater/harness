@@ -121,7 +121,19 @@ integration:
     full engineering closure is claimed. That path derives admissible source
     Authorities from Engineering Graph prerequisites, validates canonical
     read/write provenance, requires the knowledge-kind semantic review contract,
-    and records a capability acceptance identity plus prerequisite baseline.
+    composes the Harness-generated candidate-free Decision Explorer Request,
+    request-bound pre-choice Decision Exploration and Decision Governance for
+    participating knowledge kinds, and records a capability acceptance identity
+    plus prerequisite baseline.
+  decision_governance_rule: >-
+    When a target project supplies a decision policy and a knowledge kind has a
+    required decision contract, admission fails closed unless exploration is
+    bound to the exact Harness-generated Explorer Request and both exploration
+    and governance are accepted. Exploration proves the required search protocol
+    over a candidate-free authorized input manifest; governance proves Authority
+    and autonomy disposition over exactly that explored alternative set. Neither
+    proves exhaustive discovery of every possible solution or physical LLM
+    context isolation. Unresolved non-delegated decisions remain Core Questions.
   coverage_rule: >-
     Engineering Coverage may use a semantic claim only from an ACCEPTED
     evaluation that explicitly accepts that claim.

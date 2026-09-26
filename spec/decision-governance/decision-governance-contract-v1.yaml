@@ -1,0 +1,35 @@
+version: 1
+kind: harness-decision-governance-contract
+id: decision-governance/v1
+status: experimental
+
+purpose: >-
+  Govern viability, Authority ownership and delegated choice over an alternative
+  space produced by pre-choice Decision Exploration. Governance does not perform
+  the search itself and may not introduce or hide explored alternatives.
+
+autonomy_levels: [NONE, CONSERVATIVE, BROAD, MAXIMUM]
+alternative_states: [VIABLE, REJECTED, UNKNOWN]
+
+decision_dispositions:
+  DETERMINED: Exactly one explored alternative remains viable and none is unknown.
+  DELEGATED: Multiple explored alternatives remain viable, the current Authority owns the choice, and project autonomy permits producer choice.
+  ESCALATED: The explored choice is unresolved or not delegated and must be represented by a blocking Core Question.
+
+rules:
+  - Decision Exploration must be ACCEPTED before Decision Governance can be accepted.
+  - Governance must disposition exactly the decision points and alternatives produced by exploration.
+  - Governance cannot use autonomy to weaken exploration.
+  - Authority ownership is absolute; project autonomy cannot delegate another Authority's decision.
+  - Rejected alternatives require rationale against accepted constraints.
+  - Unknown alternatives force escalation rather than silent selection.
+  - Only a same-Authority choice meeting the axis delegation threshold may be DELEGATED.
+  - Semantic admission fails closed when required exploration or governance evidence is rejected.
+  - Candidate exploration/governance evidence is noncanonical; only unresolved escalations become Core Questions.
+
+non_goals:
+  - discover the solution space
+  - prove every possible solution was found
+  - globally rank implementations
+  - replace semantic review or source provenance
+  - change Core Question structure
