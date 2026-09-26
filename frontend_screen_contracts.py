@@ -235,6 +235,115 @@ def _validate_screen_composition(
             )
 
 
+
+def _validate_visual_reference_contract(
+    *,
+    screen_row: dict[str, Any],
+    screen: str,
+    verification: dict[str, Any] | None,
+    findings: list[dict[str, Any]],
+) -> None:
+    """Validate optional accepted visual-reference invariants and rendered traceability."""
+    references = screen_row.get("visual_references")
+    if references is None:
+        return
+    if not isinstance(references, list) or not references:
+        _finding(
+            findings,
+            "INVALID_VISUAL_REFERENCE_SET",
+            "visual_references must be a non-empty list when declared",
+            screen=screen,
+        )
+        return
+
+    reference_ids: set[str] = set()
+    for index, reference in enumerate(references):
+        if not isinstance(reference, dict):
+            _finding(
+                findings,
+                "INVALID_VISUAL_REFERENCE",
+                f"visual reference {index} must be a mapping",
+                screen=screen,
+            )
+            continue
+        reference_id = reference.get("id")
+        artifact = reference.get("artifact")
+        constrains = reference.get("constrains")
+        freedoms = reference.get("freedoms")
+        if not isinstance(reference_id, str) or not reference_id.strip():
+            _finding(
+                findings,
+                "INVALID_VISUAL_REFERENCE",
+                f"visual reference {index} requires id",
+                screen=screen,
+            )
+            continue
+        if reference_id in reference_ids:
+            _finding(
+                findings,
+                "DUPLICATE_VISUAL_REFERENCE",
+                f"duplicate visual reference {reference_id}",
+                screen=screen,
+            )
+        reference_ids.add(reference_id)
+        if not isinstance(artifact, str) or not artifact.strip():
+            _finding(
+                findings,
+                "VISUAL_REFERENCE_REQUIRES_ARTIFACT",
+                f"visual reference {reference_id} requires artifact",
+                screen=screen,
+            )
+        if (
+            not isinstance(constrains, list)
+            or not constrains
+            or not all(isinstance(item, str) and item.strip() for item in constrains)
+        ):
+            _finding(
+                findings,
+                "VISUAL_REFERENCE_REQUIRES_CONSTRAINTS",
+                f"visual reference {reference_id} requires explicit presentation constraints",
+                screen=screen,
+            )
+        if (
+            not isinstance(freedoms, list)
+            or not freedoms
+            or not all(isinstance(item, str) and item.strip() for item in freedoms)
+        ):
+            _finding(
+                findings,
+                "VISUAL_REFERENCE_REQUIRES_FREEDOMS",
+                f"visual reference {reference_id} requires explicit implementation freedoms",
+                screen=screen,
+            )
+
+    if not reference_ids:
+        return
+    rendered = verification.get("rendered") if isinstance(verification, dict) else None
+    rendered_rows = rendered if isinstance(rendered, list) else []
+    covered: set[str] = set()
+    for row in rendered_rows:
+        if not isinstance(row, dict):
+            continue
+        reference_id = row.get("reference_id")
+        oracle = row.get("oracle")
+        if isinstance(reference_id, str) and reference_id in reference_ids:
+            covered.add(reference_id)
+            if not isinstance(oracle, str) or not oracle.strip():
+                _finding(
+                    findings,
+                    "VISUAL_REFERENCE_RENDERED_ORACLE_MISSING",
+                    f"rendered proof for {reference_id} requires an observable conformance oracle",
+                    screen=screen,
+                )
+    for reference_id in sorted(reference_ids - covered):
+        _finding(
+            findings,
+            "VISUAL_REFERENCE_NOT_VERIFIED",
+            f"accepted visual reference {reference_id} is not traced by verification.rendered",
+            screen=screen,
+        )
+
+
 def _validate_entity_collection_default(
     *,
     presentation: dict[str, Any],
@@ -876,6 +985,13 @@ def evaluate_frontend_screen_contracts(
                 value = verification.get(key)
                 if not isinstance(value, list) or not value:
                     _finding(findings, "INCOMPLETE_VERIFICATION_CONTRACT", f"verification.{key} requires at least one proof obligation", screen=screen)
+
+        _validate_visual_reference_contract(
+            screen_row=row,
+            screen=screen,
+            verification=verification if isinstance(verification, dict) else None,
+            findings=findings,
+        )
 
     if screen_ids is not None:
         missing = sorted(screen_ids - set(evaluated))

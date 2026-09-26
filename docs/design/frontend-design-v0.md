@@ -156,6 +156,21 @@ A screen contract identifies inherited presentation system, regions/sections/tab
 
 Structured YAML/JSON is preferred when sufficient. Wireframes, prototypes, Figma frames and Storybook stories may be generated projections.
 
+## Accepted visual references and rendered conformance
+
+A sketch, screenshot, Figma frame or executable prototype is normally a projection/evidence surface. A target project may intentionally make one a versioned **visual reference** inside its existing Presentation System or Screen/View Design when prose and structural fields alone would leave material hierarchy, composition, density or relative visual weight for implementation to reinvent.
+
+This does **not** create a new Authority, Core entity, Stage, Gate or handoff. Ownership remains:
+
+- HUMAN-INTERFACE-DESIGN owns which visual presentation facts are accepted and which details remain implementation freedom;
+- VERIFICATION-DESIGN owns the rendered-conformance evidence obligation;
+- TEST-DESIGN owns executable comparison oracles when automation is appropriate;
+- INSPECTION/DEMONSTRATION may provide human perceptual evidence when an automated oracle would be weaker or more brittle.
+
+An accepted visual reference must identify the artifact/ref, enumerate the presentation facts it constrains and enumerate material freedoms it deliberately leaves unconstrained. Downstream evidence must trace back to that reference. Pixel-perfect equality is required only when exact pixels are intentionally accepted; otherwise the oracle should target hierarchy, region weight, density, alignment, responsive transformation or other declared presentation facts.
+
+A screenshot, diff or Figma file never authorizes product behavior, data semantics, permissions or domain truth. It can constrain presentation only to the extent explicitly admitted by HUMAN-INTERFACE-DESIGN.
+
 ## Performance-sensitive presentation surfaces
 
 When a user-facing visualization, canvas, map, graph, dense table or other presentation surface has accepted measurable constraints for data size, frame/interaction latency, resource usage or graceful degradation, that knowledge belongs to QUALITY-DESIGN and must participate in the frontend consumer closure.
