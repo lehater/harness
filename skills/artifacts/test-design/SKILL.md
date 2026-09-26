@@ -37,8 +37,9 @@ Existing production code and executable tests may describe current state, but th
 6. Preserve substitutability: test consumer-owned/public contracts rather than concrete provider internals unless the verification objective specifically owns an integration boundary.
 7. Trace every contract through non-empty `verification_refs` to accepted Verification Design checks; Product Requirement coverage is inherited through those checks rather than re-stating requirement text.
 8. Leave framework, fixtures, helper structure, mocks and assertion syntax to test implementation unless project policy makes one architecturally significant.
-9. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards. Do not use snapshot/visual-regression output as semantic authority unless a visual invariant is intentionally canonical.
-10. Route any missing expected behavior to its upstream Authority instead of inventing it.
+9. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards.
+10. When an upstream Screen/View contract intentionally accepts a visual reference/invariant, a visual-regression or rendered-comparison test may use that reference as an oracle only for the presentation facts explicitly constrained there. Preserve declared freedoms; do not turn incidental pixels, provider internals or unaccepted screenshot details into requirements.
+11. Route any missing expected behavior to its upstream Authority instead of inventing it.
 11. Produce `test-design/v1`, run `workspace.py validate-artifact`, accept/register it and reevaluate.
 
 ## Stop conditions
@@ -71,7 +72,8 @@ Additional project-native detail may elaborate invariants, failure/atomicity, pr
 - public/consumer contracts are preferred over provider internals;
 - implementation mechanics remain free unless materially constrained;
 - test design can survive reasonable implementation refactoring;
-- unresolved semantics are routed upstream.
+- unresolved semantics are routed upstream;
+- visual-regression evidence is admissible only when it traces to an intentionally accepted visual invariant and compares only its declared constraints.
 
 ## Registration
 
