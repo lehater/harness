@@ -41,10 +41,10 @@ Do not treat a performance benchmark, lint check or test count as useful evidenc
 6. For user-facing screens with intentionally accepted visual references, add rendered-conformance checks that name the reference and the observable presentation facts being compared. Use TEST when automated comparison has a stable oracle; use INSPECTION or DEMONSTRATION when perceptual review is the appropriate evidence. A screenshot or diff is evidence, not the semantic owner.
 7. Preserve important out-of-scope boundaries.
 8. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
-8. Draft `verification-plan/v1`.
-9. Run `workspace.py validate-artifact`.
-10. Apply common semantic acceptance.
-11. After acceptance, register, render and re-evaluate target state.
+9. Draft `verification-plan/v1`.
+10. Run `workspace.py validate-artifact`.
+11. Apply common semantic acceptance.
+12. After acceptance, register, render and re-evaluate target state.
 
 ## Stop conditions
 
