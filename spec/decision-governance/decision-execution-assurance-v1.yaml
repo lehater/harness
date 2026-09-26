@@ -1,0 +1,39 @@
+version: 1
+kind: harness-decision-execution-assurance-contract
+id: decision-execution-assurance/v1
+status: experimental
+
+purpose: >-
+  Separate what Harness can deterministically prove about Decision Explorer
+  execution from stronger runtime-isolation claims that require a trusted
+  external control plane.
+
+levels:
+  REQUEST_BOUND:
+    meaning: >-
+      Exploration is bound to the exact Harness-generated candidate-free
+      Explorer Request. Harness proves the authorized input manifest and request
+      identity, but does not prove physical session/process isolation.
+    satisfiable_by_harness: true
+
+  ATTESTED_ISOLATED:
+    meaning: >-
+      A trusted control plane proves that Decision Exploration executed in an
+      isolated context whose inputs were restricted to the Explorer Request and
+      whose output is bound to that execution.
+    satisfiable_by_harness: false
+
+rules:
+  - Workload/producer self-attestation never upgrades REQUEST_BOUND to ATTESTED_ISOLATED.
+  - If project policy requires ATTESTED_ISOLATED and no trusted external verifier exists, semantic admission fails closed.
+  - The trusted executor/verifier must be outside the explored workload's control.
+  - Strong execution provenance must bind request identity, output identity, executor identity and execution identity.
+  - Runtime provenance is orthogonal to exploration depth and decision autonomy.
+  - Attestation proves execution conditions, not completeness or correctness of reasoning.
+
+future_adapter_requirements:
+  - authenticate a trusted executor/control-plane identity
+  - verify request digest/identity
+  - verify exploration output digest/identity
+  - prove fresh/isolated execution context according to the executor's security model
+  - reject replay or cross-request receipt reuse

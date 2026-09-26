@@ -42,6 +42,20 @@ topology, deployment, persistence, integration or trust boundaries,
 route a Question to the owning upstream Authority and stop. Ask only unresolved
 material questions; do not force a universal NFR questionnaire.
 
+## Decision exploration
+
+Before forming the candidate, run the `decision-explorer` agent skill against the accepted prerequisites and this knowledge kind's registered axes. The resulting noncanonical exploration evidence must exist before any preferred solution is selected.
+
+Before semantic acceptance, inspect the decision axes registered for
+`system-architecture`: runtime boundaries, deployment topology, interaction
+model, state placement, dependency direction, and failure isolation. The first
+satisfying topology is a candidate, not proof that the choice is determined.
+
+At `EXPLORE` or deeper, consume the explorer's materially different alternatives; do not generate a post-hoc replacement set after choosing the candidate. At `RESEARCH` or deeper, use external authoritative
+evidence required by Decision Governance. Select among multiple viable
+same-Authority alternatives only when project autonomy delegates the axis;
+otherwise create a blocking Core `Question`.
+
 ## Procedure
 
 1. Confirm the work is CREATE and upstream semantic requirements are satisfied.
@@ -50,7 +64,7 @@ material questions; do not force a universal NFR questionnaire.
 4. Derive material architectural drivers and risks from accepted upstream truth.
 5. Select the smallest structural/runtime model capable of satisfying all accepted drivers.
 6. Justify every material increase in runtime, deployment, coordination or operational complexity with an accepted driver, constraint or material risk.
-7. Compare materially different candidates only when uncertainty/risk makes the choice consequential; do not perform heavyweight trade-off analysis for a trivially sufficient topology.
+7. Perform the required decision exploration for every registered architecture axis. Keep trade-off analysis lightweight when alternatives are immaterial, but do not treat the first sufficient topology as evidence that no material alternative exists.
 8. Define component/module/application boundaries and allowed dependency directions.
 9. Define technical interaction topology where cross-boundary behavior matters. Route material ordering, isolation, atomicity, conflict, retry/idempotency or consistency semantics to CONCURRENCY-CONSISTENCY-DESIGN.
 10. Define explicit architectural non-goals and reopening conditions.

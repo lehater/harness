@@ -62,6 +62,9 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
+- `docs/design/decision-governance-v0.md` — experimental pre-choice exploration and delegated-choice contract above Core.
+- `docs/design/decision-explorer-execution-assurance-v0.md` — experimental boundary between request binding and externally attested isolated Explorer execution.
+- `skills/agent/decision-explorer/SKILL.md` — generic blind pre-choice exploration procedure used by decision-governed artifact skills.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
 - `docs/design/graph-doctor-v1.md` — canonical aggregate graph/model diagnostic contract.
 - `docs/design/capability-lifecycle-projection-v1.md` — canonical Capability acceptance-baseline currentness contract.
@@ -77,6 +80,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `workspace.py` — managed knowledge validation and rendering.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
+- `spec/decision-governance/**` — experimental decision-governance evidence and knowledge-kind decision contracts.
 - `spec/adapter-acceptance/**` — executable adapter integration cases.
 - `spec/target-state-acceptance/**` — executable Design Profile target-state cases.
 - `spec/workspace-acceptance/**` — executable managed-workspace scenarios.
