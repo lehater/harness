@@ -38,8 +38,9 @@ Do not treat a performance benchmark, lint check or test count as useful evidenc
    - select exactly one method: `TEST`, `ANALYSIS`, `INSPECTION` or `DEMONSTRATION`;
    - identify concrete evidence or an explicit evidence requirement that must exist before the stronger capability is claimed.
 5. Remove redundant or diagnostic-only checks from the correctness gate.
-6. Preserve important out-of-scope boundaries.
-7. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
+6. For user-facing screens with intentionally accepted visual references, add rendered-conformance checks that name the reference and the observable presentation facts being compared. Use TEST when automated comparison has a stable oracle; use INSPECTION or DEMONSTRATION when perceptual review is the appropriate evidence. A screenshot or diff is evidence, not the semantic owner.
+7. Preserve important out-of-scope boundaries.
+8. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
 8. Draft `verification-plan/v1`.
 9. Run `workspace.py validate-artifact`.
 10. Apply common semantic acceptance.
@@ -78,7 +79,8 @@ Optional `out_of_scope` makes non-gates explicit.
 - every evidence item is specific enough for an agent to locate or create;
 - diagnostic performance evidence is not mislabeled as correctness;
 - the strategy does not introduce new product requirements;
-- test implementation details do not become domain truth.
+- test implementation details do not become domain truth;
+- accepted visual references, when present upstream, have explicit rendered-conformance evidence and do not become a new workflow gate or Authority.
 
 ## Registration
 
