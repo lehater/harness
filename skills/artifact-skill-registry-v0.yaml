@@ -66,6 +66,9 @@ routes:
   - knowledge_kind: screen-view-design
     skill: skills/artifacts/screen-view-design/SKILL.md
 
+  - knowledge_kind: visual-composition-design
+    skill: skills/artifacts/visual-composition-design/SKILL.md
+
   - knowledge_kind: data-design
     skill: skills/artifacts/data-design/SKILL.md
 

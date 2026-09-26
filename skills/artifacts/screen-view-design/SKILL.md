@@ -13,7 +13,7 @@ Owner: HUMAN-INTERFACE-DESIGN.
 
 ## Responsibility
 
-Materialize each concrete screen/view as a composition contract that inherits an application Presentation System and supplies only screen-specific structure or justified overrides.
+Materialize each concrete screen/view as a semantic composition contract that inherits an application Presentation System and supplies screen-specific regions, capabilities, hierarchy and responsive semantic transformations. A separate Visual Composition capability may own material spatial styling/appearance decisions when those have an independent implementation consumer.
 
 ## Inputs
 
@@ -35,7 +35,7 @@ For each required view:
 
 1. state purpose, covered task and entry/exit context;
 2. reference the inherited Presentation System;
-3. define semantic regions/sections/tabs/disclosures, their hierarchy and spatial priority so implementation does not invent which work surface dominates;
+3. define semantic regions/sections/tabs/disclosures and their hierarchy/priority so downstream visual work knows what must dominate semantically; do not force detailed spatial styling here when a separate Visual Composition capability owns it;
 4. map displayed/edited data to accepted providers and, for server-backed behavior, bind reads/commands to stable machine-interface operation ids;
 5. define the semantic Screen/View Model consumed by the view when transport/query shape is not itself the intended UI semantic contract;
 6. define allowed user-visible capabilities and their backing read/command/navigation/local semantics; record material exclusions;
@@ -68,7 +68,7 @@ Canonical examples:
 Implementation freedom examples:
 - exact DOM tree;
 - CSS Grid/Flexbox;
-- exact coordinates;
+- exact coordinates unless intentionally owned by a separate Visual Composition contract;
 - internal component split;
 - framework-specific routing/layout primitives.
 

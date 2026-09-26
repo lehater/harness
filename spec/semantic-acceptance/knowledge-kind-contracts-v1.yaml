@@ -59,6 +59,10 @@ contracts:
     required_review_checks: [presentation-not-domain-semantics]
   - knowledge_kind: screen-view-design
     required_review_checks: [screen-not-product-semantics]
+  - knowledge_kind: visual-composition-design
+    required_review_checks:
+      - visual-composition-not-product-semantics
+      - visual-composition-not-frontend-architecture
   - knowledge_kind: data-design
     required_review_checks: [storage-not-semantic-owner]
   - knowledge_kind: operability-design

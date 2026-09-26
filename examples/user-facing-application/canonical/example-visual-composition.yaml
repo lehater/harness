@@ -1,0 +1,36 @@
+version: 1
+kind: visual-composition-design
+id: EXAMPLE-VISUAL-COMPOSITION
+status: CURRENT
+inherits: EXAMPLE-PRESENTATION-SYSTEM
+
+screens:
+  - id: RESOURCE-CATALOGUE
+    composition:
+      default:
+        - query controls occupy a compact top band
+        - catalogue is the dominant work surface below
+        - feedback remains supporting and visually quieter
+    invariants:
+      - catalogue has greater visual weight than query controls and feedback
+      - query controls remain grouped as one compact band
+    freedoms:
+      - exact CSS layout mechanism
+      - exact neutral shades
+      - internal DOM structure
+
+  - id: RESOURCE-DETAIL
+    composition:
+      default:
+        - identity context leads the view
+        - primary detail follows as the dominant content region
+        - history remains visually secondary
+    invariants:
+      - history never competes with primary detail for equal visual weight
+    freedoms:
+      - exact spacing values
+      - exact provider primitives
+
+rendered_conformance:
+  - RESOURCE-CATALOGUE preserves dominant catalogue weight and compact query grouping
+  - RESOURCE-DETAIL preserves primary-detail dominance over history

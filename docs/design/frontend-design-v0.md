@@ -33,10 +33,12 @@ Architecture      Design
           │
           ▼
     Screen / View Design
-          │
-          ▼
-Frontend System Architecture
-          ↓
+       ├───────────────┐
+       ▼               ▼
+Visual Composition   Frontend System Architecture
+       │               │
+       └───────┬───────┘
+               ▼
 Component Design + Verification Design
           ↓
 Test Design
@@ -155,6 +157,28 @@ Purpose: define implementation-independent composition for each required screen/
 A screen contract identifies inherited presentation system, regions/sections/tabs/disclosures, content/action hierarchy, reusable pattern references, state variants, responsive transformations and justified local overrides. CSS/framework mechanics and exact coordinates remain free unless an accepted invariant requires them.
 
 Structured YAML/JSON is preferred when sufficient. Wireframes, prototypes, Figma frames and Storybook stories may be generated projections.
+
+## Visual composition as a parallel implementation input
+
+Accepted Screen/View semantics answer what regions, actions, states and navigation exist. They do not have to carry every material visual arrangement decision.
+
+When a materially specific visual result is required, use `visual-composition-design` under HUMAN-INTERFACE-DESIGN as a separate capability. It consumes accepted Screen/View semantics plus the Presentation System and visual evidence, but normally does **not** depend on Frontend System Architecture.
+
+Its responsibility is visual realization: spatial grouping, placement, relative visual weight, sizing/proportion, density, spacing, typography, surfaces and other appearance decisions needed to reproduce an accepted design.
+
+The implementation therefore receives independent inputs:
+
+```text
+Screen/View semantics ───────┐
+                             ├──> frontend realization
+Visual Composition ──────────┤
+                             │
+Frontend System Architecture ┘
+```
+
+This is a dependency graph, not a workflow handoff. Screen/View remains the authority for user-visible capabilities and state semantics. Visual Composition may arrange only accepted content. Frontend architecture owns runtime/module/state/dependency structure and is not visual authority.
+
+A visual reference can be canonical for explicitly admitted visual facts without becoming product/domain truth. Provider defaults, component code and existing CSS do not override accepted Visual Composition.
 
 ## Performance-sensitive presentation surfaces
 

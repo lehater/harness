@@ -85,6 +85,9 @@ authorities:
         knowledge_kind: screen-view-design
         semantic_claims: [engineering.interface.human.screen-composition]
         requires: [{capability: example.frontend.topology}, {capability: example.frontend.interaction}, {capability: example.frontend.presentation-system}, {capability: example.machine-interface}]
+      - capability: example.frontend.visual-composition
+        knowledge_kind: visual-composition-design
+        requires: [{capability: example.frontend.screen-view-design}, {capability: example.frontend.presentation-system}, {capability: example.quality-constraints}]
   - id: SYSTEM-ARCHITECTURE
     responsibility: Own frontend runtime and structural architecture.
     boundary: {semantic_cohesion: Technical runtime structure and dependency topology., independent_change: Technical architecture can evolve behind stable interface semantics., public_contract: Provides frontend architecture constraints.}
@@ -109,7 +112,7 @@ authorities:
       - capability: example.frontend.verification
         knowledge_kind: verification-strategy
         semantic_claims: [engineering.verification.interface.presentation]
-        requires: [{capability: example.frontend.interface-verification}, {capability: example.requirements}, {capability: example.frontend.presentation-system}, {capability: example.frontend.screen-view-design}, {capability: example.frontend.architecture}]
+        requires: [{capability: example.frontend.interface-verification}, {capability: example.requirements}, {capability: example.frontend.presentation-system}, {capability: example.frontend.screen-view-design}, {capability: example.frontend.visual-composition}, {capability: example.frontend.architecture}]
   - id: TEST-DESIGN
     responsibility: Own executable frontend behavioral test contracts.
     boundary: {semantic_cohesion: Preconditions operations and observable UI oracles., independent_change: Test semantics can survive implementation refactoring., public_contract: Provides executable frontend test contracts.}
@@ -123,7 +126,7 @@ authorities:
     produces:
       - capability: example.frontend.implementation-design
         knowledge_kind: implementation-design
-        requires: [{capability: example.frontend.component-design}, {capability: example.frontend.verification}, {capability: example.frontend.test-design}]
+        requires: [{capability: example.frontend.component-design}, {capability: example.frontend.visual-composition}, {capability: example.frontend.verification}, {capability: example.frontend.test-design}]
 consumers:
   - id: FRONTEND-IMPLEMENTATION
     purpose: Implement the user-facing application without inventing user-visible or major structural decisions.

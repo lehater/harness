@@ -55,7 +55,13 @@ def main() -> None:
         },
     )
     assert_frontier("core-state-with-ui-foundations.yaml", {("screen-view-design", "HUMAN-INTERFACE-DESIGN")})
-    assert_frontier("core-state-with-screen-view.yaml", {("system-architecture", "SYSTEM-ARCHITECTURE")})
+    assert_frontier(
+        "core-state-with-screen-view.yaml",
+        {
+            ("visual-composition-design", "HUMAN-INTERFACE-DESIGN"),
+            ("system-architecture", "SYSTEM-ARCHITECTURE"),
+        },
+    )
     assert_frontier(
         "core-state-with-architecture.yaml",
         {

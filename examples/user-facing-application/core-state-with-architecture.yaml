@@ -80,6 +80,11 @@ artifacts:
     authority: HUMAN-INTERFACE-DESIGN
     provides: [example.frontend.screen-view-design]
     depends_on: [EXAMPLE-INTERFACE-TOPOLOGY, EXAMPLE-INTERACTION-DESIGN, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-MACHINE-INTERFACE]
+  - id: EXAMPLE-VISUAL-COMPOSITION
+    path: examples/user-facing-application/canonical/example-visual-composition.yaml
+    authority: HUMAN-INTERFACE-DESIGN
+    provides: [example.frontend.visual-composition]
+    depends_on: [EXAMPLE-SCREEN-VIEW-DESIGN, EXAMPLE-PRESENTATION-SYSTEM, EXAMPLE-QUALITY]
   - id: EXAMPLE-FRONTEND-ARCHITECTURE
     path: examples/user-facing-application/canonical/example-frontend-architecture.yaml
     authority: SYSTEM-ARCHITECTURE
