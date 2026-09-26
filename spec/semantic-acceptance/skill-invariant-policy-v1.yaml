@@ -25,6 +25,7 @@ enforced:
   - {knowledge_kind: human-interface-design, skill: skills/artifacts/human-interface-design/SKILL.md}
   - {knowledge_kind: presentation-system-design, skill: skills/artifacts/presentation-system-design/SKILL.md}
   - {knowledge_kind: screen-view-design, skill: skills/artifacts/screen-view-design/SKILL.md}
+  - {knowledge_kind: visual-composition-design, skill: skills/artifacts/visual-composition-design/SKILL.md}
   - {knowledge_kind: data-design, skill: skills/artifacts/data-design/SKILL.md}
   - {knowledge_kind: operability-design, skill: skills/artifacts/operability-design/SKILL.md}
   - {knowledge_kind: security-analysis, skill: skills/artifacts/security-analysis/SKILL.md}
