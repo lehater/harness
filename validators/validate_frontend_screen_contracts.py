@@ -105,6 +105,14 @@ SCREENS = {
                 ]
             },
             "states": ["loading", "loaded", "empty", "validation-rejected", "error"],
+            "visual_references": [
+                {
+                    "id": "RESOURCE-CATALOGUE-WIDE-V1",
+                    "artifact": "design/resource-catalogue-wide-v1.png",
+                    "constrains": ["spatial hierarchy", "relative region weight", "information density"],
+                    "freedoms": ["exact pixels", "DOM structure", "font rasterization"],
+                }
+            ],
             "semantic_contract": {
                 "reads": [
                     {
@@ -156,7 +164,13 @@ SCREENS = {
                 "verification": {
                     "contract": ["operation:listResources", "operation:createResource"],
                     "semantic": ["resource-catalogue-state-matrix"],
-                    "rendered": ["resource-catalogue-reference-render"],
+                    "rendered": [
+                        {
+                            "id": "resource-catalogue-reference-render",
+                            "reference_id": "RESOURCE-CATALOGUE-WIDE-V1",
+                            "oracle": "Rendered wide view preserves the accepted spatial hierarchy, relative region weight and information density while allowing declared freedoms.",
+                        }
+                    ],
                 },
             },
         },
@@ -325,6 +339,25 @@ def main() -> int:
     no_rendered_proof["screens"][1]["semantic_contract"]["verification"]["rendered"] = []
     result = evaluate_frontend_screen_contracts(PRESENTATION, no_rendered_proof, OPENAPI)
     assert "INCOMPLETE_VERIFICATION_CONTRACT" in codes(result)
+
+    missing_visual_trace = deepcopy(SCREENS)
+    missing_visual_trace["screens"][0]["semantic_contract"]["verification"]["rendered"] = [
+        "unrelated-render-proof"
+    ]
+    result = evaluate_frontend_screen_contracts(PRESENTATION, missing_visual_trace, OPENAPI)
+    assert "VISUAL_REFERENCE_NOT_VERIFIED" in codes(result)
+
+    missing_visual_constraints = deepcopy(SCREENS)
+    del missing_visual_constraints["screens"][0]["visual_references"][0]["constrains"]
+    result = evaluate_frontend_screen_contracts(
+        PRESENTATION, missing_visual_constraints, OPENAPI
+    )
+    assert "VISUAL_REFERENCE_REQUIRES_CONSTRAINTS" in codes(result)
+
+    missing_visual_oracle = deepcopy(SCREENS)
+    del missing_visual_oracle["screens"][0]["semantic_contract"]["verification"]["rendered"][0]["oracle"]
+    result = evaluate_frontend_screen_contracts(PRESENTATION, missing_visual_oracle, OPENAPI)
+    assert "VISUAL_REFERENCE_RENDERED_ORACLE_MISSING" in codes(result)
 
     missing_regions = deepcopy(SCREENS)
     del missing_regions["screens"][0]["regions"]
