@@ -1,0 +1,139 @@
+version: 1
+kind: harness-knowledge-kind-decision-contracts
+id: knowledge-kind-decision-contracts/v1
+status: experimental
+
+policy_defaults:
+  exploration: EXPLORE
+  autonomy: CONSERVATIVE
+
+contracts:
+  - knowledge_kind: domain-model
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: semantic-identity
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [identity-basis, continuity, merge-split]
+        challenge_strategies: [identity-substitution, merge-vs-split, lifecycle-perturbation]
+      - id: invariants
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [valid-state-space, enforcement-owner, exception-policy]
+        challenge_strategies: [relax-invariant, strengthen-invariant, move-enforcement-owner]
+      - id: lifecycle
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [state-set, transition-ownership, terminality]
+        challenge_strategies: [state-split, state-merge, transition-perturbation]
+      - id: relationships
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [relation-vs-entity, directionality, cardinality]
+        challenge_strategies: [entity-vs-relation, reverse-direction, cardinality-perturbation]
+      - id: responsibility-boundaries
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [semantic-owner, boundary-placement, downstream-freedom]
+        challenge_strategies: [move-owner-upstream, move-owner-downstream, split-responsibility]
+
+  - knowledge_kind: application-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: operation-boundaries
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [operation-granularity, mutation-owner, query-write-split]
+        challenge_strategies: [split-operation, merge-operations, command-query-perturbation]
+      - id: orchestration
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [orchestration-owner, ordering, sync-async]
+        challenge_strategies: [move-orchestrator, reorder-steps, sync-vs-async]
+      - id: failure-semantics
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [failure-classification, recovery-owner, retry-policy]
+        challenge_strategies: [fail-vs-recover, retry-vs-no-retry, move-recovery-owner]
+      - id: partial-results
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [all-or-nothing, partial-validity, continuation]
+        challenge_strategies: [all-or-nothing-vs-partial, drop-partial-result, resumability-perturbation]
+      - id: continuation-currentness
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [snapshot-vs-live, staleness-policy, continuation-token]
+        challenge_strategies: [recompute-vs-materialize, stale-vs-refresh, continuation-token-perturbation]
+
+  - knowledge_kind: system-architecture
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: runtime-boundaries
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [runtime-count, process-boundary, independent-deployment]
+        challenge_strategies: [merge-vs-split, boundary-shift, independent-deployment-perturbation]
+      - id: deployment-topology
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [deployable-count, colocation, scaling-boundary]
+        challenge_strategies: [co-locate-vs-separate, scaling-perturbation, deployment-boundary-shift]
+      - id: interaction-model
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [sync-async, protocol-boundary, coupling]
+        challenge_strategies: [sync-vs-async, adapter-substitution, transport-boundary-shift]
+      - id: state-placement
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [source-of-truth, state-locality, replication]
+        challenge_strategies: [move-source-of-truth, cache-vs-canonical, replication-perturbation]
+      - id: dependency-direction
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [dependency-owner, inversion-boundary, framework-coupling]
+        challenge_strategies: [reverse-dependency, invert-port, framework-coupling-perturbation]
+      - id: failure-isolation
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [failure-domain, containment-boundary, fallback]
+        challenge_strategies: [collapse-failure-boundary, isolate-failure-boundary, dependency-outage-perturbation]
+
+  - knowledge_kind: implementation-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: slice-boundaries
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [slice-granularity, dependency-order, ownership-alignment]
+        challenge_strategies: [split-slice, merge-slices, dependency-order-perturbation]
+      - id: repository-realization
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [module-boundary, composition-root, generated-source-placement]
+        challenge_strategies: [boundary-remap, composition-root-shift, generated-source-perturbation]
+      - id: dependency-tooling
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [tool-family, enforcement-point, runtime-footprint]
+        challenge_strategies: [tool-substitution, enforcement-point-shift, remove-tool]
+      - id: migration-transition
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [transition-mode, rollback, compatibility]
+        challenge_strategies: [in-place-vs-parallel, rollback-perturbation, compatibility-window]
+      - id: verification-enforcement
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [verification-layer, automation-boundary, failure-gate]
+        challenge_strategies: [move-verification-layer, manual-vs-automated, gate-failure-perturbation]
+      - id: delivery-gates
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [gate-location, authority, reproducibility]
+        challenge_strategies: [local-vs-ci, gate-owner-shift, reproducibility-perturbation]

@@ -19,7 +19,11 @@ CREATE / WAIT / PENDING / COMPLETE
         ↓
 artifact skill for one CREATE
         ↓
-candidate canonical knowledge
+Harness-generated Decision Explorer Request when required
+        ↓
+isolated pre-choice Decision Exploration
+        ↓
+artifact producer forms candidate + governance disposition
         ↓
 typed schema or project validator
         ↓
@@ -73,7 +77,9 @@ grouped artifact work by Authority + subject + knowledge_kind
         ↓
 registered artifact skill when available
         ↓
-candidate → validation → semantic acceptance → Core provider
+Explorer Request → pre-choice exploration when required
+        ↓
+candidate → governance → validation → semantic acceptance → Core provider
         ↓
 reevaluate target Consumer
         ↓
@@ -178,10 +184,11 @@ Before registering `provides`, the agent must establish all of the following:
 3. **Source discipline** — accepted statements are supported by canonical project sources, explicit user decisions, or deterministic derivation from them.
 4. **Authority direction** — when the production contract requires machine-addressable source ownership, every source assertion identifies its owning Authority and only admitted upstream/same-Authority sources may justify the candidate. Restating or reconfirming a downstream decision does not promote it into upstream truth.
 5. **No invention** — unresolved product/domain/architecture choices are not silently filled in.
-6. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
-7. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
-8. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
-9. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
+6. **Decision diligence** — when the knowledge kind participates in Decision Governance, Harness first derives a pre-choice Decision Exploration Request. Option formation discovers materially distinct alternatives and then critically reviews the full decision space for mixed concerns, missing material cases, accepted-constraint conflicts and Authority-boundary mistakes before any choice. REDO/REVISION may read the current accepted provider as baseline; the future candidate/preselected solution remains forbidden. Choice may use only the reviewed alternative set; non-delegated or unresolved choices become blocking Core Questions.
+7. **Conflict handling** — conflicting canonical evidence creates or preserves a Core `Question`; the affected artifact is not accepted as unblocked.
+8. **Dependency closure** — every canonical artifact whose semantics the new artifact relies on is represented by `depends_on`.
+9. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
+10. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
 Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
 
@@ -307,6 +314,23 @@ Every artifact skill should state:
 Do not make skills generic document writers. Their purpose is to obtain trustworthy engineering knowledge.
 
 
+## Sequential decision execution
+
+Decision-governed production uses a single derived Capability frontier. For one
+READY Capability the agent runs option formation, critical decision-space
+review, choice/escalation, candidate production and semantic admission
+sequentially. There is no Explorer/Producer execution-role handoff.
+
+CURRENT work is omitted by default. Explicit redo may place a CURRENT
+Capability back into the frontier without bypassing blockers or prerequisite
+currentness. In REDO/REVISION, the current accepted provider is an allowed
+baseline input to option formation; only the future candidate/preselected
+solution remains forbidden.
+
+After one Capability reaches CURRENT, BLOCKED or FAILED_VALIDATION, recompute
+the frontier. See `docs/design/decision-pipeline-v0.md` and
+`skills/agent/decision-pipeline/SKILL.md`.
+
 ## Mandatory strict admission for routed artifact skills
 
 The prose skill contract is not itself evidence that the skill was obeyed.
@@ -322,8 +346,11 @@ The admission boundary composes:
 3. canonical read/write provenance;
 4. source-Authority direction derived from direct production prerequisites;
 5. the knowledge-kind semantic-review contract;
-6. deterministic semantic acceptance;
-7. a capability acceptance identity and exact prerequisite acceptance baseline.
+6. the Harness-generated pre-choice Decision Exploration Request when the knowledge kind is decision-governed;
+7. accepted option-formation evidence, including a COMPLETE decision-space review bound to that request;
+8. accepted Decision Governance over exactly the reviewed decision/alternative set;
+9. deterministic semantic acceptance;
+10. a capability acceptance identity and exact prerequisite acceptance baseline.
 
 A routed skill may not satisfy full closure merely because a file exists, a
 schema validates, or a bare semantic evaluation is absent. Migration/static

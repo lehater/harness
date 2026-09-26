@@ -1,0 +1,63 @@
+version: 1
+kind: harness-decision-pipeline-contract
+id: decision-pipeline/v1
+status: experimental
+
+purpose: >-
+  Execute one ready Capability through option formation, critical review,
+  choice/escalation, candidate production and semantic admission without
+  role-specific execution states or handoff stops.
+
+work_unit:
+  identity: Capability
+  source: Engineering Graph target closure
+
+roadmap:
+  source_of_truth: derived
+  buckets:
+    - ready
+    - completed
+    - blocked
+    - waiting_upstream
+  rules:
+    - READY requires all direct prerequisites CURRENT and no unresolved Core blocker.
+    - CURRENT capabilities are omitted from ordinary READY work.
+    - explicit redo may include a CURRENT capability but never bypasses prerequisites or blockers.
+    - after one Capability reaches a terminal outcome, recompute the roadmap before choosing more work.
+
+pipeline:
+  stages:
+    - FORM_OPTIONS
+    - REVIEW_OPTIONS
+    - CHOOSE_OR_ESCALATE
+    - PRODUCE_CANDIDATE
+    - SEMANTIC_ADMISSION
+  terminal_outcomes:
+    - CURRENT
+    - BLOCKED
+    - FAILED_VALIDATION
+  rules:
+    - stages execute sequentially in one capability execution; no role handoff is required.
+    - FORM_OPTIONS must not select/prefer a future solution.
+    - REVIEW_OPTIONS must close mixed-decision, missing-case, accepted-constraint and Authority-boundary gaps before choice.
+    - unresolved semantics are published as Core Questions addressed to the owning Authority.
+    - CHOOSE_OR_ESCALATE classifies exactly the reviewed option set.
+    - local correction between FORM_OPTIONS and REVIEW_OPTIONS is normal refinement, not a new workflow cycle.
+    - discovering a malformed decision space after the review gate is FAILED_VALIDATION, not an automatic reexploration workflow.
+
+revision:
+  rules:
+    - CREATE option formation uses accepted prerequisites/support only.
+    - REVISION and explicit REDO also receive the current accepted provider as baseline input.
+    - the current provider is accepted historical truth, not the future candidate.
+    - future candidate, decision review and preferred/selected solution remain forbidden pre-choice inputs.
+
+idempotence:
+  rule: >-
+    Repeated ordinary invocation over unchanged CURRENT state produces an empty
+    READY frontier. Only explicit redo intentionally repeats completed work.
+
+core_boundary:
+  - no Stage/Role/Task/Workflow entity is added to Core.
+  - Questions remain the only canonical unresolved-semantic feedback mechanism.
+  - roadmap and pipeline stages are derived execution procedure, not project truth.
