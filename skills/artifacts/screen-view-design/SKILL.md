@@ -46,8 +46,12 @@ For each required view:
 11. define responsive transformations by semantic effect, not CSS breakpoint mechanics; every screen must either declare at least one material transformation or explicitly justify responsive non-applicability;
 12. define focus/read-order consequences where composition changes;
 13. when a material interactive visualization is constrained by accepted Quality/performance knowledge, reference that constraint and define semantic degradation/fallback behavior that preserves required information access; renderer knobs remain downstream unless their user-visible effect is intentionally accepted;
-14. attach accepted reference/evidence anchors to the regions or states they actually constrain;
-15. define verification obligations for contract/semantic/rendered realization when material;
+14. when a sketch, screenshot, Figma frame or executable prototype is intentionally accepted as a visual invariant, record it as a Screen/View visual reference with a stable id/artifact ref, the exact presentation facts it constrains, and explicit freedoms it does not constrain; keep the reference subordinate to accepted product/domain semantics;
+15. attach accepted reference/evidence anchors to the regions or states they actually constrain;
+16. define verification obligations for contract/semantic/rendered realization when material; accepted visual references require rendered reference-conformance evidence with an observable oracle;
+17. classify remaining choices as controlled freedom or ordinary implementation detail;
+18. record local overrides only with rationale;
+19. route missing upstream semantics as Questions.
 16. classify remaining choices as controlled freedom or ordinary implementation detail;
 17. record local overrides only with rationale;
 18. route missing upstream semantics as Questions.
@@ -86,6 +90,8 @@ Machine-readable YAML/JSON is preferred when it can express:
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
 - overrides with rationale;
+- optional accepted visual references with id, artifact/ref, constrained presentation facts and explicit freedoms;
+- rendered verification trace for every accepted visual reference;
 - unresolved Questions.
 
 The contract should be sufficient to generate review projections such as a screen spec, wireframe skeleton, state matrix or prototype scaffold. Generated visuals are not canonical by default.
@@ -109,6 +115,8 @@ The contract should be sufficient to generate review projections such as a scree
 - a performance-sensitive visualization with accepted scale/performance constraints traces those constraints and preserves semantic access under any accepted degradation mode;
 - listing a pattern id without the material screen-specific composition it requires is insufficient;
 - reference-backed regions/states declare what the reference constrains and what it does not;
+- an intentionally accepted visual reference is part of Screen/View presentation truth, not a new Core entity or Authority, and every such reference traces to a rendered verification oracle;
+- visual comparison may establish hierarchy/composition/density conformance without requiring pixel-perfect equality unless exact pixels are themselves an accepted invariant;
 - framework/CSS implementation freedom remains.
 
 ## Registration
