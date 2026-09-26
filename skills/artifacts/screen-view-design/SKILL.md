@@ -52,9 +52,6 @@ For each required view:
 17. classify remaining choices as controlled freedom or ordinary implementation detail;
 18. record local overrides only with rationale;
 19. route missing upstream semantics as Questions.
-16. classify remaining choices as controlled freedom or ordinary implementation detail;
-17. record local overrides only with rationale;
-18. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
