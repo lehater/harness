@@ -40,7 +40,7 @@ Existing production code and executable tests may describe current state, but th
 9. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards.
 10. When an upstream Screen/View contract intentionally accepts a visual reference/invariant, a visual-regression or rendered-comparison test may use that reference as an oracle only for the presentation facts explicitly constrained there. Preserve declared freedoms; do not turn incidental pixels, provider internals or unaccepted screenshot details into requirements.
 11. Route any missing expected behavior to its upstream Authority instead of inventing it.
-11. Produce `test-design/v1`, run `workspace.py validate-artifact`, accept/register it and reevaluate.
+12. Produce `test-design/v1`, run `workspace.py validate-artifact`, accept/register it and reevaluate.
 
 ## Stop conditions
 
