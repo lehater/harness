@@ -20,6 +20,20 @@ Use when actionable work has `knowledge_kind: application-design` and accepted b
 
 Use accepted owner contracts. Do not infer application semantics from controllers, services, transactions, queues or existing implementation.
 
+## Decision exploration
+
+Before forming the candidate, run the `decision-explorer` agent skill against the accepted prerequisites and this knowledge kind's registered axes. The resulting noncanonical exploration evidence must exist before any preferred solution is selected.
+
+Before semantic acceptance, inspect the decision axes registered for
+`application-design`: operation boundaries, orchestration, failure semantics,
+partial results, and continuation/currentness. Do not stop after finding the
+first workable orchestration. At `EXPLORE` or deeper, challenge every material
+choice with a materially different alternative and a counterfactual.
+
+Select among multiple viable alternatives only when the current Authority owns
+the choice and project autonomy delegates that axis. Missing upstream meaning or
+a non-delegated material choice becomes a blocking Core `Question`.
+
 ## Procedure
 
 1. Enumerate application commands/queries/materializations required by accepted use cases.

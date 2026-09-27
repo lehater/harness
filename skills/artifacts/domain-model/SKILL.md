@@ -30,6 +30,22 @@ Read only the canonical sources needed to establish:
 
 Do not mine the whole repository.
 
+## Decision exploration
+
+Before forming the candidate, run the `decision-explorer` agent skill against the accepted prerequisites and this knowledge kind's registered axes. The resulting noncanonical exploration evidence must exist before any preferred solution is selected.
+
+Before semantic acceptance, inspect the decision axes registered for `domain-model`:
+semantic identity, invariants, lifecycle, relationships, and responsibility
+boundaries. For every applicable material choice, generate materially distinct
+alternatives to the effective exploration depth and record a counterfactual at
+`EXPLORE` or deeper.
+
+A domain decision may be selected locally only when it is owned by the current
+Authority and the project autonomy policy delegates that decision class.
+Otherwise create a blocking Core `Question`. High autonomy never permits a
+Domain producer to absorb Product, Application, Architecture, or Implementation
+semantics.
+
 ## Procedure
 
 1. Confirm the expectation is `CREATE`, not `WAIT` or `PENDING`.

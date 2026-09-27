@@ -17,6 +17,14 @@ import yaml
 from agent_router import validate_skill_registry
 from authority_context import build_authority_context, validate_extracted_references
 from capability_lifecycle import lifecycle_index, lifecycle_states
+from decision_execution_assurance import evaluate_execution_assurance
+from decision_exploration import evaluate_decision_exploration
+from decision_explorer_request import build_decision_explorer_request
+from decision_governance import (
+    axis_policies,
+    decision_contract_index,
+    evaluate_decision_governance,
+)
 from engineering_graph import producer_index, production_index, validate_realization
 from harness import CoreError
 from semantic_acceptance import evaluate_artifact
@@ -167,11 +175,15 @@ def admit_artifact(
     model: dict[str, Any],
     skill_registry: dict[str, Any],
     knowledge_contracts: dict[str, Any],
+    decision_contracts: dict[str, Any] | None = None,
+    decision_policy: dict[str, Any] | None = None,
+    decision_exploration: dict[str, Any] | None = None,
     capability: str,
     sources: dict[str, Any],
     candidate: dict[str, Any],
     acceptance_id: str,
     lifecycle: dict[str, Any] | None = None,
+    decision_request_mode: str = "CREATE",
 ) -> dict[str, Any]:
     validate_skill_registry(skill_registry)
     realized = validate_realization(graph, model)
@@ -213,6 +225,19 @@ def admit_artifact(
         raise CoreError(
             f"knowledge_kind {knowledge_kind} has no semantic admission contract"
         )
+
+    if decision_contracts is None:
+        decision_contracts = load_yaml(
+            Path(__file__).resolve().parent
+            / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+        )
+    decision_contract = decision_contract_index(decision_contracts).get(
+        knowledge_kind
+    )
+    decision_axis_policies = axis_policies(
+        decision_contract,
+        decision_policy,
+    )
 
     context = build_authority_context(
         graph, realized, authority, [capability]
@@ -275,7 +300,85 @@ def admit_artifact(
         ),
     }
 
+    current_provider_baseline = None
+    if decision_request_mode in {"REVISION", "REDO"}:
+        if lifecycle is None:
+            raise CoreError(
+                f"{decision_request_mode} semantic admission requires lifecycle evidence"
+            )
+        lifecycle_by_capability = lifecycle_index(lifecycle)
+        provider = lifecycle_by_capability.get(capability)
+        if provider is None:
+            raise CoreError(
+                f"{decision_request_mode} semantic admission requires current provider"
+            )
+        artifact_id = provider["artifact"]
+        matches = [
+            item
+            for item in realized.get("artifacts", []) or []
+            if item.get("id") == artifact_id
+        ]
+        if len(matches) != 1:
+            raise CoreError(
+                f"{decision_request_mode} semantic admission cannot resolve current provider {artifact_id}"
+            )
+        current_provider_baseline = matches[0]
+
+    explorer_request = build_decision_explorer_request(
+        capability=capability,
+        knowledge_kind=knowledge_kind,
+        authority=authority,
+        authority_context=context,
+        contract=decision_contract,
+        axis_policies=decision_axis_policies,
+        prerequisite_baseline=baseline,
+        model=realized,
+        mode=decision_request_mode,
+        current_provider_baseline=current_provider_baseline,
+    )
+
     evaluation = evaluate_artifact(semantic_contract, sources, candidate)
+    exploration_evaluation = evaluate_decision_exploration(
+        contract=decision_contract,
+        axis_policies=decision_axis_policies,
+        capability=capability,
+        knowledge_kind=knowledge_kind,
+        evidence=decision_exploration,
+        explorer_request=explorer_request,
+        model=realized,
+    )
+    execution_evaluation = evaluate_execution_assurance(
+        policy=decision_policy,
+        knowledge_kind=knowledge_kind,
+        explorer_request=explorer_request,
+        exploration_evaluation=exploration_evaluation,
+    )
+    decision_evaluation = evaluate_decision_governance(
+        contract=decision_contract,
+        policy=decision_policy,
+        exploration_evaluation=exploration_evaluation,
+        authority=authority,
+        capability=capability,
+        candidate=candidate,
+        model=realized,
+    )
+    if exploration_evaluation["status"] != "NOT_REQUIRED":
+        evaluation["decision_exploration"] = exploration_evaluation
+        evaluation["decision_execution_assurance"] = execution_evaluation
+        evaluation["decision_governance"] = decision_evaluation
+        if (
+            exploration_evaluation["status"] != "ACCEPTED"
+            or execution_evaluation["status"] != "ACCEPTED"
+            or decision_evaluation["status"] != "ACCEPTED"
+        ):
+            evaluation["status"] = "REJECTED"
+            evaluation["findings"].extend(
+                exploration_evaluation["findings"]
+            )
+            evaluation["findings"].extend(execution_evaluation["findings"])
+            evaluation["findings"].extend(decision_evaluation["findings"])
+            evaluation["semantic_claims"]["accepted"] = []
+
     evaluation["admission"] = {
         "status": evaluation["status"],
         "knowledge_kind": knowledge_kind,
@@ -287,6 +390,15 @@ def admit_artifact(
         "canonical_references": references,
         "accepted_prerequisites": baseline,
         "semantic_contract": "knowledge-kind-semantic-contracts/v1",
+        "decision_exploration": exploration_evaluation["status"],
+        "decision_explorer_request_id": (
+            explorer_request.get("request_id")
+            if isinstance(explorer_request, dict)
+            else None
+        ),
+        "decision_execution_assurance": execution_evaluation["status"],
+        "decision_governance": decision_evaluation["status"],
+        "decision_request_mode": decision_request_mode,
     }
     if evaluation["status"] == "ACCEPTED":
         evaluation["lifecycle_assertion"] = {
@@ -315,6 +427,17 @@ def main() -> int:
         "--knowledge-contracts",
         default="spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml",
     )
+    parser.add_argument(
+        "--decision-contracts",
+        default="spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml",
+    )
+    parser.add_argument("--decision-policy")
+    parser.add_argument("--decision-exploration")
+    parser.add_argument(
+        "--decision-request-mode",
+        choices=["CREATE", "REVISION", "REDO"],
+        default="CREATE",
+    )
     args = parser.parse_args()
 
     result = admit_artifact(
@@ -322,11 +445,19 @@ def main() -> int:
         model=load_yaml(args.model),
         skill_registry=load_yaml(args.skill_registry),
         knowledge_contracts=load_yaml(args.knowledge_contracts),
+        decision_contracts=load_yaml(args.decision_contracts),
+        decision_policy=load_yaml(args.decision_policy) if args.decision_policy else None,
+        decision_exploration=(
+            load_yaml(args.decision_exploration)
+            if args.decision_exploration
+            else None
+        ),
         capability=args.capability,
         sources=load_yaml(args.sources),
         candidate=load_yaml(args.candidate),
         acceptance_id=args.acceptance_id,
         lifecycle=load_yaml(args.lifecycle) if args.lifecycle else None,
+        decision_request_mode=args.decision_request_mode,
     )
     print(yaml.safe_dump(result, sort_keys=False, allow_unicode=True))
     return 0 if result["status"] == "ACCEPTED" else 1
