@@ -123,6 +123,26 @@ contracts:
         material_dimensions: [control-persistence, direct-manipulation, keyboard-equivalence]
         challenge_strategies: [inline-vs-dedicated-controls, direct-manipulation-vs-command, pointer-vs-keyboard]
 
+  - knowledge_kind: screen-view-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: view-composition
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [primary-region, secondary-context, task-colocation]
+        challenge_strategies: [single-vs-split, co-locate-vs-separate, region-priority-shift]
+      - id: detail-edit-placement
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [detail-placement, edit-placement, context-preservation]
+        challenge_strategies: [inline-vs-overlay, same-view-vs-dedicated, context-preservation-perturbation]
+      - id: responsive-composition
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [narrow-layout, disclosure, projection-priority]
+        challenge_strategies: [collapse-vs-reflow, persistent-vs-disclosed, primary-surface-perturbation]
+
   - knowledge_kind: implementation-design
     required: true
     minimum_exploration: EXPLORE
