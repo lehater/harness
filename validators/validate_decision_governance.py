@@ -265,7 +265,18 @@ def main() -> int:
     decision_contracts = load(
         "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
     )
-    contract = decision_contract_index(decision_contracts)["system-architecture"]
+    contracts = decision_contract_index(decision_contracts)
+    contract = contracts["system-architecture"]
+    presentation_contract = contracts["presentation-system-design"]
+    assert set(presentation_contract["axes"]) == {
+        "knowledge-representation",
+        "information-density",
+        "control-surface",
+    }, presentation_contract
+    assert all(
+        item["delegation_requires"] == "CONSERVATIVE"
+        for item in presentation_contract["axes"].values()
+    ), presentation_contract
 
     # A global project decision policy must not accidentally govern knowledge
     # kinds that have no decision contract.
