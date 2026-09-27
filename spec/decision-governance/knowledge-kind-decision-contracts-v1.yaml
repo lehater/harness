@@ -103,6 +103,26 @@ contracts:
         material_dimensions: [failure-domain, containment-boundary, fallback]
         challenge_strategies: [collapse-failure-boundary, isolate-failure-boundary, dependency-outage-perturbation]
 
+  - knowledge_kind: presentation-system-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: knowledge-representation
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [representation-form, spatial-dimensionality, relation-encoding]
+        challenge_strategies: [graph-vs-nongraph, 2d-vs-3d, single-vs-mixed]
+      - id: information-density
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [simultaneous-context, detail-disclosure, label-density]
+        challenge_strategies: [dense-vs-progressive, focus-context-shift, always-visible-vs-on-demand]
+      - id: control-surface
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [control-persistence, direct-manipulation, keyboard-equivalence]
+        challenge_strategies: [inline-vs-dedicated-controls, direct-manipulation-vs-command, pointer-vs-keyboard]
+
   - knowledge_kind: implementation-design
     required: true
     minimum_exploration: EXPLORE
