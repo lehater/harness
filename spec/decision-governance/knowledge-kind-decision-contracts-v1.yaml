@@ -143,6 +143,26 @@ contracts:
         material_dimensions: [narrow-layout, disclosure, projection-priority]
         challenge_strategies: [collapse-vs-reflow, persistent-vs-disclosed, primary-surface-perturbation]
 
+  - knowledge_kind: component-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: responsibility-boundaries
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [boundary-granularity, ownership-basis, cross-feature-sharing]
+        challenge_strategies: [split-vs-merge, feature-vs-technical, local-vs-shared]
+      - id: provider-seams
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [seam-location, provider-leakage, substitution-scope]
+        challenge_strategies: [direct-vs-port, wrapper-scope-perturbation, provider-substitution]
+      - id: state-ownership
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [state-owner, sharing-scope, lifecycle]
+        challenge_strategies: [local-vs-global, server-vs-client-owner, lifecycle-perturbation]
+
   - knowledge_kind: implementation-design
     required: true
     minimum_exploration: EXPLORE
