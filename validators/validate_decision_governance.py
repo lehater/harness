@@ -287,6 +287,16 @@ def main() -> int:
         item["delegation_requires"] == "CONSERVATIVE"
         for item in screen_contract["axes"].values()
     ), screen_contract
+    component_contract = contracts["component-design"]
+    assert set(component_contract["axes"]) == {
+        "responsibility-boundaries",
+        "provider-seams",
+        "state-ownership",
+    }, component_contract
+    assert all(
+        item["delegation_requires"] == "CONSERVATIVE"
+        for item in component_contract["axes"].values()
+    ), component_contract
 
     # A global project decision policy must not accidentally govern knowledge
     # kinds that have no decision contract.
