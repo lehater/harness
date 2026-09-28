@@ -1,0 +1,138 @@
+version: 1
+kind: harness-scenario
+id: semantic-closure-requires-current-lifecycle
+title: Semantic closure rejects stale downstream acceptance
+dimensions:
+  project_archetype: backend-service
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - semantic-closure-currentness
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SEMANTIC-CLOSURE-CURRENTNESS
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted source knowledge.
+          boundary:
+            semantic_cohesion: Source semantics.
+            independent_change: Source semantics change independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.source
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: APPLICATION-DESIGN
+          responsibility: Own application design.
+          boundary:
+            semantic_cohesion: Application semantics.
+            independent_change: Application design changes independently.
+            public_contract: Accepted application design.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: [demo.source]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume current application design.
+          requires: [demo.application]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: SOURCE
+          authority: DISCOVERY
+          path: docs/source.md
+          provides: [demo.source]
+          depends_on: []
+        - id: APPLICATION
+          authority: APPLICATION-DESIGN
+          path: docs/application.md
+          provides: [demo.application]
+          depends_on: [SOURCE]
+      questions: []
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: SEMANTIC-CLOSURE-REGISTRY
+      routes:
+        - {knowledge_kind: problem-evidence, skill: skills/artifacts/problem-evidence/SKILL.md}
+        - {knowledge_kind: application-design, skill: skills/artifacts/application-design/SKILL.md}
+  evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: SOURCE
+          capability: demo.source
+          status: ACCEPTED
+          findings: []
+          semantic_claims: {accepted: []}
+          question_proposals: []
+          admission: {status: ACCEPTED, acceptance_id: SOURCE-2}
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: APPLICATION
+          capability: demo.application
+          status: ACCEPTED
+          findings: []
+          semantic_claims: {accepted: []}
+          question_proposals: []
+          admission: {status: ACCEPTED, acceptance_id: APPLICATION-1}
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: SOURCE
+          capability: demo.source
+          acceptance_id: SOURCE-2
+          accepted_prerequisites: {}
+        - artifact: APPLICATION
+          capability: demo.application
+          acceptance_id: APPLICATION-1
+          accepted_prerequisites:
+            demo.source: SOURCE-1
+
+steps:
+  - id: structural
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+
+  - id: closure
+    driver: semantic.closure
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      skill_registry: {ref: fixture.registry}
+      semantic_evaluations: {ref: fixture.evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /structural_status, op: equals, value: COMPLETE}
+      - {path: /semantic_gaps, op: length, value: 0}
+      - path: /currentness_gaps
+        op: contains_match
+        value:
+          capability: demo.application
+          authority: APPLICATION-DESIGN
+          state: STALE
+      - path: /revalidate
+        op: contains_match
+        value:
+          capability: demo.application

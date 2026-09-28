@@ -54,11 +54,13 @@ required_dimension_values:
   execution_type: [deterministic, agent-evaluation]
 
 required_drivers:
+  - core.validate
   - data.patch
   - engineering.target
   - semantic.acceptance
   - semantic.questions
   - semantic.apply_questions
+  - semantic.closure
   - lifecycle.states
   - agent.route
   - concern.activation
@@ -138,7 +140,7 @@ requirements:
 
   - id: core-model-invalid-rejected
     category: core
-    enforcement: planned
+    enforcement: required
     description: Invalid Core ownership, dependency or Question structure is rejected deterministically.
     min_scenarios: 1
 
@@ -174,13 +176,13 @@ requirements:
 
   - id: semantic-process-error-no-question
     category: semantic
-    enforcement: planned
+    enforcement: required
     description: Producer/process validation failures remain rejection findings and do not become semantic Questions.
     min_scenarios: 1
 
   - id: semantic-closure-currentness
     category: semantic
-    enforcement: planned
+    enforcement: required
     description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
     min_scenarios: 1
 
@@ -222,7 +224,7 @@ requirements:
 
   - id: decision-material-diversity
     category: decision
-    enforcement: planned
+    enforcement: required
     description: Superficially different alternatives with identical material effects do not satisfy decision exploration diversity.
     min_scenarios: 1
 
@@ -252,7 +254,7 @@ requirements:
 
   - id: project-authority-migration
     category: authority
-    enforcement: planned
+    enforcement: required
     description: Authority splits do not blindly inherit applicability from retired Authority identities.
     min_scenarios: 1
 
