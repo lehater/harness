@@ -61,22 +61,25 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise CoreError(
                 f"invalid prerequisite semantic baseline for {capability}"
             )
-        for prerequisite, atoms in semantic_baseline.items():
+        for prerequisite, baseline_entry in semantic_baseline.items():
             if (
                 not isinstance(prerequisite, str)
                 or not prerequisite
-                or not isinstance(atoms, dict)
-                or not atoms
+                or not isinstance(baseline_entry, dict)
+                or baseline_entry.get("exhaustive") is not True
+                or not isinstance(baseline_entry.get("semantic_atoms"), dict)
+                or not baseline_entry["semantic_atoms"]
                 or any(
                     not isinstance(atom_id, str)
                     or not atom_id
                     or not isinstance(fingerprint, str)
                     or not fingerprint
-                    for atom_id, fingerprint in atoms.items()
+                    for atom_id, fingerprint
+                    in baseline_entry["semantic_atoms"].items()
                 )
             ):
                 raise CoreError(
-                    f"invalid prerequisite semantic baseline for {capability}"
+                    f"prerequisite semantic baseline for {capability} must be exhaustive and contain semantic_atoms"
                 )
         result[capability] = item
     return result
@@ -170,8 +173,9 @@ def lifecycle_states(
                 )
                 continue
 
-            consumed_atoms = semantic_baseline.get(prerequisite)
-            if consumed_atoms is not None:
+            semantic_entry = semantic_baseline.get(prerequisite)
+            if semantic_entry is not None:
+                consumed_atoms = semantic_entry["semantic_atoms"]
                 current_atoms = upstream_provider.get(
                     "semantic_atom_fingerprints",
                     {},
