@@ -41,6 +41,9 @@ fixtures:
 steps:
   - id: forbidden-source
     driver: semantic.acceptance
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: provenance-owner-drift
     with:
       contract: {ref: fixture.contract}
       sources: {ref: fixture.sources}
@@ -58,6 +61,9 @@ steps:
 
   - id: allowed-source
     driver: semantic.acceptance
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: allowed-provenance
     with:
       contract: {ref: fixture.contract}
       sources: {ref: step.admit-source}
