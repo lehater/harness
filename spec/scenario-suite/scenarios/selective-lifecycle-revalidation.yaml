@@ -140,7 +140,7 @@ steps:
       - {path: /status, op: equals, value: ACCEPTED}
       - {path: /lifecycle_dependency/exhaustive, op: equals, value: true}
       - {path: /lifecycle_dependency/semantic_atoms, op: contains, value: ATOM-A}
-      - {path: /lifecycle_dependency/semantic_atoms, op: not_contains, value: NOISE-G}
+      - {path: /lifecycle_dependency/semantic_atoms, op: length, value: 1}
 
   - id: irrelevant-upstream-change
     driver: lifecycle.states
