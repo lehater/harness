@@ -127,6 +127,9 @@ steps:
 
   - id: false-meaning
     driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection, mutation_detection]
+      mutation_class: false-semantic-link
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -171,6 +174,8 @@ steps:
 
   - id: correct-meaning
     driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control]
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -192,6 +197,9 @@ steps:
 
   - id: stale-judgement-rejected
     driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: stale-judgement
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -211,6 +219,9 @@ steps:
 
   - id: incomplete-judgement-rejected
     driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: incomplete-judgement
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
