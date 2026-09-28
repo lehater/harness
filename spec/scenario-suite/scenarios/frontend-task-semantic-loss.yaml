@@ -1,0 +1,66 @@
+version: 1
+kind: harness-scenario
+id: frontend-task-semantic-loss-must-be-detected
+title: Interaction design must not silently lose material Task Model semantics
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: frontend
+  execution_type: deterministic
+covers:
+  - frontend-contract-closure
+
+fixtures:
+  task:
+    value:
+      version: 1
+      kind: task-model
+      id: DERIVATION-TASK-MODEL
+      goals:
+        - id: GOAL-EDIT-RESOURCE
+          tasks:
+            - id: TASK-EDIT-RESOURCE
+              responsibility: USER
+              required_information: [resource-identity, current-status, current-configuration]
+              decision_or_input: requested-configuration
+              outcome: configuration-changed
+              recovery: validation-failure-preserves-entered-values
+  conceptual:
+    value:
+      concepts:
+        - {id: RESOURCE, meaning: Managed resource}
+      modes: []
+  ia:
+    value:
+      locations:
+        - {id: RESOURCE-DETAIL, purpose: Inspect and edit one resource, concept_refs: [RESOURCE]}
+  interaction:
+    value:
+      contexts:
+        - id: RESOURCE-EDIT-CONTEXT
+          task_refs: [TASK-EDIT-RESOURCE]
+          actions: [edit-resource]
+      task_dispositions: []
+  topology:
+    value:
+      views:
+        - id: RESOURCE-DETAIL
+          responsibility: Inspect and edit one resource.
+          location_ref: RESOURCE-DETAIL
+          interaction_context_refs: [RESOURCE-EDIT-CONTEXT]
+          parent: ROOT
+          exits: []
+      non_view_contexts: []
+
+steps:
+  - id: evaluate-loss
+    driver: frontend.ux_closure
+    with:
+      task_model: {ref: fixture.task}
+      conceptual_model: {ref: fixture.conceptual}
+      information_architecture: {ref: fixture.ia}
+      interaction_design: {ref: fixture.interaction}
+      topology: {ref: fixture.topology}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNCOVERED_TASK_SEMANTICS, task: TASK-EDIT-RESOURCE}}
