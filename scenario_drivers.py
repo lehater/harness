@@ -10,8 +10,13 @@ import copy
 from typing import Any, Callable
 
 from agent_router import route_create_work
+from authority_context import build_authority_context
 from capability_lifecycle import lifecycle_states
 from concern_activation import derive_activation
+from coverage_obligations import (
+    derive_subject_inventory_disposition,
+    validate_subject_obligations,
+)
 from decision_exploration import evaluate_decision_exploration
 from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
@@ -20,6 +25,8 @@ from engineering_graph import evaluate_engineering_target
 from graph_doctor import diagnose_project
 from harness import validate_model
 from project_status import bootstrap_registry, status as project_status
+from repository_realization import evaluate as evaluate_repository_realization
+from source_coverage import validate_source_coverage
 from semantic_acceptance import evaluate_artifact
 from semantic_closure import evaluate_semantic_closure
 from semantic_questions import (
@@ -240,3 +247,62 @@ def project_status_driver(
     core: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return project_status(catalog, registry, core)
+
+
+@scenario_driver("source.coverage")
+def source_coverage_driver(*, document: dict[str, Any]) -> dict[str, Any]:
+    return validate_source_coverage(document)
+
+
+@scenario_driver("authority.context")
+def authority_context_driver(
+    *,
+    graph: dict[str, Any],
+    model: dict[str, Any],
+    authority_id: str,
+    capability_ids: list[str] | None = None,
+) -> dict[str, Any]:
+    return build_authority_context(
+        graph,
+        model,
+        authority_id,
+        capability_ids,
+    )
+
+
+@scenario_driver("coverage.subject_inventory")
+def subject_inventory_driver(
+    *,
+    disposition: dict[str, Any] | None,
+    consumer: str,
+    scope: str,
+) -> dict[str, Any]:
+    return derive_subject_inventory_disposition(
+        disposition,
+        consumer=consumer,
+        scope=scope,
+    )
+
+
+@scenario_driver("coverage.subject_obligations")
+def subject_obligations_driver(
+    *,
+    obligations: dict[str, Any],
+    source: dict[str, Any],
+    consumer: str,
+    scope: str,
+) -> dict[str, Any]:
+    return validate_subject_obligations(
+        obligations,
+        source,
+        consumer=consumer,
+        scope=scope,
+    )
+
+
+@scenario_driver("repository.realization")
+def repository_realization_driver(
+    *,
+    model: dict[str, Any],
+) -> dict[str, Any]:
+    return evaluate_repository_realization(model)

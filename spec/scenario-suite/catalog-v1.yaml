@@ -54,6 +54,11 @@ required_dimension_values:
   execution_type: [deterministic, agent-evaluation]
 
 required_drivers:
+  - repository.realization
+  - coverage.subject_obligations
+  - coverage.subject_inventory
+  - authority.context
+  - source.coverage
   - core.validate
   - data.patch
   - engineering.target
@@ -158,7 +163,7 @@ requirements:
 
   - id: source-coverage-completeness
     category: assurance
-    enforcement: planned
+    enforcement: required
     description: Source coverage detects unclassified accepted source statements and explicit exclusions.
     min_scenarios: 1
 
@@ -188,13 +193,13 @@ requirements:
 
   - id: subject-inventory-disposition
     category: coverage
-    enforcement: planned
+    enforcement: required
     description: Coverage requires an explicit subject inventory contract or disposition instead of treating silence as not applicable.
     min_scenarios: 1
 
   - id: subject-obligation-classification
     category: coverage
-    enforcement: planned
+    enforcement: required
     description: Every accepted scope requirement is classified into required subject coverage or explicit exclusion.
     min_scenarios: 1
 
@@ -248,7 +253,7 @@ requirements:
 
   - id: authority-context-read-boundary
     category: authority
-    enforcement: planned
+    enforcement: required
     description: Authority execution context exposes only admitted upstream and same-Authority canonical inputs.
     min_scenarios: 1
 
@@ -260,7 +265,7 @@ requirements:
 
   - id: repository-realization
     category: repository
-    enforcement: planned
+    enforcement: required
     description: Repository realization validates source-of-truth, environment and gate-policy applicability.
     min_scenarios: 1
 

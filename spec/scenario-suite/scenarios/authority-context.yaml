@@ -1,0 +1,78 @@
+version: 1
+kind: harness-scenario
+id: authority-context-enforces-read-boundary
+title: Authority context excludes unrelated canonical knowledge
+dimensions:
+  project_archetype: backend-service
+  stage: design
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - authority-context-read-boundary
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: AUTHORITY-CONTEXT-SCENARIO
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own source knowledge.
+          boundary:
+            semantic_cohesion: Source semantics.
+            independent_change: Source semantics change independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.source
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: APPLICATION-DESIGN
+          responsibility: Own application design.
+          boundary:
+            semantic_cohesion: Application semantics.
+            independent_change: Application design changes independently.
+            public_contract: Accepted application design.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: [demo.source]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume application design.
+          requires: [demo.application]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: SOURCE
+          authority: DISCOVERY
+          path: docs/source.md
+          provides: [demo.source]
+          depends_on: []
+        - id: SOURCE-UNRELATED
+          authority: DISCOVERY
+          path: docs/unrelated.md
+          provides: []
+          depends_on: []
+        - id: APPLICATION
+          authority: APPLICATION-DESIGN
+          path: docs/application.md
+          provides: [demo.application]
+          depends_on: [SOURCE]
+      questions: []
+
+steps:
+  - id: context
+    driver: authority.context
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      authority_id: APPLICATION-DESIGN
+      capability_ids: [demo.application]
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /input_artifacts, op: contains_match, value: {id: SOURCE, path: docs/source.md}}
+      - {path: /access/read, op: set_equals, value: [docs/application.md, docs/source.md]}
+      - {path: /access/write, op: equals, value: [docs/application.md]}
+      - {path: /access/read, op: not_equals, value: [docs/application.md, docs/source.md, docs/unrelated.md]}

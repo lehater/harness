@@ -1,0 +1,58 @@
+version: 1
+kind: harness-scenario
+id: source-coverage-requires-every-statement-disposition
+title: Source coverage fails closed on an unclassified source statement
+dimensions:
+  project_archetype: data-integration
+  stage: discovery
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - source-coverage-completeness
+
+fixtures:
+  coverage:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: SOURCE-COVERAGE-SCENARIO
+      source_baseline: baseline-v1
+      coverage_status: COMPLETE
+      statements:
+        - {id: S1, source_ref: source.md#1, text: Accepted observable fact.}
+        - {id: S2, source_ref: source.md#2, text: Prior derived design.}
+      dispositions:
+        - statement_id: S1
+          classification: ADMITTED
+          admitted_ref: problem.fact.s1
+          sanitized_statement: Accepted observable fact.
+        - statement_id: S2
+          classification: EXCLUDED_DERIVED_DESIGN
+          rationale: Derived design is intentionally excluded from blind source truth.
+
+steps:
+  - id: complete
+    driver: source.coverage
+    with:
+      document: {ref: fixture.coverage}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 2}
+
+  - id: remove-disposition
+    driver: data.patch
+    with:
+      value: {ref: fixture.coverage}
+      operations:
+        - {op: remove, path: /dispositions/1}
+
+  - id: incomplete
+    driver: source.coverage
+    with:
+      document: {ref: step.remove-disposition}
+    expect_error:
+      type: CoreError
+      contains: source statements without disposition
+    expect:
+      - {path: /error/type, op: equals, value: CoreError}
