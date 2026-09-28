@@ -278,6 +278,7 @@ def _accepted_prerequisite_semantics(
         if (
             not isinstance(dependency, dict)
             or dependency.get("capability") != source_capability
+            or dependency.get("exhaustive") is not True
             or not isinstance(dependency.get("semantic_atoms"), dict)
             or not dependency["semantic_atoms"]
             or any(
@@ -289,7 +290,7 @@ def _accepted_prerequisite_semantics(
             )
         ):
             raise CoreError(
-                f"invalid lifecycle dependency evidence for {source_capability}"
+                f"lifecycle dependency evidence for {source_capability} must be exhaustive and contain consumed semantic atoms"
             )
         result[source_capability] = dict(dependency["semantic_atoms"])
     return result
