@@ -20,6 +20,7 @@ from coverage_obligations import (
     validate_subject_obligations,
 )
 from decision_exploration import evaluate_decision_exploration
+from derivation_test_coverage import evaluate_derivation_test_coverage
 from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
 from engineering_coverage import evaluate_with_repository_policy
@@ -157,6 +158,11 @@ def semantic_acceptance(
 @scenario_driver("semantic.derivation")
 def semantic_derivation(**kwargs: Any) -> dict[str, Any]:
     return evaluate_derivation(**kwargs)
+
+
+@scenario_driver("semantic.derivation_test_coverage")
+def semantic_derivation_test_coverage(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_derivation_test_coverage(**kwargs)
 
 
 @scenario_driver("semantic.questions")
