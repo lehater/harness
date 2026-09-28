@@ -193,6 +193,9 @@ steps:
 
   - id: derivation-loss
     driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: semantic-omission
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -220,6 +223,9 @@ steps:
 
   - id: missing-input
     driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: upstream-omission
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -232,6 +238,9 @@ steps:
 
   - id: route-missing-input
     driver: semantic.questions
+    benchmark:
+      metrics: [question_owner_routing]
+      mutation_class: upstream-omission
     with:
       graph: {ref: fixture.graph}
       evaluation: {ref: step.missing-input}
@@ -251,6 +260,9 @@ steps:
 
   - id: downstream-waits
     driver: engineering.target
+    benchmark:
+      metrics: [blocking_behavior]
+      mutation_class: upstream-omission
     with:
       graph: {ref: fixture.graph}
       target: FRONTEND
@@ -261,6 +273,8 @@ steps:
 
   - id: alternative-valid-b
     driver: semantic.derivation
+    benchmark:
+      metrics: [alternative_valid_acceptance]
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
@@ -283,6 +297,9 @@ steps:
 
   - id: irrelevant-noise-stable
     driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: irrelevant-noise
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
