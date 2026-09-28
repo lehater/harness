@@ -203,6 +203,7 @@ def main() -> int:
             "obligations": [
                 {"id": "needs", "source_kind": "user-need"},
             ],
+            "lifecycle_dependency": {"exhaustive": True},
         },
         source=sources(),
         candidate=candidate(),
