@@ -54,49 +54,169 @@ fixtures:
       semantic_judgement:
         required: true
         required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [EVALUATOR, HUMAN]
 
   source:
     value:
       semantic_assertions:
         - {id: RECOVERY-F, kind: task-recovery, subject: TASK-1, semantic_value: validation-failure-preserves-entered-values, decision_authority: APPLICATION-DESIGN}
 
-  candidate:
+  wrong-candidate:
     value:
       semantic_assertions:
         - {id: INT-TITLE, kind: interaction-information, subject: CTX-1, semantic_value: resource-editor-title, decision_authority: HUMAN-INTERFACE-DESIGN}
 
-  evidence:
+  wrong-evidence:
     value:
       version: 1
       kind: harness-semantic-derivation-evidence
       source_capability: demo.task
       target_capability: demo.interaction
       links:
-        - id: LINK-RECOVERY
-          sources: [RECOVERY-F]
-          relation: REALIZES
-          targets: [INT-TITLE]
+        - {id: LINK-RECOVERY, sources: [RECOVERY-F], relation: REALIZES, targets: [INT-TITLE]}
       dispositions: []
-      semantic_judgement:
-        version: 1
-        kind: harness-semantic-derivation-judgement
-        reviewer_kind: EVALUATOR
-        status: REJECTED
-        reviewed_links: [LINK-RECOVERY]
-        checks: [meaning-preserved, relation-justified]
-        findings:
-          - {link: LINK-RECOVERY, code: MEANING_NOT_PRESERVED, rationale: A screen title does not realize task recovery behavior.}
+
+  correct-candidate:
+    value:
+      semantic_assertions:
+        - {id: INT-RECOVERY, kind: interaction-recovery, subject: CTX-1, semantic_value: validation-state-preserves-input, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  correct-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task
+      target_capability: demo.interaction
+      links:
+        - {id: LINK-RECOVERY, sources: [RECOVERY-F], relation: REALIZES, targets: [INT-RECOVERY]}
+      dispositions: []
 
 steps:
+  - id: wrong-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.wrong-candidate}
+      evidence: {ref: fixture.wrong-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: reject-wrong-meaning
+    driver: data.patch
+    with:
+      value: {ref: fixture.wrong-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.wrong-request#/semantic_judgement_request/request_id}
+            reviewer_kind: EVALUATOR
+            status: REJECTED
+            reviewed_links: [LINK-RECOVERY]
+            checks: [meaning-preserved, relation-justified]
+            findings:
+              - {link: LINK-RECOVERY, code: MEANING_NOT_PRESERVED, rationale: A screen title does not realize task recovery behavior.}
+
   - id: false-meaning
     driver: semantic.derivation
     with:
       graph: {ref: fixture.graph}
       contract: {ref: fixture.contract}
       source: {ref: fixture.source}
-      candidate: {ref: fixture.candidate}
-      evidence: {ref: fixture.evidence}
+      candidate: {ref: fixture.wrong-candidate}
+      evidence: {ref: step.reject-wrong-meaning}
     expect:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /coverage/unresolved, op: equals, value: 0}
       - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REJECTED}}
+      - {path: /findings, op: not_contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_BINDING_MISMATCH}}
+
+  - id: correct-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.correct-candidate}
+      evidence: {ref: fixture.correct-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+      - {path: /semantic_judgement_request/request_id, op: not_equals, value: {ref: step.wrong-request#/semantic_judgement_request/request_id}}
+
+  - id: accept-correct-meaning
+    driver: data.patch
+    with:
+      value: {ref: fixture.correct-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.correct-request#/semantic_judgement_request/request_id}
+            reviewer_kind: EVALUATOR
+            status: ACCEPTED
+            reviewed_links: [LINK-RECOVERY]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+
+  - id: correct-meaning
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.correct-candidate}
+      evidence: {ref: step.accept-correct-meaning}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /semantic_judgement/status, op: equals, value: ACCEPTED}
+      - {path: /semantic_judgement/assurance, op: equals, value: REQUEST_BOUND}
+      - {path: /findings, op: length, value: 0}
+
+  - id: mutate-after-judgement
+    driver: data.patch
+    with:
+      value: {ref: fixture.correct-candidate}
+      operations:
+        - {op: replace, path: /semantic_assertions/0/semantic_value, value: unrelated-banner-text}
+
+  - id: stale-judgement-rejected
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: step.mutate-after-judgement}
+      evidence: {ref: step.accept-correct-meaning}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_BINDING_MISMATCH}}
+
+  - id: remove-required-check
+    driver: data.patch
+    with:
+      value: {ref: step.accept-correct-meaning}
+      operations:
+        - {op: remove, path: /semantic_judgement/checks/1}
+
+  - id: incomplete-judgement-rejected
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.correct-candidate}
+      evidence: {ref: step.remove-required-check}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_CHECKS_MISSING, checks: [relation-justified]}}
