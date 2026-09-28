@@ -284,6 +284,7 @@ def run_scenario(path: Path) -> ScenarioResult:
         if legacy_name in document and legacy_name not in dimensions:
             dimensions[legacy_name] = document[legacy_name]
     trace: list[dict[str, Any]] = []
+    current_step: dict[str, Any] | None = None
 
     try:
         validate_scenario(document)
@@ -300,6 +301,7 @@ def run_scenario(path: Path) -> ScenarioResult:
             }
             outputs: dict[str, Any] = {}
             for step in document["steps"]:
+                current_step = step
                 step_id = step["id"]
                 args = _resolve(step.get("with", {}) or {}, fixtures, outputs)
                 driver = get_driver(step["driver"])
@@ -381,8 +383,24 @@ def run_scenario(path: Path) -> ScenarioResult:
     except Exception as exc:
         trace.append(
             {
-                "id": trace[-1]["id"] if trace else "<setup>",
+                "id": (
+                    current_step.get("id")
+                    if isinstance(current_step, dict)
+                    else "<setup>"
+                ),
+                **(
+                    {"driver": current_step.get("driver")}
+                    if isinstance(current_step, dict)
+                    and current_step.get("driver")
+                    else {}
+                ),
                 "status": "FAIL",
+                **(
+                    {"benchmark": copy.deepcopy(current_step["benchmark"])}
+                    if isinstance(current_step, dict)
+                    and current_step.get("benchmark") is not None
+                    else {}
+                ),
                 "error": f"{exc.__class__.__name__}: {exc}",
             }
         )
