@@ -23,6 +23,10 @@ fixtures:
       - {id: valid-paraphrase, status: ACCEPTED}
       - {id: valid-decomposition, status: ACCEPTED}
       - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
 
   false-negative:
     value:
@@ -32,6 +36,10 @@ fixtures:
       - {id: valid-paraphrase, status: ACCEPTED}
       - {id: valid-decomposition, status: ACCEPTED}
       - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
 
   incomplete:
     value:
@@ -40,6 +48,10 @@ fixtures:
       - {id: semantic-subject-swap, status: REJECTED}
       - {id: valid-paraphrase, status: ACCEPTED}
       - {id: valid-decomposition, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
 
   false-positive:
     value:
@@ -49,6 +61,10 @@ fixtures:
       - {id: valid-paraphrase, status: REJECTED}
       - {id: valid-decomposition, status: ACCEPTED}
       - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
 
 steps:
   - id: perfect-calibration
@@ -98,7 +114,7 @@ steps:
       predictions: {ref: fixture.incomplete}
     expect:
       - {path: /status, op: equals, value: INCOMPLETE}
-      - {path: /scored_count, op: equals, value: 5}
+      - {path: /scored_count, op: equals, value: 9}
       - {path: /missing, op: contains, value: valid-aggregation}
 
   - id: unknown-case-rejected
