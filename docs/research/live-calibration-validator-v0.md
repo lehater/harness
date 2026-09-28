@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: completed research; implemented experimental validator.
+Status: active research; deterministic validator implemented, external execution RED open.
 
 ## Scope
 
@@ -282,3 +282,26 @@ corpus/protocol.
 
 The Scenario Suite is therefore the executable acceptance surface for the
 validator; no parallel test runner was introduced.
+
+
+## External execution RED — reopened closure
+
+The previous closure statement was too strong: the repository proved validation
+of externally supplied run evidence, but did not yet contain an executable
+reference driver proving that Scenario Suite can actually launch a separate
+evaluator runtime.
+
+The closure is reopened for one narrow RED/GREEN slice. Acceptance requires an
+operator-selected external driver that:
+
+- is loaded through the existing Scenario Suite `--driver-module` mechanism;
+- receives corpus/protocol/evaluator/run configuration from the scenario;
+- sends only blinded request material to a separate process;
+- converts process failure/timeout/malformed output into non-successful run
+  evidence;
+- returns the normal live calibration evaluation using the unchanged scorer.
+
+The integration fixture intentionally uses an evaluator process that ACCEPTS
+every case. The expected calibration outcome is FAIL with false negatives. This
+proves execution plumbing, not semantic quality, and prevents the fixture from
+becoming a new semantic oracle.
