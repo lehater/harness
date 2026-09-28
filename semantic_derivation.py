@@ -368,6 +368,11 @@ def evaluate_derivation(
         raise CoreError("semantic_judgement contract must be a mapping")
     judgement_required = bool(judgement_contract.get("required", False))
 
+    lifecycle_contract = contract.get("lifecycle_dependency", {}) or {}
+    if not isinstance(lifecycle_contract, dict):
+        raise CoreError("lifecycle_dependency contract must be a mapping")
+    lifecycle_exhaustive = bool(lifecycle_contract.get("exhaustive", False))
+
     covered_sources: set[str] = set()
     evaluated_links: list[dict[str, Any]] = []
     seen_link_ids: set[str] = set()
@@ -542,6 +547,27 @@ def evaluate_derivation(
             }
         )
 
+    lifecycle_unaccounted = sorted(
+        source_id
+        for source_id in source_assertions
+        if source_id not in covered_sources
+        and source_id not in disposition_by_source
+    )
+    if lifecycle_exhaustive:
+        for source_id in lifecycle_unaccounted:
+            assertion = source_assertions[source_id]
+            findings.append(
+                {
+                    "code": "LIFECYCLE_DEPENDENCY_INCOMPLETE",
+                    "source": source_id,
+                    "source_kind": assertion.get("kind"),
+                    "subject": assertion.get("subject"),
+                    "source_capability": source_capability,
+                    "target_capability": target_capability,
+                    "owner_authority": target_authority,
+                }
+            )
+
     semantic_judgement_request: dict[str, Any] | None = None
     semantic_judgement: dict[str, Any] | None = None
     if judgement_required:
@@ -591,7 +617,6 @@ def evaluate_derivation(
                 "rationale": item["rationale"],
             }
             for source_id, item in sorted(disposition_by_source.items())
-            if source_id in required_sources
         ],
         "links": evaluated_links,
         "coverage": {
@@ -602,12 +627,22 @@ def evaluate_derivation(
         },
         "lifecycle_dependency": {
             "capability": source_capability,
+            "exhaustive": lifecycle_exhaustive,
             "semantic_atoms": {
                 source_id: semantic_assertion_fingerprint(
                     source_assertions[source_id]
                 )
-                for source_id in sorted(required_sources & covered_sources)
+                for source_id in sorted(
+                    covered_sources
+                    if lifecycle_exhaustive
+                    else required_sources & covered_sources
+                )
             },
+            **(
+                {"unaccounted_sources": lifecycle_unaccounted}
+                if lifecycle_exhaustive and lifecycle_unaccounted
+                else {}
+            ),
         },
         **(
             {"semantic_judgement_request": semantic_judgement_request}
