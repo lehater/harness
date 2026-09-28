@@ -98,6 +98,7 @@ def evaluate_derivation(
     findings: list[dict[str, Any]] = []
     required_sources: set[str] = set()
     source_obligation: dict[str, str] = {}
+    obligation_allows_not_applicable: dict[str, bool] = {}
 
     obligations = contract.get("obligations", []) or []
     if not isinstance(obligations, list) or not obligations:
@@ -114,6 +115,9 @@ def evaluate_derivation(
         if obligation_id in seen_obligations:
             raise CoreError(f"duplicate semantic derivation obligation: {obligation_id}")
         seen_obligations.add(obligation_id)
+        obligation_allows_not_applicable[obligation_id] = bool(
+            item.get("allow_not_applicable", False)
+        )
         source_kind = _require_string(
             item.get("source_kind"),
             f"semantic derivation obligation {obligation_id} source_kind",
@@ -272,6 +276,19 @@ def evaluate_derivation(
             )
             continue
         disposition_by_source[source_id] = item
+        obligation_id = source_obligation.get(source_id)
+        if (
+            status == "NOT_APPLICABLE"
+            and obligation_id is not None
+            and not obligation_allows_not_applicable.get(obligation_id, False)
+        ):
+            findings.append(
+                {
+                    "code": "NOT_APPLICABLE_NOT_ALLOWED",
+                    "source": source_id,
+                    "obligation": obligation_id,
+                }
+            )
         if status == "QUESTION":
             findings.append(
                 {
@@ -310,6 +327,12 @@ def evaluate_derivation(
             }
         )
 
+    unresolved_sources = sorted(
+        source_id
+        for source_id in required_sources
+        if source_id not in covered_sources
+        and source_id not in disposition_by_source
+    )
     status = "ACCEPTED" if not findings else "REJECTED"
     return {
         "version": 1,
@@ -331,6 +354,12 @@ def evaluate_derivation(
             if source_id in required_sources
         ],
         "links": evaluated_links,
+        "coverage": {
+            "required": len(required_sources),
+            "covered": len(required_sources & covered_sources),
+            "disposed": len(required_sources & set(disposition_by_source)),
+            "unresolved": len(unresolved_sources),
+        },
         "findings": findings,
     }
 
