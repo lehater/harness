@@ -7,8 +7,10 @@ only test orchestration; it does not model engineering semantics.
 from __future__ import annotations
 
 import copy
+from pathlib import Path
 from typing import Any, Callable
 
+from adapters.canonical_graph import project_model
 from agent_router import route_create_work
 from authority_context import build_authority_context
 from capability_lifecycle import lifecycle_states
@@ -22,13 +24,19 @@ from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
 from engineering_coverage import evaluate_with_repository_policy
 from engineering_graph import evaluate_engineering_target
+from frontend_interface_knowledge import evaluate_frontend_ux_closure
+from frontend_screen_contracts import evaluate_frontend_screen_contracts
 from graph_doctor import diagnose_project
+from human_projection import compile_manifest
+from integration_alignment import validate_project_alignment
 from harness import validate_model
 from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
+from decision_execution_assurance import evaluate_execution_assurance
 from source_coverage import validate_source_coverage
 from semantic_acceptance import evaluate_artifact
 from semantic_closure import evaluate_semantic_closure
+from workspace import load_workspace, render_workspace
 from semantic_questions import (
     append_question_proposals,
     questions_from_semantic_evaluation,
@@ -306,3 +314,87 @@ def repository_realization_driver(
     model: dict[str, Any],
 ) -> dict[str, Any]:
     return evaluate_repository_realization(model)
+
+
+@scenario_driver("canonical.project")
+def canonical_project_driver(
+    *,
+    source_graph: dict[str, Any],
+    projection: dict[str, Any],
+) -> dict[str, Any]:
+    return project_model(source_graph, projection)
+
+
+@scenario_driver("canonical.alignment")
+def canonical_alignment_driver(
+    *,
+    source_graph: dict[str, Any],
+    projection: dict[str, Any],
+    engineering_graph: dict[str, Any],
+    require_complete_binding: bool = True,
+    target_consumer: str | None = None,
+) -> dict[str, Any]:
+    return validate_project_alignment(
+        source_graph,
+        projection,
+        engineering_graph,
+        require_complete_binding=require_complete_binding,
+        target_consumer=target_consumer,
+    )
+
+
+@scenario_driver("workspace.load")
+def workspace_load_driver(*, root: str) -> dict[str, Any]:
+    value = load_workspace(Path(root))
+    result = dict(value)
+    result["root"] = str(result["root"])
+    return result
+
+
+@scenario_driver("workspace.render")
+def workspace_render_driver(*, root: str) -> dict[str, Any]:
+    return render_workspace(Path(root))
+
+
+@scenario_driver("decision.execution_assurance")
+def decision_execution_assurance_driver(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_execution_assurance(**kwargs)
+
+
+@scenario_driver("human.compile_manifest")
+def human_compile_manifest_driver(**kwargs: Any) -> dict[str, Any]:
+    return compile_manifest(**kwargs)
+
+
+@scenario_driver("frontend.ux_closure")
+def frontend_ux_closure_driver(
+    *,
+    task_model: dict[str, Any],
+    conceptual_model: dict[str, Any],
+    information_architecture: dict[str, Any],
+    interaction_design: dict[str, Any],
+    topology: dict[str, Any],
+) -> dict[str, Any]:
+    return evaluate_frontend_ux_closure(
+        task_model,
+        conceptual_model,
+        information_architecture,
+        interaction_design,
+        topology,
+    )
+
+
+@scenario_driver("frontend.screen_contracts")
+def frontend_screen_contracts_driver(
+    *,
+    presentation: dict[str, Any],
+    screen_design: dict[str, Any],
+    interface_contract: dict[str, Any] | None = None,
+    screen_ids: list[str] | None = None,
+) -> dict[str, Any]:
+    return evaluate_frontend_screen_contracts(
+        presentation,
+        screen_design,
+        interface_contract,
+        screen_ids=set(screen_ids) if screen_ids is not None else None,
+    )

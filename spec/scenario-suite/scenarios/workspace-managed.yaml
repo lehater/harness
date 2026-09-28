@@ -1,0 +1,33 @@
+version: 1
+kind: harness-scenario
+id: managed-workspace-validates-and-renders
+title: Managed workspace validates canonical knowledge and renders projections
+dimensions:
+  project_archetype: synthetic
+  stage: implementation
+  behavior_class: workspace
+  execution_type: deterministic
+covers:
+  - workspace-managed-artifact-validation
+
+fixtures:
+  project:
+    workspace: ../../workspace-acceptance/minimal-domain
+
+steps:
+  - id: validate
+    driver: workspace.load
+    with:
+      root: {ref: fixture.project}
+    expect:
+      - {path: /target_state/status, op: equals, value: COMPLETE}
+      - {path: /documents, op: exists}
+
+  - id: render
+    driver: workspace.render
+    with:
+      root: {ref: fixture.project}
+    expect:
+      - {path: /target_state/status, op: equals, value: COMPLETE}
+      - {path: /generated, op: length, value: 4}
+      - {path: /generated, op: contains, value: docs/generated/application-domain.md}

@@ -28,6 +28,11 @@ dimensions:
     - coverage
     - diagnosis
     - applicability
+    - integration
+    - workspace
+    - projection
+    - frontend
+    - assurance
   execution_type:
     - deterministic
     - agent-evaluation
@@ -76,6 +81,14 @@ required_drivers:
   - graph.doctor
   - project.authority_bootstrap
   - project.status
+  - canonical.project
+  - canonical.alignment
+  - workspace.load
+  - workspace.render
+  - decision.execution_assurance
+  - human.compile_manifest
+  - frontend.ux_closure
+  - frontend.screen_contracts
 
 requirements:
   - id: structural-target-reaction
@@ -151,13 +164,13 @@ requirements:
 
   - id: canonical-projection-alignment
     category: integration
-    enforcement: planned
+    enforcement: required
     description: Project-native canonical graphs project into Core without hidden or phantom dependencies.
     min_scenarios: 1
 
   - id: workspace-managed-artifact-validation
     category: workspace
-    enforcement: planned
+    enforcement: required
     description: Managed workspace validation accepts canonical managed knowledge and rejects invalid/generated ownership states.
     min_scenarios: 1
 
@@ -169,13 +182,13 @@ requirements:
 
   - id: semantic-provenance-enforcement
     category: semantic
-    enforcement: planned
+    enforcement: required
     description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
     min_scenarios: 1
 
   - id: semantic-contradiction-detection
     category: semantic
-    enforcement: planned
+    enforcement: required
     description: Conflicting accepted semantic assertions are rejected rather than silently reconciled.
     min_scenarios: 1
 
@@ -205,25 +218,25 @@ requirements:
 
   - id: coverage-question-frontier
     category: coverage
-    enforcement: planned
+    enforcement: required
     description: Coverage routes unresolved proof gaps to the correct Question frontier.
     min_scenarios: 1
 
   - id: production-contract-overlay
     category: coverage
-    enforcement: planned
+    enforcement: required
     description: Project overlays can add justified production contracts without replacing reusable Engineering Graph truth.
     min_scenarios: 1
 
   - id: consumer-scoped-activation
     category: activation
-    enforcement: planned
+    enforcement: required
     description: Concern activation is constrained to the selected Consumer closure.
     min_scenarios: 1
 
   - id: scope-root-activation
     category: activation
-    enforcement: planned
+    enforcement: required
     description: Scope roots narrow activation and coverage without silently broadening to unrelated capabilities.
     min_scenarios: 1
 
@@ -235,19 +248,19 @@ requirements:
 
   - id: decision-research-depth
     category: decision
-    enforcement: planned
+    enforcement: required
     description: RESEARCH and DEEP_RESEARCH decision policies require corresponding authoritative/diverse evidence.
     min_scenarios: 1
 
   - id: decision-redo-idempotence
     category: decision
-    enforcement: planned
+    enforcement: required
     description: CURRENT work is omitted by default while explicit REDO remains bounded and repeatable.
     min_scenarios: 1
 
   - id: decision-execution-assurance
     category: decision
-    enforcement: planned
+    enforcement: required
     description: Stronger execution assurance fails closed when trusted external attestation is unavailable.
     min_scenarios: 1
 
@@ -271,13 +284,13 @@ requirements:
 
   - id: human-documentation-projection
     category: projection
-    enforcement: planned
+    enforcement: required
     description: Human documentation is derived from accepted canonical knowledge and cannot become an independent truth source.
     min_scenarios: 1
 
   - id: frontend-contract-closure
     category: frontend
-    enforcement: planned
+    enforcement: required
     description: Frontend screen and UX closure rejects missing query/action/state/provider or presentation semantics.
     min_scenarios: 1
 

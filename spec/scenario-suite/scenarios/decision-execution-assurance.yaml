@@ -1,0 +1,55 @@
+version: 1
+kind: harness-scenario
+id: decision-execution-assurance-fails-closed
+title: Strong execution assurance cannot be self-attested
+dimensions:
+  project_archetype: synthetic
+  stage: decision
+  behavior_class: assurance
+  execution_type: agent-evaluation
+covers:
+  - decision-execution-assurance
+
+fixtures:
+  request_policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults: {execution_assurance: REQUEST_BOUND}
+  attested_policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults: {execution_assurance: ATTESTED_ISOLATED}
+  request:
+    value: {request_id: REQUEST-1}
+  exploration:
+    value:
+      status: ACCEPTED
+      explorer_request_id: REQUEST-1
+
+steps:
+  - id: request-bound
+    driver: decision.execution_assurance
+    with:
+      policy: {ref: fixture.request_policy}
+      knowledge_kind: system-architecture
+      explorer_request: {ref: fixture.request}
+      exploration_evaluation: {ref: fixture.exploration}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /guarantee, op: equals, value: AUTHORIZED_INPUT_MANIFEST_BOUND}
+      - {path: /executor_trust, op: equals, value: UNATTESTED}
+
+  - id: self-attestation-rejected
+    driver: decision.execution_assurance
+    with:
+      policy: {ref: fixture.attested_policy}
+      knowledge_kind: system-architecture
+      explorer_request: {ref: fixture.request}
+      exploration_evaluation: {ref: fixture.exploration}
+      self_attested_execution: {isolated: true}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /executor_trust, op: equals, value: UNVERIFIED}
+      - {path: /findings, op: contains_match, value: {code: DECISION_TRUSTED_EXECUTION_VERIFIER_REQUIRED, self_attested_claim_ignored: true}}

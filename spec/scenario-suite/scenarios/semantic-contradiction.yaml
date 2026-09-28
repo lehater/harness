@@ -1,0 +1,46 @@
+version: 1
+kind: harness-scenario
+id: semantic-contradiction-is-rejected
+title: Conflicting claims in one semantic owner are rejected
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-contradiction-detection
+
+fixtures:
+  contract:
+    value:
+      authority: TACTICAL-DOMAIN-DESIGN
+      owned_assertion_kinds: [domain-invariant]
+      requires_source_authority: false
+      requires_assertion_authority: true
+  candidate:
+    value:
+      id: DOMAIN
+      capability: demo.domain
+      semantic_assertions:
+        - id: INV-A
+          kind: domain-invariant
+          subject: Resource.identity
+          semantic_value: stable
+          decision_authority: TACTICAL-DOMAIN-DESIGN
+        - id: INV-B
+          kind: domain-invariant
+          subject: Resource.identity
+          semantic_value: replaceable
+          decision_authority: TACTICAL-DOMAIN-DESIGN
+
+steps:
+  - id: reject-contradiction
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.contract}
+      sources:
+        semantic_assertions: []
+      candidate: {ref: fixture.candidate}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: INTERNAL_CONTRADICTION}}

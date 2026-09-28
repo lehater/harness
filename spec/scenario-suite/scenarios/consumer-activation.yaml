@@ -1,0 +1,76 @@
+version: 1
+kind: harness-scenario
+id: concern-activation-is-consumer-scoped
+title: Consumer closure constrains concern activation
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: activation
+  execution_type: deterministic
+covers:
+  - consumer-scoped-activation
+
+fixtures:
+  policy:
+    yaml: ../../engineering-coverage/activation-policy-v1.yaml
+  roles:
+    yaml: ../../research/consumer-activation-fixture-roles.yaml
+  graph:
+    yaml: ../../research/consumer-activation-fixture-graph.yaml
+  backend_overlay:
+    value:
+      version: 1
+      kind: harness-concern-activation-overlay
+      project: CONSUMER-ACTIVATION-FIXTURE
+      scope: backend
+      activate:
+        - concern: governance.data
+          rationale: Shared project fact.
+          consumers: [BACKEND, FRONTEND]
+        - concern: quality.performance.latency
+          rationale: Frontend-only interaction concern.
+          consumers: [FRONTEND]
+      decisions: []
+  frontend_overlay:
+    value:
+      version: 1
+      kind: harness-concern-activation-overlay
+      project: CONSUMER-ACTIVATION-FIXTURE
+      scope: frontend
+      activate:
+        - concern: governance.data
+          rationale: Shared project fact.
+          consumers: [BACKEND, FRONTEND]
+        - concern: quality.performance.latency
+          rationale: Frontend-only interaction concern.
+          consumers: [FRONTEND]
+      decisions: []
+
+steps:
+  - id: backend
+    driver: concern.activation
+    with:
+      policy: {ref: fixture.policy}
+      project_roles: {ref: fixture.roles}
+      overlay: {ref: fixture.backend_overlay}
+      project_docs: [{ref: fixture.graph}]
+      target_consumer: BACKEND
+    expect:
+      - {path: /rows, op: contains_match, value: {concern: data.lifecycle}}
+      - {path: /rows, op: not_contains_match, value: {concern: interface.human.accessibility}}
+      - {path: /rows, op: not_contains_match, value: {concern: quality.performance.latency}}
+      - {path: /rows, op: contains_match, value: {concern: governance.data}}
+
+  - id: frontend
+    driver: concern.activation
+    with:
+      policy: {ref: fixture.policy}
+      project_roles: {ref: fixture.roles}
+      overlay: {ref: fixture.frontend_overlay}
+      project_docs: [{ref: fixture.graph}]
+      target_consumer: FRONTEND
+    expect:
+      - {path: /rows, op: contains_match, value: {concern: interface.human.accessibility}}
+      - {path: /rows, op: contains_match, value: {concern: quality.performance.latency}}
+      - {path: /rows, op: not_contains_match, value: {concern: data.lifecycle}}
+      - {path: /rows, op: contains_match, value: {concern: governance.data}}
