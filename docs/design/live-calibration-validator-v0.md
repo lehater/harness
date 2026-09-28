@@ -154,3 +154,17 @@ distinct run ids and pass the resulting evaluations to
 The stability evaluator requires identical corpus, protocol and evaluator
 fingerprints. It reports `STABLE` or `UNSTABLE` and the disagreeing cases.
 It deliberately does not perform consensus voting or alter scorer metrics.
+
+
+## Reference external-process adapter
+
+Harness includes optional Scenario Suite driver `live_calibration_process_driver`, loaded only by operator/CI configuration. It executes one configured program without a shell and sends only the versioned instruction, evaluator descriptor/configuration, and blinded cases with opaque `case_request_id`.
+
+Executable bytes and timeout are fingerprinted into the evaluator adapter descriptor before request construction. Changing either changes evaluator binding. The separate-process boundary does not prove evaluator independence; `independence.status` remains `UNVERIFIED`.
+
+
+## Evidence persistence
+
+A live calibration evaluation is runtime evidence, not canonical engineering knowledge. A Scenario Suite step should observe the evaluation root (`observe: {evaluation: /}`) when the run must be persisted. The existing `--json-report` output then records the bound evaluator descriptor, fingerprints, run/request identities, validated per-case verdict evidence, scorer result and execution metadata.
+
+Credentials and provider secrets must remain outside the evaluator descriptor and Scenario Suite report; the descriptor contains only reproducibility-relevant non-secret configuration.
