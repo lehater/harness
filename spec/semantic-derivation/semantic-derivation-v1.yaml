@@ -23,6 +23,7 @@ model:
       source_kind: required
       min_count: optional-default-1
       subject: optional
+      allow_not_applicable: optional-default-false
   evidence:
     kind: harness-semantic-derivation-evidence
     required:
@@ -51,6 +52,7 @@ model:
       - INVALID_DERIVATION_DISPOSITION
       - DUPLICATE_DERIVATION_DISPOSITION
       - DERIVATION_DISPOSITION_CONFLICT
+      - NOT_APPLICABLE_NOT_ALLOWED
       - UNDISPOSITIONED_SOURCE
       - DERIVATION_QUESTION
 
