@@ -10,6 +10,9 @@ dimensions:
 covers:
   - semantic-derivation-coverage
 
+derivation_edges:
+  - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design}
+
 fixtures:
   graph:
     value:
