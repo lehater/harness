@@ -1,66 +1,285 @@
 version: 1
 kind: harness-scenario
-id: frontend-task-semantic-loss-must-be-detected
-title: Interaction design must not silently lose material Task Model semantics
+id: task-to-interaction-semantic-derivation
+title: Task semantics remain accounted for across Interaction Design alternatives
 dimensions:
   project_archetype: user-facing
   stage: design
-  behavior_class: frontend
+  behavior_class: semantic
   execution_type: deterministic
 covers:
-  - frontend-contract-closure
+  - semantic-derivation-coverage
 
 fixtures:
-  task:
+  graph:
     value:
       version: 1
-      kind: task-model
-      id: DERIVATION-TASK-MODEL
+      kind: harness-engineering-graph
+      id: DERIVATION-EXPERIMENT
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own intended human task semantics.
+          boundary:
+            semantic_cohesion: Goal and task semantics.
+            independent_change: Tasks can change before interaction design.
+            public_contract: Accepted Task Model.
+          produces:
+            - capability: demo.task-model
+              knowledge_kind: task-model
+              requires: []
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own user-visible interaction semantics.
+          boundary:
+            semantic_cohesion: Interaction contexts, actions, states and recovery.
+            independent_change: Interaction can change behind accepted tasks.
+            public_contract: Accepted Interaction Design.
+          produces:
+            - capability: demo.interaction
+              knowledge_kind: interaction-design
+              requires: [demo.task-model]
+      consumers:
+        - id: FRONTEND
+          purpose: Consume accepted interaction design.
+          requires: [demo.interaction]
+      terminal_capabilities: []
+
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: TASK-MODEL
+          authority: APPLICATION-DESIGN
+          path: docs/task-model.yaml
+          provides: [demo.task-model]
+          depends_on: []
+        - id: INTERACTION
+          authority: HUMAN-INTERFACE-DESIGN
+          path: docs/interaction.yaml
+          provides: [demo.interaction]
+          depends_on: [TASK-MODEL]
+      questions: []
+
+  contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: task-model-to-interaction-design
+      source_capability: demo.task-model
+      target_capability: demo.interaction
+      obligations:
+        - {id: information, source_kind: task-information, min_count: 3}
+        - {id: input, source_kind: task-decision-input}
+        - {id: outcome, source_kind: task-outcome}
+        - {id: recovery, source_kind: task-recovery}
+
+  source:
+    value:
+      semantic_assertions:
+        - {id: INFO-A, kind: task-information, subject: TASK-EDIT-RESOURCE, semantic_value: resource-identity, decision_authority: APPLICATION-DESIGN}
+        - {id: INFO-B, kind: task-information, subject: TASK-EDIT-RESOURCE, semantic_value: current-status, decision_authority: APPLICATION-DESIGN}
+        - {id: INFO-C, kind: task-information, subject: TASK-EDIT-RESOURCE, semantic_value: current-configuration, decision_authority: APPLICATION-DESIGN}
+        - {id: INPUT-D, kind: task-decision-input, subject: TASK-EDIT-RESOURCE, semantic_value: requested-configuration, decision_authority: APPLICATION-DESIGN}
+        - {id: OUTCOME-E, kind: task-outcome, subject: TASK-EDIT-RESOURCE, semantic_value: configuration-changed, decision_authority: APPLICATION-DESIGN}
+        - {id: RECOVERY-F, kind: task-recovery, subject: TASK-EDIT-RESOURCE, semantic_value: validation-failure-preserves-entered-values, decision_authority: APPLICATION-DESIGN}
+
+  candidate-a:
+    value:
+      semantic_assertions:
+        - {id: INT-INFO, kind: interaction-information, subject: RESOURCE-EDIT, semantic_value: edit-context, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-INPUT, kind: interaction-input, subject: RESOURCE-EDIT, semantic_value: edit-action, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-OUTCOME, kind: interaction-state, subject: RESOURCE-EDIT, semantic_value: success-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-RECOVERY, kind: interaction-recovery, subject: RESOURCE-EDIT, semantic_value: validation-state-preserves-input, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  evidence-a:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task-model
+      target_capability: demo.interaction
+      links:
+        - {sources: [INFO-A, INFO-B, INFO-C], relation: TRANSFORMS, targets: [INT-INFO]}
+        - {sources: [INPUT-D], relation: REALIZES, targets: [INT-INPUT]}
+        - {sources: [OUTCOME-E], relation: REALIZES, targets: [INT-OUTCOME]}
+        - {sources: [RECOVERY-F], relation: REALIZES, targets: [INT-RECOVERY]}
+      dispositions: []
+
+  candidate-b:
+    value:
+      semantic_assertions:
+        - {id: INT-SUMMARY, kind: interaction-information, subject: RESOURCE-WORKSPACE, semantic_value: identity-and-status, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-CONFIG, kind: interaction-information, subject: RESOURCE-EDIT, semantic_value: current-configuration, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-EDIT, kind: interaction-input, subject: RESOURCE-EDIT, semantic_value: requested-configuration, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-SUCCESS, kind: interaction-state, subject: RESOURCE-WORKSPACE, semantic_value: configuration-changed-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-VALIDATION, kind: interaction-recovery, subject: RESOURCE-EDIT, semantic_value: preserve-entered-values, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  evidence-b:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task-model
+      target_capability: demo.interaction
+      links:
+        - {sources: [INFO-A, INFO-B], relation: TRANSFORMS, targets: [INT-SUMMARY]}
+        - {sources: [INFO-C], relation: PRESERVES, targets: [INT-CONFIG]}
+        - {sources: [INPUT-D], relation: REALIZES, targets: [INT-EDIT]}
+        - {sources: [OUTCOME-E], relation: REALIZES, targets: [INT-SUCCESS]}
+        - {sources: [RECOVERY-F], relation: REALIZES, targets: [INT-VALIDATION]}
+      dispositions: []
+
+  task-structural:
+    value:
       goals:
-        - id: GOAL-EDIT-RESOURCE
+        - id: GOAL-EDIT
           tasks:
-            - id: TASK-EDIT-RESOURCE
-              responsibility: USER
-              required_information: [resource-identity, current-status, current-configuration]
-              decision_or_input: requested-configuration
-              outcome: configuration-changed
-              recovery: validation-failure-preserves-entered-values
+            - {id: TASK-EDIT-RESOURCE, responsibility: USER, outcome: configuration-changed}
   conceptual:
     value:
-      concepts:
-        - {id: RESOURCE, meaning: Managed resource}
+      concepts: [{id: RESOURCE, meaning: Managed resource}]
       modes: []
   ia:
     value:
-      locations:
-        - {id: RESOURCE-DETAIL, purpose: Inspect and edit one resource, concept_refs: [RESOURCE]}
-  interaction:
+      locations: [{id: RESOURCE-DETAIL, purpose: Edit one resource, concept_refs: [RESOURCE]}]
+  interaction-structural:
     value:
       contexts:
-        - id: RESOURCE-EDIT-CONTEXT
-          task_refs: [TASK-EDIT-RESOURCE]
-          actions: [edit-resource]
+        - {id: RESOURCE-EDIT, task_refs: [TASK-EDIT-RESOURCE], actions: [edit-resource]}
       task_dispositions: []
   topology:
     value:
       views:
         - id: RESOURCE-DETAIL
-          responsibility: Inspect and edit one resource.
+          responsibility: Edit one resource.
           location_ref: RESOURCE-DETAIL
-          interaction_context_refs: [RESOURCE-EDIT-CONTEXT]
+          interaction_context_refs: [RESOURCE-EDIT]
           parent: ROOT
           exits: []
       non_view_contexts: []
 
 steps:
-  - id: evaluate-loss
+  - id: structural-closure
     driver: frontend.ux_closure
     with:
-      task_model: {ref: fixture.task}
+      task_model: {ref: fixture.task-structural}
       conceptual_model: {ref: fixture.conceptual}
       information_architecture: {ref: fixture.ia}
-      interaction_design: {ref: fixture.interaction}
+      interaction_design: {ref: fixture.interaction-structural}
       topology: {ref: fixture.topology}
     expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: complete-a
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate-a}
+      evidence: {ref: fixture.evidence-a}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /required_sources, op: length, value: 6}
+      - {path: /covered_sources, op: length, value: 6}
+      - {path: /findings, op: length, value: 0}
+
+  - id: remove-recovery-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.evidence-a}
+      operations:
+        - {op: remove, path: /links/3}
+
+  - id: derivation-loss
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate-a}
+      evidence: {ref: step.remove-recovery-link}
+    expect:
       - {path: /status, op: equals, value: REJECTED}
-      - {path: /findings, op: contains_match, value: {code: UNCOVERED_TASK_SEMANTICS, task: TASK-EDIT-RESOURCE}}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: RECOVERY-F, owner_authority: HUMAN-INTERFACE-DESIGN}}
+
+  - id: remove-upstream-recovery
+    driver: data.patch
+    with:
+      value: {ref: fixture.source}
+      operations:
+        - {op: remove, path: /semantic_assertions/5}
+
+  - id: missing-input
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: step.remove-upstream-recovery}
+      candidate: {ref: fixture.candidate-a}
+      evidence: {ref: fixture.evidence-a}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: recovery, owner_authority: APPLICATION-DESIGN}}
+
+  - id: route-missing-input
+    driver: semantic.questions
+    with:
+      graph: {ref: fixture.graph}
+      evaluation: {ref: step.missing-input}
+    expect:
+      - {path: /, op: length, value: 1}
+      - {path: /0/authority, op: equals, value: APPLICATION-DESIGN}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.task-model]}
+      - {path: /, op: not_contains_match, value: {authority: HUMAN-INTERFACE-DESIGN}}
+    observe:
+      question_owner: /0/authority
+
+  - id: apply-missing-input-question
+    driver: semantic.apply_questions
+    with:
+      model: {ref: fixture.model}
+      proposals: {ref: step.route-missing-input}
+
+  - id: downstream-waits
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: FRONTEND
+      model: {ref: step.apply-missing-input-question}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - {path: /wait, op: contains_match, value: {capability: demo.task-model, questions: [Q-INPUT-DEMO-TASK-MODEL-RECOVERY]}}
+
+  - id: alternative-valid-b
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate-b}
+      evidence: {ref: fixture.evidence-b}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /covered_sources, op: length, value: 6}
+      - {path: /findings, op: length, value: 0}
+
+  - id: add-irrelevant-noise
+    driver: data.patch
+    with:
+      value: {ref: fixture.source}
+      operations:
+        - op: add
+          path: /semantic_assertions/-
+          value: {id: NOISE-X, kind: task-note, subject: TASK-EDIT-RESOURCE, semantic_value: non-contractual-note, decision_authority: APPLICATION-DESIGN}
+
+  - id: irrelevant-noise-stable
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: step.add-irrelevant-noise}
+      candidate: {ref: fixture.candidate-a}
+      evidence: {ref: fixture.evidence-a}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /required_sources, op: length, value: 6}
+      - {path: /covered_sources, op: length, value: 6}
+      - {path: /findings, op: length, value: 0}
