@@ -1,0 +1,233 @@
+version: 1
+kind: harness-scenario
+id: human-interface-semantic-derivation
+title: Human-interface design preserves product, domain, task, journey, security and machine semantics
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: task-model, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: user-journey-design, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: conceptual-interface-model, target_knowledge_kind: information-architecture-design}
+  - {source_knowledge_kind: task-model, target_knowledge_kind: information-architecture-design}
+  - {source_knowledge_kind: user-journey-design, target_knowledge_kind: information-architecture-design}
+  - {source_knowledge_kind: conceptual-interface-model, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: user-journey-design, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: information-architecture-design, target_knowledge_kind: interface-topology-design}
+  - {source_knowledge_kind: conceptual-interface-model, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: information-architecture-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: interface-topology-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: quality-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: presentation-system-design, target_knowledge_kind: screen-view-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: screen-view-design}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: HUMAN-INTERFACE-DERIVATION
+      authorities:
+        - id: PRODUCT
+          responsibility: Own requirements.
+          boundary: {semantic_cohesion: Product intent., independent_change: Product changes., public_contract: Requirements.}
+          produces: [{capability: demo.req, knowledge_kind: product-requirements, requires: []}]
+        - id: DOMAIN
+          responsibility: Own domain behavior.
+          boundary: {semantic_cohesion: Domain behavior., independent_change: Domain changes., public_contract: Domain use cases.}
+          produces: [{capability: demo.domain, knowledge_kind: domain-use-case, requires: []}]
+        - id: APP
+          responsibility: Own tasks and journeys.
+          boundary: {semantic_cohesion: Human work., independent_change: Work changes., public_contract: Task and journey semantics.}
+          produces:
+            - {capability: demo.task, knowledge_kind: task-model, requires: []}
+            - {capability: demo.journey, knowledge_kind: user-journey-design, requires: []}
+        - id: SECURITY
+          responsibility: Own security architecture.
+          boundary: {semantic_cohesion: Trust and admission., independent_change: Security changes., public_contract: Security constraints.}
+          produces: [{capability: demo.security, knowledge_kind: security-architecture, requires: []}]
+        - id: MACHINE
+          responsibility: Own machine interface.
+          boundary: {semantic_cohesion: Machine contract., independent_change: Interface changes., public_contract: Interface contract.}
+          produces: [{capability: demo.api, knowledge_kind: interface-contract, requires: []}]
+        - id: QUALITY
+          responsibility: Own quality constraints.
+          boundary: {semantic_cohesion: Quality., independent_change: Quality changes., public_contract: Quality constraints.}
+          produces: [{capability: demo.quality, knowledge_kind: quality-design, requires: []}]
+        - id: HUMAN
+          responsibility: Own human-interface semantics.
+          boundary: {semantic_cohesion: Human interface., independent_change: Interface changes behind upstream meaning., public_contract: Human-interface design.}
+          produces:
+            - {capability: demo.conceptual, knowledge_kind: conceptual-interface-model, requires: [demo.req, demo.domain, demo.task, demo.journey, demo.security, demo.api]}
+            - {capability: demo.ia, knowledge_kind: information-architecture-design, requires: [demo.conceptual, demo.task, demo.journey]}
+            - {capability: demo.interaction, knowledge_kind: interaction-design, requires: [demo.conceptual, demo.task, demo.journey, demo.api, demo.security]}
+            - {capability: demo.topology, knowledge_kind: interface-topology-design, requires: [demo.ia, demo.interaction]}
+            - {capability: demo.presentation, knowledge_kind: presentation-system-design, requires: [demo.conceptual, demo.ia, demo.interaction, demo.topology, demo.quality]}
+            - {capability: demo.screen, knowledge_kind: screen-view-design, requires: [demo.topology, demo.interaction, demo.presentation, demo.api]}
+      consumers: [{id: FRONTEND, purpose: Consume screen design., requires: [demo.screen]}]
+      terminal_capabilities: []
+
+  req:
+    value: {semantic_assertions: [{id: REQ-VISIBLE, kind: product-behavior-requirement, subject: RESOURCE, semantic_value: user-can-inspect-and-edit-resource, decision_authority: PRODUCT}]}
+  domain:
+    value: {semantic_assertions: [{id: DOM-CONCEPT, kind: domain-concept, subject: RESOURCE, semantic_value: managed-resource, decision_authority: DOMAIN}, {id: DOM-OUTCOME, kind: domain-outcome, subject: EDIT, semantic_value: changed-resource-state, decision_authority: DOMAIN}]}
+  task:
+    value: {semantic_assertions: [{id: TASK-INFO, kind: task-information, subject: EDIT, semantic_value: current-resource-state, decision_authority: APP}, {id: TASK-OUTCOME, kind: task-outcome, subject: EDIT, semantic_value: changed-resource-visible, decision_authority: APP}]}
+  journey:
+    value: {semantic_assertions: [{id: JOURNEY-STEP, kind: journey-step, subject: EDIT, semantic_value: inspect-then-edit, decision_authority: APP}, {id: JOURNEY-RECOVERY, kind: journey-recovery, subject: EDIT, semantic_value: return-to-edit-with-input-preserved, decision_authority: APP}]}
+  security:
+    value: {semantic_assertions: [{id: SEC-AUTHZ, kind: security-admission-rule, subject: EDIT, semantic_value: edit-action-visible-only-when-authorized, decision_authority: SECURITY}]}
+  api:
+    value: {semantic_assertions: [{id: API-EDIT, kind: interface-operation, subject: RESOURCE, semantic_value: update-resource, decision_authority: MACHINE}, {id: API-ERROR, kind: interface-error, subject: API-EDIT, semantic_value: validation-error, decision_authority: MACHINE}]}
+  quality:
+    value: {semantic_assertions: [{id: QUALITY-REFLOW, kind: quality-constraint, subject: UI, semantic_value: content-remains-usable-under-accepted-reflow-constraint, decision_authority: QUALITY}]}
+
+  conceptual:
+    value: {semantic_assertions: [{id: CONCEPT-RESOURCE, kind: conceptual-concept, subject: RESOURCE, semantic_value: user-recognizable-resource, decision_authority: HUMAN}, {id: MODE-EDIT, kind: conceptual-mode, subject: RESOURCE, semantic_value: resource-editing, decision_authority: HUMAN}, {id: CONCEPT-VALIDATION, kind: conceptual-state, subject: RESOURCE, semantic_value: validation-failed, decision_authority: HUMAN}]}
+  ia:
+    value: {semantic_assertions: [{id: LOCATION-RESOURCE, kind: information-location, subject: RESOURCE, semantic_value: resource-detail-location, decision_authority: HUMAN}, {id: LOCATION-EDIT, kind: information-location, subject: EDIT, semantic_value: edit-context-location, decision_authority: HUMAN}]}
+  interaction:
+    value: {semantic_assertions: [{id: CTX-EDIT, kind: interaction-context, subject: EDIT, semantic_value: resource-edit-context, decision_authority: HUMAN}, {id: ACTION-EDIT, kind: interaction-action, subject: CTX-EDIT, semantic_value: submit-edit, decision_authority: HUMAN}, {id: RECOVERY-EDIT, kind: interaction-recovery, subject: CTX-EDIT, semantic_value: validation-error-preserves-input, decision_authority: HUMAN}, {id: STATE-EDIT, kind: interaction-state, subject: CTX-EDIT, semantic_value: changed-resource-visible, decision_authority: HUMAN}]}
+  topology:
+    value: {semantic_assertions: [{id: VIEW-RESOURCE, kind: topology-view, subject: RESOURCE, semantic_value: resource-detail-view, decision_authority: HUMAN}, {id: VIEW-EDIT, kind: topology-view, subject: EDIT, semantic_value: resource-edit-view, decision_authority: HUMAN}]}
+  presentation:
+    value: {semantic_assertions: [{id: PRESENT-RESOURCE, kind: presentation-pattern, subject: RESOURCE, semantic_value: resource-detail-presentation, decision_authority: HUMAN}, {id: PRESENT-EDIT, kind: presentation-pattern, subject: EDIT, semantic_value: edit-form-presentation, decision_authority: HUMAN}, {id: PRESENT-ERROR, kind: presentation-state, subject: EDIT, semantic_value: validation-error-presentation, decision_authority: HUMAN}, {id: PRESENT-REFLOW, kind: presentation-responsive, subject: UI, semantic_value: accepted-reflow-behavior, decision_authority: HUMAN}]}
+  screen:
+    value: {semantic_assertions: [{id: SCREEN-RESOURCE, kind: screen-view, subject: RESOURCE, semantic_value: resource-detail-screen, decision_authority: HUMAN}, {id: SCREEN-EDIT, kind: screen-action, subject: RESOURCE, semantic_value: edit-resource-action, decision_authority: HUMAN}, {id: SCREEN-ERROR, kind: screen-state, subject: RESOURCE, semantic_value: validation-error-visible, decision_authority: HUMAN}]}
+
+  contracts:
+    value:
+      - {id: req-concept, source: demo.req, target: demo.conceptual, source_kind: product-behavior-requirement, sources: [REQ-VISIBLE], relation: REALIZES, targets: [CONCEPT-RESOURCE, MODE-EDIT]}
+      - {id: domain-concept, source: demo.domain, target: demo.conceptual, source_kind: domain-concept, sources: [DOM-CONCEPT], relation: PRESERVES, targets: [CONCEPT-RESOURCE]}
+      - {id: task-concept, source: demo.task, target: demo.conceptual, source_kind: task-information, sources: [TASK-INFO], relation: REALIZES, targets: [CONCEPT-RESOURCE]}
+      - {id: journey-concept, source: demo.journey, target: demo.conceptual, source_kind: journey-step, sources: [JOURNEY-STEP], relation: REALIZES, targets: [MODE-EDIT]}
+      - {id: security-concept, source: demo.security, target: demo.conceptual, source_kind: security-admission-rule, sources: [SEC-AUTHZ], relation: CONSTRAINS, targets: [MODE-EDIT]}
+      - {id: api-concept, source: demo.api, target: demo.conceptual, source_kind: interface-error, sources: [API-ERROR], relation: REALIZES, targets: [CONCEPT-VALIDATION]}
+      - {id: concept-ia, source: demo.conceptual, target: demo.ia, source_kind: conceptual-concept, sources: [CONCEPT-RESOURCE], relation: REALIZES, targets: [LOCATION-RESOURCE]}
+      - {id: task-ia, source: demo.task, target: demo.ia, source_kind: task-information, sources: [TASK-INFO], relation: REALIZES, targets: [LOCATION-EDIT]}
+      - {id: journey-ia, source: demo.journey, target: demo.ia, source_kind: journey-step, sources: [JOURNEY-STEP], relation: REALIZES, targets: [LOCATION-RESOURCE, LOCATION-EDIT]}
+      - {id: concept-interaction, source: demo.conceptual, target: demo.interaction, source_kind: conceptual-mode, sources: [MODE-EDIT], relation: REALIZES, targets: [CTX-EDIT]}
+      - {id: journey-interaction, source: demo.journey, target: demo.interaction, source_kind: journey-recovery, sources: [JOURNEY-RECOVERY], relation: REALIZES, targets: [RECOVERY-EDIT]}
+      - {id: api-interaction, source: demo.api, target: demo.interaction, source_kind: interface-operation, sources: [API-EDIT], relation: REALIZES, targets: [ACTION-EDIT]}
+      - {id: security-interaction, source: demo.security, target: demo.interaction, source_kind: security-admission-rule, sources: [SEC-AUTHZ], relation: CONSTRAINS, targets: [ACTION-EDIT]}
+      - {id: ia-topology, source: demo.ia, target: demo.topology, source_kind: information-location, sources: [LOCATION-RESOURCE, LOCATION-EDIT], relation: REALIZES, targets: [VIEW-RESOURCE, VIEW-EDIT]}
+      - {id: concept-presentation, source: demo.conceptual, target: demo.presentation, source_kind: conceptual-concept, sources: [CONCEPT-RESOURCE], relation: REALIZES, targets: [PRESENT-RESOURCE]}
+      - {id: ia-presentation, source: demo.ia, target: demo.presentation, source_kind: information-location, sources: [LOCATION-RESOURCE, LOCATION-EDIT], relation: REALIZES, targets: [PRESENT-RESOURCE, PRESENT-EDIT]}
+      - {id: interaction-presentation, source: demo.interaction, target: demo.presentation, source_kind: interaction-recovery, sources: [RECOVERY-EDIT], relation: REALIZES, targets: [PRESENT-ERROR]}
+      - {id: topology-presentation, source: demo.topology, target: demo.presentation, source_kind: topology-view, sources: [VIEW-RESOURCE, VIEW-EDIT], relation: REALIZES, targets: [PRESENT-RESOURCE, PRESENT-EDIT]}
+      - {id: quality-presentation, source: demo.quality, target: demo.presentation, source_kind: quality-constraint, sources: [QUALITY-REFLOW], relation: REALIZES, targets: [PRESENT-REFLOW]}
+      - {id: presentation-screen, source: demo.presentation, target: demo.screen, source_kind: presentation-pattern, sources: [PRESENT-RESOURCE, PRESENT-EDIT], relation: REALIZES, targets: [SCREEN-RESOURCE, SCREEN-EDIT]}
+      - {id: api-screen, source: demo.api, target: demo.screen, source_kind: interface-error, sources: [API-ERROR], relation: REALIZES, targets: [SCREEN-ERROR]}
+
+steps:
+  - id: req-concept
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.req, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: product-behavior-requirement}]}
+      source: {ref: fixture.req}
+      candidate: {ref: fixture.conceptual}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.req, target_capability: demo.conceptual, links: [{sources: [REQ-VISIBLE], relation: REALIZES, targets: [CONCEPT-RESOURCE, MODE-EDIT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: domain-concept
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: domain-concept}]}, source: {ref: fixture.domain}, candidate: {ref: fixture.conceptual}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.conceptual, links: [{sources: [DOM-CONCEPT], relation: PRESERVES, targets: [CONCEPT-RESOURCE]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: task-concept
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.task, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: task-information}]}, source: {ref: fixture.task}, candidate: {ref: fixture.conceptual}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.task, target_capability: demo.conceptual, links: [{sources: [TASK-INFO], relation: REALIZES, targets: [CONCEPT-RESOURCE]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: journey-concept
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.journey, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: journey-step}]}, source: {ref: fixture.journey}, candidate: {ref: fixture.conceptual}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.journey, target_capability: demo.conceptual, links: [{sources: [JOURNEY-STEP], relation: REALIZES, targets: [MODE-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: security-concept
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: security-admission-rule}]}, source: {ref: fixture.security}, candidate: {ref: fixture.conceptual}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.conceptual, links: [{sources: [SEC-AUTHZ], relation: CONSTRAINS, targets: [MODE-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: api-concept
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.api, target_capability: demo.conceptual, obligations: [{id: semantics, source_kind: interface-error}]}, source: {ref: fixture.api}, candidate: {ref: fixture.conceptual}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.api, target_capability: demo.conceptual, links: [{sources: [API-ERROR], relation: REALIZES, targets: [CONCEPT-VALIDATION]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: concept-ia
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.conceptual, target_capability: demo.ia, obligations: [{id: semantics, source_kind: conceptual-concept}]}, source: {ref: fixture.conceptual}, candidate: {ref: fixture.ia}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.conceptual, target_capability: demo.ia, links: [{sources: [CONCEPT-RESOURCE], relation: REALIZES, targets: [LOCATION-RESOURCE]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: task-ia
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.task, target_capability: demo.ia, obligations: [{id: semantics, source_kind: task-information}]}, source: {ref: fixture.task}, candidate: {ref: fixture.ia}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.task, target_capability: demo.ia, links: [{sources: [TASK-INFO], relation: REALIZES, targets: [LOCATION-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: journey-ia
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.journey, target_capability: demo.ia, obligations: [{id: semantics, source_kind: journey-step}]}, source: {ref: fixture.journey}, candidate: {ref: fixture.ia}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.journey, target_capability: demo.ia, links: [{sources: [JOURNEY-STEP], relation: REALIZES, targets: [LOCATION-RESOURCE, LOCATION-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: concept-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.conceptual, target_capability: demo.interaction, obligations: [{id: semantics, source_kind: conceptual-mode}]}, source: {ref: fixture.conceptual}, candidate: {ref: fixture.interaction}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.conceptual, target_capability: demo.interaction, links: [{sources: [MODE-EDIT], relation: REALIZES, targets: [CTX-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: journey-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.journey, target_capability: demo.interaction, obligations: [{id: semantics, source_kind: journey-recovery}]}, source: {ref: fixture.journey}, candidate: {ref: fixture.interaction}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.journey, target_capability: demo.interaction, links: [{sources: [JOURNEY-RECOVERY], relation: REALIZES, targets: [RECOVERY-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: api-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.api, target_capability: demo.interaction, obligations: [{id: semantics, source_kind: interface-operation}]}, source: {ref: fixture.api}, candidate: {ref: fixture.interaction}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.api, target_capability: demo.interaction, links: [{sources: [API-EDIT], relation: REALIZES, targets: [ACTION-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: security-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.interaction, obligations: [{id: semantics, source_kind: security-admission-rule}]}, source: {ref: fixture.security}, candidate: {ref: fixture.interaction}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.interaction, links: [{sources: [SEC-AUTHZ], relation: CONSTRAINS, targets: [ACTION-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: ia-topology
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.ia, target_capability: demo.topology, obligations: [{id: semantics, source_kind: information-location, min_count: 2}]}, source: {ref: fixture.ia}, candidate: {ref: fixture.topology}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.ia, target_capability: demo.topology, links: [{sources: [LOCATION-RESOURCE, LOCATION-EDIT], relation: REALIZES, targets: [VIEW-RESOURCE, VIEW-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: concept-presentation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.conceptual, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: conceptual-concept}]}, source: {ref: fixture.conceptual}, candidate: {ref: fixture.presentation}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.conceptual, target_capability: demo.presentation, links: [{sources: [CONCEPT-RESOURCE], relation: REALIZES, targets: [PRESENT-RESOURCE]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: ia-presentation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.ia, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: information-location, min_count: 2}]}, source: {ref: fixture.ia}, candidate: {ref: fixture.presentation}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.ia, target_capability: demo.presentation, links: [{sources: [LOCATION-RESOURCE, LOCATION-EDIT], relation: REALIZES, targets: [PRESENT-RESOURCE, PRESENT-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: interaction-presentation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interaction, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: interaction-recovery}]}, source: {ref: fixture.interaction}, candidate: {ref: fixture.presentation}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interaction, target_capability: demo.presentation, links: [{sources: [RECOVERY-EDIT], relation: REALIZES, targets: [PRESENT-ERROR]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: topology-presentation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.topology, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: topology-view, min_count: 2}]}, source: {ref: fixture.topology}, candidate: {ref: fixture.presentation}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.topology, target_capability: demo.presentation, links: [{sources: [VIEW-RESOURCE, VIEW-EDIT], relation: REALIZES, targets: [PRESENT-RESOURCE, PRESENT-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: quality-presentation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.quality, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: quality-constraint}]}, source: {ref: fixture.quality}, candidate: {ref: fixture.presentation}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.quality, target_capability: demo.presentation, links: [{sources: [QUALITY-REFLOW], relation: REALIZES, targets: [PRESENT-REFLOW]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: presentation-screen
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.presentation, target_capability: demo.screen, obligations: [{id: semantics, source_kind: presentation-pattern, min_count: 2}]}, source: {ref: fixture.presentation}, candidate: {ref: fixture.screen}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.presentation, target_capability: demo.screen, links: [{sources: [PRESENT-RESOURCE, PRESENT-EDIT], relation: REALIZES, targets: [SCREEN-RESOURCE, SCREEN-EDIT]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: api-screen
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.api, target_capability: demo.screen, obligations: [{id: semantics, source_kind: interface-error}]}, source: {ref: fixture.api}, candidate: {ref: fixture.screen}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.api, target_capability: demo.screen, links: [{sources: [API-ERROR], relation: REALIZES, targets: [SCREEN-ERROR]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-quality-link
+    driver: data.patch
+    with: {value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.quality, target_capability: demo.presentation, links: [{sources: [QUALITY-REFLOW], relation: REALIZES, targets: [PRESENT-REFLOW]}], dispositions: []}, operations: [{op: remove, path: /links/0}]}
+  - id: presentation-loses-quality
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.quality, target_capability: demo.presentation, obligations: [{id: semantics, source_kind: quality-constraint}]}, source: {ref: fixture.quality}, candidate: {ref: fixture.presentation}, evidence: {ref: step.remove-quality-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: QUALITY-REFLOW, owner_authority: HUMAN}}
