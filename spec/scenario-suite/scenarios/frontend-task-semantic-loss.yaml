@@ -200,6 +200,14 @@ steps:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: RECOVERY-F, owner_authority: HUMAN-INTERFACE-DESIGN}}
 
+  - id: loss-is-producer-defect
+    driver: semantic.questions
+    with:
+      graph: {ref: fixture.graph}
+      evaluation: {ref: step.derivation-loss}
+    expect:
+      - {path: /, op: length, value: 0}
+
   - id: remove-upstream-recovery
     driver: data.patch
     with:
@@ -214,7 +222,7 @@ steps:
       contract: {ref: fixture.contract}
       source: {ref: step.remove-upstream-recovery}
       candidate: {ref: fixture.candidate-a}
-      evidence: {ref: fixture.evidence-a}
+      evidence: {ref: step.remove-recovery-link}
     expect:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: recovery, owner_authority: APPLICATION-DESIGN}}
