@@ -111,3 +111,48 @@ introduced.
 
 A higher-level capability-test-pack DSL should be added only if repeated
 scenario data demonstrates real duplication.
+
+
+## Mutation classes
+
+Reusable packs should classify semantic mutations rather than expose only raw
+JSON-patch operations:
+
+- omission: fact, requirement, relation, information, outcome or recovery;
+- ambiguity or contradiction;
+- constraint change;
+- provenance/owner drift;
+- stale prerequisite;
+- irrelevant noise;
+- alternative collapse or preselected solution.
+
+`data.patch` remains the execution primitive. The classification belongs to
+scenario/test data, not to a second mutation engine.
+
+## Metrics
+
+Do not collapse quality into one score. Useful independent measures are:
+
+- gap-detection recall and false-positive rate;
+- Question owner-routing accuracy;
+- root-cause localization accuracy;
+- blocking precision;
+- derivation mutation kill rate by mutation class;
+- alternative-valid acceptance;
+- irrelevant-input stability;
+- cross-Authority invention findings when a semantic/evaluator oracle is used.
+
+The deterministic evaluator already exposes required/covered/disposed/unresolved
+counts. Corpus-level rates require benchmark packs with expert-labelled expected
+results and are intentionally not fabricated from the small bootstrap suite.
+
+## Remaining boundary
+
+v0 proves deterministic trace/disposition coverage. It does not independently
+prove that the meaning claimed by a `TRANSFORMS` or `REALIZES` link is true.
+That is the semantic/evaluator oracle boundary.
+
+Likewise, lifecycle currentness is still Capability-acceptance-granular. A later
+experiment may use consumed semantic fingerprints to avoid revalidating a
+downstream Capability when only irrelevant upstream atoms changed. That change
+should be justified by its own RED scenario rather than folded into v0.
