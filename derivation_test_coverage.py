@@ -92,6 +92,29 @@ def evaluate_derivation_test_coverage(
     scenario_edges = _scenario_edge_index(scenario_directory)
     invalid_registrations: list[dict[str, Any]] = []
 
+    if tested_kind_edges is None and scenario_directory is not None:
+        tested_kind_edges = [
+            {
+                "source_knowledge_kind": source_kind,
+                "target_knowledge_kind": target_kind,
+                "scenario": scenario_id,
+            }
+            for scenario_id, meta in sorted(scenario_edges.items())
+            for source_kind, target_kind in sorted(meta["kind_edges"])
+        ]
+    if tested_capability_edges is None and scenario_directory is not None:
+        tested_capability_edges = [
+            {
+                "source_capability": source_capability,
+                "target_capability": target_capability,
+                "scenario": scenario_id,
+            }
+            for scenario_id, meta in sorted(scenario_edges.items())
+            for source_capability, target_capability in sorted(
+                meta["capability_edges"]
+            )
+        ]
+
     graph_edges: list[dict[str, str]] = []
     edge_ids: set[tuple[str, str]] = set()
     for target_capability, target_production in productions.items():
@@ -141,11 +164,8 @@ def evaluate_derivation_test_coverage(
                 }
             )
             continue
-        if key in tested_kind_pairs and tested_kind_pairs[key] != scenario:
-            raise CoreError(
-                f"duplicate tested derivation kind edge with conflicting scenario: {key}"
-            )
-        tested_kind_pairs[key] = scenario
+        if key not in tested_kind_pairs:
+            tested_kind_pairs[key] = scenario
 
     tested_capability_pairs: dict[tuple[str, str], str] = {}
     for item in tested_capability_edges or []:
@@ -178,11 +198,8 @@ def evaluate_derivation_test_coverage(
             continue
         if key not in edge_ids:
             raise CoreError(f"tested derivation capability edge is not in graph: {key}")
-        if key in tested_capability_pairs and tested_capability_pairs[key] != scenario:
-            raise CoreError(
-                f"duplicate tested derivation capability edge with conflicting scenario: {key}"
-            )
-        tested_capability_pairs[key] = scenario
+        if key not in tested_capability_pairs:
+            tested_capability_pairs[key] = scenario
 
     disposition_by_edge: dict[tuple[str, str], dict[str, Any]] = {}
     for item in dispositions or []:
