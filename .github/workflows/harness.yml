@@ -31,6 +31,7 @@ on:
       - "semantic_closure.py"
       - "semantic_derivation.py"
       - "semantic_fingerprint.py"
+      - "derivation_test_coverage.py"
       - "scenario_suite.py"
       - "scenario_drivers.py"
       - "capability_lifecycle.py"
