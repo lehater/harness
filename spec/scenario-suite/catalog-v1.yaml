@@ -82,6 +82,7 @@ required_drivers:
   - semantic.derivation
   - semantic.derivation_test_coverage
   - semantic.judgement_calibration
+  - semantic.live_calibration.request
   - semantic.live_calibration.validate
   - semantic.questions
   - semantic.apply_questions

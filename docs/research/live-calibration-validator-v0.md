@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: active research; first RED established.
+Status: active research; RED proven, minimal GREEN implemented.
 
 ## Scope
 
@@ -93,3 +93,27 @@ Actual model/service invocation stays in an explicitly loaded Scenario Suite
 external driver. Without trusted external attestation Harness must report
 evaluator independence as unverified; binding and label withholding are the
 guarantees Harness itself can establish.
+
+## RED evidence
+
+PR #94 at commit `da4daeb202b5de459ca94a2c5cce1f5bfda54088`
+failed the repository Scenario Suite exactly because
+`semantic.live_calibration.validate` did not exist. Existing checks before the
+Scenario Suite passed. This isolates the missing capability rather than a
+pre-existing repository failure.
+
+## Minimal GREEN
+
+The first GREEN adds:
+
+- canonical live evaluator protocol v1;
+- label-blind request construction;
+- corpus/protocol/evaluator/run fingerprints;
+- opaque per-case request binding;
+- deterministic live-run validation;
+- unchanged delegation to `semantic_judgement_calibration.py`;
+- Scenario Suite request/validator drivers.
+
+The GREEN deliberately does not add provider SDKs or a new executor. A real
+provider is integrated through the existing externally loaded Scenario Suite
+driver module.

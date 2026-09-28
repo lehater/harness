@@ -1,7 +1,7 @@
 version: 1
 kind: harness-scenario
 id: live-semantic-evaluator-calibration
-title: Live calibration fails closed without bound evaluator evidence
+title: Live calibration request is blinded and stale evidence fails closed
 dimensions:
   project_archetype: synthetic
   stage: diagnosis
@@ -15,10 +15,7 @@ fixtures:
     yaml: ../../../spec/semantic-derivation/calibration-corpus-v1.yaml
 
   protocol:
-    value:
-      version: 1
-      kind: harness-live-semantic-evaluator-protocol
-      id: semantic-derivation-live-calibration-v1
+    yaml: ../../../spec/semantic-derivation/live-calibration-protocol-v1.yaml
 
   evaluator:
     value:
@@ -35,12 +32,27 @@ fixtures:
     value:
       version: 1
       kind: harness-live-semantic-calibration-run
-      run_id: RED-1
+      run_id: GREEN-1
       request_id: NOT-BOUND
       state: COMPLETED
       results: []
 
 steps:
+  - id: blinded-request
+    driver: semantic.live_calibration.request
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: GREEN-1
+    expect:
+      - {path: /cases, op: length, value: 10}
+      - {path: /cases/0/case_request_id, op: exists}
+      - {path: /cases/0/id, op: not_exists}
+      - {path: /cases/0/expected_status, op: not_exists}
+      - {path: /cases/0/mutation_class, op: not_exists}
+      - {path: /cases/0/rationale, op: not_exists}
+
   - id: reject-unbound-run
     driver: semantic.live_calibration.validate
     with:

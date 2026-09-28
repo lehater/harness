@@ -41,6 +41,10 @@ from semantic_closure import evaluate_semantic_closure
 from semantic_derivation import evaluate_derivation
 from workspace import load_workspace, render_workspace
 from semantic_judgement_calibration import evaluate_judgement_calibration
+from live_calibration import (
+    build_live_calibration_request,
+    evaluate_live_calibration_run,
+)
 from semantic_questions import (
     append_question_proposals,
     questions_from_evaluation,
@@ -169,6 +173,16 @@ def semantic_derivation_test_coverage(**kwargs: Any) -> dict[str, Any]:
 @scenario_driver("semantic.judgement_calibration")
 def semantic_judgement_calibration(**kwargs: Any) -> dict[str, Any]:
     return evaluate_judgement_calibration(**kwargs)
+
+
+@scenario_driver("semantic.live_calibration.request")
+def semantic_live_calibration_request(**kwargs: Any) -> dict[str, Any]:
+    return build_live_calibration_request(**kwargs)
+
+
+@scenario_driver("semantic.live_calibration.validate")
+def semantic_live_calibration_validate(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_live_calibration_run(**kwargs)
 
 
 @scenario_driver("semantic.questions")
