@@ -36,6 +36,9 @@ derivation_edges:
   - {source_knowledge_kind: system-architecture, target_knowledge_kind: engineering-policy}
   - {source_knowledge_kind: presentation-system-design, target_knowledge_kind: engineering-policy}
   - {source_knowledge_kind: quality-design, target_knowledge_kind: screen-view-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: presentation-system-design}
   - {source_knowledge_kind: application-design, target_knowledge_kind: system-architecture}
   - {source_knowledge_kind: concurrency-consistency-design, target_knowledge_kind: system-architecture}
   - {source_knowledge_kind: domain-model, target_knowledge_kind: system-architecture}
@@ -108,7 +111,10 @@ fixtures:
               requires: []
             - capability: demo.presentation
               knowledge_kind: presentation-system-design
-              requires: []
+              requires:
+                - capability: demo.application
+                - capability: demo.product
+                - capability: demo.security
             - capability: demo.screen
               knowledge_kind: screen-view-design
               requires:
@@ -687,6 +693,33 @@ steps:
       source: {ref: fixture.system}
       candidate: {ref: fixture.frontend_system}
       evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.frontend-system, links: [{sources: [SYSTEM], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-36-application-design-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.application, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: application-operation}]}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.application, target_capability: demo.presentation, links: [{sources: [APP], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-37-product-requirements-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.product, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: product-behavior}]}
+      source: {ref: fixture.product}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.product, target_capability: demo.presentation, links: [{sources: [PRODUCT], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-38-security-architecture-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.presentation, links: [{sources: [SECURITY], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
     expect: [{path: /status, op: equals, value: ACCEPTED}]
   - id: remove-security-analysis-input
     driver: data.patch
