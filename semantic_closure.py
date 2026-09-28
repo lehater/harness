@@ -60,8 +60,53 @@ def evaluate_semantic_closure(
     currentness_gaps: list[dict[str, Any]] = []
     satisfied: list[str] = []
 
+    structural_satisfied = set(structural.get("satisfied", []) or [])
+    proposals_by_capability: dict[str, list[dict[str, Any]]] = {}
+    for proposal in proposals:
+        for capability in proposal.get("blocks_capabilities", []) or []:
+            proposals_by_capability.setdefault(capability, []).append(proposal)
+
     for expectation in profile["expectations"]:
         capability = expectation["capability"]
+
+        direct_proposals = proposals_by_capability.get(capability, [])
+        if direct_proposals:
+            lifecycle_item = lifecycle_by_capability.get(capability)
+            artifact_id = (
+                lifecycle_item.get("artifact")
+                if isinstance(lifecycle_item, dict)
+                else None
+            )
+            evaluation = (
+                evaluations.get((artifact_id, capability))
+                if artifact_id is not None
+                else None
+            )
+            if evaluation is None and artifact_id is not None:
+                evaluation = evaluations.get((artifact_id, None))
+            semantic_gaps.append(
+                {
+                    "capability": capability,
+                    "authority": expectation["authority"],
+                    **({"artifact": artifact_id} if artifact_id else {}),
+                    "code": "SEMANTIC_QUESTION",
+                    "questions": [item["id"] for item in direct_proposals],
+                    "findings": (
+                        evaluation.get("findings", [])
+                        if isinstance(evaluation, dict)
+                        else []
+                    ),
+                }
+            )
+            continue
+
+        # WAIT/PENDING structural expectations are consequences of an upstream
+        # blocker, not independent lifecycle defects. Evaluate currentness only
+        # for expectations that remain structurally satisfied after Question
+        # projection.
+        if expectation["id"] not in structural_satisfied:
+            continue
+
         production = productions[capability]
         knowledge_kind = production.get("knowledge_kind")
         if knowledge_kind not in routed_kinds:

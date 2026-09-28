@@ -334,6 +334,20 @@ def main() -> int:
     assert closure["status"] == "BLOCKED", closure
     assert closure["structural_status"] == "BLOCKED", closure
     assert closure["question_frontier"][0]["authority"] == "APPLICATION-DESIGN", closure
+    assert closure["currentness_gaps"] == [], closure
+    assert closure["semantic_gaps"] == [
+        {
+            "capability": "example.task-model",
+            "authority": "APPLICATION-DESIGN",
+            "artifact": "TASK-MODEL",
+            "code": "SEMANTIC_QUESTION",
+            "questions": [question["id"]],
+            "findings": rejected["findings"],
+        }
+    ], closure
+    assert {
+        item["capability"] for item in closure["pending"]
+    } == {"example.interaction"}, closure
 
     realized = realize_core_model(
         GRAPH,
