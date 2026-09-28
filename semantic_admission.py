@@ -250,7 +250,7 @@ def _accepted_prerequisite_semantics(
         return {}
 
     allowed = set(prerequisite_capabilities)
-    result: dict[str, dict[str, str]] = {}
+    result: dict[str, dict[str, Any]] = {}
     for evaluation in derivation_evaluations:
         if not isinstance(evaluation, dict):
             raise CoreError("derivation evaluation must be a mapping")
@@ -292,7 +292,10 @@ def _accepted_prerequisite_semantics(
             raise CoreError(
                 f"lifecycle dependency evidence for {source_capability} must be exhaustive and contain consumed semantic atoms"
             )
-        result[source_capability] = dict(dependency["semantic_atoms"])
+        result[source_capability] = {
+            "exhaustive": True,
+            "semantic_atoms": dict(dependency["semantic_atoms"]),
+        }
     return result
 
 
