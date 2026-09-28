@@ -62,11 +62,14 @@ def _effective_evaluator(
     return result
 
 
+_NO_RESULTS = object()
+
+
 def _run_record(
     request: dict[str, Any],
     *,
     state: str,
-    results: Any = None,
+    results: Any = _NO_RESULTS,
 ) -> dict[str, Any]:
     return {
         "version": 1,
@@ -74,7 +77,7 @@ def _run_record(
         "run_id": request["run_id"],
         "request_id": request["request_id"],
         "state": state,
-        "results": results if results is not None else [],
+        "results": [] if results is _NO_RESULTS else results,
     }
 
 
