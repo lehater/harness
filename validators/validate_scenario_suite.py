@@ -37,6 +37,20 @@ def main() -> int:
         assert result["total"] > 0, (metric, result)
         assert result["pass_rate"] == 1.0, (metric, result)
 
+    external = next(
+        item
+        for item in report["scenarios"]
+        if item["id"] == "external-project-derivation-test-coverage"
+    )
+    prep_coverage = next(
+        item for item in external["steps"] if item["id"] == "prep-coverage"
+    )
+    napms_coverage = next(
+        item for item in external["steps"] if item["id"] == "napms-coverage"
+    )
+    for step in (prep_coverage, napms_coverage):
+        assert step["observations"]["edge_count"] == step["observations"]["covered_count"], step
+
     semantic = next(
         item
         for item in report["scenarios"]
@@ -72,7 +86,10 @@ def main() -> int:
         f"({report['scenario_count']} scenarios; "
         f"{sum(1 for item in report['coverage']['requirement_status'].values() if item['enforcement'] == 'required')} required behaviors tracked; "
         f"{report['coverage']['planned_gap_count']} planned coverage gap(s); "
-        f"{report['benchmarks']['case_count']} benchmark cases)"
+        f"{report['benchmarks']['case_count']} benchmark cases; "
+        f"external derivation edges: "
+        f"Prep={prep_coverage['observations']['covered_count']}, "
+        f"NAPMS={napms_coverage['observations']['covered_count']})"
     )
     return 0
 
