@@ -89,6 +89,7 @@ required_drivers:
   - human.compile_manifest
   - frontend.ux_closure
   - frontend.screen_contracts
+  - skill.invariant_policy
 
 requirements:
   - id: structural-target-reaction
@@ -296,12 +297,12 @@ requirements:
 
   - id: skill-invariant-policy
     category: agent
-    enforcement: planned
+    enforcement: required
     description: Every active artifact skill is explicitly enforced or judgement-only with rationale.
     min_scenarios: 1
 
   - id: implementation-feedback-classification
     category: implementation
-    enforcement: planned
+    enforcement: required
     description: Missing upstream semantics reopen knowledge while implementation/evidence lag does not manufacture a semantic Question.
     min_scenarios: 1

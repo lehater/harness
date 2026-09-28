@@ -1,0 +1,27 @@
+version: 1
+kind: harness-scenario
+id: artifact-skills-have-explicit-invariant-policy
+title: Every active artifact skill is enforced or explicitly judgement-only
+dimensions:
+  project_archetype: real-project
+  stage: bootstrap
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - skill-invariant-policy
+
+fixtures:
+  repository:
+    path: ../../..
+
+steps:
+  - id: evaluate
+    driver: skill.invariant_policy
+    with:
+      root: {ref: fixture.repository}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+      - {path: /active_skill_count, op: gte, value: 1}
+      - {path: /enforced_count, op: gte, value: 1}
+      - {path: /judgement_only_count, op: gte, value: 1}

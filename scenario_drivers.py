@@ -34,6 +34,7 @@ from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
 from source_coverage import validate_source_coverage
+from skill_invariant_policy import evaluate_skill_invariant_policy
 from semantic_acceptance import evaluate_artifact
 from semantic_closure import evaluate_semantic_closure
 from workspace import load_workspace, render_workspace
@@ -398,3 +399,8 @@ def frontend_screen_contracts_driver(
         interface_contract,
         screen_ids=set(screen_ids) if screen_ids is not None else None,
     )
+
+
+@scenario_driver("skill.invariant_policy")
+def skill_invariant_policy_driver(*, root: str) -> dict[str, Any]:
+    return evaluate_skill_invariant_policy(root)
