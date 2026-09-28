@@ -245,7 +245,10 @@ def main() -> int:
         "example.user-needs": "NEEDS-1"
     }
     assert result["lifecycle_assertion"]["accepted_prerequisite_semantics"] == {
-        "example.user-needs": derivation["lifecycle_dependency"]["semantic_atoms"]
+        "example.user-needs": {
+            "exhaustive": True,
+            "semantic_atoms": derivation["lifecycle_dependency"]["semantic_atoms"],
+        }
     }
     assert result["lifecycle_assertion"]["semantic_atom_fingerprints"], result
 
