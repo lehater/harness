@@ -30,6 +30,7 @@ on:
       - "semantic_questions.py"
       - "semantic_closure.py"
       - "semantic_derivation.py"
+      - "semantic_fingerprint.py"
       - "scenario_suite.py"
       - "scenario_drivers.py"
       - "capability_lifecycle.py"
