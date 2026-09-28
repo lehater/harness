@@ -1,0 +1,102 @@
+version: 1
+kind: harness-scenario
+id: semantic-derivation-false-meaning
+title: Full trace coverage does not prove semantic truth
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: agent-evaluation
+covers:
+  - semantic-derivation-truth
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: FALSE-MEANING
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own task semantics.
+          boundary:
+            semantic_cohesion: Task semantics.
+            independent_change: Tasks change independently.
+            public_contract: Accepted Task Model.
+          produces:
+            - capability: demo.task
+              knowledge_kind: task-model
+              requires: []
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own interaction semantics.
+          boundary:
+            semantic_cohesion: Interaction semantics.
+            independent_change: Interaction changes behind task semantics.
+            public_contract: Accepted Interaction Design.
+          produces:
+            - capability: demo.interaction
+              knowledge_kind: interaction-design
+              requires: [demo.task]
+      consumers:
+        - id: FRONTEND
+          purpose: Consume interaction.
+          requires: [demo.interaction]
+      terminal_capabilities: []
+
+  contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.task
+      target_capability: demo.interaction
+      obligations:
+        - {id: recovery, source_kind: task-recovery}
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+
+  source:
+    value:
+      semantic_assertions:
+        - {id: RECOVERY-F, kind: task-recovery, subject: TASK-1, semantic_value: validation-failure-preserves-entered-values, decision_authority: APPLICATION-DESIGN}
+
+  candidate:
+    value:
+      semantic_assertions:
+        - {id: INT-TITLE, kind: interaction-information, subject: CTX-1, semantic_value: resource-editor-title, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task
+      target_capability: demo.interaction
+      links:
+        - id: LINK-RECOVERY
+          sources: [RECOVERY-F]
+          relation: REALIZES
+          targets: [INT-TITLE]
+      dispositions: []
+      semantic_judgement:
+        version: 1
+        kind: harness-semantic-derivation-judgement
+        reviewer_kind: EVALUATOR
+        status: REJECTED
+        reviewed_links: [LINK-RECOVERY]
+        checks: [meaning-preserved, relation-justified]
+        findings:
+          - {link: LINK-RECOVERY, code: MEANING_NOT_PRESERVED, rationale: A screen title does not realize task recovery behavior.}
+
+steps:
+  - id: false-meaning
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: fixture.evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REJECTED}}
