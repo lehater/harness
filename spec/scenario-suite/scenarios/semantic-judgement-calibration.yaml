@@ -9,6 +9,7 @@ dimensions:
   execution_type: deterministic
 covers:
   - semantic-derivation-truth
+  - semantic-judgement-calibration
 
 fixtures:
   corpus:
