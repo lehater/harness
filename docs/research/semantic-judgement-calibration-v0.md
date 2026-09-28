@@ -123,7 +123,8 @@ The next calibration work is:
 4. trend comparison across evaluator versions without weakening the Harness
    acceptance contract.
 
-Live evaluator execution is intentionally a separate research stage: Live
-Calibration Validator. Without a specific evaluator/model identity and
-configuration, recording generated verdicts would not be reproducible
-calibration evidence.
+The separate Live Calibration Validator research is now implemented in
+`docs/design/live-calibration-validator-v0.md`. It adds blinded request
+construction and reproducible corpus/protocol/evaluator/run binding while
+retaining this scorer unchanged. Concrete provider results remain runtime
+evidence and require an independently controlled external evaluator driver.

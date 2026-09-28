@@ -84,6 +84,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `docs/design/decision-governance-v0.md` — experimental pre-choice exploration and delegated-choice contract above Core.
 - `docs/design/decision-explorer-execution-assurance-v0.md` — experimental boundary between request binding and externally attested isolated Explorer execution.
+- `docs/design/live-calibration-validator-v0.md` — blinded, request-bound live semantic-evaluator calibration above Core.
 - `docs/design/decision-pipeline-v0.md` — experimental sequential Decision Pipeline and derived Capability frontier.
 - `skills/agent/decision-pipeline/SKILL.md` — sequential option-formation, review, choice/escalation and admission procedure for decision-governed work.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.

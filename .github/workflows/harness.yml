@@ -32,6 +32,7 @@ on:
       - "semantic_derivation.py"
       - "semantic_fingerprint.py"
       - "semantic_judgement_calibration.py"
+      - "live_calibration.py"
       - "derivation_test_coverage.py"
       - "scenario_suite.py"
       - "scenario_drivers.py"

@@ -82,6 +82,9 @@ required_drivers:
   - semantic.derivation
   - semantic.derivation_test_coverage
   - semantic.judgement_calibration
+  - semantic.live_calibration.request
+  - semantic.live_calibration.validate
+  - semantic.live_calibration.stability
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure
@@ -223,6 +226,12 @@ requirements:
     category: assurance
     enforcement: required
     description: External semantic-judgement verdicts are scored against expert labels with explicit false-negative and false-positive counts.
+    min_scenarios: 1
+
+  - id: live-semantic-evaluator-calibration
+    category: assurance
+    enforcement: required
+    description: Live evaluator predictions are blinded, request-bound to corpus/protocol/evaluator/run identity, and fail closed before deterministic scoring.
     min_scenarios: 1
 
   - id: derivation-test-coverage
