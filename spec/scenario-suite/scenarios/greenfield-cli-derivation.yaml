@@ -1,0 +1,195 @@
+version: 1
+kind: harness-scenario
+id: greenfield-cli-semantic-derivation
+title: Greenfield CLI design preserves problem, product, architecture, interface and verification semantics
+dimensions:
+  project_archetype: backend-service
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: problem-evidence, target_knowledge_kind: product-requirements}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: interface-contract}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: implementation-design, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: implementation-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: verification-strategy, target_knowledge_kind: acceptance-scenarios}
+
+fixtures:
+  graph:
+    yaml: ../../../examples/greenfield-csv-deduplicator/engineering-graph.yaml
+  problem:
+    value:
+      semantic_assertions:
+        - {id: OBS-DUPLICATES, kind: problem-observation, subject: CSV, semantic_value: duplicate-records-require-manual-cleanup, decision_authority: DISCOVERY}
+  product-intent:
+    value:
+      semantic_assertions:
+        - {id: REQ-DEDUP, kind: product-behavior-requirement, subject: CSV, semantic_value: remove-duplicate-records-by-accepted-identity-rule, decision_authority: PRODUCT-REQUIREMENTS}
+  acceptance:
+    value:
+      semantic_assertions:
+        - {id: ACCEPT-DEDUP, kind: acceptance-intent, subject: CSV, semantic_value: duplicate-input-produces-one-retained-record-per-accepted-key, decision_authority: PRODUCT-REQUIREMENTS}
+  architecture:
+    value:
+      semantic_assertions:
+        - {id: ARCH-CLI, kind: architecture-boundary, subject: APP, semantic_value: single-local-cli-process-with-file-input-output, decision_authority: SYSTEM-ARCHITECTURE}
+  cli:
+    value:
+      semantic_assertions:
+        - {id: CLI-OP, kind: interface-operation, subject: CLI, semantic_value: deduplicate-input-output-command, decision_authority: MACHINE-INTERFACE-DESIGN}
+        - {id: CLI-EXIT, kind: interface-outcome, subject: CLI, semantic_value: nonzero-exit-on-invalid-input, decision_authority: MACHINE-INTERFACE-DESIGN}
+  implementation:
+    value:
+      semantic_assertions:
+        - {id: IMPL-SLICE, kind: implementation-slice, subject: CSV, semantic_value: parse-deduplicate-write-slice, decision_authority: IMPLEMENTATION-DESIGN}
+        - {id: IMPL-CLI, kind: implementation-slice, subject: CLI, semantic_value: cli-adapter-slice, decision_authority: IMPLEMENTATION-DESIGN}
+  completion:
+    value:
+      semantic_assertions:
+        - {id: IMPL-DONE, kind: implementation-criterion, subject: CSV, semantic_value: implementation-and-acceptance-evidence-complete, decision_authority: IMPLEMENTATION-DESIGN}
+  verification:
+    value:
+      semantic_assertions:
+        - {id: VERIFY-BEHAVIOR, kind: verification-obligation, subject: CSV, semantic_value: prove-deduplication-acceptance, decision_authority: VERIFICATION-DESIGN}
+        - {id: VERIFY-CLI, kind: verification-obligation, subject: CLI, semantic_value: prove-cli-contract-and-exit-semantics, decision_authority: VERIFICATION-DESIGN}
+        - {id: VERIFY-REALIZATION, kind: verification-obligation, subject: APP, semantic_value: prove-implementation-realizes-accepted-design, decision_authority: VERIFICATION-DESIGN}
+  scenarios:
+    value:
+      semantic_assertions:
+        - {id: SCENARIO-DUP, kind: acceptance-scenario, subject: CSV, semantic_value: duplicate-input-yields-accepted-deduplicated-output, decision_authority: VERIFICATION-DESIGN}
+
+steps:
+  - id: problem-to-product-intent
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.problem-evidence, target_capability: csv-deduplicator.product-intent, obligations: [{id: observations, source_kind: problem-observation}]}
+      source: {ref: fixture.problem}
+      candidate: {ref: fixture.product-intent}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.problem-evidence, target_capability: csv-deduplicator.product-intent, links: [{sources: [OBS-DUPLICATES], relation: TRANSFORMS, targets: [REQ-DEDUP]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: problem-to-acceptance
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.problem-evidence, target_capability: csv-deduplicator.acceptance, obligations: [{id: observations, source_kind: problem-observation}]}
+      source: {ref: fixture.problem}
+      candidate: {ref: fixture.acceptance}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.problem-evidence, target_capability: csv-deduplicator.acceptance, links: [{sources: [OBS-DUPLICATES], relation: TRANSFORMS, targets: [ACCEPT-DEDUP]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: product-to-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.product-intent, target_capability: csv-deduplicator.architecture, obligations: [{id: behavior, source_kind: product-behavior-requirement}]}
+      source: {ref: fixture.product-intent}
+      candidate: {ref: fixture.architecture}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.product-intent, target_capability: csv-deduplicator.architecture, links: [{sources: [REQ-DEDUP], relation: CONSTRAINS, targets: [ARCH-CLI]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: architecture-to-cli
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.architecture, target_capability: csv-deduplicator.cli-contract, obligations: [{id: boundary, source_kind: architecture-boundary}]}
+      source: {ref: fixture.architecture}
+      candidate: {ref: fixture.cli}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.architecture, target_capability: csv-deduplicator.cli-contract, links: [{sources: [ARCH-CLI], relation: CONSTRAINS, targets: [CLI-OP]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: product-to-implementation
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.product-intent, target_capability: csv-deduplicator.implementation-plan, obligations: [{id: behavior, source_kind: product-behavior-requirement}]}
+      source: {ref: fixture.product-intent}
+      candidate: {ref: fixture.implementation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.product-intent, target_capability: csv-deduplicator.implementation-plan, links: [{sources: [REQ-DEDUP], relation: REALIZES, targets: [IMPL-SLICE]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: architecture-to-implementation
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.architecture, target_capability: csv-deduplicator.implementation-plan, obligations: [{id: boundary, source_kind: architecture-boundary}]}
+      source: {ref: fixture.architecture}
+      candidate: {ref: fixture.implementation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.architecture, target_capability: csv-deduplicator.implementation-plan, links: [{sources: [ARCH-CLI], relation: REALIZES, targets: [IMPL-SLICE, IMPL-CLI]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: cli-to-implementation
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.implementation-plan, obligations: [{id: operation, source_kind: interface-operation}, {id: exit, source_kind: interface-outcome}]}
+      source: {ref: fixture.cli}
+      candidate: {ref: fixture.implementation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.implementation-plan, links: [{sources: [CLI-OP, CLI-EXIT], relation: REALIZES, targets: [IMPL-CLI]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: implementation-to-completion
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.implementation-plan, target_capability: csv-deduplicator.completion-criteria, obligations: [{id: slices, source_kind: implementation-slice, min_count: 2}]}
+      source: {ref: fixture.implementation}
+      candidate: {ref: fixture.completion}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.implementation-plan, target_capability: csv-deduplicator.completion-criteria, links: [{sources: [IMPL-SLICE, IMPL-CLI], relation: REALIZES, targets: [IMPL-DONE]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: cli-to-verification
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.verification-strategy, obligations: [{id: operation, source_kind: interface-operation}, {id: exit, source_kind: interface-outcome}]}
+      source: {ref: fixture.cli}
+      candidate: {ref: fixture.verification}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.verification-strategy, links: [{sources: [CLI-OP, CLI-EXIT], relation: REALIZES, targets: [VERIFY-CLI]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: implementation-to-verification
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.implementation-plan, target_capability: csv-deduplicator.verification-strategy, obligations: [{id: slices, source_kind: implementation-slice, min_count: 2}]}
+      source: {ref: fixture.implementation}
+      candidate: {ref: fixture.verification}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.implementation-plan, target_capability: csv-deduplicator.verification-strategy, links: [{sources: [IMPL-SLICE, IMPL-CLI], relation: REALIZES, targets: [VERIFY-REALIZATION]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: verification-to-scenarios
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.verification-strategy, target_capability: csv-deduplicator.acceptance-scenarios, obligations: [{id: obligations, source_kind: verification-obligation, min_count: 3}]}
+      source: {ref: fixture.verification}
+      candidate: {ref: fixture.scenarios}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.verification-strategy, target_capability: csv-deduplicator.acceptance-scenarios, links: [{sources: [VERIFY-BEHAVIOR, VERIFY-CLI, VERIFY-REALIZATION], relation: REALIZES, targets: [SCENARIO-DUP]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-cli-exit-link
+    driver: data.patch
+    with:
+      value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.verification-strategy, links: [{sources: [CLI-OP], relation: REALIZES, targets: [VERIFY-CLI]}, {sources: [CLI-EXIT], relation: REALIZES, targets: [VERIFY-CLI]}], dispositions: []}
+      operations: [{op: remove, path: /links/1}]
+  - id: verification-loses-cli-exit
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: csv-deduplicator.cli-contract, target_capability: csv-deduplicator.verification-strategy, obligations: [{id: operation, source_kind: interface-operation}, {id: exit, source_kind: interface-outcome}]}
+      source: {ref: fixture.cli}
+      candidate: {ref: fixture.verification}
+      evidence: {ref: step.remove-cli-exit-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: CLI-EXIT, owner_authority: VERIFICATION-DESIGN}}

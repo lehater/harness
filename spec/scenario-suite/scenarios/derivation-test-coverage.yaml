@@ -1,0 +1,128 @@
+version: 1
+kind: harness-scenario
+id: derivation-test-coverage-gap
+title: Production dependency edges cannot remain silently untested
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - derivation-test-coverage
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DERIVATION-TEST-COVERAGE
+      authorities:
+        - id: A
+          responsibility: Own A.
+          boundary: {semantic_cohesion: A, independent_change: A, public_contract: A}
+          produces:
+            - {capability: demo.a, knowledge_kind: task-model, requires: []}
+        - id: B
+          responsibility: Own B.
+          boundary: {semantic_cohesion: B, independent_change: B, public_contract: B}
+          produces:
+            - {capability: demo.b, knowledge_kind: interaction-design, requires: [demo.a]}
+        - id: C
+          responsibility: Own C.
+          boundary: {semantic_cohesion: C, independent_change: C, public_contract: C}
+          produces:
+            - {capability: demo.c, knowledge_kind: implementation-design, requires: [demo.b]}
+      consumers:
+        - {id: TARGET, purpose: Consume C, requires: [demo.c]}
+      terminal_capabilities: []
+
+  tested-kind-edges:
+    value:
+      - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: task-to-interaction-semantic-derivation}
+
+  dispositions:
+    value: []
+  scenario-directory:
+    path: .
+
+steps:
+  - id: uncovered
+    driver: semantic.derivation_test_coverage
+    with:
+      graph: {ref: fixture.graph}
+      tested_kind_edges: {ref: fixture.tested-kind-edges}
+      dispositions: {ref: fixture.dispositions}
+      scenario_directory: {ref: fixture.scenario-directory}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /covered, op: contains_match, value: {source_capability: demo.a, target_capability: demo.b, mode: TESTED_KIND_EDGE, scenario: task-to-interaction-semantic-derivation}}
+      - {path: /gaps, op: contains_match, value: {source_capability: demo.b, target_capability: demo.c}}
+
+  - id: disposition
+    driver: data.patch
+    with:
+      value: {ref: fixture.dispositions}
+      operations:
+        - op: add
+          path: /-
+          value:
+            source_capability: demo.b
+            target_capability: demo.c
+            disposition: NOT_APPLICABLE
+            rationale: This synthetic edge is intentionally outside semantic derivation scope.
+
+  - id: complete
+    driver: semantic.derivation_test_coverage
+    with:
+      graph: {ref: fixture.graph}
+      tested_kind_edges: {ref: fixture.tested-kind-edges}
+      dispositions: {ref: step.disposition}
+      scenario_directory: {ref: fixture.scenario-directory}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /gaps, op: length, value: 0}
+      - {path: /disposed, op: contains_match, value: {source_capability: demo.b, target_capability: demo.c, disposition: NOT_APPLICABLE}}
+
+  - id: invalid-registration-poisons-complete-status
+    driver: semantic.derivation_test_coverage
+    with:
+      graph: {ref: fixture.graph}
+      tested_kind_edges:
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: task-to-interaction-semantic-derivation}
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: DOES-NOT-EXIST}
+      dispositions: {ref: step.disposition}
+      scenario_directory: {ref: fixture.scenario-directory}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /gap_count, op: equals, value: 0}
+      - {path: /invalid_registration_count, op: equals, value: 1}
+
+  - id: fake-test-registration
+    driver: semantic.derivation_test_coverage
+    with:
+      graph:
+        version: 1
+        kind: harness-engineering-graph
+        id: FAKE-REGISTRATION
+        authorities:
+          - id: A
+            responsibility: Own A.
+            boundary: {semantic_cohesion: A, independent_change: A, public_contract: A}
+            produces:
+              - {capability: fake.a, knowledge_kind: task-model, requires: []}
+          - id: B
+            responsibility: Own B.
+            boundary: {semantic_cohesion: B, independent_change: B, public_contract: B}
+            produces:
+              - {capability: fake.b, knowledge_kind: interaction-design, requires: [fake.a]}
+        consumers:
+          - {id: TARGET, purpose: Consume B, requires: [fake.b]}
+        terminal_capabilities: []
+      tested_kind_edges:
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: DOES-NOT-EXIST}
+      dispositions: []
+      scenario_directory: {ref: fixture.scenario-directory}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /invalid_registrations, op: contains_match, value: {mode: TESTED_KIND_EDGE, scenario: DOES-NOT-EXIST}}
+      - {path: /gaps, op: contains_match, value: {source_capability: fake.a, target_capability: fake.b}}

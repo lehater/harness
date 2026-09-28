@@ -80,6 +80,9 @@ fixtures:
 steps:
   - id: evaluate
     driver: decision.exploration
+    benchmark:
+      metrics: [mutation_detection]
+      mutation_class: alternative-collapse
     with:
       contract: {ref: fixture.contract}
       axis_policies: {ref: fixture.axis_policies}

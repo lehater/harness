@@ -36,6 +36,9 @@ fixtures:
 steps:
   - id: reject-contradiction
     driver: semantic.acceptance
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: contradiction
     with:
       contract: {ref: fixture.contract}
       sources:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Semantic completeness gap -> Core Question projection above Harness Core."""
+"""Semantic completeness/derivation gap -> Core Question projection above Harness Core."""
 from __future__ import annotations
 
 import copy
@@ -15,6 +15,11 @@ GAP_FINDING_CODES = {
     "MISSING_VALUES",
     "OBLIGATION_DEFERRED",
     "OBLIGATION_QUESTION",
+}
+
+DERIVATION_GAP_FINDING_CODES = {
+    "MISSING_REQUIRED_INPUT",
+    "DERIVATION_QUESTION",
 }
 
 
@@ -83,16 +88,99 @@ def questions_from_semantic_evaluation(
     return [proposals[key] for key in sorted(proposals)]
 
 
+def questions_from_derivation_evaluation(
+    *,
+    graph: dict[str, Any],
+    evaluation: dict[str, Any],
+) -> list[dict[str, Any]]:
+    if evaluation.get("status") == "ACCEPTED":
+        return []
+    if evaluation.get("kind") != "harness-semantic-derivation-evaluation":
+        raise CoreError("unexpected semantic derivation evaluation kind")
+
+    producers = producer_index(graph)
+    source_capability = evaluation.get("source_capability")
+    target_capability = evaluation.get("target_capability")
+    if source_capability not in producers or target_capability not in producers:
+        raise CoreError("semantic derivation evaluation references unknown capability")
+
+    proposals: dict[str, dict[str, Any]] = {}
+    for finding in evaluation.get("findings", []) or []:
+        if not isinstance(finding, dict):
+            continue
+        code = finding.get("code")
+        if code not in DERIVATION_GAP_FINDING_CODES:
+            continue
+
+        identity = _gap_identity(finding)
+        if code == "MISSING_REQUIRED_INPUT":
+            capability = source_capability
+            authority = producers[source_capability]
+            prefix = "INPUT"
+            text = (
+                f"Resolve missing upstream semantic input '{identity}' in "
+                f"capability '{source_capability}' required by "
+                f"'{target_capability}'."
+            )
+        else:
+            capability = target_capability
+            authority = producers[target_capability]
+            prefix = "DERIVATION"
+            text = (
+                f"Resolve downstream derivation question '{identity}' for "
+                f"capability '{target_capability}' from '{source_capability}'."
+            )
+            if finding.get("rationale"):
+                text += f" Rationale: {finding['rationale']}"
+
+        question_id = (
+            f"Q-{prefix}-{_slug(capability)}-{_slug(identity)}"
+        )
+        proposals[question_id] = {
+            "id": question_id,
+            "authority": authority,
+            "text": text,
+            "blocks_capabilities": [capability],
+        }
+
+    return [proposals[key] for key in sorted(proposals)]
+
+
+def questions_from_evaluation(
+    *,
+    graph: dict[str, Any],
+    evaluation: dict[str, Any],
+    capability: str | None = None,
+) -> list[dict[str, Any]]:
+    kind = evaluation.get("kind")
+    if kind == "harness-semantic-derivation-evaluation":
+        return questions_from_derivation_evaluation(
+            graph=graph,
+            evaluation=evaluation,
+        )
+    if capability is None:
+        raise CoreError("artifact semantic Question routing requires capability")
+    return questions_from_semantic_evaluation(
+        graph=graph,
+        capability=capability,
+        evaluation=evaluation,
+    )
+
+
 def proposals_from_evaluation_set(
     evaluations: dict[str, Any],
 ) -> list[dict[str, Any]]:
     proposals: dict[str, dict[str, Any]] = {}
     documents: list[dict[str, Any]] = []
-    if evaluations.get("kind") == "harness-artifact-semantic-evaluation":
+    if evaluations.get("kind") in {
+        "harness-artifact-semantic-evaluation",
+        "harness-semantic-derivation-evaluation",
+    }:
         documents.append(evaluations)
     documents.extend(
         item
-        for item in evaluations.get("semantic_evaluations", []) or []
+        for key in ("semantic_evaluations", "derivation_evaluations")
+        for item in (evaluations.get(key, []) or [])
         if isinstance(item, dict)
     )
     for evaluation in documents:
@@ -137,9 +225,6 @@ def append_question_proposals(
         comparable = ("authority", "text", "blocks_capabilities")
         if any(current.get(key) != proposal.get(key) for key in comparable):
             raise CoreError(f"conflicting semantic question proposal: {question_id}")
-        # The same semantic gap may recur after a prior resolution becomes
-        # invalid. A fresh deterministic proposal reopens the existing Question
-        # rather than creating a duplicate or trusting stale resolution.
         current.pop("resolution", None)
 
     return result

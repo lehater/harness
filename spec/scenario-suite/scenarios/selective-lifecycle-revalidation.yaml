@@ -1,0 +1,199 @@
+version: 1
+kind: harness-scenario
+id: selective-lifecycle-revalidation
+title: Downstream revalidation reacts only to consumed upstream semantic atoms
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - selective-lifecycle-revalidation
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SELECTIVE-LIFECYCLE
+      authorities:
+        - id: SOURCE
+          responsibility: Own upstream semantics.
+          boundary:
+            semantic_cohesion: Upstream facts.
+            independent_change: Facts change independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.upstream
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: USE
+          responsibility: Own downstream semantics.
+          boundary:
+            semantic_cohesion: Derived use knowledge.
+            independent_change: Use knowledge changes behind accepted source semantics.
+            public_contract: Accepted downstream knowledge.
+          produces:
+            - capability: demo.downstream
+              knowledge_kind: application-design
+              requires: [demo.upstream]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume downstream knowledge.
+          requires: [demo.downstream]
+      terminal_capabilities: []
+
+  model:
+    value:
+      artifacts:
+        - {id: UPSTREAM, authority: SOURCE, path: docs/upstream.yaml, provides: [demo.upstream], depends_on: []}
+        - {id: DOWNSTREAM, authority: USE, path: docs/downstream.yaml, provides: [demo.downstream], depends_on: [UPSTREAM]}
+      questions: []
+
+  source-semantics:
+    value:
+      semantic_assertions:
+        - {id: ATOM-A, kind: consumed-semantic, subject: SUBJECT, semantic_value: consumed-value, decision_authority: SOURCE}
+        - {id: NOISE-G, kind: optional-note, subject: SUBJECT, semantic_value: unrelated-value, decision_authority: SOURCE}
+
+  downstream-candidate:
+    value:
+      semantic_assertions:
+        - {id: TARGET-A, kind: application-semantic, subject: SUBJECT, semantic_value: realized-consumed-value, decision_authority: USE}
+
+  exhaustive-derivation-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.upstream
+      target_capability: demo.downstream
+      obligations:
+        - {id: consumed, source_kind: consumed-semantic}
+      lifecycle_dependency:
+        exhaustive: true
+
+  partial-derivation-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.upstream
+      target_capability: demo.downstream
+      links:
+        - {sources: [ATOM-A], relation: REALIZES, targets: [TARGET-A]}
+      dispositions: []
+
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: UPSTREAM
+          capability: demo.upstream
+          acceptance_id: UPSTREAM-2
+          accepted_prerequisites: {}
+          semantic_atom_fingerprints:
+            ATOM-A: HASH-A-1
+            NOISE-G: HASH-G-2
+        - artifact: DOWNSTREAM
+          capability: demo.downstream
+          acceptance_id: DOWNSTREAM-1
+          accepted_prerequisites:
+            demo.upstream: UPSTREAM-1
+          accepted_prerequisite_semantics:
+            demo.upstream:
+              exhaustive: true
+              semantic_atoms:
+                ATOM-A: HASH-A-1
+
+steps:
+  - id: reject-incomplete-lifecycle-surface
+    driver: semantic.derivation
+    benchmark:
+      metrics: [selective_revalidation, mutation_detection]
+      mutation_class: incomplete-lifecycle-dependency-surface
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.exhaustive-derivation-contract}
+      source: {ref: fixture.source-semantics}
+      candidate: {ref: fixture.downstream-candidate}
+      evidence: {ref: fixture.partial-derivation-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: LIFECYCLE_DEPENDENCY_INCOMPLETE, source: NOISE-G}}
+
+  - id: explicitly-dispose-unconsumed
+    driver: data.patch
+    with:
+      value: {ref: fixture.partial-derivation-evidence}
+      operations:
+        - op: add
+          path: /dispositions/-
+          value: {source: NOISE-G, status: NOT_APPLICABLE, rationale: This source atom is explicitly outside the downstream dependency surface.}
+
+  - id: accept-exhaustive-lifecycle-surface
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.exhaustive-derivation-contract}
+      source: {ref: fixture.source-semantics}
+      candidate: {ref: fixture.downstream-candidate}
+      evidence: {ref: step.explicitly-dispose-unconsumed}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /lifecycle_dependency/exhaustive, op: equals, value: true}
+      - {path: /lifecycle_dependency/semantic_atoms, op: contains, value: ATOM-A}
+      - {path: /lifecycle_dependency/semantic_atoms, op: length, value: 1}
+
+  - id: irrelevant-upstream-change
+    driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, false_positive_control]
+      mutation_class: irrelevant-upstream-change
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /demo.upstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: CURRENT}
+
+  - id: change-consumed-atom
+    driver: data.patch
+    with:
+      value: {ref: fixture.lifecycle}
+      operations:
+        - {op: replace, path: /providers/0/semantic_atom_fingerprints/ATOM-A, value: HASH-A-2}
+
+  - id: relevant-upstream-change
+    driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, mutation_detection]
+      mutation_class: consumed-atom-change
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: step.change-consumed-atom}
+    expect:
+      - {path: /demo.upstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: STALE}
+      - {path: /demo.downstream/mismatches/0/mode, op: equals, value: SEMANTIC_ATOMS}
+      - {path: /demo.downstream/mismatches/0/changed_atoms/0/id, op: equals, value: ATOM-A}
+
+  - id: add-new-irrelevant-atom
+    driver: data.patch
+    with:
+      value: {ref: fixture.lifecycle}
+      operations:
+        - {op: add, path: /providers/0/semantic_atom_fingerprints/NEW-X, value: HASH-X-1}
+
+  - id: new-irrelevant-atom-stable
+    driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, false_positive_control]
+      mutation_class: irrelevant-upstream-addition
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: step.add-new-irrelevant-atom}
+    expect:
+      - {path: /demo.downstream/state, op: equals, value: CURRENT}

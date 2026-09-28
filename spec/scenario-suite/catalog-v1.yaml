@@ -58,6 +58,17 @@ required_dimension_values:
     - applicability
   execution_type: [deterministic, agent-evaluation]
 
+required_benchmark_metrics:
+  - mutation_detection
+  - ambiguity_handling
+  - false_positive_control
+  - question_owner_routing
+  - root_cause_localization
+  - blocking_behavior
+  - alternative_valid_acceptance
+  - selective_revalidation
+  - semantic_truth_detection
+
 required_drivers:
   - repository.realization
   - coverage.subject_obligations
@@ -68,6 +79,8 @@ required_drivers:
   - data.patch
   - engineering.target
   - semantic.acceptance
+  - semantic.derivation
+  - semantic.derivation_test_coverage
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure
@@ -109,7 +122,13 @@ requirements:
     min_scenarios: 1
 
   - id: lifecycle-currentness
-    description: Changed upstream acceptance makes dependent accepted knowledge stale.
+    description: Changed upstream acceptance makes dependent accepted knowledge stale when no finer semantic dependency baseline is available.
+    min_scenarios: 1
+
+  - id: selective-lifecycle-revalidation
+    category: lifecycle
+    enforcement: required
+    description: A downstream Capability remains current when only unconsumed upstream semantic atoms change and becomes stale when a consumed atom changes.
     min_scenarios: 1
 
   - id: create-work-skill-routing
@@ -185,6 +204,24 @@ requirements:
     category: semantic
     enforcement: required
     description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
+    min_scenarios: 1
+
+  - id: semantic-derivation-coverage
+    category: semantic
+    enforcement: required
+    description: Direct Capability derivation accounts for required upstream semantic atoms without forcing one literal downstream design.
+    min_scenarios: 1
+
+  - id: semantic-derivation-truth
+    category: semantic
+    enforcement: required
+    description: Required semantic judgement is request-bound and rejects meaning-preserving claims that an evaluator or human reviewer rejects.
+    min_scenarios: 1
+
+  - id: derivation-test-coverage
+    category: coverage
+    enforcement: required
+    description: Every selected ProductionContract dependency edge is either covered by a derivation test class or explicitly disposed as not applicable.
     min_scenarios: 1
 
   - id: semantic-contradiction-detection

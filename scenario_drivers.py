@@ -20,6 +20,7 @@ from coverage_obligations import (
     validate_subject_obligations,
 )
 from decision_exploration import evaluate_decision_exploration
+from derivation_test_coverage import evaluate_derivation_test_coverage
 from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
 from engineering_coverage import evaluate_with_repository_policy
@@ -37,10 +38,11 @@ from source_coverage import validate_source_coverage
 from skill_invariant_policy import evaluate_skill_invariant_policy
 from semantic_acceptance import evaluate_artifact
 from semantic_closure import evaluate_semantic_closure
+from semantic_derivation import evaluate_derivation
 from workspace import load_workspace, render_workspace
 from semantic_questions import (
     append_question_proposals,
-    questions_from_semantic_evaluation,
+    questions_from_evaluation,
 )
 
 Driver = Callable[..., Any]
@@ -153,14 +155,24 @@ def semantic_acceptance(
     return evaluate_artifact(contract, sources, candidate)
 
 
+@scenario_driver("semantic.derivation")
+def semantic_derivation(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_derivation(**kwargs)
+
+
+@scenario_driver("semantic.derivation_test_coverage")
+def semantic_derivation_test_coverage(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_derivation_test_coverage(**kwargs)
+
+
 @scenario_driver("semantic.questions")
 def semantic_questions(
     *,
     graph: dict[str, Any],
-    capability: str,
     evaluation: dict[str, Any],
+    capability: str | None = None,
 ) -> list[dict[str, Any]]:
-    return questions_from_semantic_evaluation(
+    return questions_from_evaluation(
         graph=graph,
         capability=capability,
         evaluation=evaluation,

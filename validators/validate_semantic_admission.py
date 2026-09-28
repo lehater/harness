@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from harness import CoreError
 from semantic_admission import admit_artifact, knowledge_contract_index
+from semantic_derivation import evaluate_derivation
 
 
 GRAPH = {
@@ -192,6 +193,37 @@ def main() -> int:
         "repository-realization-derived-from-accepted-boundaries",
     } <= set(contract_index["implementation-design"]["required_review_checks"])
 
+    derivation = evaluate_derivation(
+        graph=GRAPH,
+        contract={
+            "version": 1,
+            "kind": "harness-semantic-derivation-contract",
+            "source_capability": "example.user-needs",
+            "target_capability": "example.requirements",
+            "obligations": [
+                {"id": "needs", "source_kind": "user-need"},
+            ],
+            "lifecycle_dependency": {"exhaustive": True},
+        },
+        source=sources(),
+        candidate=candidate(),
+        evidence={
+            "version": 1,
+            "kind": "harness-semantic-derivation-evidence",
+            "source_capability": "example.user-needs",
+            "target_capability": "example.requirements",
+            "links": [
+                {
+                    "sources": ["NEED-AUTHORIZED-SOURCE"],
+                    "relation": "REALIZES",
+                    "targets": ["REQ-AUTHORIZED-SOURCE"],
+                }
+            ],
+            "dispositions": [],
+        },
+    )
+    assert derivation["status"] == "ACCEPTED", derivation
+
     result = admit_artifact(
         graph=GRAPH,
         model=MODEL,
@@ -202,6 +234,7 @@ def main() -> int:
         candidate=candidate(),
         acceptance_id="REQ-1",
         lifecycle=LIFECYCLE,
+        derivation_evaluations=[derivation],
     )
     assert result["status"] == "ACCEPTED", result
     assert result["admission"]["allowed_source_authorities"] == [
@@ -211,6 +244,13 @@ def main() -> int:
     assert result["lifecycle_assertion"]["accepted_prerequisites"] == {
         "example.user-needs": "NEEDS-1"
     }
+    assert result["lifecycle_assertion"]["accepted_prerequisite_semantics"] == {
+        "example.user-needs": {
+            "exhaustive": True,
+            "semantic_atoms": derivation["lifecycle_dependency"]["semantic_atoms"],
+        }
+    }
+    assert result["lifecycle_assertion"]["semantic_atom_fingerprints"], result
 
     bad_review = candidate()
     bad_review["semantic_review"]["checks"].remove(
@@ -266,7 +306,10 @@ def main() -> int:
         "may not write outside admitted canonical artifacts",
     )
 
-    print("semantic admission: PASS (direction + review + provenance + write boundary)")
+    print(
+        "semantic admission: PASS "
+        "(direction + review + provenance + write boundary + derivation lifecycle baseline)"
+    )
     return 0
 
 

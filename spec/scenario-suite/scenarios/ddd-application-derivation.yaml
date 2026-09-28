@@ -1,0 +1,881 @@
+version: 1
+kind: harness-scenario
+id: ddd-application-semantic-derivation
+title: DDD and Application design preserve strategic, contextual and tactical semantics
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: product-requirements}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: domain-strategy}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: model-context-strategy}
+  - {source_knowledge_kind: domain-strategy, target_knowledge_kind: model-context-strategy}
+  - {source_knowledge_kind: problem-evidence, target_knowledge_kind: domain-use-case}
+  - {source_knowledge_kind: strategic-domain-design, target_knowledge_kind: domain-use-case}
+  - {source_knowledge_kind: model-context-strategy, target_knowledge_kind: domain-model}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: domain-model}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: domain-model}
+  - {source_knowledge_kind: strategic-domain-design, target_knowledge_kind: domain-model}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: domain-model}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: application-design}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: application-design}
+  - {source_knowledge_kind: strategic-domain-design, target_knowledge_kind: application-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: user-journey-design}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: user-journey-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: conceptual-interface-model}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: interface-contract}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: interface-contract}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: quality-design}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DDD-APPLICATION-DERIVATION
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted problem evidence.
+          boundary: {semantic_cohesion: "Own accepted problem evidence.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted DISCOVERY knowledge."}
+          produces:
+            - capability: demo.problem
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own accepted product intent and behavior.
+          boundary: {semantic_cohesion: "Own accepted product intent and behavior.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted PRODUCT-REQUIREMENTS knowledge."}
+          produces:
+            - capability: demo.intent
+              knowledge_kind: product-requirements
+              requires: []
+            - capability: demo.capabilities
+              knowledge_kind: product-requirements
+              requires:
+                - capability: demo.intent
+        - id: DOMAIN-STRATEGY
+          responsibility: Own strategic problem-space responsibility classification.
+          boundary: {semantic_cohesion: "Own strategic problem-space responsibility classification.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted DOMAIN-STRATEGY knowledge."}
+          produces:
+            - capability: demo.domain-strategy
+              knowledge_kind: domain-strategy
+              requires:
+                - capability: demo.capabilities
+        - id: STRATEGIC-DOMAIN-DESIGN
+          responsibility: Own strategic domain boundaries.
+          boundary: {semantic_cohesion: "Own strategic domain boundaries.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted STRATEGIC-DOMAIN-DESIGN knowledge."}
+          produces:
+            - capability: demo.strategic
+              knowledge_kind: strategic-domain-design
+              requires: []
+        - id: MODEL-CONTEXT-STRATEGY
+          responsibility: Own model-language applicability and context relationships.
+          boundary: {semantic_cohesion: "Own model-language applicability and context relationships.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted MODEL-CONTEXT-STRATEGY knowledge."}
+          produces:
+            - capability: demo.model-context
+              knowledge_kind: model-context-strategy
+              requires:
+                - capability: demo.capabilities
+                - capability: demo.domain-strategy
+        - id: DOMAIN-USE-CASE-DESIGN
+          responsibility: Own domain use-case behavior.
+          boundary: {semantic_cohesion: "Own domain use-case behavior.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted DOMAIN-USE-CASE-DESIGN knowledge."}
+          produces:
+            - capability: demo.use-case
+              knowledge_kind: domain-use-case
+              requires:
+                - capability: demo.problem
+                - capability: demo.strategic
+        - id: TACTICAL-DOMAIN-DESIGN
+          responsibility: Own tactical domain semantics and invariants.
+          boundary: {semantic_cohesion: "Own tactical domain semantics and invariants.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted TACTICAL-DOMAIN-DESIGN knowledge."}
+          produces:
+            - capability: demo.domain-foundation
+              knowledge_kind: domain-model
+              requires:
+                - capability: demo.model-context
+                - capability: demo.capabilities
+                - capability: demo.use-case
+                - capability: demo.strategic
+            - capability: demo.domain-model
+              knowledge_kind: domain-model
+              requires:
+                - capability: demo.domain-foundation
+        - id: APPLICATION-DESIGN
+          responsibility: Own application orchestration and intended human work.
+          boundary: {semantic_cohesion: "Own application orchestration and intended human work.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted APPLICATION-DESIGN knowledge."}
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires:
+                - capability: demo.capabilities
+                - capability: demo.domain-model
+                - capability: demo.strategic
+            - capability: demo.task
+              knowledge_kind: task-model
+              requires:
+                - capability: demo.application
+                - capability: demo.domain-model
+            - capability: demo.journey
+              knowledge_kind: user-journey-design
+              requires:
+                - capability: demo.application
+                - capability: demo.domain-model
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own human-interface semantics.
+          boundary: {semantic_cohesion: "Own human-interface semantics.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted HUMAN-INTERFACE-DESIGN knowledge."}
+          produces:
+            - capability: demo.conceptual
+              knowledge_kind: conceptual-interface-model
+              requires:
+                - capability: demo.application
+                - capability: demo.domain-model
+            - capability: demo.interaction
+              knowledge_kind: interaction-design
+              requires:
+                - capability: demo.application
+        - id: MACHINE-INTERFACE-DESIGN
+          responsibility: Own machine interface semantics.
+          boundary: {semantic_cohesion: "Own machine interface semantics.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted MACHINE-INTERFACE-DESIGN knowledge."}
+          produces:
+            - capability: demo.interface
+              knowledge_kind: interface-contract
+              requires:
+                - capability: demo.application
+                - capability: demo.domain-model
+        - id: QUALITY-DESIGN
+          responsibility: Own architecture-significant quality constraints.
+          boundary: {semantic_cohesion: "Own architecture-significant quality constraints.", independent_change: "Owned semantics can evolve behind accepted prerequisites.", public_contract: "Provides accepted QUALITY-DESIGN knowledge."}
+          produces:
+            - capability: demo.quality
+              knowledge_kind: quality-design
+              requires:
+                - capability: demo.domain-model
+      consumers:
+        - id: DOWNSTREAM-DESIGN
+          purpose: Consume accepted DDD/Application knowledge without inventing upstream semantics.
+          requires:
+            - capability: demo.task
+            - capability: demo.journey
+            - capability: demo.conceptual
+            - capability: demo.interaction
+            - capability: demo.interface
+            - capability: demo.quality
+      terminal_capabilities: []
+
+  problem:
+    value:
+      semantic_assertions:
+        - id: PROBLEM
+          kind: problem-observation
+          subject: RESOURCE-CHANGE
+          semantic_value: "users-cannot-complete-resource-change-without-manual-reconciliation"
+          decision_authority: DISCOVERY
+  intent:
+    value:
+      semantic_assertions:
+        - id: INTENT
+          kind: product-intent
+          subject: RESOURCE-CHANGE
+          semantic_value: "support-safe-resource-change"
+          decision_authority: PRODUCT-REQUIREMENTS
+  capabilities:
+    value:
+      semantic_assertions:
+        - id: PRODUCT
+          kind: product-behavior
+          subject: RESOURCE-CHANGE
+          semantic_value: "authorized-user-can-change-resource-and-observe-result"
+          decision_authority: PRODUCT-REQUIREMENTS
+  domain_strategy:
+    value:
+      semantic_assertions:
+        - id: DSTRAT
+          kind: domain-responsibility
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-policy-and-resource-change-are-distinct-problem-responsibilities"
+          decision_authority: DOMAIN-STRATEGY
+  strategic:
+    value:
+      semantic_assertions:
+        - id: SSTRAT
+          kind: strategic-domain-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-belongs-to-access-policy-domain"
+          decision_authority: STRATEGIC-DOMAIN-DESIGN
+  model_context:
+    value:
+      semantic_assertions:
+        - id: CTX
+          kind: model-context-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "access-policy-model-is-distinct-from-resource-catalog-model"
+          decision_authority: MODEL-CONTEXT-STRATEGY
+  use_case:
+    value:
+      semantic_assertions:
+        - id: USECASE
+          kind: domain-use-case-semantics
+          subject: RESOURCE-CHANGE
+          semantic_value: "change-resource-validates-policy-and-produces-visible-outcome"
+          decision_authority: DOMAIN-USE-CASE-DESIGN
+  domain_foundation:
+    value:
+      semantic_assertions:
+        - id: DOMAIN-BASE
+          kind: domain-semantic
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-identity-is-stable-and-change-must-satisfy-policy"
+          decision_authority: TACTICAL-DOMAIN-DESIGN
+  domain_model:
+    value:
+      semantic_assertions:
+        - id: DOMAIN
+          kind: domain-semantic
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-preserves-identity-and-enforces-policy-invariant"
+          decision_authority: TACTICAL-DOMAIN-DESIGN
+  application:
+    value:
+      semantic_assertions:
+        - id: APP
+          kind: application-operation
+          subject: RESOURCE-CHANGE
+          semantic_value: "orchestrate-authorized-resource-change-and-report-domain-rejection"
+          decision_authority: APPLICATION-DESIGN
+  task:
+    value:
+      semantic_assertions:
+        - id: TASK
+          kind: task-information
+          subject: RESOURCE-CHANGE
+          semantic_value: "user-inspects-current-resource-and-submits-change"
+          decision_authority: APPLICATION-DESIGN
+  journey:
+    value:
+      semantic_assertions:
+        - id: JOURNEY
+          kind: journey-step
+          subject: RESOURCE-CHANGE
+          semantic_value: "inspect-change-observe-or-recover"
+          decision_authority: APPLICATION-DESIGN
+  conceptual:
+    value:
+      semantic_assertions:
+        - id: CONCEPT
+          kind: conceptual-concept
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-and-policy-are-user-recognizable-concepts"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  interaction:
+    value:
+      semantic_assertions:
+        - id: INTERACTION
+          kind: interaction-context
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-context-exposes-domain-rejection"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  interface:
+    value:
+      semantic_assertions:
+        - id: INTERFACE
+          kind: interface-operation
+          subject: RESOURCE-CHANGE
+          semantic_value: "update-resource-operation-preserves-domain-outcomes"
+          decision_authority: MACHINE-INTERFACE-DESIGN
+  quality:
+    value:
+      semantic_assertions:
+        - id: QUALITY
+          kind: quality-constraint
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-outcome-remains-observable-under-accepted-load"
+          decision_authority: QUALITY-DESIGN
+
+steps:
+  - id: edge-01-product-requirements-to-product-requirements
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.intent
+        target_capability: demo.capabilities
+        obligations:
+          - {id: source-semantics, source_kind: product-intent}
+      source: {ref: fixture.intent}
+      candidate: {ref: fixture.capabilities}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.intent
+        target_capability: demo.capabilities
+        links:
+          - {sources: [INTENT], relation: TRANSFORMS, targets: [PRODUCT]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-02-product-requirements-to-domain-strategy
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.capabilities
+        target_capability: demo.domain-strategy
+        obligations:
+          - {id: source-semantics, source_kind: product-behavior}
+      source: {ref: fixture.capabilities}
+      candidate: {ref: fixture.domain_strategy}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.capabilities
+        target_capability: demo.domain-strategy
+        links:
+          - {sources: [PRODUCT], relation: CONSTRAINS, targets: [DSTRAT]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-03-product-requirements-to-model-context-strategy
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.capabilities
+        target_capability: demo.model-context
+        obligations:
+          - {id: source-semantics, source_kind: product-behavior}
+      source: {ref: fixture.capabilities}
+      candidate: {ref: fixture.model_context}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.capabilities
+        target_capability: demo.model-context
+        links:
+          - {sources: [PRODUCT], relation: CONSTRAINS, targets: [CTX]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-04-domain-strategy-to-model-context-strategy
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-strategy
+        target_capability: demo.model-context
+        obligations:
+          - {id: source-semantics, source_kind: domain-responsibility}
+      source: {ref: fixture.domain_strategy}
+      candidate: {ref: fixture.model_context}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-strategy
+        target_capability: demo.model-context
+        links:
+          - {sources: [DSTRAT], relation: REALIZES, targets: [CTX]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-05-problem-evidence-to-domain-use-case
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.problem
+        target_capability: demo.use-case
+        obligations:
+          - {id: source-semantics, source_kind: problem-observation}
+      source: {ref: fixture.problem}
+      candidate: {ref: fixture.use_case}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.problem
+        target_capability: demo.use-case
+        links:
+          - {sources: [PROBLEM], relation: TRANSFORMS, targets: [USECASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-06-strategic-domain-design-to-domain-use-case
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.strategic
+        target_capability: demo.use-case
+        obligations:
+          - {id: source-semantics, source_kind: strategic-domain-boundary}
+      source: {ref: fixture.strategic}
+      candidate: {ref: fixture.use_case}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.strategic
+        target_capability: demo.use-case
+        links:
+          - {sources: [SSTRAT], relation: CONSTRAINS, targets: [USECASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-07-model-context-strategy-to-domain-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.model-context
+        target_capability: demo.domain-foundation
+        obligations:
+          - {id: source-semantics, source_kind: model-context-boundary}
+      source: {ref: fixture.model_context}
+      candidate: {ref: fixture.domain_foundation}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.model-context
+        target_capability: demo.domain-foundation
+        links:
+          - {sources: [CTX], relation: CONSTRAINS, targets: [DOMAIN-BASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-08-product-requirements-to-domain-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.capabilities
+        target_capability: demo.domain-foundation
+        obligations:
+          - {id: source-semantics, source_kind: product-behavior}
+      source: {ref: fixture.capabilities}
+      candidate: {ref: fixture.domain_foundation}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.capabilities
+        target_capability: demo.domain-foundation
+        links:
+          - {sources: [PRODUCT], relation: CONSTRAINS, targets: [DOMAIN-BASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-09-domain-use-case-to-domain-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.use-case
+        target_capability: demo.domain-foundation
+        obligations:
+          - {id: source-semantics, source_kind: domain-use-case-semantics}
+      source: {ref: fixture.use_case}
+      candidate: {ref: fixture.domain_foundation}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.use-case
+        target_capability: demo.domain-foundation
+        links:
+          - {sources: [USECASE], relation: REALIZES, targets: [DOMAIN-BASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-10-strategic-domain-design-to-domain-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.strategic
+        target_capability: demo.domain-foundation
+        obligations:
+          - {id: source-semantics, source_kind: strategic-domain-boundary}
+      source: {ref: fixture.strategic}
+      candidate: {ref: fixture.domain_foundation}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.strategic
+        target_capability: demo.domain-foundation
+        links:
+          - {sources: [SSTRAT], relation: CONSTRAINS, targets: [DOMAIN-BASE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-11-domain-model-to-domain-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-foundation
+        target_capability: demo.domain-model
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_foundation}
+      candidate: {ref: fixture.domain_model}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-foundation
+        target_capability: demo.domain-model
+        links:
+          - {sources: [DOMAIN-BASE], relation: PRESERVES, targets: [DOMAIN]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-12-product-requirements-to-application-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.capabilities
+        target_capability: demo.application
+        obligations:
+          - {id: source-semantics, source_kind: product-behavior}
+      source: {ref: fixture.capabilities}
+      candidate: {ref: fixture.application}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.capabilities
+        target_capability: demo.application
+        links:
+          - {sources: [PRODUCT], relation: CONSTRAINS, targets: [APP]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-13-domain-model-to-application-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.application
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.application}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.application
+        links:
+          - {sources: [DOMAIN], relation: REALIZES, targets: [APP]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-14-strategic-domain-design-to-application-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.strategic
+        target_capability: demo.application
+        obligations:
+          - {id: source-semantics, source_kind: strategic-domain-boundary}
+      source: {ref: fixture.strategic}
+      candidate: {ref: fixture.application}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.strategic
+        target_capability: demo.application
+        links:
+          - {sources: [SSTRAT], relation: CONSTRAINS, targets: [APP]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-15-application-design-to-task-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.application
+        target_capability: demo.task
+        obligations:
+          - {id: source-semantics, source_kind: application-operation}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.task}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.application
+        target_capability: demo.task
+        links:
+          - {sources: [APP], relation: REALIZES, targets: [TASK]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-16-domain-model-to-task-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.task
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.task}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.task
+        links:
+          - {sources: [DOMAIN], relation: CONSTRAINS, targets: [TASK]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-17-application-design-to-user-journey-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.application
+        target_capability: demo.journey
+        obligations:
+          - {id: source-semantics, source_kind: application-operation}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.journey}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.application
+        target_capability: demo.journey
+        links:
+          - {sources: [APP], relation: REALIZES, targets: [JOURNEY]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-18-domain-model-to-user-journey-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.journey
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.journey}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.journey
+        links:
+          - {sources: [DOMAIN], relation: CONSTRAINS, targets: [JOURNEY]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-19-application-design-to-conceptual-interface-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.application
+        target_capability: demo.conceptual
+        obligations:
+          - {id: source-semantics, source_kind: application-operation}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.conceptual}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.application
+        target_capability: demo.conceptual
+        links:
+          - {sources: [APP], relation: REALIZES, targets: [CONCEPT]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-20-domain-model-to-conceptual-interface-model
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.conceptual
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.conceptual}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.conceptual
+        links:
+          - {sources: [DOMAIN], relation: REALIZES, targets: [CONCEPT]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-21-application-design-to-interaction-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.application
+        target_capability: demo.interaction
+        obligations:
+          - {id: source-semantics, source_kind: application-operation}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.interaction}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.application
+        target_capability: demo.interaction
+        links:
+          - {sources: [APP], relation: REALIZES, targets: [INTERACTION]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-22-application-design-to-interface-contract
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.application
+        target_capability: demo.interface
+        obligations:
+          - {id: source-semantics, source_kind: application-operation}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.interface}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.application
+        target_capability: demo.interface
+        links:
+          - {sources: [APP], relation: REALIZES, targets: [INTERFACE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-23-domain-model-to-interface-contract
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.interface
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.interface}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.interface
+        links:
+          - {sources: [DOMAIN], relation: PRESERVES, targets: [INTERFACE]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: edge-24-domain-model-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.domain-model
+        target_capability: demo.quality
+        obligations:
+          - {id: source-semantics, source_kind: domain-semantic}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.quality}
+      evidence:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.quality
+        links:
+          - {sources: [DOMAIN], relation: CONSTRAINS, targets: [QUALITY]}
+        dispositions: []
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: remove-domain-to-application-link
+    driver: data.patch
+    with:
+      value:
+        version: 1
+        kind: harness-semantic-derivation-evidence
+        source_capability: demo.domain-model
+        target_capability: demo.application
+        links:
+          - {sources: [DOMAIN], relation: REALIZES, targets: [APP]}
+        dispositions: []
+      operations: [{op: remove, path: /links/0}]
+  - id: domain-semantics-lost-by-application
+    driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: ddd-application-semantic-omission
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain-model, target_capability: demo.application, obligations: [{id: source-semantics, source_kind: domain-semantic}]}
+      source: {ref: fixture.domain_model}
+      candidate: {ref: fixture.application}
+      evidence: {ref: step.remove-domain-to-application-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: DOMAIN, owner_authority: APPLICATION-DESIGN}}
