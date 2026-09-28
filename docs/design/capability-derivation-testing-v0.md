@@ -174,10 +174,24 @@ Lifecycle then uses two modes:
 This keeps backward compatibility while preventing unnecessary cascade from
 unconsumed upstream changes.
 
+## Derivation test coverage
+
+`derivation_test_coverage.py` evaluates direct Engineering Graph production
+dependencies against two reusable proof forms:
+
+- a tested knowledge-kind edge, which allows one generic scenario to cover the
+  same semantic transfer class across projects;
+- an exact capability-edge test for project-specific behavior.
+
+An edge may alternatively be explicitly `NOT_APPLICABLE` with rationale.
+Anything else remains a coverage gap. The evaluator is exposed through the
+Scenario Suite as `semantic.derivation_test_coverage`; it does not introduce a
+second test runner.
+
 ## Remaining boundary
 
-The next coverage problem is meta-level completeness: every material
-ProductionContract dependency should have either tested derivation behavior or
-an explicit disposition explaining why semantic derivation testing is not
-applicable. The Scenario Suite remains the intended enforcement surface; no
-second test runner should be introduced.
+The reusable mechanisms are now present for deterministic derivation coverage,
+request-bound semantic judgement, selective lifecycle invalidation and
+derivation-test coverage. The remaining work is domain population: add
+knowledge-kind edge tests or explicit dispositions for additional Engineering
+Graph relationships as they are brought under strict semantic derivation.
