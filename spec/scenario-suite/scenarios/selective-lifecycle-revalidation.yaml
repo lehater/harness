@@ -1,0 +1,118 @@
+version: 1
+kind: harness-scenario
+id: selective-lifecycle-revalidation
+title: Downstream revalidation reacts only to consumed upstream semantic atoms
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - selective-lifecycle-revalidation
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SELECTIVE-LIFECYCLE
+      authorities:
+        - id: SOURCE
+          responsibility: Own upstream semantics.
+          boundary:
+            semantic_cohesion: Upstream facts.
+            independent_change: Facts change independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.upstream
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: USE
+          responsibility: Own downstream semantics.
+          boundary:
+            semantic_cohesion: Derived use knowledge.
+            independent_change: Use knowledge changes behind accepted source semantics.
+            public_contract: Accepted downstream knowledge.
+          produces:
+            - capability: demo.downstream
+              knowledge_kind: application-design
+              requires: [demo.upstream]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume downstream knowledge.
+          requires: [demo.downstream]
+      terminal_capabilities: []
+
+  model:
+    value:
+      artifacts:
+        - {id: UPSTREAM, authority: SOURCE, path: docs/upstream.yaml, provides: [demo.upstream], depends_on: []}
+        - {id: DOWNSTREAM, authority: USE, path: docs/downstream.yaml, provides: [demo.downstream], depends_on: [UPSTREAM]}
+      questions: []
+
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: UPSTREAM
+          capability: demo.upstream
+          acceptance_id: UPSTREAM-2
+          accepted_prerequisites: {}
+          semantic_atom_fingerprints:
+            ATOM-A: HASH-A-1
+            NOISE-G: HASH-G-2
+        - artifact: DOWNSTREAM
+          capability: demo.downstream
+          acceptance_id: DOWNSTREAM-1
+          accepted_prerequisites:
+            demo.upstream: UPSTREAM-1
+          accepted_prerequisite_semantics:
+            demo.upstream:
+              ATOM-A: HASH-A-1
+
+steps:
+  - id: irrelevant-upstream-change
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /demo.upstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: CURRENT}
+
+  - id: change-consumed-atom
+    driver: data.patch
+    with:
+      value: {ref: fixture.lifecycle}
+      operations:
+        - {op: replace, path: /providers/0/semantic_atom_fingerprints/ATOM-A, value: HASH-A-2}
+
+  - id: relevant-upstream-change
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: step.change-consumed-atom}
+    expect:
+      - {path: /demo.upstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: STALE}
+      - {path: /demo.downstream/mismatches/0/mode, op: equals, value: SEMANTIC_ATOMS}
+      - {path: /demo.downstream/mismatches/0/changed_atoms/0/id, op: equals, value: ATOM-A}
+
+  - id: add-new-irrelevant-atom
+    driver: data.patch
+    with:
+      value: {ref: fixture.lifecycle}
+      operations:
+        - {op: add, path: /providers/0/semantic_atom_fingerprints/NEW-X, value: HASH-X-1}
+
+  - id: new-irrelevant-atom-stable
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: step.add-new-irrelevant-atom}
+    expect:
+      - {path: /demo.downstream/state, op: equals, value: CURRENT}
