@@ -39,12 +39,15 @@ Each provider assertion contains:
 - the exact current prerequisite Capability acceptance identities against which
   that capability was accepted;
 - optional fingerprints for its accepted semantic atoms;
-- optional consumed-atom baselines for individual prerequisites.
+- optional exhaustive consumed-atom baselines for individual prerequisites.
 
-The acceptance identity remains Capability-granular. When no finer semantic
-baseline is available, lifecycle retains the conservative Capability-level
-behavior. When accepted derivation evidence identifies consumed upstream atoms,
-their fingerprints provide a narrower currentness proof.
+The acceptance identity remains Capability-granular. When no authoritative
+semantic baseline is available, lifecycle retains the conservative
+Capability-level behavior. A finer baseline is admitted only from an ACCEPTED
+derivation evaluation whose lifecycle dependency surface is explicitly
+exhaustive: every upstream semantic assertion must be either consumed or
+explicitly dispositioned. This prevents partial dependency evidence from
+suppressing necessary revalidation.
 
 ## Derived states
 
@@ -114,9 +117,10 @@ file dependencies.
 candidate. It publishes semantic atom fingerprints for accepted assertions.
 For non-root productions, admission fails unless every production prerequisite
 is CURRENT and therefore has an acceptance identity that can be recorded in the
-new baseline. When ACCEPTED semantic-derivation evaluations are supplied,
-admission also records their consumed-source fingerprints under
-`accepted_prerequisite_semantics`.
+new baseline. When ACCEPTED and exhaustive semantic-derivation evaluations are supplied,
+admission records their consumed-source fingerprints under
+`accepted_prerequisite_semantics`. Non-exhaustive derivation evaluations are
+not trusted for selective lifecycle baselines.
 
 `semantic_closure.py` requires the selected lifecycle assertion to match the
 ACCEPTED semantic-admission identity for every routed capability in the
