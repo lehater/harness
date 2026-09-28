@@ -81,6 +81,7 @@ required_drivers:
   - semantic.acceptance
   - semantic.derivation
   - semantic.derivation_test_coverage
+  - semantic.judgement_calibration
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure
@@ -216,6 +217,12 @@ requirements:
     category: semantic
     enforcement: required
     description: Required semantic judgement is request-bound and rejects meaning-preserving claims that an evaluator or human reviewer rejects.
+    min_scenarios: 1
+
+  - id: semantic-judgement-calibration
+    category: assurance
+    enforcement: required
+    description: External semantic-judgement verdicts are scored against expert labels with explicit false-negative and false-positive counts.
     min_scenarios: 1
 
   - id: derivation-test-coverage
