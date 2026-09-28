@@ -245,7 +245,7 @@ def _accepted_prerequisite_semantics(
     capability: str,
     prerequisite_capabilities: list[str],
     derivation_evaluations: list[dict[str, Any]] | None,
-) -> dict[str, dict[str, str]]:
+) -> dict[str, dict[str, Any]]:
     if not derivation_evaluations:
         return {}
 
