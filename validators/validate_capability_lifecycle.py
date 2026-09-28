@@ -145,6 +145,30 @@ def main() -> int:
     else:
         raise AssertionError("invalid lifecycle baseline must fail")
 
+    partial_semantic = projection(identity="ID2")
+    partial_semantic["providers"][0]["semantic_atom_fingerprints"] = {
+        "ATOM-A": "HASH-A-1",
+        "ATOM-B": "HASH-B-2",
+    }
+    partial_semantic["providers"][1]["accepted_prerequisite_semantics"] = {
+        "source.identity": {
+            "semantic_atoms": {"ATOM-A": "HASH-A-1"},
+        }
+    }
+    try:
+        evaluate_lifecycle_target(
+            GRAPH,
+            "IMPLEMENTATION",
+            MODEL,
+            partial_semantic,
+        )
+    except CoreError:
+        pass
+    else:
+        raise AssertionError(
+            "non-exhaustive semantic lifecycle baseline must fail"
+        )
+
     print("capability lifecycle: PASS (CURRENT/STALE/UNKNOWN + REVALIDATE)")
     return 0
 
