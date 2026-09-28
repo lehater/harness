@@ -219,8 +219,12 @@ def evaluate_derivation_test_coverage(
     productions = production_index(graph)
     scenario_edges = _scenario_edge_index(scenario_directory)
     invalid_registrations: list[dict[str, Any]] = []
+    auto_kind_edges = tested_kind_edges is None and scenario_directory is not None
+    auto_capability_edges = (
+        tested_capability_edges is None and scenario_directory is not None
+    )
 
-    if tested_kind_edges is None and scenario_directory is not None:
+    if auto_kind_edges:
         tested_kind_edges = [
             {
                 "source_knowledge_kind": source_kind,
@@ -230,7 +234,7 @@ def evaluate_derivation_test_coverage(
             for scenario_id, meta in sorted(scenario_edges.items())
             for source_kind, target_kind in sorted(meta["kind_edges"])
         ]
-    if tested_capability_edges is None and scenario_directory is not None:
+    if auto_capability_edges:
         tested_capability_edges = [
             {
                 "source_capability": source_capability,
@@ -325,6 +329,8 @@ def evaluate_derivation_test_coverage(
             )
             continue
         if key not in edge_ids:
+            if auto_capability_edges:
+                continue
             raise CoreError(f"tested derivation capability edge is not in graph: {key}")
         if key not in tested_capability_pairs:
             tested_capability_pairs[key] = scenario
