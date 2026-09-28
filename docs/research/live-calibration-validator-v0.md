@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: active research; deterministic validator complete, external execution proof in progress.
+Status: completed research; deterministic validator and external execution proof implemented.
 
 ## Scope
 
@@ -297,3 +297,12 @@ The transport fixture intentionally accepts every case and therefore receives ca
 ## External process mutation result
 
 The adapter is exercised against missing executable, timeout, non-zero exit, malformed response, and changed executable bytes. These map respectively to fail-closed `UNAVAILABLE`, `INTERRUPTED`, `FAILED`, `INVALID`, and changed evaluator binding. None upgrades evaluator independence.
+
+
+## Final closure after execution proof
+
+The previously missing execution proof is now present. Scenario Suite can launch an operator-selected separate evaluator process, send only blinded request material, bind executable identity into the evaluator fingerprint, validate the returned run, persist the complete evaluation through normal Scenario Suite observations, and delegate quality scoring to the unchanged calibration scorer.
+
+The execution adapter has fail-closed coverage for unavailable executable, timeout, process failure and malformed response. Changing executable bytes changes evaluator binding. CI passes with the full repository suite plus these integration checks.
+
+This closes the Live Calibration Validator research boundary. Harness guarantees blinding, request/case binding, descriptor/configuration binding, completeness/protocol validation, scorer delegation, evidence persistence and process-level failure handling. It still does not claim that a process boundary proves semantic independence or that a declared provider/model actually ran without external attestation.
