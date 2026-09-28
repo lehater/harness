@@ -1,0 +1,81 @@
+version: 1
+kind: harness-semantic-derivation-meta-contract
+id: semantic-derivation/v1
+status: experimental
+
+purpose: >-
+  Define generated evidence for semantic preservation across one direct
+  Engineering Graph production dependency without requiring a literal
+  downstream artifact shape.
+
+model:
+  subject: >-
+    One direct edge source Capability -> target ProductionContract.
+    Production quality and derivation quality are distinct checks.
+  contract:
+    kind: harness-semantic-derivation-contract
+    required:
+      - source_capability
+      - target_capability
+      - obligations
+    obligation_fields:
+      id: required
+      source_kind: required
+      min_count: optional-default-1
+      subject: optional
+  evidence:
+    kind: harness-semantic-derivation-evidence
+    required:
+      - source_capability
+      - target_capability
+      - links
+    link_fields:
+      sources: required-non-empty
+      relation: [PRESERVES, TRANSFORMS, CONSTRAINS, REALIZES]
+      targets: required-non-empty
+    dispositions:
+      statuses: [NOT_APPLICABLE, QUESTION]
+      rationale: required
+  evaluation:
+    kind: harness-semantic-derivation-evaluation
+    statuses: [ACCEPTED, REJECTED]
+    deterministic_findings:
+      - MISSING_REQUIRED_INPUT
+      - DERIVATION_EVIDENCE_REQUIRED
+      - INVALID_DERIVATION_LINKS
+      - INVALID_DERIVATION_LINK
+      - INVALID_DERIVATION_RELATION
+      - UNKNOWN_DERIVATION_SOURCE
+      - UNKNOWN_DERIVATION_TARGET
+      - INVALID_DERIVATION_DISPOSITIONS
+      - INVALID_DERIVATION_DISPOSITION
+      - DUPLICATE_DERIVATION_DISPOSITION
+      - DERIVATION_DISPOSITION_CONFLICT
+      - UNDISPOSITIONED_SOURCE
+      - DERIVATION_QUESTION
+
+rules:
+  input_gap: >-
+    If an input obligation is absent, route the Question to the Authority that
+    owns the source Capability and block that source Capability. Downstream work
+    then waits through the existing Engineering Graph dependency.
+  derivation_gap: >-
+    If a required accepted source assertion exists but has neither a valid
+    derivation link nor an explicit disposition, reject the downstream
+    derivation. This is a downstream producer defect, not an upstream Question.
+  alternatives: >-
+    Several downstream designs may be valid. Acceptance depends on required
+    semantic coverage and valid evidence, not literal target identities or shape.
+  irrelevant_input: >-
+    Source assertions outside declared input obligations do not affect
+    derivation acceptance.
+  core: >-
+    Semantic derivation evidence is generated evidence above Core. It does not
+    introduce a new Core entity.
+
+non_goals:
+  - universal ontology of engineering semantics
+  - literal artifact golden snapshots
+  - proof of arbitrary natural-language entailment
+  - replacement for Decision Governance
+  - automatic proof that every declared transformation is semantically truthful
