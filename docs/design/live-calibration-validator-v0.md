@@ -154,3 +154,29 @@ distinct run ids and pass the resulting evaluations to
 The stability evaluator requires identical corpus, protocol and evaluator
 fingerprints. It reports `STABLE` or `UNSTABLE` and the disagreeing cases.
 It deliberately does not perform consensus voting or alter scorer metrics.
+
+
+## Reference external-process adapter
+
+Harness includes an optional Scenario Suite external driver module
+`live_calibration_process_driver`. It is not loaded by scenario YAML. The
+operator/CI explicitly loads it and supplies the evaluator executable through
+`HARNESS_LIVE_CALIBRATION_EXECUTABLE`.
+
+The driver executes exactly one program without a shell and sends a JSON request
+on stdin containing only:
+
+- the versioned semantic judgement instruction;
+- the declared evaluator descriptor/configuration;
+- blinded cases with opaque `case_request_id`.
+
+Expert labels and canonical case ids are not sent.
+
+The driver fingerprints the executable bytes and effective timeout into the
+evaluator adapter descriptor before request construction. Therefore changing the
+executable or timeout changes evaluator binding and invalidates old run
+evidence.
+
+An external process boundary is execution evidence only. It does not upgrade
+`independence.status`; a separate process does not prove a fresh model session,
+different provider-side memory, or an independent viewpoint.

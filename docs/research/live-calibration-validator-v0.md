@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: active research; deterministic validator implemented, external execution RED open.
+Status: active research; external execution RED proven, minimal execution GREEN implemented.
 
 ## Scope
 
@@ -305,3 +305,27 @@ The integration fixture intentionally uses an evaluator process that ACCEPTS
 every case. The expected calibration outcome is FAIL with false negatives. This
 proves execution plumbing, not semantic quality, and prevents the fixture from
 becoming a new semantic oracle.
+
+
+## External execution GREEN
+
+The RED was observed in CI: all existing Scenario Suite coverage passed and the
+new integration validator failed only because
+`live_calibration_process_driver` did not exist.
+
+The minimal GREEN adds that one driver. It deliberately supports a single
+executable path rather than arbitrary shell commands:
+
+- executable selection remains operator/CI configuration;
+- scenario data cannot choose code to execute;
+- no shell is used;
+- executable bytes and timeout are incorporated into the effective evaluator
+  descriptor and therefore into request identity;
+- only blinded request material crosses the process boundary;
+- process/output failures are converted to normal fail-closed live-run states;
+- the resulting predictions still flow through
+  `semantic_judgement_calibration.py`.
+
+The fixture evaluator accepts every case and therefore scores FAIL with five
+false negatives. This proves the execution path cannot manufacture semantic
+success.
