@@ -174,12 +174,18 @@ under `accepted_prerequisite_semantics`.
 
 Lifecycle then uses two modes:
 
-- no semantic baseline -> conservative prerequisite acceptance-id comparison;
-- consumed semantic baseline -> stale only when a consumed atom changes,
-  disappears, or its upstream Capability is itself non-current.
+- no authoritative semantic baseline -> conservative prerequisite
+  acceptance-id comparison;
+- exhaustive consumed semantic baseline -> stale only when a consumed atom
+  changes, disappears, or its upstream Capability is itself non-current.
 
-This keeps backward compatibility while preventing unnecessary cascade from
-unconsumed upstream changes.
+Selective currentness is fail-closed. A derivation contract must explicitly
+declare `lifecycle_dependency.exhaustive: true`, and every upstream semantic
+assertion must be either linked as consumed or explicitly dispositioned. A
+partial derivation evaluation cannot silently narrow lifecycle invalidation.
+
+This keeps backward compatibility while preventing unnecessary cascade only
+when the dependency surface is proven complete.
 
 ## Derivation test coverage
 
