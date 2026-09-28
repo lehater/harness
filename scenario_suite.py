@@ -241,6 +241,28 @@ def validate_scenario(document: dict[str, Any]) -> None:
         ids.add(step_id)
         if not isinstance(driver, str) or not driver:
             raise ScenarioError(f"step {step_id} driver is required")
+        benchmark = step.get("benchmark")
+        if benchmark is not None:
+            if not isinstance(benchmark, dict):
+                raise ScenarioError(
+                    f"step {step_id} benchmark must be a mapping"
+                )
+            metrics = benchmark.get("metrics")
+            if (
+                not isinstance(metrics, list)
+                or not metrics
+                or any(not isinstance(item, str) or not item for item in metrics)
+            ):
+                raise ScenarioError(
+                    f"step {step_id} benchmark requires non-empty metrics"
+                )
+            mutation_class = benchmark.get("mutation_class")
+            if mutation_class is not None and (
+                not isinstance(mutation_class, str) or not mutation_class
+            ):
+                raise ScenarioError(
+                    f"step {step_id} benchmark mutation_class must be non-empty"
+                )
 
 
 def run_scenario(path: Path) -> ScenarioResult:
@@ -344,6 +366,11 @@ def run_scenario(path: Path) -> ScenarioResult:
                         "id": step_id,
                         "driver": step["driver"],
                         "status": "PASS",
+                        **(
+                            {"benchmark": copy.deepcopy(step["benchmark"])}
+                            if step.get("benchmark") is not None
+                            else {}
+                        ),
                         **(
                             {"observations": observations}
                             if observations
@@ -563,6 +590,83 @@ def evaluate_coverage(
     }
 
 
+
+def evaluate_benchmarks(
+    catalog: dict[str, Any],
+    results: list[ScenarioResult],
+) -> dict[str, Any]:
+    metric_counts: dict[str, dict[str, int]] = {}
+    mutation_counts: dict[str, dict[str, int]] = {}
+    cases: list[dict[str, Any]] = []
+
+    for result in results:
+        for step in result.steps:
+            benchmark = step.get("benchmark")
+            if not isinstance(benchmark, dict):
+                continue
+            metrics = benchmark.get("metrics", []) or []
+            passed = step.get("status") == "PASS"
+            case = {
+                "scenario": result.id,
+                "step": step.get("id"),
+                "status": "PASS" if passed else "FAIL",
+                "metrics": list(metrics),
+            }
+            mutation_class = benchmark.get("mutation_class")
+            if isinstance(mutation_class, str):
+                case["mutation_class"] = mutation_class
+            cases.append(case)
+
+            for metric in metrics:
+                counts = metric_counts.setdefault(
+                    metric,
+                    {"total": 0, "passed": 0, "failed": 0},
+                )
+                counts["total"] += 1
+                counts["passed" if passed else "failed"] += 1
+
+            if isinstance(mutation_class, str):
+                counts = mutation_counts.setdefault(
+                    mutation_class,
+                    {"total": 0, "passed": 0, "failed": 0},
+                )
+                counts["total"] += 1
+                counts["passed" if passed else "failed"] += 1
+
+    def rendered(
+        source: dict[str, dict[str, int]],
+    ) -> dict[str, dict[str, Any]]:
+        return {
+            key: {
+                **counts,
+                "pass_rate": (
+                    counts["passed"] / counts["total"]
+                    if counts["total"]
+                    else None
+                ),
+            }
+            for key, counts in sorted(source.items())
+        }
+
+    findings: list[dict[str, Any]] = []
+    for metric in catalog.get("required_benchmark_metrics", []) or []:
+        if metric not in metric_counts:
+            findings.append(
+                {
+                    "code": "BENCHMARK_METRIC_MISSING",
+                    "metric": metric,
+                }
+            )
+
+    return {
+        "status": "PASS" if not findings else "FAIL",
+        "case_count": len(cases),
+        "metrics": rendered(metric_counts),
+        "mutation_classes": rendered(mutation_counts),
+        "cases": cases,
+        "findings": findings,
+    }
+
 def run_suite(root: Path, catalog_path: Path) -> dict[str, Any]:
     paths = sorted(root.rglob("*.yaml"))
     results = [run_scenario(path) for path in paths]
@@ -570,7 +674,8 @@ def run_suite(root: Path, catalog_path: Path) -> dict[str, Any]:
     duplicate_ids = sorted({item for item in ids if ids.count(item) > 1})
     catalog = _load_catalog(catalog_path)
     coverage = evaluate_coverage(catalog, results)
-    findings = list(coverage["findings"])
+    benchmarks = evaluate_benchmarks(catalog, results)
+    findings = list(coverage["findings"]) + list(benchmarks["findings"])
     if duplicate_ids:
         findings.append(
             {"code": "DUPLICATE_SCENARIO_ID", "ids": duplicate_ids}
@@ -596,6 +701,7 @@ def run_suite(root: Path, catalog_path: Path) -> dict[str, Any]:
             **coverage,
             "findings": findings,
         },
+        "benchmarks": benchmarks,
         "scenarios": [result.as_dict() for result in results],
     }
 
