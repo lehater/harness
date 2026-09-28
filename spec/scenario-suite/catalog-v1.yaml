@@ -33,6 +33,12 @@ dimensions:
     - agent-evaluation
     - real-project
 
+required_scenario_dimensions:
+  - project_archetype
+  - stage
+  - behavior_class
+  - execution_type
+
 required_dimension_values:
   stage: [bootstrap, design, decision, implementation, revalidation, diagnosis]
   behavior_class:

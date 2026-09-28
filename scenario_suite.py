@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import importlib
 import json
 import shutil
 import tempfile
@@ -316,11 +317,38 @@ def run_scenario(path: Path) -> ScenarioResult:
                             f"step {step_id}: assertion must be a mapping"
                         )
                     _assertion(output, assertion, fixtures, outputs)
+                observe = step.get("observe", {}) or {}
+                if not isinstance(observe, dict):
+                    raise ScenarioError(
+                        f"step {step_id}: observe must be a mapping"
+                    )
+                observations = {}
+                for name, pointer in observe.items():
+                    if not isinstance(name, str) or not name:
+                        raise ScenarioError(
+                            f"step {step_id}: observation name must be non-empty"
+                        )
+                    if not isinstance(pointer, str):
+                        raise ScenarioError(
+                            f"step {step_id}: observation path must be a string"
+                        )
+                    observed = _pointer(output, pointer, _MISSING)
+                    if observed is _MISSING:
+                        raise ScenarioError(
+                            f"step {step_id}: observation path absent: {pointer}"
+                        )
+                    observations[name] = copy.deepcopy(observed)
+
                 trace.append(
                     {
                         "id": step_id,
                         "driver": step["driver"],
                         "status": "PASS",
+                        **(
+                            {"observations": observations}
+                            if observations
+                            else {}
+                        ),
                     }
                 )
     except Exception as exc:
@@ -351,6 +379,19 @@ def run_scenario(path: Path) -> ScenarioResult:
     )
 
 
+def load_driver_modules(modules: list[str]) -> None:
+    """Load explicitly configured driver extensions.
+
+    Scenario YAML cannot select Python modules to import. Extensions are an
+    operator/CI choice supplied through the CLI, keeping executable code out of
+    untrusted scenario data.
+    """
+    for module in modules:
+        if not isinstance(module, str) or not module.strip():
+            raise ScenarioError("driver module name must be non-empty")
+        importlib.import_module(module)
+
+
 def _load_catalog(path: Path) -> dict[str, Any]:
     document = _load_yaml(path)
     if not isinstance(document, dict):
@@ -374,7 +415,20 @@ def evaluate_coverage(
     dimensions = catalog.get("dimensions", {}) or {}
     findings: list[dict[str, Any]] = []
 
+    required_scenario_dimensions = (
+        catalog.get("required_scenario_dimensions", []) or []
+    )
+
     for result in results:
+        for dimension in required_scenario_dimensions:
+            if dimension not in result.dimensions:
+                findings.append(
+                    {
+                        "code": "SCENARIO_DIMENSION_MISSING",
+                        "scenario": result.id,
+                        "dimension": dimension,
+                    }
+                )
         for claim in result.covers:
             if claim not in requirements:
                 findings.append(
@@ -529,8 +583,18 @@ def main() -> int:
         default="spec/scenario-suite/catalog-v1.yaml",
     )
     parser.add_argument("--json-report")
+    parser.add_argument(
+        "--driver-module",
+        action="append",
+        default=[],
+        help=(
+            "Explicit Python module that registers extra scenario drivers. "
+            "May be repeated; modules are never selected from scenario YAML."
+        ),
+    )
     args = parser.parse_args()
 
+    load_driver_modules(args.driver_module)
     report = run_suite(Path(args.root), Path(args.catalog))
     rendered = json.dumps(report, indent=2, sort_keys=True)
     if args.json_report:

@@ -175,3 +175,25 @@ The first cross-layer suite intentionally spans distinct Harness mechanisms:
 These scenarios are bootstrap proofs of the mechanism, not the final scenario
 inventory. New Harness behavior should normally add or strengthen a catalog
 requirement and then add scenarios until that requirement is satisfied.
+
+
+## External drivers
+
+Target repositories may extend the runner without changing Harness. The CLI
+accepts repeated `--driver-module <python.module>` options. Each explicitly
+loaded module may register drivers through `scenario_driver(...)`.
+
+Driver modules are selected by the operator/CI command, never by scenario YAML.
+This keeps executable-code selection outside untrusted test data while allowing
+Prep, NAPMS or another repository to expose project-native validators and
+integration behavior to the same scenario protocol.
+
+## Observations
+
+Assertions determine pass/fail. A step may additionally declare `observe` as a
+mapping from stable observation names to JSON Pointer paths. Observations are
+copied into the suite report without requiring a full golden snapshot.
+
+Use observations for longitudinal analysis such as selected frontier size,
+Question owner, activated concern count or decision disposition. They are
+diagnostic evidence, not a second correctness oracle.

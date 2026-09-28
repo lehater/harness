@@ -93,6 +93,9 @@ steps:
       - {path: /, op: length, value: 1}
       - {path: /0/authority, op: equals, value: APPLICATION-DESIGN}
       - {path: /0/blocks_capabilities, op: equals, value: [demo.task-model]}
+    observe:
+      question_id: /0/id
+      question_authority: /0/authority
   - id: project
     driver: semantic.apply_questions
     with:
