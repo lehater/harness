@@ -1,0 +1,55 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: semantic-derivation-calibration-v1
+cases:
+  - id: semantic-weakening
+    expected_status: REJECTED
+    mutation_class: semantic-weakening
+    source: Unauthorized actors must not execute resource edits.
+    target: Warn unauthorized actors but allow the edit to proceed.
+    relation: REALIZES
+    rationale: Warning plus execution weakens mandatory denial.
+
+  - id: semantic-inversion
+    expected_status: REJECTED
+    mutation_class: semantic-inversion
+    source: Validation failure preserves all valid entered values.
+    target: Validation failure clears all entered values.
+    relation: REALIZES
+    rationale: Clearing values contradicts preservation.
+
+  - id: semantic-subject-swap
+    expected_status: REJECTED
+    mutation_class: semantic-subject-swap
+    source: Actor may edit only RESOURCE-A.
+    target: Actor may edit RESOURCE-B.
+    relation: PRESERVES
+    rationale: The target changes the governed subject.
+
+  - id: valid-paraphrase
+    expected_status: ACCEPTED
+    mutation_class: valid-paraphrase
+    source: Unauthorized actors must not execute resource edits.
+    target: Deny edit execution when the actor lacks authorization.
+    relation: TRANSFORMS
+    rationale: The target preserves the denial semantics.
+
+  - id: valid-decomposition
+    expected_status: ACCEPTED
+    mutation_class: valid-decomposition
+    source: On validation failure preserve valid entered values and explain the invalid field.
+    target:
+      - Preserve valid entered values.
+      - Explain the invalid field.
+    relation: REALIZES
+    rationale: The target decomposes both required effects without loss.
+
+  - id: valid-aggregation
+    expected_status: ACCEPTED
+    mutation_class: valid-aggregation
+    source:
+      - Unauthorized actors must not execute resource edits.
+      - Successful resource edits must expose the changed state.
+    target: Authorized edits expose the changed state; unauthorized edits are denied.
+    relation: TRANSFORMS
+    rationale: The target combines both source constraints without weakening them.
