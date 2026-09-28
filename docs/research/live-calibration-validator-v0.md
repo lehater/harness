@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: active research; RED proven, minimal GREEN implemented.
+Status: completed research; implemented experimental validator.
 
 ## Scope
 
@@ -154,3 +154,95 @@ separate live evaluations. Each retains its own descriptor fingerprint and full
 existing scorer result. Comparison is side-by-side over false negatives, false
 positives, recall, false-positive rate, accuracy, per-class accuracy and misses;
 Harness does not select a winner or collapse those dimensions.
+
+
+## Closure result
+
+The research question is answered positively with an explicit trust boundary.
+
+Harness can reproducibly measure a concrete live evaluator when an
+operator-controlled Scenario Suite driver performs the external call and returns
+a run bound to the generated request. Harness itself remains deterministic and
+does not become the semantic oracle.
+
+The resulting model is:
+
+- **Calibration Corpus** — canonical Harness expert oracle.
+- **Evaluation Protocol** — canonical versioned, label-blind evaluator contract.
+- **Evaluator Descriptor** — runtime provenance/configuration input whose full
+  contents are fingerprinted.
+- **Live Calibration Request** — generated evidence binding corpus, protocol,
+  evaluator descriptor and run identity; contains only blinded cases.
+- **Live Calibration Run** — runtime evidence produced by the external driver.
+- **Calibration Evaluation** — generated deterministic evidence containing the
+  unchanged existing scorer result.
+- **Stability Evaluation** — optional generated evidence comparing repeated
+  runs of the exact same binding.
+
+No new Core concept was required.
+
+### Guarantees established by Harness
+
+1. Expert labels, mutation classes, expert rationale and label-bearing canonical
+   case ids are withheld from evaluator input.
+2. Corpus, protocol, evaluator descriptor/configuration, adapter version and run
+   identity are cryptographically bound into the request.
+3. Each returned verdict is bound to an opaque request-specific case identity.
+4. Changed corpus/protocol/evaluator configuration or run identity invalidates
+   old predictions.
+5. Unknown, duplicate, malformed or missing verdict evidence cannot become a
+   successful calibration.
+6. Interrupted, failed or unavailable runs cannot become successful
+   calibration.
+7. Validated predictions are scored only by
+   `semantic_judgement_calibration.py`; scorer semantics are not duplicated.
+8. Separate evaluator/model/configuration runs retain separate FN, FP, recall,
+   false-positive rate, accuracy, per-class performance and misses.
+9. Repeated identical bindings can be checked for verdict instability without
+   inventing consensus or a combined quality score.
+10. Private chain-of-thought is neither requested nor required; short rationale
+    and structured findings are optional auditable evidence.
+
+### Guarantees outside Harness
+
+Harness does not prove:
+
+- that expert labels are universally correct;
+- that the declared provider/model/version actually ran unless the external
+  control plane supplies independently verifiable attestation;
+- that two evaluator runs are organizationally, physically or statistically
+  independent;
+- that a fresh process implies a fresh model session or absence of hidden
+  provider-side memory;
+- production error rates from the bootstrap corpus.
+
+Accordingly evaluator independence remains `UNVERIFIED` in ordinary run
+evidence. This is intentional fail-closed behavior, not a missing semantic
+validator.
+
+### Execution boundary
+
+A real evaluator call is made by an explicitly operator-loaded Scenario Suite
+driver. The driver may target a separate model, fresh model configuration,
+isolated agent/session, external evaluator service, HUMAN workflow, or multiple
+independent evaluators. Harness supplies the blinded request and validates the
+returned run.
+
+A provider-specific driver is infrastructure/integration code and is not
+required in Core. No concrete provider calibration result is recorded by this
+research change because no independently controlled evaluator/provider
+configuration is part of the repository fixture. Such a result must be added as
+separate runtime evidence, not synthesized by the same agent that authored the
+corpus/protocol.
+
+## CI evidence
+
+- RED: PR #94 commit
+  `da4daeb202b5de459ca94a2c5cce1f5bfda54088` failed exactly because the
+  required live-calibration driver was absent.
+- GREEN + mutations: commit
+  `f6db868b64ac1272afa24dd038a4b61fdb5f7f25` passed the complete
+  `harness core` workflow.
+
+The Scenario Suite is therefore the executable acceptance surface for the
+validator; no parallel test runner was introduced.

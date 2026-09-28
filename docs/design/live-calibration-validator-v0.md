@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: experimental.
+Status: implemented experimental design; research closed in `docs/research/live-calibration-validator-v0.md`.
 
 ## Purpose
 
