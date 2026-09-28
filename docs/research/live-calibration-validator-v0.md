@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: completed research; implemented experimental validator.
+Status: active research; deterministic validator complete, external execution proof in progress.
 
 ## Scope
 
@@ -282,3 +282,18 @@ corpus/protocol.
 
 The Scenario Suite is therefore the executable acceptance surface for the
 validator; no parallel test runner was introduced.
+
+
+## External execution RED — reopened closure
+
+The earlier closure was stronger than the executable evidence: Harness validated externally supplied run records, but did not yet prove that Scenario Suite could launch a separate evaluator runtime. The RED required an explicitly loaded process driver. CI showed all existing Scenario Suite coverage passing and failed only with `ModuleNotFoundError: live_calibration_process_driver`.
+
+## External execution GREEN
+
+A single optional process adapter reuses the existing Scenario Suite driver extension. Scenario data cannot select an executable and no shell is used. Only blinded request material crosses the process boundary; the resulting run is validated and scored by the existing live validator and `semantic_judgement_calibration.py`.
+
+The transport fixture intentionally accepts every case and therefore receives calibration FAIL with five false negatives. It proves execution plumbing, not semantic quality.
+
+## External process mutation result
+
+The adapter is exercised against missing executable, timeout, non-zero exit, malformed response, and changed executable bytes. These map respectively to fail-closed `UNAVAILABLE`, `INTERRUPTED`, `FAILED`, `INVALID`, and changed evaluator binding. None upgrades evaluator independence.

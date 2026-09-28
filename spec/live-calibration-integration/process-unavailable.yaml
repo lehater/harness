@@ -1,0 +1,34 @@
+version: 1
+kind: harness-scenario
+id: live-calibration-process-unavailable
+title: Missing evaluator executable fails closed
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+fixtures:
+  corpus: {yaml: ../semantic-derivation/calibration-corpus-v1.yaml}
+  protocol: {yaml: ../semantic-derivation/live-calibration-protocol-v1.yaml}
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: unavailable
+      provider: fixture
+      model: unavailable
+      model_version: "1"
+      configuration: {}
+      adapter: {id: process-json, version: "1"}
+steps:
+  - id: execute
+    driver: semantic.live_calibration.execute_process
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: PROCESS-UNAVAILABLE
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_RUN_NOT_COMPLETED, state: UNAVAILABLE}}
+      - {path: /execution/state, op: equals, value: UNAVAILABLE}

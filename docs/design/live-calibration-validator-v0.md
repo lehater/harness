@@ -1,6 +1,6 @@
 # Live Calibration Validator v0
 
-Status: implemented experimental design; research closed in `docs/research/live-calibration-validator-v0.md`.
+Status: implemented experimental design; external execution proof in progress.
 
 ## Purpose
 
@@ -154,3 +154,10 @@ distinct run ids and pass the resulting evaluations to
 The stability evaluator requires identical corpus, protocol and evaluator
 fingerprints. It reports `STABLE` or `UNSTABLE` and the disagreeing cases.
 It deliberately does not perform consensus voting or alter scorer metrics.
+
+
+## Reference external-process adapter
+
+Harness includes optional Scenario Suite driver `live_calibration_process_driver`, loaded only by operator/CI configuration. It executes one configured program without a shell and sends only the versioned instruction, evaluator descriptor/configuration, and blinded cases with opaque `case_request_id`.
+
+Executable bytes and timeout are fingerprinted into the evaluator adapter descriptor before request construction. Changing either changes evaluator binding. The separate-process boundary does not prove evaluator independence; `independence.status` remains `UNVERIFIED`.

@@ -1,0 +1,34 @@
+version: 1
+kind: harness-scenario
+id: live-calibration-process-malformed
+title: Malformed evaluator response is invalid
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+fixtures:
+  corpus: {yaml: ../semantic-derivation/calibration-corpus-v1.yaml}
+  protocol: {yaml: ../semantic-derivation/live-calibration-protocol-v1.yaml}
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: malformed
+      provider: fixture
+      model: malformed
+      model_version: "1"
+      configuration: {}
+      adapter: {id: process-json, version: "1"}
+steps:
+  - id: execute
+    driver: semantic.live_calibration.execute_process
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: PROCESS-MALFORMED
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_RESULTS_INVALID}}
+      - {path: /execution/response, op: equals, value: MALFORMED}
