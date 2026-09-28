@@ -22,6 +22,7 @@ class ScenarioError(CoreError):
 
 
 _MISSING = object()
+_NO_DEFAULT = object()
 
 
 @dataclass
@@ -82,7 +83,7 @@ def _load_fixture(
     raise ScenarioError(f"invalid fixture {fixture_id}")
 
 
-def _pointer(value: Any, pointer: str, default: Any = _MISSING) -> Any:
+def _pointer(value: Any, pointer: str, default: Any = _NO_DEFAULT) -> Any:
     if pointer in ("", "/"):
         return value
     if not pointer.startswith("/"):
@@ -99,7 +100,7 @@ def _pointer(value: Any, pointer: str, default: Any = _MISSING) -> Any:
                 raise KeyError(token)
         return current
     except (KeyError, IndexError, ValueError, TypeError):
-        if default is not _MISSING:
+        if default is not _NO_DEFAULT:
             return default
         raise ScenarioError(f"assertion path not found: {pointer}")
 
