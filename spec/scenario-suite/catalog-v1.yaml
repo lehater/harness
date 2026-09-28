@@ -194,6 +194,12 @@ requirements:
     description: Direct Capability derivation accounts for required upstream semantic atoms without forcing one literal downstream design.
     min_scenarios: 1
 
+  - id: semantic-derivation-truth
+    category: semantic
+    enforcement: required
+    description: Required semantic judgement is request-bound and rejects meaning-preserving claims that an evaluator or human reviewer rejects.
+    min_scenarios: 1
+
   - id: semantic-contradiction-detection
     category: semantic
     enforcement: required
