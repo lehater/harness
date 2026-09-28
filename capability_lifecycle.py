@@ -35,6 +35,8 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
         artifact = item.get("artifact")
         acceptance_id = item.get("acceptance_id")
         baseline = item.get("accepted_prerequisites", {})
+        semantic_atoms = item.get("semantic_atom_fingerprints", {})
+        semantic_baseline = item.get("accepted_prerequisite_semantics", {})
         if not all(isinstance(v, str) and v for v in (capability, artifact, acceptance_id)):
             raise CoreError("lifecycle provider artifact/capability/acceptance_id are required")
         if capability in result:
@@ -47,6 +49,35 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
             for k, v in baseline.items()
         ):
             raise CoreError(f"invalid prerequisite baseline for {capability}")
+        if not isinstance(semantic_atoms, dict) or any(
+            not isinstance(k, str)
+            or not k
+            or not isinstance(v, str)
+            or not v
+            for k, v in semantic_atoms.items()
+        ):
+            raise CoreError(f"invalid semantic atom fingerprints for {capability}")
+        if not isinstance(semantic_baseline, dict):
+            raise CoreError(
+                f"invalid prerequisite semantic baseline for {capability}"
+            )
+        for prerequisite, atoms in semantic_baseline.items():
+            if (
+                not isinstance(prerequisite, str)
+                or not prerequisite
+                or not isinstance(atoms, dict)
+                or not atoms
+                or any(
+                    not isinstance(atom_id, str)
+                    or not atom_id
+                    or not isinstance(fingerprint, str)
+                    or not fingerprint
+                    for atom_id, fingerprint in atoms.items()
+                )
+            ):
+                raise CoreError(
+                    f"invalid prerequisite semantic baseline for {capability}"
+                )
         result[capability] = item
     return result
 
@@ -78,6 +109,12 @@ def validate_projection(
             raise CoreError(
                 f"lifecycle baseline for {capability} must cover exactly production prerequisites; "
                 f"expected {sorted(expected)}, got {sorted(actual)}"
+            )
+        semantic_actual = set(item.get("accepted_prerequisite_semantics", {}))
+        if not semantic_actual.issubset(expected):
+            raise CoreError(
+                f"semantic lifecycle baseline for {capability} references non-prerequisites; "
+                f"expected subset of {sorted(expected)}, got {sorted(semantic_actual)}"
             )
     return lifecycle
 
@@ -114,17 +151,63 @@ def lifecycle_states(
         mismatches: list[dict[str, Any]] = []
         baseline = item.get("accepted_prerequisites", {})
 
+        semantic_baseline = item.get("accepted_prerequisite_semantics", {})
         for prerequisite in required:
             upstream = state(prerequisite)
-            current = lifecycle.get(prerequisite, {}).get("acceptance_id")
-            if (
-                upstream["state"] != "CURRENT"
-                or baseline.get(prerequisite) != current
-            ):
+            upstream_provider = lifecycle.get(prerequisite, {})
+            current = upstream_provider.get("acceptance_id")
+            accepted = baseline.get(prerequisite)
+
+            if upstream["state"] != "CURRENT":
                 mismatches.append(
                     {
                         "capability": prerequisite,
-                        "accepted_acceptance_id": baseline.get(prerequisite),
+                        "mode": "UPSTREAM_STATE",
+                        "accepted_acceptance_id": accepted,
+                        "current_acceptance_id": current,
+                        "upstream_state": upstream["state"],
+                    }
+                )
+                continue
+
+            consumed_atoms = semantic_baseline.get(prerequisite)
+            if consumed_atoms is not None:
+                current_atoms = upstream_provider.get(
+                    "semantic_atom_fingerprints",
+                    {},
+                )
+                changed_atoms: list[dict[str, Any]] = []
+                for atom_id, accepted_fingerprint in sorted(
+                    consumed_atoms.items()
+                ):
+                    current_fingerprint = current_atoms.get(atom_id)
+                    if current_fingerprint != accepted_fingerprint:
+                        changed_atoms.append(
+                            {
+                                "id": atom_id,
+                                "accepted_fingerprint": accepted_fingerprint,
+                                "current_fingerprint": current_fingerprint,
+                            }
+                        )
+                if changed_atoms:
+                    mismatches.append(
+                        {
+                            "capability": prerequisite,
+                            "mode": "SEMANTIC_ATOMS",
+                            "accepted_acceptance_id": accepted,
+                            "current_acceptance_id": current,
+                            "upstream_state": upstream["state"],
+                            "changed_atoms": changed_atoms,
+                        }
+                    )
+                continue
+
+            if accepted != current:
+                mismatches.append(
+                    {
+                        "capability": prerequisite,
+                        "mode": "CAPABILITY_ACCEPTANCE",
+                        "accepted_acceptance_id": accepted,
                         "current_acceptance_id": current,
                         "upstream_state": upstream["state"],
                     }
