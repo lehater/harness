@@ -38,10 +38,15 @@ Initial semantic classes:
 - semantic subject swap — REJECTED;
 - valid paraphrase — ACCEPTED;
 - valid decomposition — ACCEPTED;
-- valid aggregation — ACCEPTED.
+- valid aggregation — ACCEPTED;
+- valid strengthening — ACCEPTED;
+- semantic partial loss — REJECTED;
+- valid subject preservation — ACCEPTED;
+- semantic outcome substitution — REJECTED.
 
-The corpus is deliberately balanced between defect cases and valid controls.
-It is a bootstrap calibration set, not a claim of statistical
+The 10-case corpus is deliberately balanced between defect cases and valid
+controls, including near-miss cases whose wording is related but whose semantic
+verdict differs. It is a bootstrap calibration set, not a claim of statistical
 representativeness.
 
 ## Evaluator input
@@ -110,11 +115,14 @@ This protocol measures agreement with the expert corpus. It does not establish
 that the expert labels are universally correct, nor does it estimate production
 error rates from six bootstrap cases.
 
-The next calibration work is corpus growth:
+The next calibration work is:
 
-1. near-miss pairs with small wording changes and opposite labels;
-2. DDD / security / consistency / lifecycle-specific semantic cases;
-3. independently reviewed labels;
-4. evaluator runs recorded by model/version/configuration;
-5. trend comparison across evaluator versions without weakening the Harness
+1. DDD / security / consistency / lifecycle-specific semantic cases;
+2. independently reviewed labels;
+3. evaluator runs recorded by model/version/configuration;
+4. trend comparison across evaluator versions without weakening the Harness
    acceptance contract.
+
+Live evaluator execution is intentionally outside this bootstrap PR. Without a
+specific evaluator/model identity and configuration, recording generated
+verdicts would not be reproducible calibration evidence.
