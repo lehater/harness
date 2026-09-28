@@ -1,0 +1,356 @@
+version: 1
+kind: harness-scenario
+id: frontend-semantic-derivation-chain
+title: Frontend design DAG preserves required semantics across direct production edges
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: FRONTEND-DERIVATION-CHAIN
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted users, goals and needs.
+          boundary:
+            semantic_cohesion: Problem-space user knowledge.
+            independent_change: Needs can change before design.
+            public_contract: Accepted User Needs.
+          produces:
+            - capability: demo.user-needs
+              knowledge_kind: user-needs
+              requires: []
+        - id: APPLICATION-DESIGN
+          responsibility: Own intended task semantics.
+          boundary:
+            semantic_cohesion: Goal-to-task decomposition.
+            independent_change: Tasks can change before interface structure.
+            public_contract: Accepted Task Model.
+          produces:
+            - capability: demo.task-model
+              knowledge_kind: task-model
+              requires: [demo.user-needs]
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own interaction, topology and screen semantics.
+          boundary:
+            semantic_cohesion: User-visible interface design.
+            independent_change: Interface design can evolve behind accepted tasks.
+            public_contract: Accepted human-interface knowledge.
+          produces:
+            - capability: demo.interaction
+              knowledge_kind: interaction-design
+              requires: [demo.task-model]
+            - capability: demo.topology
+              knowledge_kind: interface-topology-design
+              requires: [demo.interaction]
+            - capability: demo.screen
+              knowledge_kind: screen-view-design
+              requires: [demo.interaction, demo.topology]
+      consumers:
+        - id: FRONTEND
+          purpose: Consume accepted screen design.
+          requires: [demo.screen]
+      terminal_capabilities: []
+
+  user-needs:
+    value:
+      semantic_assertions:
+        - {id: GOAL-1, kind: user-goal, subject: USER-1, semantic_value: edit-resource, decision_authority: DISCOVERY}
+        - {id: NEED-1, kind: user-need, subject: GOAL-1, semantic_value: understand-current-state-before-change, decision_authority: DISCOVERY}
+
+  task-model:
+    value:
+      semantic_assertions:
+        - {id: TASK-GOAL-1, kind: task-goal, subject: GOAL-1, semantic_value: edit-resource, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-1, kind: task, subject: GOAL-1, semantic_value: edit-resource, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-INFO-1, kind: task-information, subject: TASK-1, semantic_value: current-resource-state, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-INPUT-1, kind: task-decision-input, subject: TASK-1, semantic_value: requested-change, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-OUTCOME-1, kind: task-outcome, subject: TASK-1, semantic_value: changed-resource-visible, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-RECOVERY-1, kind: task-recovery, subject: TASK-1, semantic_value: invalid-change-preserves-input, decision_authority: APPLICATION-DESIGN}
+
+  interaction:
+    value:
+      semantic_assertions:
+        - {id: CTX-1, kind: interaction-context, subject: TASK-1, semantic_value: resource-edit-context, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-INFO-1, kind: interaction-information, subject: CTX-1, semantic_value: current-resource-state-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-ACTION-1, kind: interaction-action, subject: CTX-1, semantic_value: submit-requested-change, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-OUTCOME-1, kind: interaction-outcome, subject: CTX-1, semantic_value: changed-resource-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-RECOVERY-1, kind: interaction-recovery, subject: CTX-1, semantic_value: validation-state-preserves-input, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  topology:
+    value:
+      semantic_assertions:
+        - {id: VIEW-1, kind: topology-view, subject: CTX-1, semantic_value: resource-detail-view, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  screen:
+    value:
+      semantic_assertions:
+        - {id: SCREEN-1, kind: screen-view, subject: VIEW-1, semantic_value: resource-detail-screen, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-INFO-1, kind: screen-information, subject: SCREEN-1, semantic_value: current-resource-state-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-ACTION-1, kind: screen-action, subject: SCREEN-1, semantic_value: submit-requested-change, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-OUTCOME-1, kind: screen-state, subject: SCREEN-1, semantic_value: changed-resource-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-RECOVERY-1, kind: screen-recovery, subject: SCREEN-1, semantic_value: validation-state-preserves-input, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  user-to-task-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.user-needs
+      target_capability: demo.task-model
+      obligations:
+        - {id: goals, source_kind: user-goal}
+        - {id: needs, source_kind: user-need}
+
+  user-to-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.user-needs
+      target_capability: demo.task-model
+      links:
+        - {sources: [GOAL-1], relation: PRESERVES, targets: [TASK-GOAL-1]}
+        - {sources: [NEED-1], relation: REALIZES, targets: [TASK-1]}
+      dispositions: []
+
+  task-to-interaction-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.task-model
+      target_capability: demo.interaction
+      obligations:
+        - {id: information, source_kind: task-information}
+        - {id: input, source_kind: task-decision-input}
+        - {id: outcome, source_kind: task-outcome}
+        - {id: recovery, source_kind: task-recovery}
+
+  task-to-interaction-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task-model
+      target_capability: demo.interaction
+      links:
+        - {sources: [TASK-INFO-1], relation: TRANSFORMS, targets: [INT-INFO-1]}
+        - {sources: [TASK-INPUT-1], relation: REALIZES, targets: [INT-ACTION-1]}
+        - {sources: [TASK-OUTCOME-1], relation: REALIZES, targets: [INT-OUTCOME-1]}
+        - {sources: [TASK-RECOVERY-1], relation: REALIZES, targets: [INT-RECOVERY-1]}
+      dispositions: []
+
+  interaction-to-topology-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.interaction
+      target_capability: demo.topology
+      obligations:
+        - {id: contexts, source_kind: interaction-context}
+
+  interaction-to-topology-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.interaction
+      target_capability: demo.topology
+      links:
+        - {sources: [CTX-1], relation: REALIZES, targets: [VIEW-1]}
+      dispositions: []
+
+  topology-to-screen-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.topology
+      target_capability: demo.screen
+      obligations:
+        - {id: views, source_kind: topology-view}
+
+  topology-to-screen-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.topology
+      target_capability: demo.screen
+      links:
+        - {sources: [VIEW-1], relation: REALIZES, targets: [SCREEN-1]}
+      dispositions: []
+
+  interaction-to-screen-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.interaction
+      target_capability: demo.screen
+      obligations:
+        - {id: information, source_kind: interaction-information}
+        - {id: actions, source_kind: interaction-action}
+        - {id: outcomes, source_kind: interaction-outcome}
+        - {id: recovery, source_kind: interaction-recovery}
+
+  interaction-to-screen-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.interaction
+      target_capability: demo.screen
+      links:
+        - {sources: [INT-INFO-1], relation: REALIZES, targets: [SCREEN-INFO-1]}
+        - {sources: [INT-ACTION-1], relation: REALIZES, targets: [SCREEN-ACTION-1]}
+        - {sources: [INT-OUTCOME-1], relation: REALIZES, targets: [SCREEN-OUTCOME-1]}
+        - {sources: [INT-RECOVERY-1], relation: REALIZES, targets: [SCREEN-RECOVERY-1]}
+      dispositions: []
+
+steps:
+  - id: user-to-task
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.user-to-task-contract}
+      source: {ref: fixture.user-needs}
+      candidate: {ref: fixture.task-model}
+      evidence: {ref: fixture.user-to-task-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: task-to-interaction
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.task-to-interaction-contract}
+      source: {ref: fixture.task-model}
+      candidate: {ref: fixture.interaction}
+      evidence: {ref: fixture.task-to-interaction-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: interaction-to-topology
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.interaction-to-topology-contract}
+      source: {ref: fixture.interaction}
+      candidate: {ref: fixture.topology}
+      evidence: {ref: fixture.interaction-to-topology-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: topology-to-screen
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.topology-to-screen-contract}
+      source: {ref: fixture.topology}
+      candidate: {ref: fixture.screen}
+      evidence: {ref: fixture.topology-to-screen-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: interaction-to-screen
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.interaction-to-screen-contract}
+      source: {ref: fixture.interaction}
+      candidate: {ref: fixture.screen}
+      evidence: {ref: fixture.interaction-to-screen-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: remove-user-need
+    driver: data.patch
+    with:
+      value: {ref: fixture.user-needs}
+      operations:
+        - {op: remove, path: /semantic_assertions/1}
+
+  - id: remove-user-need-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.user-to-task-evidence}
+      operations:
+        - {op: remove, path: /links/1}
+
+  - id: missing-user-need
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.user-to-task-contract}
+      source: {ref: step.remove-user-need}
+      candidate: {ref: fixture.task-model}
+      evidence: {ref: step.remove-user-need-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: needs, owner_authority: DISCOVERY}}
+
+  - id: route-missing-user-need
+    driver: semantic.questions
+    with:
+      graph: {ref: fixture.graph}
+      evaluation: {ref: step.missing-user-need}
+    expect:
+      - {path: /0/authority, op: equals, value: DISCOVERY}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.user-needs]}
+
+  - id: remove-topology-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.interaction-to-topology-evidence}
+      operations:
+        - {op: remove, path: /links/0}
+
+  - id: topology-context-loss
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.interaction-to-topology-contract}
+      source: {ref: fixture.interaction}
+      candidate: {ref: fixture.topology}
+      evidence: {ref: step.remove-topology-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: CTX-1}}
+
+  - id: remove-screen-recovery-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.interaction-to-screen-evidence}
+      operations:
+        - {op: remove, path: /links/3}
+
+  - id: screen-recovery-loss
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.interaction-to-screen-contract}
+      source: {ref: fixture.interaction}
+      candidate: {ref: fixture.screen}
+      evidence: {ref: step.remove-screen-recovery-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: INT-RECOVERY-1}}
+
+  - id: remove-screen-view-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.topology-to-screen-evidence}
+      operations:
+        - {op: remove, path: /links/0}
+
+  - id: screen-view-loss
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.topology-to-screen-contract}
+      source: {ref: fixture.topology}
+      candidate: {ref: fixture.screen}
+      evidence: {ref: step.remove-screen-view-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: VIEW-1}}
