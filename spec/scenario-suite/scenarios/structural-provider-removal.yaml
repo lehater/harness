@@ -1,0 +1,68 @@
+version: 1
+kind: harness-scenario
+id: structural-provider-removal
+title: Structural target reacts to provider removal
+project_archetype: synthetic
+stage: design
+covers:
+  - structural-target-reaction
+  - fixture-mutation
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: STRUCTURAL-PROVIDER-REMOVAL
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own problem evidence.
+          boundary:
+            semantic_cohesion: Problem evidence.
+            independent_change: Problem evidence may change independently.
+            public_contract: Accepted problem evidence.
+          produces:
+            - capability: demo.problem-evidence
+              knowledge_kind: problem-evidence
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume accepted problem evidence.
+          requires: [demo.problem-evidence]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: PROBLEM
+          authority: DISCOVERY
+          path: docs/problem.md
+          provides: [demo.problem-evidence]
+          depends_on: []
+      questions: []
+steps:
+  - id: before
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+  - id: mutate
+    driver: data.patch
+    with:
+      value: {ref: fixture.model}
+      operations:
+        - {op: remove, path: /artifacts/0}
+    expect:
+      - {path: /artifacts, op: length, value: 0}
+  - id: after
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: step.mutate}
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /create, op: length, value: 1}
+      - {path: /create/0/capability, op: equals, value: demo.problem-evidence}

@@ -1,0 +1,76 @@
+version: 1
+kind: harness-scenario
+id: recurring-semantic-question-reopens
+title: Recurring semantic gap reopens a resolved Question
+project_archetype: synthetic
+stage: revalidation
+covers:
+  - recurring-question-reopen
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: RECURRING-QUESTION
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own task semantics.
+          boundary:
+            semantic_cohesion: Task semantics.
+            independent_change: Tasks may change independently.
+            public_contract: Accepted task model.
+          produces:
+            - capability: demo.task-model
+              knowledge_kind: task-model
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume task semantics.
+          requires: [demo.task-model]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: TASK-MODEL
+          authority: APPLICATION-DESIGN
+          path: docs/task-model.yaml
+          provides: [demo.task-model]
+          depends_on: []
+      questions:
+        - id: Q-SEMANTIC-DEMO-TASK-MODEL-RECOVERY-PER-TASK
+          authority: APPLICATION-DESIGN
+          text: Resolve semantic completeness gap.
+          blocks_capabilities: [demo.task-model]
+          resolution: TASK-MODEL
+  proposal:
+    value:
+      - id: Q-SEMANTIC-DEMO-TASK-MODEL-RECOVERY-PER-TASK
+        authority: APPLICATION-DESIGN
+        text: Resolve semantic completeness gap.
+        blocks_capabilities: [demo.task-model]
+steps:
+  - id: before
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+  - id: reopen
+    driver: semantic.apply_questions
+    with:
+      model: {ref: fixture.model}
+      proposals: {ref: fixture.proposal}
+    expect:
+      - {path: /questions/0/resolution, op: not_exists}
+  - id: after
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: step.reopen}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - {path: /wait/0/questions, op: contains, value: Q-SEMANTIC-DEMO-TASK-MODEL-RECOVERY-PER-TASK}

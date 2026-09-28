@@ -1,0 +1,39 @@
+version: 1
+kind: harness-scenario-coverage-catalog
+id: harness-scenario-coverage-v1
+
+dimensions:
+  project_archetype:
+    - synthetic
+    - user-facing
+    - backend-service
+    - data-integration
+    - library
+  stage:
+    - bootstrap
+    - discovery
+    - design
+    - decision
+    - implementation
+    - revalidation
+
+requirements:
+  - id: structural-target-reaction
+    description: Structural target state reacts to provider presence or absence.
+    min_scenarios: 1
+
+  - id: fixture-mutation
+    description: A known-good state can be mutated without modifying its source fixture.
+    min_scenarios: 1
+
+  - id: semantic-gap-question-routing
+    description: Missing semantic knowledge becomes a Question for the owning Authority.
+    min_scenarios: 1
+
+  - id: recurring-question-reopen
+    description: A recurring semantic gap reopens a previously resolved deterministic Question.
+    min_scenarios: 1
+
+  - id: lifecycle-currentness
+    description: Changed upstream acceptance makes dependent accepted knowledge stale.
+    min_scenarios: 1
