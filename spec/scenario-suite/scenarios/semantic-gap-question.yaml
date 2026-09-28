@@ -2,6 +2,9 @@ version: 1
 kind: harness-scenario
 id: semantic-gap-routes-question
 title: Missing task semantics become an owning-Authority Question
+dimensions:
+  behavior_class: semantic
+  execution_type: deterministic
 project_archetype: synthetic
 stage: design
 covers:

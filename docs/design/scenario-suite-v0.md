@@ -35,8 +35,8 @@ project shape, or a mutation of a known-good state.
 Each `harness-scenario` declares:
 
 - stable scenario id;
-- project archetype;
-- Harness stage under observation;
+- arbitrary catalog-defined dimensions such as project archetype, Harness stage,
+  behavior class and execution type;
 - behavioral requirements it claims to cover;
 - reusable fixtures;
 - ordered driver steps;
@@ -96,11 +96,12 @@ v0 uses deterministic invariant assertions over structured results:
 Prefer invariants over full golden-output snapshots. This keeps scenarios stable
 when irrelevant output fields evolve.
 
-Agentic or heuristic decisions should later be exposed through a driver that
-returns structured decision evidence. The scenario should assert required
-constraints, explored alternatives, forbidden behavior, escalation behavior and
-accepted outcome properties rather than require one literal answer where several
-answers may be valid.
+Agentic or heuristic decisions are tested through structured evidence rather
+than a literal golden answer. Scenario drivers expose the decision/exploration
+boundary; scenarios assert required constraints, material alternative diversity,
+forbidden preselection, delegation limits, escalation behavior and accepted
+outcome properties. Several concrete answers may remain valid while the
+decision process is still testable.
 
 ## Mutation testing
 
@@ -120,7 +121,18 @@ The base fixture remains unchanged.
 
 `spec/scenario-suite/catalog-v1.yaml` is the inventory of Harness behaviors
 that must have executable scenario coverage. Scenarios declare `covers`.
-The suite fails when a required behavior has no passing scenario.
+
+The catalog also owns the allowed scenario dimensions, mandatory dimension
+values and required driver coverage. Therefore the suite can fail even when all
+individual scenarios pass, for example when:
+
+- a Harness behavior has no passing scenario;
+- a required stage or behavior class has no scenario at all;
+- a newly mandatory driver has never been exercised;
+- a specific behavior is required to be proven across several dimension values.
+
+Dimensions are data, not Python fields. Adding a future axis such as
+`risk_class` or `project_maturity` requires only catalog/scenario changes.
 
 This is not a claim of mathematical completeness. It makes missing test
 coverage explicit and reviewable as Harness grows.
@@ -141,3 +153,25 @@ The suite should expand across independent dimensions:
 Real-project fixtures such as Prep or NAPMS may be added as regression
 scenarios, but reusable synthetic scenarios remain the minimal proofs of Harness
 mechanics.
+
+
+## Current bootstrap coverage
+
+The first cross-layer suite intentionally spans distinct Harness mechanisms:
+
+- structural target reaction and mutation;
+- semantic completeness gap to owning-Authority Question;
+- recurring Question reopening;
+- lifecycle currentness propagation;
+- CREATE-to-skill routing and WAIT suppression;
+- selective concern activation;
+- sequential decision frontier;
+- blind pre-choice exploration;
+- autonomy enforcement and escalation;
+- Engineering Coverage;
+- Graph Doctor diagnostics;
+- project Authority applicability/status.
+
+These scenarios are bootstrap proofs of the mechanism, not the final scenario
+inventory. New Harness behavior should normally add or strengthen a catalog
+requirement and then add scenarios until that requirement is satisfied.

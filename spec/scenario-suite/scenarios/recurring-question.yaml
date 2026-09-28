@@ -2,6 +2,9 @@ version: 1
 kind: harness-scenario
 id: recurring-semantic-question-reopens
 title: Recurring semantic gap reopens a resolved Question
+dimensions:
+  behavior_class: semantic
+  execution_type: deterministic
 project_archetype: synthetic
 stage: revalidation
 covers:

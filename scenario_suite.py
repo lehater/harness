@@ -31,8 +31,7 @@ class ScenarioResult:
     path: str
     status: str
     covers: list[str]
-    project_archetype: str | None
-    stage: str | None
+    dimensions: dict[str, str]
     steps: list[dict[str, Any]]
     error: str | None = None
 
@@ -42,8 +41,7 @@ class ScenarioResult:
             "path": self.path,
             "status": self.status,
             "covers": self.covers,
-            "project_archetype": self.project_archetype,
-            "stage": self.stage,
+            "dimensions": self.dimensions,
             "steps": self.steps,
             **({"error": self.error} if self.error else {}),
         }
@@ -134,6 +132,20 @@ def _resolve(value: Any, fixtures: dict[str, Any], steps: dict[str, Any]) -> Any
     return copy.deepcopy(value)
 
 
+def _matches_subset(actual: Any, expected: Any) -> bool:
+    if isinstance(expected, dict):
+        return (
+            isinstance(actual, dict)
+            and all(
+                key in actual and _matches_subset(actual[key], value)
+                for key, value in expected.items()
+            )
+        )
+    if isinstance(expected, list):
+        return actual == expected
+    return actual == expected
+
+
 def _assertion(
     output: Any,
     spec: dict[str, Any],
@@ -169,6 +181,20 @@ def _assertion(
         ok = set(actual) == set(expected)
     elif op == "length":
         ok = len(actual) == expected
+    elif op == "contains_match":
+        ok = isinstance(actual, list) and any(
+            _matches_subset(item, expected) for item in actual
+        )
+    elif op == "not_contains_match":
+        ok = isinstance(actual, list) and not any(
+            _matches_subset(item, expected) for item in actual
+        )
+    elif op == "gte":
+        ok = actual >= expected
+    elif op == "lte":
+        ok = actual <= expected
+    elif op == "one_of":
+        ok = actual in expected
     elif op == "truthy":
         ok = bool(actual)
     elif op == "falsy":
@@ -189,6 +215,15 @@ def validate_scenario(document: dict[str, Any]) -> None:
         raise ScenarioError("scenario kind must be harness-scenario")
     if not isinstance(document.get("id"), str) or not document["id"]:
         raise ScenarioError("scenario id is required")
+    dimensions = document.get("dimensions", {}) or {}
+    if not isinstance(dimensions, dict):
+        raise ScenarioError("scenario dimensions must be a mapping")
+    for name, value in dimensions.items():
+        if not isinstance(name, str) or not name:
+            raise ScenarioError("scenario dimension name must be non-empty")
+        if not isinstance(value, str) or not value:
+            raise ScenarioError(f"scenario dimension {name} must be a non-empty string")
+
     steps = document.get("steps")
     if not isinstance(steps, list) or not steps:
         raise ScenarioError("scenario requires non-empty steps")
@@ -215,15 +250,16 @@ def run_scenario(path: Path) -> ScenarioResult:
             path=str(path),
             status="FAILED",
             covers=[],
-            project_archetype=None,
-            stage=None,
+            dimensions={},
             steps=[],
             error="scenario must contain a mapping",
         )
     scenario_id = str(document.get("id", path.stem))
     covers = list(document.get("covers", []) or [])
-    archetype = document.get("project_archetype")
-    stage = document.get("stage")
+    dimensions = dict(document.get("dimensions", {}) or {})
+    for legacy_name in ("project_archetype", "stage"):
+        if legacy_name in document and legacy_name not in dimensions:
+            dimensions[legacy_name] = document[legacy_name]
     trace: list[dict[str, Any]] = []
 
     try:
@@ -300,8 +336,7 @@ def run_scenario(path: Path) -> ScenarioResult:
             path=str(path),
             status="FAILED",
             covers=covers,
-            project_archetype=archetype,
-            stage=stage,
+            dimensions=dimensions,
             steps=trace,
             error=f"{exc.__class__.__name__}: {exc}",
         )
@@ -311,8 +346,7 @@ def run_scenario(path: Path) -> ScenarioResult:
         path=str(path),
         status="PASSED",
         covers=covers,
-        project_archetype=archetype,
-        stage=stage,
+        dimensions=dimensions,
         steps=trace,
     )
 
@@ -351,7 +385,7 @@ def evaluate_coverage(
                     }
                 )
         for dimension, allowed in dimensions.items():
-            value = getattr(result, dimension, None)
+            value = result.dimensions.get(dimension)
             if value is not None and value not in allowed:
                 findings.append(
                     {
@@ -372,6 +406,7 @@ def evaluate_coverage(
             if claim in passed_by_requirement:
                 passed_by_requirement[claim].append(result.id)
 
+    by_id = {result.id: result for result in results}
     for requirement, spec in requirements.items():
         minimum = int(spec.get("min_scenarios", 1))
         passed = sorted(set(passed_by_requirement[requirement]))
@@ -382,6 +417,60 @@ def evaluate_coverage(
                     "requirement": requirement,
                     "required": minimum,
                     "passed": passed,
+                }
+            )
+        required_dimensions = spec.get("required_dimensions", {}) or {}
+        for dimension, required_values in required_dimensions.items():
+            observed = {
+                by_id[scenario_id].dimensions.get(dimension)
+                for scenario_id in passed
+                if scenario_id in by_id
+            }
+            for required_value in required_values:
+                if required_value not in observed:
+                    findings.append(
+                        {
+                            "code": "SCENARIO_DIMENSION_COVERAGE_MISSING",
+                            "requirement": requirement,
+                            "dimension": dimension,
+                            "value": required_value,
+                            "observed": sorted(
+                                value for value in observed if value is not None
+                            ),
+                        }
+                    )
+
+    passed_results = [result for result in results if result.status == "PASSED"]
+    required_dimension_values = catalog.get("required_dimension_values", {}) or {}
+    for dimension, required_values in required_dimension_values.items():
+        observed = {
+            result.dimensions.get(dimension)
+            for result in passed_results
+            if result.dimensions.get(dimension) is not None
+        }
+        for required_value in required_values:
+            if required_value not in observed:
+                findings.append(
+                    {
+                        "code": "SUITE_DIMENSION_COVERAGE_MISSING",
+                        "dimension": dimension,
+                        "value": required_value,
+                        "observed": sorted(observed),
+                    }
+                )
+
+    used_drivers = {
+        step.get("driver")
+        for result in passed_results
+        for step in result.steps
+        if step.get("driver")
+    }
+    for driver in catalog.get("required_drivers", []) or []:
+        if driver not in used_drivers:
+            findings.append(
+                {
+                    "code": "SCENARIO_DRIVER_COVERAGE_MISSING",
+                    "driver": driver,
                 }
             )
 

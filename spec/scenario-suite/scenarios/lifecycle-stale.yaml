@@ -2,6 +2,9 @@ version: 1
 kind: harness-scenario
 id: upstream-change-makes-downstream-stale
 title: Lifecycle detects stale downstream acceptance
+dimensions:
+  behavior_class: lifecycle
+  execution_type: deterministic
 project_archetype: synthetic
 stage: revalidation
 covers:

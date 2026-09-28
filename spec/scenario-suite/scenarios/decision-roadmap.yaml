@@ -1,0 +1,146 @@
+version: 1
+kind: harness-scenario
+id: decision-roadmap-orders-frontier
+title: Decision roadmap exposes only prerequisite-ready work
+dimensions:
+  project_archetype: backend-service
+  stage: decision
+  behavior_class: decision
+  execution_type: deterministic
+covers:
+  - decision-frontier-ordering
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DECISION-ROADMAP-SCENARIO
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted source facts.
+          boundary:
+            semantic_cohesion: Source facts.
+            independent_change: Facts change independently.
+            public_contract: Accepted source facts.
+          produces:
+            - capability: demo.source
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own architecture.
+          boundary:
+            semantic_cohesion: Architecture.
+            independent_change: Architecture changes independently.
+            public_contract: Accepted architecture.
+          produces:
+            - capability: demo.architecture
+              knowledge_kind: system-architecture
+              requires: [demo.source]
+        - id: IMPLEMENTATION-DESIGN
+          responsibility: Own implementation design.
+          boundary:
+            semantic_cohesion: Implementation design.
+            independent_change: Implementation design changes independently.
+            public_contract: Accepted implementation design.
+          produces:
+            - capability: demo.implementation-design
+              knowledge_kind: implementation-design
+              requires: [demo.architecture]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Build the system.
+          requires: [demo.implementation-design]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: SOURCE
+          authority: DISCOVERY
+          path: docs/source.md
+          provides: [demo.source]
+          depends_on: []
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: SOURCE
+          capability: demo.source
+          acceptance_id: SOURCE-1
+          accepted_prerequisites: {}
+  contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-decision-contracts
+      policy_defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+      contracts:
+        - knowledge_kind: system-architecture
+          required: true
+          axes:
+            - id: runtime-shape
+              material_dimensions: [failure-isolation]
+              challenge_strategies: [alternative-shape, failure-probe]
+              minimum_probes: 2
+              delegation_requires: BROAD
+  policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+        execution_assurance: REQUEST_BOUND
+
+steps:
+  - id: roadmap
+    driver: decision.roadmap
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      lifecycle: {ref: fixture.lifecycle}
+      decision_contracts: {ref: fixture.contracts}
+      decision_policy: {ref: fixture.policy}
+    expect:
+      - {path: /frontier_status, op: equals, value: READY}
+      - path: /ready
+        op: contains_match
+        value:
+          capability: demo.architecture
+          authority: SYSTEM-ARCHITECTURE
+          decision_governed: true
+          decision_request_mode: CREATE
+          pipeline: [FORM_OPTIONS, REVIEW_OPTIONS, CHOOSE_OR_ESCALATE, PRODUCE_CANDIDATE, SEMANTIC_ADMISSION]
+      - {path: /waiting_upstream, op: contains_match, value: {capability: demo.implementation-design, state: WAITING_UPSTREAM}}
+      - {path: /completed, op: contains_match, value: {capability: demo.source, state: CURRENT}}
+
+  - id: block-architecture
+    driver: data.patch
+    with:
+      value: {ref: fixture.model}
+      operations:
+        - op: add
+          path: /questions/-
+          value:
+            id: Q-ARCH
+            authority: SYSTEM-ARCHITECTURE
+            text: Which architecture decision is accepted?
+            blocks_capabilities: [demo.architecture]
+
+  - id: blocked-roadmap
+    driver: decision.roadmap
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: step.block-architecture}
+      target: IMPLEMENTATION
+      lifecycle: {ref: fixture.lifecycle}
+      decision_contracts: {ref: fixture.contracts}
+      decision_policy: {ref: fixture.policy}
+    expect:
+      - {path: /ready, op: not_contains_match, value: {capability: demo.architecture}}
+      - {path: /blocked, op: contains_match, value: {capability: demo.architecture, questions: [Q-ARCH]}}
+      - {path: /waiting_upstream, op: contains_match, value: {capability: demo.implementation-design}}

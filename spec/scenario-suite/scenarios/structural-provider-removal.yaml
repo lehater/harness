@@ -2,6 +2,9 @@ version: 1
 kind: harness-scenario
 id: structural-provider-removal
 title: Structural target reacts to provider removal
+dimensions:
+  behavior_class: structural
+  execution_type: deterministic
 project_archetype: synthetic
 stage: design
 covers:

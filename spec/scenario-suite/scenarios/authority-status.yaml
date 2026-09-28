@@ -1,0 +1,77 @@
+version: 1
+kind: harness-scenario
+id: authority-applicability-and-status
+title: Authority applicability uses evidence and projects operational blockers
+dimensions:
+  project_archetype: backend-service
+  stage: bootstrap
+  behavior_class: applicability
+  execution_type: deterministic
+covers:
+  - authority-applicability
+  - authority-operational-status
+
+fixtures:
+  catalog:
+    value:
+      authorities:
+        - {id: PRODUCT-REQUIREMENTS}
+        - {id: SECURITY-ARCHITECTURE}
+        - {id: OPERABILITY-DESIGN}
+  core:
+    value:
+      authorities:
+        - {id: PRODUCT-REQUIREMENTS}
+        - {id: SECURITY-ARCHITECTURE}
+      artifacts:
+        - id: PRODUCT
+          authority: PRODUCT-REQUIREMENTS
+          path: product.yaml
+          provides: [product.intent]
+          depends_on: []
+      questions:
+        - id: Q-SECURITY
+          authority: SECURITY-ARCHITECTURE
+          text: Which trust boundary is accepted?
+          blocks_capabilities: [security.trust]
+
+steps:
+  - id: bootstrap
+    driver: project.authority_bootstrap
+    with:
+      catalog: {ref: fixture.catalog}
+      core: {ref: fixture.core}
+    expect:
+      - path: /assessments
+        op: contains_match
+        value: {authority_id: PRODUCT-REQUIREMENTS, applicability: REQUIRED}
+      - path: /assessments
+        op: contains_match
+        value: {authority_id: SECURITY-ARCHITECTURE, applicability: UNRESOLVED}
+      - path: /assessments
+        op: contains_match
+        value: {authority_id: OPERABILITY-DESIGN, applicability: UNASSESSED}
+
+  - id: require-security
+    driver: data.patch
+    with:
+      value: {ref: step.bootstrap}
+      operations:
+        - {op: replace, path: /assessments/1/applicability, value: REQUIRED}
+
+  - id: status
+    driver: project.status
+    with:
+      catalog: {ref: fixture.catalog}
+      registry: {ref: step.require-security}
+      core: {ref: fixture.core}
+    expect:
+      - path: /rows
+        op: contains_match
+        value: {authority: PRODUCT-REQUIREMENTS, applicability: REQUIRED, operational_status: IN_PROGRESS}
+      - path: /rows
+        op: contains_match
+        value: {authority: SECURITY-ARCHITECTURE, applicability: REQUIRED, operational_status: BLOCKED, blocking: [Q-SECURITY]}
+      - path: /rows
+        op: contains_match
+        value: {authority: OPERABILITY-DESIGN, applicability: UNASSESSED}

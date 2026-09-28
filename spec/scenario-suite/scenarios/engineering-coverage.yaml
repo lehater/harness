@@ -1,0 +1,48 @@
+version: 1
+kind: harness-scenario
+id: engineering-coverage-finds-subject-gap
+title: Engineering Coverage detects missing subject-specific knowledge
+dimensions:
+  project_archetype: backend-service
+  stage: implementation
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - engineering-coverage-gap
+
+fixtures:
+  graph:
+    yaml: ../../research/subject-coverage-fixture-graph.yaml
+  realization:
+    yaml: ../../research/subject-coverage-fixture-core-partial.yaml
+  overlay:
+    value:
+      activate:
+        - concern: domain.model
+          rationale: Each accepted bounded context requires its own tactical domain model.
+      decisions: []
+
+steps:
+  - id: coverage
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.realization}
+      consumer: IMPLEMENTATION
+      scope: all
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - {path: /completion_ready, op: equals, value: false}
+      - {path: /remaining_work_count, op: gte, value: 1}
+      - path: /rows
+        op: contains_match
+        value:
+          concern: domain.model
+          state: MISSING
+          action: PRODUCE_CAPABILITY
+      - path: /work_items
+        op: contains_match
+        value:
+          action: PRODUCE_CAPABILITY
+          capability: fixture.domain.model.bc-b
+          authority: TACTICAL-DOMAIN-DESIGN

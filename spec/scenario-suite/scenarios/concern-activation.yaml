@@ -1,0 +1,80 @@
+version: 1
+kind: harness-scenario
+id: concern-activation-is-selective
+title: Concern activation follows project signals without broadening scope
+dimensions:
+  project_archetype: data-integration
+  stage: design
+  behavior_class: activation
+  execution_type: deterministic
+covers:
+  - concern-activation-selectivity
+
+fixtures:
+  policy:
+    value:
+      version: 1
+      kind: harness-concern-activation-policy
+      id: SELECTIVE-ACTIVATION
+      baseline: [intent.behavior]
+      rules:
+        - id: DATA-DESIGN-PRESENT
+          match: any
+          when:
+            knowledge_kinds_any: [data-design]
+          activate: [data.lifecycle]
+  roles:
+    value:
+      version: 1
+      kind: harness-authority-role-bindings
+      bindings:
+        DATA-DESIGN: [data]
+  overlay:
+    value:
+      project: ACTIVATION-SCENARIO
+      consumer: IMPLEMENTATION
+      scope: default
+      scope_roots: []
+      activate:
+        - concern: governance.privacy
+          rationale: Project explicitly handles personal data.
+          evidence: [project:personal-data]
+      decisions: []
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: ACTIVATION-SCENARIO
+      authorities:
+        - id: DATA-DESIGN
+          responsibility: Own persistence design.
+          boundary:
+            semantic_cohesion: Data representation.
+            independent_change: Storage can change independently.
+            public_contract: Accepted data design.
+          produces:
+            - capability: demo.data-design
+              knowledge_kind: data-design
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Build the data integration.
+          requires: [demo.data-design]
+      terminal_capabilities: []
+
+steps:
+  - id: activate
+    driver: concern.activation
+    with:
+      policy: {ref: fixture.policy}
+      project_roles: {ref: fixture.roles}
+      overlay: {ref: fixture.overlay}
+      project_docs:
+        - {ref: fixture.graph}
+      target_consumer: IMPLEMENTATION
+    expect:
+      - {path: /activated_count, op: equals, value: 3}
+      - {path: /rows, op: contains_match, value: {concern: intent.behavior}}
+      - {path: /rows, op: contains_match, value: {concern: data.lifecycle}}
+      - {path: /rows, op: contains_match, value: {concern: governance.privacy}}
+      - {path: /rows, op: not_contains_match, value: {concern: interface.human.accessibility}}

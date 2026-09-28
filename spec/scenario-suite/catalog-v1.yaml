@@ -9,6 +9,7 @@ dimensions:
     - backend-service
     - data-integration
     - library
+    - real-project
   stage:
     - bootstrap
     - discovery
@@ -16,6 +17,52 @@ dimensions:
     - decision
     - implementation
     - revalidation
+    - diagnosis
+  behavior_class:
+    - structural
+    - semantic
+    - routing
+    - activation
+    - decision
+    - lifecycle
+    - coverage
+    - diagnosis
+    - applicability
+  execution_type:
+    - deterministic
+    - agent-evaluation
+    - real-project
+
+required_dimension_values:
+  stage: [bootstrap, design, decision, implementation, revalidation, diagnosis]
+  behavior_class:
+    - structural
+    - semantic
+    - routing
+    - activation
+    - decision
+    - lifecycle
+    - coverage
+    - diagnosis
+    - applicability
+  execution_type: [deterministic, agent-evaluation]
+
+required_drivers:
+  - data.patch
+  - engineering.target
+  - semantic.acceptance
+  - semantic.questions
+  - semantic.apply_questions
+  - lifecycle.states
+  - agent.route
+  - concern.activation
+  - decision.roadmap
+  - decision.exploration
+  - decision.governance
+  - engineering.coverage
+  - graph.doctor
+  - project.authority_bootstrap
+  - project.status
 
 requirements:
   - id: structural-target-reaction
@@ -36,4 +83,44 @@ requirements:
 
   - id: lifecycle-currentness
     description: Changed upstream acceptance makes dependent accepted knowledge stale.
+    min_scenarios: 1
+
+  - id: create-work-skill-routing
+    description: Actionable CREATE work is routed to the registered knowledge-kind skill.
+    min_scenarios: 1
+
+  - id: blocked-work-not-routed
+    description: Blocked work remains WAIT and is not sent to an artifact producer.
+    min_scenarios: 1
+
+  - id: concern-activation-selectivity
+    description: Baseline, rule-derived and explicit concerns activate while irrelevant concerns remain inactive.
+    min_scenarios: 1
+
+  - id: decision-frontier-ordering
+    description: Decision roadmap exposes only capabilities whose prerequisites are current and leaves downstream work waiting.
+    min_scenarios: 1
+
+  - id: decision-exploration-blindness
+    description: Pre-choice exploration rejects evidence contaminated with a selected or preferred solution.
+    min_scenarios: 1
+
+  - id: decision-autonomy-escalation
+    description: A material choice beyond delegated autonomy is rejected unless escalated through an owning Authority Question.
+    min_scenarios: 1
+
+  - id: engineering-coverage-gap
+    description: Engineering Coverage exposes missing activated engineering knowledge even when structural artifacts exist.
+    min_scenarios: 1
+
+  - id: graph-diagnostics
+    description: Graph Doctor exposes structural ownership or dependency defects without treating normal incompleteness as a graph error.
+    min_scenarios: 1
+
+  - id: authority-applicability
+    description: Project Authority bootstrap infers only evidence-backed applicability and leaves unknown Authorities unassessed.
+    min_scenarios: 1
+
+  - id: authority-operational-status
+    description: Project status projects REQUIRED Authorities into NOT_STARTED, IN_PROGRESS or BLOCKED from canonical artifacts and Questions.
     min_scenarios: 1

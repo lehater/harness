@@ -9,12 +9,17 @@ from __future__ import annotations
 import copy
 from typing import Any, Callable
 
+from agent_router import route_create_work
 from capability_lifecycle import lifecycle_states
 from concern_activation import derive_activation
 from decision_exploration import evaluate_decision_exploration
 from decision_governance import evaluate_decision_governance
+from decision_pipeline import derive_decision_roadmap
+from engineering_coverage import evaluate_with_repository_policy
 from engineering_graph import evaluate_engineering_target
+from graph_doctor import diagnose_project
 from harness import validate_model
+from project_status import bootstrap_registry, status as project_status
 from semantic_acceptance import evaluate_artifact
 from semantic_closure import evaluate_semantic_closure
 from semantic_questions import (
@@ -183,3 +188,55 @@ def decision_exploration(**kwargs: Any) -> dict[str, Any]:
 @scenario_driver("decision.governance")
 def decision_governance(**kwargs: Any) -> dict[str, Any]:
     return evaluate_decision_governance(**kwargs)
+
+
+@scenario_driver("agent.route")
+def agent_route(
+    *,
+    graph: dict[str, Any],
+    target: str,
+    model: dict[str, Any],
+    registry: dict[str, Any],
+) -> dict[str, Any]:
+    return route_create_work(graph, target, model, registry)
+
+
+@scenario_driver("decision.roadmap")
+def decision_roadmap(**kwargs: Any) -> dict[str, Any]:
+    return derive_decision_roadmap(**kwargs)
+
+
+@scenario_driver("engineering.coverage")
+def engineering_coverage(**kwargs: Any) -> dict[str, Any]:
+    return evaluate_with_repository_policy(**kwargs)
+
+
+@scenario_driver("graph.doctor")
+def graph_doctor(**kwargs: Any) -> dict[str, Any]:
+    return diagnose_project(**kwargs)
+
+
+@scenario_driver("project.authority_bootstrap")
+def project_authority_bootstrap(
+    *,
+    catalog: dict[str, Any],
+    existing: dict[str, Any] | None = None,
+    core: dict[str, Any] | None = None,
+    authority_migrations: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
+    return bootstrap_registry(
+        catalog,
+        existing=existing,
+        core=core,
+        authority_migrations=authority_migrations,
+    )
+
+
+@scenario_driver("project.status")
+def project_status_driver(
+    *,
+    catalog: dict[str, Any],
+    registry: dict[str, Any],
+    core: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return project_status(catalog, registry, core)
