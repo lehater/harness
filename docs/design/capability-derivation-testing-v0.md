@@ -142,9 +142,15 @@ Do not collapse quality into one score. Useful independent measures are:
 - irrelevant-input stability;
 - cross-Authority invention findings when a semantic/evaluator oracle is used.
 
-The deterministic evaluator already exposes required/covered/disposed/unresolved
-counts. Corpus-level rates require benchmark packs with expert-labelled expected
-results and are intentionally not fabricated from the small bootstrap suite.
+The deterministic evaluator exposes required/covered/disposed/unresolved
+counts. Scenario steps may additionally opt into benchmark labels. The Scenario
+Suite aggregates independent corpus metrics such as mutation detection,
+false-positive control, Question-owner routing, root-cause localization,
+blocking behavior, alternative-valid acceptance, selective revalidation and
+semantic-truth detection, including rates by mutation class.
+
+These are regression-corpus rates, not estimates of universal recall/precision.
+Harness deliberately does not collapse them into one quality score.
 
 ## Semantic judgement
 
@@ -184,14 +190,23 @@ dependencies against two reusable proof forms:
 - an exact capability-edge test for project-specific behavior.
 
 An edge may alternatively be explicitly `NOT_APPLICABLE` with rationale.
-Anything else remains a coverage gap. The evaluator is exposed through the
-Scenario Suite as `semantic.derivation_test_coverage`; it does not introduce a
-second test runner.
+Anything else remains a coverage gap. Coverage is auto-discovered from the
+actual executable `semantic.derivation` steps in scenario files; optional
+`derivation_edges` metadata must match those executable graph/contract edges
+exactly. A scenario name or declaration alone cannot satisfy coverage.
+
+The evaluator is exposed through the Scenario Suite as
+`semantic.derivation_test_coverage`; it does not introduce a second test
+runner. The three current repository example Engineering Graphs are guarded by
+full direct-edge coverage scenarios.
 
 ## Remaining boundary
 
 The reusable mechanisms are now present for deterministic derivation coverage,
-request-bound semantic judgement, selective lifecycle invalidation and
-derivation-test coverage. The remaining work is domain population: add
-knowledge-kind edge tests or explicit dispositions for additional Engineering
-Graph relationships as they are brought under strict semantic derivation.
+request-bound semantic judgement, selective lifecycle invalidation,
+executable-proof-derived edge coverage and benchmark corpus metrics.
+
+The current repository example graphs are covered. Remaining validation work is
+to grow the labelled mutation corpus, calibrate evaluator/human semantic
+judgement against expert-reviewed cases, and apply the same coverage gates to
+additional real external project graphs as they are integrated.
