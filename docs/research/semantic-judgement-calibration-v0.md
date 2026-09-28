@@ -113,7 +113,7 @@ changing Harness semantics.
 
 This protocol measures agreement with the expert corpus. It does not establish
 that the expert labels are universally correct, nor does it estimate production
-error rates from six bootstrap cases.
+error rates from the 10 bootstrap cases.
 
 The next calibration work is:
 
@@ -123,6 +123,7 @@ The next calibration work is:
 4. trend comparison across evaluator versions without weakening the Harness
    acceptance contract.
 
-Live evaluator execution is intentionally outside this bootstrap PR. Without a
-specific evaluator/model identity and configuration, recording generated
-verdicts would not be reproducible calibration evidence.
+Live evaluator execution is intentionally a separate research stage: Live
+Calibration Validator. Without a specific evaluator/model identity and
+configuration, recording generated verdicts would not be reproducible
+calibration evidence.

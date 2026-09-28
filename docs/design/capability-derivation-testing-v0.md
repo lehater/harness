@@ -1,6 +1,7 @@
 # Capability derivation testing v0
 
-Status: experimental
+Status: implemented experimental design; research task closed in
+`docs/research/capability-derivation-testing-closure-v1.md`.
 
 ## Purpose
 
@@ -207,13 +208,13 @@ The evaluator is exposed through the Scenario Suite as
 runner. The three current repository example Engineering Graphs are guarded by
 full direct-edge coverage scenarios.
 
-## Remaining boundary
+## Closure boundary
 
-The reusable mechanisms are now present for deterministic derivation coverage,
-request-bound semantic judgement, selective lifecycle invalidation,
+The capability-derivation testing research task is complete. The reusable
+mechanisms are present for deterministic derivation coverage, request-bound
+semantic judgement, fail-closed selective lifecycle invalidation,
 executable-proof-derived edge coverage and benchmark corpus metrics.
 
-The current repository example graphs are covered. Remaining validation work is
-to grow the labelled mutation corpus, calibrate evaluator/human semantic
-judgement against expert-reviewed cases, and apply the same coverage gates to
-additional real external project graphs as they are integrated.
+Further live evaluation of a concrete semantic evaluator is a separate research
+stage: Live Calibration Validator. See
+`docs/research/capability-derivation-testing-closure-v1.md`.
