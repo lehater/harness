@@ -238,6 +238,63 @@ def _validate_source_assertion_artifacts(
                 )
 
 
+
+
+def _accepted_prerequisite_semantics(
+    *,
+    capability: str,
+    prerequisite_capabilities: list[str],
+    derivation_evaluations: list[dict[str, Any]] | None,
+) -> dict[str, dict[str, str]]:
+    if not derivation_evaluations:
+        return {}
+
+    allowed = set(prerequisite_capabilities)
+    result: dict[str, dict[str, str]] = {}
+    for evaluation in derivation_evaluations:
+        if not isinstance(evaluation, dict):
+            raise CoreError("derivation evaluation must be a mapping")
+        if evaluation.get("kind") != "harness-semantic-derivation-evaluation":
+            raise CoreError("unexpected derivation evaluation kind")
+        if evaluation.get("status") != "ACCEPTED":
+            raise CoreError(
+                f"derivation evaluation for {capability} must be ACCEPTED"
+            )
+        if evaluation.get("target_capability") != capability:
+            raise CoreError(
+                f"derivation evaluation target mismatch for {capability}"
+            )
+        source_capability = evaluation.get("source_capability")
+        if source_capability not in allowed:
+            raise CoreError(
+                f"derivation evaluation source {source_capability} is not a "
+                f"prerequisite of {capability}"
+            )
+        if source_capability in result:
+            raise CoreError(
+                f"duplicate derivation lifecycle baseline for {source_capability}"
+            )
+        dependency = evaluation.get("lifecycle_dependency")
+        if (
+            not isinstance(dependency, dict)
+            or dependency.get("capability") != source_capability
+            or not isinstance(dependency.get("semantic_atoms"), dict)
+            or not dependency["semantic_atoms"]
+            or any(
+                not isinstance(atom_id, str)
+                or not atom_id
+                or not isinstance(fingerprint, str)
+                or not fingerprint
+                for atom_id, fingerprint in dependency["semantic_atoms"].items()
+            )
+        ):
+            raise CoreError(
+                f"invalid lifecycle dependency evidence for {source_capability}"
+            )
+        result[source_capability] = dict(dependency["semantic_atoms"])
+    return result
+
+
 def admit_artifact(
     *,
     graph: dict[str, Any],
@@ -248,6 +305,7 @@ def admit_artifact(
     decision_contracts: dict[str, Any] | None = None,
     decision_policy: dict[str, Any] | None = None,
     decision_exploration: dict[str, Any] | None = None,
+    derivation_evaluations: list[dict[str, Any]] | None = None,
     capability: str,
     sources: dict[str, Any],
     candidate: dict[str, Any],
@@ -354,6 +412,12 @@ def admit_artifact(
                     f"{states[prerequisite]['state']}, not CURRENT"
                 )
             baseline[prerequisite] = index[prerequisite]["acceptance_id"]
+
+    semantic_baseline = _accepted_prerequisite_semantics(
+        capability=capability,
+        prerequisite_capabilities=prerequisite_capabilities,
+        derivation_evaluations=derivation_evaluations,
+    )
 
     semantic_contract = {
         "authority": authority,
@@ -482,6 +546,7 @@ def admit_artifact(
         "changed_paths": changed_paths,
         "canonical_references": references,
         "accepted_prerequisites": baseline,
+        "accepted_prerequisite_semantics": semantic_baseline,
         "semantic_contract": "knowledge-kind-semantic-contracts/v1",
         "decision_exploration": exploration_evaluation["status"],
         "decision_explorer_request_id": (
@@ -499,6 +564,11 @@ def admit_artifact(
             "capability": capability,
             "acceptance_id": acceptance_id,
             "accepted_prerequisites": baseline,
+            **(
+                {"accepted_prerequisite_semantics": semantic_baseline}
+                if semantic_baseline
+                else {}
+            ),
             "semantic_atom_fingerprints": semantic_assertion_fingerprints(candidate),
         }
     return evaluation
@@ -533,6 +603,11 @@ def main() -> int:
     parser.add_argument("--decision-policy")
     parser.add_argument("--decision-exploration")
     parser.add_argument(
+        "--derivation-evaluation",
+        action="append",
+        default=[],
+    )
+    parser.add_argument(
         "--decision-request-mode",
         choices=["CREATE", "REVISION", "REDO"],
         default="CREATE",
@@ -554,6 +629,9 @@ def main() -> int:
             if args.decision_exploration
             else None
         ),
+        derivation_evaluations=[
+            load_yaml(path) for path in args.derivation_evaluation
+        ],
         capability=args.capability,
         sources=load_yaml(args.sources),
         candidate=load_yaml(args.candidate),
