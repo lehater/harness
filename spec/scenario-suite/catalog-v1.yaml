@@ -68,6 +68,7 @@ required_drivers:
   - data.patch
   - engineering.target
   - semantic.acceptance
+  - semantic.derivation
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure
@@ -185,6 +186,12 @@ requirements:
     category: semantic
     enforcement: required
     description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
+    min_scenarios: 1
+
+  - id: semantic-derivation-coverage
+    category: semantic
+    enforcement: required
+    description: Direct Capability derivation accounts for required upstream semantic atoms without forcing one literal downstream design.
     min_scenarios: 1
 
   - id: semantic-contradiction-detection
