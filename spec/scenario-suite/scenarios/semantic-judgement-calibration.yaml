@@ -33,6 +33,14 @@ fixtures:
       - {id: valid-decomposition, status: ACCEPTED}
       - {id: valid-aggregation, status: ACCEPTED}
 
+  incomplete:
+    value:
+      - {id: semantic-weakening, status: REJECTED}
+      - {id: semantic-inversion, status: REJECTED}
+      - {id: semantic-subject-swap, status: REJECTED}
+      - {id: valid-paraphrase, status: ACCEPTED}
+      - {id: valid-decomposition, status: ACCEPTED}
+
   false-positive:
     value:
       - {id: semantic-weakening, status: REJECTED}
@@ -82,3 +90,23 @@ steps:
       - {path: /confusion/false_negative, op: equals, value: 0}
       - {path: /confusion/false_positive, op: equals, value: 1}
       - {path: /misses, op: contains_match, value: {id: valid-paraphrase, expected: ACCEPTED, actual: REJECTED}}
+
+  - id: incomplete-predictions
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.incomplete}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /scored_count, op: equals, value: 5}
+      - {path: /missing, op: contains, value: valid-aggregation}
+
+  - id: unknown-case-rejected
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions:
+        - {id: DOES-NOT-EXIST, status: REJECTED}
+    expect_error:
+      type: CoreError
+      contains: unknown calibration prediction case
