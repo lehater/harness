@@ -78,3 +78,31 @@ steps:
       - {path: /status, op: equals, value: COMPLETE}
       - {path: /gaps, op: length, value: 0}
       - {path: /disposed, op: contains_match, value: {source_capability: demo.b, target_capability: demo.c, disposition: NOT_APPLICABLE}}
+
+  - id: fake-test-registration
+    driver: semantic.derivation_test_coverage
+    with:
+      graph:
+        version: 1
+        kind: harness-engineering-graph
+        id: FAKE-REGISTRATION
+        authorities:
+          - id: A
+            responsibility: Own A.
+            boundary: {semantic_cohesion: A, independent_change: A, public_contract: A}
+            produces:
+              - {capability: fake.a, knowledge_kind: task-model, requires: []}
+          - id: B
+            responsibility: Own B.
+            boundary: {semantic_cohesion: B, independent_change: B, public_contract: B}
+            produces:
+              - {capability: fake.b, knowledge_kind: interaction-design, requires: [fake.a]}
+        consumers:
+          - {id: TARGET, purpose: Consume B, requires: [fake.b]}
+        terminal_capabilities: []
+      tested_kind_edges:
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: DOES-NOT-EXIST}
+      dispositions: []
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /gaps, op: contains_match, value: {source_capability: fake.a, target_capability: fake.b}}
