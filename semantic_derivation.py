@@ -12,6 +12,7 @@ import yaml
 
 from engineering_graph import producer_index, production_index
 from harness import CoreError
+from semantic_fingerprint import semantic_assertion_fingerprint
 
 RELATIONS = {"PRESERVES", "TRANSFORMS", "CONSTRAINS", "REALIZES"}
 DISPOSITIONS = {"NOT_APPLICABLE", "QUESTION"}
@@ -598,6 +599,15 @@ def evaluate_derivation(
             "covered": len(required_sources & covered_sources),
             "disposed": len(required_sources & set(disposition_by_source)),
             "unresolved": len(unresolved_sources),
+        },
+        "lifecycle_dependency": {
+            "capability": source_capability,
+            "semantic_atoms": {
+                source_id: semantic_assertion_fingerprint(
+                    source_assertions[source_id]
+                )
+                for source_id in sorted(required_sources & covered_sources)
+            },
         },
         **(
             {"semantic_judgement_request": semantic_judgement_request}
