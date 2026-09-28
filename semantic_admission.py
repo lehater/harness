@@ -28,6 +28,7 @@ from decision_governance import (
 from engineering_graph import producer_index, production_index, validate_realization
 from harness import CoreError
 from semantic_acceptance import evaluate_artifact
+from semantic_fingerprint import semantic_assertion_fingerprints
 from semantic_questions import questions_from_semantic_evaluation
 
 
@@ -498,6 +499,7 @@ def admit_artifact(
             "capability": capability,
             "acceptance_id": acceptance_id,
             "accepted_prerequisites": baseline,
+            "semantic_atom_fingerprints": semantic_assertion_fingerprints(candidate),
         }
     return evaluation
 
