@@ -156,6 +156,42 @@ positives, recall, false-positive rate, accuracy, per-class accuracy and misses;
 Harness does not select a winner or collapse those dimensions.
 
 
+## Independence options
+
+The validator distinguishes evaluator identity/configuration from evaluator
+independence. The practical options have different assurance strength:
+
+- **same model, same session/context** — useful only as a functional integration
+  test; it is not independent semantic calibration;
+- **same model, fresh session/context** — removes declared conversation context
+  when an external orchestrator actually creates that fresh context, but Harness
+  still reports independence as unverified without trusted execution evidence;
+- **same model, different configuration/version** — a distinct reproducible
+  evaluator binding suitable for regression comparison, not proof of an
+  independent viewpoint;
+- **different model or provider** — provides stronger evaluator diversity when
+  the external driver really invokes the declared model, while provenance still
+  depends on the control plane;
+- **external evaluator service** — the natural automated trust boundary; it may
+  additionally provide authenticated execution provenance;
+- **HUMAN evaluator** — valid external judgement when reviewer identity and the
+  blinded request are recorded; automation and repeatability are lower;
+- **multiple evaluators** — represented as separate runs/evaluations. Harness
+  compares their independent metrics and stability evidence but does not invent
+  consensus semantics.
+
+No descriptor field named "independent" is accepted as proof. Independence is a
+property of execution/control, not of evaluator-authored metadata.
+
+## Evidence persistence
+
+A live calibration evaluation is a runtime record, not canonical engineering
+knowledge. Scenario Suite already supports a JSON report output; CI/operator
+execution can persist that report as the reproducible evidence record. The
+record contains the run/request identities, corpus/protocol/evaluator
+fingerprints, evaluator descriptor, validated per-case verdict evidence and the
+existing scorer result.
+
 ## Closure result
 
 The research question is answered positively with an explicit trust boundary.
