@@ -415,7 +415,11 @@ def evaluate_derivation_test_coverage(
     return {
         "version": 1,
         "kind": "harness-semantic-derivation-test-coverage",
-        "status": "COMPLETE" if not gaps else "INCOMPLETE",
+        "status": (
+            "COMPLETE"
+            if not gaps and not invalid_registrations
+            else "INCOMPLETE"
+        ),
         "edge_count": len(graph_edges),
         "covered_count": len(covered),
         "disposed_count": len(disposed),
