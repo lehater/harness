@@ -137,5 +137,9 @@ def append_question_proposals(
         comparable = ("authority", "text", "blocks_capabilities")
         if any(current.get(key) != proposal.get(key) for key in comparable):
             raise CoreError(f"conflicting semantic question proposal: {question_id}")
+        # The same semantic gap may recur after a prior resolution becomes
+        # invalid. A fresh deterministic proposal reopens the existing Question
+        # rather than creating a duplicate or trusting stale resolution.
+        current.pop("resolution", None)
 
     return result

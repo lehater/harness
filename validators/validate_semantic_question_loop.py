@@ -356,6 +356,15 @@ def main() -> int:
     resolved = resolve_question(realized, question["id"], "TASK-MODEL")
     assert unresolved_questions(resolved) == [], resolved
 
+    reopened = append_question_proposals(resolved, [question])
+    assert unresolved_questions(reopened) == [question["id"]], reopened
+    reopened_target = evaluate_engineering_target(
+        GRAPH,
+        "IMPLEMENTATION",
+        reopened,
+    )
+    assert reopened_target["status"] == "BLOCKED", reopened_target
+
     accepted = admit_artifact(
         graph=GRAPH,
         model=complete_model,
