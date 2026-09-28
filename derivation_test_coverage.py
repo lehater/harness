@@ -2,7 +2,10 @@
 """Coverage of semantic-derivation tests over Engineering Graph dependency edges."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 from engineering_graph import production_index
 from harness import CoreError
@@ -19,14 +22,75 @@ def _kind(production: dict[str, Any], capability: str) -> str:
     return value
 
 
+
+
+def _scenario_edge_index(
+    scenario_directory: str | None,
+) -> dict[str, dict[str, set[tuple[str, str]]]]:
+    if scenario_directory is None:
+        return {}
+    root = Path(scenario_directory)
+    if not root.is_dir():
+        raise CoreError(
+            f"derivation coverage scenario_directory is not a directory: {root}"
+        )
+    result: dict[str, dict[str, set[tuple[str, str]]]] = {}
+    for path in sorted(root.glob("*.yaml")):
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(document, dict) or document.get("kind") != "harness-scenario":
+            continue
+        scenario_id = document.get("id")
+        if not isinstance(scenario_id, str) or not scenario_id:
+            continue
+        kind_edges: set[tuple[str, str]] = set()
+        capability_edges: set[tuple[str, str]] = set()
+        for item in document.get("derivation_edges", []) or []:
+            if not isinstance(item, dict):
+                raise CoreError(
+                    f"scenario {scenario_id} derivation_edge must be a mapping"
+                )
+            source_kind = item.get("source_knowledge_kind")
+            target_kind = item.get("target_knowledge_kind")
+            source_capability = item.get("source_capability")
+            target_capability = item.get("target_capability")
+            if (
+                isinstance(source_kind, str)
+                and source_kind
+                and isinstance(target_kind, str)
+                and target_kind
+            ):
+                kind_edges.add((source_kind, target_kind))
+                continue
+            if (
+                isinstance(source_capability, str)
+                and source_capability
+                and isinstance(target_capability, str)
+                and target_capability
+            ):
+                capability_edges.add((source_capability, target_capability))
+                continue
+            raise CoreError(
+                f"scenario {scenario_id} derivation_edge requires a "
+                "knowledge-kind pair or capability pair"
+            )
+        result[scenario_id] = {
+            "kind_edges": kind_edges,
+            "capability_edges": capability_edges,
+        }
+    return result
+
+
 def evaluate_derivation_test_coverage(
     *,
     graph: dict[str, Any],
     tested_kind_edges: list[dict[str, Any]] | None = None,
     tested_capability_edges: list[dict[str, Any]] | None = None,
     dispositions: list[dict[str, Any]] | None = None,
+    scenario_directory: str | None = None,
 ) -> dict[str, Any]:
     productions = production_index(graph)
+    scenario_edges = _scenario_edge_index(scenario_directory)
+    invalid_registrations: list[dict[str, Any]] = []
 
     graph_edges: list[dict[str, str]] = []
     edge_ids: set[tuple[str, str]] = set()
@@ -64,6 +128,19 @@ def evaluate_derivation_test_coverage(
         )):
             raise CoreError("tested derivation kind edge requires kinds and scenario")
         key = (source_kind, target_kind)
+        scenario_meta = scenario_edges.get(scenario)
+        if scenario_directory is not None and (
+            scenario_meta is None or key not in scenario_meta["kind_edges"]
+        ):
+            invalid_registrations.append(
+                {
+                    "mode": "TESTED_KIND_EDGE",
+                    "source_knowledge_kind": source_kind,
+                    "target_knowledge_kind": target_kind,
+                    "scenario": scenario,
+                }
+            )
+            continue
         if key in tested_kind_pairs and tested_kind_pairs[key] != scenario:
             raise CoreError(
                 f"duplicate tested derivation kind edge with conflicting scenario: {key}"
@@ -86,6 +163,19 @@ def evaluate_derivation_test_coverage(
                 "tested derivation capability edge requires capabilities and scenario"
             )
         key = (source, target)
+        scenario_meta = scenario_edges.get(scenario)
+        if scenario_directory is not None and (
+            scenario_meta is None or key not in scenario_meta["capability_edges"]
+        ):
+            invalid_registrations.append(
+                {
+                    "mode": "TESTED_CAPABILITY_EDGE",
+                    "source_capability": source,
+                    "target_capability": target,
+                    "scenario": scenario,
+                }
+            )
+            continue
         if key not in edge_ids:
             raise CoreError(f"tested derivation capability edge is not in graph: {key}")
         if key in tested_capability_pairs and tested_capability_pairs[key] != scenario:
@@ -179,7 +269,9 @@ def evaluate_derivation_test_coverage(
         "covered_count": len(covered),
         "disposed_count": len(disposed),
         "gap_count": len(gaps),
+        "invalid_registration_count": len(invalid_registrations),
         "covered": covered,
+        "invalid_registrations": invalid_registrations,
         "disposed": disposed,
         "gaps": gaps,
     }
