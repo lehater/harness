@@ -101,7 +101,9 @@ fixtures:
             demo.upstream: UPSTREAM-1
           accepted_prerequisite_semantics:
             demo.upstream:
-              ATOM-A: HASH-A-1
+              exhaustive: true
+              semantic_atoms:
+                ATOM-A: HASH-A-1
 
 steps:
   - id: reject-incomplete-lifecycle-surface
