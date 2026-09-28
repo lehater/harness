@@ -22,6 +22,8 @@ model:
       required: optional-default-false
       required_checks: optional
       allowed_reviewer_kinds: optional-default-[EVALUATOR,HUMAN]
+    lifecycle_dependency:
+      exhaustive: optional-default-false
     obligation_fields:
       id: required
       source_kind: required
@@ -82,6 +84,7 @@ model:
       - SEMANTIC_DERIVATION_JUDGEMENT_UNKNOWN_LINKS
       - SEMANTIC_DERIVATION_JUDGEMENT_FINDINGS_INVALID
       - SEMANTIC_DERIVATION_JUDGEMENT_REJECTED
+      - LIFECYCLE_DEPENDENCY_INCOMPLETE
 
 rules:
   input_gap: >-
@@ -108,7 +111,13 @@ rules:
     attestation and is outside this v1 mechanism.
   irrelevant_input: >-
     Source assertions outside declared input obligations do not affect
-    derivation acceptance.
+    derivation acceptance unless lifecycle_dependency.exhaustive is true.
+  selective_lifecycle: >-
+    A derivation evaluation may become an authoritative selective lifecycle
+    baseline only when lifecycle_dependency.exhaustive is true and every source
+    semantic assertion is either covered by a derivation link or explicitly
+    dispositioned. This prevents a partial derivation contract from classifying
+    unknown upstream changes as irrelevant.
   core: >-
     Semantic derivation evidence is generated evidence above Core. It does not
     introduce a new Core entity.
