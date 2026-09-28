@@ -1,0 +1,195 @@
+version: 1
+kind: harness-scenario
+id: architecture-verification-semantic-derivation
+title: Architecture and verification preserve accepted interface, quality and behavior semantics
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: interface-topology-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: presentation-system-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: screen-view-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: quality-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: task-model, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: information-architecture-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: interface-topology-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: verification-strategy, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: presentation-system-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: screen-view-design, target_knowledge_kind: verification-strategy}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: verification-strategy}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: ARCHITECTURE-VERIFICATION-DERIVATION
+      authorities:
+        - id: PRODUCT
+          responsibility: Own requirements.
+          boundary: {semantic_cohesion: Product intent., independent_change: Product changes., public_contract: Requirements.}
+          produces: [{capability: demo.req, knowledge_kind: product-requirements, requires: []}]
+        - id: APP
+          responsibility: Own tasks.
+          boundary: {semantic_cohesion: Human work., independent_change: Tasks change., public_contract: Task semantics.}
+          produces: [{capability: demo.task, knowledge_kind: task-model, requires: []}]
+        - id: HUMAN
+          responsibility: Own human-interface design.
+          boundary: {semantic_cohesion: Interface design., independent_change: Interface changes., public_contract: Human-interface semantics.}
+          produces:
+            - {capability: demo.ia, knowledge_kind: information-architecture-design, requires: []}
+            - {capability: demo.interaction, knowledge_kind: interaction-design, requires: []}
+            - {capability: demo.topology, knowledge_kind: interface-topology-design, requires: []}
+            - {capability: demo.presentation, knowledge_kind: presentation-system-design, requires: []}
+            - {capability: demo.screen, knowledge_kind: screen-view-design, requires: []}
+        - id: MACHINE
+          responsibility: Own machine interface.
+          boundary: {semantic_cohesion: Machine contract., independent_change: Interface changes., public_contract: Interface contract.}
+          produces: [{capability: demo.api, knowledge_kind: interface-contract, requires: []}]
+        - id: SECURITY
+          responsibility: Own security architecture.
+          boundary: {semantic_cohesion: Security structure., independent_change: Security changes., public_contract: Security constraints.}
+          produces: [{capability: demo.security, knowledge_kind: security-architecture, requires: []}]
+        - id: QUALITY
+          responsibility: Own quality constraints.
+          boundary: {semantic_cohesion: Quality., independent_change: Quality changes., public_contract: Quality constraints.}
+          produces: [{capability: demo.quality, knowledge_kind: quality-design, requires: []}]
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own runtime structure.
+          boundary: {semantic_cohesion: Runtime and dependency topology., independent_change: Architecture changes behind accepted semantics., public_contract: System architecture.}
+          produces:
+            - capability: demo.architecture
+              knowledge_kind: system-architecture
+              requires: [demo.topology, demo.presentation, demo.screen, demo.api, demo.security, demo.quality]
+        - id: VERIFICATION-DESIGN
+          responsibility: Own verification intent.
+          boundary: {semantic_cohesion: Verification obligations., independent_change: Verification strategy changes independently., public_contract: Verification strategy.}
+          produces:
+            - capability: demo.interface-verification
+              knowledge_kind: verification-strategy
+              requires: [demo.task, demo.ia, demo.interaction, demo.topology]
+            - capability: demo.verification
+              knowledge_kind: verification-strategy
+              requires: [demo.interface-verification, demo.req, demo.presentation, demo.screen, demo.architecture]
+      consumers:
+        - {id: IMPLEMENTATION, purpose: Consume verified architecture., requires: [demo.verification]}
+      terminal_capabilities: []
+  topology:
+    value: {semantic_assertions: [{id: VIEW-RESOURCE, kind: topology-view, subject: RESOURCE, semantic_value: resource-detail-view, decision_authority: HUMAN}]}
+  presentation:
+    value: {semantic_assertions: [{id: PRESENT-RESOURCE, kind: presentation-pattern, subject: RESOURCE, semantic_value: resource-detail-presentation, decision_authority: HUMAN}]}
+  screen:
+    value: {semantic_assertions: [{id: SCREEN-RESOURCE, kind: screen-view, subject: RESOURCE, semantic_value: resource-detail-screen, decision_authority: HUMAN}]}
+  api:
+    value: {semantic_assertions: [{id: API-EDIT, kind: interface-operation, subject: RESOURCE, semantic_value: update-resource, decision_authority: MACHINE}]}
+  security:
+    value: {semantic_assertions: [{id: SEC-BOUNDARY, kind: security-trust-boundary, subject: FRONTEND, semantic_value: authenticated-api-boundary, decision_authority: SECURITY}]}
+  quality:
+    value: {semantic_assertions: [{id: QUALITY-AVAIL, kind: quality-constraint, subject: FRONTEND, semantic_value: preserve-accepted-availability-constraint, decision_authority: QUALITY}]}
+  architecture:
+    value: {semantic_assertions: [{id: ARCH-RUNTIME, kind: architecture-boundary, subject: FRONTEND, semantic_value: ui-application-api-runtime-boundaries, decision_authority: SYSTEM-ARCHITECTURE}, {id: ARCH-DEPENDENCY, kind: architecture-dependency, subject: FRONTEND, semantic_value: ui-depends-on-application-port-and-api-adapter, decision_authority: SYSTEM-ARCHITECTURE}, {id: ARCH-TRUST, kind: architecture-security, subject: FRONTEND, semantic_value: api-trust-boundary-preserved, decision_authority: SYSTEM-ARCHITECTURE}, {id: ARCH-QUALITY, kind: architecture-quality, subject: FRONTEND, semantic_value: availability-driver-preserved, decision_authority: SYSTEM-ARCHITECTURE}]}
+  task:
+    value: {semantic_assertions: [{id: TASK-OUTCOME, kind: task-outcome, subject: EDIT, semantic_value: changed-resource-visible, decision_authority: APP}]}
+  ia:
+    value: {semantic_assertions: [{id: LOCATION-RESOURCE, kind: information-location, subject: RESOURCE, semantic_value: resource-detail-location, decision_authority: HUMAN}]}
+  interaction:
+    value: {semantic_assertions: [{id: ACTION-EDIT, kind: interaction-action, subject: EDIT, semantic_value: submit-edit, decision_authority: HUMAN}, {id: RECOVERY-EDIT, kind: interaction-recovery, subject: EDIT, semantic_value: validation-error-preserves-input, decision_authority: HUMAN}]}
+  req:
+    value: {semantic_assertions: [{id: REQ-EDIT, kind: product-behavior-requirement, subject: RESOURCE, semantic_value: authorized-user-can-edit-resource, decision_authority: PRODUCT}]}
+  interface-verification:
+    value: {semantic_assertions: [{id: VERIFY-TASK, kind: verification-obligation, subject: EDIT, semantic_value: prove-task-outcome, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-LOCATION, kind: verification-obligation, subject: RESOURCE, semantic_value: prove-location-reachability, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-ACTION, kind: verification-obligation, subject: EDIT, semantic_value: prove-action-and-recovery, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-VIEW, kind: verification-obligation, subject: RESOURCE, semantic_value: prove-topology-view-coverage, decision_authority: VERIFICATION-DESIGN}]}
+  verification:
+    value: {semantic_assertions: [{id: VERIFY-INTERFACE, kind: verification-obligation, subject: FRONTEND, semantic_value: preserve-interface-verification-suite, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-REQ, kind: verification-obligation, subject: RESOURCE, semantic_value: prove-product-edit-requirement, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-PRESENTATION, kind: verification-obligation, subject: RESOURCE, semantic_value: prove-presentation-contract, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-SCREEN, kind: verification-obligation, subject: RESOURCE, semantic_value: prove-screen-contract, decision_authority: VERIFICATION-DESIGN}, {id: VERIFY-ARCH, kind: verification-obligation, subject: FRONTEND, semantic_value: prove-architecture-contract, decision_authority: VERIFICATION-DESIGN}]}
+
+steps:
+  - id: topology-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.topology, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: topology-view}]}, source: {ref: fixture.topology}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.topology, target_capability: demo.architecture, links: [{sources: [VIEW-RESOURCE], relation: CONSTRAINS, targets: [ARCH-RUNTIME]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: presentation-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.presentation, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: presentation-pattern}]}, source: {ref: fixture.presentation}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.presentation, target_capability: demo.architecture, links: [{sources: [PRESENT-RESOURCE], relation: CONSTRAINS, targets: [ARCH-RUNTIME]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: screen-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.screen, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: screen-view}]}, source: {ref: fixture.screen}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.screen, target_capability: demo.architecture, links: [{sources: [SCREEN-RESOURCE], relation: CONSTRAINS, targets: [ARCH-RUNTIME]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: api-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.api, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: interface-operation}]}, source: {ref: fixture.api}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.api, target_capability: demo.architecture, links: [{sources: [API-EDIT], relation: REALIZES, targets: [ARCH-DEPENDENCY]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: security-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: security-trust-boundary}]}, source: {ref: fixture.security}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.architecture, links: [{sources: [SEC-BOUNDARY], relation: REALIZES, targets: [ARCH-TRUST]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: quality-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.quality, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: quality-constraint}]}, source: {ref: fixture.quality}, candidate: {ref: fixture.architecture}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.quality, target_capability: demo.architecture, links: [{sources: [QUALITY-AVAIL], relation: REALIZES, targets: [ARCH-QUALITY]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: task-interface-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.task, target_capability: demo.interface-verification, obligations: [{id: semantics, source_kind: task-outcome}]}, source: {ref: fixture.task}, candidate: {ref: fixture.interface-verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.task, target_capability: demo.interface-verification, links: [{sources: [TASK-OUTCOME], relation: REALIZES, targets: [VERIFY-TASK]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: ia-interface-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.ia, target_capability: demo.interface-verification, obligations: [{id: semantics, source_kind: information-location}]}, source: {ref: fixture.ia}, candidate: {ref: fixture.interface-verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.ia, target_capability: demo.interface-verification, links: [{sources: [LOCATION-RESOURCE], relation: REALIZES, targets: [VERIFY-LOCATION]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: interaction-interface-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interaction, target_capability: demo.interface-verification, obligations: [{id: actions, source_kind: interaction-action}, {id: recovery, source_kind: interaction-recovery}]}, source: {ref: fixture.interaction}, candidate: {ref: fixture.interface-verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interaction, target_capability: demo.interface-verification, links: [{sources: [ACTION-EDIT, RECOVERY-EDIT], relation: REALIZES, targets: [VERIFY-ACTION]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: topology-interface-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.topology, target_capability: demo.interface-verification, obligations: [{id: semantics, source_kind: topology-view}]}, source: {ref: fixture.topology}, candidate: {ref: fixture.interface-verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.topology, target_capability: demo.interface-verification, links: [{sources: [VIEW-RESOURCE], relation: REALIZES, targets: [VERIFY-VIEW]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: interface-verification-full
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface-verification, target_capability: demo.verification, obligations: [{id: semantics, source_kind: verification-obligation, min_count: 4}]}, source: {ref: fixture.interface-verification}, candidate: {ref: fixture.verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface-verification, target_capability: demo.verification, links: [{sources: [VERIFY-TASK, VERIFY-LOCATION, VERIFY-ACTION, VERIFY-VIEW], relation: PRESERVES, targets: [VERIFY-INTERFACE]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: req-full-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.req, target_capability: demo.verification, obligations: [{id: semantics, source_kind: product-behavior-requirement}]}, source: {ref: fixture.req}, candidate: {ref: fixture.verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.req, target_capability: demo.verification, links: [{sources: [REQ-EDIT], relation: REALIZES, targets: [VERIFY-REQ]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: presentation-full-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.presentation, target_capability: demo.verification, obligations: [{id: semantics, source_kind: presentation-pattern}]}, source: {ref: fixture.presentation}, candidate: {ref: fixture.verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.presentation, target_capability: demo.verification, links: [{sources: [PRESENT-RESOURCE], relation: REALIZES, targets: [VERIFY-PRESENTATION]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: screen-full-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.screen, target_capability: demo.verification, obligations: [{id: semantics, source_kind: screen-view}]}, source: {ref: fixture.screen}, candidate: {ref: fixture.verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.screen, target_capability: demo.verification, links: [{sources: [SCREEN-RESOURCE], relation: REALIZES, targets: [VERIFY-SCREEN]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: architecture-full-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.architecture, target_capability: demo.verification, obligations: [{id: semantics, source_kind: architecture-boundary}]}, source: {ref: fixture.architecture}, candidate: {ref: fixture.verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.architecture, target_capability: demo.verification, links: [{sources: [ARCH-RUNTIME], relation: REALIZES, targets: [VERIFY-ARCH]}], dispositions: []}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-security-architecture-link
+    driver: data.patch
+    with: {value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.architecture, links: [{sources: [SEC-BOUNDARY], relation: REALIZES, targets: [ARCH-TRUST]}], dispositions: []}, operations: [{op: remove, path: /links/0}]}
+  - id: architecture-loses-security
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.architecture, obligations: [{id: semantics, source_kind: security-trust-boundary}]}, source: {ref: fixture.security}, candidate: {ref: fixture.architecture}, evidence: {ref: step.remove-security-architecture-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: SEC-BOUNDARY, owner_authority: SYSTEM-ARCHITECTURE}}
+
+  - id: remove-task-outcome
+    driver: data.patch
+    with: {value: {ref: fixture.task}, operations: [{op: remove, path: /semantic_assertions/0}]}
+  - id: missing-task-verification-input
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.task, target_capability: demo.interface-verification, obligations: [{id: semantics, source_kind: task-outcome}]}, source: {ref: step.remove-task-outcome}, candidate: {ref: fixture.interface-verification}, evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.task, target_capability: demo.interface-verification, links: [], dispositions: []}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, owner_authority: APP}}
