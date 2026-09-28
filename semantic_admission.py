@@ -28,6 +28,7 @@ from decision_governance import (
 from engineering_graph import producer_index, production_index, validate_realization
 from harness import CoreError
 from semantic_acceptance import evaluate_artifact
+from semantic_questions import questions_from_semantic_evaluation
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -285,6 +286,13 @@ def admit_artifact(
             item["claim"] if isinstance(item, dict) else item
             for item in production.get("semantic_claims", []) or []
         ],
+        "owned_assertion_kinds": list(
+            kind_contract.get("owned_assertion_kinds", []) or []
+        ),
+        "obligations": list(kind_contract.get("obligations", []) or []),
+        "compatibility_obligations": list(
+            kind_contract.get("compatibility_obligations", []) or []
+        ),
         "allowed_source_authorities": sorted(allowed_source_authorities),
         "requires_source_authority": bool(
             kind_contract.get("requires_source_authority", True)
@@ -378,6 +386,16 @@ def admit_artifact(
             evaluation["findings"].extend(execution_evaluation["findings"])
             evaluation["findings"].extend(decision_evaluation["findings"])
             evaluation["semantic_claims"]["accepted"] = []
+
+    evaluation["question_proposals"] = (
+        questions_from_semantic_evaluation(
+            graph=graph,
+            capability=capability,
+            evaluation=evaluation,
+        )
+        if evaluation["status"] != "ACCEPTED"
+        else []
+    )
 
     evaluation["admission"] = {
         "status": evaluation["status"],
