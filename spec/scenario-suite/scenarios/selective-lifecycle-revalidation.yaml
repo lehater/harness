@@ -74,6 +74,9 @@ fixtures:
 steps:
   - id: irrelevant-upstream-change
     driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, false_positive_control]
+      mutation_class: irrelevant-upstream-change
     with:
       graph: {ref: fixture.graph}
       model: {ref: fixture.model}
@@ -91,6 +94,9 @@ steps:
 
   - id: relevant-upstream-change
     driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, mutation_detection]
+      mutation_class: consumed-atom-change
     with:
       graph: {ref: fixture.graph}
       model: {ref: fixture.model}
@@ -110,6 +116,9 @@ steps:
 
   - id: new-irrelevant-atom-stable
     driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, false_positive_control]
+      mutation_class: irrelevant-upstream-addition
     with:
       graph: {ref: fixture.graph}
       model: {ref: fixture.model}
