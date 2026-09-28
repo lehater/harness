@@ -60,6 +60,7 @@ required_dimension_values:
 
 required_benchmark_metrics:
   - mutation_detection
+  - ambiguity_handling
   - false_positive_control
   - question_owner_routing
   - root_cause_localization
