@@ -43,6 +43,26 @@ No manifest, pin, submodule or repository-to-repository runtime binding is requi
 - A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
+## Scenario Suite discipline
+
+The Scenario Suite in `docs/design/scenario-suite-v0.md` is the cross-layer
+executable behavioral specification of Harness.
+
+When a change adds or materially changes externally observable Harness
+behavior:
+
+1. classify the behavior in `spec/scenario-suite/catalog-v1.yaml`;
+2. add or update a reusable scenario when deterministic observation is
+   possible;
+3. use `planned` only when the functional surface is known but a stable
+   executable oracle is not yet available;
+4. promote stable coverage to `required`;
+5. prefer invariant assertions and mutations over full-output golden files.
+
+A subsystem-specific validator remains useful, but it does not substitute for a
+cross-layer scenario when the consumer-visible behavior spans multiple Harness
+mechanisms.
+
 ## Change discipline
 
 Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a universal semantic DSL without a concrete consumer failure.
@@ -85,6 +105,8 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `spec/adapter-acceptance/**` — executable adapter integration cases.
 - `spec/target-state-acceptance/**` — executable Design Profile target-state cases.
 - `spec/workspace-acceptance/**` — executable managed-workspace scenarios.
+- `spec/scenario-suite/**` — cross-layer executable behavioral scenarios and coverage catalog.
+- `scenario_suite.py` / `scenario_drivers.py` — universal scenario runner and built-in driver registry.
 - `validators/validate_core.py` — Core validator/acceptance runner.
 - `validators/validate_adapters.py` — adapter acceptance runner.
 - `validators/validate_target_state.py` — target-state acceptance runner.

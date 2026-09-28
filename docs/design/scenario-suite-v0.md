@@ -197,3 +197,18 @@ copied into the suite report without requiring a full golden snapshot.
 Use observations for longitudinal analysis such as selected frontier size,
 Question owner, activated concern count or decision disposition. They are
 diagnostic evidence, not a second correctness oracle.
+
+
+### Required versus planned coverage
+
+A catalog requirement may set `enforcement: required` or
+`enforcement: planned` (default is `required`).
+
+- **required** — missing passing scenarios fail the suite;
+- **planned** — the gap is emitted in `planned_gaps` but does not fail CI.
+
+This permits the catalog to describe the complete known Harness functional
+surface before every scenario exists. Coverage should normally move from
+`planned` to `required` when a stable executable scenario is available.
+New behavior must not remain uncataloged merely because its scenario has not yet
+been written.

@@ -130,3 +130,158 @@ requirements:
   - id: authority-operational-status
     description: Project status projects REQUIRED Authorities into NOT_STARTED, IN_PROGRESS or BLOCKED from canonical artifacts and Questions.
     min_scenarios: 1
+
+
+  # Known functional surface not yet promoted to mandatory scenario coverage.
+  # These entries make the remaining test roadmap explicit without weakening
+  # the already-required behaviors above.
+
+  - id: core-model-invalid-rejected
+    category: core
+    enforcement: planned
+    description: Invalid Core ownership, dependency or Question structure is rejected deterministically.
+    min_scenarios: 1
+
+  - id: canonical-projection-alignment
+    category: integration
+    enforcement: planned
+    description: Project-native canonical graphs project into Core without hidden or phantom dependencies.
+    min_scenarios: 1
+
+  - id: workspace-managed-artifact-validation
+    category: workspace
+    enforcement: planned
+    description: Managed workspace validation accepts canonical managed knowledge and rejects invalid/generated ownership states.
+    min_scenarios: 1
+
+  - id: source-coverage-completeness
+    category: assurance
+    enforcement: planned
+    description: Source coverage detects unclassified accepted source statements and explicit exclusions.
+    min_scenarios: 1
+
+  - id: semantic-provenance-enforcement
+    category: semantic
+    enforcement: planned
+    description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
+    min_scenarios: 1
+
+  - id: semantic-contradiction-detection
+    category: semantic
+    enforcement: planned
+    description: Conflicting accepted semantic assertions are rejected rather than silently reconciled.
+    min_scenarios: 1
+
+  - id: semantic-process-error-no-question
+    category: semantic
+    enforcement: planned
+    description: Producer/process validation failures remain rejection findings and do not become semantic Questions.
+    min_scenarios: 1
+
+  - id: semantic-closure-currentness
+    category: semantic
+    enforcement: planned
+    description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
+    min_scenarios: 1
+
+  - id: subject-inventory-disposition
+    category: coverage
+    enforcement: planned
+    description: Coverage requires an explicit subject inventory contract or disposition instead of treating silence as not applicable.
+    min_scenarios: 1
+
+  - id: subject-obligation-classification
+    category: coverage
+    enforcement: planned
+    description: Every accepted scope requirement is classified into required subject coverage or explicit exclusion.
+    min_scenarios: 1
+
+  - id: coverage-question-frontier
+    category: coverage
+    enforcement: planned
+    description: Coverage routes unresolved proof gaps to the correct Question frontier.
+    min_scenarios: 1
+
+  - id: production-contract-overlay
+    category: coverage
+    enforcement: planned
+    description: Project overlays can add justified production contracts without replacing reusable Engineering Graph truth.
+    min_scenarios: 1
+
+  - id: consumer-scoped-activation
+    category: activation
+    enforcement: planned
+    description: Concern activation is constrained to the selected Consumer closure.
+    min_scenarios: 1
+
+  - id: scope-root-activation
+    category: activation
+    enforcement: planned
+    description: Scope roots narrow activation and coverage without silently broadening to unrelated capabilities.
+    min_scenarios: 1
+
+  - id: decision-material-diversity
+    category: decision
+    enforcement: planned
+    description: Superficially different alternatives with identical material effects do not satisfy decision exploration diversity.
+    min_scenarios: 1
+
+  - id: decision-research-depth
+    category: decision
+    enforcement: planned
+    description: RESEARCH and DEEP_RESEARCH decision policies require corresponding authoritative/diverse evidence.
+    min_scenarios: 1
+
+  - id: decision-redo-idempotence
+    category: decision
+    enforcement: planned
+    description: CURRENT work is omitted by default while explicit REDO remains bounded and repeatable.
+    min_scenarios: 1
+
+  - id: decision-execution-assurance
+    category: decision
+    enforcement: planned
+    description: Stronger execution assurance fails closed when trusted external attestation is unavailable.
+    min_scenarios: 1
+
+  - id: authority-context-read-boundary
+    category: authority
+    enforcement: planned
+    description: Authority execution context exposes only admitted upstream and same-Authority canonical inputs.
+    min_scenarios: 1
+
+  - id: project-authority-migration
+    category: authority
+    enforcement: planned
+    description: Authority splits do not blindly inherit applicability from retired Authority identities.
+    min_scenarios: 1
+
+  - id: repository-realization
+    category: repository
+    enforcement: planned
+    description: Repository realization validates source-of-truth, environment and gate-policy applicability.
+    min_scenarios: 1
+
+  - id: human-documentation-projection
+    category: projection
+    enforcement: planned
+    description: Human documentation is derived from accepted canonical knowledge and cannot become an independent truth source.
+    min_scenarios: 1
+
+  - id: frontend-contract-closure
+    category: frontend
+    enforcement: planned
+    description: Frontend screen and UX closure rejects missing query/action/state/provider or presentation semantics.
+    min_scenarios: 1
+
+  - id: skill-invariant-policy
+    category: agent
+    enforcement: planned
+    description: Every active artifact skill is explicitly enforced or judgement-only with rationale.
+    min_scenarios: 1
+
+  - id: implementation-feedback-classification
+    category: implementation
+    enforcement: planned
+    description: Missing upstream semantics reopen knowledge while implementation/evidence lag does not manufacture a semantic Question.
+    min_scenarios: 1

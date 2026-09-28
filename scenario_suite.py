@@ -414,6 +414,7 @@ def evaluate_coverage(
     }
     dimensions = catalog.get("dimensions", {}) or {}
     findings: list[dict[str, Any]] = []
+    planned_gaps: list[dict[str, Any]] = []
 
     required_scenario_dimensions = (
         catalog.get("required_scenario_dimensions", []) or []
@@ -461,18 +462,37 @@ def evaluate_coverage(
                 passed_by_requirement[claim].append(result.id)
 
     by_id = {result.id: result for result in results}
+    requirement_status: dict[str, dict[str, Any]] = {}
     for requirement, spec in requirements.items():
-        minimum = int(spec.get("min_scenarios", 1))
-        passed = sorted(set(passed_by_requirement[requirement]))
-        if len(passed) < minimum:
+        enforcement = spec.get("enforcement", "required")
+        if enforcement not in {"required", "planned"}:
             findings.append(
                 {
-                    "code": "SCENARIO_COVERAGE_MISSING",
+                    "code": "INVALID_REQUIREMENT_ENFORCEMENT",
                     "requirement": requirement,
-                    "required": minimum,
-                    "passed": passed,
+                    "enforcement": enforcement,
                 }
             )
+            enforcement = "required"
+        minimum = int(spec.get("min_scenarios", 1))
+        passed = sorted(set(passed_by_requirement[requirement]))
+        requirement_status[requirement] = {
+            "enforcement": enforcement,
+            "minimum": minimum,
+            "passed": passed,
+            "covered": len(passed) >= minimum,
+        }
+        if len(passed) < minimum:
+            gap = {
+                "code": "SCENARIO_COVERAGE_MISSING",
+                "requirement": requirement,
+                "required": minimum,
+                "passed": passed,
+            }
+            if enforcement == "required":
+                findings.append(gap)
+            else:
+                planned_gaps.append(gap)
         required_dimensions = spec.get("required_dimensions", {}) or {}
         for dimension, required_values in required_dimensions.items():
             observed = {
@@ -482,17 +502,19 @@ def evaluate_coverage(
             }
             for required_value in required_values:
                 if required_value not in observed:
-                    findings.append(
-                        {
-                            "code": "SCENARIO_DIMENSION_COVERAGE_MISSING",
-                            "requirement": requirement,
-                            "dimension": dimension,
-                            "value": required_value,
-                            "observed": sorted(
-                                value for value in observed if value is not None
-                            ),
-                        }
-                    )
+                    gap = {
+                        "code": "SCENARIO_DIMENSION_COVERAGE_MISSING",
+                        "requirement": requirement,
+                        "dimension": dimension,
+                        "value": required_value,
+                        "observed": sorted(
+                            value for value in observed if value is not None
+                        ),
+                    }
+                    if enforcement == "required":
+                        findings.append(gap)
+                    else:
+                        planned_gaps.append(gap)
 
     passed_results = [result for result in results if result.status == "PASSED"]
     required_dimension_values = catalog.get("required_dimension_values", {}) or {}
@@ -534,6 +556,9 @@ def evaluate_coverage(
             requirement: sorted(set(scenarios))
             for requirement, scenarios in passed_by_requirement.items()
         },
+        "requirement_status": requirement_status,
+        "planned_gaps": planned_gaps,
+        "planned_gap_count": len(planned_gaps),
         "findings": findings,
     }
 

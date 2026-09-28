@@ -62,7 +62,8 @@ def main() -> int:
     print(
         "Harness scenario suite passed "
         f"({report['scenario_count']} scenarios; "
-        f"{len(report['coverage']['requirements'])} required behaviors covered)"
+        f"{sum(1 for item in report['coverage']['requirement_status'].values() if item['enforcement'] == 'required')} required behaviors tracked; "
+        f"{report['coverage']['planned_gap_count']} planned coverage gap(s))"
     )
     return 0
 
