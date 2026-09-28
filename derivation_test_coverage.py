@@ -24,6 +24,91 @@ def _kind(production: dict[str, Any], capability: str) -> str:
 
 
 
+def _scenario_fixture_value(
+    document: dict[str, Any],
+    scenario_path: Path,
+    name: str,
+) -> Any:
+    fixtures = document.get("fixtures", {}) or {}
+    spec = fixtures.get(name)
+    if spec is None:
+        raise CoreError(
+            f"scenario {document.get('id')} references unknown fixture: {name}"
+        )
+    if not isinstance(spec, dict):
+        return spec
+    if "value" in spec:
+        return spec["value"]
+    if "yaml" in spec:
+        path = (scenario_path.parent / str(spec["yaml"])).resolve()
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    raise CoreError(
+        f"scenario {document.get('id')} derivation proof fixture {name} "
+        "must use value or yaml"
+    )
+
+
+def _resolve_scenario_value(
+    document: dict[str, Any],
+    scenario_path: Path,
+    value: Any,
+) -> Any:
+    if (
+        isinstance(value, dict)
+        and set(value) == {"ref"}
+        and isinstance(value.get("ref"), str)
+    ):
+        ref = value["ref"]
+        if not ref.startswith("fixture.") or "#" in ref:
+            raise CoreError(
+                f"scenario {document.get('id')} derivation proof uses "
+                f"unsupported reference: {ref}"
+            )
+        return _scenario_fixture_value(
+            document,
+            scenario_path,
+            ref[len("fixture."):],
+        )
+    return value
+
+
+def _declared_derivation_edges(
+    document: dict[str, Any],
+) -> tuple[set[tuple[str, str]], set[tuple[str, str]]]:
+    kind_edges: set[tuple[str, str]] = set()
+    capability_edges: set[tuple[str, str]] = set()
+    for item in document.get("derivation_edges", []) or []:
+        if not isinstance(item, dict):
+            raise CoreError(
+                f"scenario {document.get('id')} derivation_edge must be a mapping"
+            )
+        source_kind = item.get("source_knowledge_kind")
+        target_kind = item.get("target_knowledge_kind")
+        source_capability = item.get("source_capability")
+        target_capability = item.get("target_capability")
+        if (
+            isinstance(source_kind, str)
+            and source_kind
+            and isinstance(target_kind, str)
+            and target_kind
+        ):
+            kind_edges.add((source_kind, target_kind))
+            continue
+        if (
+            isinstance(source_capability, str)
+            and source_capability
+            and isinstance(target_capability, str)
+            and target_capability
+        ):
+            capability_edges.add((source_capability, target_capability))
+            continue
+        raise CoreError(
+            f"scenario {document.get('id')} derivation_edge requires a "
+            "knowledge-kind pair or capability pair"
+        )
+    return kind_edges, capability_edges
+
+
 def _scenario_edge_index(
     scenario_directory: str | None,
 ) -> dict[str, dict[str, set[tuple[str, str]]]]:
@@ -34,6 +119,7 @@ def _scenario_edge_index(
         raise CoreError(
             f"derivation coverage scenario_directory is not a directory: {root}"
         )
+
     result: dict[str, dict[str, set[tuple[str, str]]]] = {}
     for path in sorted(root.glob("*.yaml")):
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -42,43 +128,85 @@ def _scenario_edge_index(
         scenario_id = document.get("id")
         if not isinstance(scenario_id, str) or not scenario_id:
             continue
-        kind_edges: set[tuple[str, str]] = set()
-        capability_edges: set[tuple[str, str]] = set()
-        for item in document.get("derivation_edges", []) or []:
-            if not isinstance(item, dict):
-                raise CoreError(
-                    f"scenario {scenario_id} derivation_edge must be a mapping"
-                )
-            source_kind = item.get("source_knowledge_kind")
-            target_kind = item.get("target_knowledge_kind")
-            source_capability = item.get("source_capability")
-            target_capability = item.get("target_capability")
-            if (
-                isinstance(source_kind, str)
-                and source_kind
-                and isinstance(target_kind, str)
-                and target_kind
-            ):
-                kind_edges.add((source_kind, target_kind))
+
+        actual_kind_edges: set[tuple[str, str]] = set()
+        actual_capability_edges: set[tuple[str, str]] = set()
+        for step in document.get("steps", []) or []:
+            if not isinstance(step, dict) or step.get("driver") != "semantic.derivation":
                 continue
-            if (
+            arguments = step.get("with", {}) or {}
+            if not isinstance(arguments, dict):
+                raise CoreError(
+                    f"scenario {scenario_id} semantic.derivation step requires with mapping"
+                )
+            graph = _resolve_scenario_value(
+                document,
+                path,
+                arguments.get("graph"),
+            )
+            contract = _resolve_scenario_value(
+                document,
+                path,
+                arguments.get("contract"),
+            )
+            if not isinstance(graph, dict) or not isinstance(contract, dict):
+                raise CoreError(
+                    f"scenario {scenario_id} semantic.derivation proof requires "
+                    "resolvable graph and contract"
+                )
+            source_capability = contract.get("source_capability")
+            target_capability = contract.get("target_capability")
+            if not (
                 isinstance(source_capability, str)
                 and source_capability
                 and isinstance(target_capability, str)
                 and target_capability
             ):
-                capability_edges.add((source_capability, target_capability))
-                continue
-            raise CoreError(
-                f"scenario {scenario_id} derivation_edge requires a "
-                "knowledge-kind pair or capability pair"
+                raise CoreError(
+                    f"scenario {scenario_id} semantic.derivation contract "
+                    "requires source_capability and target_capability"
+                )
+            productions = production_index(graph)
+            source_production = productions.get(source_capability)
+            target_production = productions.get(target_capability)
+            if source_production is None or target_production is None:
+                raise CoreError(
+                    f"scenario {scenario_id} semantic.derivation step references "
+                    "capability outside its graph"
+                )
+            actual_capability_edges.add(
+                (source_capability, target_capability)
             )
+            actual_kind_edges.add(
+                (
+                    _kind(source_production, source_capability),
+                    _kind(target_production, target_capability),
+                )
+            )
+
+        declared_kind_edges, declared_capability_edges = _declared_derivation_edges(
+            document
+        )
+        if declared_kind_edges and declared_kind_edges != actual_kind_edges:
+            raise CoreError(
+                f"scenario {scenario_id} derivation_edges do not match executable "
+                f"semantic.derivation kind edges; declared={sorted(declared_kind_edges)}, "
+                f"actual={sorted(actual_kind_edges)}"
+            )
+        if (
+            declared_capability_edges
+            and declared_capability_edges != actual_capability_edges
+        ):
+            raise CoreError(
+                f"scenario {scenario_id} capability derivation_edges do not match "
+                "executable semantic.derivation steps"
+            )
+
         result[scenario_id] = {
-            "kind_edges": kind_edges,
-            "capability_edges": capability_edges,
+            "kind_edges": actual_kind_edges,
+            "capability_edges": actual_capability_edges,
         }
     return result
-
 
 def evaluate_derivation_test_coverage(
     *,
