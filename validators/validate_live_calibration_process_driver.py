@@ -30,6 +30,12 @@ second_obs = second.steps[0]["observations"]
 assert first_obs["executable_sha256"] != second_obs["executable_sha256"]
 assert first_obs["evaluator_fingerprint"] != second_obs["evaluator_fingerprint"]
 
+evidence = first_obs["evaluation"]
+assert evidence["run_id"] == "PROCESS-RUN-1"
+assert evidence["evaluator"]["adapter"]["executable_sha256"]
+assert len(evidence["predictions"]) == 10
+assert evidence["calibration"]["confusion"]["false_negative"] == 5
+
 run("process-unavailable.yaml", INTEGRATION / "does-not-exist")
 run("process-timeout.yaml", INTEGRATION / "process-timeout.py", "0.05")
 run("process-failed.yaml", INTEGRATION / "process-failed.py")
