@@ -43,5 +43,6 @@ steps:
       - {path: /independence/status, op: equals, value: UNVERIFIED}
       - {path: /execution/boundary, op: equals, value: EXTERNAL_PROCESS}
     observe:
+      evaluation: /
       evaluator_fingerprint: /evaluator/fingerprint
       executable_sha256: /execution/executable_sha256
