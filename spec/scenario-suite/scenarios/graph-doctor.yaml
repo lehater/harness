@@ -34,7 +34,13 @@ fixtures:
       terminal_capabilities: []
   model:
     value:
-      authorities: []
+      authorities:
+        - id: DOMAIN
+          responsibility: Own domain knowledge.
+          boundary:
+            semantic_cohesion: Domain semantics.
+            independent_change: Domain semantics change independently.
+            public_contract: Accepted domain model.
       artifacts:
         - id: DOMAIN-MODEL
           authority: DOMAIN
