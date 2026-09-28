@@ -58,6 +58,16 @@ required_dimension_values:
     - applicability
   execution_type: [deterministic, agent-evaluation]
 
+required_benchmark_metrics:
+  - mutation_detection
+  - false_positive_control
+  - question_owner_routing
+  - root_cause_localization
+  - blocking_behavior
+  - alternative_valid_acceptance
+  - selective_revalidation
+  - semantic_truth_detection
+
 required_drivers:
   - repository.realization
   - coverage.subject_obligations
