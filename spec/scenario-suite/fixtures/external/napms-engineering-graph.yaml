@@ -1,0 +1,569 @@
+# External validation snapshot.
+# source_repository: lehater/napms
+# source_commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+# source_path: docs/harness-engineering-graph.yaml
+version: 1
+kind: harness-engineering-graph
+id: NAPMS-FIRST-MVP
+default_subject: NAPMS-FIRST-MVP
+
+authorities:
+  - id: DISCOVERY
+    responsibility: Own problem observations, actors, desired outcomes and evidence that motivate design work without deciding requirements or solution semantics.
+    boundary:
+      semantic_cohesion: One class of engineering knowledge about the problem/evidence space.
+      independent_change: Evidence may be refined before accepted requirements or solution models change.
+      public_contract: Provides problem evidence to requirements/use-case analysis; discovery Questions route here.
+    produces:
+      - capability: engineering.discovery.problem-evidence
+        knowledge_kind: problem-evidence
+        requires: []
+      - capability: engineering.hcd.first-mvp.problem-evidence
+        knowledge_kind: problem-evidence
+        requires: []
+      - capability: engineering.hcd.application-components.user-needs
+        knowledge_kind: user-needs
+        requires:
+          - engineering.hcd.first-mvp.problem-evidence
+      - capability: engineering.hcd.access-request.user-needs
+        knowledge_kind: user-needs
+        requires:
+          - engineering.hcd.first-mvp.problem-evidence
+      - capability: engineering.hcd.policy-export.user-needs
+        knowledge_kind: user-needs
+        requires:
+          - engineering.hcd.first-mvp.problem-evidence
+
+  - id: PRODUCT-REQUIREMENTS
+    responsibility: Own accepted product intent, scope, externally observable behavior and acceptance expectations.
+    boundary:
+      semantic_cohesion: One class of decisions about what the product must achieve rather than how it is modeled or built.
+      independent_change: Product intent can change without directly deciding domain or technical realization.
+      public_contract: Provides accepted product intent and acceptance semantics.
+    produces:
+      - capability: engineering.requirements.product-intent
+        knowledge_kind: product-requirements
+        requires: []
+      - capability: engineering.requirements.acceptance
+        knowledge_kind: product-requirements
+        requires: []
+      - capability: engineering.hcd.application-components.requirements
+        knowledge_kind: product-requirements
+        requires:
+          - engineering.hcd.application-components.user-needs
+      - capability: engineering.hcd.access-request.requirements
+        knowledge_kind: product-requirements
+        requires:
+          - engineering.hcd.access-request.user-needs
+      - capability: engineering.hcd.policy-export.requirements
+        knowledge_kind: product-requirements
+        requires:
+          - engineering.hcd.policy-export.user-needs
+
+  - id: STRATEGIC-DOMAIN-DESIGN
+    responsibility: Own strategic DDD engineering knowledge including capability model, Bounded Context decomposition and context relationships.
+    boundary:
+      semantic_cohesion: These decisions jointly define strategic domain partitioning and relationships.
+      independent_change: Strategic decomposition can evolve without directly editing tactical models or technical architecture.
+      public_contract: Provides the strategic domain model.
+    produces:
+      - capability: engineering.domain.strategic-model
+        knowledge_kind: strategic-domain-design
+        requires: []
+
+  - id: DOMAIN-USE-CASE-DESIGN
+    responsibility: Own context-focused use-case behavior used to drive tactical domain modeling.
+    boundary:
+      semantic_cohesion: Decisions describe observable domain behavior for a bounded problem/use-case slice.
+      independent_change: Use-case behavior can be refined before tactical structures or persistence representations are chosen.
+      public_contract: Provides accepted domain use-case behavior.
+    produces:
+      - capability: engineering.domain.use-case-model
+        knowledge_kind: domain-use-case
+        requires:
+          - engineering.discovery.problem-evidence
+          - engineering.domain.strategic-model
+
+  - id: TACTICAL-DOMAIN-DESIGN
+    responsibility: Own tactical DDD engineering knowledge across selected Bounded Contexts.
+    boundary:
+      semantic_cohesion: Artifacts answer how accepted domain behavior is modeled tactically.
+      independent_change: Tactical modeling can evolve while strategic boundaries and use-case contracts remain stable.
+      public_contract: Provides the selected tactical domain model.
+    produces:
+      - capability: engineering.domain.tactical-model
+        knowledge_kind: domain-model
+        requires:
+          - engineering.domain.use-case-model
+          - engineering.domain.strategic-model
+
+  - id: APPLICATION-JOURNEY-DESIGN
+    responsibility: Own cross-context/application journey composition and policy-materialization behavior for the selected MVP flow.
+    boundary:
+      semantic_cohesion: Decisions describe application-level orchestration of accepted domain semantics.
+      independent_change: Journey composition can evolve without re-owning tactical domain truth or technical architecture.
+      public_contract: Provides cross-context journey and materialization semantics.
+    produces:
+      - capability: engineering.application.journey
+        knowledge_kind: application-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.domain.tactical-model
+      - capability: engineering.application.materialization-semantics
+        knowledge_kind: application-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.application-components.task-model
+        knowledge_kind: task-model
+        requires:
+          - engineering.hcd.application-components.user-needs
+          - engineering.hcd.application-components.requirements
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.access-request.task-model
+        knowledge_kind: task-model
+        requires:
+          - engineering.hcd.access-request.user-needs
+          - engineering.hcd.access-request.requirements
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.policy-export.task-model
+        knowledge_kind: task-model
+        requires:
+          - engineering.hcd.policy-export.user-needs
+          - engineering.hcd.policy-export.requirements
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.application-components.user-journey
+        knowledge_kind: user-journey-design
+        requires:
+          - engineering.hcd.application-components.task-model
+          - engineering.hcd.application-components.requirements
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.access-request.user-journey
+        knowledge_kind: user-journey-design
+        requires:
+          - engineering.hcd.access-request.task-model
+          - engineering.hcd.access-request.requirements
+          - engineering.domain.tactical-model
+      - capability: engineering.hcd.policy-export.user-journey
+        knowledge_kind: user-journey-design
+        requires:
+          - engineering.hcd.policy-export.task-model
+          - engineering.hcd.policy-export.requirements
+          - engineering.domain.tactical-model
+
+  - id: SYSTEM-ARCHITECTURE
+    responsibility: Own structural/runtime architecture, application-boundary rules, module interaction/consistency rules and in-process module contracts.
+    boundary:
+      semantic_cohesion: C4 structure, architectural rules and module contracts jointly define the system/application architecture baseline.
+      independent_change: Architecture can evolve behind stable requirements/domain/interface contracts.
+      public_contract: Provides C4 topology, architecture rules and module contracts.
+    produces:
+      - capability: engineering.architecture.c4-model
+        knowledge_kind: system-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.application.journey
+      - capability: engineering.architecture.rules
+        knowledge_kind: system-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.application.journey
+      - capability: engineering.architecture.module-contracts
+        knowledge_kind: system-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.domain.tactical-model
+          - engineering.domain.use-case-model
+          - engineering.application.journey
+      - capability: engineering.architecture.async-messaging-not-applicable
+        knowledge_kind: system-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.strategic-model
+          - engineering.application.journey
+      - capability: engineering.frontend.architecture
+        knowledge_kind: system-architecture
+        requires:
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.frontend.screen-view-design
+          - engineering.interface.http-contract
+          - engineering.architecture.security
+          - engineering.security.browser-credential-lifecycle
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+
+  - id: SECURITY-ARCHITECTURE-DESIGN
+    responsibility: Own authentication, identity-boundary and protected-action admission architecture.
+    boundary:
+      semantic_cohesion: Decisions describe the security architecture boundary.
+      independent_change: Security architecture can evolve independently from tactical domain modeling and later threat analysis.
+      public_contract: Provides security architecture constraints to downstream design.
+    produces:
+      - capability: engineering.architecture.security
+        knowledge_kind: security-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.architecture.rules
+      - capability: engineering.security.browser-credential-lifecycle
+        knowledge_kind: security-architecture
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.architecture.rules
+
+  - id: INTERFACE-DESIGN
+    responsibility: Own shared technical representations and supported external interface contracts including machine and human interaction contracts.
+    boundary:
+      semantic_cohesion: Decisions define supported external interaction and representation semantics.
+      independent_change: Interface representations can evolve without changing domain ownership or physical persistence design.
+      public_contract: Provides shared representations, HTTP and human-interface contracts.
+    produces:
+      - capability: engineering.interface.shared-representations
+        knowledge_kind: interface-contract
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.application.journey
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+      - capability: engineering.interface.http-contract
+        knowledge_kind: interface-contract
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.application.journey
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+      - capability: engineering.interface.ui-navigation
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.application.journey
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+      - capability: engineering.interface.resource-detail-ui
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.application.journey
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+      - capability: engineering.frontend.human-interface
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.domain.tactical-model
+          - engineering.application.journey
+          - engineering.architecture.security
+          - engineering.security.browser-credential-lifecycle
+          - engineering.interface.http-contract
+      - capability: engineering.hcd.application-components.human-interface
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.hcd.application-components.requirements
+          - engineering.hcd.application-components.task-model
+          - engineering.hcd.application-components.user-journey
+          - engineering.architecture.security
+      - capability: engineering.hcd.access-request.human-interface
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.hcd.access-request.requirements
+          - engineering.hcd.access-request.task-model
+          - engineering.hcd.access-request.user-journey
+          - engineering.architecture.security
+      - capability: engineering.hcd.policy-export.human-interface
+        knowledge_kind: human-interface-design
+        requires:
+          - engineering.hcd.policy-export.requirements
+          - engineering.hcd.policy-export.task-model
+          - engineering.hcd.policy-export.user-journey
+          - engineering.architecture.security
+      - capability: engineering.frontend.presentation-system
+        knowledge_kind: presentation-system-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.application.journey
+          - engineering.frontend.human-interface
+          - engineering.architecture.security
+          - engineering.quality.constraints
+      - capability: engineering.frontend.screen-view-design
+        knowledge_kind: screen-view-design
+        requires:
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.interface.ui-navigation
+          - engineering.interface.resource-detail-ui
+          - engineering.interface.http-contract
+      - capability: engineering.hcd.application-components.screen-view
+        knowledge_kind: screen-view-design
+        requires:
+          - engineering.hcd.application-components.human-interface
+      - capability: engineering.hcd.access-request.screen-view
+        knowledge_kind: screen-view-design
+        requires:
+          - engineering.hcd.access-request.human-interface
+      - capability: engineering.hcd.policy-export.screen-view
+        knowledge_kind: screen-view-design
+        requires:
+          - engineering.hcd.policy-export.human-interface
+
+  - id: DATA-DESIGN
+    responsibility: Own physical persistence engineering knowledge.
+    boundary:
+      semantic_cohesion: Decisions define one physical data-storage model.
+      independent_change: Storage design can evolve behind stable domain/application/interface contracts.
+      public_contract: Provides the canonical persistence model.
+    produces:
+      - capability: engineering.data.persistence-model
+        knowledge_kind: data-design
+        requires:
+          - engineering.domain.tactical-model
+          - engineering.architecture.rules
+          - engineering.interface.shared-representations
+
+  - id: QUALITY-DESIGN
+    responsibility: Own explicit architecture-significant quality constraints derived from accepted product and design truth.
+    boundary:
+      semantic_cohesion: Decisions express cross-cutting realization qualities and explicit unknown targets.
+      independent_change: Quality constraints can evolve without reallocating domain or interface ownership.
+      public_contract: Provides quality constraints to implementation and verification.
+    produces:
+      - capability: engineering.quality.constraints
+        knowledge_kind: quality-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.application.materialization-semantics
+          - engineering.architecture.rules
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.data.persistence-model
+
+  - id: SECURITY-ANALYSIS
+    responsibility: Own threat analysis and coverage of accepted security/system/data/interface design.
+    boundary:
+      semantic_cohesion: Security analysis evaluates threats against an already selected design baseline.
+      independent_change: Threat analysis can evolve without owning underlying security architecture decisions.
+      public_contract: Provides threat/control analysis.
+    produces:
+      - capability: engineering.security.threat-analysis
+        knowledge_kind: security-analysis
+        requires:
+          - engineering.architecture.rules
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.data.persistence-model
+
+  - id: OPERABILITY-DESIGN
+    responsibility: Own diagnostic/observability engineering requirements for implementation and verification.
+    boundary:
+      semantic_cohesion: Decisions define correlation, diagnostic outcomes and dependency-health visibility.
+      independent_change: Operability design can evolve without redefining domain or interface semantics.
+      public_contract: Provides observability/diagnostic requirements.
+    produces:
+      - capability: engineering.operability.observability
+        knowledge_kind: operability-design
+        requires:
+          - engineering.architecture.c4-model
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.data.persistence-model
+
+  - id: IMPLEMENTATION-DESIGN
+    responsibility: Own implementation slicing, sequencing and completion criteria after upstream engineering decisions are available.
+    boundary:
+      semantic_cohesion: Decisions concern how accepted design is realized.
+      independent_change: Slice order and realization planning can change without redefining upstream design.
+      public_contract: Provides implementation plan and completion criteria.
+    produces:
+      - capability: engineering.implementation.plan
+        knowledge_kind: implementation-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.application.journey
+          - engineering.architecture.c4-model
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.interface.resource-detail-ui
+          - engineering.data.persistence-model
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+          - engineering.architecture.async-messaging-not-applicable
+          - engineering.backend.component-design
+      - capability: engineering.implementation.completion-criteria
+        knowledge_kind: implementation-design
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.application.journey
+          - engineering.architecture.c4-model
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.interface.resource-detail-ui
+          - engineering.data.persistence-model
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+          - engineering.architecture.async-messaging-not-applicable
+          - engineering.backend.component-design
+      - capability: engineering.frontend.implementation-design
+        knowledge_kind: implementation-design
+        requires:
+          - engineering.frontend.component-design
+          - engineering.frontend.verification
+          - engineering.frontend.test-design
+
+  - id: COMPONENT-DESIGN
+    responsibility: Own implementation-facing backend and frontend component, codebase and dependency boundaries.
+    boundary:
+      semantic_cohesion: Component responsibilities, dependency rules and code-quality constraints form one code-facing design family.
+      independent_change: Component decomposition can change behind stable domain, interface and architecture contracts.
+      public_contract: Provides code-facing component design to implementation design and verification.
+    produces:
+      - capability: engineering.backend.component-design
+        knowledge_kind: component-design
+        requires:
+          - engineering.architecture.c4-model
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.data.persistence-model
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+      - capability: engineering.frontend.component-design
+        knowledge_kind: component-design
+        requires:
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.frontend.screen-view-design
+          - engineering.frontend.architecture
+          - engineering.interface.http-contract
+
+  - id: VERIFICATION-DESIGN
+    responsibility: Own verification levels, traceability and scenarios proving implementation realizes accepted engineering knowledge.
+    boundary:
+      semantic_cohesion: Decisions concern what evidence proves the accepted design.
+      independent_change: Verification strategy can evolve without becoming product/domain/architecture authority.
+      public_contract: Provides verification strategy and acceptance scenarios.
+    produces:
+      - capability: engineering.verification.strategy
+        knowledge_kind: verification-strategy
+        requires:
+          - engineering.requirements.acceptance
+          - engineering.domain.tactical-model
+          - engineering.application.materialization-semantics
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.interface.ui-navigation
+          - engineering.interface.resource-detail-ui
+          - engineering.data.persistence-model
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+          - engineering.implementation.plan
+      - capability: engineering.verification.acceptance-scenarios
+        knowledge_kind: acceptance-scenarios
+        requires:
+          - engineering.requirements.acceptance
+          - engineering.domain.tactical-model
+          - engineering.application.materialization-semantics
+          - engineering.architecture.rules
+          - engineering.architecture.module-contracts
+          - engineering.architecture.security
+          - engineering.interface.http-contract
+          - engineering.interface.ui-navigation
+          - engineering.interface.resource-detail-ui
+          - engineering.data.persistence-model
+          - engineering.quality.constraints
+          - engineering.security.threat-analysis
+          - engineering.operability.observability
+          - engineering.implementation.plan
+
+      - capability: engineering.frontend.verification
+        knowledge_kind: verification-strategy
+        requires:
+          - engineering.requirements.product-intent
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.frontend.screen-view-design
+          - engineering.frontend.architecture
+          - engineering.frontend.component-design
+      - capability: engineering.frontend.presentation-verification
+        knowledge_kind: verification-strategy
+        requires:
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.frontend.screen-view-design
+
+  - id: TEST-DESIGN
+    responsibility: Own executable frontend behavioral test contracts before implementation.
+    boundary:
+      semantic_cohesion: Preconditions, operations and observable frontend oracles form one executable-test design family.
+      independent_change: Test contracts can survive frontend implementation refactoring.
+      public_contract: Provides executable frontend test design.
+    produces:
+      - capability: engineering.frontend.test-design
+        knowledge_kind: test-design
+        requires:
+          - engineering.frontend.verification
+          - engineering.frontend.presentation-verification
+          - engineering.frontend.human-interface
+          - engineering.frontend.presentation-system
+          - engineering.frontend.screen-view-design
+
+consumers:
+  - id: BACKEND-IMPLEMENTATION
+    purpose: Realize the accepted first-MVP backend engineering knowledge without inventing product, domain, architecture, interface, data, security, operability or verification decisions.
+    requires:
+      - engineering.requirements.product-intent
+      - engineering.requirements.acceptance
+      - engineering.domain.strategic-model
+      - engineering.domain.tactical-model
+      - engineering.application.journey
+      - engineering.architecture.c4-model
+      - engineering.architecture.rules
+      - engineering.architecture.module-contracts
+      - engineering.architecture.security
+      - engineering.interface.shared-representations
+      - engineering.interface.http-contract
+      - engineering.interface.ui-navigation
+      - engineering.interface.resource-detail-ui
+      - engineering.data.persistence-model
+      - engineering.quality.constraints
+      - engineering.security.threat-analysis
+      - engineering.operability.observability
+      - engineering.implementation.plan
+      - engineering.implementation.completion-criteria
+      - engineering.verification.strategy
+      - engineering.verification.acceptance-scenarios
+
+  - id: FRONTEND-IMPLEMENTATION
+    purpose: Realize the browser frontend without inventing user-visible, security, architecture, component or test decisions.
+    requires:
+      - engineering.frontend.implementation-design
+      - engineering.hcd.application-components.screen-view
+      - engineering.hcd.access-request.screen-view
+      - engineering.hcd.policy-export.screen-view
+
+terminal_capabilities: []
