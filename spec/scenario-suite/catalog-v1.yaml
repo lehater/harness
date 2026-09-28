@@ -69,6 +69,7 @@ required_drivers:
   - engineering.target
   - semantic.acceptance
   - semantic.derivation
+  - semantic.derivation_test_coverage
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure
@@ -204,6 +205,12 @@ requirements:
     category: semantic
     enforcement: required
     description: Required semantic judgement is request-bound and rejects meaning-preserving claims that an evaluator or human reviewer rejects.
+    min_scenarios: 1
+
+  - id: derivation-test-coverage
+    category: coverage
+    enforcement: required
+    description: Every selected ProductionContract dependency edge is either covered by a derivation test class or explicitly disposed as not applicable.
     min_scenarios: 1
 
   - id: semantic-contradiction-detection
