@@ -52,7 +52,8 @@ fixtures:
             - {capability: demo.interface, knowledge_kind: interface-contract, requires: [demo.requirements, demo.domain, demo.security]}
       consumers:
         - {id: FRONTEND, purpose: Consume machine contracts., requires: [demo.interface]}
-      terminal_capabilities: [demo.quality]
+      terminal_capabilities:
+        - {capability: demo.quality, authority: QUALITY-DESIGN, reason: Synthetic pack exposes quality as an independently accepted output.}
 
   requirements:
     value:
