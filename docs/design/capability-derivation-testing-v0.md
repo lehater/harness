@@ -79,8 +79,8 @@ downstream.
   dispositions and Question routing;
 - invariant/property oracle: mutations, alternative-valid designs and
   irrelevant-input stability;
-- semantic/evaluator oracle: whether a declared transformation preserves the
-  intended meaning when deterministic structure is insufficient;
+- semantic/evaluator oracle: request-bound EVALUATOR/HUMAN judgement when a
+  declared transformation cannot be validated structurally;
 - human/expert oracle: benchmark/test-pack authoring and calibration.
 
 Literal full-artifact snapshots are not the primary oracle.
@@ -146,13 +146,38 @@ The deterministic evaluator already exposes required/covered/disposed/unresolved
 counts. Corpus-level rates require benchmark packs with expert-labelled expected
 results and are intentionally not fabricated from the small bootstrap suite.
 
+## Semantic judgement
+
+A derivation contract may require semantic judgement. Harness creates a
+deterministic request bound to the exact required source assertions, referenced
+target assertions, link set and required checks. EVALUATOR or HUMAN evidence is
+accepted only for that request. A changed target/source/link therefore rejects
+stale judgement evidence.
+
+This proves request binding and fail-closed behavior. It does not prove reviewer
+independence or that an evaluator is infallible. Stronger execution/trust
+attestation remains a separate concern.
+
+## Selective lifecycle revalidation
+
+Accepted semantic admission publishes fingerprints for its semantic assertions.
+An ACCEPTED derivation evaluation publishes fingerprints only for source atoms
+actually consumed by derivation links. Downstream admission may persist these
+under `accepted_prerequisite_semantics`.
+
+Lifecycle then uses two modes:
+
+- no semantic baseline -> conservative prerequisite acceptance-id comparison;
+- consumed semantic baseline -> stale only when a consumed atom changes,
+  disappears, or its upstream Capability is itself non-current.
+
+This keeps backward compatibility while preventing unnecessary cascade from
+unconsumed upstream changes.
+
 ## Remaining boundary
 
-v0 proves deterministic trace/disposition coverage. It does not independently
-prove that the meaning claimed by a `TRANSFORMS` or `REALIZES` link is true.
-That is the semantic/evaluator oracle boundary.
-
-Likewise, lifecycle currentness is still Capability-acceptance-granular. A later
-experiment may use consumed semantic fingerprints to avoid revalidating a
-downstream Capability when only irrelevant upstream atoms changed. That change
-should be justified by its own RED scenario rather than folded into v0.
+The next coverage problem is meta-level completeness: every material
+ProductionContract dependency should have either tested derivation behavior or
+an explicit disposition explaining why semantic derivation testing is not
+applicable. The Scenario Suite remains the intended enforcement surface; no
+second test runner should be introduced.
