@@ -145,9 +145,10 @@ Do not collapse quality into one score. Useful independent measures are:
 The deterministic evaluator exposes required/covered/disposed/unresolved
 counts. Scenario steps may additionally opt into benchmark labels. The Scenario
 Suite aggregates independent corpus metrics such as mutation detection,
-false-positive control, Question-owner routing, root-cause localization,
-blocking behavior, alternative-valid acceptance, selective revalidation and
-semantic-truth detection, including rates by mutation class.
+false-positive control, ambiguity handling, Question-owner routing,
+root-cause localization, blocking behavior, alternative-valid acceptance,
+selective revalidation and semantic-truth detection, including rates by
+mutation class.
 
 These are regression-corpus rates, not estimates of universal recall/precision.
 Harness deliberately does not collapse them into one quality score.
