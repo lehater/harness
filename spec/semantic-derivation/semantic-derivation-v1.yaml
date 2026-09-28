@@ -18,6 +18,10 @@ model:
       - source_capability
       - target_capability
       - obligations
+    semantic_judgement:
+      required: optional-default-false
+      required_checks: optional
+      allowed_reviewer_kinds: optional-default-[EVALUATOR,HUMAN]
     obligation_fields:
       id: required
       source_kind: required
@@ -31,9 +35,18 @@ model:
       - target_capability
       - links
     link_fields:
+      id: required-when-semantic-judgement-required
       sources: required-non-empty
       relation: [PRESERVES, TRANSFORMS, CONSTRAINS, REALIZES]
       targets: required-non-empty
+    semantic_judgement:
+      kind: harness-semantic-derivation-judgement
+      assurance: request-bound
+      reviewer_kind: [EVALUATOR, HUMAN]
+      status: [ACCEPTED, REJECTED]
+      reviewed_links: required
+      checks: required
+      findings: required
     dispositions:
       statuses: [NOT_APPLICABLE, QUESTION]
       rationale: required
@@ -55,6 +68,20 @@ model:
       - NOT_APPLICABLE_NOT_ALLOWED
       - UNDISPOSITIONED_SOURCE
       - DERIVATION_QUESTION
+      - DERIVATION_LINK_ID_REQUIRED
+      - DUPLICATE_DERIVATION_LINK_ID
+      - SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED
+      - SEMANTIC_DERIVATION_JUDGEMENT_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_REVIEWER_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_BINDING_MISMATCH
+      - SEMANTIC_DERIVATION_JUDGEMENT_STATUS_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_CHECKS_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_CHECKS_MISSING
+      - SEMANTIC_DERIVATION_JUDGEMENT_LINKS_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_INCOMPLETE
+      - SEMANTIC_DERIVATION_JUDGEMENT_UNKNOWN_LINKS
+      - SEMANTIC_DERIVATION_JUDGEMENT_FINDINGS_INVALID
+      - SEMANTIC_DERIVATION_JUDGEMENT_REJECTED
 
 rules:
   input_gap: >-
@@ -68,6 +95,17 @@ rules:
   alternatives: >-
     Several downstream designs may be valid. Acceptance depends on required
     semantic coverage and valid evidence, not literal target identities or shape.
+  semantic_truth: >-
+    A derivation contract may require semantic judgement when deterministic
+    trace structure cannot establish meaning preservation. Harness generates a
+    deterministic judgement request bound to the exact required source
+    assertions, referenced target assertions, derivation links and required
+    checks. ACCEPTED judgement applies only to that request. A stale or changed
+    candidate therefore cannot reuse an old verdict.
+  judgement_trust: >-
+    REQUEST_BOUND proves evidence binding, not reviewer independence or model
+    correctness. Stronger trusted-execution assurance requires separate external
+    attestation and is outside this v1 mechanism.
   irrelevant_input: >-
     Source assertions outside declared input obligations do not affect
     derivation acceptance.
