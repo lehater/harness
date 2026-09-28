@@ -70,6 +70,73 @@ def knowledge_contract_index(document: dict[str, Any]) -> dict[str, dict[str, An
     return result
 
 
+def _merge_named_items(
+    base: list[dict[str, Any]],
+    overlay: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    result = {
+        item["id"]: dict(item)
+        for item in base
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    order = [
+        item["id"]
+        for item in base
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    ]
+    for item in overlay:
+        if not isinstance(item, dict) or not isinstance(item.get("id"), str):
+            raise CoreError("semantic contract overlay items require id")
+        item_id = item["id"]
+        if item_id not in result:
+            order.append(item_id)
+        result[item_id] = dict(item)
+    return [result[item_id] for item_id in order]
+
+
+def effective_knowledge_contract(
+    base: dict[str, Any],
+    knowledge_kind: str,
+    overlays: list[dict[str, Any]] | None,
+) -> dict[str, Any]:
+    result = dict(base)
+    for document in overlays or []:
+        if document.get("version") != 1:
+            raise CoreError("knowledge-kind semantic overlay version must be 1")
+        if document.get("kind") != "harness-knowledge-kind-semantic-overlay":
+            raise CoreError("unexpected knowledge-kind semantic overlay kind")
+        matches = [
+            item
+            for item in document.get("contracts", []) or []
+            if isinstance(item, dict)
+            and item.get("knowledge_kind") == knowledge_kind
+        ]
+        if len(matches) > 1:
+            raise CoreError(
+                f"duplicate semantic overlay knowledge_kind: {knowledge_kind}"
+            )
+        if not matches:
+            continue
+        item = matches[0]
+        for field in (
+            "requires_source_authority",
+            "requires_assertion_authority",
+            "requires_semantic_review",
+        ):
+            if field in item:
+                result[field] = item[field]
+        for field in ("required_review_checks", "owned_assertion_kinds"):
+            result[field] = sorted(
+                set(result.get(field, []) or []) | set(item.get(field, []) or [])
+            )
+        for field in ("obligations", "compatibility_obligations"):
+            result[field] = _merge_named_items(
+                list(result.get(field, []) or []),
+                list(item.get(field, []) or []),
+            )
+    return result
+
+
 def _artifact_index(model: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {
         item["id"]: item
@@ -176,6 +243,7 @@ def admit_artifact(
     model: dict[str, Any],
     skill_registry: dict[str, Any],
     knowledge_contracts: dict[str, Any],
+    knowledge_contract_overlays: list[dict[str, Any]] | None = None,
     decision_contracts: dict[str, Any] | None = None,
     decision_policy: dict[str, Any] | None = None,
     decision_exploration: dict[str, Any] | None = None,
@@ -226,6 +294,12 @@ def admit_artifact(
         raise CoreError(
             f"knowledge_kind {knowledge_kind} has no semantic admission contract"
         )
+
+    kind_contract = effective_knowledge_contract(
+        kind_contract,
+        knowledge_kind,
+        knowledge_contract_overlays,
+    )
 
     if decision_contracts is None:
         decision_contracts = load_yaml(
@@ -446,6 +520,11 @@ def main() -> int:
         default="spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml",
     )
     parser.add_argument(
+        "--knowledge-contract-overlay",
+        action="append",
+        default=[],
+    )
+    parser.add_argument(
         "--decision-contracts",
         default="spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml",
     )
@@ -463,6 +542,9 @@ def main() -> int:
         model=load_yaml(args.model),
         skill_registry=load_yaml(args.skill_registry),
         knowledge_contracts=load_yaml(args.knowledge_contracts),
+        knowledge_contract_overlays=[
+            load_yaml(path) for path in args.knowledge_contract_overlay
+        ],
         decision_contracts=load_yaml(args.decision_contracts),
         decision_policy=load_yaml(args.decision_policy) if args.decision_policy else None,
         decision_exploration=(

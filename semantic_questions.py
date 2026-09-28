@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Experimental semantic-gap -> Core Question projection.
-
-This layer is intentionally above Harness Core. It does not invent semantic
-answers and does not mutate canonical state. It turns machine-addressable
-semantic admission gaps into deterministic Question proposals addressed to the
-Authority that owns the rejected capability.
-"""
+"""Semantic completeness gap -> Core Question projection above Harness Core."""
 from __future__ import annotations
 
 import copy
@@ -19,8 +13,8 @@ GAP_FINDING_CODES = {
     "MISSING_OBLIGATION",
     "MISSING_SUBJECTS",
     "MISSING_VALUES",
-    "SEMANTIC_REVIEW_REQUIRED",
-    "SEMANTIC_REVIEW_CHECKS_MISSING",
+    "OBLIGATION_DEFERRED",
+    "OBLIGATION_QUESTION",
 }
 
 
@@ -30,12 +24,31 @@ def _slug(value: str) -> str:
 
 def _gap_identity(finding: dict[str, Any]) -> str:
     obligation = finding.get("obligation")
+    subject = finding.get("subject")
     if isinstance(obligation, str) and obligation:
+        if isinstance(subject, str) and subject:
+            return f"{obligation}-{subject}"
         return obligation
-    checks = finding.get("checks")
-    if isinstance(checks, list) and checks:
-        return "review-" + "-".join(str(item) for item in checks)
     return str(finding.get("code", "semantic-gap")).lower()
+
+
+def _gap_text(
+    capability: str,
+    identity: str,
+    finding: dict[str, Any],
+) -> str:
+    details: list[str] = []
+    if finding.get("subjects"):
+        details.append("subjects=" + ", ".join(finding["subjects"]))
+    if finding.get("values"):
+        details.append("values=" + ", ".join(str(v) for v in finding["values"]))
+    if finding.get("rationale"):
+        details.append("rationale=" + str(finding["rationale"]))
+    suffix = f"; {'; '.join(details)}" if details else ""
+    return (
+        f"Resolve semantic completeness gap '{identity}' "
+        f"for capability '{capability}' ({finding.get('code')}{suffix})."
+    )
 
 
 def questions_from_semantic_evaluation(
@@ -44,7 +57,6 @@ def questions_from_semantic_evaluation(
     capability: str,
     evaluation: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """Project accepted semantic-gap finding types into Core Question proposals."""
     if evaluation.get("status") == "ACCEPTED":
         return []
 
@@ -57,23 +69,45 @@ def questions_from_semantic_evaluation(
     for finding in evaluation.get("findings", []) or []:
         if not isinstance(finding, dict):
             continue
-        code = finding.get("code")
-        if code not in GAP_FINDING_CODES:
+        if finding.get("code") not in GAP_FINDING_CODES:
             continue
         identity = _gap_identity(finding)
-        question_id = (
-            f"Q-SEMANTIC-{_slug(capability)}-{_slug(identity)}"
-        )
+        question_id = f"Q-SEMANTIC-{_slug(capability)}-{_slug(identity)}"
         proposals[question_id] = {
             "id": question_id,
             "authority": authority,
-            "text": (
-                f"Resolve semantic completeness gap '{identity}' "
-                f"for capability '{capability}' ({code})."
-            ),
+            "text": _gap_text(capability, identity, finding),
             "blocks_capabilities": [capability],
         }
 
+    return [proposals[key] for key in sorted(proposals)]
+
+
+def proposals_from_evaluation_set(
+    evaluations: dict[str, Any],
+) -> list[dict[str, Any]]:
+    proposals: dict[str, dict[str, Any]] = {}
+    documents: list[dict[str, Any]] = []
+    if evaluations.get("kind") == "harness-artifact-semantic-evaluation":
+        documents.append(evaluations)
+    documents.extend(
+        item
+        for item in evaluations.get("semantic_evaluations", []) or []
+        if isinstance(item, dict)
+    )
+    for evaluation in documents:
+        for proposal in evaluation.get("question_proposals", []) or []:
+            if not isinstance(proposal, dict):
+                continue
+            question_id = proposal.get("id")
+            if not isinstance(question_id, str) or not question_id:
+                raise CoreError("semantic Question proposal id is required")
+            current = proposals.get(question_id)
+            if current is not None and current != proposal:
+                raise CoreError(
+                    f"conflicting semantic Question proposals: {question_id}"
+                )
+            proposals[question_id] = copy.deepcopy(proposal)
     return [proposals[key] for key in sorted(proposals)]
 
 
@@ -81,12 +115,6 @@ def append_question_proposals(
     model: dict[str, Any],
     proposals: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Return a copy with non-conflicting proposals appended.
-
-    Engineering-Graph callers may keep Authorities outside Core; validation is
-    therefore performed later through validate_realization(), which projects
-    those Authorities before Core validation.
-    """
     result = copy.deepcopy(model)
     questions = result.setdefault("questions", [])
     if not isinstance(questions, list):

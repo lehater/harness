@@ -12,8 +12,9 @@ import yaml
 from agent_router import validate_skill_registry
 from capability_lifecycle import evaluate_lifecycle_target, lifecycle_index, lifecycle_states
 from engineering_graph import derive_profile, evaluate_engineering_target, production_index, validate_realization
-from harness import CoreError
+from harness import CoreError, question_frontier
 from semantic_acceptance import evaluation_index
+from semantic_questions import append_question_proposals, proposals_from_evaluation_set
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -33,7 +34,11 @@ def evaluate_semantic_closure(
     lifecycle: dict[str, Any],
 ) -> dict[str, Any]:
     validate_skill_registry(skill_registry)
-    realized = validate_realization(graph, model)
+
+    proposals = proposals_from_evaluation_set(semantic_evaluations)
+    projected_model = append_question_proposals(model, proposals)
+    realized = validate_realization(graph, projected_model)
+
     structural = evaluate_engineering_target(graph, target, realized)
     profile = derive_profile(graph, target)
     productions = production_index(graph)
@@ -110,6 +115,11 @@ def evaluate_semantic_closure(
                     "authority": expectation["authority"],
                     "artifact": artifact_id,
                     "code": "SEMANTIC_ADMISSION_REQUIRED",
+                    "findings": (
+                        evaluation.get("findings", [])
+                        if isinstance(evaluation, dict)
+                        else []
+                    ),
                 }
             )
             continue
@@ -131,21 +141,34 @@ def evaluate_semantic_closure(
     lifecycle_target = evaluate_lifecycle_target(
         graph, target, realized, lifecycle
     )
+    proposal_ids = [item["id"] for item in proposals]
+    frontier = question_frontier(realized, proposal_ids) if proposal_ids else []
+
     complete = (
         structural["status"] == "COMPLETE"
         and not semantic_gaps
         and not currentness_gaps
+        and not frontier
         and len(satisfied) == len(profile["expectations"])
+    )
+    status = (
+        "COMPLETE"
+        if complete
+        else "BLOCKED"
+        if frontier or structural["status"] == "BLOCKED"
+        else "INCOMPLETE"
     )
 
     return {
         "version": 1,
         "kind": "harness-semantic-closure-evaluation",
         "target": target,
-        "status": "COMPLETE" if complete else "INCOMPLETE",
+        "status": status,
         "structural_status": structural["status"],
         "semantic_gaps": semantic_gaps,
         "currentness_gaps": currentness_gaps,
+        "question_proposals": proposals,
+        "question_frontier": frontier,
         "revalidate": lifecycle_target["revalidate"],
         "pending": lifecycle_target["pending"],
         "satisfied_capabilities": sorted(satisfied),

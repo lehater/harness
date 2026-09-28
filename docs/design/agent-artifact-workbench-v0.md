@@ -192,6 +192,44 @@ Before registering `provides`, the agent must establish all of the following:
 
 Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
 
+## Semantic completeness and automatic Questions
+
+For knowledge kinds with machine-addressable semantic obligations, strict
+admission evaluates the obligation surface before accepting the capability.
+
+```text
+knowledge-kind obligation
+        ↓
+assertion or explicit disposition
+        ↓
+missing / DEFERRED / QUESTION
+        ↓
+deterministic Core Question proposal
+        ↓
+owning Authority
+        ↓
+capability blocked
+        ↓
+canonical artifact revised
+        ↓
+admission + lifecycle revalidation
+```
+
+`NOT_APPLICABLE` closes an obligation only with explicit rationale.
+`DEFERRED` and `QUESTION` remain open. Validation/process defects such as
+missing review checks, invalid provenance or wrong Authority never become
+Questions; the producing agent must fix those directly.
+
+A project may extend a reusable knowledge-kind contract with a
+`harness-knowledge-kind-semantic-overlay` when completeness depends on
+project-specific semantics. The overlay adds obligations without creating a
+second canonical product/domain truth.
+
+Semantic closure projects generated Questions in memory before computing target
+status, so a structurally present provider cannot preserve a misleading
+`COMPLETE` result when its accepted semantic evaluation contains an open
+obligation.
+
 ## Unknowns and Questions
 
 When a skill cannot produce the requested knowledge without choosing an unresolved semantic fact:

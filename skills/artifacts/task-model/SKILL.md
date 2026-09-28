@@ -86,3 +86,16 @@ Product Requirements and Domain semantics actually consumed.
 Prefer a goal/task tree or table showing decomposition, responsibility, required
 information/decisions and outcomes. User journeys are downstream scenario
 projections and screen/navigation diagrams remain Interface Design projections.
+
+
+## Semantic completeness projection
+
+Strict semantic admission projects each goal and task into machine-addressable
+assertions. Every task must be covered for goal reference, responsibility,
+required information, decision/input, expected outcome, required system support
+and recovery semantics.
+
+When one of these dimensions genuinely does not apply to a task, record an
+explicit subject-scoped `NOT_APPLICABLE` disposition with rationale. Missing,
+`DEFERRED` or `QUESTION` semantics are open gaps and must block the
+Task Model capability rather than be invented by Interface or Implementation.
