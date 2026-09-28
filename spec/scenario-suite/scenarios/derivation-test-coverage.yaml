@@ -83,6 +83,20 @@ steps:
       - {path: /gaps, op: length, value: 0}
       - {path: /disposed, op: contains_match, value: {source_capability: demo.b, target_capability: demo.c, disposition: NOT_APPLICABLE}}
 
+  - id: invalid-registration-poisons-complete-status
+    driver: semantic.derivation_test_coverage
+    with:
+      graph: {ref: fixture.graph}
+      tested_kind_edges:
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: task-to-interaction-semantic-derivation}
+        - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: DOES-NOT-EXIST}
+      dispositions: {ref: step.disposition}
+      scenario_directory: {ref: fixture.scenario-directory}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /gap_count, op: equals, value: 0}
+      - {path: /invalid_registration_count, op: equals, value: 1}
+
   - id: fake-test-registration
     driver: semantic.derivation_test_coverage
     with:
