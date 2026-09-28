@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,8 @@ from harness import CoreError
 
 RELATIONS = {"PRESERVES", "TRANSFORMS", "CONSTRAINS", "REALIZES"}
 DISPOSITIONS = {"NOT_APPLICABLE", "QUESTION"}
+JUDGEMENT_REVIEWERS = {"EVALUATOR", "HUMAN"}
+JUDGEMENT_STATUSES = {"ACCEPTED", "REJECTED"}
 
 
 def _index_assertions(document: dict[str, Any], where: str) -> dict[str, dict[str, Any]]:
@@ -44,6 +47,190 @@ def _required_capabilities(production: dict[str, Any]) -> set[str]:
         elif isinstance(item, dict) and isinstance(item.get("capability"), str):
             result.add(item["capability"])
     return result
+
+
+
+
+def _judgement_request(
+    *,
+    source_capability: str,
+    target_capability: str,
+    required_sources: set[str],
+    source_assertions: dict[str, dict[str, Any]],
+    target_assertions: dict[str, dict[str, Any]],
+    links: list[dict[str, Any]],
+    required_checks: list[str],
+) -> dict[str, Any]:
+    referenced_targets = sorted(
+        {
+            target
+            for link in links
+            for target in link.get("targets", []) or []
+            if isinstance(target, str) and target in target_assertions
+        }
+    )
+    payload = {
+        "source_capability": source_capability,
+        "target_capability": target_capability,
+        "source_assertions": [
+            source_assertions[source_id]
+            for source_id in sorted(required_sources)
+            if source_id in source_assertions
+        ],
+        "target_assertions": [
+            target_assertions[target_id]
+            for target_id in referenced_targets
+        ],
+        "links": links,
+        "required_checks": sorted(required_checks),
+    }
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    request_id = "SDJ-" + hashlib.sha256(encoded).hexdigest()
+    return {
+        "version": 1,
+        "kind": "harness-semantic-derivation-judgement-request",
+        "request_id": request_id,
+        **payload,
+    }
+
+
+def _evaluate_judgement(
+    *,
+    contract: dict[str, Any],
+    evidence: dict[str, Any],
+    request: dict[str, Any],
+    evaluated_links: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    judgement_contract = contract.get("semantic_judgement", {}) or {}
+    required_checks = {
+        str(value)
+        for value in judgement_contract.get("required_checks", []) or []
+        if isinstance(value, str) and value
+    }
+    allowed_reviewers = set(
+        judgement_contract.get("allowed_reviewer_kinds", []) or JUDGEMENT_REVIEWERS
+    )
+    unknown_reviewers = sorted(allowed_reviewers - JUDGEMENT_REVIEWERS)
+    if unknown_reviewers:
+        raise CoreError(
+            f"semantic derivation contract has unknown reviewer kinds: {unknown_reviewers}"
+        )
+
+    judgement = evidence.get("semantic_judgement")
+    if not isinstance(judgement, dict):
+        findings.append({"code": "SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED"})
+        return findings, {
+            "required": True,
+            "assurance": "REQUEST_BOUND",
+            "status": "MISSING",
+            "request_id": request["request_id"],
+        }
+
+    if (
+        judgement.get("version") != 1
+        or judgement.get("kind") != "harness-semantic-derivation-judgement"
+    ):
+        findings.append({"code": "SEMANTIC_DERIVATION_JUDGEMENT_INVALID"})
+
+    reviewer_kind = judgement.get("reviewer_kind")
+    if reviewer_kind not in allowed_reviewers:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_REVIEWER_INVALID",
+                "reviewer_kind": reviewer_kind,
+            }
+        )
+
+    if judgement.get("request_id") != request["request_id"]:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_BINDING_MISMATCH",
+                "expected_request_id": request["request_id"],
+                "actual_request_id": judgement.get("request_id"),
+            }
+        )
+
+    status = judgement.get("status")
+    if status not in JUDGEMENT_STATUSES:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_STATUS_INVALID",
+                "status": status,
+            }
+        )
+
+    checks = judgement.get("checks", []) or []
+    if not isinstance(checks, list) or any(
+        not isinstance(value, str) or not value for value in checks
+    ):
+        findings.append({"code": "SEMANTIC_DERIVATION_JUDGEMENT_CHECKS_INVALID"})
+        checks = []
+    missing_checks = sorted(required_checks - set(checks))
+    if missing_checks:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_CHECKS_MISSING",
+                "checks": missing_checks,
+            }
+        )
+
+    expected_links = {
+        link["id"]
+        for link in evaluated_links
+        if isinstance(link.get("id"), str) and link["id"]
+    }
+    reviewed_links = judgement.get("reviewed_links", []) or []
+    if not isinstance(reviewed_links, list) or any(
+        not isinstance(value, str) or not value for value in reviewed_links
+    ):
+        findings.append({"code": "SEMANTIC_DERIVATION_JUDGEMENT_LINKS_INVALID"})
+        reviewed_links = []
+    missing_links = sorted(expected_links - set(reviewed_links))
+    unknown_links = sorted(set(reviewed_links) - expected_links)
+    if missing_links:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_INCOMPLETE",
+                "links": missing_links,
+            }
+        )
+    if unknown_links:
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_UNKNOWN_LINKS",
+                "links": unknown_links,
+            }
+        )
+
+    judgement_findings = judgement.get("findings", []) or []
+    if not isinstance(judgement_findings, list):
+        findings.append({"code": "SEMANTIC_DERIVATION_JUDGEMENT_FINDINGS_INVALID"})
+        judgement_findings = []
+
+    if status == "REJECTED":
+        findings.append(
+            {
+                "code": "SEMANTIC_DERIVATION_JUDGEMENT_REJECTED",
+                "judgement_findings": judgement_findings,
+            }
+        )
+
+    return findings, {
+        "required": True,
+        "assurance": "REQUEST_BOUND",
+        "status": status if status in JUDGEMENT_STATUSES else "INVALID",
+        "reviewer_kind": reviewer_kind,
+        "request_id": request["request_id"],
+        "checks": sorted(set(checks)),
+        "reviewed_links": sorted(set(reviewed_links)),
+        "findings": judgement_findings,
+    }
 
 
 def evaluate_derivation(
@@ -175,8 +362,14 @@ def evaluate_derivation(
             f"semantic derivation contract has unknown relations: {unknown_relations}"
         )
 
+    judgement_contract = contract.get("semantic_judgement", {}) or {}
+    if not isinstance(judgement_contract, dict):
+        raise CoreError("semantic_judgement contract must be a mapping")
+    judgement_required = bool(judgement_contract.get("required", False))
+
     covered_sources: set[str] = set()
     evaluated_links: list[dict[str, Any]] = []
+    seen_link_ids: set[str] = set()
     links = evidence.get("links", []) or []
     if not isinstance(links, list):
         findings.append({"code": "INVALID_DERIVATION_LINKS"})
@@ -186,6 +379,26 @@ def evaluate_derivation(
         if not isinstance(link, dict):
             findings.append({"code": "INVALID_DERIVATION_LINK", "index": index})
             continue
+        link_id = link.get("id")
+        if judgement_required:
+            if not isinstance(link_id, str) or not link_id:
+                findings.append(
+                    {
+                        "code": "DERIVATION_LINK_ID_REQUIRED",
+                        "index": index,
+                    }
+                )
+            elif link_id in seen_link_ids:
+                findings.append(
+                    {
+                        "code": "DUPLICATE_DERIVATION_LINK_ID",
+                        "index": index,
+                        "id": link_id,
+                    }
+                )
+            else:
+                seen_link_ids.add(link_id)
+
         relation = link.get("relation")
         sources = link.get("sources", []) or []
         targets = link.get("targets", []) or []
@@ -233,13 +446,14 @@ def evaluate_derivation(
             continue
 
         covered_sources.update(valid_sources)
-        evaluated_links.append(
-            {
-                "relation": relation,
-                "sources": valid_sources,
-                "targets": valid_targets,
-            }
-        )
+        evaluated_link = {
+            "relation": relation,
+            "sources": valid_sources,
+            "targets": valid_targets,
+        }
+        if isinstance(link_id, str) and link_id:
+            evaluated_link["id"] = link_id
+        evaluated_links.append(evaluated_link)
 
     disposition_by_source: dict[str, dict[str, Any]] = {}
     dispositions = evidence.get("dispositions", []) or []
@@ -327,6 +541,31 @@ def evaluate_derivation(
             }
         )
 
+    semantic_judgement_request: dict[str, Any] | None = None
+    semantic_judgement: dict[str, Any] | None = None
+    if judgement_required:
+        required_checks = [
+            value
+            for value in judgement_contract.get("required_checks", []) or []
+            if isinstance(value, str) and value
+        ]
+        semantic_judgement_request = _judgement_request(
+            source_capability=source_capability,
+            target_capability=target_capability,
+            required_sources=required_sources,
+            source_assertions=source_assertions,
+            target_assertions=target_assertions,
+            links=evaluated_links,
+            required_checks=required_checks,
+        )
+        judgement_findings, semantic_judgement = _evaluate_judgement(
+            contract=contract,
+            evidence=evidence,
+            request=semantic_judgement_request,
+            evaluated_links=evaluated_links,
+        )
+        findings.extend(judgement_findings)
+
     unresolved_sources = sorted(
         source_id
         for source_id in required_sources
@@ -360,6 +599,16 @@ def evaluate_derivation(
             "disposed": len(required_sources & set(disposition_by_source)),
             "unresolved": len(unresolved_sources),
         },
+        **(
+            {"semantic_judgement_request": semantic_judgement_request}
+            if semantic_judgement_request is not None
+            else {}
+        ),
+        **(
+            {"semantic_judgement": semantic_judgement}
+            if semantic_judgement is not None
+            else {}
+        ),
         "findings": findings,
     }
 
