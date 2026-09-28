@@ -27,7 +27,15 @@ def main() -> int:
                 )
         for finding in report["coverage"]["findings"]:
             print(f"- coverage: {finding}", file=sys.stderr)
+        for finding in report["benchmarks"]["findings"]:
+            print(f"- benchmark: {finding}", file=sys.stderr)
         return 1
+
+    benchmarks = report["benchmarks"]
+    assert benchmarks["case_count"] > 0, benchmarks
+    for metric, result in benchmarks["metrics"].items():
+        assert result["total"] > 0, (metric, result)
+        assert result["pass_rate"] == 1.0, (metric, result)
 
     semantic = next(
         item
@@ -63,7 +71,8 @@ def main() -> int:
         "Harness scenario suite passed "
         f"({report['scenario_count']} scenarios; "
         f"{sum(1 for item in report['coverage']['requirement_status'].values() if item['enforcement'] == 'required')} required behaviors tracked; "
-        f"{report['coverage']['planned_gap_count']} planned coverage gap(s))"
+        f"{report['coverage']['planned_gap_count']} planned coverage gap(s); "
+        f"{report['benchmarks']['case_count']} benchmark cases)"
     )
     return 0
 
