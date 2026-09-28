@@ -28,7 +28,9 @@ providers:
       ARCH-BOUNDARY: SAF-...
     accepted_prerequisite_semantics:
       example.requirements:
-        REQ-AUTHORIZATION: SAF-...
+        exhaustive: true
+        semantic_atoms:
+          REQ-AUTHORIZATION: SAF-...
 ```
 
 Each provider assertion contains:
@@ -118,7 +120,8 @@ candidate. It publishes semantic atom fingerprints for accepted assertions.
 For non-root productions, admission fails unless every production prerequisite
 is CURRENT and therefore has an acceptance identity that can be recorded in the
 new baseline. When ACCEPTED and exhaustive semantic-derivation evaluations are supplied,
-admission records their consumed-source fingerprints under
+admission records a self-describing `exhaustive: true` baseline plus the
+consumed-source fingerprints under
 `accepted_prerequisite_semantics`. Non-exhaustive derivation evaluations are
 not trusted for selective lifecycle baselines.
 
