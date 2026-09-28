@@ -10,6 +10,13 @@ dimensions:
 covers:
   - semantic-derivation-coverage
 
+derivation_edges:
+  - {source_knowledge_kind: user-needs, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: interface-topology-design}
+  - {source_knowledge_kind: interface-topology-design, target_knowledge_kind: screen-view-design}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: screen-view-design}
+
 fixtures:
   graph:
     value:
