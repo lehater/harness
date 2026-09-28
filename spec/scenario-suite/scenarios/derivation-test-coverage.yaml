@@ -21,27 +21,29 @@ fixtures:
           responsibility: Own A.
           boundary: {semantic_cohesion: A, independent_change: A, public_contract: A}
           produces:
-            - {capability: demo.a, knowledge_kind: kind-a, requires: []}
+            - {capability: demo.a, knowledge_kind: task-model, requires: []}
         - id: B
           responsibility: Own B.
           boundary: {semantic_cohesion: B, independent_change: B, public_contract: B}
           produces:
-            - {capability: demo.b, knowledge_kind: kind-b, requires: [demo.a]}
+            - {capability: demo.b, knowledge_kind: interaction-design, requires: [demo.a]}
         - id: C
           responsibility: Own C.
           boundary: {semantic_cohesion: C, independent_change: C, public_contract: C}
           produces:
-            - {capability: demo.c, knowledge_kind: kind-c, requires: [demo.b]}
+            - {capability: demo.c, knowledge_kind: implementation-design, requires: [demo.b]}
       consumers:
         - {id: TARGET, purpose: Consume C, requires: [demo.c]}
       terminal_capabilities: []
 
   tested-kind-edges:
     value:
-      - {source_knowledge_kind: kind-a, target_knowledge_kind: kind-b, scenario: tested-a-to-b}
+      - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: task-to-interaction-semantic-derivation}
 
   dispositions:
     value: []
+  scenario-directory:
+    path: .
 
 steps:
   - id: uncovered
@@ -50,9 +52,10 @@ steps:
       graph: {ref: fixture.graph}
       tested_kind_edges: {ref: fixture.tested-kind-edges}
       dispositions: {ref: fixture.dispositions}
+      scenario_directory: {ref: fixture.scenario-directory}
     expect:
       - {path: /status, op: equals, value: INCOMPLETE}
-      - {path: /covered, op: contains_match, value: {source_capability: demo.a, target_capability: demo.b, mode: TESTED_KIND_EDGE}}
+      - {path: /covered, op: contains_match, value: {source_capability: demo.a, target_capability: demo.b, mode: TESTED_KIND_EDGE, scenario: task-to-interaction-semantic-derivation}}
       - {path: /gaps, op: contains_match, value: {source_capability: demo.b, target_capability: demo.c}}
 
   - id: disposition
@@ -74,6 +77,7 @@ steps:
       graph: {ref: fixture.graph}
       tested_kind_edges: {ref: fixture.tested-kind-edges}
       dispositions: {ref: step.disposition}
+      scenario_directory: {ref: fixture.scenario-directory}
     expect:
       - {path: /status, op: equals, value: COMPLETE}
       - {path: /gaps, op: length, value: 0}
@@ -103,6 +107,8 @@ steps:
       tested_kind_edges:
         - {source_knowledge_kind: task-model, target_knowledge_kind: interaction-design, scenario: DOES-NOT-EXIST}
       dispositions: []
+      scenario_directory: {ref: fixture.scenario-directory}
     expect:
       - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /invalid_registrations, op: contains_match, value: {mode: TESTED_KIND_EDGE, scenario: DOES-NOT-EXIST}}
       - {path: /gaps, op: contains_match, value: {source_capability: fake.a, target_capability: fake.b}}
