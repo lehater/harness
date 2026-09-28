@@ -1,0 +1,53 @@
+version: 1
+kind: harness-scenario
+id: live-semantic-evaluator-calibration
+title: Live calibration fails closed without bound evaluator evidence
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - live-semantic-evaluator-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/calibration-corpus-v1.yaml
+
+  protocol:
+    value:
+      version: 1
+      kind: harness-live-semantic-evaluator-protocol
+      id: semantic-derivation-live-calibration-v1
+
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: evaluator-a
+      provider: example
+      model: semantic-evaluator
+      model_version: "1"
+      configuration: {temperature: 0}
+      adapter: {id: example-adapter, version: "1"}
+
+  unbound-run:
+    value:
+      version: 1
+      kind: harness-live-semantic-calibration-run
+      run_id: RED-1
+      request_id: NOT-BOUND
+      state: COMPLETED
+      results: []
+
+steps:
+  - id: reject-unbound-run
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: fixture.unbound-run}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_REQUEST_BINDING_MISMATCH}}
