@@ -24,6 +24,11 @@ providers:
     accepted_prerequisites:
       example.requirements: requirements-acceptance-4
       example.domain: domain-acceptance-3
+    semantic_atom_fingerprints:
+      ARCH-BOUNDARY: SAF-...
+    accepted_prerequisite_semantics:
+      example.requirements:
+        REQ-AUTHORIZATION: SAF-...
 ```
 
 Each provider assertion contains:
@@ -32,10 +37,14 @@ Each provider assertion contains:
 - one public CapabilityId;
 - an opaque semantic `acceptance_id`;
 - the exact current prerequisite Capability acceptance identities against which
-  that capability was accepted.
+  that capability was accepted;
+- optional fingerprints for its accepted semantic atoms;
+- optional consumed-atom baselines for individual prerequisites.
 
-The identity is Capability-granular, not file-revision-granular. One artifact
-may therefore expose several independently current capabilities.
+The acceptance identity remains Capability-granular. When no finer semantic
+baseline is available, lifecycle retains the conservative Capability-level
+behavior. When accepted derivation evidence identifies consumed upstream atoms,
+their fingerprints provide a narrower currentness proof.
 
 ## Derived states
 
@@ -45,13 +54,17 @@ A Capability is CURRENT only when:
 
 1. a lifecycle assertion exists for the selected provider;
 2. every production prerequisite is CURRENT;
-3. every recorded prerequisite acceptance identity equals the currently
-   selected prerequisite acceptance identity.
+3. for a prerequisite without a semantic baseline, its recorded acceptance
+   identity equals the current acceptance identity;
+4. for a prerequisite with a semantic baseline, every consumed atom still
+   exists with the recorded fingerprint. Unconsumed atom changes do not make the
+   downstream Capability stale.
 
 ### STALE
 
-A provider/assertion exists but at least one prerequisite is non-current or its
-current acceptance identity differs from the recorded baseline.
+A provider/assertion exists but at least one prerequisite is non-current, a
+coarse acceptance baseline changed, or a consumed semantic atom is missing or
+has a different fingerprint.
 
 STALE means "not proven current against the selected baseline", not
 "semantically wrong".
@@ -72,10 +85,14 @@ No current provider exists. Ordinary CREATE/WAIT semantics remain applicable.
 
 ## Propagation
 
-When an upstream acceptance identity changes:
+When relevant accepted upstream knowledge changes:
 
 ```text
 upstream accepted revision changes
+        ↓
+consumed atom changed? ── no ──→ downstream may remain CURRENT
+        │
+       yes
         ↓
 direct accepted consumer = STALE / REVALIDATE
         ↓
@@ -94,9 +111,12 @@ file dependencies.
 ## Admission integration
 
 `semantic_admission.py` emits the lifecycle assertion for an ACCEPTED
-candidate. For non-root productions, admission fails unless every production
-prerequisite is CURRENT and therefore has an acceptance identity that can be
-recorded in the new baseline.
+candidate. It publishes semantic atom fingerprints for accepted assertions.
+For non-root productions, admission fails unless every production prerequisite
+is CURRENT and therefore has an acceptance identity that can be recorded in the
+new baseline. When ACCEPTED semantic-derivation evaluations are supplied,
+admission also records their consumed-source fingerprints under
+`accepted_prerequisite_semantics`.
 
 `semantic_closure.py` requires the selected lifecycle assertion to match the
 ACCEPTED semantic-admission identity for every routed capability in the
