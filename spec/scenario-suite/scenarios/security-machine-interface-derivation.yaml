@@ -1,0 +1,169 @@
+version: 1
+kind: harness-scenario
+id: security-machine-interface-semantic-derivation
+title: Security, quality and machine-interface design preserve accepted upstream semantics
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: security-architecture}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: security-architecture}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: interface-contract}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: interface-contract}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: interface-contract}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SECURITY-MACHINE-INTERFACE-DERIVATION
+      authorities:
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own observable product requirements.
+          boundary: {semantic_cohesion: Product intent., independent_change: Product intent changes independently., public_contract: Accepted requirements.}
+          produces:
+            - {capability: demo.requirements, knowledge_kind: product-requirements, requires: []}
+        - id: DOMAIN-USE-CASE-DESIGN
+          responsibility: Own domain behavior.
+          boundary: {semantic_cohesion: Domain behavior., independent_change: Domain behavior changes independently., public_contract: Accepted domain use cases.}
+          produces:
+            - {capability: demo.domain, knowledge_kind: domain-use-case, requires: []}
+        - id: SECURITY-ARCHITECTURE
+          responsibility: Own trust and admission structure.
+          boundary: {semantic_cohesion: Security architecture., independent_change: Trust structure changes independently., public_contract: Accepted security constraints.}
+          produces:
+            - {capability: demo.security, knowledge_kind: security-architecture, requires: [demo.requirements, demo.domain]}
+        - id: QUALITY-DESIGN
+          responsibility: Own accepted quality constraints.
+          boundary: {semantic_cohesion: Quality constraints., independent_change: Quality constraints change independently., public_contract: Accepted quality design.}
+          produces:
+            - {capability: demo.quality, knowledge_kind: quality-design, requires: [demo.requirements]}
+        - id: MACHINE-INTERFACE-DESIGN
+          responsibility: Own machine interaction contracts.
+          boundary: {semantic_cohesion: Machine interface semantics., independent_change: Interface representation changes independently., public_contract: Accepted interface contract.}
+          produces:
+            - {capability: demo.interface, knowledge_kind: interface-contract, requires: [demo.requirements, demo.domain, demo.security]}
+      consumers:
+        - {id: FRONTEND, purpose: Consume machine contracts., requires: [demo.interface]}
+      terminal_capabilities: []
+
+  requirements:
+    value:
+      semantic_assertions:
+        - {id: REQ-EDIT, kind: product-behavior-requirement, subject: RESOURCE, semantic_value: authorized-user-can-edit-resource, decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: REQ-DENY, kind: product-security-requirement, subject: RESOURCE, semantic_value: unauthorized-edit-is-rejected, decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: REQ-LATENCY, kind: product-quality-requirement, subject: RESOURCE, semantic_value: edit-response-target-is-accepted-project-constraint, decision_authority: PRODUCT-REQUIREMENTS}
+
+  domain:
+    value:
+      semantic_assertions:
+        - {id: DOMAIN-INPUT, kind: domain-input, subject: EDIT-RESOURCE, semantic_value: requested-configuration, decision_authority: DOMAIN-USE-CASE-DESIGN}
+        - {id: DOMAIN-OUTCOME, kind: domain-outcome, subject: EDIT-RESOURCE, semantic_value: accepted-change-updates-resource, decision_authority: DOMAIN-USE-CASE-DESIGN}
+        - {id: DOMAIN-AUTH, kind: domain-admission-condition, subject: EDIT-RESOURCE, semantic_value: source-actor-must-own-resource-edit-right, decision_authority: DOMAIN-USE-CASE-DESIGN}
+        - {id: DOMAIN-REJECTION, kind: domain-rejection, subject: EDIT-RESOURCE, semantic_value: invalid-change-rejected, decision_authority: DOMAIN-USE-CASE-DESIGN}
+
+  security:
+    value:
+      semantic_assertions:
+        - {id: SEC-IDENTITY, kind: security-trust-boundary, subject: EDIT-RESOURCE, semantic_value: authenticated-actor-bound-to-request, decision_authority: SECURITY-ARCHITECTURE}
+        - {id: SEC-AUTHZ, kind: security-admission-rule, subject: EDIT-RESOURCE, semantic_value: authorize-resource-edit-before-domain-operation, decision_authority: SECURITY-ARCHITECTURE}
+
+  quality:
+    value:
+      semantic_assertions:
+        - {id: QUALITY-LATENCY, kind: quality-constraint, subject: EDIT-RESOURCE, semantic_value: preserve-accepted-edit-response-target, decision_authority: QUALITY-DESIGN}
+
+  interface:
+    value:
+      semantic_assertions:
+        - {id: API-EDIT, kind: interface-operation, subject: RESOURCE, semantic_value: update-resource, decision_authority: MACHINE-INTERFACE-DESIGN}
+        - {id: API-INPUT, kind: interface-input, subject: API-EDIT, semantic_value: requested-configuration, decision_authority: MACHINE-INTERFACE-DESIGN}
+        - {id: API-SUCCESS, kind: interface-outcome, subject: API-EDIT, semantic_value: updated-resource-representation, decision_authority: MACHINE-INTERFACE-DESIGN}
+        - {id: API-INVALID, kind: interface-error, subject: API-EDIT, semantic_value: validation-rejection, decision_authority: MACHINE-INTERFACE-DESIGN}
+        - {id: API-DENIED, kind: interface-security, subject: API-EDIT, semantic_value: authorization-denial, decision_authority: MACHINE-INTERFACE-DESIGN}
+
+  req-to-security:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.requirements, target_capability: demo.security, obligations: [{id: security-requirements, source_kind: product-security-requirement}]}
+  req-to-security-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.requirements, target_capability: demo.security, links: [{sources: [REQ-DENY], relation: REALIZES, targets: [SEC-AUTHZ]}], dispositions: []}
+
+  domain-to-security:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.security, obligations: [{id: admission, source_kind: domain-admission-condition}]}
+  domain-to-security-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.security, links: [{sources: [DOMAIN-AUTH], relation: REALIZES, targets: [SEC-IDENTITY, SEC-AUTHZ]}], dispositions: []}
+
+  req-to-quality:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.requirements, target_capability: demo.quality, obligations: [{id: quality, source_kind: product-quality-requirement}]}
+  req-to-quality-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.requirements, target_capability: demo.quality, links: [{sources: [REQ-LATENCY], relation: PRESERVES, targets: [QUALITY-LATENCY]}], dispositions: []}
+
+  req-to-interface:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.requirements, target_capability: demo.interface, obligations: [{id: behavior, source_kind: product-behavior-requirement}, {id: security, source_kind: product-security-requirement}]}
+  req-to-interface-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.requirements, target_capability: demo.interface, links: [{sources: [REQ-EDIT], relation: REALIZES, targets: [API-EDIT]}, {sources: [REQ-DENY], relation: CONSTRAINS, targets: [API-DENIED]}], dispositions: []}
+
+  domain-to-interface:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.interface, obligations: [{id: inputs, source_kind: domain-input}, {id: outcomes, source_kind: domain-outcome}, {id: rejections, source_kind: domain-rejection}]}
+  domain-to-interface-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.interface, links: [{sources: [DOMAIN-INPUT], relation: REALIZES, targets: [API-INPUT]}, {sources: [DOMAIN-OUTCOME], relation: REALIZES, targets: [API-SUCCESS]}, {sources: [DOMAIN-REJECTION], relation: REALIZES, targets: [API-INVALID]}], dispositions: []}
+
+  security-to-interface:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.interface, obligations: [{id: admission, source_kind: security-admission-rule}]}
+  security-to-interface-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.interface, links: [{sources: [SEC-AUTHZ], relation: REALIZES, targets: [API-DENIED]}], dispositions: []}
+
+steps:
+  - id: req-to-security
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-security}, source: {ref: fixture.requirements}, candidate: {ref: fixture.security}, evidence: {ref: fixture.req-to-security-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: domain-to-security
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.domain-to-security}, source: {ref: fixture.domain}, candidate: {ref: fixture.security}, evidence: {ref: fixture.domain-to-security-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: req-to-quality
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-quality}, source: {ref: fixture.requirements}, candidate: {ref: fixture.quality}, evidence: {ref: fixture.req-to-quality-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: req-to-interface
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-interface}, source: {ref: fixture.requirements}, candidate: {ref: fixture.interface}, evidence: {ref: fixture.req-to-interface-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: domain-to-interface
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.domain-to-interface}, source: {ref: fixture.domain}, candidate: {ref: fixture.interface}, evidence: {ref: fixture.domain-to-interface-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: security-to-interface
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.security-to-interface}, source: {ref: fixture.security}, candidate: {ref: fixture.interface}, evidence: {ref: fixture.security-to-interface-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-security-rule-link
+    driver: data.patch
+    with: {value: {ref: fixture.security-to-interface-evidence}, operations: [{op: remove, path: /links/0}]}
+  - id: interface-loses-security
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.security-to-interface}, source: {ref: fixture.security}, candidate: {ref: fixture.interface}, evidence: {ref: step.remove-security-rule-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: SEC-AUTHZ, owner_authority: MACHINE-INTERFACE-DESIGN}}
+
+  - id: remove-domain-admission
+    driver: data.patch
+    with: {value: {ref: fixture.domain}, operations: [{op: remove, path: /semantic_assertions/2}]}
+  - id: remove-domain-admission-link
+    driver: data.patch
+    with: {value: {ref: fixture.domain-to-security-evidence}, operations: [{op: remove, path: /links/0}]}
+  - id: missing-domain-security-input
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.domain-to-security}, source: {ref: step.remove-domain-admission}, candidate: {ref: fixture.security}, evidence: {ref: step.remove-domain-admission-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: admission, owner_authority: DOMAIN-USE-CASE-DESIGN}}
