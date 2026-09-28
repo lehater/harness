@@ -1,0 +1,348 @@
+version: 1
+kind: harness-scenario
+id: product-domain-application-semantic-derivation
+title: Product, domain and application design preserve accepted upstream semantics
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: user-needs, target_knowledge_kind: product-requirements}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: domain-use-case}
+  - {source_knowledge_kind: user-needs, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: task-model}
+  - {source_knowledge_kind: task-model, target_knowledge_kind: user-journey-design}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: user-journey-design}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: user-journey-design}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: PRODUCT-DOMAIN-APPLICATION-DERIVATION
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own user goals and needs.
+          boundary: {semantic_cohesion: User problem semantics., independent_change: Needs change independently., public_contract: Accepted User Needs.}
+          produces:
+            - {capability: demo.user-needs, knowledge_kind: user-needs, requires: []}
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own observable product intent.
+          boundary: {semantic_cohesion: Product behavior., independent_change: Product intent changes independently., public_contract: Accepted Product Requirements.}
+          produces:
+            - {capability: demo.requirements, knowledge_kind: product-requirements, requires: [demo.user-needs]}
+        - id: DOMAIN-USE-CASE-DESIGN
+          responsibility: Own domain behavior contracts.
+          boundary: {semantic_cohesion: Domain behavior., independent_change: Domain behavior changes independently., public_contract: Accepted Domain Use Cases.}
+          produces:
+            - {capability: demo.domain-use-cases, knowledge_kind: domain-use-case, requires: [demo.requirements]}
+        - id: APPLICATION-DESIGN
+          responsibility: Own task and journey semantics.
+          boundary: {semantic_cohesion: Intended human work., independent_change: Task decomposition changes independently., public_contract: Accepted Task Model and User Journeys.}
+          produces:
+            - capability: demo.task-model
+              knowledge_kind: task-model
+              requires: [demo.user-needs, demo.requirements, demo.domain-use-cases]
+            - capability: demo.user-journeys
+              knowledge_kind: user-journey-design
+              requires: [demo.task-model, demo.requirements, demo.domain-use-cases]
+      consumers:
+        - {id: INTERFACE, purpose: Consume application semantics., requires: [demo.user-journeys]}
+      terminal_capabilities: []
+
+  user-needs:
+    value:
+      semantic_assertions:
+        - {id: GOAL-EDIT, kind: user-goal, subject: USER, semantic_value: change-resource-configuration, decision_authority: DISCOVERY}
+        - {id: NEED-CONTEXT, kind: user-need, subject: GOAL-EDIT, semantic_value: understand-current-state-before-change, decision_authority: DISCOVERY}
+        - {id: NEED-RECOVERY, kind: user-need, subject: GOAL-EDIT, semantic_value: recover-from-invalid-change-without-reentering-valid-input, decision_authority: DISCOVERY}
+
+  requirements:
+    value:
+      semantic_assertions:
+        - {id: REQ-CONTEXT, kind: product-requirement, subject: GOAL-EDIT, semantic_value: product-shows-current-state-before-edit, decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: REQ-RECOVERY, kind: product-requirement, subject: GOAL-EDIT, semantic_value: validation-failure-preserves-valid-entered-values, decision_authority: PRODUCT-REQUIREMENTS}
+
+  domain:
+    value:
+      semantic_assertions:
+        - {id: UC-INPUT, kind: domain-input, subject: EDIT-RESOURCE, semantic_value: requested-configuration, decision_authority: DOMAIN-USE-CASE-DESIGN}
+        - {id: UC-OUTCOME, kind: domain-outcome, subject: EDIT-RESOURCE, semantic_value: accepted-change-updates-resource-state, decision_authority: DOMAIN-USE-CASE-DESIGN}
+        - {id: UC-REJECTION, kind: domain-rejection, subject: EDIT-RESOURCE, semantic_value: invalid-change-rejected-with-current-state-unchanged, decision_authority: DOMAIN-USE-CASE-DESIGN}
+
+  task-model:
+    value:
+      semantic_assertions:
+        - {id: TASK-GOAL, kind: task-goal-ref, subject: TASK-EDIT, semantic_value: GOAL-EDIT, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-INFO, kind: task-information, subject: TASK-EDIT, semantic_value: current-resource-state, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-INPUT, kind: task-decision-input, subject: TASK-EDIT, semantic_value: requested-configuration, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-OUTCOME, kind: task-outcome, subject: TASK-EDIT, semantic_value: changed-resource-visible, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-RECOVERY, kind: task-recovery, subject: TASK-EDIT, semantic_value: validation-failure-preserves-entered-values, decision_authority: APPLICATION-DESIGN}
+
+  journeys:
+    value:
+      semantic_assertions:
+        - {id: JOURNEY-CONTEXT, kind: journey-step, subject: JOURNEY-EDIT, semantic_value: inspect-current-state, decision_authority: APPLICATION-DESIGN}
+        - {id: JOURNEY-INPUT, kind: journey-step, subject: JOURNEY-EDIT, semantic_value: submit-requested-configuration, decision_authority: APPLICATION-DESIGN}
+        - {id: JOURNEY-COMPLETE, kind: journey-outcome, subject: JOURNEY-EDIT, semantic_value: changed-resource-visible, decision_authority: APPLICATION-DESIGN}
+        - {id: JOURNEY-RECOVERY, kind: journey-recovery, subject: JOURNEY-EDIT, semantic_value: validation-return-preserves-entered-values, decision_authority: APPLICATION-DESIGN}
+
+  need-to-req:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.user-needs
+      target_capability: demo.requirements
+      obligations:
+        - {id: goals, source_kind: user-goal}
+        - {id: needs, source_kind: user-need, min_count: 2}
+  need-to-req-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.user-needs
+      target_capability: demo.requirements
+      links:
+        - {sources: [GOAL-EDIT, NEED-CONTEXT], relation: TRANSFORMS, targets: [REQ-CONTEXT]}
+        - {sources: [NEED-RECOVERY], relation: REALIZES, targets: [REQ-RECOVERY]}
+      dispositions: []
+
+  req-to-domain:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.requirements
+      target_capability: demo.domain-use-cases
+      obligations:
+        - {id: requirements, source_kind: product-requirement, min_count: 2}
+  req-to-domain-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.requirements
+      target_capability: demo.domain-use-cases
+      links:
+        - {sources: [REQ-CONTEXT], relation: CONSTRAINS, targets: [UC-INPUT]}
+        - {sources: [REQ-RECOVERY], relation: CONSTRAINS, targets: [UC-REJECTION]}
+      dispositions: []
+
+  need-to-task:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.user-needs
+      target_capability: demo.task-model
+      obligations:
+        - {id: goals, source_kind: user-goal}
+        - {id: needs, source_kind: user-need, min_count: 2}
+  need-to-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.user-needs
+      target_capability: demo.task-model
+      links:
+        - {sources: [GOAL-EDIT], relation: PRESERVES, targets: [TASK-GOAL]}
+        - {sources: [NEED-CONTEXT], relation: REALIZES, targets: [TASK-INFO]}
+        - {sources: [NEED-RECOVERY], relation: REALIZES, targets: [TASK-RECOVERY]}
+      dispositions: []
+
+  req-to-task:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.requirements
+      target_capability: demo.task-model
+      obligations:
+        - {id: requirements, source_kind: product-requirement, min_count: 2}
+  req-to-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.requirements
+      target_capability: demo.task-model
+      links:
+        - {sources: [REQ-CONTEXT], relation: REALIZES, targets: [TASK-INFO]}
+        - {sources: [REQ-RECOVERY], relation: REALIZES, targets: [TASK-RECOVERY]}
+      dispositions: []
+
+  domain-to-task:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.domain-use-cases
+      target_capability: demo.task-model
+      obligations:
+        - {id: inputs, source_kind: domain-input}
+        - {id: outcomes, source_kind: domain-outcome}
+        - {id: rejections, source_kind: domain-rejection}
+  domain-to-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.domain-use-cases
+      target_capability: demo.task-model
+      links:
+        - {sources: [UC-INPUT], relation: REALIZES, targets: [TASK-INPUT]}
+        - {sources: [UC-OUTCOME], relation: REALIZES, targets: [TASK-OUTCOME]}
+        - {sources: [UC-REJECTION], relation: REALIZES, targets: [TASK-RECOVERY]}
+      dispositions: []
+
+  task-to-journey:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.task-model
+      target_capability: demo.user-journeys
+      obligations:
+        - {id: information, source_kind: task-information}
+        - {id: input, source_kind: task-decision-input}
+        - {id: outcome, source_kind: task-outcome}
+        - {id: recovery, source_kind: task-recovery}
+  task-to-journey-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.task-model
+      target_capability: demo.user-journeys
+      links:
+        - {sources: [TASK-INFO], relation: REALIZES, targets: [JOURNEY-CONTEXT]}
+        - {sources: [TASK-INPUT], relation: REALIZES, targets: [JOURNEY-INPUT]}
+        - {sources: [TASK-OUTCOME], relation: REALIZES, targets: [JOURNEY-COMPLETE]}
+        - {sources: [TASK-RECOVERY], relation: REALIZES, targets: [JOURNEY-RECOVERY]}
+      dispositions: []
+
+  req-to-journey:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.requirements
+      target_capability: demo.user-journeys
+      obligations:
+        - {id: requirements, source_kind: product-requirement, min_count: 2}
+  req-to-journey-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.requirements
+      target_capability: demo.user-journeys
+      links:
+        - {sources: [REQ-CONTEXT], relation: CONSTRAINS, targets: [JOURNEY-CONTEXT]}
+        - {sources: [REQ-RECOVERY], relation: CONSTRAINS, targets: [JOURNEY-RECOVERY]}
+      dispositions: []
+
+  domain-to-journey:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.domain-use-cases
+      target_capability: demo.user-journeys
+      obligations:
+        - {id: outcomes, source_kind: domain-outcome}
+        - {id: rejections, source_kind: domain-rejection}
+  domain-to-journey-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.domain-use-cases
+      target_capability: demo.user-journeys
+      links:
+        - {sources: [UC-OUTCOME], relation: REALIZES, targets: [JOURNEY-COMPLETE]}
+        - {sources: [UC-REJECTION], relation: REALIZES, targets: [JOURNEY-RECOVERY]}
+      dispositions: []
+
+steps:
+  - id: need-to-req
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.need-to-req}, source: {ref: fixture.user-needs}, candidate: {ref: fixture.requirements}, evidence: {ref: fixture.need-to-req-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: req-to-domain
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-domain}, source: {ref: fixture.requirements}, candidate: {ref: fixture.domain}, evidence: {ref: fixture.req-to-domain-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: need-to-task
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.need-to-task}, source: {ref: fixture.user-needs}, candidate: {ref: fixture.task-model}, evidence: {ref: fixture.need-to-task-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: req-to-task
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-task}, source: {ref: fixture.requirements}, candidate: {ref: fixture.task-model}, evidence: {ref: fixture.req-to-task-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: domain-to-task
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.domain-to-task}, source: {ref: fixture.domain}, candidate: {ref: fixture.task-model}, evidence: {ref: fixture.domain-to-task-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: task-to-journey
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.task-to-journey}, source: {ref: fixture.task-model}, candidate: {ref: fixture.journeys}, evidence: {ref: fixture.task-to-journey-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: req-to-journey
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.req-to-journey}, source: {ref: fixture.requirements}, candidate: {ref: fixture.journeys}, evidence: {ref: fixture.req-to-journey-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: domain-to-journey
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.domain-to-journey}, source: {ref: fixture.domain}, candidate: {ref: fixture.journeys}, evidence: {ref: fixture.domain-to-journey-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-recovery-requirement
+    driver: data.patch
+    with:
+      value: {ref: fixture.requirements}
+      operations: [{op: remove, path: /semantic_assertions/1}]
+
+  - id: remove-recovery-requirement-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.req-to-domain-evidence}
+      operations: [{op: remove, path: /links/1}]
+
+  - id: missing-product-input
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.req-to-domain}
+      source: {ref: step.remove-recovery-requirement}
+      candidate: {ref: fixture.domain}
+      evidence: {ref: step.remove-recovery-requirement-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: requirements, owner_authority: PRODUCT-REQUIREMENTS}}
+
+  - id: route-missing-product-input
+    driver: semantic.questions
+    with: {graph: {ref: fixture.graph}, evaluation: {ref: step.missing-product-input}}
+    expect:
+      - {path: /0/authority, op: equals, value: PRODUCT-REQUIREMENTS}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.requirements]}
+
+  - id: remove-domain-rejection-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.domain-to-task-evidence}
+      operations: [{op: remove, path: /links/2}]
+
+  - id: downstream-domain-loss
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.domain-to-task}
+      source: {ref: fixture.domain}
+      candidate: {ref: fixture.task-model}
+      evidence: {ref: step.remove-domain-rejection-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: UC-REJECTION, owner_authority: APPLICATION-DESIGN}}
