@@ -143,3 +143,14 @@ orchestration framework.
 - self-attested model/session independence;
 - replacing the calibration scorer;
 - aggregating evaluator quality into one score.
+
+## Stability
+
+A single live run measures agreement for that run only. When repeatability is a
+requirement, run the same bound evaluator configuration more than once with
+distinct run ids and pass the resulting evaluations to
+`evaluate_live_calibration_stability`.
+
+The stability evaluator requires identical corpus, protocol and evaluator
+fingerprints. It reports `STABLE` or `UNSTABLE` and the disagreeing cases.
+It deliberately does not perform consensus voting or alter scorer metrics.

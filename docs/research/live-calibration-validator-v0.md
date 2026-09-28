@@ -117,3 +117,40 @@ The first GREEN adds:
 The GREEN deliberately does not add provider SDKs or a new executor. A real
 provider is integrated through the existing externally loaded Scenario Suite
 driver module.
+
+## Mutation result
+
+The live layer now fails closed for:
+
+- changed evaluator configuration;
+- changed corpus;
+- changed protocol;
+- stale run identity/request;
+- wrong case binding;
+- missing prediction;
+- duplicate prediction;
+- malformed/missing verdict;
+- interrupted run;
+- unavailable evaluator/run.
+
+A complete bound run is scored only by the existing
+`semantic_judgement_calibration.py` scorer.
+
+## Unstable evaluator decision
+
+The explicit unstable-evaluator RED justifies one small additional check:
+repeated whole-corpus runs for the same corpus/protocol/evaluator binding remain
+independent runs, and their case verdicts may be compared for stability.
+
+No consensus, majority vote or averaged quality score is introduced. If two
+scorable runs disagree on any case, the stability result is `UNSTABLE` and
+lists the affected canonical case ids. This is a separate quality dimension from
+FN/FP/recall/FPR/accuracy.
+
+## Evaluator comparison
+
+Evaluator A vs B, or model/configuration version N vs N+1, is represented by
+separate live evaluations. Each retains its own descriptor fingerprint and full
+existing scorer result. Comparison is side-by-side over false negatives, false
+positives, recall, false-positive rate, accuracy, per-class accuracy and misses;
+Harness does not select a winner or collapse those dimensions.

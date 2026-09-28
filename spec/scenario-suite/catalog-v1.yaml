@@ -84,6 +84,7 @@ required_drivers:
   - semantic.judgement_calibration
   - semantic.live_calibration.request
   - semantic.live_calibration.validate
+  - semantic.live_calibration.stability
   - semantic.questions
   - semantic.apply_questions
   - semantic.closure

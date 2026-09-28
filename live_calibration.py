@@ -208,7 +208,10 @@ def _base_evaluation(
             for key, value in request["protocol"].items()
             if key != "instruction"
         },
-        "evaluator": copy.deepcopy(evaluator),
+        "evaluator": {
+            **copy.deepcopy(evaluator),
+            "fingerprint": request["evaluator"]["fingerprint"],
+        },
         "independence": {
             "status": "UNVERIFIED",
             "harness_guarantees": [
@@ -250,7 +253,10 @@ def evaluate_live_calibration_run(
             "request_id": None,
             "corpus": bound["corpus"],
             "protocol": bound["protocol"],
-            "evaluator": copy.deepcopy(evaluator),
+            "evaluator": {
+                **copy.deepcopy(evaluator),
+                "fingerprint": bound["evaluator"]["fingerprint"],
+            },
             "independence": {
                 "status": "UNVERIFIED",
                 "harness_guarantees": [],
@@ -268,7 +274,10 @@ def evaluate_live_calibration_run(
             "request_id": None,
             "corpus": bound["corpus"],
             "protocol": bound["protocol"],
-            "evaluator": copy.deepcopy(evaluator),
+            "evaluator": {
+                **copy.deepcopy(evaluator),
+                "fingerprint": bound["evaluator"]["fingerprint"],
+            },
             "independence": {
                 "status": "UNVERIFIED",
                 "harness_guarantees": [],
@@ -409,4 +418,98 @@ def evaluate_live_calibration_run(
         "findings": [],
         "calibration": calibration,
         "predictions": evidence,
+    }
+
+
+def evaluate_live_calibration_stability(
+    *,
+    evaluations: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Detect evaluator instability without inventing consensus semantics."""
+    if not isinstance(evaluations, list) or len(evaluations) < 2:
+        raise CoreError(
+            "live calibration stability requires at least two evaluations"
+        )
+
+    first = evaluations[0]
+    required_binding = (
+        first.get("corpus", {}).get("fingerprint"),
+        first.get("protocol", {}).get("fingerprint"),
+        first.get("evaluator", {}).get("fingerprint"),
+    )
+    run_ids: set[str] = set()
+    verdicts: dict[str, set[str]] = {}
+
+    for evaluation in evaluations:
+        if evaluation.get("status") not in {"PASS", "FAIL"}:
+            return {
+                "version": 1,
+                "kind": "harness-live-semantic-calibration-stability",
+                "status": "INCOMPLETE",
+                "findings": [
+                    {"code": "LIVE_CALIBRATION_SERIES_RUN_NOT_SCORABLE"}
+                ],
+                "unstable_cases": [],
+            }
+
+        current_binding = (
+            evaluation.get("corpus", {}).get("fingerprint"),
+            evaluation.get("protocol", {}).get("fingerprint"),
+            evaluation.get("evaluator", {}).get("fingerprint"),
+        )
+        if current_binding != required_binding:
+            return {
+                "version": 1,
+                "kind": "harness-live-semantic-calibration-stability",
+                "status": "INVALID",
+                "findings": [
+                    {"code": "LIVE_CALIBRATION_SERIES_BINDING_MISMATCH"}
+                ],
+                "unstable_cases": [],
+            }
+
+        run_id = evaluation.get("run_id")
+        if (
+            not isinstance(run_id, str)
+            or not run_id
+            or run_id in run_ids
+        ):
+            return {
+                "version": 1,
+                "kind": "harness-live-semantic-calibration-stability",
+                "status": "INVALID",
+                "findings": [
+                    {"code": "LIVE_CALIBRATION_SERIES_RUN_ID_INVALID"}
+                ],
+                "unstable_cases": [],
+            }
+        run_ids.add(run_id)
+
+        for prediction in evaluation.get("predictions", []) or []:
+            verdicts.setdefault(
+                prediction["case_id"],
+                set(),
+            ).add(prediction["status"])
+
+    unstable = sorted(
+        case_id
+        for case_id, statuses in verdicts.items()
+        if len(statuses) > 1
+    )
+    return {
+        "version": 1,
+        "kind": "harness-live-semantic-calibration-stability",
+        "status": "UNSTABLE" if unstable else "STABLE",
+        "run_ids": sorted(run_ids),
+        "unstable_cases": unstable,
+        "findings": (
+            [
+                {
+                    "code": "LIVE_CALIBRATION_UNSTABLE_VERDICTS",
+                    "cases": unstable,
+                }
+            ]
+            if unstable
+            else []
+        ),
     }
