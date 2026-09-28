@@ -42,3 +42,6 @@ steps:
       - {path: /calibration/confusion/false_positive, op: equals, value: 0}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
       - {path: /execution/boundary, op: equals, value: EXTERNAL_PROCESS}
+    observe:
+      evaluator_fingerprint: /evaluator/fingerprint
+      executable_sha256: /execution/executable_sha256

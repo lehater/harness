@@ -329,3 +329,18 @@ executable path rather than arbitrary shell commands:
 The fixture evaluator accepts every case and therefore scores FAIL with five
 false negatives. This proves the execution path cannot manufacture semantic
 success.
+
+
+## External process mutation result
+
+The reference adapter is now exercised against execution-layer mutations:
+
+- missing executable -> `UNAVAILABLE` -> calibration `INCOMPLETE`;
+- timeout -> `INTERRUPTED` -> calibration `INCOMPLETE`;
+- non-zero process exit -> `FAILED` -> calibration `INCOMPLETE`;
+- malformed JSON/envelope -> calibration `INVALID`;
+- changing executable bytes changes both executable fingerprint and evaluator
+  fingerprint, so old evidence cannot silently retain the same evaluator binding.
+
+These tests establish transport/process fail-closed behavior only. They do not
+claim semantic evaluator independence.
