@@ -36,6 +36,50 @@ jobs:
           npm install -g @github/copilot@1.0.86
           copilot --version
 
+      - name: Resolve available Copilot model
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          PROBE_HOME="$(mktemp -d)"
+          HOME="$PROBE_HOME" \
+          COPILOT_HOME="$PROBE_HOME/.copilot" \
+          COPILOT_AUTO_UPDATE=false \
+          COPILOT_MCP_TOOL_CACHE=false \
+          copilot -p "Return exactly READY." \
+            --model=auto \
+            --output-format=json \
+            --no-ask-user \
+            --available-tools=ask_user \
+            --disable-builtin-mcps \
+            --no-custom-instructions \
+            --no-auto-update \
+            --no-remote \
+            --no-remote-export \
+            --no-experimental \
+            > copilot-model-probe.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          resolved = None
+          for raw in Path("copilot-model-probe.jsonl").read_text(
+              encoding="utf-8"
+          ).splitlines():
+              try:
+                  event = json.loads(raw)
+              except json.JSONDecodeError:
+                  continue
+              if event.get("type") == "session.shutdown":
+                  data = event.get("data") or {}
+                  resolved = data.get("currentModel") or resolved
+              if event.get("type") == "assistant.turn_start":
+                  data = event.get("data") or {}
+                  resolved = data.get("model") or resolved
+          if not resolved:
+              raise SystemExit("Copilot auto model could not be resolved")
+          print(f"COPILOT_AUTO_RESOLVED_MODEL={resolved}")
+          PY
+
       - name: Build runtime scenario
         shell: bash
         run: |
