@@ -291,5 +291,16 @@ structural traceability:
 - repeated fresh-session evidence matters even when observed model identity is
   unchanged.
 
+A follow-up atom-level experiment is recorded in
+`docs/research/real-project-semantic-atom-coverage-proof-v0.md`.
+
+It shows that the same four omissions become deterministic
+`UNDISPOSITIONED_SOURCE` findings when the consumed requirement surface is
+represented as explicit semantic atoms and only actually realized atoms are
+linked. It also reduces live omission judgement from whole-oracle comparison to
+one source atom versus one target atom; on the focused real-project set,
+missing-link recall increased from 0.50 per complete whole-oracle run to 1.00
+in every scorable atomic run.
+
 No Core entity, scorer change, provider registry, consensus mechanism or new
 orchestration framework is required.
