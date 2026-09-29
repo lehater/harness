@@ -19,7 +19,7 @@ Harness does not generate the semantic verdict. It owns:
 
 Canonical bootstrap corpus:
 
-`spec/semantic-derivation/calibration-corpus-v2.yaml`
+`spec/semantic-derivation/calibration-corpus-v3.yaml`
 
 Each case has:
 
