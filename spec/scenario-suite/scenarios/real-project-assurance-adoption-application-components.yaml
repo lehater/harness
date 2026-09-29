@@ -1,0 +1,510 @@
+version: 1
+kind: harness-scenario
+id: real-project-assurance-adoption-application-components
+title: NAPMS Application Components source-to-verification assurance localizes a real semantic omission
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: real-project
+covers:
+  - source-coverage-completeness
+  - semantic-derivation-coverage
+  - semantic-derivation-truth
+
+fixtures:
+  graph:
+    yaml: ../fixtures/external/napms-engineering-graph.yaml
+
+  acquisition-contract:
+    value:
+      version: 1
+      kind: harness-source-set-contract
+      id: NAPMS-APPLICATION-COMPONENTS-ASSURANCE-SOURCE-SET
+      scope: >-
+        Application Components evidence admitted by the pinned NAPMS canonical
+        problem-evidence -> user-needs -> product-requirements chain.
+      requirements:
+        - {id: problem-evidence, min_items: 1}
+        - {id: user-needs, min_items: 1}
+        - {id: product-requirements, min_items: 1}
+
+  source-inventory:
+    value:
+      version: 1
+      kind: harness-source-set
+      id: NAPMS-APPLICATION-COMPONENTS-ASSURANCE-SOURCE-INVENTORY
+      contract_id: NAPMS-APPLICATION-COMPONENTS-ASSURANCE-SOURCE-SET
+      channels:
+        - id: problem-evidence
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        - id: user-needs
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-user-needs.yaml
+        - id: product-requirements
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-001..REQ-INT-003
+
+  requirements-source:
+    value: |2-
+          - id: REQ-APP-001
+            statement: >-
+              An Application shall represent a reusable application communication profile:
+              a template of network communication roles and requirements, not an inventory
+              identity for one concrete software product or system. The profile shall be
+              reusable across multiple concrete deployments and independent from current
+              network realization.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+              - current-stakeholder-input:2026-09-23
+            rationale: Preserve the established Application term while making its network-communication-profile meaning explicit.
+
+          - id: REQ-APP-002
+            statement: >-
+              A Component shall represent a participant/role in application network data exchange
+              rather than a network device.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+
+          - id: REQ-INT-001
+            statement: >-
+              A described directed Interaction shall connect source and destination Components
+              belonging to the same Application communication profile. Components belonging
+              to different Applications shall not be connected by one Interaction.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+              - current-stakeholder-input:2026-09-23
+            rationale: Application classifies a reusable network communication contract; cross-Application interaction would cross profile boundaries instead of instantiating one profile.
+
+          - id: REQ-INT-002
+            statement: >-
+              The product shall allow multiple independently meaningful directed Interactions
+              between the same Component pair when their communication reasons or independent
+              applicability are distinct.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+
+          - id: REQ-INT-003
+            statement: >-
+              Each Interaction shall represent one independently meaningful communication
+              reason and the complete minimal traffic semantics required for that reason.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+
+  requirements-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-APPLICATION-COMPONENTS-REQUIREMENTS-BOUNDARY
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#L46-L94
+      source_sha256: 6fb4e54027eb57f5cba850f52045428eeed79c7b9c5d2e04187a9485de43f5f7
+      segments:
+        - {id: REQ-APP-001, start_line: 1, end_line: 13}
+        - {id: REQ-APP-002, start_line: 14, end_line: 21}
+        - {id: REQ-INT-001, start_line: 22, end_line: 32}
+        - {id: REQ-INT-002, start_line: 33, end_line: 41}
+        - {id: REQ-INT-003, start_line: 42, end_line: 48}
+
+  statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-APPLICATION-COMPONENTS-REQUIREMENT-STATEMENTS
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#L46-L94
+      coverage_status: COMPLETE
+      statements:
+        - id: STMT-REQ-APP-001
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-001
+          text: Application is a reusable communication profile independent from concrete deployment and current network realization.
+        - id: STMT-REQ-APP-002
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-002
+          text: Component is a participant or role in application network exchange rather than a network device.
+        - id: STMT-REQ-INT-001
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-INT-001
+          text: Interaction endpoints must belong to the same Application; cross-Application Interaction is invalid.
+        - id: STMT-REQ-INT-002
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-INT-002
+          text: Multiple independently meaningful directed Interactions may exist for one Component pair.
+        - id: STMT-REQ-INT-003
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-INT-003
+          text: Each Interaction preserves one independently meaningful reason and complete minimal traffic semantics.
+      dispositions:
+        - statement_id: STMT-REQ-APP-001
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-APP-REUSE
+          sanitized_statement: Application is a reusable communication profile independent from concrete deployment and current network realization.
+        - statement_id: STMT-REQ-APP-002
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-COMPONENT-ROLE
+          sanitized_statement: Component is a participant or role in application network exchange rather than a network device.
+        - statement_id: STMT-REQ-INT-001
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-INTERACTION-SAME-APPLICATION
+          sanitized_statement: Interaction endpoints must belong to the same Application; cross-Application Interaction is invalid.
+        - statement_id: STMT-REQ-INT-002
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-INTERACTION-DISTINCT-REASONS
+          sanitized_statement: Multiple independently meaningful directed Interactions may exist for one Component pair.
+        - statement_id: STMT-REQ-INT-003
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-INTERACTION-TRAFFIC
+          sanitized_statement: Each Interaction preserves one independently meaningful reason and complete minimal traffic semantics.
+
+  source-atom-baseline:
+    value:
+      semantic_assertions:
+        - id: SRC-APP-REUSE
+          kind: requirement-atom
+          subject: REQ-APP-001.reuse
+          semantic_value: reusable-communication-profile-independent-from-deployment-realization
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: SRC-COMPONENT-ROLE
+          kind: requirement-atom
+          subject: REQ-APP-002.role
+          semantic_value: component-is-communication-participant-not-network-device
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: SRC-INTERACTION-SAME-APPLICATION
+          kind: requirement-atom
+          subject: REQ-INT-001.same-application-boundary
+          semantic_value: interaction-endpoints-same-application-cross-application-rejected
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: SRC-INTERACTION-DISTINCT-REASONS
+          kind: requirement-atom
+          subject: REQ-INT-002.distinct-reasons
+          semantic_value: multiple-independent-directed-reasons-per-component-pair
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: SRC-INTERACTION-TRAFFIC
+          kind: requirement-atom
+          subject: REQ-INT-003.traffic
+          semantic_value: one-independent-reason-with-complete-minimal-traffic-semantics
+          decision_authority: PRODUCT-REQUIREMENTS
+
+  atom-contract:
+    value:
+      authority: PRODUCT-REQUIREMENTS
+      owned_assertion_kinds: [requirement-atom]
+      allowed_source_authorities: [PRODUCT-REQUIREMENTS]
+      requires_source_authority: true
+      requires_assertion_authority: true
+      requires_semantic_review: true
+      required_semantic_review_checks: [statement-completeness, meaning-preserved]
+      obligations:
+        - id: application-components-requirement-surface
+          kind: requirement-atom
+          subjects:
+            - REQ-APP-001.reuse
+            - REQ-APP-002.role
+            - REQ-INT-001.same-application-boundary
+            - REQ-INT-002.distinct-reasons
+            - REQ-INT-003.traffic
+
+  accepted-requirement-surface:
+    value:
+      id: NAPMS-APPLICATION-COMPONENTS-REQUIREMENT-SURFACE
+      capability: engineering.requirements.product-intent
+      semantic_assertions:
+        - id: ATOM-APP-REUSE
+          kind: requirement-atom
+          subject: REQ-APP-001.reuse
+          semantic_value: reusable-communication-profile-independent-from-deployment-realization
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-APP-REUSE]
+        - id: ATOM-COMPONENT-ROLE
+          kind: requirement-atom
+          subject: REQ-APP-002.role
+          semantic_value: component-is-communication-participant-not-network-device
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-COMPONENT-ROLE]
+        - id: ATOM-INTERACTION-SAME-APPLICATION
+          kind: requirement-atom
+          subject: REQ-INT-001.same-application-boundary
+          semantic_value: interaction-endpoints-same-application-cross-application-rejected
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-INTERACTION-SAME-APPLICATION]
+        - id: ATOM-INTERACTION-DISTINCT-REASONS
+          kind: requirement-atom
+          subject: REQ-INT-002.distinct-reasons
+          semantic_value: multiple-independent-directed-reasons-per-component-pair
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-INTERACTION-DISTINCT-REASONS]
+        - id: ATOM-INTERACTION-TRAFFIC
+          kind: requirement-atom
+          subject: REQ-INT-003.traffic
+          semantic_value: one-independent-reason-with-complete-minimal-traffic-semantics
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-INTERACTION-TRAFFIC]
+      semantic_review:
+        reviewer_kind: HUMAN
+        status: ACCEPTED
+        checks: [statement-completeness, meaning-preserved]
+
+  verification-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-application-components-requirements-to-frontend-verification
+      source_capability: engineering.requirements.product-intent
+      target_capability: engineering.frontend.verification
+      obligations:
+        - {id: consumed-application-component-requirements, source_kind: requirement-atom, min_count: 5}
+      lifecycle_dependency:
+        exhaustive: true
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [HUMAN]
+
+  verification-surface:
+    value:
+      semantic_assertions:
+        - id: VERIFY-APP-REUSE
+          kind: verification-oracle-atom
+          subject: Application management
+          semantic_value: reusable-application-description-independent-from-deployment
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-COMPONENT-ROLE
+          kind: verification-oracle-atom
+          subject: Component management
+          semantic_value: component-is-communication-participant-not-network-device
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-INTERACTION-DISTINCT-REASONS
+          kind: verification-oracle-atom
+          subject: Interaction management.distinct-reasons
+          semantic_value: interaction-management-supports-distinct-directed-reasons
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-INTERACTION-TRAFFIC
+          kind: verification-oracle-atom
+          subject: Interaction management.traffic
+          semantic_value: interaction-management-supports-complete-traffic-semantics
+          decision_authority: VERIFICATION-DESIGN
+
+  honest-verification-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.requirements.product-intent
+      target_capability: engineering.frontend.verification
+      links:
+        - {id: LINK-APP-REUSE, sources: [ATOM-APP-REUSE], relation: REALIZES, targets: [VERIFY-APP-REUSE]}
+        - {id: LINK-COMPONENT-ROLE, sources: [ATOM-COMPONENT-ROLE], relation: REALIZES, targets: [VERIFY-COMPONENT-ROLE]}
+        - {id: LINK-INTERACTION-DISTINCT-REASONS, sources: [ATOM-INTERACTION-DISTINCT-REASONS], relation: REALIZES, targets: [VERIFY-INTERACTION-DISTINCT-REASONS]}
+        - {id: LINK-INTERACTION-TRAFFIC, sources: [ATOM-INTERACTION-TRAFFIC], relation: REALIZES, targets: [VERIFY-INTERACTION-TRAFFIC]}
+      dispositions: []
+
+  test-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-frontend-verification-to-test-design
+      source_capability: engineering.frontend.verification
+      target_capability: engineering.frontend.test-design
+      obligations:
+        - {id: consumed-frontend-verification-atoms, source_kind: verification-oracle-atom, min_count: 4}
+      lifecycle_dependency:
+        exhaustive: true
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [HUMAN]
+
+  test-surface:
+    value:
+      semantic_assertions:
+        - id: TEST-APP-REUSE
+          kind: test-oracle-atom
+          subject: UI-APPLICATION
+          semantic_value: reusable-application-description-independent-from-deployment-realization
+          decision_authority: TEST-DESIGN
+        - id: TEST-COMPONENT-ROLE
+          kind: test-oracle-atom
+          subject: UI-COMPONENT
+          semantic_value: component-authoring-preserves-participant-semantics
+          decision_authority: TEST-DESIGN
+        - id: TEST-INTERACTION-DISTINCT-REASONS
+          kind: test-oracle-atom
+          subject: UI-INTERACTION.distinct-reasons
+          semantic_value: directed-interactions-preserve-distinct-reasons
+          decision_authority: TEST-DESIGN
+        - id: TEST-INTERACTION-TRAFFIC
+          kind: test-oracle-atom
+          subject: UI-INTERACTION.traffic
+          semantic_value: directed-interactions-preserve-traffic-semantics
+          decision_authority: TEST-DESIGN
+
+  honest-test-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.frontend.verification
+      target_capability: engineering.frontend.test-design
+      links:
+        - {id: TEST-LINK-APP, sources: [VERIFY-APP-REUSE], relation: REALIZES, targets: [TEST-APP-REUSE]}
+        - {id: TEST-LINK-COMPONENT, sources: [VERIFY-COMPONENT-ROLE], relation: REALIZES, targets: [TEST-COMPONENT-ROLE]}
+        - {id: TEST-LINK-INTERACTION-REASONS, sources: [VERIFY-INTERACTION-DISTINCT-REASONS], relation: REALIZES, targets: [TEST-INTERACTION-DISTINCT-REASONS]}
+        - {id: TEST-LINK-INTERACTION-TRAFFIC, sources: [VERIFY-INTERACTION-TRAFFIC], relation: REALIZES, targets: [TEST-INTERACTION-TRAFFIC]}
+      dispositions: []
+
+steps:
+  - id: acquisition-scope-complete
+    driver: source.set
+    with:
+      contract: {ref: fixture.acquisition-contract}
+      inventory: {ref: fixture.source-inventory}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /required_channel_count, op: equals, value: 3}
+      - {path: /reviewed_channel_count, op: equals, value: 3}
+      - {path: /findings, op: length, value: 0}
+
+  - id: requirements-boundary-complete
+    driver: source.boundary
+    with:
+      source: {ref: fixture.requirements-source}
+      manifest: {ref: fixture.requirements-boundary}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 48}
+      - {path: /covered_line_count, op: equals, value: 48}
+      - {path: /findings, op: length, value: 0}
+
+  - id: statements-complete
+    driver: source.coverage
+    with:
+      document: {ref: fixture.statement-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 5}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 5}
+
+  - id: semantic-surface-accepted
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.atom-contract}
+      sources: {ref: fixture.source-atom-baseline}
+      candidate: {ref: fixture.accepted-requirement-surface}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /obligations/satisfied, op: contains, value: application-components-requirement-surface}
+      - {path: /findings, op: length, value: 0}
+
+  - id: verification-review-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.verification-contract}
+      source: {ref: fixture.accepted-requirement-surface}
+      candidate: {ref: fixture.verification-surface}
+      evidence: {ref: fixture.honest-verification-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 5}
+      - {path: /coverage/covered, op: equals, value: 4}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: ATOM-INTERACTION-SAME-APPLICATION, owner_authority: VERIFICATION-DESIGN}}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: bind-verification-link-review
+    driver: data.patch
+    with:
+      value: {ref: fixture.honest-verification-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.verification-review-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links:
+              - LINK-APP-REUSE
+              - LINK-COMPONENT-ROLE
+              - LINK-INTERACTION-DISTINCT-REASONS
+              - LINK-INTERACTION-TRAFFIC
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+
+  - id: verification-real-red
+    driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: real-project-frontend-verification-partial-loss
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.verification-contract}
+      source: {ref: fixture.accepted-requirement-surface}
+      candidate: {ref: fixture.verification-surface}
+      evidence: {ref: step.bind-verification-link-review}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 5}
+      - {path: /coverage/covered, op: equals, value: 4}
+      - {path: /coverage/unresolved, op: equals, value: 1}
+      - {path: /semantic_judgement/status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: ATOM-INTERACTION-SAME-APPLICATION, owner_authority: VERIFICATION-DESIGN}}
+      - {path: /findings, op: not_contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+
+  - id: test-review-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.test-contract}
+      source: {ref: fixture.verification-surface}
+      candidate: {ref: fixture.test-surface}
+      evidence: {ref: fixture.honest-test-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 4}
+      - {path: /coverage/covered, op: equals, value: 4}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: bind-test-link-review
+    driver: data.patch
+    with:
+      value: {ref: fixture.honest-test-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.test-review-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links:
+              - TEST-LINK-APP
+              - TEST-LINK-COMPONENT
+              - TEST-LINK-INTERACTION-REASONS
+              - TEST-LINK-INTERACTION-TRAFFIC
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+
+  - id: downstream-test-design-consistent-with-incomplete-verification
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.test-contract}
+      source: {ref: fixture.verification-surface}
+      candidate: {ref: fixture.test-surface}
+      evidence: {ref: step.bind-test-link-review}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/required, op: equals, value: 4}
+      - {path: /coverage/covered, op: equals, value: 4}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /semantic_judgement/status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
