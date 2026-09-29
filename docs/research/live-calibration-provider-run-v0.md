@@ -336,6 +336,25 @@ is not established by the currently available Copilot `auto` route. That
 requires an explicitly pinnable provider/model or stronger external
 attestation/control-plane evidence.
 
+### Cost-policy follow-up
+
+Repository policy now uses GPT-6 Luna as the default cost baseline for
+provider-backed checks. GitHub's current public model/pricing documentation
+classifies GPT-6 Luna as a lightweight model and prices it below
+MAI-Code-1.1-Flash.
+
+The existing GitHub Actions identity was re-probed with explicit
+`--model=gpt-6-luna` on Copilot CLI 1.0.86 and again on 1.0.88. Both executions
+failed before semantic scoring with:
+
+`Model "gpt-6-luna" from --model flag is not available.`
+
+Therefore the repository must not pretend the current Actions identity can pin
+GPT-6 Luna. The live workflow now defaults to the explicit GPT-6 Luna request
+and exposes `auto` only as an operator-selected fallback/research option.
+This means the cost-preferred baseline fails closed today rather than silently
+routing to a different model.
+
 No Core entity, scorer, orchestration framework, provider registry, consensus
 mechanism or generic evaluator SDK was added.
 

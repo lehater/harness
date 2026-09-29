@@ -1,9 +1,19 @@
 name: live calibration copilot evidence
 
 # Live provider execution is intentionally operator-triggered evidence, not a
-# deterministic PR gate. Provider routing/output may vary between executions.
+# deterministic PR gate. GPT-6 Luna is the default cost baseline. `auto` is an
+# explicit fallback/research choice and may route to a different model.
 on:
   workflow_dispatch:
+    inputs:
+      model:
+        description: Evaluator model; GPT-6 Luna is the cost baseline. Use auto only for explicit fallback/research.
+        required: true
+        default: gpt-6-luna
+        type: choice
+        options:
+          - gpt-6-luna
+          - auto
 
 permissions:
   contents: read
@@ -34,7 +44,13 @@ jobs:
         shell: bash
         run: |
           RUN_BASE="GH-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          sed "s/__RUN_BASE__/${RUN_BASE}/g"             spec/live-calibration-provider/copilot-run.yaml.tmpl             > spec/live-calibration-provider/copilot-run.yaml
+          MODEL="${{ inputs.model }}"
+          if [[ "${MODEL}" == "auto" ]]; then
+            MODEL_SELECTION="provider-auto"
+          else
+            MODEL_SELECTION="explicit"
+          fi
+          sed             -e "s/__RUN_BASE__/${RUN_BASE}/g"             -e "s/__MODEL__/${MODEL}/g"             -e "s/__MODEL_SELECTION__/${MODEL_SELECTION}/g"             spec/live-calibration-provider/copilot-run.yaml.tmpl             > spec/live-calibration-provider/copilot-run.yaml
 
       - name: Execute real live calibration
         env:
