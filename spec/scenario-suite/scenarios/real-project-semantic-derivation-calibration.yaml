@@ -1,0 +1,71 @@
+version: 1
+kind: harness-scenario
+id: real-project-semantic-derivation-calibration
+title: Real project derivation cases expose canonical semantic drift
+dimensions:
+  project_archetype: real-project
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-derivation-truth
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v1.yaml
+
+  expert:
+    value:
+      - {id: napms-missing-address-requirement-to-journey, status: ACCEPTED}
+      - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-security, status: REJECTED}
+      - {id: prep-study-preview-application-to-machine-interface, status: ACCEPTED}
+      - {id: prep-import-machine-interface-to-consistency, status: ACCEPTED}
+      - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
+      - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
+      - {id: prep-import-task-to-interaction, status: ACCEPTED}
+
+  accepts-canonical-drift:
+    value:
+      - {id: napms-missing-address-requirement-to-journey, status: ACCEPTED}
+      - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-security, status: ACCEPTED}
+      - {id: prep-study-preview-application-to-machine-interface, status: ACCEPTED}
+      - {id: prep-import-machine-interface-to-consistency, status: ACCEPTED}
+      - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
+      - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
+      - {id: prep-import-task-to-interaction, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 8}
+      - {path: /confusion/true_positive, op: equals, value: 1}
+      - {path: /confusion/true_negative, op: equals, value: 7}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: expose-real-project-false-negative
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: real-project-canonical-drift-missed
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-canonical-drift}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 1}
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-rules-to-security
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
