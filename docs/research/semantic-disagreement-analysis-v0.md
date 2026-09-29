@@ -77,7 +77,7 @@ not invent unstated mechanisms, exclusivity, enforcement paths, side effects or
 context. It also makes `REALIZES` sufficiency explicit: a merely contributory
 mechanism is not enough.
 
-Corpus v2 splits the ambiguous v1 example into two discriminating controls:
+Corpus v2 split the ambiguous v1 example into two discriminating controls:
 
 1. `valid-subject-preservation` is now explicitly sufficient:
    owner/resource identity is preserved and non-owner edit execution is
@@ -86,7 +86,9 @@ Corpus v2 splits the ambiguous v1 example into two discriminating controls:
    labelled `REJECTED`.
 
 This preserves the semantic lesson discovered by the disagreement instead of
-merely rewriting the case until models agree.
+merely rewriting the case until models agree. A subsequent full audit found
+additional wording/coverage weaknesses and promoted the current corpus to v3;
+see `semantic-calibration-corpus-audit-v0.md`. Protocol v2 remains current.
 
 ## Consequence
 
