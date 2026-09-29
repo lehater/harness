@@ -243,8 +243,14 @@ This preserves three independent truths:
 No new Core entity, scorer, orchestration framework or provider abstraction is
 required.
 
-The next scale step, if pursued, is corpus work rather than framework work:
-extract more expert-reviewed consumed-atom pairs from real Capability edges and
-include naturally occurring defects when found. The real-project corpus should
-remain a benchmark/evidence set, not an estimate of universal production error
-rates.
+The next scale step was executed in
+`docs/research/real-project-semantic-corpus-expansion-v0.md`.
+
+Corpus v4 expands the benchmark from 8 to 16 real Capability-edge cases and
+adds a request-authority consistency triangle that localizes the existing NAPMS
+scope drift to Security Architecture. It also establishes that several rejected
+edge cases may represent one root defect, so case-level recall must not be read
+as independent defect count.
+
+The real-project corpus remains a benchmark/evidence set, not an estimate of
+universal production error rates.
