@@ -92,8 +92,8 @@ Scenario Suite records independent benchmark dimensions including:
 - selective lifecycle revalidation;
 - semantic-truth detection.
 
-The bootstrap semantic-judgement calibration corpus contains 10 expert-labelled
-cases, including valid near-miss controls and semantic defects. The deterministic
+The current bootstrap semantic-judgement calibration corpus contains 14
+expert-labelled cases, including valid near-miss controls and semantic defects. The deterministic
 calibration scorer can compute false negatives, false positives, detection
 recall, false-positive rate, accuracy and per-class accuracy from external
 verdicts.
