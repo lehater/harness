@@ -114,6 +114,29 @@ verdicts.
 - Knowledge-kind edge coverage is reusable test-class coverage, not project
   semantic proof.
 
+## Real-project semantic evidence
+
+A later real-project audit applied the completed mechanism to pinned Prep and
+NAPMS Capability transitions rather than synthetic mutations.
+
+The audit established two additional points:
+
+- semantic test cases must be scoped to the upstream atoms actually consumed by
+  the downstream ProductionContract; whole-artifact comparison creates false
+  positives by requiring downstream Authorities to restate knowledge they do
+  not own;
+- the method exposed two canonical NAPMS derivation defects: loss of the
+  non-deployable meaning of an INCOMPLETE policy row during application
+  materialization, and destination-scope authority being added during the
+  System-Rules-to-Security-Architecture transition.
+
+A blinded live evaluator detected the authority contradiction but consistently
+missed the subtler materialization partial loss. This confirms both the value of
+real Capability-edge semantic testing and the need to calibrate the evaluator
+against expert-reviewed real-project cases.
+
+See `docs/research/real-project-semantic-derivation-audit-v0.md`.
+
 ## Boundaries intentionally left open
 
 The completed task does not solve:
