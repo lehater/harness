@@ -255,6 +255,16 @@ relative_to = <accepted acquisition contract>
 
 If the acquisition contract changes, source-set completeness must be recomputed.
 
+## Research closure
+
+The complete source-to-downstream trust-boundary investigation is closed in
+`docs/research/source-to-derivation-assurance-closure-v1.md`.
+
+The remaining acquisition-contract sufficiency question is deliberately treated
+as the outer semantic/Authority boundary rather than another deterministic
+coverage layer. New evidence may reopen that boundary; Harness does not claim
+open-world omniscience.
+
 ## Architecture consequence
 
 The new validator remains assurance above Core.
