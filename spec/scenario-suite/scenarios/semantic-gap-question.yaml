@@ -1,0 +1,113 @@
+version: 1
+kind: harness-scenario
+id: semantic-gap-routes-question
+title: Missing task semantics become an owning-Authority Question
+dimensions:
+  behavior_class: semantic
+  execution_type: deterministic
+project_archetype: synthetic
+stage: design
+covers:
+  - semantic-gap-question-routing
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SEMANTIC-GAP
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own task semantics.
+          boundary:
+            semantic_cohesion: Task semantics.
+            independent_change: Tasks may change independently.
+            public_contract: Accepted task model.
+          produces:
+            - capability: demo.task-model
+              knowledge_kind: task-model
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume accepted task semantics.
+          requires: [demo.task-model]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: TASK-MODEL
+          authority: APPLICATION-DESIGN
+          path: docs/task-model.yaml
+          provides: [demo.task-model]
+          depends_on: []
+      questions: []
+  contract:
+    value:
+      authority: APPLICATION-DESIGN
+      owned_assertion_kinds: [task, task-recovery]
+      obligations:
+        - {id: tasks, kind: task}
+        - {id: recovery-per-task, kind: task-recovery, subjects_from_kind: task}
+      requires_assertion_authority: true
+      requires_source_authority: false
+      requires_semantic_review: false
+  sources:
+    value:
+      semantic_assertions: []
+  candidate:
+    value:
+      id: TASK-MODEL
+      capability: demo.task-model
+      semantic_assertions:
+        - id: TASK-A
+          kind: task
+          subject: TASK-A
+          semantic_value: Do A
+          decision_authority: APPLICATION-DESIGN
+steps:
+  - id: structural-before
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+  - id: evaluate
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.contract}
+      sources: {ref: fixture.sources}
+      candidate: {ref: fixture.candidate}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings/0/code, op: equals, value: MISSING_SUBJECTS}
+      - {path: /findings/0/obligation, op: equals, value: recovery-per-task}
+  - id: questions
+    driver: semantic.questions
+    with:
+      graph: {ref: fixture.graph}
+      capability: demo.task-model
+      evaluation: {ref: step.evaluate}
+    expect:
+      - {path: /, op: length, value: 1}
+      - {path: /0/authority, op: equals, value: APPLICATION-DESIGN}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.task-model]}
+    observe:
+      question_id: /0/id
+      question_authority: /0/authority
+  - id: project
+    driver: semantic.apply_questions
+    with:
+      model: {ref: fixture.model}
+      proposals: {ref: step.questions}
+  - id: structural-after
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: step.project}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - {path: /wait, op: length, value: 1}
+      - {path: /wait/0/questions, op: contains, value: Q-SEMANTIC-DEMO-TASK-MODEL-RECOVERY-PER-TASK}

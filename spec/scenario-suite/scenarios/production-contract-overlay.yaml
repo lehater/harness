@@ -1,0 +1,64 @@
+version: 1
+kind: harness-scenario
+id: production-contract-overlay-adds-routed-coverage-work
+title: Project production overlay adds justified coverage capability without activation drift
+dimensions:
+  project_archetype: data-integration
+  stage: implementation
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - production-contract-overlay
+
+fixtures:
+  graph:
+    yaml: ../../research/scope-activation-fixture-graph.yaml
+  core:
+    yaml: ../../research/scope-activation-fixture-core.yaml
+  project_overlay:
+    value:
+      activate:
+        - concern: data.lifecycle
+          rationale: Fixture requires explicit data lifecycle.
+      decisions: []
+  production_overlay:
+    value:
+      version: 1
+      kind: harness-production-contract-overlay
+      productions:
+        - authority: DATA-DESIGN
+          capability: fixture.mvp.data-lifecycle-design
+          semantic_claims: [engineering.data.lifecycle]
+          knowledge_kind: data-design
+          requires: [fixture.mvp.data-design]
+
+steps:
+  - id: evaluate
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.core}
+      consumer: IMPLEMENTATION
+      scope: mvp
+      scope_roots: [fixture.mvp.implementation-design]
+      project_overlay: {ref: fixture.project_overlay}
+      production_contract_overlay: {ref: fixture.production_overlay}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: data.lifecycle
+          state: MISSING
+          action: PRODUCE_CAPABILITY
+      - path: /work_items
+        op: contains_match
+        value:
+          action: PRODUCE_CAPABILITY
+          capability: fixture.mvp.data-lifecycle-design
+          authority: DATA-DESIGN
+          execution_route:
+            status: ROUTED
+            knowledge_kind: data-design
+            skill: skills/artifacts/data-design/SKILL.md
+      - {path: /routed_production_count, op: gte, value: 1}
+      - {path: /activation_signals/capabilities, op: not_contains_match, value: fixture.mvp.data-lifecycle-design}

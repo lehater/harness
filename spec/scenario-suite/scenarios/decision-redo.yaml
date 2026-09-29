@@ -1,0 +1,109 @@
+version: 1
+kind: harness-scenario
+id: decision-redo-is-explicit-and-idempotent
+title: CURRENT decision work is omitted until explicit REDO
+dimensions:
+  project_archetype: backend-service
+  stage: revalidation
+  behavior_class: decision
+  execution_type: deterministic
+covers:
+  - decision-redo-idempotence
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: REDO-SCENARIO
+      authorities:
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own architecture.
+          boundary:
+            semantic_cohesion: Architecture decisions.
+            independent_change: Architecture changes independently.
+            public_contract: Accepted architecture.
+          produces:
+            - capability: demo.architecture
+              knowledge_kind: system-architecture
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Build accepted architecture.
+          requires: [demo.architecture]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: ARCH
+          authority: SYSTEM-ARCHITECTURE
+          path: docs/architecture.md
+          provides: [demo.architecture]
+          depends_on: []
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: ARCH
+          capability: demo.architecture
+          acceptance_id: ARCH-1
+          accepted_prerequisites: {}
+  contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-decision-contracts
+      policy_defaults: {exploration: EXPLORE, autonomy: CONSERVATIVE}
+      contracts:
+        - knowledge_kind: system-architecture
+          required: true
+          axes:
+            - id: runtime-shape
+              material_dimensions: [failure-isolation]
+              challenge_strategies: [alternative-shape, failure-probe]
+              minimum_probes: 2
+              delegation_requires: BROAD
+  policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+        execution_assurance: REQUEST_BOUND
+
+steps:
+  - id: ordinary
+    driver: decision.roadmap
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      lifecycle: {ref: fixture.lifecycle}
+      decision_contracts: {ref: fixture.contracts}
+      decision_policy: {ref: fixture.policy}
+    expect:
+      - {path: /frontier_status, op: equals, value: EMPTY}
+      - {path: /ready, op: length, value: 0}
+      - {path: /completed, op: contains_match, value: {capability: demo.architecture, state: CURRENT}}
+
+  - id: explicit-redo
+    driver: decision.roadmap
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      lifecycle: {ref: fixture.lifecycle}
+      decision_contracts: {ref: fixture.contracts}
+      decision_policy: {ref: fixture.policy}
+      redo_capabilities: [demo.architecture]
+    expect:
+      - {path: /frontier_status, op: equals, value: READY}
+      - path: /ready
+        op: contains_match
+        value:
+          capability: demo.architecture
+          reason: EXPLICIT_REDO
+          decision_request_mode: REDO
+          decision_governed: true

@@ -1,0 +1,54 @@
+version: 1
+kind: harness-scenario
+id: canonical-projection-alignment-detects-drift
+title: Canonical projection stays aligned with Engineering Graph dependencies
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: integration
+  execution_type: deterministic
+covers:
+  - canonical-projection-alignment
+
+fixtures:
+  shape:
+    yaml: ../../unified-model-acceptance/napms-shape.yaml
+
+steps:
+  - id: project
+    driver: canonical.project
+    with:
+      source_graph: {ref: fixture.shape#/source_graph}
+      projection: {ref: fixture.shape#/projection}
+    expect:
+      - {path: /artifacts, op: length, value: 6}
+      - {path: /questions, op: length, value: 0}
+
+  - id: align
+    driver: canonical.alignment
+    with:
+      source_graph: {ref: fixture.shape#/source_graph}
+      projection: {ref: fixture.shape#/projection}
+      engineering_graph: {ref: fixture.shape#/engineering_graph}
+      target_consumer: BACKEND-IMPLEMENTATION
+    expect:
+      - {path: /target_consumer, op: equals, value: BACKEND-IMPLEMENTATION}
+      - {path: /bound_artifacts, op: contains_all, value: [REQUIREMENTS, JOURNEY, ARCHITECTURE, ASYNC-NA, INTERFACE, IMPLEMENTATION-DESIGN]}
+
+  - id: hidden-dependency
+    driver: data.patch
+    with:
+      value: {ref: fixture.shape#/source_graph}
+      operations:
+        - {op: add, path: /nodes/4/depends_on/-, value: JOURNEY}
+
+  - id: reject-hidden-dependency
+    driver: canonical.alignment
+    with:
+      source_graph: {ref: step.hidden-dependency}
+      projection: {ref: fixture.shape#/projection}
+      engineering_graph: {ref: fixture.shape#/engineering_graph}
+      target_consumer: BACKEND-IMPLEMENTATION
+    expect_error:
+      type: CoreError
+      contains: hidden project-graph upstream Authorities

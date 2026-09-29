@@ -1,0 +1,48 @@
+version: 1
+kind: harness-scenario
+id: live-calibration-external-process
+title: Scenario Suite invokes a separately executed blinded evaluator
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - live-semantic-evaluator-calibration
+
+fixtures:
+  corpus:
+    yaml: ../semantic-derivation/calibration-corpus-v1.yaml
+  protocol:
+    yaml: ../semantic-derivation/live-calibration-protocol-v1.yaml
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: process-fixture
+      provider: fixture
+      model: accept-all
+      model_version: "1"
+      configuration: {}
+      adapter:
+        id: process-json
+        version: "1"
+
+steps:
+  - id: execute
+    driver: semantic.live_calibration.execute_process
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: PROCESS-RUN-1
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /calibration/confusion/false_negative, op: equals, value: 5}
+      - {path: /calibration/confusion/false_positive, op: equals, value: 0}
+      - {path: /independence/status, op: equals, value: UNVERIFIED}
+      - {path: /execution/boundary, op: equals, value: EXTERNAL_PROCESS}
+    observe:
+      evaluation: /
+      evaluator_fingerprint: /evaluator/fingerprint
+      executable_sha256: /execution/executable_sha256

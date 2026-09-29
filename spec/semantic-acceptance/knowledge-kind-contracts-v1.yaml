@@ -16,6 +16,25 @@ contracts:
   - knowledge_kind: problem-evidence
     required_review_checks: [evidence-not-solution]
   - knowledge_kind: user-needs
+    owned_assertion_kinds:
+      - user-actor
+      - context-of-use
+      - user-goal
+      - user-need
+      - need-evidence
+    obligations:
+      - id: actors
+        kind: user-actor
+      - id: context-of-use
+        kind: context-of-use
+      - id: goals
+        kind: user-goal
+      - id: needs-for-goals
+        kind: user-need
+        subjects_from_kind: user-goal
+      - id: evidence-for-needs
+        kind: need-evidence
+        subjects_from_kind: user-need
     required_review_checks: [need-not-normative-solution]
   - knowledge_kind: product-requirements
     required_review_checks:
@@ -32,6 +51,42 @@ contracts:
   - knowledge_kind: application-design
     required_review_checks: [orchestration-not-domain-reownership]
   - knowledge_kind: task-model
+    owned_assertion_kinds:
+      - task-goal
+      - task
+      - task-goal-ref
+      - task-responsibility
+      - task-information
+      - task-decision-input
+      - task-outcome
+      - task-system-support
+      - task-recovery
+    obligations:
+      - id: goals
+        kind: task-goal
+      - id: tasks
+        kind: task
+      - id: goal-ref-per-task
+        kind: task-goal-ref
+        subjects_from_kind: task
+      - id: responsibility-per-task
+        kind: task-responsibility
+        subjects_from_kind: task
+      - id: information-per-task
+        kind: task-information
+        subjects_from_kind: task
+      - id: decision-input-per-task
+        kind: task-decision-input
+        subjects_from_kind: task
+      - id: outcome-per-task
+        kind: task-outcome
+        subjects_from_kind: task
+      - id: system-support-per-task
+        kind: task-system-support
+        subjects_from_kind: task
+      - id: recovery-per-task
+        kind: task-recovery
+        subjects_from_kind: task
     required_review_checks: [task-not-screen-design]
   - knowledge_kind: user-journey-design
     required_review_checks: [journey-not-screen-design]

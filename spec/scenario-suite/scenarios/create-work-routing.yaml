@@ -1,0 +1,86 @@
+version: 1
+kind: harness-scenario
+id: create-work-routing-and-blocking
+title: CREATE work routes to skills while blocked work waits
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - create-work-skill-routing
+  - blocked-work-not-routed
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: ROUTING-SCENARIO
+      authorities:
+        - id: VERIFICATION
+          responsibility: Own verification strategy.
+          boundary:
+            semantic_cohesion: Verification semantics.
+            independent_change: Verification changes independently.
+            public_contract: Accepted verification strategy.
+          produces:
+            - capability: demo.verification
+              knowledge_kind: verification-strategy
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume verification strategy.
+          requires: [demo.verification]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts: []
+      questions: []
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: ROUTING-SCENARIO-REGISTRY
+      routes:
+        - knowledge_kind: verification-strategy
+          skill: skills/artifacts/verification-strategy/SKILL.md
+
+steps:
+  - id: route-create
+    driver: agent.route
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+      registry: {ref: fixture.registry}
+    expect:
+      - {path: /target_status, op: equals, value: READY}
+      - {path: /routed, op: contains_match, value: {knowledge_kind: verification-strategy, capabilities: [demo.verification]}}
+      - {path: /unrouted, op: length, value: 0}
+
+  - id: block
+    driver: data.patch
+    with:
+      value: {ref: fixture.model}
+      operations:
+        - op: add
+          path: /questions/-
+          value:
+            id: Q-VERIFY
+            authority: VERIFICATION
+            text: Which verification semantics are accepted?
+            blocks_capabilities: [demo.verification]
+
+  - id: route-blocked
+    driver: agent.route
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: step.block}
+      registry: {ref: fixture.registry}
+    expect:
+      - {path: /target_status, op: equals, value: BLOCKED}
+      - {path: /routed, op: length, value: 0}
+      - {path: /unrouted, op: length, value: 0}
+      - {path: /wait, op: contains_match, value: {capability: demo.verification, questions: [Q-VERIFY]}}

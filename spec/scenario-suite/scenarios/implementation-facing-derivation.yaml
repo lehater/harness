@@ -1,0 +1,237 @@
+version: 1
+kind: harness-scenario
+id: implementation-facing-semantic-derivation
+title: Architecture, component, verification and test knowledge remain traceable into implementation design
+dimensions:
+  project_archetype: user-facing
+  stage: implementation
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: screen-view-design, target_knowledge_kind: component-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: component-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: component-design}
+  - {source_knowledge_kind: verification-strategy, target_knowledge_kind: test-design}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: test-design}
+  - {source_knowledge_kind: screen-view-design, target_knowledge_kind: test-design}
+  - {source_knowledge_kind: component-design, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: verification-strategy, target_knowledge_kind: implementation-design}
+  - {source_knowledge_kind: test-design, target_knowledge_kind: implementation-design}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: IMPLEMENTATION-FACING-DERIVATION
+      authorities:
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own screen and interaction semantics.
+          boundary: {semantic_cohesion: Human interface semantics., independent_change: Interface changes independently., public_contract: Accepted interface design.}
+          produces:
+            - {capability: demo.interaction, knowledge_kind: interaction-design, requires: []}
+            - {capability: demo.screen, knowledge_kind: screen-view-design, requires: []}
+        - id: MACHINE-INTERFACE-DESIGN
+          responsibility: Own machine interface contracts.
+          boundary: {semantic_cohesion: Machine interface semantics., independent_change: Interface changes independently., public_contract: Accepted machine interface.}
+          produces:
+            - {capability: demo.api, knowledge_kind: interface-contract, requires: []}
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own runtime and dependency topology.
+          boundary: {semantic_cohesion: Runtime structure., independent_change: Architecture changes independently., public_contract: Accepted system architecture.}
+          produces:
+            - {capability: demo.architecture, knowledge_kind: system-architecture, requires: []}
+        - id: VERIFICATION-DESIGN
+          responsibility: Own verification obligations.
+          boundary: {semantic_cohesion: Verification intent., independent_change: Verification strategy changes independently., public_contract: Accepted verification strategy.}
+          produces:
+            - {capability: demo.verification, knowledge_kind: verification-strategy, requires: []}
+        - id: COMPONENT-DESIGN
+          responsibility: Own implementation-facing component boundaries.
+          boundary: {semantic_cohesion: Component contracts., independent_change: Components change behind upstream contracts., public_contract: Accepted component design.}
+          produces:
+            - capability: demo.components
+              knowledge_kind: component-design
+              requires: [demo.screen, demo.architecture, demo.api]
+        - id: TEST-DESIGN
+          responsibility: Own executable test contracts.
+          boundary: {semantic_cohesion: Executable verification contracts., independent_change: Test design changes independently., public_contract: Accepted test design.}
+          produces:
+            - capability: demo.tests
+              knowledge_kind: test-design
+              requires: [demo.verification, demo.interaction, demo.screen]
+        - id: IMPLEMENTATION-DESIGN
+          responsibility: Own bounded realization slices.
+          boundary: {semantic_cohesion: Implementation realization., independent_change: Slice ordering changes behind accepted design., public_contract: Accepted implementation design.}
+          produces:
+            - capability: demo.implementation
+              knowledge_kind: implementation-design
+              requires: [demo.components, demo.verification, demo.tests]
+      consumers:
+        - {id: IMPLEMENTATION, purpose: Build accepted design., requires: [demo.implementation]}
+      terminal_capabilities: []
+
+  screen:
+    value:
+      semantic_assertions:
+        - {id: SCREEN-ACTION, kind: screen-action, subject: RESOURCE, semantic_value: submit-edit, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-STATE, kind: screen-state, subject: RESOURCE, semantic_value: validation-error-visible, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  interaction:
+    value:
+      semantic_assertions:
+        - {id: INT-ACTION, kind: interaction-action, subject: RESOURCE, semantic_value: submit-edit, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INT-RECOVERY, kind: interaction-recovery, subject: RESOURCE, semantic_value: preserve-valid-input-after-error, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  api:
+    value:
+      semantic_assertions:
+        - {id: API-EDIT, kind: interface-operation, subject: RESOURCE, semantic_value: update-resource, decision_authority: MACHINE-INTERFACE-DESIGN}
+
+  architecture:
+    value:
+      semantic_assertions:
+        - {id: ARCH-BOUNDARY, kind: architecture-boundary, subject: FRONTEND, semantic_value: application-to-api-boundary, decision_authority: SYSTEM-ARCHITECTURE}
+        - {id: ARCH-DEPENDENCY, kind: architecture-dependency, subject: FRONTEND, semantic_value: ui-depends-on-application-port, decision_authority: SYSTEM-ARCHITECTURE}
+
+  verification:
+    value:
+      semantic_assertions:
+        - {id: VERIFY-BEHAVIOR, kind: verification-obligation, subject: RESOURCE-EDIT, semantic_value: prove-success-and-validation-recovery, decision_authority: VERIFICATION-DESIGN}
+        - {id: VERIFY-STRUCTURE, kind: verification-obligation, subject: FRONTEND, semantic_value: prove-dependency-direction, decision_authority: VERIFICATION-DESIGN}
+
+  components:
+    value:
+      semantic_assertions:
+        - {id: COMP-PORT, kind: component-responsibility, subject: EDIT-FEATURE, semantic_value: expose-edit-use-case-port, decision_authority: COMPONENT-DESIGN}
+        - {id: COMP-DEPENDENCY, kind: component-dependency, subject: EDIT-FEATURE, semantic_value: ui-adapter-depends-on-edit-port, decision_authority: COMPONENT-DESIGN}
+        - {id: COMP-API, kind: component-adapter, subject: EDIT-FEATURE, semantic_value: api-adapter-realizes-update-resource, decision_authority: COMPONENT-DESIGN}
+
+  tests:
+    value:
+      semantic_assertions:
+        - {id: TEST-EDIT, kind: test-contract, subject: RESOURCE-EDIT, semantic_value: submit-edit-and-observe-success, decision_authority: TEST-DESIGN}
+        - {id: TEST-RECOVERY, kind: test-contract, subject: RESOURCE-EDIT, semantic_value: invalid-edit-preserves-valid-input, decision_authority: TEST-DESIGN}
+        - {id: TEST-DEPENDENCY, kind: test-contract, subject: FRONTEND, semantic_value: enforce-ui-to-port-dependency, decision_authority: TEST-DESIGN}
+
+  implementation:
+    value:
+      semantic_assertions:
+        - {id: IMPL-COMPONENT, kind: implementation-slice, subject: EDIT-FEATURE, semantic_value: realize-edit-component-boundaries, decision_authority: IMPLEMENTATION-DESIGN}
+        - {id: IMPL-TEST, kind: implementation-slice, subject: EDIT-FEATURE, semantic_value: realize-edit-behavior-tests, decision_authority: IMPLEMENTATION-DESIGN}
+        - {id: IMPL-GATE, kind: implementation-criterion, subject: FRONTEND, semantic_value: verification-and-tests-pass, decision_authority: IMPLEMENTATION-DESIGN}
+
+  screen-to-component:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.screen, target_capability: demo.components, obligations: [{id: actions, source_kind: screen-action}, {id: states, source_kind: screen-state}]}
+  screen-to-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.screen, target_capability: demo.components, links: [{sources: [SCREEN-ACTION], relation: REALIZES, targets: [COMP-PORT]}, {sources: [SCREEN-STATE], relation: CONSTRAINS, targets: [COMP-PORT]}], dispositions: []}
+
+  architecture-to-component:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.architecture, target_capability: demo.components, obligations: [{id: boundaries, source_kind: architecture-boundary}, {id: dependencies, source_kind: architecture-dependency}]}
+  architecture-to-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.architecture, target_capability: demo.components, links: [{sources: [ARCH-BOUNDARY], relation: REALIZES, targets: [COMP-PORT]}, {sources: [ARCH-DEPENDENCY], relation: REALIZES, targets: [COMP-DEPENDENCY]}], dispositions: []}
+
+  api-to-component:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.api, target_capability: demo.components, obligations: [{id: operations, source_kind: interface-operation}]}
+  api-to-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.api, target_capability: demo.components, links: [{sources: [API-EDIT], relation: REALIZES, targets: [COMP-API]}], dispositions: []}
+
+  verification-to-test:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.verification, target_capability: demo.tests, obligations: [{id: obligations, source_kind: verification-obligation, min_count: 2}]}
+  verification-to-test-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.verification, target_capability: demo.tests, links: [{sources: [VERIFY-BEHAVIOR], relation: REALIZES, targets: [TEST-EDIT, TEST-RECOVERY]}, {sources: [VERIFY-STRUCTURE], relation: REALIZES, targets: [TEST-DEPENDENCY]}], dispositions: []}
+
+  interaction-to-test:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interaction, target_capability: demo.tests, obligations: [{id: actions, source_kind: interaction-action}, {id: recovery, source_kind: interaction-recovery}]}
+  interaction-to-test-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interaction, target_capability: demo.tests, links: [{sources: [INT-ACTION], relation: REALIZES, targets: [TEST-EDIT]}, {sources: [INT-RECOVERY], relation: REALIZES, targets: [TEST-RECOVERY]}], dispositions: []}
+
+  screen-to-test:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.screen, target_capability: demo.tests, obligations: [{id: actions, source_kind: screen-action}, {id: states, source_kind: screen-state}]}
+  screen-to-test-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.screen, target_capability: demo.tests, links: [{sources: [SCREEN-ACTION], relation: REALIZES, targets: [TEST-EDIT]}, {sources: [SCREEN-STATE], relation: REALIZES, targets: [TEST-RECOVERY]}], dispositions: []}
+
+  component-to-implementation:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.components, target_capability: demo.implementation, obligations: [{id: responsibilities, source_kind: component-responsibility}, {id: dependencies, source_kind: component-dependency}, {id: adapters, source_kind: component-adapter}]}
+  component-to-implementation-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.components, target_capability: demo.implementation, links: [{sources: [COMP-PORT, COMP-DEPENDENCY, COMP-API], relation: REALIZES, targets: [IMPL-COMPONENT]}], dispositions: []}
+
+  verification-to-implementation:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.verification, target_capability: demo.implementation, obligations: [{id: obligations, source_kind: verification-obligation, min_count: 2}]}
+  verification-to-implementation-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.verification, target_capability: demo.implementation, links: [{sources: [VERIFY-BEHAVIOR, VERIFY-STRUCTURE], relation: CONSTRAINS, targets: [IMPL-GATE]}], dispositions: []}
+
+  test-to-implementation:
+    value: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.tests, target_capability: demo.implementation, obligations: [{id: tests, source_kind: test-contract, min_count: 3}]}
+  test-to-implementation-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.tests, target_capability: demo.implementation, links: [{sources: [TEST-EDIT, TEST-RECOVERY], relation: REALIZES, targets: [IMPL-TEST]}, {sources: [TEST-DEPENDENCY], relation: CONSTRAINS, targets: [IMPL-GATE]}], dispositions: []}
+
+steps:
+  - id: screen-to-component
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.screen-to-component}, source: {ref: fixture.screen}, candidate: {ref: fixture.components}, evidence: {ref: fixture.screen-to-component-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: architecture-to-component
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.architecture-to-component}, source: {ref: fixture.architecture}, candidate: {ref: fixture.components}, evidence: {ref: fixture.architecture-to-component-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: api-to-component
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.api-to-component}, source: {ref: fixture.api}, candidate: {ref: fixture.components}, evidence: {ref: fixture.api-to-component-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: verification-to-test
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.verification-to-test}, source: {ref: fixture.verification}, candidate: {ref: fixture.tests}, evidence: {ref: fixture.verification-to-test-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: interaction-to-test
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.interaction-to-test}, source: {ref: fixture.interaction}, candidate: {ref: fixture.tests}, evidence: {ref: fixture.interaction-to-test-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: screen-to-test
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.screen-to-test}, source: {ref: fixture.screen}, candidate: {ref: fixture.tests}, evidence: {ref: fixture.screen-to-test-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: component-to-implementation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.component-to-implementation}, source: {ref: fixture.components}, candidate: {ref: fixture.implementation}, evidence: {ref: fixture.component-to-implementation-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: verification-to-implementation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.verification-to-implementation}, source: {ref: fixture.verification}, candidate: {ref: fixture.implementation}, evidence: {ref: fixture.verification-to-implementation-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: test-to-implementation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.test-to-implementation}, source: {ref: fixture.tests}, candidate: {ref: fixture.implementation}, evidence: {ref: fixture.test-to-implementation-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-architecture-dependency-link
+    driver: data.patch
+    with: {value: {ref: fixture.architecture-to-component-evidence}, operations: [{op: remove, path: /links/1}]}
+  - id: architecture-loss
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.architecture-to-component}, source: {ref: fixture.architecture}, candidate: {ref: fixture.components}, evidence: {ref: step.remove-architecture-dependency-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: ARCH-DEPENDENCY, owner_authority: COMPONENT-DESIGN}}
+
+  - id: remove-verification-structure
+    driver: data.patch
+    with: {value: {ref: fixture.verification}, operations: [{op: remove, path: /semantic_assertions/1}]}
+  - id: remove-verification-structure-link
+    driver: data.patch
+    with: {value: {ref: fixture.verification-to-test-evidence}, operations: [{op: remove, path: /links/1}]}
+  - id: missing-verification-input
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.verification-to-test}, source: {ref: step.remove-verification-structure}, candidate: {ref: fixture.tests}, evidence: {ref: step.remove-verification-structure-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_INPUT, obligation: obligations, owner_authority: VERIFICATION-DESIGN}}
+  - id: route-missing-verification
+    driver: semantic.questions
+    with: {graph: {ref: fixture.graph}, evaluation: {ref: step.missing-verification-input}}
+    expect:
+      - {path: /0/authority, op: equals, value: VERIFICATION-DESIGN}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.verification]}

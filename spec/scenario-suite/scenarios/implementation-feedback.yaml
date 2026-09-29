@@ -1,0 +1,100 @@
+version: 1
+kind: harness-scenario
+id: implementation-feedback-does-not-confuse-lag-with-semantic-gap
+title: Implementation lag leaves design COMPLETE while semantic gaps reopen upstream knowledge
+dimensions:
+  project_archetype: backend-service
+  stage: implementation
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - implementation-feedback-classification
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: IMPLEMENTATION-FEEDBACK
+      authorities:
+        - id: DOMAIN
+          responsibility: Own accepted domain semantics.
+          boundary:
+            semantic_cohesion: Domain semantics.
+            independent_change: Domain semantics change independently.
+            public_contract: Accepted domain model.
+          produces:
+            - capability: demo.domain
+              knowledge_kind: domain-model
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Implement accepted domain semantics.
+          requires: [demo.domain]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: DOMAIN-MODEL
+          authority: DOMAIN
+          path: docs/domain.yaml
+          provides: [demo.domain]
+          depends_on: []
+      questions: []
+  evidence:
+    value:
+      implementation_status: MATCHES_ACCEPTED_KNOWLEDGE
+      verification_status: PASS
+  semantic_question:
+    value:
+      - id: Q-DOMAIN-GAP
+        authority: DOMAIN
+        text: Which domain rule applies to the newly discovered semantic case?
+        blocks_capabilities: [demo.domain]
+
+steps:
+  - id: baseline
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+
+  - id: implementation-lag
+    driver: data.patch
+    with:
+      value: {ref: fixture.evidence}
+      operations:
+        - {op: replace, path: /implementation_status, value: OUT_OF_SYNC}
+        - {op: replace, path: /verification_status, value: FAIL}
+    expect:
+      - {path: /implementation_status, op: equals, value: OUT_OF_SYNC}
+      - {path: /verification_status, op: equals, value: FAIL}
+
+  - id: design-remains-complete
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+
+  - id: semantic-gap
+    driver: semantic.apply_questions
+    with:
+      model: {ref: fixture.model}
+      proposals: {ref: fixture.semantic_question}
+
+  - id: semantic-gap-blocks
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: step.semantic-gap}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - {path: /wait, op: contains_match, value: {capability: demo.domain, questions: [Q-DOMAIN-GAP]}}

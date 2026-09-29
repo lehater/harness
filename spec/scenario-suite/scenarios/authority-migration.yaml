@@ -1,0 +1,55 @@
+version: 1
+kind: harness-scenario
+id: authority-split-does-not-inherit-applicability
+title: Authority split requires reassessment instead of blind inheritance
+dimensions:
+  project_archetype: synthetic
+  stage: bootstrap
+  behavior_class: applicability
+  execution_type: deterministic
+covers:
+  - project-authority-migration
+
+fixtures:
+  new_catalog:
+    value:
+      authorities:
+        - {id: MACHINE-INTERFACE-DESIGN}
+        - {id: HUMAN-INTERFACE-DESIGN}
+  old_registry:
+    value:
+      version: 1
+      kind: harness-project-authority-assessments
+      assessments:
+        - authority_id: INTERFACE-DESIGN
+          applicability: REQUIRED
+          evidence: [legacy-interface]
+          rationale: Legacy interface knowledge was accepted.
+          depends_on_evidence: [legacy-interface]
+          reopening_conditions: [interface semantics change]
+  migrations:
+    value:
+      INTERFACE-DESIGN:
+        - MACHINE-INTERFACE-DESIGN
+        - HUMAN-INTERFACE-DESIGN
+
+steps:
+  - id: migrate
+    driver: project.authority_bootstrap
+    with:
+      catalog: {ref: fixture.new_catalog}
+      existing: {ref: fixture.old_registry}
+      authority_migrations: {ref: fixture.migrations}
+    expect:
+      - path: /assessments
+        op: contains_match
+        value: {authority_id: MACHINE-INTERFACE-DESIGN, applicability: UNASSESSED}
+      - path: /assessments
+        op: contains_match
+        value: {authority_id: HUMAN-INTERFACE-DESIGN, applicability: UNASSESSED}
+      - path: /migration_conflicts
+        op: contains_match
+        value:
+          retired_authority: INTERFACE-DESIGN
+          replacements: [MACHINE-INTERFACE-DESIGN, HUMAN-INTERFACE-DESIGN]
+          resolution: MANUAL-DECISION

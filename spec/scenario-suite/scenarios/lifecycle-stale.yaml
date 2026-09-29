@@ -1,0 +1,84 @@
+version: 1
+kind: harness-scenario
+id: upstream-change-makes-downstream-stale
+title: Lifecycle detects stale downstream acceptance
+dimensions:
+  behavior_class: lifecycle
+  execution_type: deterministic
+project_archetype: synthetic
+stage: revalidation
+covers:
+  - lifecycle-currentness
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: LIFECYCLE-STALE
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own upstream knowledge.
+          boundary:
+            semantic_cohesion: Upstream semantics.
+            independent_change: Upstream changes independently.
+            public_contract: Accepted upstream knowledge.
+          produces:
+            - capability: demo.upstream
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: APPLICATION-DESIGN
+          responsibility: Own downstream knowledge.
+          boundary:
+            semantic_cohesion: Downstream semantics.
+            independent_change: Downstream changes independently.
+            public_contract: Accepted downstream knowledge.
+          produces:
+            - capability: demo.downstream
+              knowledge_kind: application-design
+              requires: [demo.upstream]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume downstream knowledge.
+          requires: [demo.downstream]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities: []
+      artifacts:
+        - id: UPSTREAM
+          authority: DISCOVERY
+          path: docs/upstream.md
+          provides: [demo.upstream]
+          depends_on: []
+        - id: DOWNSTREAM
+          authority: APPLICATION-DESIGN
+          path: docs/downstream.md
+          provides: [demo.downstream]
+          depends_on: [UPSTREAM]
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: UPSTREAM
+          capability: demo.upstream
+          acceptance_id: UPSTREAM-2
+          accepted_prerequisites: {}
+        - artifact: DOWNSTREAM
+          capability: demo.downstream
+          acceptance_id: DOWNSTREAM-1
+          accepted_prerequisites:
+            demo.upstream: UPSTREAM-1
+steps:
+  - id: states
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /demo.upstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: STALE}
+      - {path: /demo.downstream/mismatches/0/current_acceptance_id, op: equals, value: UPSTREAM-2}
+      - {path: /demo.downstream/mismatches/0/accepted_acceptance_id, op: equals, value: UPSTREAM-1}

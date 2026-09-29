@@ -1,0 +1,176 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: source-unit-statement-enumeration-calibration-v1
+
+scope:
+  purpose: >-
+    Calibrate local semantic enumeration from one losslessly covered raw source
+    unit into independently meaningful source statements.
+  project:
+    repository: lehater/napms
+    commit: c403ceed
+  policy: >-
+    Source units are real accepted NAPMS requirement sections. Positive cases
+    enumerate all material statements in the unit. Negative cases omit one
+    material statement while leaving the rest unchanged.
+
+cases:
+  - id: w1-004-enumeration-complete
+    expected_status: ACCEPTED
+    mutation_class: source-unit-enumeration-complete
+    source: >-
+      For one semantic identity tuple, exactly one authoritative Access Rule
+      exists. Repeated materialization of the same Allowed identity is idempotent
+      and resolves the existing Rule ID. On first materialization from Allowed,
+      the Rule starts in Active state. Acceptance intent also states that a
+      NotAllowed proposal creates no Rule.
+    target:
+      - One authoritative Access Rule exists for one semantic identity tuple.
+      - Repeated Allowed materialization is idempotent and resolves the existing Rule ID.
+      - First Allowed materialization starts the Rule in Active state.
+      - A NotAllowed proposal creates no authoritative Rule.
+    relation: TRANSFORMS
+    rationale: Every material product statement in REQ-W1-004 is enumerated.
+
+  - id: w1-008-enumeration-complete
+    expected_status: ACCEPTED
+    mutation_class: source-unit-enumeration-complete
+    source: >-
+      An actor with required read/export authority may select a domain-policy
+      subset for export. At export as-of, a Rule contributes desired effect only
+      when an authoritative Rule exists from an Allowed decision, the Rule is
+      Active, and declarative effective conditions permit effect.
+      Selection/filter semantics operate on domain-policy meaning, not
+      vendor/device syntax.
+    target:
+      - Export selection requires the required read/export authority.
+      - The actor selects a domain-policy subset rather than vendor/device syntax.
+      - A Rule contributes desired effect only if it exists authoritatively from an Allowed decision.
+      - The Rule must be Active at export evaluation time.
+      - Declarative effective conditions must permit effect at export evaluation time.
+    relation: TRANSFORMS
+    rationale: Authority, selection semantics and all contribution predicates are preserved.
+
+  - id: w1-010-enumeration-complete
+    expected_status: ACCEPTED
+    mutation_class: source-unit-enumeration-complete
+    source: >-
+      For the selected effective Rule subset, the product produces a vendor-neutral
+      normalized technical table suitable for downstream human use or a future
+      renderer without reconstructing missing domain meaning. Minimum row semantics
+      include authoritative Rule correlation, Connectivity Decision correlation,
+      source and destination technical realization, DCS-derived protocol/ports/
+      interaction semantics, supported declarative Rule properties, export as-of,
+      and source-fact provenance/effective validity sufficient to explain the
+      projection. Serialization format is an interface choice, not domain meaning.
+    target:
+      - Export is vendor-neutral normalized technical data for downstream use without reconstructing missing domain meaning.
+      - Rows correlate to the authoritative Rule and relevant Connectivity Decision.
+      - Rows include source and destination technical realization.
+      - Rows include DCS-derived protocol, port and interaction semantics required for realization.
+      - Rows include supported declarative Rule properties.
+      - Rows include export as-of.
+      - Rows retain source-fact provenance/effective validity sufficient to explain projection.
+      - CSV, XLSX or another serialization is an interface choice rather than domain meaning.
+    relation: TRANSFORMS
+    rationale: All minimum row-semantics families and the serialization boundary are represented.
+
+  - id: w1-013-enumeration-complete
+    expected_status: ACCEPTED
+    mutation_class: source-unit-enumeration-complete
+    source: >-
+      The product must correlate requesting actor and effective authority
+      scope/time through proposal subject, Connectivity Decision result/reference,
+      authoritative Access Rule identity, relevant Rule state/property history,
+      authoritative realization/DCS facts used for export, and normalized export
+      rows plus export as-of. Storage/event-log/version-token mechanisms are
+      architecture/implementation decisions.
+    target:
+      - Provenance starts with requesting actor and effective authority scope/time.
+      - Provenance includes the Access Rule Proposal semantic subject.
+      - Provenance includes Connectivity Decision reference/result.
+      - Provenance includes authoritative Access Rule ID and semantic identity.
+      - Provenance includes relevant Rule state/property history.
+      - Provenance includes authoritative realization and DCS facts used for export.
+      - Provenance reaches normalized export rows and export as-of.
+      - Storage, event-log and version-token mechanisms remain architecture/implementation choices.
+    relation: TRANSFORMS
+    rationale: The full provenance chain and implementation-choice boundary are enumerated.
+
+  - id: w1-004-enumeration-omission
+    expected_status: REJECTED
+    mutation_class: source-unit-enumeration-omission
+    source: >-
+      For one semantic identity tuple, exactly one authoritative Access Rule
+      exists. Repeated materialization of the same Allowed identity is idempotent
+      and resolves the existing Rule ID. On first materialization from Allowed,
+      the Rule starts in Active state. Acceptance intent also states that a
+      NotAllowed proposal creates no Rule.
+    target:
+      - One authoritative Access Rule exists for one semantic identity tuple.
+      - Repeated Allowed materialization is idempotent and resolves the existing Rule ID.
+      - A NotAllowed proposal creates no authoritative Rule.
+    relation: TRANSFORMS
+    rationale: The initial Active-state requirement is omitted.
+
+  - id: w1-008-enumeration-omission
+    expected_status: REJECTED
+    mutation_class: source-unit-enumeration-omission
+    source: >-
+      An actor with required read/export authority may select a domain-policy
+      subset for export. At export as-of, a Rule contributes desired effect only
+      when an authoritative Rule exists from an Allowed decision, the Rule is
+      Active, and declarative effective conditions permit effect.
+      Selection/filter semantics operate on domain-policy meaning, not
+      vendor/device syntax.
+    target:
+      - The actor selects a domain-policy subset rather than vendor/device syntax.
+      - A Rule contributes desired effect only if it exists authoritatively from an Allowed decision.
+      - The Rule must be Active at export evaluation time.
+      - Declarative effective conditions must permit effect at export evaluation time.
+    relation: TRANSFORMS
+    rationale: The required read/export authority statement is omitted.
+
+  - id: w1-010-enumeration-omission
+    expected_status: REJECTED
+    mutation_class: source-unit-enumeration-omission
+    source: >-
+      For the selected effective Rule subset, the product produces a vendor-neutral
+      normalized technical table suitable for downstream human use or a future
+      renderer without reconstructing missing domain meaning. Minimum row semantics
+      include authoritative Rule correlation, Connectivity Decision correlation,
+      source and destination technical realization, DCS-derived protocol/ports/
+      interaction semantics, supported declarative Rule properties, export as-of,
+      and source-fact provenance/effective validity sufficient to explain the
+      projection. Serialization format is an interface choice, not domain meaning.
+    target:
+      - Export is vendor-neutral normalized technical data for downstream use without reconstructing missing domain meaning.
+      - Rows correlate to the authoritative Rule and relevant Connectivity Decision.
+      - Rows include source and destination technical realization.
+      - Rows include DCS-derived protocol, port and interaction semantics required for realization.
+      - Rows include supported declarative Rule properties.
+      - Rows include export as-of.
+      - CSV, XLSX or another serialization is an interface choice rather than domain meaning.
+    relation: TRANSFORMS
+    rationale: Source-fact provenance/effective-validity semantics are omitted.
+
+  - id: w1-013-enumeration-omission
+    expected_status: REJECTED
+    mutation_class: source-unit-enumeration-omission
+    source: >-
+      The product must correlate requesting actor and effective authority
+      scope/time through proposal subject, Connectivity Decision result/reference,
+      authoritative Access Rule identity, relevant Rule state/property history,
+      authoritative realization/DCS facts used for export, and normalized export
+      rows plus export as-of. Storage/event-log/version-token mechanisms are
+      architecture/implementation decisions.
+    target:
+      - Provenance includes the Access Rule Proposal semantic subject.
+      - Provenance includes Connectivity Decision reference/result.
+      - Provenance includes authoritative Access Rule ID and semantic identity.
+      - Provenance includes relevant Rule state/property history.
+      - Provenance includes authoritative realization and DCS facts used for export.
+      - Provenance reaches normalized export rows and export as-of.
+      - Storage, event-log and version-token mechanisms remain architecture/implementation choices.
+    relation: TRANSFORMS
+    rationale: Requesting actor and effective authority scope/time are omitted.

@@ -1,0 +1,387 @@
+version: 1
+kind: harness-scenario
+id: live-semantic-evaluator-calibration
+title: Live calibration is blinded, bound, fail-closed and stability-aware
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - live-semantic-evaluator-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/calibration-corpus-v3.yaml
+
+  protocol:
+    yaml: ../../../spec/semantic-derivation/live-calibration-protocol-v2.yaml
+
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: evaluator-a
+      provider: example
+      model: semantic-evaluator
+      model_version: "1"
+      configuration: {temperature: 0}
+      adapter: {id: example-adapter, version: "1"}
+
+steps:
+  - id: request-a
+    driver: semantic.live_calibration.request
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: RUN-A
+    expect:
+      - {path: /cases, op: length, value: 14}
+      - {path: /cases/0/case_request_id, op: exists}
+      - {path: /cases/0/id, op: not_exists}
+      - {path: /cases/0/expected_status, op: not_exists}
+      - {path: /cases/0/mutation_class, op: not_exists}
+      - {path: /cases/0/rationale, op: not_exists}
+
+  - id: run-a-record
+    driver: data.patch
+    with:
+      value:
+        version: 1
+        kind: harness-live-semantic-calibration-run
+        run_id: RUN-A
+        request_id: {ref: step.request-a#/request_id}
+        state: COMPLETED
+        results:
+          - {case_request_id: {ref: step.request-a#/cases/0/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/1/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/2/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/3/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/4/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/5/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/6/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/7/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/8/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/10/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/11/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/12/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a#/cases/13/case_request_id}, status: REJECTED}
+      operations: []
+
+  - id: valid-run-a
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.run-a-record}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /calibration/confusion/false_negative, op: equals, value: 0}
+      - {path: /calibration/confusion/false_positive, op: equals, value: 0}
+      - {path: /independence/status, op: equals, value: UNVERIFIED}
+
+  - id: changed-evaluator
+    driver: data.patch
+    with:
+      value: {ref: fixture.evaluator}
+      operations:
+        - {op: replace, path: /configuration/temperature, value: 0.2}
+
+  - id: reject-changed-evaluator
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: step.changed-evaluator}
+      run: {ref: step.run-a-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_REQUEST_BINDING_MISMATCH}}
+
+  - id: changed-corpus
+    driver: data.patch
+    with:
+      value: {ref: fixture.corpus}
+      operations:
+        - {op: replace, path: /cases/0/target, value: Changed target semantics.}
+
+  - id: reject-changed-corpus
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: step.changed-corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.run-a-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_REQUEST_BINDING_MISMATCH}}
+
+  - id: changed-protocol
+    driver: data.patch
+    with:
+      value: {ref: fixture.protocol}
+      operations:
+        - {op: replace, path: /instruction, value: Changed protocol instruction.}
+
+  - id: reject-changed-protocol
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: step.changed-protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.run-a-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_REQUEST_BINDING_MISMATCH}}
+
+  - id: stale-run-id
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: replace, path: /run_id, value: RUN-STALE}
+
+  - id: reject-stale-run
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.stale-run-id}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_REQUEST_BINDING_MISMATCH}}
+
+  - id: wrong-case-binding
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: replace, path: /results/0/case_request_id, value: LCCASE-NOT-BOUND}
+
+  - id: reject-wrong-case-binding
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.wrong-case-binding}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_UNKNOWN_CASE_BINDING}}
+
+  - id: missing-prediction-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: remove, path: /results/9}
+
+  - id: reject-missing-prediction
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.missing-prediction-record}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /calibration/status, op: equals, value: INCOMPLETE}
+      - {path: /calibration/missing, op: contains, value: semantic-outcome-substitution}
+
+  - id: duplicate-prediction-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - op: add
+          path: /results/-
+          value: {ref: step.run-a-record#/results/0}
+
+  - id: reject-duplicate-prediction
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.duplicate-prediction-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_DUPLICATE_RESULT}}
+
+  - id: malformed-prediction-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: replace, path: /results/0/status, value: UNKNOWN}
+
+  - id: reject-malformed-prediction
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.malformed-prediction-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_VERDICT_INVALID}}
+
+  - id: no-verdict-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: remove, path: /results/0/status}
+
+  - id: reject-no-verdict
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.no-verdict-record}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_VERDICT_INVALID}}
+
+  - id: interrupted-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: replace, path: /state, value: INTERRUPTED}
+
+  - id: reject-interrupted-run
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.interrupted-record}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_RUN_NOT_COMPLETED, state: INTERRUPTED}}
+
+  - id: unavailable-record
+    driver: data.patch
+    with:
+      value: {ref: step.run-a-record}
+      operations:
+        - {op: replace, path: /state, value: UNAVAILABLE}
+
+  - id: reject-unavailable-run
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.unavailable-record}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /findings, op: contains_match, value: {code: LIVE_CALIBRATION_RUN_NOT_COMPLETED, state: UNAVAILABLE}}
+
+  - id: request-a2
+    driver: semantic.live_calibration.request
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: RUN-A2
+
+  - id: unstable-run-record
+    driver: data.patch
+    with:
+      value:
+        version: 1
+        kind: harness-live-semantic-calibration-run
+        run_id: RUN-A2
+        request_id: {ref: step.request-a2#/request_id}
+        state: COMPLETED
+        results:
+          - {case_request_id: {ref: step.request-a2#/cases/0/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/1/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/2/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/3/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/4/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/5/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/6/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/7/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/8/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/10/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/11/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/12/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-a2#/cases/13/case_request_id}, status: REJECTED}
+      operations: []
+
+  - id: unstable-run
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run: {ref: step.unstable-run-record}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /calibration/confusion/false_negative, op: equals, value: 1}
+
+  - id: detect-instability
+    driver: semantic.live_calibration.stability
+    with:
+      evaluations:
+        - {ref: step.valid-run-a}
+        - {ref: step.unstable-run}
+    expect:
+      - {path: /status, op: equals, value: UNSTABLE}
+      - {path: /unstable_cases, op: contains, value: semantic-weakening}
+
+  - id: request-b
+    driver: semantic.live_calibration.request
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: step.changed-evaluator}
+      run_id: RUN-B
+
+  - id: run-b-record
+    driver: data.patch
+    with:
+      value:
+        version: 1
+        kind: harness-live-semantic-calibration-run
+        run_id: RUN-B
+        request_id: {ref: step.request-b#/request_id}
+        state: COMPLETED
+        results:
+          - {case_request_id: {ref: step.request-b#/cases/0/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/1/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/2/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/3/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/4/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/5/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/6/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/7/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/8/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/10/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/11/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/12/case_request_id}, status: ACCEPTED}
+          - {case_request_id: {ref: step.request-b#/cases/13/case_request_id}, status: REJECTED}
+      operations: []
+
+  - id: valid-run-b
+    driver: semantic.live_calibration.validate
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: step.changed-evaluator}
+      run: {ref: step.run-b-record}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /calibration/metrics/detection_recall, op: equals, value: 1.0}
+      - {path: /calibration/metrics/false_positive_rate, op: equals, value: 0.0}
+      - {path: /evaluator/fingerprint, op: not_equals, value: {ref: step.valid-run-a#/evaluator/fingerprint}}

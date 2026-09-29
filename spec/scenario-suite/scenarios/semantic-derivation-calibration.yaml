@@ -1,0 +1,331 @@
+version: 1
+kind: harness-scenario
+id: semantic-derivation-calibration-corpus
+title: Expert-labelled semantic derivation calibration corpus
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: agent-evaluation
+covers:
+  - semantic-derivation-truth
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SEMANTIC-DERIVATION-CALIBRATION
+      authorities:
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own observable product and policy semantics.
+          boundary: {semantic_cohesion: Product and policy intent., independent_change: Intent changes independently., public_contract: Accepted product semantics.}
+          produces:
+            - {capability: calibration.source, knowledge_kind: product-requirements, requires: []}
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own user-visible realization semantics.
+          boundary: {semantic_cohesion: Human interaction realization., independent_change: Interaction can change behind accepted product semantics., public_contract: Accepted interaction semantics.}
+          produces:
+            - {capability: calibration.target, knowledge_kind: interaction-design, requires: [calibration.source]}
+      consumers:
+        - {id: FRONTEND, purpose: Consume calibrated interaction semantics., requires: [calibration.target]}
+      terminal_capabilities: []
+
+  contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: calibration.source
+      target_capability: calibration.target
+      obligations:
+        - {id: claims, source_kind: calibration-claim, min_count: 1}
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [HUMAN, EVALUATOR]
+
+  weakening-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-WEAKEN, kind: calibration-claim, subject: EDIT, semantic_value: Unauthorized actors must not execute resource edits., decision_authority: PRODUCT-REQUIREMENTS}
+  weakening-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-WEAKEN, kind: interaction-policy, subject: EDIT, semantic_value: Warn unauthorized actors but allow the edit to proceed., decision_authority: HUMAN-INTERFACE-DESIGN}
+  weakening-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-WEAKEN, sources: [SRC-WEAKEN], relation: REALIZES, targets: [TGT-WEAKEN]}
+      dispositions: []
+
+  inversion-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-INVERT, kind: calibration-claim, subject: FORM, semantic_value: Validation failure preserves all valid entered values., decision_authority: PRODUCT-REQUIREMENTS}
+  inversion-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-INVERT, kind: interaction-recovery, subject: FORM, semantic_value: Validation failure clears all entered values., decision_authority: HUMAN-INTERFACE-DESIGN}
+  inversion-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-INVERT, sources: [SRC-INVERT], relation: REALIZES, targets: [TGT-INVERT]}
+      dispositions: []
+
+  subject-swap-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-SUBJECT, kind: calibration-claim, subject: RESOURCE-A, semantic_value: Actor may edit only RESOURCE-A., decision_authority: PRODUCT-REQUIREMENTS}
+  subject-swap-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-SUBJECT, kind: interaction-policy, subject: RESOURCE-B, semantic_value: Actor may edit RESOURCE-B., decision_authority: HUMAN-INTERFACE-DESIGN}
+  subject-swap-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-SUBJECT, sources: [SRC-SUBJECT], relation: PRESERVES, targets: [TGT-SUBJECT]}
+      dispositions: []
+
+  paraphrase-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-PARAPHRASE, kind: calibration-claim, subject: EDIT, semantic_value: Unauthorized actors must not execute resource edits., decision_authority: PRODUCT-REQUIREMENTS}
+  paraphrase-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-PARAPHRASE, kind: interaction-policy, subject: EDIT, semantic_value: Deny edit execution when the actor lacks authorization., decision_authority: HUMAN-INTERFACE-DESIGN}
+  paraphrase-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-PARAPHRASE, sources: [SRC-PARAPHRASE], relation: TRANSFORMS, targets: [TGT-PARAPHRASE]}
+      dispositions: []
+
+  decomposition-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-DECOMPOSE, kind: calibration-claim, subject: FORM, semantic_value: On validation failure preserve valid entered values and explain the invalid field., decision_authority: PRODUCT-REQUIREMENTS}
+  decomposition-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-KEEP, kind: interaction-recovery, subject: FORM, semantic_value: Preserve valid entered values., decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: TGT-ERROR, kind: interaction-feedback, subject: FORM, semantic_value: Explain the invalid field., decision_authority: HUMAN-INTERFACE-DESIGN}
+  decomposition-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-DECOMPOSE, sources: [SRC-DECOMPOSE], relation: REALIZES, targets: [TGT-KEEP, TGT-ERROR]}
+      dispositions: []
+
+  aggregation-source:
+    value:
+      semantic_assertions:
+        - {id: SRC-AUTH, kind: calibration-claim, subject: EDIT, semantic_value: Unauthorized actors must not execute resource edits., decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: SRC-OUTCOME, kind: calibration-claim, subject: EDIT, semantic_value: Successful resource edits must expose the changed state., decision_authority: PRODUCT-REQUIREMENTS}
+  aggregation-target:
+    value:
+      semantic_assertions:
+        - {id: TGT-AGG, kind: interaction-policy, subject: EDIT, semantic_value: Authorized edits expose the changed state; unauthorized edits are denied., decision_authority: HUMAN-INTERFACE-DESIGN}
+  aggregation-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: calibration.source
+      target_capability: calibration.target
+      links:
+        - {id: LINK-AGG, sources: [SRC-AUTH, SRC-OUTCOME], relation: TRANSFORMS, targets: [TGT-AGG]}
+      dispositions: []
+
+steps:
+  - id: weakening-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.weakening-source}, candidate: {ref: fixture.weakening-target}, evidence: {ref: fixture.weakening-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: weakening-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.weakening-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.weakening-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: REJECTED
+            reviewed_links: [LINK-WEAKEN]
+            checks: [meaning-preserved, relation-justified]
+            findings: [{link: LINK-WEAKEN, code: SEMANTIC_WEAKENING, rationale: Warning plus execution is weaker than mandatory denial.}]
+  - id: weakening-detected
+    driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection, mutation_detection]
+      mutation_class: semantic-weakening
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.weakening-source}, candidate: {ref: fixture.weakening-target}, evidence: {ref: step.weakening-labelled}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REJECTED}}
+
+  - id: inversion-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.inversion-source}, candidate: {ref: fixture.inversion-target}, evidence: {ref: fixture.inversion-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: inversion-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.inversion-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.inversion-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: REJECTED
+            reviewed_links: [LINK-INVERT]
+            checks: [meaning-preserved, relation-justified]
+            findings: [{link: LINK-INVERT, code: SEMANTIC_INVERSION, rationale: Clearing values contradicts preservation.}]
+  - id: inversion-detected
+    driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection, mutation_detection]
+      mutation_class: semantic-inversion
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.inversion-source}, candidate: {ref: fixture.inversion-target}, evidence: {ref: step.inversion-labelled}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+
+  - id: subject-swap-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.subject-swap-source}, candidate: {ref: fixture.subject-swap-target}, evidence: {ref: fixture.subject-swap-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: subject-swap-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.subject-swap-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.subject-swap-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: REJECTED
+            reviewed_links: [LINK-SUBJECT]
+            checks: [meaning-preserved, relation-justified]
+            findings: [{link: LINK-SUBJECT, code: SUBJECT_MISMATCH, rationale: RESOURCE-A semantics cannot be preserved as RESOURCE-B.}]
+  - id: subject-swap-detected
+    driver: semantic.derivation
+    benchmark:
+      metrics: [semantic_truth_detection, mutation_detection]
+      mutation_class: semantic-subject-swap
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.subject-swap-source}, candidate: {ref: fixture.subject-swap-target}, evidence: {ref: step.subject-swap-labelled}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+
+  - id: paraphrase-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.paraphrase-source}, candidate: {ref: fixture.paraphrase-target}, evidence: {ref: fixture.paraphrase-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: paraphrase-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.paraphrase-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.paraphrase-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links: [LINK-PARAPHRASE]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+  - id: paraphrase-accepted
+    driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: valid-paraphrase
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.paraphrase-source}, candidate: {ref: fixture.paraphrase-target}, evidence: {ref: step.paraphrase-labelled}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: decomposition-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.decomposition-source}, candidate: {ref: fixture.decomposition-target}, evidence: {ref: fixture.decomposition-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: decomposition-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.decomposition-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.decomposition-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links: [LINK-DECOMPOSE]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+  - id: decomposition-accepted
+    driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control, alternative_valid_acceptance]
+      mutation_class: valid-decomposition
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.decomposition-source}, candidate: {ref: fixture.decomposition-target}, evidence: {ref: step.decomposition-labelled}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: aggregation-request
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.aggregation-source}, candidate: {ref: fixture.aggregation-target}, evidence: {ref: fixture.aggregation-evidence}}
+    expect: [{path: /status, op: equals, value: REJECTED}]
+  - id: aggregation-labelled
+    driver: data.patch
+    with:
+      value: {ref: fixture.aggregation-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.aggregation-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links: [LINK-AGG]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+  - id: aggregation-accepted
+    driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control, alternative_valid_acceptance]
+      mutation_class: valid-aggregation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.aggregation-source}, candidate: {ref: fixture.aggregation-target}, evidence: {ref: step.aggregation-labelled}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}

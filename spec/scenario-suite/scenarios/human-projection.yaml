@@ -1,0 +1,58 @@
+version: 1
+kind: harness-scenario
+id: human-projection-derives-from-canonical-closure
+title: Human documentation projection follows canonical Consumer closure
+dimensions:
+  project_archetype: real-project
+  stage: implementation
+  behavior_class: projection
+  execution_type: deterministic
+covers:
+  - human-documentation-projection
+
+fixtures:
+  shape:
+    yaml: ../../unified-model-acceptance/napms-shape.yaml
+
+steps:
+  - id: project
+    driver: canonical.project
+    with:
+      source_graph: {ref: fixture.shape#/source_graph}
+      projection: {ref: fixture.shape#/projection}
+
+  - id: manifest
+    driver: human.compile_manifest
+    with:
+      engineering_graph: {ref: fixture.shape#/engineering_graph}
+      model: {ref: step.project}
+      consumer_id: BACKEND-IMPLEMENTATION
+      harness_version: scenario-suite
+      project_revision: fixture
+      recipe_id: backend-review
+    expect:
+      - {path: /consumer, op: equals, value: BACKEND-IMPLEMENTATION}
+      - {path: /target/status, op: equals, value: COMPLETE}
+      - {path: /unresolved, op: length, value: 0}
+      - {path: /sources, op: contains_match, value: {artifact: REQUIREMENTS, path: docs/requirements.yaml}}
+      - {path: /sources, op: contains_match, value: {artifact: IMPLEMENTATION-DESIGN, path: docs/implementation-design.yaml}}
+
+  - id: remove-provider
+    driver: data.patch
+    with:
+      value: {ref: step.project}
+      operations:
+        - {op: remove, path: /artifacts/5}
+
+  - id: incomplete-manifest
+    driver: human.compile_manifest
+    with:
+      engineering_graph: {ref: fixture.shape#/engineering_graph}
+      model: {ref: step.remove-provider}
+      consumer_id: BACKEND-IMPLEMENTATION
+      harness_version: scenario-suite
+      project_revision: fixture
+      recipe_id: backend-review
+    expect:
+      - {path: /target/status, op: equals, value: READY}
+      - {path: /unresolved, op: contains_match, value: {capability: example.implementation-design}}

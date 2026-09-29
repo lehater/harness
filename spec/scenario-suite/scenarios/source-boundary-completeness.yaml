@@ -1,0 +1,137 @@
+version: 1
+kind: harness-scenario
+id: source-boundary-prevents-silent-statement-enumeration-loss
+title: Lossless source boundary detects source text omitted before statement coverage
+dimensions:
+  project_archetype: real-project
+  stage: discovery
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - source-coverage-completeness
+
+fixtures:
+  source:
+    value: |-
+      ### REQ-W1-004 — Materialize one authoritative Access Rule per semantic identity
+
+      Status: `accepted`.
+      Disposition: `new` target requirement.
+
+      For one semantic identity tuple, exactly one authoritative Access Rule exists. Repeated materialization of the same `Allowed` identity is idempotent and resolves the existing Rule ID.
+
+      On first materialization from `Allowed`, the Rule starts in `Active` state.
+
+      Acceptance intent:
+      - first allowed materialization -> stable Rule ID + `Active`;
+      - repeated allowed materialization -> same Rule ID, no duplicate Rule;
+      - not-allowed proposal -> no Rule.
+
+      ### REQ-W1-005 — Maintain operational Rule state independently from permission
+
+      Status: `accepted`.
+      Disposition: `new` target requirement.
+
+      Wave 1 supports:
+
+      ```text
+      Active <-> Inactive
+      ```
+
+      `Inactive` preserves Rule identity/history but removes desired network effect. Changing `Active/Inactive` does not require a new Connectivity Decision.
+
+      Every state transition is auditable at business level.
+
+      ### REQ-W1-006 — Maintain supported declarative operational properties
+
+      Status: `accepted at current D1 depth`.
+      Disposition: `new/change` target requirement.
+
+      An allowed Rule may carry supported declarative operational properties required by Wave 1, including schedule/periodicity where applicable. These properties describe when/how an already allowed Rule contributes desired effect and do not redefine Rule identity or decision subject.
+
+      Exact tactical representation is deferred to implementation design; material examples are owned by WP-04.
+
+  incomplete-statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-WAVE1-STATEMENT-ENUMERATION-RED
+      source_baseline: lehater/napms@c403ceed:docs/requirements/wave1-product-requirements.md
+      coverage_status: COMPLETE
+      statements:
+        - id: REQ-W1-004
+          source_ref: docs/requirements/wave1-product-requirements.md#REQ-W1-004
+          text: Materialize one authoritative Access Rule per semantic identity.
+        - id: REQ-W1-005
+          source_ref: docs/requirements/wave1-product-requirements.md#REQ-W1-005
+          text: Maintain operational Rule state independently from permission.
+      dispositions:
+        - statement_id: REQ-W1-004
+          classification: ADMITTED
+          admitted_ref: admitted-source.yaml#REQ-W1-004
+          sanitized_statement: Materialize one authoritative Access Rule per semantic identity.
+        - statement_id: REQ-W1-005
+          classification: ADMITTED
+          admitted_ref: admitted-source.yaml#REQ-W1-005
+          sanitized_statement: Maintain operational Rule state independently from permission.
+
+  incomplete-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-WAVE1-SOURCE-BOUNDARY-RED
+      source_baseline: lehater/napms@c403ceed:docs/requirements/wave1-product-requirements.md#REQ-W1-004..REQ-W1-006
+      source_sha256: 98f732c1cc1660debbd9c5c218b07227d4ff5a437a0b872b8ab26d39f2ce4757
+      segments:
+        - {id: REQ-W1-004-BLOCK, start_line: 1, end_line: 14}
+        - {id: REQ-W1-005-BLOCK, start_line: 15, end_line: 29}
+
+  complete-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-WAVE1-SOURCE-BOUNDARY-COMPLETE
+      source_baseline: lehater/napms@c403ceed:docs/requirements/wave1-product-requirements.md#REQ-W1-004..REQ-W1-006
+      source_sha256: 98f732c1cc1660debbd9c5c218b07227d4ff5a437a0b872b8ab26d39f2ce4757
+      segments:
+        - {id: REQ-W1-004-BLOCK, start_line: 1, end_line: 14}
+        - {id: REQ-W1-005-BLOCK, start_line: 15, end_line: 29}
+        - {id: REQ-W1-006-BLOCK, start_line: 30, end_line: 37}
+
+steps:
+  - id: existing-ledger-can-look-complete
+    driver: source.coverage
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: source-statement-enumeration-omission
+    with:
+      document: {ref: fixture.incomplete-statement-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 2}
+
+  - id: boundary-detects-uncovered-source
+    driver: source.boundary
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: source-boundary-omission
+    with:
+      source: {ref: fixture.source}
+      manifest: {ref: fixture.incomplete-boundary}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /source/line_count, op: equals, value: 37}
+      - {path: /covered_line_count, op: equals, value: 29}
+      - {path: /findings, op: contains_match, value: {code: UNCOVERED_SOURCE_LINES}}
+
+  - id: full-boundary-accepts
+    driver: source.boundary
+    with:
+      source: {ref: fixture.source}
+      manifest: {ref: fixture.complete-boundary}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 37}
+      - {path: /segment_count, op: equals, value: 3}
+      - {path: /covered_line_count, op: equals, value: 37}

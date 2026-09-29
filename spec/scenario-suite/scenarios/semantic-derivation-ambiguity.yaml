@@ -1,0 +1,100 @@
+version: 1
+kind: harness-scenario
+id: semantic-derivation-ambiguity
+title: Ambiguous downstream-owned derivation becomes a downstream Question
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: agent-evaluation
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: interaction-design}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DERIVATION-AMBIGUITY
+      authorities:
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own observable product behavior.
+          boundary: {semantic_cohesion: Product behavior., independent_change: Product intent changes independently., public_contract: Accepted requirements.}
+          produces:
+            - {capability: demo.requirement, knowledge_kind: product-requirements, requires: []}
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own interaction realization choices.
+          boundary: {semantic_cohesion: Human interaction semantics., independent_change: Interaction can change behind product behavior., public_contract: Accepted interaction design.}
+          produces:
+            - {capability: demo.interaction, knowledge_kind: interaction-design, requires: [demo.requirement]}
+      consumers:
+        - {id: FRONTEND, purpose: Consume interaction design., requires: [demo.interaction]}
+      terminal_capabilities: []
+
+  source:
+    value:
+      semantic_assertions:
+        - id: REQ-DENY
+          kind: product-security-requirement
+          subject: EDIT-RESOURCE
+          semantic_value: Unauthorized users must not execute resource edits.
+          decision_authority: PRODUCT-REQUIREMENTS
+
+  candidate:
+    value:
+      semantic_assertions: []
+
+  evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.requirement
+      target_capability: demo.interaction
+      links: []
+      dispositions:
+        - source: REQ-DENY
+          status: QUESTION
+          rationale: >-
+            Product semantics require denial but do not choose whether the
+            interaction hides or disables the edit action. That realization
+            choice belongs to Human Interface Design.
+
+steps:
+  - id: ambiguous-derivation
+    driver: semantic.derivation
+    benchmark:
+      metrics: [ambiguity_handling, root_cause_localization]
+      mutation_class: ambiguous-downstream-choice
+    with:
+      graph: {ref: fixture.graph}
+      contract:
+        version: 1
+        kind: harness-semantic-derivation-contract
+        source_capability: demo.requirement
+        target_capability: demo.interaction
+        obligations:
+          - {id: authorization-behavior, source_kind: product-security-requirement}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: fixture.evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: DERIVATION_QUESTION, source: REQ-DENY, owner_authority: HUMAN-INTERFACE-DESIGN}}
+      - {path: /findings, op: not_contains_match, value: {code: MISSING_REQUIRED_INPUT}}
+
+  - id: route-ambiguity
+    driver: semantic.questions
+    benchmark:
+      metrics: [ambiguity_handling, question_owner_routing]
+      mutation_class: ambiguous-downstream-choice
+    with:
+      graph: {ref: fixture.graph}
+      evaluation: {ref: step.ambiguous-derivation}
+    expect:
+      - {path: /, op: length, value: 1}
+      - {path: /0/authority, op: equals, value: HUMAN-INTERFACE-DESIGN}
+      - {path: /0/blocks_capabilities, op: equals, value: [demo.interaction]}
+      - {path: /, op: not_contains_match, value: {authority: PRODUCT-REQUIREMENTS}}

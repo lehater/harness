@@ -1,0 +1,78 @@
+version: 1
+kind: harness-scenario
+id: semantic-process-error-does-not-create-question
+title: Process validation failures do not become semantic Questions
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-process-error-no-question
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: PROCESS-ERROR-NO-QUESTION
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own application semantics.
+          boundary:
+            semantic_cohesion: Application semantics.
+            independent_change: Application design changes independently.
+            public_contract: Accepted application design.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume application design.
+          requires: [demo.application]
+      terminal_capabilities: []
+  contract:
+    value:
+      authority: APPLICATION-DESIGN
+      owned_assertion_kinds: [application-behavior]
+      obligations: []
+      requires_assertion_authority: true
+      requires_source_authority: false
+      requires_semantic_review: true
+      required_semantic_review_checks: [no-invention]
+  sources:
+    value:
+      semantic_assertions: []
+  candidate:
+    value:
+      id: APPLICATION
+      capability: demo.application
+      semantic_assertions:
+        - id: APP-BEHAVIOR
+          kind: application-behavior
+          semantic_value: Coordinate accepted use case.
+          decision_authority: APPLICATION-DESIGN
+      semantic_review:
+        status: ACCEPTED
+        checks: []
+
+steps:
+  - id: evaluate
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.contract}
+      sources: {ref: fixture.sources}
+      candidate: {ref: fixture.candidate}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_REVIEW_CHECKS_MISSING}}
+
+  - id: questions
+    driver: semantic.questions
+    with:
+      graph: {ref: fixture.graph}
+      capability: demo.application
+      evaluation: {ref: step.evaluate}
+    expect:
+      - {path: /, op: length, value: 0}

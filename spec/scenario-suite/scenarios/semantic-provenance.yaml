@@ -1,0 +1,72 @@
+version: 1
+kind: harness-scenario
+id: semantic-provenance-enforces-read-boundary
+title: Semantic provenance rejects source knowledge from a forbidden Authority
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-provenance-enforcement
+
+fixtures:
+  contract:
+    value:
+      authority: PRODUCT-REQUIREMENTS
+      owned_assertion_kinds: [product-requirement]
+      allowed_source_authorities: [USER-NEEDS, PRODUCT-REQUIREMENTS]
+      requires_source_authority: true
+      requires_assertion_authority: true
+  sources:
+    value:
+      semantic_assertions:
+        - id: DOMAIN-SOURCE
+          kind: domain-decision
+          subject: request-authority
+          semantic_value: Domain-specific authority rule.
+          decision_authority: DOMAIN-DESIGN
+  candidate:
+    value:
+      id: PRODUCT
+      capability: demo.product
+      semantic_assertions:
+        - id: PRODUCT-REQ
+          kind: product-requirement
+          subject: request-authority
+          semantic_value: Only authorized actors may submit.
+          derived_from: [DOMAIN-SOURCE]
+          decision_authority: PRODUCT-REQUIREMENTS
+
+steps:
+  - id: forbidden-source
+    driver: semantic.acceptance
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: provenance-owner-drift
+    with:
+      contract: {ref: fixture.contract}
+      sources: {ref: fixture.sources}
+      candidate: {ref: fixture.candidate}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SOURCE_AUTHORITY_VIOLATION, source_authority: DOMAIN-DESIGN}}
+
+  - id: admit-source
+    driver: data.patch
+    with:
+      value: {ref: fixture.sources}
+      operations:
+        - {op: replace, path: /semantic_assertions/0/decision_authority, value: USER-NEEDS}
+
+  - id: allowed-source
+    driver: semantic.acceptance
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: allowed-provenance
+    with:
+      contract: {ref: fixture.contract}
+      sources: {ref: step.admit-source}
+      candidate: {ref: fixture.candidate}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}

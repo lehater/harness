@@ -1,0 +1,361 @@
+version: 1
+kind: harness-scenario-coverage-catalog
+id: harness-scenario-coverage-v1
+
+dimensions:
+  project_archetype:
+    - synthetic
+    - user-facing
+    - backend-service
+    - data-integration
+    - library
+    - real-project
+  stage:
+    - bootstrap
+    - discovery
+    - design
+    - decision
+    - implementation
+    - revalidation
+    - diagnosis
+  behavior_class:
+    - structural
+    - semantic
+    - routing
+    - activation
+    - decision
+    - lifecycle
+    - coverage
+    - diagnosis
+    - applicability
+    - integration
+    - workspace
+    - projection
+    - frontend
+    - assurance
+  execution_type:
+    - deterministic
+    - agent-evaluation
+    - real-project
+
+required_scenario_dimensions:
+  - project_archetype
+  - stage
+  - behavior_class
+  - execution_type
+
+required_dimension_values:
+  stage: [bootstrap, design, decision, implementation, revalidation, diagnosis]
+  behavior_class:
+    - structural
+    - semantic
+    - routing
+    - activation
+    - decision
+    - lifecycle
+    - coverage
+    - diagnosis
+    - applicability
+  execution_type: [deterministic, agent-evaluation]
+
+required_benchmark_metrics:
+  - mutation_detection
+  - ambiguity_handling
+  - false_positive_control
+  - question_owner_routing
+  - root_cause_localization
+  - blocking_behavior
+  - alternative_valid_acceptance
+  - selective_revalidation
+  - semantic_truth_detection
+
+required_drivers:
+  - repository.realization
+  - coverage.subject_obligations
+  - coverage.subject_inventory
+  - authority.context
+  - source.coverage
+  - core.validate
+  - data.patch
+  - engineering.target
+  - semantic.acceptance
+  - semantic.derivation
+  - semantic.derivation_test_coverage
+  - semantic.judgement_calibration
+  - semantic.live_calibration.request
+  - semantic.live_calibration.validate
+  - semantic.live_calibration.stability
+  - semantic.questions
+  - semantic.apply_questions
+  - semantic.closure
+  - lifecycle.states
+  - agent.route
+  - concern.activation
+  - decision.roadmap
+  - decision.exploration
+  - decision.governance
+  - engineering.coverage
+  - graph.doctor
+  - project.authority_bootstrap
+  - project.status
+  - canonical.project
+  - canonical.alignment
+  - workspace.load
+  - workspace.render
+  - decision.execution_assurance
+  - human.compile_manifest
+  - frontend.ux_closure
+  - frontend.screen_contracts
+  - skill.invariant_policy
+
+requirements:
+  - id: structural-target-reaction
+    description: Structural target state reacts to provider presence or absence.
+    min_scenarios: 1
+
+  - id: fixture-mutation
+    description: A known-good state can be mutated without modifying its source fixture.
+    min_scenarios: 1
+
+  - id: semantic-gap-question-routing
+    description: Missing semantic knowledge becomes a Question for the owning Authority.
+    min_scenarios: 1
+
+  - id: recurring-question-reopen
+    description: A recurring semantic gap reopens a previously resolved deterministic Question.
+    min_scenarios: 1
+
+  - id: lifecycle-currentness
+    description: Changed upstream acceptance makes dependent accepted knowledge stale when no finer semantic dependency baseline is available.
+    min_scenarios: 1
+
+  - id: selective-lifecycle-revalidation
+    category: lifecycle
+    enforcement: required
+    description: A downstream Capability remains current when only unconsumed upstream semantic atoms change and becomes stale when a consumed atom changes.
+    min_scenarios: 1
+
+  - id: create-work-skill-routing
+    description: Actionable CREATE work is routed to the registered knowledge-kind skill.
+    min_scenarios: 1
+
+  - id: blocked-work-not-routed
+    description: Blocked work remains WAIT and is not sent to an artifact producer.
+    min_scenarios: 1
+
+  - id: concern-activation-selectivity
+    description: Baseline, rule-derived and explicit concerns activate while irrelevant concerns remain inactive.
+    min_scenarios: 1
+
+  - id: decision-frontier-ordering
+    description: Decision roadmap exposes only capabilities whose prerequisites are current and leaves downstream work waiting.
+    min_scenarios: 1
+
+  - id: decision-exploration-blindness
+    description: Pre-choice exploration rejects evidence contaminated with a selected or preferred solution.
+    min_scenarios: 1
+
+  - id: decision-autonomy-escalation
+    description: A material choice beyond delegated autonomy is rejected unless escalated through an owning Authority Question.
+    min_scenarios: 1
+
+  - id: engineering-coverage-gap
+    description: Engineering Coverage exposes missing activated engineering knowledge even when structural artifacts exist.
+    min_scenarios: 1
+
+  - id: graph-diagnostics
+    description: Graph Doctor exposes structural ownership or dependency defects without treating normal incompleteness as a graph error.
+    min_scenarios: 1
+
+  - id: authority-applicability
+    description: Project Authority bootstrap infers only evidence-backed applicability and leaves unknown Authorities unassessed.
+    min_scenarios: 1
+
+  - id: authority-operational-status
+    description: Project status projects REQUIRED Authorities into NOT_STARTED, IN_PROGRESS or BLOCKED from canonical artifacts and Questions.
+    min_scenarios: 1
+
+
+  # Known functional surface not yet promoted to mandatory scenario coverage.
+  # These entries make the remaining test roadmap explicit without weakening
+  # the already-required behaviors above.
+
+  - id: core-model-invalid-rejected
+    category: core
+    enforcement: required
+    description: Invalid Core ownership, dependency or Question structure is rejected deterministically.
+    min_scenarios: 1
+
+  - id: canonical-projection-alignment
+    category: integration
+    enforcement: required
+    description: Project-native canonical graphs project into Core without hidden or phantom dependencies.
+    min_scenarios: 1
+
+  - id: workspace-managed-artifact-validation
+    category: workspace
+    enforcement: required
+    description: Managed workspace validation accepts canonical managed knowledge and rejects invalid/generated ownership states.
+    min_scenarios: 1
+
+  - id: source-coverage-completeness
+    category: assurance
+    enforcement: required
+    description: Lossless source-boundary coverage prevents raw source omission before statement enumeration; source coverage then detects unclassified statements and explicit exclusions.
+    min_scenarios: 1
+
+  - id: semantic-provenance-enforcement
+    category: semantic
+    enforcement: required
+    description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
+    min_scenarios: 1
+
+  - id: semantic-derivation-coverage
+    category: semantic
+    enforcement: required
+    description: Direct Capability derivation accounts for required upstream semantic atoms without forcing one literal downstream design.
+    min_scenarios: 1
+
+  - id: semantic-derivation-truth
+    category: semantic
+    enforcement: required
+    description: Required semantic judgement is request-bound and rejects meaning-preserving claims that an evaluator or human reviewer rejects.
+    min_scenarios: 1
+
+  - id: semantic-judgement-calibration
+    category: assurance
+    enforcement: required
+    description: External semantic-judgement verdicts are scored against expert labels with explicit false-negative and false-positive counts.
+    min_scenarios: 1
+
+  - id: live-semantic-evaluator-calibration
+    category: assurance
+    enforcement: required
+    description: Live evaluator predictions are blinded, request-bound to corpus/protocol/evaluator/run identity, and fail closed before deterministic scoring.
+    min_scenarios: 1
+
+  - id: derivation-test-coverage
+    category: coverage
+    enforcement: required
+    description: Every selected ProductionContract dependency edge is either covered by a derivation test class or explicitly disposed as not applicable.
+    min_scenarios: 1
+
+  - id: semantic-contradiction-detection
+    category: semantic
+    enforcement: required
+    description: Conflicting accepted semantic assertions are rejected rather than silently reconciled.
+    min_scenarios: 1
+
+  - id: semantic-process-error-no-question
+    category: semantic
+    enforcement: required
+    description: Producer/process validation failures remain rejection findings and do not become semantic Questions.
+    min_scenarios: 1
+
+  - id: semantic-closure-currentness
+    category: semantic
+    enforcement: required
+    description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
+    min_scenarios: 1
+
+  - id: subject-inventory-disposition
+    category: coverage
+    enforcement: required
+    description: Coverage requires an explicit subject inventory contract or disposition instead of treating silence as not applicable.
+    min_scenarios: 1
+
+  - id: subject-obligation-classification
+    category: coverage
+    enforcement: required
+    description: Every accepted scope requirement is classified into required subject coverage or explicit exclusion.
+    min_scenarios: 1
+
+  - id: coverage-question-frontier
+    category: coverage
+    enforcement: required
+    description: Coverage routes unresolved proof gaps to the correct Question frontier.
+    min_scenarios: 1
+
+  - id: production-contract-overlay
+    category: coverage
+    enforcement: required
+    description: Project overlays can add justified production contracts without replacing reusable Engineering Graph truth.
+    min_scenarios: 1
+
+  - id: consumer-scoped-activation
+    category: activation
+    enforcement: required
+    description: Concern activation is constrained to the selected Consumer closure.
+    min_scenarios: 1
+
+  - id: scope-root-activation
+    category: activation
+    enforcement: required
+    description: Scope roots narrow activation and coverage without silently broadening to unrelated capabilities.
+    min_scenarios: 1
+
+  - id: decision-material-diversity
+    category: decision
+    enforcement: required
+    description: Superficially different alternatives with identical material effects do not satisfy decision exploration diversity.
+    min_scenarios: 1
+
+  - id: decision-research-depth
+    category: decision
+    enforcement: required
+    description: RESEARCH and DEEP_RESEARCH decision policies require corresponding authoritative/diverse evidence.
+    min_scenarios: 1
+
+  - id: decision-redo-idempotence
+    category: decision
+    enforcement: required
+    description: CURRENT work is omitted by default while explicit REDO remains bounded and repeatable.
+    min_scenarios: 1
+
+  - id: decision-execution-assurance
+    category: decision
+    enforcement: required
+    description: Stronger execution assurance fails closed when trusted external attestation is unavailable.
+    min_scenarios: 1
+
+  - id: authority-context-read-boundary
+    category: authority
+    enforcement: required
+    description: Authority execution context exposes only admitted upstream and same-Authority canonical inputs.
+    min_scenarios: 1
+
+  - id: project-authority-migration
+    category: authority
+    enforcement: required
+    description: Authority splits do not blindly inherit applicability from retired Authority identities.
+    min_scenarios: 1
+
+  - id: repository-realization
+    category: repository
+    enforcement: required
+    description: Repository realization validates source-of-truth, environment and gate-policy applicability.
+    min_scenarios: 1
+
+  - id: human-documentation-projection
+    category: projection
+    enforcement: required
+    description: Human documentation is derived from accepted canonical knowledge and cannot become an independent truth source.
+    min_scenarios: 1
+
+  - id: frontend-contract-closure
+    category: frontend
+    enforcement: required
+    description: Frontend screen and UX closure rejects missing query/action/state/provider or presentation semantics.
+    min_scenarios: 1
+
+  - id: skill-invariant-policy
+    category: agent
+    enforcement: required
+    description: Every active artifact skill is explicitly enforced or judgement-only with rationale.
+    min_scenarios: 1
+
+  - id: implementation-feedback-classification
+    category: implementation
+    enforcement: required
+    description: Missing upstream semantics reopen knowledge while implementation/evidence lag does not manufacture a semantic Question.
+    min_scenarios: 1

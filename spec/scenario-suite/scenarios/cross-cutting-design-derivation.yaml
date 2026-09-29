@@ -1,0 +1,742 @@
+version: 1
+kind: harness-scenario
+id: cross-cutting-design-semantic-derivation
+title: Cross-cutting design preserves consistency, data, security, quality and operability semantics
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: application-design, target_knowledge_kind: concurrency-consistency-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: concurrency-consistency-design}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: data-design}
+  - {source_knowledge_kind: concurrency-consistency-design, target_knowledge_kind: data-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: data-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: data-design}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: security-architecture}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: security-architecture}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: data-design, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: quality-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: security-analysis}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: security-analysis}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: security-analysis}
+  - {source_knowledge_kind: data-design, target_knowledge_kind: security-analysis}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: operability-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: operability-design}
+  - {source_knowledge_kind: interface-contract, target_knowledge_kind: operability-design}
+  - {source_knowledge_kind: data-design, target_knowledge_kind: operability-design}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: engineering-policy}
+  - {source_knowledge_kind: presentation-system-design, target_knowledge_kind: engineering-policy}
+  - {source_knowledge_kind: quality-design, target_knowledge_kind: screen-view-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: product-requirements, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: application-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: concurrency-consistency-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: domain-model, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: domain-use-case, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: human-interface-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: interaction-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: operability-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: security-analysis, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: strategic-domain-design, target_knowledge_kind: system-architecture}
+  - {source_knowledge_kind: system-architecture, target_knowledge_kind: system-architecture}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: CROSS-CUTTING-DERIVATION
+      authorities:
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own product behavior.
+          boundary: {semantic_cohesion: "Own product behavior.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted PRODUCT-REQUIREMENTS knowledge."}
+          produces:
+            - capability: demo.product
+              knowledge_kind: product-requirements
+              requires: []
+        - id: TACTICAL-DOMAIN-DESIGN
+          responsibility: Own domain semantics.
+          boundary: {semantic_cohesion: "Own domain semantics.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted TACTICAL-DOMAIN-DESIGN knowledge."}
+          produces:
+            - capability: demo.domain
+              knowledge_kind: domain-model
+              requires: []
+        - id: DOMAIN-USE-CASE-DESIGN
+          responsibility: Own domain use-case semantics.
+          boundary: {semantic_cohesion: "Own domain use-case semantics.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted DOMAIN-USE-CASE-DESIGN knowledge."}
+          produces:
+            - capability: demo.usecase
+              knowledge_kind: domain-use-case
+              requires: []
+        - id: STRATEGIC-DOMAIN-DESIGN
+          responsibility: Own strategic domain boundaries.
+          boundary: {semantic_cohesion: "Own strategic domain boundaries.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted STRATEGIC-DOMAIN-DESIGN knowledge."}
+          produces:
+            - capability: demo.strategic
+              knowledge_kind: strategic-domain-design
+              requires: []
+        - id: APPLICATION-DESIGN
+          responsibility: Own application orchestration.
+          boundary: {semantic_cohesion: "Own application orchestration.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted APPLICATION-DESIGN knowledge."}
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: []
+        - id: MACHINE-INTERFACE-DESIGN
+          responsibility: Own machine interface contracts.
+          boundary: {semantic_cohesion: "Own machine interface contracts.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted MACHINE-INTERFACE-DESIGN knowledge."}
+          produces:
+            - capability: demo.interface
+              knowledge_kind: interface-contract
+              requires: []
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own human interface and presentation semantics.
+          boundary: {semantic_cohesion: "Own human interface and presentation semantics.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted HUMAN-INTERFACE-DESIGN knowledge."}
+          produces:
+            - capability: demo.human
+              knowledge_kind: human-interface-design
+              requires: []
+            - capability: demo.interaction
+              knowledge_kind: interaction-design
+              requires: []
+            - capability: demo.presentation
+              knowledge_kind: presentation-system-design
+              requires:
+                - capability: demo.application
+                - capability: demo.product
+                - capability: demo.security
+            - capability: demo.screen
+              knowledge_kind: screen-view-design
+              requires:
+                - capability: demo.quality
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own runtime and dependency topology.
+          boundary: {semantic_cohesion: "Own runtime and dependency topology.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted SYSTEM-ARCHITECTURE knowledge."}
+          produces:
+            - capability: demo.system
+              knowledge_kind: system-architecture
+              requires: []
+            - capability: demo.frontend-system
+              knowledge_kind: system-architecture
+              requires:
+                - capability: demo.application
+                - capability: demo.concurrency
+                - capability: demo.domain
+                - capability: demo.usecase
+                - capability: demo.human
+                - capability: demo.interaction
+                - capability: demo.operability
+                - capability: demo.security-analysis
+                - capability: demo.strategic
+                - capability: demo.system
+        - id: CONCURRENCY-CONSISTENCY-DESIGN
+          responsibility: Own concurrency and consistency correctness.
+          boundary: {semantic_cohesion: "Own concurrency and consistency correctness.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted CONCURRENCY-CONSISTENCY-DESIGN knowledge."}
+          produces:
+            - capability: demo.concurrency
+              knowledge_kind: concurrency-consistency-design
+              requires:
+                - capability: demo.application
+                - capability: demo.interface
+        - id: DATA-DESIGN
+          responsibility: Own durable data representation constraints.
+          boundary: {semantic_cohesion: "Own durable data representation constraints.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted DATA-DESIGN knowledge."}
+          produces:
+            - capability: demo.data
+              knowledge_kind: data-design
+              requires:
+                - capability: demo.domain
+                - capability: demo.concurrency
+                - capability: demo.system
+                - capability: demo.interface
+        - id: SECURITY-ARCHITECTURE
+          responsibility: Own trust and admission architecture.
+          boundary: {semantic_cohesion: "Own trust and admission architecture.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted SECURITY-ARCHITECTURE knowledge."}
+          produces:
+            - capability: demo.security
+              knowledge_kind: security-architecture
+              requires:
+                - capability: demo.domain
+                - capability: demo.system
+        - id: QUALITY-DESIGN
+          responsibility: Own architecture-significant quality constraints.
+          boundary: {semantic_cohesion: "Own architecture-significant quality constraints.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted QUALITY-DESIGN knowledge."}
+          produces:
+            - capability: demo.quality
+              knowledge_kind: quality-design
+              requires:
+                - capability: demo.application
+                - capability: demo.data
+                - capability: demo.domain
+                - capability: demo.interface
+                - capability: demo.security
+                - capability: demo.system
+        - id: SECURITY-ANALYSIS
+          responsibility: Own threat analysis.
+          boundary: {semantic_cohesion: "Own threat analysis.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted SECURITY-ANALYSIS knowledge."}
+          produces:
+            - capability: demo.security-analysis
+              knowledge_kind: security-analysis
+              requires:
+                - capability: demo.system
+                - capability: demo.security
+                - capability: demo.interface
+                - capability: demo.data
+        - id: OPERABILITY-DESIGN
+          responsibility: Own operability and diagnostic obligations.
+          boundary: {semantic_cohesion: "Own operability and diagnostic obligations.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted OPERABILITY-DESIGN knowledge."}
+          produces:
+            - capability: demo.operability
+              knowledge_kind: operability-design
+              requires:
+                - capability: demo.system
+                - capability: demo.security
+                - capability: demo.interface
+                - capability: demo.data
+        - id: ENGINEERING-POLICY
+          responsibility: Own project-selected engineering rules.
+          boundary: {semantic_cohesion: "Own project-selected engineering rules.", independent_change: "Owned semantics may evolve behind accepted prerequisites.", public_contract: "Provides accepted ENGINEERING-POLICY knowledge."}
+          produces:
+            - capability: demo.policy
+              knowledge_kind: engineering-policy
+              requires:
+                - capability: demo.system
+                - capability: demo.presentation
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume accepted cross-cutting design without inventing upstream constraints.
+          requires:
+            - capability: demo.frontend-system
+            - capability: demo.data
+            - capability: demo.quality
+            - capability: demo.security-analysis
+            - capability: demo.operability
+            - capability: demo.policy
+            - capability: demo.screen
+      terminal_capabilities: []
+
+  product:
+    value:
+      semantic_assertions:
+        - id: PRODUCT
+          kind: product-behavior
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-and-visible-outcome-are-required"
+          decision_authority: PRODUCT-REQUIREMENTS
+  domain:
+    value:
+      semantic_assertions:
+        - id: DOMAIN
+          kind: domain-semantic
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-identity-and-policy-invariant-are-stable"
+          decision_authority: TACTICAL-DOMAIN-DESIGN
+  usecase:
+    value:
+      semantic_assertions:
+        - id: USECASE
+          kind: domain-use-case-semantics
+          subject: RESOURCE-CHANGE
+          semantic_value: "change-resource-validates-policy-and-produces-outcome"
+          decision_authority: DOMAIN-USE-CASE-DESIGN
+  strategic:
+    value:
+      semantic_assertions:
+        - id: STRATEGIC
+          kind: strategic-domain-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-belongs-to-policy-domain"
+          decision_authority: STRATEGIC-DOMAIN-DESIGN
+  application:
+    value:
+      semantic_assertions:
+        - id: APP
+          kind: application-operation
+          subject: RESOURCE-CHANGE
+          semantic_value: "orchestrate-change-with-explicit-partial-failure-semantics"
+          decision_authority: APPLICATION-DESIGN
+  interface:
+    value:
+      semantic_assertions:
+        - id: API
+          kind: interface-operation
+          subject: RESOURCE-CHANGE
+          semantic_value: "update-resource-operation-with-explicit-outcomes"
+          decision_authority: MACHINE-INTERFACE-DESIGN
+  human:
+    value:
+      semantic_assertions:
+        - id: HUMAN
+          kind: human-interface-contract
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-change-workspace-preserves-visible-state"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  interaction:
+    value:
+      semantic_assertions:
+        - id: INTERACTION
+          kind: interaction-context
+          subject: RESOURCE-CHANGE
+          semantic_value: "edit-context-exposes-recovery-and-result"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  presentation:
+    value:
+      semantic_assertions:
+        - id: PRESENT
+          kind: presentation-pattern
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-workspace-presentation"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  system:
+    value:
+      semantic_assertions:
+        - id: SYSTEM
+          kind: architecture-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "application-and-adapter-runtime-boundaries"
+          decision_authority: SYSTEM-ARCHITECTURE
+  concurrency:
+    value:
+      semantic_assertions:
+        - id: CONSISTENCY
+          kind: consistency-policy
+          subject: RESOURCE-CHANGE
+          semantic_value: "change-retry-is-idempotent-and-partial-application-is-explicit"
+          decision_authority: CONCURRENCY-CONSISTENCY-DESIGN
+  data:
+    value:
+      semantic_assertions:
+        - id: DATA
+          kind: data-constraint
+          subject: RESOURCE-CHANGE
+          semantic_value: "durable-resource-state-preserves-identity-and-consistency-baseline"
+          decision_authority: DATA-DESIGN
+  security:
+    value:
+      semantic_assertions:
+        - id: SECURITY
+          kind: security-trust-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "authenticated-actor-and-authorization-boundary-precede-change"
+          decision_authority: SECURITY-ARCHITECTURE
+  quality:
+    value:
+      semantic_assertions:
+        - id: QUALITY
+          kind: quality-constraint
+          subject: RESOURCE-CHANGE
+          semantic_value: "accepted-response-and-capacity-targets-preserve-outcome-semantics"
+          decision_authority: QUALITY-DESIGN
+  security_analysis:
+    value:
+      semantic_assertions:
+        - id: THREAT
+          kind: security-analysis-finding
+          subject: RESOURCE-CHANGE
+          semantic_value: "threat-analysis-covers-trust-interface-and-data-boundaries"
+          decision_authority: SECURITY-ANALYSIS
+  operability:
+    value:
+      semantic_assertions:
+        - id: OPERABILITY
+          kind: operability-obligation
+          subject: RESOURCE-CHANGE
+          semantic_value: "correlation-and-dependency-health-make-change-outcomes-diagnosable"
+          decision_authority: OPERABILITY-DESIGN
+  policy:
+    value:
+      semantic_assertions:
+        - id: POLICY
+          kind: engineering-policy-rule
+          subject: RESOURCE-CHANGE
+          semantic_value: "dependency-direction-and-provider-isolation-are-enforced"
+          decision_authority: ENGINEERING-POLICY
+  screen:
+    value:
+      semantic_assertions:
+        - id: SCREEN
+          kind: screen-view
+          subject: RESOURCE-CHANGE
+          semantic_value: "resource-screen-preserves-accepted-quality-behavior"
+          decision_authority: HUMAN-INTERFACE-DESIGN
+  frontend_system:
+    value:
+      semantic_assertions:
+        - id: FRONTEND-SYSTEM
+          kind: architecture-boundary
+          subject: RESOURCE-CHANGE
+          semantic_value: "frontend-runtime-realizes-interface-security-operability-and-quality-constraints"
+          decision_authority: SYSTEM-ARCHITECTURE
+
+steps:
+  - id: edge-01-application-design-to-concurrency-consistency-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.application, target_capability: demo.concurrency, obligations: [{id: source-semantics, source_kind: application-operation}]}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.concurrency}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.application, target_capability: demo.concurrency, links: [{sources: [APP], relation: CONSTRAINS, targets: [CONSISTENCY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-02-interface-contract-to-concurrency-consistency-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface, target_capability: demo.concurrency, obligations: [{id: source-semantics, source_kind: interface-operation}]}
+      source: {ref: fixture.interface}
+      candidate: {ref: fixture.concurrency}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface, target_capability: demo.concurrency, links: [{sources: [API], relation: CONSTRAINS, targets: [CONSISTENCY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-03-domain-model-to-data-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.data, obligations: [{id: source-semantics, source_kind: domain-semantic}]}
+      source: {ref: fixture.domain}
+      candidate: {ref: fixture.data}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.data, links: [{sources: [DOMAIN], relation: REALIZES, targets: [DATA]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-04-concurrency-consistency-design-to-data-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.concurrency, target_capability: demo.data, obligations: [{id: source-semantics, source_kind: consistency-policy}]}
+      source: {ref: fixture.concurrency}
+      candidate: {ref: fixture.data}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.concurrency, target_capability: demo.data, links: [{sources: [CONSISTENCY], relation: REALIZES, targets: [DATA]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-05-system-architecture-to-data-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.data, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.data}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.data, links: [{sources: [SYSTEM], relation: REALIZES, targets: [DATA]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-06-interface-contract-to-data-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface, target_capability: demo.data, obligations: [{id: source-semantics, source_kind: interface-operation}]}
+      source: {ref: fixture.interface}
+      candidate: {ref: fixture.data}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface, target_capability: demo.data, links: [{sources: [API], relation: REALIZES, targets: [DATA]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-07-domain-model-to-security-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.security, obligations: [{id: source-semantics, source_kind: domain-semantic}]}
+      source: {ref: fixture.domain}
+      candidate: {ref: fixture.security}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.security, links: [{sources: [DOMAIN], relation: REALIZES, targets: [SECURITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-08-system-architecture-to-security-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.security, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.security}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.security, links: [{sources: [SYSTEM], relation: REALIZES, targets: [SECURITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-09-application-design-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.application, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: application-operation}]}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.application, target_capability: demo.quality, links: [{sources: [APP], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-10-data-design-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.data, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: data-constraint}]}
+      source: {ref: fixture.data}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.data, target_capability: demo.quality, links: [{sources: [DATA], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-11-domain-model-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: domain-semantic}]}
+      source: {ref: fixture.domain}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.quality, links: [{sources: [DOMAIN], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-12-interface-contract-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: interface-operation}]}
+      source: {ref: fixture.interface}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface, target_capability: demo.quality, links: [{sources: [API], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-13-security-architecture-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.quality, links: [{sources: [SECURITY], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-14-system-architecture-to-quality-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.quality, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.quality}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.quality, links: [{sources: [SYSTEM], relation: CONSTRAINS, targets: [QUALITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-15-system-architecture-to-security-analysis
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.security-analysis, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.security_analysis}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.security-analysis, links: [{sources: [SYSTEM], relation: REALIZES, targets: [THREAT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-16-security-architecture-to-security-analysis
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.security-analysis, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.security_analysis}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.security-analysis, links: [{sources: [SECURITY], relation: REALIZES, targets: [THREAT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-17-interface-contract-to-security-analysis
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface, target_capability: demo.security-analysis, obligations: [{id: source-semantics, source_kind: interface-operation}]}
+      source: {ref: fixture.interface}
+      candidate: {ref: fixture.security_analysis}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface, target_capability: demo.security-analysis, links: [{sources: [API], relation: REALIZES, targets: [THREAT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-18-data-design-to-security-analysis
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.data, target_capability: demo.security-analysis, obligations: [{id: source-semantics, source_kind: data-constraint}]}
+      source: {ref: fixture.data}
+      candidate: {ref: fixture.security_analysis}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.data, target_capability: demo.security-analysis, links: [{sources: [DATA], relation: REALIZES, targets: [THREAT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-19-system-architecture-to-operability-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.operability, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.operability}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.operability, links: [{sources: [SYSTEM], relation: REALIZES, targets: [OPERABILITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-20-security-architecture-to-operability-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.operability, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.operability}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.operability, links: [{sources: [SECURITY], relation: REALIZES, targets: [OPERABILITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-21-interface-contract-to-operability-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interface, target_capability: demo.operability, obligations: [{id: source-semantics, source_kind: interface-operation}]}
+      source: {ref: fixture.interface}
+      candidate: {ref: fixture.operability}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interface, target_capability: demo.operability, links: [{sources: [API], relation: REALIZES, targets: [OPERABILITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-22-data-design-to-operability-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.data, target_capability: demo.operability, obligations: [{id: source-semantics, source_kind: data-constraint}]}
+      source: {ref: fixture.data}
+      candidate: {ref: fixture.operability}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.data, target_capability: demo.operability, links: [{sources: [DATA], relation: REALIZES, targets: [OPERABILITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-23-system-architecture-to-engineering-policy
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.policy, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.policy}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.policy, links: [{sources: [SYSTEM], relation: CONSTRAINS, targets: [POLICY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-24-presentation-system-design-to-engineering-policy
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.presentation, target_capability: demo.policy, obligations: [{id: source-semantics, source_kind: presentation-pattern}]}
+      source: {ref: fixture.presentation}
+      candidate: {ref: fixture.policy}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.presentation, target_capability: demo.policy, links: [{sources: [PRESENT], relation: CONSTRAINS, targets: [POLICY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-25-quality-design-to-screen-view-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.quality, target_capability: demo.screen, obligations: [{id: source-semantics, source_kind: quality-constraint}]}
+      source: {ref: fixture.quality}
+      candidate: {ref: fixture.screen}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.quality, target_capability: demo.screen, links: [{sources: [QUALITY], relation: CONSTRAINS, targets: [SCREEN]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-26-application-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.application, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: application-operation}]}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.application, target_capability: demo.frontend-system, links: [{sources: [APP], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-27-concurrency-consistency-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.concurrency, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: consistency-policy}]}
+      source: {ref: fixture.concurrency}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.concurrency, target_capability: demo.frontend-system, links: [{sources: [CONSISTENCY], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-28-domain-model-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.domain, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: domain-semantic}]}
+      source: {ref: fixture.domain}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.domain, target_capability: demo.frontend-system, links: [{sources: [DOMAIN], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-29-domain-use-case-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.usecase, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: domain-use-case-semantics}]}
+      source: {ref: fixture.usecase}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.usecase, target_capability: demo.frontend-system, links: [{sources: [USECASE], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-30-human-interface-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.human, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: human-interface-contract}]}
+      source: {ref: fixture.human}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.human, target_capability: demo.frontend-system, links: [{sources: [HUMAN], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-31-interaction-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.interaction, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: interaction-context}]}
+      source: {ref: fixture.interaction}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.interaction, target_capability: demo.frontend-system, links: [{sources: [INTERACTION], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-32-operability-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.operability, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: operability-obligation}]}
+      source: {ref: fixture.operability}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.operability, target_capability: demo.frontend-system, links: [{sources: [OPERABILITY], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-33-security-analysis-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security-analysis, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: security-analysis-finding}]}
+      source: {ref: fixture.security_analysis}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security-analysis, target_capability: demo.frontend-system, links: [{sources: [THREAT], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-34-strategic-domain-design-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.strategic, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: strategic-domain-boundary}]}
+      source: {ref: fixture.strategic}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.strategic, target_capability: demo.frontend-system, links: [{sources: [STRATEGIC], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-35-system-architecture-to-system-architecture
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.system, target_capability: demo.frontend-system, obligations: [{id: source-semantics, source_kind: architecture-boundary}]}
+      source: {ref: fixture.system}
+      candidate: {ref: fixture.frontend_system}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.system, target_capability: demo.frontend-system, links: [{sources: [SYSTEM], relation: CONSTRAINS, targets: [FRONTEND-SYSTEM]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-36-application-design-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.application, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: application-operation}]}
+      source: {ref: fixture.application}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.application, target_capability: demo.presentation, links: [{sources: [APP], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-37-product-requirements-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.product, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: product-behavior}]}
+      source: {ref: fixture.product}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.product, target_capability: demo.presentation, links: [{sources: [PRODUCT], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: edge-38-security-architecture-to-presentation-system-design
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.presentation, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.presentation, links: [{sources: [SECURITY], relation: CONSTRAINS, targets: [PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: remove-security-analysis-input
+    driver: data.patch
+    with:
+      value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: demo.security, target_capability: demo.security-analysis, links: [{sources: [SECURITY], relation: REALIZES, targets: [THREAT]}], dispositions: []}
+      operations: [{op: remove, path: /links/0}]
+  - id: threat-analysis-loses-security-boundary
+    driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: cross-cutting-semantic-omission
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: demo.security, target_capability: demo.security-analysis, obligations: [{id: source-semantics, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.security_analysis}
+      evidence: {ref: step.remove-security-analysis-input}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: SECURITY, owner_authority: SECURITY-ANALYSIS}}

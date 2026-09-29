@@ -1,0 +1,96 @@
+version: 1
+kind: harness-scenario
+id: decision-alternatives-must-be-materially-distinct
+title: Decision exploration rejects fake alternative diversity
+dimensions:
+  project_archetype: synthetic
+  stage: decision
+  behavior_class: decision
+  execution_type: agent-evaluation
+covers:
+  - decision-material-diversity
+
+fixtures:
+  contract:
+    value:
+      knowledge_kind: demo-decision
+      required: true
+      policy_defaults:
+        exploration: EXPLORE
+        autonomy: BROAD
+      axes:
+        shape:
+          minimum_exploration: EXPLORE
+          delegation_requires: BROAD
+          material_dimensions: [failure-isolation]
+          challenge_strategies: [alternative-shape, failure-probe]
+          minimum_probes: 2
+  axis_policies:
+    value:
+      shape:
+        exploration: EXPLORE
+        autonomy: BROAD
+  request:
+    value:
+      request_id: REQUEST-DIVERSITY
+  model:
+    value:
+      artifacts: []
+      questions: []
+  evidence:
+    value:
+      version: 1
+      kind: harness-decision-exploration
+      capability: demo.choice
+      knowledge_kind: demo-decision
+      explorer_request_id: REQUEST-DIVERSITY
+      research_sources: []
+      axes:
+        - axis: shape
+          applicability: APPLICABLE
+          exploration_level: EXPLORE
+          probes:
+            - strategy: alternative-shape
+              challenge: Compare a materially different runtime shape.
+              alternatives: [shape-a, shape-b]
+            - strategy: failure-probe
+              challenge: Probe failure behavior under both alternatives.
+              alternatives: [shape-a, shape-b]
+          decision_points:
+            - id: shape-choice
+              alternatives:
+                - id: shape-a
+                  difference: Alternative A.
+                  material_effects:
+                    failure-isolation: shared
+                - id: shape-b
+                  difference: Alternative B.
+                  material_effects:
+                    failure-isolation: shared
+      decision_space_review:
+        status: COMPLETE
+        checks:
+          - mixed-decision-split
+          - missing-material-case-search
+          - accepted-constraint-cross-check
+          - authority-boundary-cross-check
+        reviewed_decisions: [shape-choice]
+        open_gaps: []
+
+steps:
+  - id: evaluate
+    driver: decision.exploration
+    benchmark:
+      metrics: [mutation_detection]
+      mutation_class: alternative-collapse
+    with:
+      contract: {ref: fixture.contract}
+      axis_policies: {ref: fixture.axis_policies}
+      capability: demo.choice
+      knowledge_kind: demo-decision
+      evidence: {ref: fixture.evidence}
+      explorer_request: {ref: fixture.request}
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: DECISION_ALTERNATIVES_NOT_MATERIALLY_DISTINCT}}

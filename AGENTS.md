@@ -43,6 +43,48 @@ No manifest, pin, submodule or repository-to-repository runtime binding is requi
 - A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
+## LLM execution cost policy
+
+For Harness-owned work that requires a provider-backed LLM evaluator or other
+LLM-backed assurance:
+
+- prefer deterministic validation whenever it can answer the question;
+- use GPT-6 Luna as the default and cost baseline for LLM-backed checks and
+  experiments;
+- use the normal context/reasoning tier unless a scenario explicitly requires
+  a stronger setting;
+- do not silently substitute `auto` or a more expensive model as the baseline;
+  any such use must be an explicit task-specific exception and must retain
+  provider/model provenance;
+- if the active provider identity cannot execute an explicit GPT-6 Luna request,
+  fail closed or use `auto` only as explicitly requested research evidence;
+  an auto-routed non-Luna result is not the repository's default evaluator
+  baseline.
+
+This policy optimizes recurring assurance cost without changing semantic truth:
+expert-reviewed canonical knowledge remains the oracle and model choice never
+defines correctness.
+
+## Scenario Suite discipline
+
+The Scenario Suite in `docs/design/scenario-suite-v0.md` is the cross-layer
+executable behavioral specification of Harness.
+
+When a change adds or materially changes externally observable Harness
+behavior:
+
+1. classify the behavior in `spec/scenario-suite/catalog-v1.yaml`;
+2. add or update a reusable scenario when deterministic observation is
+   possible;
+3. use `planned` only when the functional surface is known but a stable
+   executable oracle is not yet available;
+4. promote stable coverage to `required`;
+5. prefer invariant assertions and mutations over full-output golden files.
+
+A subsystem-specific validator remains useful, but it does not substitute for a
+cross-layer scenario when the consumer-visible behavior spans multiple Harness
+mechanisms.
+
 ## Change discipline
 
 Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a universal semantic DSL without a concrete consumer failure.
@@ -64,6 +106,7 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
 - `docs/design/decision-governance-v0.md` — experimental pre-choice exploration and delegated-choice contract above Core.
 - `docs/design/decision-explorer-execution-assurance-v0.md` — experimental boundary between request binding and externally attested isolated Explorer execution.
+- `docs/design/live-calibration-validator-v0.md` — blinded, request-bound live semantic-evaluator calibration above Core.
 - `docs/design/decision-pipeline-v0.md` — experimental sequential Decision Pipeline and derived Capability frontier.
 - `skills/agent/decision-pipeline/SKILL.md` — sequential option-formation, review, choice/escalation and admission procedure for decision-governed work.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
@@ -79,12 +122,16 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
 - `workspace.py` — managed knowledge validation and rendering.
+- `source_boundary.py` — assurance-only lossless line-range coverage for a selected immutable raw source before semantic statement enumeration.
+- `source_coverage.py` — statement-level admitted/excluded/question coverage after the raw source boundary has been established.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/decision-governance/**` — experimental decision-governance evidence and knowledge-kind decision contracts.
 - `spec/adapter-acceptance/**` — executable adapter integration cases.
 - `spec/target-state-acceptance/**` — executable Design Profile target-state cases.
 - `spec/workspace-acceptance/**` — executable managed-workspace scenarios.
+- `spec/scenario-suite/**` — cross-layer executable behavioral scenarios and coverage catalog.
+- `scenario_suite.py` / `scenario_drivers.py` — universal scenario runner and built-in driver registry.
 - `validators/validate_core.py` — Core validator/acceptance runner.
 - `validators/validate_adapters.py` — adapter acceptance runner.
 - `validators/validate_target_state.py` — target-state acceptance runner.

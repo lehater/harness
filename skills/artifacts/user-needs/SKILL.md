@@ -79,3 +79,15 @@ canonical evidence actually consumed.
 Prefer a concise Context-of-Use and User-Needs table with evidence references.
 Journey maps, personas or service-blueprint views are optional projections unless
 the target project explicitly assigns them canonical contract meaning.
+
+
+## Semantic completeness projection
+
+Strict semantic admission projects this artifact into machine-addressable
+assertions for `user-actor`, `context-of-use`, `user-goal`, `user-need`
+and `need-evidence`. Each accepted goal must have a subject-scoped User Need;
+each accepted User Need must have evidence/provenance or an explicit disposition.
+
+A missing required item is not silently invented. Use
+`semantic_dispositions` only as `NOT_APPLICABLE`, `DEFERRED` or
+`QUESTION` with rationale; open dispositions become blocking Questions.

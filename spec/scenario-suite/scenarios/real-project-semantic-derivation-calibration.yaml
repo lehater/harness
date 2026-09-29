@@ -1,0 +1,152 @@
+version: 1
+kind: harness-scenario
+id: real-project-semantic-derivation-calibration
+title: Real project derivation cases expose canonical semantic drift
+dimensions:
+  project_archetype: real-project
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-derivation-truth
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v5.yaml
+
+  expert:
+    value:
+      - {id: napms-missing-address-requirement-to-journey, status: REJECTED}
+      - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-security, status: REJECTED}
+      - {id: prep-study-preview-application-to-machine-interface, status: ACCEPTED}
+      - {id: prep-import-machine-interface-to-consistency, status: ACCEPTED}
+      - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
+      - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
+      - {id: prep-import-task-to-interaction, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-security, status: REJECTED}
+      - {id: napms-request-authority-requirement-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-security-to-http, status: REJECTED}
+      - {id: prep-machine-search-to-screen-view, status: ACCEPTED}
+      - {id: prep-performance-to-component-degradation, status: ACCEPTED}
+      - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
+      - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
+      - {id: napms-verification-request-authority-preserved, status: ACCEPTED}
+      - {id: napms-verification-denied-no-rule-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: napms-verification-initial-active-loss, status: REJECTED}
+      - {id: napms-verification-current-address-cardinality-loss, status: REJECTED}
+      - {id: napms-verification-business-org-not-authority-loss, status: REJECTED}
+      - {id: napms-verification-effective-window-evaluation-loss, status: REJECTED}
+
+  accepts-canonical-drifts:
+    value:
+      - {id: napms-missing-address-requirement-to-journey, status: ACCEPTED}
+      - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-security, status: ACCEPTED}
+      - {id: prep-study-preview-application-to-machine-interface, status: ACCEPTED}
+      - {id: prep-import-machine-interface-to-consistency, status: ACCEPTED}
+      - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
+      - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
+      - {id: prep-import-task-to-interaction, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-security, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-security-to-http, status: ACCEPTED}
+      - {id: prep-machine-search-to-screen-view, status: ACCEPTED}
+      - {id: prep-performance-to-component-degradation, status: ACCEPTED}
+      - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
+      - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
+      - {id: napms-verification-request-authority-preserved, status: ACCEPTED}
+      - {id: napms-verification-denied-no-rule-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: napms-verification-initial-active-loss, status: ACCEPTED}
+      - {id: napms-verification-current-address-cardinality-loss, status: ACCEPTED}
+      - {id: napms-verification-business-org-not-authority-loss, status: ACCEPTED}
+      - {id: napms-verification-effective-window-evaluation-loss, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 24}
+      - {path: /confusion/true_positive, op: equals, value: 8}
+      - {path: /confusion/true_negative, op: equals, value: 16}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: expose-real-project-false-negative
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: real-project-canonical-drift-missed
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-canonical-drifts}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 8}
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-missing-address-requirement-to-journey
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-rules-to-security
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-requirement-to-security
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-security-to-http
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-initial-active-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-current-address-cardinality-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-business-org-not-authority-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-effective-window-evaluation-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE

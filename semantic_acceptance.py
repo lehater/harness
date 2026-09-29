@@ -50,6 +50,94 @@ def evaluate_artifact(
 
     findings: list[dict[str, Any]] = []
     satisfied: list[str] = []
+    applied_dispositions: list[dict[str, Any]] = []
+
+    expected_by_id = {
+        item.get("id"): item
+        for item in expected
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    dispositions: dict[tuple[str, str | None], dict[str, Any]] = {}
+    for item in candidate.get("semantic_dispositions", []) or []:
+        if not isinstance(item, dict):
+            findings.append({"code": "INVALID_SEMANTIC_DISPOSITION"})
+            continue
+        obligation_id = item.get("obligation")
+        subject = item.get("subject")
+        status = item.get("status")
+        rationale = item.get("rationale")
+        if (
+            not isinstance(obligation_id, str)
+            or obligation_id not in expected_by_id
+            or (subject is not None and (not isinstance(subject, str) or not subject))
+            or status not in {"NOT_APPLICABLE", "DEFERRED", "QUESTION"}
+            or not isinstance(rationale, str)
+            or not rationale.strip()
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_SEMANTIC_DISPOSITION",
+                    "obligation": obligation_id,
+                    **({"subject": subject} if subject is not None else {}),
+                }
+            )
+            continue
+        key = (obligation_id, subject)
+        if key in dispositions:
+            findings.append(
+                {
+                    "code": "DUPLICATE_SEMANTIC_DISPOSITION",
+                    "obligation": obligation_id,
+                    **({"subject": subject} if subject is not None else {}),
+                }
+            )
+            continue
+        dispositions[key] = item
+
+    def disposition_for(
+        obligation_id: str,
+        subject: str | None = None,
+    ) -> dict[str, Any] | None:
+        return dispositions.get((obligation_id, subject))
+
+    def apply_disposition(
+        obligation_id: str,
+        subject: str | None = None,
+    ) -> str | None:
+        item = disposition_for(obligation_id, subject)
+        if item is None:
+            return None
+        status = item["status"]
+        applied = {
+            "obligation": obligation_id,
+            "status": status,
+            "rationale": item["rationale"],
+        }
+        if subject is not None:
+            applied["subject"] = subject
+        applied_dispositions.append(applied)
+        if status == "NOT_APPLICABLE":
+            return "SATISFIED"
+        findings.append(
+            {
+                "code": (
+                    "OBLIGATION_DEFERRED"
+                    if status == "DEFERRED"
+                    else "OBLIGATION_QUESTION"
+                ),
+                "obligation": obligation_id,
+                **({"subject": subject} if subject is not None else {}),
+                "rationale": item["rationale"],
+            }
+        )
+        return "OPEN"
+
+    assertion_ids_by_kind: dict[str, set[str]] = defaultdict(set)
+    for assertion in assertions:
+        kind = assertion.get("kind")
+        assertion_id = assertion.get("id")
+        if isinstance(kind, str) and isinstance(assertion_id, str) and assertion_id:
+            assertion_ids_by_kind[kind].add(assertion_id)
 
     for obligation in expected:
         obligation_id = obligation["id"]
@@ -64,10 +152,44 @@ def evaluate_artifact(
         if subject is not None:
             matches = [a for a in matches if a.get("subject") == subject]
 
+        required_subjects: set[str] = set()
         subjects = obligation.get("subjects")
         if subjects is not None:
-            present = {a.get("subject") for a in matches}
-            missing = sorted(set(subjects) - present)
+            required_subjects.update(subjects)
+        subjects_from_kind = obligation.get("subjects_from_kind")
+        if subjects_from_kind is not None:
+            required_subjects.update(
+                assertion_ids_by_kind.get(subjects_from_kind, set())
+            )
+
+        if required_subjects:
+            present = {
+                a.get("subject")
+                for a in matches
+                if isinstance(a.get("subject"), str) and a.get("subject")
+            }
+            missing: list[str] = []
+            open_disposition = False
+            for missing_subject in sorted(required_subjects - present):
+                disposition_state = apply_disposition(
+                    obligation_id,
+                    missing_subject,
+                )
+                if disposition_state == "SATISFIED":
+                    continue
+                if disposition_state == "OPEN":
+                    open_disposition = True
+                    continue
+                missing.append(missing_subject)
+            for present_subject in sorted(required_subjects & present):
+                if disposition_for(obligation_id, present_subject) is not None:
+                    findings.append(
+                        {
+                            "code": "OBLIGATION_DISPOSITION_CONFLICT",
+                            "obligation": obligation_id,
+                            "subject": present_subject,
+                        }
+                    )
             if missing:
                 findings.append(
                     {
@@ -76,6 +198,7 @@ def evaluate_artifact(
                         "subjects": missing,
                     }
                 )
+            if missing or open_disposition:
                 continue
 
         required_values = obligation.get("required_values")
@@ -96,9 +219,24 @@ def evaluate_artifact(
                 )
                 continue
 
-        if len(matches) < obligation.get("min_count", 1):
+        if not required_subjects and len(matches) < obligation.get("min_count", 1):
+            disposition_state = apply_disposition(obligation_id)
+            if disposition_state == "SATISFIED":
+                satisfied.append(obligation_id)
+                continue
+            if disposition_state == "OPEN":
+                continue
             findings.append(
                 {"code": "MISSING_OBLIGATION", "obligation": obligation_id}
+            )
+            continue
+
+        if matches and disposition_for(obligation_id) is not None:
+            findings.append(
+                {
+                    "code": "OBLIGATION_DISPOSITION_CONFLICT",
+                    "obligation": obligation_id,
+                }
             )
             continue
 
@@ -334,6 +472,7 @@ def evaluate_artifact(
         "obligations": {
             "expected": [item["id"] for item in expected],
             "satisfied": satisfied,
+            "dispositions": applied_dispositions,
         },
         "findings": findings,
         "semantic_claims": {

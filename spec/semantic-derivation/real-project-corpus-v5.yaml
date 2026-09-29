@@ -1,0 +1,531 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: real-project-derivation-calibration-v5
+
+scope:
+  purpose: >-
+    Calibrate semantic judgement on real accepted engineering artifacts using
+    only semantic atoms consumed by the selected downstream ProductionContract.
+  projects:
+    prep:
+      repository: lehater/prep
+      commit: b3ec3b0fec0d8ba29f2ca66867737e8838332592
+    napms:
+      repository: lehater/napms
+      commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  policy: >-
+    Each case is scoped to the semantic atoms the downstream capability is
+    responsible for consuming. Unrelated upstream semantics are excluded rather
+    than requiring downstream Authorities to restate knowledge they do not own.
+    ACCEPTED cases compare canonical upstream atoms with canonical downstream
+    realization. REJECTED cases are observed canonical contradictions, not
+    synthetic mutations.
+
+cases:
+  - id: napms-missing-address-requirement-to-journey
+    expected_status: REJECTED
+    mutation_class: real-project-partial-loss
+    defect_group: NAPMS-MATERIALIZATION-NONDEPLOYABLE-LOSS
+    project: napms
+    capability_edge:
+      source: engineering.requirements.product-intent
+      target: engineering.application.journey
+    source_ref:
+      - docs/requirements/first-mvp-product-requirements.yaml#REQ-EXP-005
+      - docs/requirements/first-mvp-product-requirements.yaml#REQ-EXP-007
+    target_ref: docs/model/use-cases/first-mvp-policy-export.yaml
+    source:
+      - >-
+        Missing current source or destination address must not remove an otherwise
+        valid selected effective Policy Rule; the row retains Resource identity/name,
+        exposes the missing address and remains explicitly technically incomplete
+        rather than deployable or globally unresolved.
+      - >-
+        Normalization must preserve represented traffic semantics without
+        broadening or narrowing them.
+    target:
+      - >-
+        Selected effective Rules remain represented when current address realization
+        is missing; an enriched INCOMPLETE row retains Resource identity/name and a
+        null address rather than becoming global UNRESOLVED or being silently omitted.
+      - >-
+        Materialization resolves the immutable InteractionRevision to canonical
+        TrafficClauses and preserves exact traffic semantics in the result.
+    relation: REALIZES
+    rationale: >-
+      The journey preserves row visibility, Resource identity and exact traffic
+      semantics but omits the upstream requirement that an INCOMPLETE row must
+      not be represented as a deployable permit. Because this artifact provides
+      application materialization semantics, the omission is semantic partial
+      loss rather than a downstream responsibility exclusion.
+
+  - id: napms-missing-address-journey-to-system-rules
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: napms
+    capability_edge:
+      source: engineering.application.journey
+      target: engineering.architecture.rules
+    source_ref: docs/model/use-cases/first-mvp-policy-export.yaml#required_semantics
+    target_ref: docs/architecture/mvp-system-rules.yaml
+    source: >-
+      Ordinary missing current Resource address is represented as row-level
+      INCOMPLETE materialization data rather than silent omission or a globally
+      unresolved/successful result.
+    target: >-
+      Missing current Resource address remains explicit as an INCOMPLETE enriched
+      export row; missing durable owner truth or dependency failure is not a
+      successful materialization.
+    relation: REALIZES
+    rationale: This edge consumes the row-level incompleteness rule, not all journey-owned Resource/provenance semantics.
+
+  - id: napms-request-authority-rules-to-security
+    expected_status: REJECTED
+    mutation_class: real-project-constraint-drift
+    defect_group: NAPMS-REQUEST-AUTHORITY-SCOPE-DRIFT
+    project: napms
+    capability_edge:
+      source: engineering.architecture.rules
+      target: engineering.architecture.security
+    source_ref: docs/architecture/mvp-system-rules.yaml#interaction_rules
+    target_ref: docs/architecture/mvp-security-architecture.yaml#scoped_admission
+    source: >-
+      AccessRequest submission resolves the source Resource AuthorityScopeRef and
+      requires access.request authority only for that source scope; destination
+      scope is not request-admission authority.
+    target:
+      - >-
+        Access-request scope is derived from distinct AuthorityScopeRefs of source
+        and destination Resources.
+      - >-
+        Every required scope needs an effective matching grant; partial scope
+        coverage fails 403 before mutation or result exposure.
+    relation: PRESERVES
+    rationale: The downstream security architecture adds destination authority and contradicts the source-only admission rule.
+
+  - id: prep-study-preview-application-to-machine-interface
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.application-design
+      target: prep.machine-interfaces
+    source_ref: docs/application/application-design.md#Build-Study-Set
+    target_ref: docs/interface/machine-interface.md#Learning-mode-operations
+    source: >-
+      Exporting a previously previewed Study Set must detect changed
+      target/question resolution rather than silently exporting a different set.
+    target: >-
+      Study-set export re-resolves current state and returns a
+      stale-materialization conflict when it no longer matches the inspected
+      preview rather than silently exporting a changed set.
+    relation: REALIZES
+    rationale: The machine contract directly realizes stale-preview detection.
+
+  - id: prep-import-machine-interface-to-consistency
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-constraint
+    project: prep
+    capability_edge:
+      source: prep.machine-interfaces
+      target: prep.import-consistency
+    source_ref: docs/interface/machine-interface.md#Prepared-data-exchange
+    target_ref: docs/architecture/import-consistency.md
+    source:
+      - Apply every import item that passes validation.
+      - Reject an invalid item without rolling back other valid items in the same bulk request.
+    target:
+      - The bulk container is not atomic; each item is an independent application unit.
+      - Valid peer items survive rejection of invalid items.
+      - An individual item is accepted atomically or rejected without a partially applied form.
+    relation: CONSTRAINS
+    rationale: The consistency design adds item atomicity while preserving independent valid-peer application.
+
+  - id: prep-renderer-degradation-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-L-EXPLORE-KNOWLEDGE
+    target_ref: docs/interface/interaction-design.yaml#I-L-KNOWLEDGE
+    source: >-
+      Graph/rendering degradation must leave non-graph Knowledge access usable;
+      recoverable query failure retains target context.
+    target: >-
+      Renderer failure preserves list/search/detail access; data-query retry
+      preserves target/filter context.
+    relation: REALIZES
+    rationale: Interaction recovery explicitly preserves the task-level fallback and context.
+
+  - id: prep-stale-preview-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-L-STUDY-QUESTIONS
+    target_ref: docs/interface/interaction-design.yaml#I-L-STUDY
+    source: >-
+      A stale Study Set preview can be rebuilt; an empty Study Set is a valid
+      explicit result.
+    target: >-
+      Study interaction exposes valid-empty preview and stale-preview conflict;
+      conflict requires rebuild and reinspection.
+    relation: REALIZES
+    rationale: The interaction contract preserves both valid-empty and stale-preview recovery semantics.
+
+  - id: prep-import-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-C-IMPORT-DATA
+    target_ref: docs/interface/interaction-design.yaml#I-C-IMPORT
+    source: >-
+      Rejected import items remain identifiable and correctable while valid peer
+      items stay applied.
+    target: >-
+      Invalid or rejected items remain identifiable for correction; valid peer
+      items are not rolled back after accepted envelope processing.
+    relation: REALIZES
+    rationale: The interaction recovery path preserves exactly the task-owned correction and valid-peer semantics.
+
+  - id: napms-request-authority-requirement-to-security
+    expected_status: REJECTED
+    mutation_class: real-project-constraint-drift
+    defect_group: NAPMS-REQUEST-AUTHORITY-SCOPE-DRIFT
+    project: napms
+    capability_edge:
+      source: engineering.requirements.product-intent
+      target: engineering.architecture.security
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-AUTH-001
+    target_ref: docs/architecture/mvp-security-architecture.yaml#scoped_admission
+    source: >-
+      Connectivity request submission requires effective access.request authority
+      for the source Resource at server-owned admission time; destination Resource
+      request authority is not required merely to submit the request.
+    target:
+      - Access-request scope is derived from distinct AuthorityScopeRefs of source and destination Resources.
+      - Every required scope needs an effective matching grant; partial scope coverage fails 403.
+    relation: REALIZES
+    rationale: Security Architecture strengthens request admission with an explicitly forbidden destination-scope requirement.
+
+  - id: napms-request-authority-requirement-to-http
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: napms
+    capability_edge:
+      source: engineering.requirements.product-intent
+      target: engineering.interface.http-contract
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-AUTH-001
+    target_ref: docs/contracts/http/napms-api-requirements.yaml#rules
+    source: >-
+      Connectivity request submission requires effective access.request authority
+      for the source Resource at server-owned admission time; destination Resource
+      request authority is not required merely to submit the request.
+    target: >-
+      access.request is admitted from effective scoped AuthorityGrants for the
+      source Resource AuthorityScopeRef at server-owned admissionAt; destination
+      request authority is not required merely to submit.
+    relation: REALIZES
+    rationale: The HTTP contract preserves the source-only request-admission rule exactly.
+
+  - id: napms-request-authority-rules-to-http
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: napms
+    capability_edge:
+      source: engineering.architecture.rules
+      target: engineering.interface.http-contract
+    source_ref: docs/architecture/mvp-system-rules.yaml#interaction_rules
+    target_ref: docs/contracts/http/napms-api-requirements.yaml#rules
+    source: >-
+      AccessRequest submission requires access.request authority only for the
+      source Resource scope; destination scope is not request-admission authority.
+    target: >-
+      access.request is admitted from effective scoped AuthorityGrants for the
+      source Resource AuthorityScopeRef at server-owned admissionAt; destination
+      request authority is not required merely to submit.
+    relation: REALIZES
+    rationale: The HTTP contract realizes the System Rules source-only admission semantics.
+
+  - id: napms-request-authority-security-to-http
+    expected_status: REJECTED
+    mutation_class: real-project-constraint-drift
+    defect_group: NAPMS-REQUEST-AUTHORITY-SCOPE-DRIFT
+    project: napms
+    capability_edge:
+      source: engineering.architecture.security
+      target: engineering.interface.http-contract
+    source_ref: docs/architecture/mvp-security-architecture.yaml#scoped_admission
+    target_ref: docs/contracts/http/napms-api-requirements.yaml#rules
+    source:
+      - Access-request scope is derived from distinct AuthorityScopeRefs of source and destination Resources.
+      - Every required scope needs an effective matching grant; partial scope coverage fails 403.
+    target: >-
+      access.request is admitted from effective scoped AuthorityGrants for the
+      source Resource AuthorityScopeRef at server-owned admissionAt; destination
+      request authority is not required merely to submit.
+    relation: PRESERVES
+    rationale: The downstream HTTP contract contradicts its direct Security Architecture prerequisite, localizing the inconsistent middle artifact.
+
+  - id: prep-machine-search-to-screen-view
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.machine-interfaces
+      target: prep.screen-view-design
+    source_ref: docs/interface/machine-interface.md#Common-conventions
+    target_ref: docs/interface/screen-view-design.md
+    source: >-
+      Search/filtering over server-backed collections is evaluated by the backend
+      over the authoritative collection and must not be implemented by filtering
+      an arbitrary partial browser page.
+    target: >-
+      Search/filter controls on server-backed collections use the corresponding
+      backend collection operation; client-only filtering over an arbitrary
+      partial page is not a supported primary catalogue behavior.
+    relation: REALIZES
+    rationale: Screen/View Design preserves the machine-boundary search semantics without local partial-page reinterpretation.
+
+  - id: prep-performance-to-component-degradation
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.frontend-performance-capacity
+      target: prep.frontend-component-design
+    source_ref: docs/architecture/performance-capacity.md#Degradation-model
+    target_ref: docs/implementation/frontend-component-design.md
+    source: >-
+      Performance degradation is presentation-only and must not change canonical
+      Knowledge identity, relation type/direction, selected scope or the
+      availability of list/search/detail access.
+    target:
+      - Component realization permits semantic-preserving effect, label and physics degradation.
+      - Renderer presentation state cannot alter canonical membership, identity, type/direction, scope or list/detail availability.
+    relation: REALIZES
+    rationale: Component Design preserves semantic identity and access while allowing renderer-cost degradation.
+
+  - id: prep-verification-to-test-selection-focus
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.frontend-verification
+      target: prep.frontend-test-design
+    source_ref: docs/verification/frontend-verification.md#FV-08
+    target_ref: docs/verification/frontend-test-design.yaml#FTD-KNOWLEDGE-SELECTION-RENDERER-CONTINUITY
+    source: >-
+      Selection/detail and focus are distinct intents: ordinary Knowledge
+      selection must not implicitly change visible graph membership; focus
+      requires explicit focus intent.
+    target: >-
+      Selecting different Knowledge items without changing semantic scope or
+      filters updates selection/detail presentation without replacing graph data
+      or the live renderer; topology changes occur only through explicit
+      focus/fit/reset or accepted topology changes.
+    relation: REALIZES
+    rationale: Test Design turns the verification obligation into an observable selection-versus-focus oracle.
+
+  - id: prep-performance-to-test-profile-semantics
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.frontend-performance-capacity
+      target: prep.frontend-test-design
+    source_ref: docs/architecture/performance-capacity.md#Degradation-model
+    target_ref: docs/verification/frontend-test-design.yaml#FTD-GRAPH-PERFORMANCE-PROFILE-SEMANTICS
+    source: >-
+      Auto, Quality and Performance presentation choices may reduce renderer
+      cost but must preserve canonical node identity, visible semantic
+      membership, relation type/direction, scope and equivalent non-graph access.
+    target: >-
+      Switching performance profiles and visual preferences must leave canonical
+      node ids, semantic membership, relation source/target/type, current scope,
+      selection/focus and equivalent list/detail access unchanged; direction
+      remains inspectable if arrowheads are disabled.
+    relation: REALIZES
+    rationale: Test Design directly operationalizes the performance contract's semantic-preservation invariant.
+
+  - id: napms-verification-request-authority-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-AUTH-001
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-REQUEST-AUTHORITY
+    source: >-
+      Connectivity request submission requires effective access.request authority
+      for the source Resource at server-owned admission time; destination Resource
+      request authority is not required merely to submit.
+    target: >-
+      AccessRequest succeeds with effective access.request authority for the
+      source Resource scope at server-owned admissionAt; destination request
+      authority is not required; exact source authority evidence is stored and
+      request admission remains distinct from the later permission decision.
+    relation: REALIZES
+    rationale: The verification oracle explicitly preserves the source-only request-admission semantics.
+
+  - id: napms-verification-denied-no-rule-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-PERM-003
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-PERMISSION
+    source: >-
+      A NotAllowed decision creates no authoritative desired-access Rule.
+    target: >-
+      DENIED creates no Rule.
+    relation: REALIZES
+    rationale: The verification oracle directly tests the no-Rule outcome.
+
+  - id: napms-verification-no-numeric-quality-target-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-QUAL-001
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-QUALITY
+    source: >-
+      Numeric latency, throughput, availability and scale targets are not
+      mandatory product requirements for the first MVP.
+    target: >-
+      No implementation or acceptance gate invents mandatory numeric latency,
+      throughput, availability or scale targets.
+    relation: REALIZES
+    rationale: The inspection oracle explicitly preserves the accepted absence of mandatory numeric targets.
+
+  - id: napms-verification-no-heavy-async-runtime-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-SCALE-004
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-SCALE
+    source: >-
+      Heavy asynchronous background jobs and queueing are outside the first-MVP
+      runtime requirement and remain a future architecture reopening concern.
+    target: >-
+      Architecture Driver Closure and system topology preserve the accepted
+      first-MVP scale and no heavy asynchronous runtime requirement; listed
+      reopen conditions remain explicit.
+    relation: REALIZES
+    rationale: The verification oracle preserves both non-requirement and reopening semantics.
+
+  - id: napms-verification-initial-active-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    defect_group: NAPMS-VERIFICATION-INITIAL-ACTIVE-LOSS
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RULE-002
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-PERMISSION
+    source: >-
+      First successful materialization of Allowed access makes the resulting
+      authoritative current access operationally Active.
+    target:
+      - >-
+        MVP-REQ-PERMISSION declares that it verifies REQ-RULE-002.
+      - >-
+        Its expected result states only that DENIED creates no Rule, ALLOWED
+        creates or resolves exactly one Rule for the exact Deployment pair plus
+        immutable InteractionRevision, and repeated allowed requests converge.
+    relation: REALIZES
+    rationale: >-
+      The declared verification oracle never checks that first successful
+      Allowed materialization starts the resulting Rule ACTIVE.
+
+  - id: napms-verification-current-address-cardinality-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    defect_group: NAPMS-VERIFICATION-CURRENT-ADDRESS-CARDINALITY-LOSS
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RES-003
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-RESOURCE
+    source: >-
+      Each logical Resource endpoint has at most one current address realization,
+      represented as either one host address or one network prefix.
+    target:
+      - >-
+        MVP-REQ-RESOURCE declares that it verifies REQ-RES-003.
+      - >-
+        Its expected result checks Resource and Endpoint identity across
+        realization changes, AuthorityScopeRef independence, no automatic
+        endpoint grouping, and Site/responsibility history.
+    relation: REALIZES
+    rationale: >-
+      The verification oracle does not check the required current-address
+      cardinality or host-versus-prefix representation constraint.
+
+  - id: napms-verification-business-org-not-authority-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    defect_group: NAPMS-VERIFICATION-BUSINESS-ORG-AUTHORITY-SEPARATION-LOSS
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-BUS-008
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-BUSINESS
+    source: >-
+      A Business Process may have organizational responsibility, but that
+      organization must not be treated as an authorization scope.
+    target:
+      - >-
+        MVP-REQ-BUSINESS declares that it verifies REQ-BUS-008.
+      - >-
+        Its expected result checks participant-side Need independence, no
+        duplicate Rule for additional Needs, retirement history, no automatic
+        revoke at zero current Needs, and opaque criticalityLabel metadata.
+    relation: REALIZES
+    rationale: >-
+      The declared verification oracle omits the required separation between
+      organizational responsibility and authorization scope.
+
+  - id: napms-verification-effective-window-evaluation-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    defect_group: NAPMS-VERIFICATION-EFFECTIVE-WINDOW-EVALUATION-LOSS
+    project: napms
+    capability_edge:
+      source: engineering.requirements.acceptance
+      target: engineering.verification.acceptance-scenarios
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RULE-004
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-RULE-OPERATIONS
+    source: >-
+      Supported declarative effective conditions determine policy contribution
+      at evaluation time without redefining access identity or periodically
+      rewriting stored Active/Inactive state.
+    target:
+      - >-
+        MVP-REQ-RULE-OPERATIONS declares that it verifies REQ-RULE-004.
+      - >-
+        Its expected result checks that ACTIVE to INACTIVE to ACTIVE and
+        EffectiveWindow preserve Rule identity and permission evidence and that
+        technical realization changes do not redefine access.
+    relation: REALIZES
+    rationale: >-
+      The verification oracle preserves identity but never checks evaluation-time
+      effectiveness or the prohibition on periodic stored-state rewriting.

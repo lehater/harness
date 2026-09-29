@@ -1,0 +1,44 @@
+version: 1
+kind: harness-scenario
+id: coverage-is-scope-root-sensitive
+title: Scope roots narrow Engineering Coverage without broadening the Consumer
+dimensions:
+  project_archetype: user-facing
+  stage: implementation
+  behavior_class: activation
+  execution_type: deterministic
+covers:
+  - scope-root-activation
+
+fixtures:
+  graph:
+    yaml: ../../research/scope-activation-fixture-graph.yaml
+  core:
+    yaml: ../../research/scope-activation-fixture-core.yaml
+
+steps:
+  - id: mvp
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.core}
+      consumer: IMPLEMENTATION
+      scope: mvp
+      scope_roots: [fixture.mvp.implementation-design]
+    expect:
+      - {path: /scope_roots, op: equals, value: [fixture.mvp.implementation-design]}
+      - {path: /rows, op: contains_match, value: {concern: data.lifecycle}}
+      - {path: /rows, op: not_contains_match, value: {concern: interface.human.accessibility}}
+
+  - id: later
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.core}
+      consumer: IMPLEMENTATION
+      scope: later
+      scope_roots: [fixture.later.implementation-design]
+    expect:
+      - {path: /scope_roots, op: equals, value: [fixture.later.implementation-design]}
+      - {path: /rows, op: contains_match, value: {concern: interface.human.accessibility}}
+      - {path: /rows, op: not_contains_match, value: {concern: data.lifecycle}}

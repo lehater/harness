@@ -1,0 +1,117 @@
+version: 1
+kind: harness-scenario
+id: source-set-evidence-boundary-completeness
+title: Declared evidence channels must all close before source assurance is complete
+dimensions:
+  project_archetype: real-project
+  stage: discovery
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - source-coverage-completeness
+
+fixtures:
+  contract:
+    value:
+      version: 1
+      kind: harness-source-set-contract
+      id: NAPMS-FIRST-MVP-SOURCE-SET
+      scope: >-
+        First-MVP discovery/product source baseline required to preserve the
+        canonical problem-evidence -> user-needs -> product-requirements chain.
+      requirements:
+        - {id: problem-evidence, min_items: 1}
+        - {id: user-needs, min_items: 1}
+        - {id: product-requirements, min_items: 1}
+
+  missing-user-needs:
+    value:
+      version: 1
+      kind: harness-source-set
+      id: NAPMS-FIRST-MVP-SOURCE-SET-MISSING
+      contract_id: NAPMS-FIRST-MVP-SOURCE-SET
+      channels:
+        - id: problem-evidence
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        - id: product-requirements
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml
+
+  unresolved-user-needs:
+    value:
+      version: 1
+      kind: harness-source-set
+      id: NAPMS-FIRST-MVP-SOURCE-SET-QUESTION
+      contract_id: NAPMS-FIRST-MVP-SOURCE-SET
+      channels:
+        - id: problem-evidence
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        - id: user-needs
+          state: QUESTION
+          items: []
+        - id: product-requirements
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml
+
+  complete:
+    value:
+      version: 1
+      kind: harness-source-set
+      id: NAPMS-FIRST-MVP-SOURCE-SET-COMPLETE
+      contract_id: NAPMS-FIRST-MVP-SOURCE-SET
+      channels:
+        - id: problem-evidence
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        - id: user-needs
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-user-needs.yaml
+        - id: product-requirements
+          state: COMPLETE
+          items:
+            - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml
+
+steps:
+  - id: missing-channel-rejected
+    driver: source.set
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: source-set-channel-omission
+    with:
+      contract: {ref: fixture.contract}
+      inventory: {ref: fixture.missing-user-needs}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /required_channel_count, op: equals, value: 3}
+      - {path: /reviewed_channel_count, op: equals, value: 2}
+      - {path: /findings, op: contains_match, value: {code: SOURCE_CHANNEL_MISSING, channel: user-needs}}
+
+  - id: unresolved-channel-rejected
+    driver: source.set
+    with:
+      contract: {ref: fixture.contract}
+      inventory: {ref: fixture.unresolved-user-needs}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /reviewed_channel_count, op: equals, value: 3}
+      - {path: /findings, op: contains_match, value: {code: SOURCE_CHANNEL_QUESTION, channel: user-needs}}
+      - {path: /findings, op: contains_match, value: {code: SOURCE_CHANNEL_UNDERSATISFIED, channel: user-needs}}
+
+  - id: declared-source-set-complete
+    driver: source.set
+    with:
+      contract: {ref: fixture.contract}
+      inventory: {ref: fixture.complete}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /required_channel_count, op: equals, value: 3}
+      - {path: /reviewed_channel_count, op: equals, value: 3}
+      - {path: /findings, op: length, value: 0}

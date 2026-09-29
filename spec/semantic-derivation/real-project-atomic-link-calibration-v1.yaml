@@ -1,0 +1,99 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: real-project-atomic-link-calibration-v1
+
+scope:
+  purpose: >-
+    Measure semantic judgement on one explicit consumed source atom against one
+    concrete downstream target atom, using real NAPMS Requirements Acceptance ->
+    Verification Acceptance Scenarios semantics.
+  project:
+    repository: lehater/napms
+    commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  policy: >-
+    Source and target text are atom-sized expert-reviewed semantic claims
+    extracted from the pinned canonical requirement and verification artifacts.
+    Negative cases pair a mandatory source atom with the nearest actually present
+    verification atom that does not realize it; no synthetic downstream wording
+    is introduced.
+
+cases:
+  - id: atomic-request-authority
+    expected_status: ACCEPTED
+    mutation_class: real-project-atomic-valid-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-AUTH-001
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-REQUEST-AUTHORITY
+    source: Request admission requires access.request authority for the source Resource scope and not destination request authority.
+    target: AccessRequest succeeds with source-scope access.request authority; destination request authority is not required.
+    relation: REALIZES
+    rationale: The target oracle directly observes the source-only authority rule.
+
+  - id: atomic-denied-no-rule
+    expected_status: ACCEPTED
+    mutation_class: real-project-atomic-valid-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-PERM-003
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-PERMISSION
+    source: A NotAllowed permission decision creates no authoritative desired-access Rule.
+    target: DENIED creates no Rule.
+    relation: REALIZES
+    rationale: The target is a direct verification oracle for the source atom.
+
+  - id: atomic-no-numeric-targets
+    expected_status: ACCEPTED
+    mutation_class: real-project-atomic-valid-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-QUAL-001
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-QUALITY
+    source: Numeric latency, throughput, availability and scale targets are not mandatory first-MVP requirements.
+    target: No implementation or acceptance gate invents mandatory numeric latency, throughput, availability or scale targets.
+    relation: REALIZES
+    rationale: The inspection oracle preserves the accepted absence of numeric targets.
+
+  - id: atomic-no-heavy-async
+    expected_status: ACCEPTED
+    mutation_class: real-project-atomic-valid-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-SCALE-004
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-SCALE
+    source: Heavy asynchronous background jobs and queueing are outside the first-MVP runtime requirement.
+    target: Verification preserves the first-MVP no-heavy-asynchronous-runtime requirement.
+    relation: REALIZES
+    rationale: The target directly observes the no-heavy-async runtime constraint.
+
+  - id: atomic-initial-active-vs-rule-creation
+    expected_status: REJECTED
+    mutation_class: real-project-atomic-missing-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RULE-002
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-PERMISSION
+    source: First successful materialization of Allowed access makes the resulting authoritative current access operationally Active.
+    target: ALLOWED creates or resolves exactly one Rule for the exact subject and repeated allowed requests converge.
+    relation: REALIZES
+    rationale: Rule creation/convergence does not verify the mandatory initial ACTIVE state.
+
+  - id: atomic-address-cardinality-vs-identity
+    expected_status: REJECTED
+    mutation_class: real-project-atomic-missing-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RES-003
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-RESOURCE
+    source: Each logical Resource endpoint has at most one current address realization, represented as one host address or one network prefix.
+    target: Resource identity and Endpoint identity survive realization changes.
+    relation: REALIZES
+    rationale: Identity preservation does not test current-address cardinality or host/prefix representation.
+
+  - id: atomic-org-authority-vs-business-behavior
+    expected_status: REJECTED
+    mutation_class: real-project-atomic-missing-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-BUS-008
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-BUSINESS
+    source: Business Process organizational responsibility must not be treated as an authorization scope.
+    target: Participant-side Needs remain independent business justification and zero current Needs does not revoke desired access.
+    relation: REALIZES
+    rationale: Need lifecycle behavior does not verify organization-versus-authorization separation.
+
+  - id: atomic-effective-evaluation-vs-identity
+    expected_status: REJECTED
+    mutation_class: real-project-atomic-missing-link
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RULE-004
+    target_ref: docs/plans/first-mvp-test-intent.yaml#MVP-REQ-RULE-OPERATIONS
+    source: Declarative effective conditions determine policy contribution at evaluation time without periodically rewriting stored Active or Inactive state.
+    target: ACTIVE to INACTIVE to ACTIVE and EffectiveWindow preserve Rule identity and permission evidence.
+    relation: REALIZES
+    rationale: Identity preservation does not verify evaluation-time contribution or the no-periodic-rewrite rule.

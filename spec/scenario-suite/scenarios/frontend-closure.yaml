@@ -1,0 +1,76 @@
+version: 1
+kind: harness-scenario
+id: frontend-contract-closure-detects-missing-task-view
+title: Frontend UX and screen closure reject missing accepted interaction surfaces
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: frontend
+  execution_type: deterministic
+covers:
+  - frontend-contract-closure
+
+fixtures:
+  task:
+    yaml: ../../../examples/user-facing-application/canonical/example-task-model.yaml
+  conceptual:
+    yaml: ../../../examples/user-facing-application/canonical/example-conceptual-interface-model.yaml
+  ia:
+    yaml: ../../../examples/user-facing-application/canonical/example-information-architecture.yaml
+  interaction:
+    yaml: ../../../examples/user-facing-application/canonical/example-interaction-design.yaml
+  topology:
+    yaml: ../../../examples/user-facing-application/canonical/example-interface-topology.yaml
+  presentation:
+    yaml: ../../../examples/user-facing-application/canonical/example-presentation-system.yaml
+  screens:
+    yaml: ../../../examples/user-facing-application/canonical/example-screen-view-design.yaml
+
+steps:
+  - id: ux-complete
+    driver: frontend.ux_closure
+    with:
+      task_model: {ref: fixture.task}
+      conceptual_model: {ref: fixture.conceptual}
+      information_architecture: {ref: fixture.ia}
+      interaction_design: {ref: fixture.interaction}
+      topology: {ref: fixture.topology}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+
+  - id: remove-detail-context
+    driver: data.patch
+    with:
+      value: {ref: fixture.interaction}
+      operations:
+        - {op: remove, path: /contexts/1}
+
+  - id: ux-gap
+    driver: frontend.ux_closure
+    with:
+      task_model: {ref: fixture.task}
+      conceptual_model: {ref: fixture.conceptual}
+      information_architecture: {ref: fixture.ia}
+      interaction_design: {ref: step.remove-detail-context}
+      topology: {ref: fixture.topology}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNCOVERED_USER_TASK}}
+
+  - id: remove-detail-screen
+    driver: data.patch
+    with:
+      value: {ref: fixture.screens}
+      operations:
+        - {op: remove, path: /screens/2}
+
+  - id: screen-gap
+    driver: frontend.screen_contracts
+    with:
+      presentation: {ref: fixture.presentation}
+      screen_design: {ref: step.remove-detail-screen}
+      interface_contract: null
+      screen_ids: [APPLICATION-SHELL, RESOURCE-CATALOGUE, RESOURCE-DETAIL]
+    expect:
+      - {path: /findings, op: contains_match, value: {code: MISSING_REQUIRED_SCREEN, screen: RESOURCE-DETAIL}}

@@ -1,0 +1,32 @@
+version: 1
+kind: harness-scenario
+id: user-facing-derivation-test-coverage
+title: User-facing Engineering Graph direct dependencies have derivation test coverage
+dimensions:
+  project_archetype: user-facing
+  stage: diagnosis
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - derivation-test-coverage
+
+fixtures:
+  graph:
+    yaml: ../../../examples/user-facing-application/engineering-graph.yaml
+  scenario-directory:
+    path: .
+
+steps:
+  - id: full-user-facing-coverage
+    driver: semantic.derivation_test_coverage
+    with:
+      graph: {ref: fixture.graph}
+      scenario_directory: {ref: fixture.scenario-directory}
+      dispositions: []
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /gap_count, op: equals, value: 0}
+      - {path: /invalid_registration_count, op: equals, value: 0}
+    observe:
+      edge_count: /edge_count
+      covered_count: /covered_count

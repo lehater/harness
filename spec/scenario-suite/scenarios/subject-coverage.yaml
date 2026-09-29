@@ -1,0 +1,94 @@
+version: 1
+kind: harness-scenario
+id: subject-inventory-and-classification-are-explicit
+title: Subject coverage requires explicit inventory and requirement classification
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - subject-inventory-disposition
+  - subject-obligation-classification
+
+fixtures:
+  source:
+    value:
+      content:
+        requirements:
+          - {id: R1, status: ACCEPTED}
+          - {id: R2, status: ACCEPTED}
+  obligations:
+    value:
+      version: 1
+      kind: harness-coverage-subject-obligations
+      consumer: IMPLEMENTATION
+      scope: default
+      subjects:
+        - subject: BC-A
+          concerns: [domain.model]
+          requirement_refs: [R1]
+          state: REQUIRED
+      excluded_requirements: []
+
+steps:
+  - id: missing-inventory
+    driver: coverage.subject_inventory
+    with:
+      disposition: null
+      consumer: IMPLEMENTATION
+      scope: default
+    expect:
+      - {path: /completion_ready, op: equals, value: false}
+      - path: /rows
+        op: contains_match
+        value:
+          concern: meta.subject-inventory
+          state: MISSING
+          action: DECLARE_SUBJECT_INVENTORY
+
+  - id: explicit-not-applicable
+    driver: coverage.subject_inventory
+    with:
+      disposition:
+        state: NOT_APPLICABLE
+        rationale: Selected scope has no independent subject partitions.
+      consumer: IMPLEMENTATION
+      scope: default
+    expect:
+      - {path: /completion_ready, op: equals, value: true}
+      - {path: /rows, op: contains_match, value: {state: NOT_APPLICABLE, action: NONE}}
+
+  - id: partial-classification
+    driver: coverage.subject_obligations
+    with:
+      obligations: {ref: fixture.obligations}
+      source: {ref: fixture.source}
+      consumer: IMPLEMENTATION
+      scope: default
+    expect:
+      - {path: /source_complete, op: equals, value: false}
+      - {path: /unclassified_requirements, op: equals, value: [R2]}
+
+  - id: exclude-r2
+    driver: data.patch
+    with:
+      value: {ref: fixture.obligations}
+      operations:
+        - op: add
+          path: /excluded_requirements/-
+          value:
+            requirement: R2
+            rationale: R2 is outside the selected tactical subject scope.
+
+  - id: complete-classification
+    driver: coverage.subject_obligations
+    with:
+      obligations: {ref: step.exclude-r2}
+      source: {ref: fixture.source}
+      consumer: IMPLEMENTATION
+      scope: default
+    expect:
+      - {path: /source_complete, op: equals, value: true}
+      - {path: /unclassified_requirements, op: length, value: 0}
+      - {path: /classified_requirement_count, op: equals, value: 2}

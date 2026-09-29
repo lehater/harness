@@ -1,0 +1,79 @@
+version: 1
+kind: harness-scenario
+id: graph-doctor-detects-owner-drift
+title: Graph Doctor distinguishes a healthy model from ownership drift
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: diagnosis
+  execution_type: deterministic
+covers:
+  - graph-diagnostics
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: GRAPH-DOCTOR-SCENARIO
+      authorities:
+        - id: DOMAIN
+          responsibility: Own domain knowledge.
+          boundary:
+            semantic_cohesion: Domain semantics.
+            independent_change: Domain semantics change independently.
+            public_contract: Accepted domain model.
+          produces:
+            - capability: demo.domain
+              knowledge_kind: domain-model
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume the domain model.
+          requires: [demo.domain]
+      terminal_capabilities: []
+  model:
+    value:
+      authorities:
+        - id: DOMAIN
+          responsibility: Own domain knowledge.
+          boundary:
+            semantic_cohesion: Domain semantics.
+            independent_change: Domain semantics change independently.
+            public_contract: Accepted domain model.
+      artifacts:
+        - id: DOMAIN-MODEL
+          authority: DOMAIN
+          path: docs/domain.yaml
+          provides: [demo.domain]
+          depends_on: []
+      questions: []
+
+steps:
+  - id: healthy
+    driver: graph.doctor
+    with:
+      engineering_graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+    expect:
+      - {path: /healthy, op: equals, value: true}
+      - {path: /summary/ERROR, op: equals, value: 0}
+
+  - id: wrong-owner
+    driver: data.patch
+    with:
+      value: {ref: fixture.model}
+      operations:
+        - {op: replace, path: /artifacts/0/authority, value: OTHER}
+
+  - id: diagnose
+    driver: graph.doctor
+    with:
+      engineering_graph: {ref: fixture.graph}
+      model: {ref: step.wrong-owner}
+      target: IMPLEMENTATION
+    expect:
+      - {path: /healthy, op: equals, value: false}
+      - {path: /summary/ERROR, op: gte, value: 1}
+      - {path: /findings, op: contains_match, value: {code: PROVIDER_OWNER_MISMATCH, severity: ERROR}}

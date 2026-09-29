@@ -1,0 +1,134 @@
+version: 1
+kind: harness-scenario
+id: semantic-surface-extraction-admission
+title: Source coverage alone cannot prove semantic-surface fidelity
+dimensions:
+  project_archetype: real-project
+  stage: discovery
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - source-coverage-completeness
+
+fixtures:
+  weakened-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-SURFACE-EXTRACTION-RED
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066
+      coverage_status: COMPLETE
+      statements:
+        - id: REQ-RULE-004-SOURCE
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-RULE-004
+          text: >-
+            Supported declarative effective conditions determine policy
+            contribution at evaluation time without redefining access identity
+            or periodically rewriting stored Active/Inactive state.
+      dispositions:
+        - statement_id: REQ-RULE-004-SOURCE
+          classification: ADMITTED
+          admitted_ref: extracted-surface.yaml#REQ-RULE-004
+          sanitized_statement: >-
+            Supported declarative effective conditions determine policy
+            contribution at evaluation time.
+
+  atom-contract:
+    value:
+      authority: PRODUCT-REQUIREMENTS
+      owned_assertion_kinds: [requirement-atom]
+      allowed_source_authorities: [PRODUCT-REQUIREMENTS]
+      requires_source_authority: true
+      requires_assertion_authority: true
+      obligations:
+        - id: preserve-effective-window-semantics
+          kind: requirement-atom
+          subjects: [REQ-RULE-004.effective-window]
+
+  source-atom-baseline:
+    value:
+      semantic_assertions:
+        - id: REQ-RULE-004-EFFECTIVE-WINDOW
+          kind: requirement-atom
+          subject: REQ-RULE-004.effective-window
+          semantic_value: evaluation-time-effectiveness-without-periodic-state-rewrite
+          decision_authority: PRODUCT-REQUIREMENTS
+
+  weakened-atom-surface:
+    value:
+      id: NAPMS-EXTRACTED-SURFACE-WEAKENED
+      capability: engineering.requirements.acceptance
+      semantic_assertions:
+        - id: EXTRACT-REQ-RULE-004-EFFECTIVE-WINDOW
+          kind: requirement-atom
+          subject: REQ-RULE-004.effective-window
+          semantic_value: evaluation-time-effectiveness
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [REQ-RULE-004-EFFECTIVE-WINDOW]
+
+  missing-atom-surface:
+    value:
+      id: NAPMS-EXTRACTED-SURFACE-MISSING
+      capability: engineering.requirements.acceptance
+      semantic_assertions: []
+
+  faithful-atom-surface:
+    value:
+      id: NAPMS-EXTRACTED-SURFACE-FAITHFUL
+      capability: engineering.requirements.acceptance
+      semantic_assertions:
+        - id: EXTRACT-REQ-RULE-004-EFFECTIVE-WINDOW
+          kind: requirement-atom
+          subject: REQ-RULE-004.effective-window
+          semantic_value: evaluation-time-effectiveness-without-periodic-state-rewrite
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [REQ-RULE-004-EFFECTIVE-WINDOW]
+
+steps:
+  - id: source-coverage-red
+    driver: source.coverage
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: semantic-sanitization-weakening
+    with:
+      document: {ref: fixture.weakened-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 1}
+
+  - id: reject-missing-atom
+    driver: semantic.acceptance
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: semantic-surface-atom-omission
+    with:
+      contract: {ref: fixture.atom-contract}
+      sources: {ref: fixture.source-atom-baseline}
+      candidate: {ref: fixture.missing-atom-surface}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: MISSING_SUBJECTS, obligation: preserve-effective-window-semantics}}
+
+  - id: reject-weakened-atom
+    driver: semantic.acceptance
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: semantic-surface-atom-weakening
+    with:
+      contract: {ref: fixture.atom-contract}
+      sources: {ref: fixture.source-atom-baseline}
+      candidate: {ref: fixture.weakened-atom-surface}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SOURCE_FIDELITY_VIOLATION, assertion: EXTRACT-REQ-RULE-004-EFFECTIVE-WINDOW, source: REQ-RULE-004-EFFECTIVE-WINDOW}}
+
+  - id: accept-faithful-atom
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.atom-contract}
+      sources: {ref: fixture.source-atom-baseline}
+      candidate: {ref: fixture.faithful-atom-surface}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /obligations/satisfied, op: contains, value: preserve-effective-window-semantics}

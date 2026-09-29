@@ -1,0 +1,91 @@
+version: 1
+kind: harness-scenario
+id: legacy-frontend-semantic-derivation
+title: Legacy broad frontend contracts retain semantic derivation coverage during migration
+dimensions:
+  project_archetype: user-facing
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: human-interface-design, target_knowledge_kind: presentation-system-design}
+  - {source_knowledge_kind: human-interface-design, target_knowledge_kind: screen-view-design}
+  - {source_knowledge_kind: security-architecture, target_knowledge_kind: implementation-design}
+
+fixtures:
+  graph:
+    yaml: ../../../examples/frontend-legacy-compatibility/engineering-graph.yaml
+  human:
+    value:
+      semantic_assertions:
+        - {id: LEGACY-HUMAN-VIEW, kind: human-interface-view, subject: RESOURCE, semantic_value: resource-workspace, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: LEGACY-HUMAN-ACTION, kind: human-interface-action, subject: RESOURCE, semantic_value: edit-resource, decision_authority: HUMAN-INTERFACE-DESIGN}
+  presentation:
+    value:
+      semantic_assertions:
+        - {id: LEGACY-PRESENT, kind: presentation-pattern, subject: RESOURCE, semantic_value: resource-workspace-presentation, decision_authority: HUMAN-INTERFACE-DESIGN}
+  screen:
+    value:
+      semantic_assertions:
+        - {id: LEGACY-SCREEN, kind: screen-view, subject: RESOURCE, semantic_value: resource-workspace-screen, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: LEGACY-SCREEN-ACTION, kind: screen-action, subject: RESOURCE, semantic_value: edit-resource-action, decision_authority: HUMAN-INTERFACE-DESIGN}
+  security:
+    value:
+      semantic_assertions:
+        - {id: LEGACY-IDENTITY, kind: security-trust-boundary, subject: FRONTEND, semantic_value: accepted-frontend-identity-context, decision_authority: SECURITY-ARCHITECTURE}
+  implementation:
+    value:
+      semantic_assertions:
+        - {id: LEGACY-IMPL-SECURITY, kind: implementation-slice, subject: FRONTEND, semantic_value: preserve-accepted-identity-boundary, decision_authority: IMPLEMENTATION-DESIGN}
+        - {id: LEGACY-IMPL-VERIFY, kind: implementation-criterion, subject: FRONTEND, semantic_value: accepted-verification-passes, decision_authority: IMPLEMENTATION-DESIGN}
+
+steps:
+  - id: human-to-presentation
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.presentation-system, obligations: [{id: views, source_kind: human-interface-view}, {id: actions, source_kind: human-interface-action}]}
+      source: {ref: fixture.human}
+      candidate: {ref: fixture.presentation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.presentation-system, links: [{sources: [LEGACY-HUMAN-VIEW, LEGACY-HUMAN-ACTION], relation: TRANSFORMS, targets: [LEGACY-PRESENT]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: human-to-screen
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.screen-view, obligations: [{id: views, source_kind: human-interface-view}, {id: actions, source_kind: human-interface-action}]}
+      source: {ref: fixture.human}
+      candidate: {ref: fixture.screen}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.screen-view, links: [{sources: [LEGACY-HUMAN-VIEW], relation: REALIZES, targets: [LEGACY-SCREEN]}, {sources: [LEGACY-HUMAN-ACTION], relation: REALIZES, targets: [LEGACY-SCREEN-ACTION]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: security-to-implementation
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: legacy.frontend.security, target_capability: legacy.frontend.implementation, obligations: [{id: identity, source_kind: security-trust-boundary}]}
+      source: {ref: fixture.security}
+      candidate: {ref: fixture.implementation}
+      evidence: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: legacy.frontend.security, target_capability: legacy.frontend.implementation, links: [{sources: [LEGACY-IDENTITY], relation: REALIZES, targets: [LEGACY-IMPL-SECURITY]}], dispositions: []}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: remove-human-action-link
+    driver: data.patch
+    with:
+      value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.screen-view, links: [{sources: [LEGACY-HUMAN-VIEW], relation: REALIZES, targets: [LEGACY-SCREEN]}, {sources: [LEGACY-HUMAN-ACTION], relation: REALIZES, targets: [LEGACY-SCREEN-ACTION]}], dispositions: []}
+      operations: [{op: remove, path: /links/1}]
+  - id: legacy-screen-loses-action
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {version: 1, kind: harness-semantic-derivation-contract, source_capability: legacy.frontend.human-interface, target_capability: legacy.frontend.screen-view, obligations: [{id: views, source_kind: human-interface-view}, {id: actions, source_kind: human-interface-action}]}
+      source: {ref: fixture.human}
+      candidate: {ref: fixture.screen}
+      evidence: {ref: step.remove-human-action-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: LEGACY-HUMAN-ACTION, owner_authority: HUMAN-INTERFACE-DESIGN}}

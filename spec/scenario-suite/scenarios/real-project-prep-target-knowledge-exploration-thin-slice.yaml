@@ -1,0 +1,428 @@
+version: 1
+kind: harness-scenario
+id: real-project-prep-target-knowledge-exploration-thin-slice
+title: Prep target-scoped Knowledge exploration preserves meaning to the pre-code boundary
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: real-project
+covers:
+  - source-coverage-completeness
+  - semantic-derivation-coverage
+
+fixtures:
+  graph:
+    yaml: ../fixtures/external/prep-engineering-graph.yaml
+
+  acquisition-contract:
+    value:
+      version: 1
+      kind: harness-source-set-contract
+      id: PREP-TARGET-KNOWLEDGE-SOURCE-SET
+      scope: Selected learner-problem evidence for target-scoped Knowledge exploration.
+      requirements:
+        - {id: problem-evidence, min_items: 1}
+
+  source-inventory:
+    value:
+      version: 1
+      kind: harness-source-set
+      id: PREP-TARGET-KNOWLEDGE-SOURCE-INVENTORY
+      contract_id: PREP-TARGET-KNOWLEDGE-SOURCE-SET
+      channels:
+        - id: problem-evidence
+          state: COMPLETE
+          items:
+            - source_ref: lehater/prep@b3ec3b0fec0d8ba29f2ca66867737e8838332592:docs/vision/problem-space.md#selected-target-knowledge-problem
+
+  problem-source:
+    value: |-
+      The desired state can require an uncertain scope of knowledge and different depths of mastery.
+      Relevant information can be fragmented, incomplete, inconsistent, redundant or expressed in different terms.
+
+  problem-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: PREP-TARGET-KNOWLEDGE-PROBLEM-BOUNDARY
+      source_baseline: lehater/prep@b3ec3b0fec0d8ba29f2ca66867737e8838332592:docs/vision/problem-space.md#selected-target-knowledge-problem
+      source_sha256: 4ad4ae5b27d165c4f5110541d1d0c9537f2fa3831e59a37e9b25f4673731513b
+      segments:
+        - {id: target-scope-uncertainty, start_line: 1, end_line: 1}
+        - {id: fragmented-relevant-information, start_line: 2, end_line: 2}
+
+  statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: PREP-TARGET-KNOWLEDGE-PROBLEM-STATEMENTS
+      source_baseline: lehater/prep@b3ec3b0fec0d8ba29f2ca66867737e8838332592:docs/vision/problem-space.md#selected-target-knowledge-problem
+      coverage_status: COMPLETE
+      statements:
+        - id: STMT-TARGET-SCOPE
+          source_ref: docs/vision/problem-space.md#desired-state-scope
+          text: The desired state may require an uncertain scope of knowledge and depth.
+        - id: STMT-FRAGMENTED-KNOWLEDGE
+          source_ref: docs/vision/problem-space.md#fragmented-information
+          text: Relevant information may be fragmented, incomplete, inconsistent, redundant or expressed differently.
+      dispositions:
+        - statement_id: STMT-TARGET-SCOPE
+          classification: ADMITTED
+          admitted_ref: accepted-problem#PROBLEM-TARGET-SCOPE
+          sanitized_statement: The desired state may require an uncertain scope of knowledge and depth.
+        - statement_id: STMT-FRAGMENTED-KNOWLEDGE
+          classification: ADMITTED
+          admitted_ref: accepted-problem#PROBLEM-REPRESENTATION
+          sanitized_statement: Relevant information may be fragmented and expressed through differing representations or terminology.
+
+  source-atoms:
+    value:
+      semantic_assertions:
+        - id: SRC-TARGET-SCOPE
+          kind: target-scope
+          subject: desired-state-scope
+          semantic_value: desired-state-has-nontrivial-required-knowledge-scope
+          decision_authority: DISCOVERY
+        - id: SRC-REPRESENTATION
+          kind: representation-independence
+          subject: fragmented-relevant-information
+          semantic_value: relevant-knowledge-is-fragmented-and-needs-coherent-access
+          decision_authority: DISCOVERY
+
+  problem-acceptance-contract:
+    value:
+      authority: DISCOVERY
+      owned_assertion_kinds: [target-scope, representation-independence]
+      allowed_source_authorities: [DISCOVERY]
+      requires_source_authority: true
+      requires_assertion_authority: true
+      requires_semantic_review: true
+      required_semantic_review_checks: [statement-completeness, meaning-preserved]
+      obligations:
+        - {id: target-scope-problem, kind: target-scope, subjects: [desired-state-scope]}
+        - {id: fragmented-knowledge-problem, kind: representation-independence, subjects: [fragmented-relevant-information]}
+
+  accepted-problem:
+    value:
+      capability: prep.problem-evidence
+      semantic_assertions:
+        - id: PROBLEM-TARGET-SCOPE
+          kind: target-scope
+          subject: desired-state-scope
+          semantic_value: desired-state-has-nontrivial-required-knowledge-scope
+          decision_authority: DISCOVERY
+          derived_from: [SRC-TARGET-SCOPE]
+        - id: PROBLEM-REPRESENTATION
+          kind: representation-independence
+          subject: fragmented-relevant-information
+          semantic_value: relevant-knowledge-is-fragmented-and-needs-coherent-access
+          decision_authority: DISCOVERY
+          derived_from: [SRC-REPRESENTATION]
+      semantic_review:
+        reviewer_kind: HUMAN
+        status: ACCEPTED
+        checks: [statement-completeness, meaning-preserved]
+
+  intent-surface:
+    value:
+      capability: prep.product-intent
+      semantic_assertions:
+        - {id: INTENT-TARGET-SCOPE, kind: target-scope, subject: coherent-target-view, semantic_value: learner-obtains-coherent-view-of-knowledge-relevant-to-chosen-target, decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: INTENT-REPRESENTATION, kind: representation-independence, subject: structured-access, semantic_value: knowledge-structure-serves-understanding-navigation-and-reuse-not-a-preferred-visualization, decision_authority: PRODUCT-REQUIREMENTS}
+
+  product-surface:
+    value:
+      capability: prep.product-capabilities
+      semantic_assertions:
+        - {id: PRODUCT-TARGET-SCOPE, kind: target-scope, subject: PC-01, semantic_value: prepared-target-expresses-intended-outcome-and-reusable-required-scope, decision_authority: PRODUCT-REQUIREMENTS}
+        - {id: PRODUCT-REPRESENTATION, kind: representation-independence, subject: PC-03, semantic_value: reusable-knowledge-identities-and-accepted-relations-are-inspectable-and-navigable-without-requiring-one-visualization-form, decision_authority: PRODUCT-REQUIREMENTS}
+
+  application-surface:
+    value:
+      capability: prep.application-design
+      semantic_assertions:
+        - {id: APP-TARGET-SCOPE, kind: target-scope, subject: learning-target-knowledge-query, semantic_value: project-knowledge-nodes-currently-relevant-to-learning-target, decision_authority: APPLICATION-DESIGN}
+        - {id: APP-REPRESENTATION, kind: representation-independence, subject: knowledge-relation-projection, semantic_value: project-accepted-relations-among-selected-target-relevant-node-set, decision_authority: APPLICATION-DESIGN}
+
+  task-surface:
+    value:
+      capability: prep.task-model
+      semantic_assertions:
+        - {id: TASK-TARGET-SCOPE, kind: target-scope, subject: TASK-L-EXPLORE-KNOWLEDGE, semantic_value: learner-explores-target-relevant-knowledge-and-recoverable-query-failure-retains-target-context, decision_authority: APPLICATION-DESIGN}
+        - {id: TASK-REPRESENTATION, kind: representation-independence, subject: TASK-L-EXPLORE-KNOWLEDGE, semantic_value: list-search-detail-and-graph-use-the-same-canonical-identities-and-relations, decision_authority: APPLICATION-DESIGN}
+
+  journey-surface:
+    value:
+      capability: prep.user-journeys
+      semantic_assertions:
+        - {id: JOURNEY-TARGET-SCOPE, kind: target-scope, subject: explore-target-knowledge, semantic_value: active-target-projects-aligned-knowledge-and-focus-can-return-to-target-scope-with-context-preserved, decision_authority: APPLICATION-DESIGN}
+        - {id: JOURNEY-REPRESENTATION, kind: representation-independence, subject: explore-target-knowledge, semantic_value: canonical-detail-and-relations-remain-available-through-equivalent-list-search-detail-alongside-graph, decision_authority: APPLICATION-DESIGN}
+
+  ia-surface:
+    value:
+      capability: prep.information-architecture
+      semantic_assertions:
+        - {id: IA-TARGET-SCOPE, kind: target-scope, subject: TARGET-KNOWLEDGE, semantic_value: target-workspace-preserves-selected-target-and-target-knowledge-location-explores-target-relevant-knowledge-and-relations, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  interaction-surface:
+    value:
+      capability: prep.interaction-design
+      semantic_assertions:
+        - {id: INTERACTION-TARGET-SCOPE, kind: target-scope, subject: I-L-KNOWLEDGE, semantic_value: data-query-retry-preserves-target-and-filter-context-and-focus-is-reversible, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: INTERACTION-REPRESENTATION, kind: representation-independence, subject: I-L-KNOWLEDGE, semantic_value: list-search-detail-remains-completable-without-graph-and-renderer-failure-preserves-canonical-access, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  topology-surface:
+    value:
+      capability: prep.interface-topology
+      semantic_assertions:
+        - {id: TOPOLOGY-TARGET-SCOPE, kind: target-scope, subject: L-03-TARGET-KNOWLEDGE, semantic_value: active-learning-target-is-preserved-by-target-workspace-around-target-knowledge-view, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  screen-surface:
+    value:
+      capability: prep.screen-view-design
+      semantic_assertions:
+        - {id: SCREEN-TARGET-SCOPE, kind: target-scope, subject: L-03-TARGET-KNOWLEDGE, semantic_value: screen-shows-knowledge-reached-from-current-target-alignments-and-preserves-target-scope-during-exploration, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-REPRESENTATION, kind: representation-independence, subject: knowledge-graph-projection, semantic_value: target-scoped-graph-and-list-search-detail-are-equivalent-canonical-access-paths-over-same-knowledge-and-relations, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  mutated-screen-surface:
+    value:
+      capability: prep.screen-view-design
+      semantic_assertions:
+        - {id: SCREEN-REPRESENTATION, kind: representation-independence, subject: knowledge-graph-projection, semantic_value: target-scoped-graph-and-list-search-detail-are-equivalent-canonical-access-paths-over-same-knowledge-and-relations, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  architecture-surface:
+    value:
+      capability: prep.frontend-system-architecture
+      semantic_assertions:
+        - {id: ARCH-TARGET-SCOPE, kind: target-scope, subject: Learning-Knowledge-Exploration, semantic_value: learning-owns-selected-target-context-and-knowledge-exploration-consumes-target-derived-scope, decision_authority: SYSTEM-ARCHITECTURE}
+        - {id: ARCH-REPRESENTATION, kind: representation-independence, subject: Knowledge-Exploration, semantic_value: list-search-detail-and-graph-are-coordinated-representations-with-stable-canonical-identities-and-renderer-neutral-semantics, decision_authority: SYSTEM-ARCHITECTURE}
+
+  component-surface:
+    value:
+      capability: prep.frontend-component-design
+      semantic_assertions:
+        - {id: COMPONENT-TARGET-SCOPE, kind: target-scope, subject: KnowledgeScope, semantic_value: explicit-target-scope-is-identified-by-canonical-learning-target-id-and-preserved-by-knowledge-explorer, decision_authority: COMPONENT-DESIGN}
+        - {id: COMPONENT-REPRESENTATION, kind: representation-independence, subject: KnowledgeExplorer, semantic_value: knowledge-explorer-coordinates-list-search-detail-and-graph-over-one-scope-through-renderer-neutral-models-and-ports, decision_authority: COMPONENT-DESIGN}
+
+  mutated-component-surface:
+    value:
+      capability: prep.frontend-component-design
+      semantic_assertions:
+        - {id: COMPONENT-TARGET-SCOPE, kind: target-scope, subject: KnowledgeScope, semantic_value: explicit-target-scope-is-identified-by-canonical-learning-target-id-and-preserved-by-knowledge-explorer, decision_authority: COMPONENT-DESIGN}
+
+  verification-surface:
+    value:
+      capability: prep.frontend-verification
+      semantic_assertions:
+        - {id: VERIFY-TARGET-SCOPE, kind: target-scope, subject: FV-02-FV-08, semantic_value: verification-requires-target-context-preservation-through-knowledge-exploration-and-selection-detail-transitions, decision_authority: VERIFICATION-DESIGN}
+        - {id: VERIFY-REPRESENTATION, kind: representation-independence, subject: FV-08-FV-09, semantic_value: verification-requires-non-graph-access-and-semantic-preserving-graph-state-without-geometric-truth, decision_authority: VERIFICATION-DESIGN}
+
+  test-surface:
+    value:
+      capability: prep.frontend-test-design
+      semantic_assertions:
+        - {id: TEST-TARGET-SCOPE, kind: target-scope, subject: FTD-TARGET-CONTEXT-PRESERVATION, semantic_value: test-oracle-preserves-same-learning-target-scope-search-filter-and-focus-intent-through-detail-navigation, decision_authority: TEST-DESIGN}
+        - {id: TEST-REPRESENTATION, kind: representation-independence, subject: FTD-GRAPH-FALLBACK-EQUIVALENCE, semantic_value: test-oracle-requires-graph-and-non-graph-representations-to-resolve-same-canonical-identities-and-relation-semantics, decision_authority: TEST-DESIGN}
+
+  implementation-surface:
+    value:
+      capability: prep.frontend-implementation-design
+      semantic_assertions:
+        - {id: IMPL-TARGET-SCOPE, kind: target-scope, subject: FI-02-FI-04, semantic_value: implementation-slices-establish-prepared-target-context-and-realize-learning-knowledge-workspace-with-route-context-preservation, decision_authority: IMPLEMENTATION-DESIGN}
+        - {id: IMPL-REPRESENTATION, kind: representation-independence, subject: FI-02-FI-03, semantic_value: implementation-slices-realize-list-search-detail-plus-renderer-neutral-graph-contract-and-preserve-non-graph-access-if-renderer-unavailable, decision_authority: IMPLEMENTATION-DESIGN}
+
+  problem-to-intent:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-problem-to-intent-target-knowledge, source_capability: prep.problem-evidence, target_capability: prep.product-intent, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  problem-to-intent-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.problem-evidence, target_capability: prep.product-intent, links: [{id: P2I-TARGET, sources: [PROBLEM-TARGET-SCOPE], relation: TRANSFORMS, targets: [INTENT-TARGET-SCOPE]}, {id: P2I-REP, sources: [PROBLEM-REPRESENTATION], relation: TRANSFORMS, targets: [INTENT-REPRESENTATION]}], dispositions: []}
+
+  intent-to-product:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-intent-to-product-target-knowledge, source_capability: prep.product-intent, target_capability: prep.product-capabilities, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  intent-to-product-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.product-intent, target_capability: prep.product-capabilities, links: [{id: I2P-TARGET, sources: [INTENT-TARGET-SCOPE], relation: TRANSFORMS, targets: [PRODUCT-TARGET-SCOPE]}, {id: I2P-REP, sources: [INTENT-REPRESENTATION], relation: TRANSFORMS, targets: [PRODUCT-REPRESENTATION]}], dispositions: []}
+
+  product-to-application:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-product-to-application-target-knowledge, source_capability: prep.product-capabilities, target_capability: prep.application-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  product-to-application-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.product-capabilities, target_capability: prep.application-design, links: [{id: P2A-TARGET, sources: [PRODUCT-TARGET-SCOPE], relation: REALIZES, targets: [APP-TARGET-SCOPE]}, {id: P2A-REP, sources: [PRODUCT-REPRESENTATION], relation: REALIZES, targets: [APP-REPRESENTATION]}], dispositions: []}
+
+  application-to-task:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-application-to-task-target-knowledge, source_capability: prep.application-design, target_capability: prep.task-model, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  application-to-task-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.application-design, target_capability: prep.task-model, links: [{id: A2T-TARGET, sources: [APP-TARGET-SCOPE], relation: REALIZES, targets: [TASK-TARGET-SCOPE]}, {id: A2T-REP, sources: [APP-REPRESENTATION], relation: REALIZES, targets: [TASK-REPRESENTATION]}], dispositions: []}
+
+  task-to-journey:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-task-to-journey-target-knowledge, source_capability: prep.task-model, target_capability: prep.user-journeys, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  task-to-journey-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.task-model, target_capability: prep.user-journeys, links: [{id: T2J-TARGET, sources: [TASK-TARGET-SCOPE], relation: REALIZES, targets: [JOURNEY-TARGET-SCOPE]}, {id: T2J-REP, sources: [TASK-REPRESENTATION], relation: REALIZES, targets: [JOURNEY-REPRESENTATION]}], dispositions: []}
+
+  journey-to-ia:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-journey-to-ia-target-knowledge, source_capability: prep.user-journeys, target_capability: prep.information-architecture, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}], lifecycle_dependency: {exhaustive: false}, semantic_judgement: {required: false}}
+  journey-to-ia-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.user-journeys, target_capability: prep.information-architecture, links: [{id: J2IA-TARGET, sources: [JOURNEY-TARGET-SCOPE], relation: REALIZES, targets: [IA-TARGET-SCOPE]}], dispositions: []}
+
+  journey-to-interaction:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-journey-to-interaction-target-knowledge, source_capability: prep.user-journeys, target_capability: prep.interaction-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  journey-to-interaction-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.user-journeys, target_capability: prep.interaction-design, links: [{id: J2I-TARGET, sources: [JOURNEY-TARGET-SCOPE], relation: REALIZES, targets: [INTERACTION-TARGET-SCOPE]}, {id: J2I-REP, sources: [JOURNEY-REPRESENTATION], relation: REALIZES, targets: [INTERACTION-REPRESENTATION]}], dispositions: []}
+
+  ia-to-topology:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-ia-to-topology-target-knowledge, source_capability: prep.information-architecture, target_capability: prep.interface-topology, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  ia-to-topology-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.information-architecture, target_capability: prep.interface-topology, links: [{id: IA2TOP-TARGET, sources: [IA-TARGET-SCOPE], relation: REALIZES, targets: [TOPOLOGY-TARGET-SCOPE]}], dispositions: []}
+
+  topology-to-screen:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-topology-to-screen-target-knowledge, source_capability: prep.interface-topology, target_capability: prep.screen-view-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  topology-to-screen-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.interface-topology, target_capability: prep.screen-view-design, links: [{id: TOP2S-TARGET, sources: [TOPOLOGY-TARGET-SCOPE], relation: REALIZES, targets: [SCREEN-TARGET-SCOPE]}], dispositions: []}
+  topology-to-mutated-screen-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.interface-topology, target_capability: prep.screen-view-design, links: [], dispositions: []}
+
+  interaction-to-screen:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-interaction-to-screen-target-knowledge, source_capability: prep.interaction-design, target_capability: prep.screen-view-design, obligations: [{id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: false}, semantic_judgement: {required: false}}
+  interaction-to-screen-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.interaction-design, target_capability: prep.screen-view-design, links: [{id: I2S-REP, sources: [INTERACTION-REPRESENTATION], relation: REALIZES, targets: [SCREEN-REPRESENTATION]}], dispositions: []}
+
+  screen-to-architecture:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-screen-to-architecture-target-knowledge, source_capability: prep.screen-view-design, target_capability: prep.frontend-system-architecture, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  screen-to-architecture-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.screen-view-design, target_capability: prep.frontend-system-architecture, links: [{id: S2A-TARGET, sources: [SCREEN-TARGET-SCOPE], relation: REALIZES, targets: [ARCH-TARGET-SCOPE]}, {id: S2A-REP, sources: [SCREEN-REPRESENTATION], relation: REALIZES, targets: [ARCH-REPRESENTATION]}], dispositions: []}
+
+  architecture-to-component:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-architecture-to-component-target-knowledge, source_capability: prep.frontend-system-architecture, target_capability: prep.frontend-component-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  architecture-to-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.frontend-system-architecture, target_capability: prep.frontend-component-design, links: [{id: A2C-TARGET, sources: [ARCH-TARGET-SCOPE], relation: REALIZES, targets: [COMPONENT-TARGET-SCOPE]}, {id: A2C-REP, sources: [ARCH-REPRESENTATION], relation: REALIZES, targets: [COMPONENT-REPRESENTATION]}], dispositions: []}
+  architecture-to-mutated-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.frontend-system-architecture, target_capability: prep.frontend-component-design, links: [{id: A2C-TARGET, sources: [ARCH-TARGET-SCOPE], relation: REALIZES, targets: [COMPONENT-TARGET-SCOPE]}], dispositions: []}
+
+  product-to-verification:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-product-to-verification-target-knowledge, source_capability: prep.product-capabilities, target_capability: prep.frontend-verification, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  product-to-verification-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.product-capabilities, target_capability: prep.frontend-verification, links: [{id: P2V-TARGET, sources: [PRODUCT-TARGET-SCOPE], relation: REALIZES, targets: [VERIFY-TARGET-SCOPE]}, {id: P2V-REP, sources: [PRODUCT-REPRESENTATION], relation: REALIZES, targets: [VERIFY-REPRESENTATION]}], dispositions: []}
+
+  verification-to-test:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-verification-to-test-target-knowledge, source_capability: prep.frontend-verification, target_capability: prep.frontend-test-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  verification-to-test-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.frontend-verification, target_capability: prep.frontend-test-design, links: [{id: V2T-TARGET, sources: [VERIFY-TARGET-SCOPE], relation: REALIZES, targets: [TEST-TARGET-SCOPE]}, {id: V2T-REP, sources: [VERIFY-REPRESENTATION], relation: REALIZES, targets: [TEST-REPRESENTATION]}], dispositions: []}
+
+  component-to-implementation:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-component-to-implementation-target-knowledge, source_capability: prep.frontend-component-design, target_capability: prep.frontend-implementation-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  component-to-implementation-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.frontend-component-design, target_capability: prep.frontend-implementation-design, links: [{id: C2IMPL-TARGET, sources: [COMPONENT-TARGET-SCOPE], relation: REALIZES, targets: [IMPL-TARGET-SCOPE]}, {id: C2IMPL-REP, sources: [COMPONENT-REPRESENTATION], relation: REALIZES, targets: [IMPL-REPRESENTATION]}], dispositions: []}
+
+  test-to-implementation:
+    value: {version: 1, kind: harness-semantic-derivation-contract, id: prep-test-to-implementation-target-knowledge, source_capability: prep.frontend-test-design, target_capability: prep.frontend-implementation-design, obligations: [{id: target-scope, source_kind: target-scope, min_count: 1}, {id: representation, source_kind: representation-independence, min_count: 1}], lifecycle_dependency: {exhaustive: true}, semantic_judgement: {required: false}}
+  test-to-implementation-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.frontend-test-design, target_capability: prep.frontend-implementation-design, links: [{id: T2IMPL-TARGET, sources: [TEST-TARGET-SCOPE], relation: CONSTRAINS, targets: [IMPL-TARGET-SCOPE]}, {id: T2IMPL-REP, sources: [TEST-REPRESENTATION], relation: CONSTRAINS, targets: [IMPL-REPRESENTATION]}], dispositions: []}
+
+steps:
+  - id: acquisition-scope
+    driver: source.set
+    with: {contract: {ref: fixture.acquisition-contract}, inventory: {ref: fixture.source-inventory}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /required_channel_count, op: equals, value: 1}
+  - id: source-boundary
+    driver: source.boundary
+    with: {source: {ref: fixture.problem-source}, manifest: {ref: fixture.problem-boundary}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 2}
+      - {path: /covered_line_count, op: equals, value: 2}
+  - id: statements
+    driver: source.coverage
+    with: {document: {ref: fixture.statement-ledger}}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 2}
+  - id: accepted-problem-surface
+    driver: semantic.acceptance
+    with: {contract: {ref: fixture.problem-acceptance-contract}, sources: {ref: fixture.source-atoms}, candidate: {ref: fixture.accepted-problem}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+
+  - id: problem-to-intent
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.problem-to-intent}, source: {ref: fixture.accepted-problem}, candidate: {ref: fixture.intent-surface}, evidence: {ref: fixture.problem-to-intent-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: intent-to-product
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.intent-to-product}, source: {ref: fixture.intent-surface}, candidate: {ref: fixture.product-surface}, evidence: {ref: fixture.intent-to-product-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: product-to-application
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.product-to-application}, source: {ref: fixture.product-surface}, candidate: {ref: fixture.application-surface}, evidence: {ref: fixture.product-to-application-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: application-to-task
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.application-to-task}, source: {ref: fixture.application-surface}, candidate: {ref: fixture.task-surface}, evidence: {ref: fixture.application-to-task-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: task-to-journey
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.task-to-journey}, source: {ref: fixture.task-surface}, candidate: {ref: fixture.journey-surface}, evidence: {ref: fixture.task-to-journey-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+
+  - id: journey-to-ia
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.journey-to-ia}, source: {ref: fixture.journey-surface}, candidate: {ref: fixture.ia-surface}, evidence: {ref: fixture.journey-to-ia-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 1}]
+  - id: journey-to-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.journey-to-interaction}, source: {ref: fixture.journey-surface}, candidate: {ref: fixture.interaction-surface}, evidence: {ref: fixture.journey-to-interaction-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: ia-to-topology
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.ia-to-topology}, source: {ref: fixture.ia-surface}, candidate: {ref: fixture.topology-surface}, evidence: {ref: fixture.ia-to-topology-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: topology-to-screen
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.topology-to-screen}, source: {ref: fixture.topology-surface}, candidate: {ref: fixture.screen-surface}, evidence: {ref: fixture.topology-to-screen-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+  - id: interaction-to-screen
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.interaction-to-screen}, source: {ref: fixture.interaction-surface}, candidate: {ref: fixture.screen-surface}, evidence: {ref: fixture.interaction-to-screen-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}]
+
+  - id: sensitivity-screen-loses-target-scope
+    driver: semantic.derivation
+    benchmark: {metrics: [mutation_detection, root_cause_localization], mutation_class: remove-target-scope-from-screen}
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.topology-to-screen}, source: {ref: fixture.topology-surface}, candidate: {ref: fixture.mutated-screen-surface}, evidence: {ref: fixture.topology-to-mutated-screen-evidence}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: TOPOLOGY-TARGET-SCOPE, owner_authority: HUMAN-INTERFACE-DESIGN}}
+
+  - id: screen-to-architecture
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.screen-to-architecture}, source: {ref: fixture.screen-surface}, candidate: {ref: fixture.architecture-surface}, evidence: {ref: fixture.screen-to-architecture-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: architecture-to-component
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.architecture-to-component}, source: {ref: fixture.architecture-surface}, candidate: {ref: fixture.component-surface}, evidence: {ref: fixture.architecture-to-component-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: sensitivity-component-loses-representation-independence
+    driver: semantic.derivation
+    benchmark: {metrics: [mutation_detection, root_cause_localization], mutation_class: remove-representation-independence-from-component-design}
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.architecture-to-component}, source: {ref: fixture.architecture-surface}, candidate: {ref: fixture.mutated-component-surface}, evidence: {ref: fixture.architecture-to-mutated-component-evidence}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: ARCH-REPRESENTATION, owner_authority: COMPONENT-DESIGN}}
+
+  - id: product-to-verification
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.product-to-verification}, source: {ref: fixture.product-surface}, candidate: {ref: fixture.verification-surface}, evidence: {ref: fixture.product-to-verification-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: verification-to-test
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.verification-to-test}, source: {ref: fixture.verification-surface}, candidate: {ref: fixture.test-surface}, evidence: {ref: fixture.verification-to-test-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+
+  - id: component-to-implementation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.component-to-implementation}, source: {ref: fixture.component-surface}, candidate: {ref: fixture.implementation-surface}, evidence: {ref: fixture.component-to-implementation-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]
+  - id: test-to-implementation
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.test-to-implementation}, source: {ref: fixture.test-surface}, candidate: {ref: fixture.implementation-surface}, evidence: {ref: fixture.test-to-implementation-evidence}}
+    expect: [{path: /status, op: equals, value: ACCEPTED}, {path: /coverage/covered, op: equals, value: 2}]

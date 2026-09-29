@@ -1,0 +1,78 @@
+version: 1
+kind: harness-scenario
+id: discovery-user-needs-semantic-derivation
+title: User Needs preserve accepted problem evidence without inventing solution semantics
+dimensions:
+  project_archetype: user-facing
+  stage: discovery
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+derivation_edges:
+  - {source_knowledge_kind: problem-evidence, target_knowledge_kind: user-needs}
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DISCOVERY-DERIVATION
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own problem evidence and user needs.
+          boundary: {semantic_cohesion: Problem-space knowledge., independent_change: Evidence and needs change before solution design., public_contract: Accepted discovery knowledge.}
+          produces:
+            - {capability: demo.problem-evidence, knowledge_kind: problem-evidence, requires: []}
+            - {capability: demo.user-needs, knowledge_kind: user-needs, requires: [demo.problem-evidence]}
+      consumers:
+        - {id: PRODUCT, purpose: Consume accepted user needs., requires: [demo.user-needs]}
+      terminal_capabilities: []
+  evidence:
+    value:
+      semantic_assertions:
+        - {id: EVIDENCE-DELAY, kind: problem-observation, subject: USER, semantic_value: user-cannot-see-current-resource-state-before-requesting-change, decision_authority: DISCOVERY}
+        - {id: EVIDENCE-REENTRY, kind: problem-observation, subject: USER, semantic_value: validation-failure-forces-reentry-of-valid-fields, decision_authority: DISCOVERY}
+  needs:
+    value:
+      semantic_assertions:
+        - {id: NEED-CONTEXT, kind: user-need, subject: USER, semantic_value: understand-current-state-before-requesting-change, decision_authority: DISCOVERY}
+        - {id: NEED-RECOVERY, kind: user-need, subject: USER, semantic_value: recover-from-invalid-input-without-reentering-valid-data, decision_authority: DISCOVERY}
+  contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: demo.problem-evidence
+      target_capability: demo.user-needs
+      obligations:
+        - {id: observations, source_kind: problem-observation, min_count: 2}
+  derivation:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: demo.problem-evidence
+      target_capability: demo.user-needs
+      links:
+        - {sources: [EVIDENCE-DELAY], relation: TRANSFORMS, targets: [NEED-CONTEXT]}
+        - {sources: [EVIDENCE-REENTRY], relation: TRANSFORMS, targets: [NEED-RECOVERY]}
+      dispositions: []
+
+steps:
+  - id: complete
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.evidence}, candidate: {ref: fixture.needs}, evidence: {ref: fixture.derivation}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/required, op: equals, value: 2}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+
+  - id: remove-evidence-link
+    driver: data.patch
+    with: {value: {ref: fixture.derivation}, operations: [{op: remove, path: /links/1}]}
+  - id: lost-problem-evidence
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.contract}, source: {ref: fixture.evidence}, candidate: {ref: fixture.needs}, evidence: {ref: step.remove-evidence-link}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: EVIDENCE-REENTRY, owner_authority: DISCOVERY}}

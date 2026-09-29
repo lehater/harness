@@ -1,0 +1,67 @@
+version: 1
+kind: harness-scenario
+id: coverage-question-frontier-transitions
+title: Coverage routes unresolved proof gaps to Questions before production
+dimensions:
+  project_archetype: synthetic
+  stage: implementation
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - coverage-question-frontier
+
+fixtures:
+  graph:
+    yaml: ../../research/coverage-blocker-fixture-graph.yaml
+  unresolved:
+    yaml: ../../research/coverage-blocker-fixture-core-unresolved.yaml
+  resolved:
+    yaml: ../../research/coverage-blocker-fixture-core-resolved.yaml
+  overlay:
+    value:
+      activate:
+        - concern: security.threat-analysis
+          rationale: Fixture threat analysis is required.
+      decisions: []
+
+steps:
+  - id: unresolved
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.unresolved}
+      consumer: IMPLEMENTATION
+      scope: all
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - {path: /completion_ready, op: equals, value: false}
+      - {path: /question_frontier_count, op: equals, value: 1}
+      - path: /question_frontier
+        op: contains_match
+        value:
+          action: ASK
+          question: Q-THREAT
+          authority: SECURITY-ANALYSIS
+      - path: /rows
+        op: contains_match
+        value:
+          concern: security.threat-analysis
+          state: MISSING
+          action: RESOLVE_QUESTIONS
+
+  - id: resolved
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.resolved}
+      consumer: IMPLEMENTATION
+      scope: all
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - {path: /question_frontier_count, op: equals, value: 0}
+      - path: /work_items
+        op: contains_match
+        value:
+          action: PRODUCE_CAPABILITY
+          capability: fixture.security.threat-analysis
+          authority: SECURITY-ANALYSIS

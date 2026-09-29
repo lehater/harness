@@ -1,0 +1,39 @@
+version: 1
+kind: harness-scenario
+id: invalid-core-model-is-rejected
+title: Invalid Core ownership structure is rejected deterministically
+dimensions:
+  project_archetype: synthetic
+  stage: bootstrap
+  behavior_class: structural
+  execution_type: deterministic
+covers:
+  - core-model-invalid-rejected
+
+fixtures:
+  invalid_model:
+    value:
+      authorities: []
+      artifacts:
+        - id: DUPLICATE
+          authority: A
+          path: docs/a.yaml
+          provides: [demo.a]
+          depends_on: []
+        - id: DUPLICATE
+          authority: B
+          path: docs/b.yaml
+          provides: [demo.b]
+          depends_on: []
+      questions: []
+
+steps:
+  - id: validate
+    driver: core.validate
+    with:
+      model: {ref: fixture.invalid_model}
+    expect_error:
+      type: CoreError
+      contains: "duplicate artifact id: DUPLICATE"
+    expect:
+      - {path: /error/type, op: equals, value: CoreError}

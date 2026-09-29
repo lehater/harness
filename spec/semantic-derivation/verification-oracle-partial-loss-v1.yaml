@@ -1,0 +1,126 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: verification-oracle-partial-loss-v1
+
+scope:
+  purpose: >-
+    Focused real-project calibration of semantic omission detection on the direct
+    NAPMS Requirements Acceptance -> Verification Acceptance Scenarios edge.
+  project:
+    repository: lehater/napms
+    commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  policy: >-
+    Each case isolates one requirement semantic atom and the specific declared
+    verification oracle that claims to verify it. Positive controls use atoms
+    preserved explicitly by the same verification artifact; rejected cases are
+    observed omissions, not synthetic mutations.
+
+cases:
+  - id: request-authority-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    source: >-
+      Connectivity request submission requires effective access.request authority
+      for the source Resource at server-owned admission time; destination Resource
+      request authority is not required merely to submit.
+    target: >-
+      AccessRequest succeeds with effective access.request authority for the
+      source Resource scope at server-owned admissionAt; destination request
+      authority is not required; exact source authority evidence is stored and
+      request admission remains distinct from the later permission decision.
+    relation: REALIZES
+    rationale: The verification oracle explicitly preserves the source-only request-admission semantics.
+
+  - id: denied-no-rule-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    source: A NotAllowed decision creates no authoritative desired-access Rule.
+    target: DENIED creates no Rule.
+    relation: REALIZES
+    rationale: The verification oracle directly tests the no-Rule outcome.
+
+  - id: no-numeric-quality-target-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    source: >-
+      Numeric latency, throughput, availability and scale targets are not
+      mandatory product requirements for the first MVP.
+    target: >-
+      No implementation or acceptance gate invents mandatory numeric latency,
+      throughput, availability or scale targets.
+    relation: REALIZES
+    rationale: The inspection oracle explicitly preserves the absence of mandatory numeric targets.
+
+  - id: no-heavy-async-runtime-preserved
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-verification
+    source: >-
+      Heavy asynchronous background jobs and queueing are outside the first-MVP
+      runtime requirement and remain a future architecture reopening concern.
+    target: >-
+      Architecture Driver Closure and system topology preserve the accepted
+      first-MVP scale and no heavy asynchronous runtime requirement; listed
+      reopen conditions remain explicit.
+    relation: REALIZES
+    rationale: The verification oracle preserves both non-requirement and reopening semantics.
+
+  - id: initial-active-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    source: >-
+      First successful materialization of Allowed access makes the resulting
+      authoritative current access operationally Active.
+    target:
+      - MVP-REQ-PERMISSION declares that it verifies REQ-RULE-002.
+      - >-
+        Its expected result states only that DENIED creates no Rule, ALLOWED
+        creates or resolves exactly one Rule for the exact Deployment pair plus
+        immutable InteractionRevision, and repeated allowed requests converge.
+    relation: REALIZES
+    rationale: The declared verification oracle never checks the required initial ACTIVE state.
+
+  - id: current-address-cardinality-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    source: >-
+      Each logical Resource endpoint has at most one current address realization,
+      represented as either one host address or one network prefix.
+    target:
+      - MVP-REQ-RESOURCE declares that it verifies REQ-RES-003.
+      - >-
+        Its expected result checks Resource and Endpoint identity across
+        realization changes, AuthorityScopeRef independence, no automatic
+        endpoint grouping, and Site/responsibility history.
+    relation: REALIZES
+    rationale: The oracle omits current-address cardinality and host-versus-prefix representation.
+
+  - id: business-org-not-authority-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    source: >-
+      A Business Process may have organizational responsibility, but that
+      organization must not be treated as an authorization scope.
+    target:
+      - MVP-REQ-BUSINESS declares that it verifies REQ-BUS-008.
+      - >-
+        Its expected result checks participant-side Need independence, no
+        duplicate Rule for additional Needs, retirement history, no automatic
+        revoke at zero current Needs, and opaque criticalityLabel metadata.
+    relation: REALIZES
+    rationale: The oracle omits organization-responsibility versus authorization-scope separation.
+
+  - id: effective-window-evaluation-loss
+    expected_status: REJECTED
+    mutation_class: real-project-verification-partial-loss
+    source: >-
+      Supported declarative effective conditions determine policy contribution
+      at evaluation time without redefining access identity or periodically
+      rewriting stored Active/Inactive state.
+    target:
+      - MVP-REQ-RULE-OPERATIONS declares that it verifies REQ-RULE-004.
+      - >-
+        Its expected result checks that ACTIVE to INACTIVE to ACTIVE and
+        EffectiveWindow preserve Rule identity and permission evidence and that
+        technical realization changes do not redefine access.
+    relation: REALIZES
+    rationale: The oracle omits evaluation-time contribution and no-periodic-rewrite semantics.

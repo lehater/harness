@@ -1,0 +1,109 @@
+version: 1
+kind: harness-scenario
+id: decision-choice-respects-autonomy
+title: Choice outside delegated autonomy must escalate
+dimensions:
+  project_archetype: backend-service
+  stage: decision
+  behavior_class: decision
+  execution_type: agent-evaluation
+covers:
+  - decision-autonomy-escalation
+
+fixtures:
+  contract:
+    value:
+      knowledge_kind: demo-decision
+      required: true
+      policy_defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+      axes:
+        shape:
+          minimum_exploration: EXPLORE
+          delegation_requires: BROAD
+          material_dimensions: [failure-isolation]
+          challenge_strategies: [alternative-shape, failure-probe]
+          minimum_probes: 2
+  policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+  exploration:
+    value:
+      status: ACCEPTED
+      axes:
+        - axis: shape
+          applicability: APPLICABLE
+          decision_points:
+            - id: shape-choice
+              alternatives: [shape-a, shape-b]
+  candidate:
+    value:
+      id: ARCHITECTURE
+      decision_review:
+        axes:
+          - axis: shape
+            decisions:
+              - id: shape-choice
+                owner_authority: SYSTEM-ARCHITECTURE
+                alternatives:
+                  - {id: shape-a, state: VIABLE}
+                  - {id: shape-b, state: VIABLE}
+                disposition: DELEGATED
+                selected: shape-a
+  empty_model:
+    value:
+      artifacts: []
+      questions: []
+  question_model:
+    value:
+      artifacts: []
+      questions:
+        - id: Q-SHAPE
+          authority: SYSTEM-ARCHITECTURE
+          text: Which viable runtime shape is accepted?
+          blocks_capabilities: [demo.choice]
+
+steps:
+  - id: delegated-too-far
+    driver: decision.governance
+    with:
+      contract: {ref: fixture.contract}
+      policy: {ref: fixture.policy}
+      exploration_evaluation: {ref: fixture.exploration}
+      authority: SYSTEM-ARCHITECTURE
+      capability: demo.choice
+      candidate: {ref: fixture.candidate}
+      model: {ref: fixture.empty_model}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: DECISION_AUTONOMY_EXCEEDED}}
+
+  - id: make-escalation
+    driver: data.patch
+    with:
+      value: {ref: fixture.candidate}
+      operations:
+        - {op: replace, path: /decision_review/axes/0/decisions/0/disposition, value: ESCALATED}
+        - {op: remove, path: /decision_review/axes/0/decisions/0/selected}
+        - {op: add, path: /decision_review/axes/0/decisions/0/question, value: Q-SHAPE}
+
+  - id: escalated
+    driver: decision.governance
+    with:
+      contract: {ref: fixture.contract}
+      policy: {ref: fixture.policy}
+      exploration_evaluation: {ref: fixture.exploration}
+      authority: SYSTEM-ARCHITECTURE
+      capability: demo.choice
+      candidate: {ref: step.make-escalation}
+      model: {ref: fixture.question_model}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+      - {path: /axes/0/decisions/0/disposition, op: equals, value: ESCALATED}
+      - {path: /axes/0/decisions/0/delegation_allowed, op: equals, value: false}

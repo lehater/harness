@@ -1,0 +1,116 @@
+version: 1
+kind: harness-scenario
+id: decision-deep-research-requires-diverse-sources
+title: Deep research requires authoritative and diverse evidence
+dimensions:
+  project_archetype: backend-service
+  stage: decision
+  behavior_class: decision
+  execution_type: agent-evaluation
+covers:
+  - decision-research-depth
+
+fixtures:
+  contract:
+    value:
+      knowledge_kind: demo-decision
+      required: true
+      policy_defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+      axes:
+        shape:
+          minimum_exploration: EXPLORE
+          delegation_requires: BROAD
+          material_dimensions: [failure-isolation]
+          challenge_strategies: [alternative-shape, failure-probe]
+          minimum_probes: 2
+  axis_policies:
+    value:
+      shape:
+        exploration: DEEP_RESEARCH
+        autonomy: BROAD
+  evidence:
+    value:
+      version: 1
+      kind: harness-decision-exploration
+      capability: demo.choice
+      knowledge_kind: demo-decision
+      research_sources:
+        - id: OFFICIAL
+          kind: official
+          reference: official runtime documentation
+      axes:
+        - axis: shape
+          applicability: APPLICABLE
+          exploration_level: DEEP_RESEARCH
+          research_sources: [OFFICIAL]
+          probes:
+            - strategy: alternative-shape
+              challenge: Compare alternate runtime shapes.
+              alternatives: [shape-a, shape-b]
+            - strategy: failure-probe
+              challenge: Compare failure isolation.
+              alternatives: [shape-a, shape-b]
+          decision_points:
+            - id: shape-choice
+              alternatives:
+                - id: shape-a
+                  difference: One runtime boundary.
+                  material_effects: {failure-isolation: shared}
+                - id: shape-b
+                  difference: Split runtime boundaries.
+                  material_effects: {failure-isolation: isolated}
+      decision_space_review:
+        status: COMPLETE
+        checks:
+          - mixed-decision-split
+          - missing-material-case-search
+          - accepted-constraint-cross-check
+          - authority-boundary-cross-check
+        reviewed_decisions: [shape-choice]
+        open_gaps: []
+  model:
+    value: {artifacts: [], questions: []}
+
+steps:
+  - id: insufficient-diversity
+    driver: decision.exploration
+    with:
+      contract: {ref: fixture.contract}
+      axis_policies: {ref: fixture.axis_policies}
+      capability: demo.choice
+      knowledge_kind: demo-decision
+      evidence: {ref: fixture.evidence}
+      explorer_request: null
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: DECISION_DEEP_RESEARCH_DIVERSITY_MISSING, axis: shape}}
+
+  - id: add-second-source
+    driver: data.patch
+    with:
+      value: {ref: fixture.evidence}
+      operations:
+        - op: add
+          path: /research_sources/-
+          value:
+            id: STANDARD
+            kind: standard
+            reference: independent architecture standard
+        - {op: add, path: /axes/0/research_sources/-, value: STANDARD}
+
+  - id: sufficient-research
+    driver: decision.exploration
+    with:
+      contract: {ref: fixture.contract}
+      axis_policies: {ref: fixture.axis_policies}
+      capability: demo.choice
+      knowledge_kind: demo-decision
+      evidence: {ref: step.add-second-source}
+      explorer_request: null
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}

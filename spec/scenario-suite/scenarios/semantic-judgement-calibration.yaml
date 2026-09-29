@@ -1,0 +1,128 @@
+version: 1
+kind: harness-scenario
+id: semantic-judgement-calibration-scoring
+title: Expert labels expose evaluator false negatives and false positives
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-derivation-truth
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/calibration-corpus-v1.yaml
+
+  perfect:
+    value:
+      - {id: semantic-weakening, status: REJECTED}
+      - {id: semantic-inversion, status: REJECTED}
+      - {id: semantic-subject-swap, status: REJECTED}
+      - {id: valid-paraphrase, status: ACCEPTED}
+      - {id: valid-decomposition, status: ACCEPTED}
+      - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
+
+  false-negative:
+    value:
+      - {id: semantic-weakening, status: ACCEPTED}
+      - {id: semantic-inversion, status: REJECTED}
+      - {id: semantic-subject-swap, status: REJECTED}
+      - {id: valid-paraphrase, status: ACCEPTED}
+      - {id: valid-decomposition, status: ACCEPTED}
+      - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
+
+  incomplete:
+    value:
+      - {id: semantic-weakening, status: REJECTED}
+      - {id: semantic-inversion, status: REJECTED}
+      - {id: semantic-subject-swap, status: REJECTED}
+      - {id: valid-paraphrase, status: ACCEPTED}
+      - {id: valid-decomposition, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
+
+  false-positive:
+    value:
+      - {id: semantic-weakening, status: REJECTED}
+      - {id: semantic-inversion, status: REJECTED}
+      - {id: semantic-subject-swap, status: REJECTED}
+      - {id: valid-paraphrase, status: REJECTED}
+      - {id: valid-decomposition, status: ACCEPTED}
+      - {id: valid-aggregation, status: ACCEPTED}
+      - {id: valid-strengthening, status: ACCEPTED}
+      - {id: semantic-partial-loss, status: REJECTED}
+      - {id: valid-subject-preservation, status: ACCEPTED}
+      - {id: semantic-outcome-substitution, status: REJECTED}
+
+steps:
+  - id: perfect-calibration
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.perfect}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+      - {path: /metrics/detection_recall, op: equals, value: 1.0}
+      - {path: /metrics/false_positive_rate, op: equals, value: 0.0}
+
+  - id: expose-false-negative
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: evaluator-false-negative
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.false-negative}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 1}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+      - {path: /misses, op: contains_match, value: {id: semantic-weakening, expected: REJECTED, actual: ACCEPTED}}
+
+  - id: expose-false-positive
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: evaluator-false-positive
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.false-positive}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 1}
+      - {path: /misses, op: contains_match, value: {id: valid-paraphrase, expected: ACCEPTED, actual: REJECTED}}
+
+  - id: incomplete-predictions
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.incomplete}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - {path: /scored_count, op: equals, value: 9}
+      - {path: /missing, op: contains, value: valid-aggregation}
+
+  - id: unknown-case-rejected
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions:
+        - {id: DOES-NOT-EXIST, status: REJECTED}
+    expect_error:
+      type: CoreError
+      contains: unknown calibration prediction case

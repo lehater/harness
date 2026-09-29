@@ -1,0 +1,65 @@
+version: 1
+kind: harness-scenario
+id: repository-realization-fails-on-unresolved-obligation
+title: Repository realization requires explicit enforceable applicability
+dimensions:
+  project_archetype: library
+  stage: implementation
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - repository-realization
+
+fixtures:
+  realization:
+    value:
+      kind: repository-realization-design
+      id: REPOSITORY-REALIZATION-SCENARIO
+      module_realizations:
+        - semantic_owner: IMPLEMENTATION-DESIGN
+          physical_root: src
+      dependency_rules:
+        - rule: Domain code must not depend on adapters.
+          enforcement: architecture-test
+      obligations:
+        - id: dependency-boundaries
+          applicability: REQUIRED
+          enforcement: architecture-test
+      generated_artifacts:
+        - id: api-client
+          source_of_truth: api/openapi.yaml
+          regenerate: generate-client
+      environment:
+        reproducibility: REQUIRED
+        lock_or_equivalent: lockfile
+      gate_policy:
+        applicability: REQUIRED
+      quality_gates:
+        - id: tests
+          command: pytest
+          trigger: pull-request
+          blocking: true
+
+steps:
+  - id: complete
+    driver: repository.realization
+    with:
+      model: {ref: fixture.realization}
+    expect:
+      - {path: /complete, op: equals, value: true}
+      - {path: /error_count, op: equals, value: 0}
+
+  - id: unresolved
+    driver: data.patch
+    with:
+      value: {ref: fixture.realization}
+      operations:
+        - {op: replace, path: /obligations/0/applicability, value: QUESTION}
+
+  - id: reject
+    driver: repository.realization
+    with:
+      model: {ref: step.unresolved}
+    expect:
+      - {path: /complete, op: equals, value: false}
+      - {path: /errors, op: contains_match, value: {code: UNRESOLVED_QUESTION}}
