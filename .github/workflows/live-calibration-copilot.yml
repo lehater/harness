@@ -30,7 +30,7 @@ jobs:
 
       - name: Install pinned Copilot CLI
         run: |
-          npm install -g @github/copilot@1.0.86
+          npm install -g @github/copilot@1.0.88
           copilot --version
 
       - name: Build runtime scenario
