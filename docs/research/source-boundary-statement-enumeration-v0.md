@@ -280,10 +280,11 @@ The expert-reviewed corpus remains the oracle.
 
 ## Focused enumeration protocol experiment
 
-A narrower protocol,
+A narrower temporary protocol,
 `source-unit-statement-enumeration-v1`, was drafted to instruct the evaluator
 to check source clauses explicitly for actor/subject, scope, time, cardinality,
-negative constraints, provenance and boundary statements.
+negative constraints, provenance and boundary statements. It was not retained
+as a repository protocol because no scorable execution was obtained.
 
 Workflow:
 
