@@ -26,7 +26,7 @@ fixtures:
       configuration:
         requested_model: gpt-6-luna
         model_selection: explicit
-        copilot_cli_version: "1.0.86"
+        copilot_cli_version: "1.0.88"
         provider_timeout_seconds: 150
         model_input: blinded-cases-plus-protocol-instruction-only
         session_policy: fresh-explicit-uuid
@@ -62,7 +62,7 @@ steps:
       - {path: /predictions, op: length, value: 14}
       - {path: /execution/state, op: equals, value: COMPLETED}
       - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
-      - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
+      - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.88"}
       - {path: /execution/provider_provenance/resolved_model, op: truthy}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
 
