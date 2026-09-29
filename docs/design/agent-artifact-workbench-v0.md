@@ -270,14 +270,16 @@ RECONSTRUCTION-READY
 
 These gates are independent:
 
-- **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification.
+- **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification. It does not by itself prove that an ADMITTED rewrite or extracted semantic surface preserved every material clause of that statement.
+- **Semantic Surface Admission** reviews each admitted canonical statement against the machine-addressable semantic atoms derived from it when those atoms will be used as the authoritative downstream derivation surface. Missing/weakened atoms are rejected before downstream derivation begins.
 - **Structural COMPLETE** proves every declared capability/prerequisite has an accepted unblocked provider.
 - **Semantic challenge PASS** proves an implementation consumer is not still forced to make a material upstream decision from the accepted closure.
 
-None substitutes for another.
+None substitutes for another. Semantic Surface Admission is an assurance boundary composed from existing source coverage, semantic acceptance and semantic judgement mechanisms; it is not a new Core entity or workflow state.
 
 For source-loss-sensitive work:
 - classify at statement granularity, not whole-file granularity;
+- when admitted statements are decomposed into `semantic_assertions`, admit that statement -> atom transformation explicitly before using the atoms as a derivation baseline;
 - split mixed source/design sentences when needed so observable constraints survive without importing prior solution choices;
 - require an explicit exclusion rationale;
 - treat a remaining classification/provenance QUESTION as source coverage INCOMPLETE;
