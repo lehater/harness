@@ -9,7 +9,6 @@ dimensions:
   execution_type: deterministic
 covers:
   - source-coverage-completeness
-  - semantic-acceptance-fidelity
 
 fixtures:
   weakened-ledger:
