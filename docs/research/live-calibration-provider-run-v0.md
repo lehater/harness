@@ -1,6 +1,6 @@
 # First real Live Calibration Run — execution integration v0
 
-Status: provider adapter implemented; live CI execution pending.
+Status: completed; first real provider-backed Live Calibration Run recorded and stable on repeat.
 
 ## Baseline note
 
@@ -178,8 +178,110 @@ Two runs of the exact same corpus/protocol/evaluator binding are executed so
 that real stability can be measured immediately. The workflow persists the full
 Scenario Suite report and a compact summary as a GitHub Actions artifact.
 
-A real scorer result is intentionally not predicted here. It is written only
-after the provider workflow actually completes.
+## Real run evidence
+
+PR #97 head commit `8489df5c11a90e95c76968a3801a63725453ea91`
+completed GitHub Actions workflow run `36502184056`, attempt 2, successfully.
+The persisted artifact is `live-calibration-evidence` artifact
+`11005519111`, digest
+`sha256:9b910cc801755de3c1f620040f8bb89340d2424e68367677508e18d6d44db40a`.
+
+Both executions used the same bound evaluator descriptor:
+
+- evaluator fingerprint:
+  `LCEVAL-0a670c5231ac40358125de00bfab1939a1a3026b66c14cbfb203785be9cc3b09`;
+- corpus fingerprint:
+  `LCCORPUS-2c25776cd379162b71939691dd9d50e18943674ad1d407ec78bdb354e63455e9`;
+- protocol fingerprint:
+  `LCPROTO-1d77f3452d39b187229944c7e0e9463a14ec06774074729e6a95aacac31daafb`;
+- provider: `github-copilot`;
+- requested model policy: `auto`;
+- resolved model observed in both executions: `mai-code-1.1-flash`;
+- observed Copilot CLI version: `1.0.86`;
+- process adapter executable SHA-256:
+  `2536c63c609a40ad7e84fac232a129749b8e26076c44f2925bce7c8436760f28`.
+
+Run 1:
+
+- run id: `GH-36502184056-2-1`;
+- request id:
+  `LCREQ-4bddd422039c183f2604120a35727c29c3bdf00671ad87033f4c560999a05139`;
+- confusion: TP=5, TN=5, FN=0, FP=0;
+- detection recall: `1.0`;
+- false-positive rate: `0.0`;
+- accuracy: `1.0`;
+- misses: none.
+
+Run 2:
+
+- run id: `GH-36502184056-2-2`;
+- request id:
+  `LCREQ-3934984813e230178e68984ed17817549dcd92f397561bbe9c0c34461828fcbc`;
+- confusion: TP=5, TN=5, FN=0, FP=0;
+- detection recall: `1.0`;
+- false-positive rate: `0.0`;
+- accuracy: `1.0`;
+- misses: none.
+
+Every corpus class scored 1/1 in both runs. The normalized verdicts were stable:
+
+- `semantic-weakening` -> REJECTED;
+- `semantic-inversion` -> REJECTED;
+- `semantic-subject-swap` -> REJECTED;
+- `semantic-partial-loss` -> REJECTED;
+- `semantic-outcome-substitution` -> REJECTED;
+- `valid-paraphrase` -> ACCEPTED;
+- `valid-decomposition` -> ACCEPTED;
+- `valid-aggregation` -> ACCEPTED;
+- `valid-strengthening` -> ACCEPTED;
+- `valid-subject-preservation` -> ACCEPTED.
+
+The artifact retains the request-bound `case_request_id`, normalized verdict,
+brief rationale and findings for every prediction. The two evaluator sessions
+had distinct client session ids and distinct run/request ids.
+
+Stability evaluation returned:
+
+```yaml
+status: STABLE
+unstable_cases: []
+```
+
+No consensus or score aggregation was applied.
+
+## Independence assessment
+
+The first real run establishes the following dimensions separately:
+
+- binding: PROVEN by Harness fingerprints and opaque case binding;
+- execution separation: ESTABLISHED at the external-process boundary;
+- fresh session: ESTABLISHED by distinct client session ids plus fresh temporary
+  Copilot home/working directories;
+- different configuration: NO; both stability runs intentionally use the same
+  descriptor;
+- different model: NO; both runs resolved to `mai-code-1.1-flash`;
+- different provider: NO; both runs use GitHub Copilot;
+- trusted provider attestation: ABSENT.
+
+Therefore `independence.status: UNVERIFIED` remains correct. The run proves
+real external execution, label withholding, binding, fail-closed normalization
+and repeatability for the observed executions. It does not prove provider-
+internal model isolation, immutable model revision, or independence from
+unknown provider-side context.
+
+## Closure
+
+The execution RED is closed: a concrete provider adapter received only the
+blinded semantic payload, invoked a real external model, returned structured
+predictions, and those predictions were deterministically bound and scored by
+the existing Live Calibration Validator.
+
+No Core entity, scorer, orchestration framework, provider registry, consensus
+mechanism or generic evaluator SDK was added.
+
+A second provider/model comparison is not required to close this task. It is a
+separate future case only if an independently executable second evaluator is
+actually available.
 
 ## References
 
