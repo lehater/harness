@@ -1,6 +1,6 @@
 # Prep target-scoped Knowledge exploration thin slice v0
 
-Status: executable research candidate; validation pending.
+Status: completed; executable scenario validated by the unchanged harness core.
 
 ## Purpose
 
@@ -89,9 +89,35 @@ Implementation Design:
 - FI-03 adds the concrete 3D renderer behind that contract while retaining non-graph fallback;
 - FI-04 realizes the Learning Knowledge workspace.
 
-## Expected result
+## Validation result
 
-The real canonical slice should be ACCEPTED end-to-end through frontend implementation design.
+The unchanged Scenario Suite accepts the real canonical slice end-to-end through frontend implementation design.
+
+Accepted transitions include:
+
+- problem evidence -> product intent;
+- product intent -> PC-01 + PC-03 product surface;
+- product capabilities -> application projections;
+- application -> task model -> user journey;
+- user journey -> Information Architecture + Interaction Design;
+- Information Architecture -> Interface Topology -> Screen/View;
+- Interaction Design -> Screen/View;
+- Screen/View -> Frontend System Architecture -> Component Design;
+- Product Capability -> Frontend Verification -> Frontend Test Design;
+- Component Design + Test Design -> Frontend Implementation Design.
+
+No real semantic omission was found in this selected slice.
+
+The two sensitivity controls are rejected exactly as intended:
+
+- removing target scope from Screen/View produces UNDISPOSITIONED_SOURCE owned by HUMAN-INTERFACE-DESIGN;
+- removing representation independence from Component Design produces UNDISPOSITIONED_SOURCE owned by COMPONENT-DESIGN.
+
+The experiment therefore distinguishes intact real derivation from the two concrete semantic-loss mutations without a new Harness mechanism.
+
+## Result interpretation
+
+The real canonical slice is ACCEPTED end-to-end through frontend implementation design.
 
 Two sensitivity controls prove that the check is discriminating:
 
