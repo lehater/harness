@@ -23,30 +23,34 @@ Read original source/provenance and the sanitized Source Corpus. Do not read pri
 
 ## Procedure
 
-1. Enumerate the source baseline at **statement-level semantic granularity**, not whole-file granularity.
-2. Give every independently meaningful source statement a stable audit id and source_ref.
-3. For each statement record exactly one disposition:
+1. Bind the selected immutable source boundary before semantic enumeration. For free-form text, use a lossless line-range partition validated by `source_boundary.py`; a deterministically complete native item inventory may serve the same role for structured sources.
+2. Reject uncovered/overlapping source ranges or a source fingerprint mismatch. Boundary coverage proves only that raw source text was not skipped.
+3. Enumerate each covered source unit at **statement-level semantic granularity**, not whole-file granularity.
+4. Give every independently meaningful source statement a stable audit id and source_ref.
+5. For each statement record exactly one disposition:
    - ADMITTED;
    - EXCLUDED_DERIVED_DESIGN;
    - EXCLUDED_OUT_OF_SCOPE;
    - EXCLUDED_DUPLICATE;
    - QUESTION.
-4. For ADMITTED, record the exact sanitized statement and the canonical Source Corpus reference that preserves it.
-5. When one sentence mixes observable requirement with prior design vocabulary, split/preserve the observable constraint rather than excluding the whole sentence.
-6. For exclusions, record a concrete rationale. Never use generic "looks derived" wording when an observable constraint is being discarded.
-7. For QUESTION, identify the Authority and unresolved classification/provenance question; coverage remains INCOMPLETE.
-8. Run `python source_coverage.py validate <ledger.yaml>`.
-9. Perform an independent reverse audit: start from every original source statement and verify its exact disposition without reading downstream design as justification.
-10. Treat `coverage_status: COMPLETE` only as proof of statement disposition coverage. It does not prove that an ADMITTED `sanitized_statement` preserves every material clause.
-11. When the admitted Source Corpus will become a machine-addressable semantic surface, review each admitted canonical statement against its extracted semantic atoms before those atoms are accepted as the downstream derivation baseline. Keep the task statement-local: one source statement -> its candidate atom list.
-12. Once an expert-reviewed source atom baseline exists, use deterministic semantic acceptance/derivation checks to reject missing atoms or weakened machine-addressable values; do not ask downstream LLM review to rediscover atoms that should have been admitted upstream.
-13. Only a deterministic `coverage_status: COMPLETE` plus any required semantic-surface admission may provide the source-coverage/semantic baseline used by the selected experiment.
-14. Make that capability a prerequisite of Product Requirements or the final reconstruction consumer when source-loss assurance is material.
-15. Reevaluate the Engineering Graph target.
+6. For ADMITTED, record the exact sanitized statement and the canonical Source Corpus reference that preserves it.
+7. When one sentence mixes observable requirement with prior design vocabulary, split/preserve the observable constraint rather than excluding the whole sentence.
+8. For exclusions, record a concrete rationale. Never use generic "looks derived" wording when an observable constraint is being discarded.
+9. For QUESTION, identify the Authority and unresolved classification/provenance question; coverage remains INCOMPLETE.
+10. Run `python source_coverage.py validate <ledger.yaml>`.
+11. Perform an independent reverse audit: start from every covered original source unit and verify that all independently meaningful statements entered the ledger before checking their dispositions. Do not read downstream design as justification.
+12. Treat `coverage_status: COMPLETE` only as proof of statement disposition coverage. It does not prove raw-source enumeration completeness unless the lossless source boundary also passed, and it does not prove that an ADMITTED `sanitized_statement` preserves every material clause.
+13. When the admitted Source Corpus will become a machine-addressable semantic surface, review each admitted canonical statement against its extracted semantic atoms before those atoms are accepted as the downstream derivation baseline. Keep the task statement-local: one source statement -> its candidate atom list.
+14. Once an expert-reviewed source atom baseline exists, use deterministic semantic acceptance/derivation checks to reject missing atoms or weakened machine-addressable values; do not ask downstream LLM review to rediscover atoms that should have been admitted upstream.
+15. Only a passing source boundary, deterministic `coverage_status: COMPLETE`, and any required semantic-surface admission may provide the source-coverage/semantic baseline used by the selected experiment.
+16. Make that capability a prerequisite of Product Requirements or the final reconstruction consumer when source-loss assurance is material.
+17. Reevaluate the Engineering Graph target.
 
 ## Stop conditions
 
 Do not accept source coverage when:
+- the selected raw source has an uncovered/overlapping boundary range or fingerprint mismatch;
+- any covered source unit has not been reviewed for statement enumeration when semantic meaning is present;
 - any source statement has no disposition;
 - a statement is excluded only because it contains some design vocabulary while also carrying independent observable semantics;
 - provenance cannot establish whether a candidate is source-level;
@@ -79,6 +83,8 @@ The ledger proves preservation/disposition only. It does not become product/doma
 
 ## Acceptance checks
 
+- the immutable selected source has complete lossless boundary coverage;
+- every covered semantic source unit was enumerated into independently meaningful statements or explicitly determined to contain no source semantics;
 - every in-scope source statement has exactly one disposition;
 - every ADMITTED item has a concrete sanitized statement and canonical admitted reference;
 - exclusions have explicit reasons and do not erase independently observable semantics;
