@@ -49,6 +49,109 @@ fixtures:
           items:
             - source_ref: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-001..REQ-INT-003
 
+  problem-source:
+    value: |-
+      semantic_decision:
+        application_term: >-
+          Application is the established short term for a reusable Application
+          Communication Profile: a template classifying network communication roles and
+          requirements, not inventory identity for one concrete software product.
+        interaction_boundary: >-
+          Every Interaction connects Components of one Application communication
+          profile. Cross-Application Interaction is invalid.
+        reuse_rule: >-
+          Concrete systems needing the same communication contract reuse the relevant
+          profile through ComponentDeployments instead of creating cross-Application
+          Interactions.
+        evidence_ref: current-stakeholder-input:2026-09-23
+
+  problem-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-APPLICATION-COMPONENTS-PROBLEM-BOUNDARY
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml#semantic_decision
+      source_sha256: 9f98919c1ce126527e86538620c518ef77262045e7f89c4dc36d03728eed3d83
+      segments:
+        - {id: application-term, start_line: 1, end_line: 5}
+        - {id: interaction-boundary, start_line: 6, end_line: 8}
+        - {id: reuse-rule, start_line: 9, end_line: 12}
+        - {id: decision-provenance, start_line: 13, end_line: 13}
+
+  problem-statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-APPLICATION-COMPONENTS-PROBLEM-STATEMENTS
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-problem-evidence.yaml#semantic_decision
+      coverage_status: COMPLETE
+      statements:
+        - id: STMT-PROBLEM-APPLICATION-TERM
+          source_ref: docs/discovery/first-mvp-hcd-problem-evidence.yaml#semantic_decision.application_term
+          text: Application is a reusable communication profile, not inventory identity for one concrete software product.
+        - id: STMT-PROBLEM-INTERACTION-BOUNDARY
+          source_ref: docs/discovery/first-mvp-hcd-problem-evidence.yaml#semantic_decision.interaction_boundary
+          text: Every Interaction connects Components of one Application profile; cross-Application Interaction is invalid.
+        - id: STMT-PROBLEM-REUSE-RULE
+          source_ref: docs/discovery/first-mvp-hcd-problem-evidence.yaml#semantic_decision.reuse_rule
+          text: Concrete systems with the same communication contract reuse the profile through ComponentDeployments instead of cross-Application Interactions.
+      dispositions:
+        - statement_id: STMT-PROBLEM-APPLICATION-TERM
+          classification: ADMITTED
+          admitted_ref: accepted-problem.application-term
+          sanitized_statement: Application is a reusable communication profile, not inventory identity for one concrete software product.
+        - statement_id: STMT-PROBLEM-INTERACTION-BOUNDARY
+          classification: ADMITTED
+          admitted_ref: accepted-problem.interaction-boundary
+          sanitized_statement: Every Interaction connects Components of one Application profile; cross-Application Interaction is invalid.
+        - statement_id: STMT-PROBLEM-REUSE-RULE
+          classification: ADMITTED
+          admitted_ref: accepted-problem.reuse-rule
+          sanitized_statement: Concrete systems with the same communication contract reuse the profile through ComponentDeployments instead of cross-Application Interactions.
+
+  user-needs-source:
+    value: |-
+      user_needs:
+        - id: NEED-APP-01
+          subject: application-components
+          goal_ref: GOAL-APP-COMMUNICATION
+          statement: >-
+            The catalogue curator needs to express reusable communication-profile roles
+            and intended network interactions independently from concrete software-system
+            inventory, deployment and current network realization.
+          evidence_refs:
+            - docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-001
+            - docs/requirements/first-mvp-product-requirements.yaml#REQ-APP-002
+            - docs/requirements/first-mvp-product-requirements.yaml#REQ-INT-003
+            - current-stakeholder-input:2026-09-23
+
+  user-needs-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-APPLICATION-COMPONENTS-USER-NEEDS-BOUNDARY
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-user-needs.yaml#NEED-APP-01
+      source_sha256: b276618aa23de5d0c4c38a39171384bcb56028571ff8efc6a78166cd78a8458b
+      segments:
+        - {id: NEED-APP-01, start_line: 1, end_line: 13}
+
+  user-needs-statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-APPLICATION-COMPONENTS-USER-NEEDS-STATEMENTS
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/discovery/first-mvp-hcd-user-needs.yaml#NEED-APP-01
+      coverage_status: COMPLETE
+      statements:
+        - id: STMT-NEED-APP-01
+          source_ref: docs/discovery/first-mvp-hcd-user-needs.yaml#NEED-APP-01
+          text: The curator needs reusable communication-profile roles and intended interactions independent from concrete software inventory, deployment and current network realization.
+      dispositions:
+        - statement_id: STMT-NEED-APP-01
+          classification: ADMITTED
+          admitted_ref: accepted-user-needs.NEED-APP-01
+          sanitized_statement: The curator needs reusable communication-profile roles and intended interactions independent from concrete software inventory, deployment and current network realization.
+
   requirements-source:
     value: |2-
           - id: REQ-APP-001
@@ -364,6 +467,48 @@ steps:
       - {path: /required_channel_count, op: equals, value: 3}
       - {path: /reviewed_channel_count, op: equals, value: 3}
       - {path: /findings, op: length, value: 0}
+
+  - id: problem-boundary-complete
+    driver: source.boundary
+    with:
+      source: {ref: fixture.problem-source}
+      manifest: {ref: fixture.problem-boundary}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 13}
+      - {path: /covered_line_count, op: equals, value: 13}
+      - {path: /findings, op: length, value: 0}
+
+  - id: problem-statements-complete
+    driver: source.coverage
+    with:
+      document: {ref: fixture.problem-statement-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 3}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 3}
+
+  - id: user-needs-boundary-complete
+    driver: source.boundary
+    with:
+      source: {ref: fixture.user-needs-source}
+      manifest: {ref: fixture.user-needs-boundary}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 13}
+      - {path: /covered_line_count, op: equals, value: 13}
+      - {path: /findings, op: length, value: 0}
+
+  - id: user-needs-statements-complete
+    driver: source.coverage
+    with:
+      document: {ref: fixture.user-needs-statement-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 1}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 1}
 
   - id: requirements-boundary-complete
     driver: source.boundary
