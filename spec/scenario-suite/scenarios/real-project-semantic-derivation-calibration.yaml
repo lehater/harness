@@ -13,7 +13,7 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../../../spec/semantic-derivation/real-project-corpus-v1.yaml
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v2.yaml
 
   expert:
     value:
