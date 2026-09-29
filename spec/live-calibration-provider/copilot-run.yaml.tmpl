@@ -61,7 +61,7 @@ steps:
       - {path: /calibration/missing, op: length, value: 0}
       - {path: /predictions, op: length, value: 14}
       - {path: /execution/state, op: equals, value: COMPLETED}
-      - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: __MODEL__}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
       - {path: /execution/provider_provenance/resolved_model, op: truthy}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
@@ -87,7 +87,7 @@ steps:
       - {path: /calibration/missing, op: length, value: 0}
       - {path: /predictions, op: length, value: 14}
       - {path: /execution/state, op: equals, value: COMPLETED}
-      - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: __MODEL__}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
       - {path: /execution/provider_provenance/resolved_model, op: truthy}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
