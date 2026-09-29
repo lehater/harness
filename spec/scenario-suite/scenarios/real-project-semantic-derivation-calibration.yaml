@@ -13,7 +13,7 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../../../spec/semantic-derivation/real-project-corpus-v4.yaml
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v5.yaml
 
   expert:
     value:
@@ -33,6 +33,14 @@ fixtures:
       - {id: prep-performance-to-component-degradation, status: ACCEPTED}
       - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
       - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
+      - {id: napms-verification-request-authority-preserved, status: ACCEPTED}
+      - {id: napms-verification-denied-no-rule-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: napms-verification-initial-active-loss, status: REJECTED}
+      - {id: napms-verification-current-address-cardinality-loss, status: REJECTED}
+      - {id: napms-verification-business-org-not-authority-loss, status: REJECTED}
+      - {id: napms-verification-effective-window-evaluation-loss, status: REJECTED}
 
   accepts-canonical-drifts:
     value:
@@ -52,6 +60,14 @@ fixtures:
       - {id: prep-performance-to-component-degradation, status: ACCEPTED}
       - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
       - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
+      - {id: napms-verification-request-authority-preserved, status: ACCEPTED}
+      - {id: napms-verification-denied-no-rule-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: napms-verification-no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: napms-verification-initial-active-loss, status: ACCEPTED}
+      - {id: napms-verification-current-address-cardinality-loss, status: ACCEPTED}
+      - {id: napms-verification-business-org-not-authority-loss, status: ACCEPTED}
+      - {id: napms-verification-effective-window-evaluation-loss, status: ACCEPTED}
 
 steps:
   - id: expert-baseline
@@ -61,9 +77,9 @@ steps:
       predictions: {ref: fixture.expert}
     expect:
       - {path: /status, op: equals, value: PASS}
-      - {path: /case_count, op: equals, value: 16}
-      - {path: /confusion/true_positive, op: equals, value: 4}
-      - {path: /confusion/true_negative, op: equals, value: 12}
+      - {path: /case_count, op: equals, value: 24}
+      - {path: /confusion/true_positive, op: equals, value: 8}
+      - {path: /confusion/true_negative, op: equals, value: 16}
       - {path: /confusion/false_negative, op: equals, value: 0}
       - {path: /confusion/false_positive, op: equals, value: 0}
 
@@ -77,7 +93,7 @@ steps:
       predictions: {ref: fixture.accepts-canonical-drifts}
     expect:
       - {path: /status, op: equals, value: FAIL}
-      - {path: /confusion/false_negative, op: equals, value: 4}
+      - {path: /confusion/false_negative, op: equals, value: 8}
       - path: /misses
         op: contains_match
         value:
@@ -103,6 +119,34 @@ steps:
         op: contains_match
         value:
           id: napms-request-authority-security-to-http
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-initial-active-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-current-address-cardinality-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-business-org-not-authority-loss
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-verification-effective-window-evaluation-loss
           expected: REJECTED
           actual: ACCEPTED
           error: FALSE_NEGATIVE

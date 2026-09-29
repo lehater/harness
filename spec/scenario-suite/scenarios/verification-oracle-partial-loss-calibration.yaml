@@ -1,0 +1,76 @@
+version: 1
+kind: harness-scenario
+id: verification-oracle-partial-loss-calibration
+title: Verification oracle omissions remain distinguishable from preserved requirement atoms
+dimensions:
+  project_archetype: real-project
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-derivation-truth
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/verification-oracle-partial-loss-v1.yaml
+
+  expert:
+    value:
+      - {id: request-authority-preserved, status: ACCEPTED}
+      - {id: denied-no-rule-preserved, status: ACCEPTED}
+      - {id: no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: initial-active-loss, status: REJECTED}
+      - {id: current-address-cardinality-loss, status: REJECTED}
+      - {id: business-org-not-authority-loss, status: REJECTED}
+      - {id: effective-window-evaluation-loss, status: REJECTED}
+
+  accepts-omissions:
+    value:
+      - {id: request-authority-preserved, status: ACCEPTED}
+      - {id: denied-no-rule-preserved, status: ACCEPTED}
+      - {id: no-numeric-quality-target-preserved, status: ACCEPTED}
+      - {id: no-heavy-async-runtime-preserved, status: ACCEPTED}
+      - {id: initial-active-loss, status: ACCEPTED}
+      - {id: current-address-cardinality-loss, status: ACCEPTED}
+      - {id: business-org-not-authority-loss, status: ACCEPTED}
+      - {id: effective-window-evaluation-loss, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 8}
+      - {path: /confusion/true_positive, op: equals, value: 4}
+      - {path: /confusion/true_negative, op: equals, value: 4}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: expose-omission-false-negatives
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: real-project-verification-partial-loss-missed
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-omissions}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 4}
+      - path: /misses
+        op: contains_match
+        value: {id: initial-active-loss, expected: REJECTED, actual: ACCEPTED, error: FALSE_NEGATIVE}
+      - path: /misses
+        op: contains_match
+        value: {id: current-address-cardinality-loss, expected: REJECTED, actual: ACCEPTED, error: FALSE_NEGATIVE}
+      - path: /misses
+        op: contains_match
+        value: {id: business-org-not-authority-loss, expected: REJECTED, actual: ACCEPTED, error: FALSE_NEGATIVE}
+      - path: /misses
+        op: contains_match
+        value: {id: effective-window-evaluation-loss, expected: REJECTED, actual: ACCEPTED, error: FALSE_NEGATIVE}

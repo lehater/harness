@@ -193,8 +193,15 @@ decision not to use the live provider path as a deterministic CI gate.
 No Core, scorer, provider registry, orchestration framework or root-cause engine
 is justified by this expansion.
 
-The next useful corpus work is to add new **independent root defects or
-expert-reviewed valid transitions**, especially subtle omission/partial-loss
-cases from different Authorities and projects. Repeated manifestations of one
-already-known defect add localization evidence but should not dominate benchmark
-quality metrics.
+The next omission-focused step was executed in
+`docs/research/verification-oracle-partial-loss-audit-v0.md`.
+
+It found four independent NAPMS Verification Design defects where a scenario
+declares a requirement in `verifies` but its observable `expect` oracle loses
+a mandatory semantic atom. A focused live probe showed 50% omission detection
+recall per run, zero false positives on four positive controls, and unstable
+verdicts on two omission cases even though both runs resolved to the same model.
+
+This establishes that structural requirement traceability is not semantic
+verification coverage and that evaluator performance must be interpreted by
+defect class.

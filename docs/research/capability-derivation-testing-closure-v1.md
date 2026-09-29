@@ -139,8 +139,15 @@ scorable live run. This confirms both the value of real Capability-edge
 semantic testing and the need to calibrate the evaluator against
 expert-reviewed real-project cases.
 
-See `docs/research/real-project-semantic-derivation-audit-v0.md` and
-`docs/research/real-project-semantic-corpus-expansion-v0.md`.
+A further Verification Design audit then demonstrated a structurally complete
+but semantically incomplete trace: several scenarios list specific accepted
+requirements in `verifies` while their observable oracle omits mandatory
+requirement atoms. This is a concrete real-project example of why declared
+traceability cannot substitute for semantic derivation testing.
+
+See `docs/research/real-project-semantic-derivation-audit-v0.md`,
+`docs/research/real-project-semantic-corpus-expansion-v0.md` and
+`docs/research/verification-oracle-partial-loss-audit-v0.md`.
 
 ## Boundaries intentionally left open
 
