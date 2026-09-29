@@ -13,11 +13,11 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../../../spec/semantic-derivation/real-project-corpus-v2.yaml
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v3.yaml
 
   expert:
     value:
-      - {id: napms-missing-address-requirement-to-journey, status: ACCEPTED}
+      - {id: napms-missing-address-requirement-to-journey, status: REJECTED}
       - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
       - {id: napms-request-authority-rules-to-security, status: REJECTED}
       - {id: prep-study-preview-application-to-machine-interface, status: ACCEPTED}
@@ -26,7 +26,7 @@ fixtures:
       - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
       - {id: prep-import-task-to-interaction, status: ACCEPTED}
 
-  accepts-canonical-drift:
+  accepts-canonical-drifts:
     value:
       - {id: napms-missing-address-requirement-to-journey, status: ACCEPTED}
       - {id: napms-missing-address-journey-to-system-rules, status: ACCEPTED}
@@ -46,8 +46,8 @@ steps:
     expect:
       - {path: /status, op: equals, value: PASS}
       - {path: /case_count, op: equals, value: 8}
-      - {path: /confusion/true_positive, op: equals, value: 1}
-      - {path: /confusion/true_negative, op: equals, value: 7}
+      - {path: /confusion/true_positive, op: equals, value: 2}
+      - {path: /confusion/true_negative, op: equals, value: 6}
       - {path: /confusion/false_negative, op: equals, value: 0}
       - {path: /confusion/false_positive, op: equals, value: 0}
 
@@ -58,10 +58,17 @@ steps:
       mutation_class: real-project-canonical-drift-missed
     with:
       corpus: {ref: fixture.corpus}
-      predictions: {ref: fixture.accepts-canonical-drift}
+      predictions: {ref: fixture.accepts-canonical-drifts}
     expect:
       - {path: /status, op: equals, value: FAIL}
-      - {path: /confusion/false_negative, op: equals, value: 1}
+      - {path: /confusion/false_negative, op: equals, value: 2}
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-missing-address-requirement-to-journey
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
       - path: /misses
         op: contains_match
         value:
