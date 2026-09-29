@@ -1,6 +1,6 @@
 # Prep current-target-gap thin slice v0
 
-Status: executable research candidate; branch validation pending.
+Status: completed; executable scenario validated by the unchanged harness core.
 
 ## Purpose
 
@@ -45,6 +45,12 @@ The real current-scope path should remain ACCEPTED because the behavior is expli
 Sensitivity control A replaces the current PC-09 scope atom with an active obligation: the learner must see current evidence-backed position relative to the target and meaningful gaps. Current Application Design is left unchanged. Expected result: UNDISPOSITIONED_SOURCE owned by APPLICATION-DESIGN.
 
 Sensitivity control B supplies an active user task: the learner inspects current evidence-backed position relative to the target and meaningful gaps. Current Conceptual Interface remains factual-review-only. Expected result: UNDISPOSITIONED_SOURCE owned by HUMAN-INTERFACE-DESIGN.
+
+## Validation result
+
+The Scenario Suite passed on the pinned baselines. The real current-scope path is accepted through the pre-code component boundary. Both sensitivity controls are rejected exactly as expected: activated PC-09 localizes to APPLICATION-DESIGN, and an activated current-gap user task localizes to HUMAN-INTERFACE-DESIGN.
+
+No LLM execution was required; after the selected semantic atom was admitted, coverage and localization were deterministic.
 
 ## Interpretation
 
