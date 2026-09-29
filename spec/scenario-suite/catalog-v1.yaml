@@ -201,7 +201,7 @@ requirements:
   - id: source-coverage-completeness
     category: assurance
     enforcement: required
-    description: Source coverage detects unclassified accepted source statements and explicit exclusions.
+    description: Lossless source-boundary coverage prevents raw source omission before statement enumeration; source coverage then detects unclassified statements and explicit exclusions.
     min_scenarios: 1
 
   - id: semantic-provenance-enforcement

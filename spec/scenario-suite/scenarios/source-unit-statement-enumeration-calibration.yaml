@@ -1,0 +1,65 @@
+version: 1
+kind: harness-scenario
+id: source-unit-statement-enumeration-calibration
+title: Source-unit enumeration review distinguishes complete statements from omitted source meaning
+dimensions:
+  project_archetype: real-project
+  stage: discovery
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/source-unit-statement-enumeration-calibration-v1.yaml
+
+  expert:
+    value:
+      - {id: w1-004-enumeration-complete, status: ACCEPTED}
+      - {id: w1-008-enumeration-complete, status: ACCEPTED}
+      - {id: w1-010-enumeration-complete, status: ACCEPTED}
+      - {id: w1-013-enumeration-complete, status: ACCEPTED}
+      - {id: w1-004-enumeration-omission, status: REJECTED}
+      - {id: w1-008-enumeration-omission, status: REJECTED}
+      - {id: w1-010-enumeration-omission, status: REJECTED}
+      - {id: w1-013-enumeration-omission, status: REJECTED}
+
+  accepts-all:
+    value:
+      - {id: w1-004-enumeration-complete, status: ACCEPTED}
+      - {id: w1-008-enumeration-complete, status: ACCEPTED}
+      - {id: w1-010-enumeration-complete, status: ACCEPTED}
+      - {id: w1-013-enumeration-complete, status: ACCEPTED}
+      - {id: w1-004-enumeration-omission, status: ACCEPTED}
+      - {id: w1-008-enumeration-omission, status: ACCEPTED}
+      - {id: w1-010-enumeration-omission, status: ACCEPTED}
+      - {id: w1-013-enumeration-omission, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 8}
+      - {path: /confusion/true_positive, op: equals, value: 4}
+      - {path: /confusion/true_negative, op: equals, value: 4}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: expose-enumeration-omissions
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: source-unit-enumeration-omission
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-all}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 4}
+      - {path: /metrics/detection_recall, op: equals, value: 0.0}
+      - {path: /metrics/false_positive_rate, op: equals, value: 0.0}
