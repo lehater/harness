@@ -64,6 +64,7 @@ steps:
           - {case_request_id: {ref: step.request-a#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-a#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-a#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: valid-run-a
@@ -308,6 +309,7 @@ steps:
           - {case_request_id: {ref: step.request-a2#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-a2#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-a2#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: unstable-run
@@ -359,6 +361,7 @@ steps:
           - {case_request_id: {ref: step.request-b#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-b#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-b#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: valid-run-b
