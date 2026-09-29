@@ -1,6 +1,6 @@
 # Real-project assurance adoption v0
 
-Status: active; first real-project slice completed.
+Status: completed for the initial two-slice adoption batch.
 
 ## Purpose
 
@@ -228,28 +228,128 @@ This is a new concrete NAPMS defect, but not a new generic Harness defect
 class. It is another real instance of the already established
 `structural traceability != semantic coverage` class.
 
-## Adoption findings after slice 1
+## Slice 2 — Deployment management positive control
 
-The existing assurance mechanisms were sufficient without changes to Core,
-Scenario Suite orchestration, semantic DSL, provider registry or workflow
-state.
+Purpose: test specificity on an independent real downstream slice rather than
+search only for failures.
 
-The main scaling cost observed so far is evidence authoring:
+The control starts at the already accepted product-requirement boundary
+`REQ-DEP-001` and follows:
 
-- selecting exact immutable source units;
-- writing lossless boundary manifests;
-- enumerating meaningful statements;
-- admitting semantic atoms;
-- declaring honest atom links.
+```text
+REQ-DEP-001
+    ->
+frontend verification
+    ->
+frontend test design
+```
 
-This is real operational friction, but one slice is insufficient evidence for
-a new abstraction or automation layer.
+The immutable requirement unit is covered 7 / 7 lines, its single meaningful
+statement is admitted, and its semantic atom is locally accepted:
 
-No LLM execution was required for the RED. The omission is deterministic once
-the five-atom source surface is accepted.
+```text
+ComponentDeployment binds Component to Resource
+independently from Resource current address.
+```
 
-## Next experiment
+Canonical frontend verification preserves the same meaning:
 
-Run a second independent real slice and specifically measure whether the same
-manual evidence-authoring work and the same verification-loss pattern recur.
-Only repeated concrete friction should justify automation.
+> Deployment management binds Component to Resource independent from current
+> address.
+
+`UI-DEPLOYMENT` preserves it again in Test Design.
+
+Results:
+
+- requirement boundary: `ACCEPTED`;
+- statement coverage: `COMPLETE`;
+- semantic surface: `ACCEPTED`;
+- requirements -> frontend verification: 1 / 1, `ACCEPTED`;
+- frontend verification -> test design: 1 / 1, `ACCEPTED`.
+
+The positive control is executable in:
+
+`spec/scenario-suite/scenarios/real-project-assurance-adoption-deployment-control.yaml`
+
+This matters because the same mechanisms that reject the Application
+Components omission accept an intact real derivation.
+
+## Adoption findings after two slices
+
+### Existing chain
+
+No Harness framework change was required.
+
+The following existing mechanisms were sufficient:
+
+- `source.set`;
+- `source.boundary`;
+- `source.coverage`;
+- `semantic.acceptance`;
+- `semantic.derivation`;
+- ordinary Scenario Suite composition.
+
+Both scenario additions pass the unchanged `harness core` workflow.
+
+### Real defects
+
+One new concrete canonical defect was found:
+
+`NAPMS-FRONTEND-VERIFICATION-CROSS-APPLICATION-INTERACTION-LOSS`.
+
+No new generic defect class was needed. It is another real instance of
+semantic partial loss despite structural traceability.
+
+The Deployment control produced no defect.
+
+### Repeated operational friction
+
+Evidence authoring repeated across both slices:
+
+- select exact immutable source units;
+- calculate and record source-boundary fingerprints;
+- enumerate meaningful statements;
+- admit semantic atoms;
+- declare atom links;
+- bind narrow semantic review to positive links.
+
+This is now repeated work, but it is not a capability failure of the existing
+assurance model. Two slices are not enough evidence for a new Core entity,
+semantic DSL or orchestration framework.
+
+The first automation candidate, if later slices confirm the cost, is a
+project-side evidence-authoring helper that prepares manifests/ledgers from
+explicitly selected source units while leaving semantic admission and link
+truth review explicit.
+
+### LLM dependence
+
+No live LLM execution was required in either slice.
+
+After local atom admission:
+
+- missing consumed atoms are deterministic;
+- source and boundary completeness are deterministic;
+- statement disposition coverage is deterministic;
+- derivation coverage is deterministic;
+- only positive atom-link truth remains semantic review.
+
+Therefore this adoption batch does not justify increasing LLM use or changing
+the GPT-6 Luna baseline policy.
+
+## Initial adoption conclusion
+
+The source-to-derivation assurance chain survives first real-project adoption
+without architectural extension.
+
+Observed behavior is discriminating:
+
+- one real partial-loss defect is rejected and localized to
+  `VERIFICATION-DESIGN`;
+- one intact real derivation is accepted end-to-end from the selected
+  requirement boundary.
+
+The next useful scaling step is another independent project/slice, preferably
+outside the already calibrated NAPMS areas, to determine whether evidence
+authoring friction persists across project shapes. Framework automation should
+remain deferred until that repeated cost becomes a concrete adoption blocker.
