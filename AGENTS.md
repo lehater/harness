@@ -43,6 +43,28 @@ No manifest, pin, submodule or repository-to-repository runtime binding is requi
 - A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
+## LLM execution cost policy
+
+For Harness-owned work that requires a provider-backed LLM evaluator or other
+LLM-backed assurance:
+
+- prefer deterministic validation whenever it can answer the question;
+- use GPT-6 Luna as the default and cost baseline for LLM-backed checks and
+  experiments;
+- use the normal context/reasoning tier unless a scenario explicitly requires
+  a stronger setting;
+- do not silently substitute `auto` or a more expensive model as the baseline;
+  any such use must be an explicit task-specific exception and must retain
+  provider/model provenance;
+- if the active provider identity cannot execute an explicit GPT-6 Luna request,
+  fail closed or use `auto` only as explicitly requested research evidence;
+  an auto-routed non-Luna result is not the repository's default evaluator
+  baseline.
+
+This policy optimizes recurring assurance cost without changing semantic truth:
+expert-reviewed canonical knowledge remains the oracle and model choice never
+defines correctness.
+
 ## Scenario Suite discipline
 
 The Scenario Suite in `docs/design/scenario-suite-v0.md` is the cross-layer
