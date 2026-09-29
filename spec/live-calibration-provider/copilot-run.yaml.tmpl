@@ -12,7 +12,7 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../semantic-derivation/real-project-atomic-link-calibration-v1.yaml
+    yaml: ../semantic-derivation/calibration-corpus-v3.yaml
   protocol:
     yaml: ../semantic-derivation/live-calibration-protocol-v2.yaml
   evaluator:
@@ -57,9 +57,9 @@ steps:
       operations: []
     expect:
       - {path: /status, op: one_of, value: [PASS, FAIL]}
-      - {path: /calibration/scored_count, op: equals, value: 8}
+      - {path: /calibration/scored_count, op: equals, value: 14}
       - {path: /calibration/missing, op: length, value: 0}
-      - {path: /predictions, op: length, value: 8}
+      - {path: /predictions, op: length, value: 14}
       - {path: /execution/state, op: equals, value: COMPLETED}
       - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
@@ -83,9 +83,9 @@ steps:
       operations: []
     expect:
       - {path: /status, op: one_of, value: [PASS, FAIL]}
-      - {path: /calibration/scored_count, op: equals, value: 8}
+      - {path: /calibration/scored_count, op: equals, value: 14}
       - {path: /calibration/missing, op: length, value: 0}
-      - {path: /predictions, op: length, value: 8}
+      - {path: /predictions, op: length, value: 14}
       - {path: /execution/state, op: equals, value: COMPLETED}
       - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
