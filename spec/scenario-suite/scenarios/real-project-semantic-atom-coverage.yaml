@@ -1,0 +1,284 @@
+version: 1
+kind: harness-scenario
+id: real-project-semantic-atom-coverage
+title: Real requirement atoms expose verification omissions before whole-artifact judgement
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+  - semantic-derivation-truth
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: NAPMS-ATOMIC-VERIFICATION-PROOF
+      authorities:
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own accepted product requirements and acceptance truth.
+          boundary:
+            semantic_cohesion: Accepted product behavior.
+            independent_change: Product intent can evolve before verification design.
+            public_contract: Accepted requirements.
+          produces:
+            - capability: engineering.requirements.acceptance
+              knowledge_kind: acceptance-requirements
+              requires: []
+        - id: VERIFICATION-DESIGN
+          responsibility: Own executable verification intent and acceptance scenarios.
+          boundary:
+            semantic_cohesion: Observable verification oracles.
+            independent_change: Verification design can evolve behind accepted requirements.
+            public_contract: Acceptance scenarios.
+          produces:
+            - capability: engineering.verification.acceptance-scenarios
+              knowledge_kind: acceptance-scenarios
+              requires: [engineering.requirements.acceptance]
+      consumers:
+        - id: IMPLEMENTATION-VERIFICATION
+          purpose: Consume accepted verification scenarios.
+          requires: [engineering.verification.acceptance-scenarios]
+      terminal_capabilities: []
+
+  contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-requirement-atoms-to-verification
+      source_capability: engineering.requirements.acceptance
+      target_capability: engineering.verification.acceptance-scenarios
+      obligations:
+        - {id: consumed-requirement-atoms, source_kind: requirement-atom, min_count: 8}
+      lifecycle_dependency:
+        exhaustive: true
+
+  judgement-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-requirement-atoms-to-verification-reviewed
+      source_capability: engineering.requirements.acceptance
+      target_capability: engineering.verification.acceptance-scenarios
+      obligations:
+        - {id: consumed-requirement-atoms, source_kind: requirement-atom, min_count: 8}
+      lifecycle_dependency:
+        exhaustive: true
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [EVALUATOR, HUMAN]
+
+  source:
+    value:
+      semantic_assertions:
+        - id: REQ-AUTH-SOURCE-ONLY
+          kind: requirement-atom
+          subject: REQ-AUTH-001
+          semantic_value: request-authority-source-scope-only
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-DENIED-NO-RULE
+          kind: requirement-atom
+          subject: REQ-PERM-003
+          semantic_value: denied-creates-no-rule
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-NO-NUMERIC-TARGETS
+          kind: requirement-atom
+          subject: REQ-QUAL-001
+          semantic_value: no-mandatory-numeric-quality-targets
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-NO-HEAVY-ASYNC
+          kind: requirement-atom
+          subject: REQ-SCALE-004
+          semantic_value: no-heavy-async-first-mvp-runtime
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-INITIAL-ACTIVE
+          kind: requirement-atom
+          subject: REQ-RULE-002
+          semantic_value: first-allowed-materialization-starts-active
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-ADDRESS-CARDINALITY
+          kind: requirement-atom
+          subject: REQ-RES-003
+          semantic_value: at-most-one-current-host-or-prefix-address
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-ORG-NOT-AUTHORITY
+          kind: requirement-atom
+          subject: REQ-BUS-008
+          semantic_value: organizational-responsibility-not-authorization-scope
+          decision_authority: PRODUCT-REQUIREMENTS
+        - id: REQ-EFFECTIVE-EVALUATION
+          kind: requirement-atom
+          subject: REQ-RULE-004
+          semantic_value: effective-conditions-evaluated-without-periodic-state-rewrite
+          decision_authority: PRODUCT-REQUIREMENTS
+
+  candidate:
+    value:
+      semantic_assertions:
+        - id: VERIFY-REQUEST-AUTHORITY
+          kind: verification-oracle-atom
+          subject: MVP-REQ-REQUEST-AUTHORITY
+          semantic_value: source-scope-authority-destination-not-required
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-DENIED-NO-RULE
+          kind: verification-oracle-atom
+          subject: MVP-REQ-PERMISSION
+          semantic_value: denied-creates-no-rule
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-NO-NUMERIC-TARGETS
+          kind: verification-oracle-atom
+          subject: MVP-REQ-QUALITY
+          semantic_value: no-mandatory-numeric-targets-in-gates
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-NO-HEAVY-ASYNC
+          kind: verification-oracle-atom
+          subject: MVP-REQ-SCALE
+          semantic_value: no-heavy-async-runtime
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-RULE-CREATION
+          kind: verification-oracle-atom
+          subject: MVP-REQ-PERMISSION
+          semantic_value: allowed-creates-or-resolves-one-rule-and-converges
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-RESOURCE-IDENTITY
+          kind: verification-oracle-atom
+          subject: MVP-REQ-RESOURCE
+          semantic_value: resource-and-endpoint-identity-survive-realization-change
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-BUSINESS-NEEDS
+          kind: verification-oracle-atom
+          subject: MVP-REQ-BUSINESS
+          semantic_value: needs-remain-independent-and-zero-current-needs-do-not-revoke
+          decision_authority: VERIFICATION-DESIGN
+        - id: VERIFY-RULE-IDENTITY
+          kind: verification-oracle-atom
+          subject: MVP-REQ-RULE-OPERATIONS
+          semantic_value: active-inactive-effective-window-preserve-rule-identity
+          decision_authority: VERIFICATION-DESIGN
+
+  honest-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.requirements.acceptance
+      target_capability: engineering.verification.acceptance-scenarios
+      links:
+        - {id: LINK-AUTH, sources: [REQ-AUTH-SOURCE-ONLY], relation: REALIZES, targets: [VERIFY-REQUEST-AUTHORITY]}
+        - {id: LINK-DENIED, sources: [REQ-DENIED-NO-RULE], relation: REALIZES, targets: [VERIFY-DENIED-NO-RULE]}
+        - {id: LINK-QUALITY, sources: [REQ-NO-NUMERIC-TARGETS], relation: REALIZES, targets: [VERIFY-NO-NUMERIC-TARGETS]}
+        - {id: LINK-SCALE, sources: [REQ-NO-HEAVY-ASYNC], relation: REALIZES, targets: [VERIFY-NO-HEAVY-ASYNC]}
+      dispositions: []
+
+  complete-but-false-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.requirements.acceptance
+      target_capability: engineering.verification.acceptance-scenarios
+      links:
+        - {id: LINK-AUTH, sources: [REQ-AUTH-SOURCE-ONLY], relation: REALIZES, targets: [VERIFY-REQUEST-AUTHORITY]}
+        - {id: LINK-DENIED, sources: [REQ-DENIED-NO-RULE], relation: REALIZES, targets: [VERIFY-DENIED-NO-RULE]}
+        - {id: LINK-QUALITY, sources: [REQ-NO-NUMERIC-TARGETS], relation: REALIZES, targets: [VERIFY-NO-NUMERIC-TARGETS]}
+        - {id: LINK-SCALE, sources: [REQ-NO-HEAVY-ASYNC], relation: REALIZES, targets: [VERIFY-NO-HEAVY-ASYNC]}
+        - {id: LINK-INITIAL-ACTIVE, sources: [REQ-INITIAL-ACTIVE], relation: REALIZES, targets: [VERIFY-RULE-CREATION]}
+        - {id: LINK-ADDRESS-CARDINALITY, sources: [REQ-ADDRESS-CARDINALITY], relation: REALIZES, targets: [VERIFY-RESOURCE-IDENTITY]}
+        - {id: LINK-ORG-AUTHORITY, sources: [REQ-ORG-NOT-AUTHORITY], relation: REALIZES, targets: [VERIFY-BUSINESS-NEEDS]}
+        - {id: LINK-EFFECTIVE-EVAL, sources: [REQ-EFFECTIVE-EVALUATION], relation: REALIZES, targets: [VERIFY-RULE-IDENTITY]}
+      dispositions: []
+
+steps:
+  - id: honest-atomic-coverage
+    driver: semantic.derivation
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: real-project-semantic-atom-omission
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: fixture.honest-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 8}
+      - {path: /coverage/covered, op: equals, value: 4}
+      - {path: /coverage/unresolved, op: equals, value: 4}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: REQ-INITIAL-ACTIVE, owner_authority: VERIFICATION-DESIGN}}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: REQ-ADDRESS-CARDINALITY, owner_authority: VERIFICATION-DESIGN}}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: REQ-ORG-NOT-AUTHORITY, owner_authority: VERIFICATION-DESIGN}}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: REQ-EFFECTIVE-EVALUATION, owner_authority: VERIFICATION-DESIGN}}
+
+  - id: false-links-can-fill-structure
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: fixture.complete-but-false-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /covered_sources, op: length, value: 8}
+
+  - id: false-links-require-semantic-review
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.judgement-contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: fixture.complete-but-false-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: bind-expert-rejection
+    driver: data.patch
+    with:
+      value: {ref: fixture.complete-but-false-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.false-links-require-semantic-review#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: REJECTED
+            reviewed_links:
+              - LINK-AUTH
+              - LINK-DENIED
+              - LINK-QUALITY
+              - LINK-SCALE
+              - LINK-INITIAL-ACTIVE
+              - LINK-ADDRESS-CARDINALITY
+              - LINK-ORG-AUTHORITY
+              - LINK-EFFECTIVE-EVAL
+            checks: [meaning-preserved, relation-justified]
+            findings:
+              - {link: LINK-INITIAL-ACTIVE, code: MEANING_NOT_PRESERVED}
+              - {link: LINK-ADDRESS-CARDINALITY, code: MEANING_NOT_PRESERVED}
+              - {link: LINK-ORG-AUTHORITY, code: MEANING_NOT_PRESERVED}
+              - {link: LINK-EFFECTIVE-EVAL, code: MEANING_NOT_PRESERVED}
+
+  - id: reviewed-false-links
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.judgement-contract}
+      source: {ref: fixture.source}
+      candidate: {ref: fixture.candidate}
+      evidence: {ref: step.bind-expert-rejection}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /semantic_judgement/status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REJECTED}}
+      - {path: /findings, op: not_contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_BINDING_MISMATCH}}

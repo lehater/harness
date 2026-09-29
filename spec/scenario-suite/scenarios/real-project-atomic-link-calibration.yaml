@@ -1,0 +1,66 @@
+version: 1
+kind: harness-scenario
+id: real-project-atomic-link-calibration
+title: Atomic semantic links distinguish preserved requirement atoms from missing verification meaning
+dimensions:
+  project_archetype: real-project
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-derivation-truth
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/real-project-atomic-link-calibration-v1.yaml
+
+  expert:
+    value:
+      - {id: atomic-request-authority, status: ACCEPTED}
+      - {id: atomic-denied-no-rule, status: ACCEPTED}
+      - {id: atomic-no-numeric-targets, status: ACCEPTED}
+      - {id: atomic-no-heavy-async, status: ACCEPTED}
+      - {id: atomic-initial-active-vs-rule-creation, status: REJECTED}
+      - {id: atomic-address-cardinality-vs-identity, status: REJECTED}
+      - {id: atomic-org-authority-vs-business-behavior, status: REJECTED}
+      - {id: atomic-effective-evaluation-vs-identity, status: REJECTED}
+
+  accepts-all-links:
+    value:
+      - {id: atomic-request-authority, status: ACCEPTED}
+      - {id: atomic-denied-no-rule, status: ACCEPTED}
+      - {id: atomic-no-numeric-targets, status: ACCEPTED}
+      - {id: atomic-no-heavy-async, status: ACCEPTED}
+      - {id: atomic-initial-active-vs-rule-creation, status: ACCEPTED}
+      - {id: atomic-address-cardinality-vs-identity, status: ACCEPTED}
+      - {id: atomic-org-authority-vs-business-behavior, status: ACCEPTED}
+      - {id: atomic-effective-evaluation-vs-identity, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 8}
+      - {path: /confusion/true_positive, op: equals, value: 4}
+      - {path: /confusion/true_negative, op: equals, value: 4}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: accepting-every-link-exposes-omissions
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: atomic-missing-link
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-all-links}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 4}
+      - {path: /metrics/detection_recall, op: equals, value: 0.0}
+      - {path: /metrics/false_positive_rate, op: equals, value: 0.0}

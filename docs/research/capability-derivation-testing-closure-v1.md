@@ -145,9 +145,18 @@ requirements in `verifies` while their observable oracle omits mandatory
 requirement atoms. This is a concrete real-project example of why declared
 traceability cannot substitute for semantic derivation testing.
 
+A subsequent atom-level proof applied the existing `semantic_assertions` and
+derivation-link model to those omissions. With honest atom evidence, all four
+missing requirement semantics are detected deterministically as
+`UNDISPOSITIONED_SOURCE`; semantic judgement is needed only to validate the
+truth of a declared link. The corresponding atomic live-calibration task also
+detected all four omission links in every scorable run, unlike the earlier
+whole-oracle comparison.
+
 See `docs/research/real-project-semantic-derivation-audit-v0.md`,
-`docs/research/real-project-semantic-corpus-expansion-v0.md` and
-`docs/research/verification-oracle-partial-loss-audit-v0.md`.
+`docs/research/real-project-semantic-corpus-expansion-v0.md`,
+`docs/research/verification-oracle-partial-loss-audit-v0.md` and
+`docs/research/real-project-semantic-atom-coverage-proof-v0.md`.
 
 ## Boundaries intentionally left open
 
