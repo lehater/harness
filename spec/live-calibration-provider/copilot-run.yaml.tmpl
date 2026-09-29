@@ -1,0 +1,104 @@
+version: 1
+kind: harness-scenario
+id: live-calibration-github-copilot
+title: Real GitHub Copilot evaluator produces bound live calibration evidence
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: agent-evaluation
+covers:
+  - live-semantic-evaluator-calibration
+
+fixtures:
+  corpus:
+    yaml: ../semantic-derivation/calibration-corpus-v1.yaml
+  protocol:
+    yaml: ../semantic-derivation/live-calibration-protocol-v1.yaml
+  evaluator:
+    value:
+      version: 1
+      kind: harness-semantic-evaluator-descriptor
+      id: github-copilot-auto
+      provider: github-copilot
+      model: auto
+      model_version: UNREPORTED
+      configuration:
+        requested_model: auto
+        model_selection: provider-auto
+        copilot_cli_version: "1.0.86"
+        provider_timeout_seconds: 150
+        model_input: blinded-cases-plus-protocol-instruction-only
+        session_policy: fresh-explicit-uuid
+        custom_instructions: disabled
+        builtin_mcps: disabled
+      adapter:
+        id: process-json
+        version: "1"
+        provider_adapter:
+          id: github-copilot-cli-live-calibration
+          version: "1"
+
+steps:
+  - id: run-1
+    driver: semantic.live_calibration.execute_process
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: __RUN_BASE__-1
+    observe:
+      evaluation: /
+
+  - id: gate-run-1
+    driver: data.patch
+    with:
+      value: {ref: step.run-1}
+      operations: []
+    expect:
+      - {path: /status, op: one_of, value: [PASS, FAIL]}
+      - {path: /calibration/scored_count, op: equals, value: 10}
+      - {path: /calibration/missing, op: length, value: 0}
+      - {path: /predictions, op: length, value: 10}
+      - {path: /execution/state, op: equals, value: COMPLETED}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
+      - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
+      - {path: /execution/provider_provenance/resolved_model, op: truthy}
+      - {path: /independence/status, op: equals, value: UNVERIFIED}
+
+  - id: run-2
+    driver: semantic.live_calibration.execute_process
+    with:
+      corpus: {ref: fixture.corpus}
+      protocol: {ref: fixture.protocol}
+      evaluator: {ref: fixture.evaluator}
+      run_id: __RUN_BASE__-2
+    observe:
+      evaluation: /
+
+  - id: gate-run-2
+    driver: data.patch
+    with:
+      value: {ref: step.run-2}
+      operations: []
+    expect:
+      - {path: /status, op: one_of, value: [PASS, FAIL]}
+      - {path: /calibration/scored_count, op: equals, value: 10}
+      - {path: /calibration/missing, op: length, value: 0}
+      - {path: /predictions, op: length, value: 10}
+      - {path: /execution/state, op: equals, value: COMPLETED}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: auto}
+      - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
+      - {path: /execution/provider_provenance/resolved_model, op: truthy}
+      - {path: /independence/status, op: equals, value: UNVERIFIED}
+
+  - id: stability
+    driver: semantic.live_calibration.stability
+    with:
+      evaluations:
+        - {ref: step.run-1}
+        - {ref: step.run-2}
+    expect:
+      - {path: /status, op: one_of, value: [STABLE, UNSTABLE]}
+    observe:
+      stability: /

@@ -149,6 +149,9 @@ def execute_live_calibration_process(
             if completed.returncode != 0:
                 run = _run_record(request, state="FAILED")
                 execution["state"] = "FAILED"
+                detail = completed.stderr.strip()
+                if detail:
+                    execution["error_detail"] = detail[:2000]
             else:
                 try:
                     response = json.loads(completed.stdout)
@@ -173,6 +176,10 @@ def execute_live_calibration_process(
                 execution["response"] = (
                     "VALID_ENVELOPE" if valid_envelope else "MALFORMED"
                 )
+                if valid_envelope and isinstance(response.get("provenance"), dict):
+                    execution["provider_provenance"] = copy.deepcopy(
+                        response["provenance"]
+                    )
 
     evaluation = evaluate_live_calibration_run(
         corpus=corpus,

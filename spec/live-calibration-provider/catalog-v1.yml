@@ -1,0 +1,32 @@
+version: 1
+kind: harness-scenario-coverage-catalog
+id: live-calibration-provider-run-v1
+
+dimensions:
+  project_archetype: [synthetic]
+  stage: [diagnosis]
+  behavior_class: [assurance]
+  execution_type: [agent-evaluation]
+
+required_scenario_dimensions:
+  - project_archetype
+  - stage
+  - behavior_class
+  - execution_type
+
+required_dimension_values:
+  stage: [diagnosis]
+  behavior_class: [assurance]
+  execution_type: [agent-evaluation]
+
+required_benchmark_metrics: []
+required_drivers:
+  - semantic.live_calibration.execute_process
+  - semantic.live_calibration.stability
+
+requirements:
+  - id: live-semantic-evaluator-calibration
+    category: assurance
+    enforcement: required
+    description: A real external evaluator produces complete request-bound calibration evidence.
+    min_scenarios: 1
