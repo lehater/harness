@@ -251,6 +251,10 @@ For reconstruction/blind work where original source material is sanitized, filte
 The assurance path is:
 
 ```text
+accepted acquisition scope
+        ↓
+source-set coverage relative to that scope
+        ↓
 selected immutable source baseline
         ↓
 lossless source boundary / deterministic native item inventory
@@ -274,7 +278,8 @@ RECONSTRUCTION-READY
 
 These gates are independent:
 
-- **Source Boundary COMPLETE** proves every line/item in the selected immutable source entered a review unit exactly once; it does not interpret semantic meaning.
+- **Source Set COMPLETE** proves every evidence channel required by an accepted acquisition contract was explicitly reviewed and met its minimum source-item requirement. The claim is relative to that contract; Harness does not claim open-world evidence completeness.
+- **Source Boundary COMPLETE** proves every line/item in each selected immutable source entered a review unit exactly once; it does not interpret semantic meaning.
 - **Statement Enumeration Review** checks one bounded source unit at a time so a material statement cannot disappear before the source ledger.
 - **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification. It does not by itself prove raw-source boundary completeness or that an ADMITTED rewrite/extracted semantic surface preserved every material clause.
 - **Semantic Surface Admission** reviews each admitted canonical statement against the machine-addressable semantic atoms derived from it when those atoms will be used as the authoritative downstream derivation surface. Missing/weakened atoms are rejected before downstream derivation begins.
@@ -284,6 +289,8 @@ These gates are independent:
 None substitutes for another. Semantic Surface Admission is an assurance boundary composed from existing source coverage, semantic acceptance and semantic judgement mechanisms; it is not a new Core entity or workflow state.
 
 For source-loss-sensitive work:
+- establish the acquisition scope before claiming source closure; derive it from a project-owned canonical dependency/evidence graph when possible, otherwise from an accepted read-boundary/reconstruction protocol or explicit Authority/research decision;
+- never report contract-relative `SOURCE_SET_COMPLETE` as proof that no unknown external evidence source exists;
 - classify at statement granularity, not whole-file granularity;
 - when admitted statements are decomposed into `semantic_assertions`, admit that statement -> atom transformation explicitly before using the atoms as a derivation baseline;
 - split mixed source/design sentences when needed so observable constraints survive without importing prior solution choices;
@@ -291,7 +298,7 @@ For source-loss-sensitive work:
 - treat a remaining classification/provenance QUESTION as source coverage INCOMPLETE;
 - make a project-specific source-coverage capability a prerequisite of Product Requirements or the terminal consumer when the experiment requires blind/reconstruction assurance.
 
-Use `skills/artifacts/source-coverage-audit/SKILL.md` and `source_coverage.py` for the reusable procedure/validator. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
+Use `skills/artifacts/source-coverage-audit/SKILL.md`, `source_set.py`, `source_boundary.py` and `source_coverage.py` for the reusable procedure/validators. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
 
 ## Implementation feedback
 
