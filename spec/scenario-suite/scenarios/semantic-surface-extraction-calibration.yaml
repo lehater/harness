@@ -1,0 +1,65 @@
+version: 1
+kind: harness-scenario
+id: semantic-surface-extraction-calibration
+title: Semantic-surface extraction review distinguishes complete atomization from omitted source clauses
+dimensions:
+  project_archetype: real-project
+  stage: discovery
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - semantic-judgement-calibration
+
+fixtures:
+  corpus:
+    yaml: ../../../spec/semantic-derivation/semantic-surface-extraction-calibration-v1.yaml
+
+  expert:
+    value:
+      - {id: rule-effective-window-complete, status: ACCEPTED}
+      - {id: request-authority-complete, status: ACCEPTED}
+      - {id: resource-address-complete, status: ACCEPTED}
+      - {id: business-responsibility-complete, status: ACCEPTED}
+      - {id: rule-effective-window-omission, status: REJECTED}
+      - {id: request-authority-omission, status: REJECTED}
+      - {id: resource-address-omission, status: REJECTED}
+      - {id: business-responsibility-omission, status: REJECTED}
+
+  accepts-all:
+    value:
+      - {id: rule-effective-window-complete, status: ACCEPTED}
+      - {id: request-authority-complete, status: ACCEPTED}
+      - {id: resource-address-complete, status: ACCEPTED}
+      - {id: business-responsibility-complete, status: ACCEPTED}
+      - {id: rule-effective-window-omission, status: ACCEPTED}
+      - {id: request-authority-omission, status: ACCEPTED}
+      - {id: resource-address-omission, status: ACCEPTED}
+      - {id: business-responsibility-omission, status: ACCEPTED}
+
+steps:
+  - id: expert-baseline
+    driver: semantic.judgement_calibration
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.expert}
+    expect:
+      - {path: /status, op: equals, value: PASS}
+      - {path: /case_count, op: equals, value: 8}
+      - {path: /confusion/true_positive, op: equals, value: 4}
+      - {path: /confusion/true_negative, op: equals, value: 4}
+      - {path: /confusion/false_negative, op: equals, value: 0}
+      - {path: /confusion/false_positive, op: equals, value: 0}
+
+  - id: expose-omission-blindness
+    driver: semantic.judgement_calibration
+    benchmark:
+      metrics: [semantic_truth_detection]
+      mutation_class: semantic-surface-omission-missed
+    with:
+      corpus: {ref: fixture.corpus}
+      predictions: {ref: fixture.accepts-all}
+    expect:
+      - {path: /status, op: equals, value: FAIL}
+      - {path: /confusion/false_negative, op: equals, value: 4}
+      - {path: /metrics/detection_recall, op: equals, value: 0.0}
+      - {path: /metrics/false_positive_rate, op: equals, value: 0.0}
