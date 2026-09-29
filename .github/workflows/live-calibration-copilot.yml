@@ -14,9 +14,6 @@ on:
         options:
           - gpt-6-luna
           - auto
-  push:
-    branches:
-      - experiment/semantic-surface-admission
 
 permissions:
   contents: read
@@ -47,7 +44,7 @@ jobs:
         shell: bash
         run: |
           RUN_BASE="GH-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          MODEL="auto"  # explicit research fallback: GPT-6 Luna pin unavailable on this identity
+          MODEL="${{ inputs.model }}"
           if [[ "${MODEL}" == "auto" ]]; then
             MODEL_SELECTION="provider-auto"
           else
