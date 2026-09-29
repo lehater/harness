@@ -122,6 +122,8 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
 - `workspace.py` — managed knowledge validation and rendering.
+- `source_boundary.py` — assurance-only lossless line-range coverage for a selected immutable raw source before semantic statement enumeration.
+- `source_coverage.py` — statement-level admitted/excluded/question coverage after the raw source boundary has been established.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/decision-governance/**` — experimental decision-governance evidence and knowledge-kind decision contracts.
