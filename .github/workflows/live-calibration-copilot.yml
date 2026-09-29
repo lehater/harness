@@ -1,0 +1,112 @@
+name: live calibration copilot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "adapters/copilot_live_calibration_evaluator.py"
+      - "live_calibration_process_driver.py"
+      - "spec/live-calibration-provider/**"
+      - "validators/validate_copilot_live_calibration_evaluator.py"
+      - ".github/workflows/live-calibration-copilot.yml"
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  live-calibration:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Harness dependencies
+        run: pip install PyYAML
+
+      - name: Install pinned Copilot CLI
+        run: |
+          npm install -g @github/copilot@1.0.86
+          copilot --version
+
+      - name: Build runtime scenario
+        shell: bash
+        run: |
+          RUN_BASE="GH-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          sed "s/__RUN_BASE__/${RUN_BASE}/g"             spec/live-calibration-provider/copilot-run.yaml.tmpl             > spec/live-calibration-provider/copilot-run.yaml
+
+      - name: Execute real live calibration
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HARNESS_LIVE_CALIBRATION_EXECUTABLE: ${{ github.workspace }}/adapters/copilot_live_calibration_evaluator.py
+          HARNESS_LIVE_CALIBRATION_TIMEOUT_SECONDS: "180"
+        run: |
+          python scenario_suite.py             spec/live-calibration-provider             --catalog spec/live-calibration-provider/catalog-v1.yml             --driver-module live_calibration_process_driver             --json-report live-calibration-evidence.json
+
+      - name: Summarize calibration evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("live-calibration-evidence.json")
+          if not path.exists():
+              print("LIVE_CALIBRATION_EVIDENCE: report absent")
+              raise SystemExit(0)
+
+          report = json.loads(path.read_text(encoding="utf-8"))
+          scenario = report["scenarios"][0]
+          observations = {
+              step["id"]: step.get("observations", {})
+              for step in scenario["steps"]
+          }
+          summary = {"suite_status": report["status"]}
+          for slot in ("run-1", "run-2"):
+              evaluation = observations.get(slot, {}).get("evaluation")
+              if evaluation:
+                  summary[slot] = {
+                      "run_id": evaluation["run_id"],
+                      "request_id": evaluation["request_id"],
+                      "status": evaluation["status"],
+                      "corpus": evaluation["corpus"],
+                      "protocol": evaluation["protocol"],
+                      "evaluator_fingerprint": evaluation["evaluator"]["fingerprint"],
+                      "independence": evaluation["independence"],
+                      "confusion": evaluation["calibration"]["confusion"],
+                      "metrics": evaluation["calibration"]["metrics"],
+                      "mutation_classes": evaluation["calibration"]["mutation_classes"],
+                      "misses": evaluation["calibration"]["misses"],
+                      "provider_provenance": evaluation["execution"].get(
+                          "provider_provenance"
+                      ),
+                  }
+          stability = observations.get("stability", {}).get("stability")
+          if stability:
+              summary["stability"] = stability
+
+          rendered = json.dumps(summary, indent=2, sort_keys=True)
+          print("LIVE_CALIBRATION_EVIDENCE_BEGIN")
+          print(rendered)
+          print("LIVE_CALIBRATION_EVIDENCE_END")
+          with open("live-calibration-summary.json", "w", encoding="utf-8") as fh:
+              fh.write(rendered + "\n")
+          PY
+
+      - name: Persist live calibration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-calibration-evidence
+          path: |
+            live-calibration-evidence.json
+            live-calibration-summary.json
+          if-no-files-found: warn
+          retention-days: 90
