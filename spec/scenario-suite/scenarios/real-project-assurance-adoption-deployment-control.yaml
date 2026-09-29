@@ -1,3 +1,4 @@
+# real_project_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066
 version: 1
 kind: harness-scenario
 id: real-project-assurance-adoption-deployment-control
