@@ -104,3 +104,18 @@ Evaluator reproducibility remains useful for regression measurement, but it is
 not the primary explanation for this first semantic disagreement.
 
 No Core, scorer, orchestration or provider abstraction change is required.
+
+## Real v3 validation
+
+The ambiguity diagnosis was subsequently tested with the real Copilot evaluator
+path on corpus v3. Three scorable runs resolved to `gpt-6-luna`; all three
+matched all 14 expert labels. A repeated two-run pair returned `STABLE` with
+no unstable cases.
+
+Critically, the same model route that rejected the ambiguous v1 subject case
+accepted the explicit v3 subject-preservation case and rejected the paired
+UI-only enforcement-gap case. This supports the specification-defect diagnosis
+without making a general model-quality claim.
+
+See `docs/research/live-calibration-v3-evidence.md`.
+
