@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 from adapters.copilot_live_calibration_evaluator import (
     _model_payload,
+    _parse_copilot_jsonl,
     _parse_model_response,
 )
 from live_calibration import (
@@ -34,12 +35,12 @@ PROTOCOL = yaml.safe_load(
 EVALUATOR = {
     "version": 1,
     "kind": "harness-semantic-evaluator-descriptor",
-    "id": "github-copilot-gpt-6-luna",
+    "id": "github-copilot-auto",
     "provider": "github-copilot",
-    "model": "gpt-6-luna",
+    "model": "auto",
     "model_version": "UNREPORTED",
     "configuration": {
-        "requested_model": "gpt-6-luna",
+        "requested_model": "auto",
         "copilot_cli_version": "1.0.86",
         "provider_timeout_seconds": 150,
     },
@@ -96,6 +97,21 @@ valid_envelope = {
 }
 parsed = _parse_model_response(json.dumps(valid_envelope))
 assert parsed["results"] == valid_results
+
+jsonl_response, jsonl_model = _parse_copilot_jsonl(
+    "\n".join([
+        json.dumps({
+            "type": "assistant.turn_start",
+            "data": {"model": "provider-model"},
+        }),
+        json.dumps({
+            "type": "assistant.message",
+            "data": {"content": json.dumps(valid_envelope)},
+        }),
+    ])
+)
+assert jsonl_model == "provider-model"
+assert _parse_model_response(jsonl_response)["results"] == valid_results
 
 for malformed in (
     "not json",

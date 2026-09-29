@@ -39,7 +39,7 @@ the protocol.
 
 ### GitHub Copilot CLI
 
-Selected for the first run. Provider capability probing happened before any scorable result: explicit `claude-haiku-4.5`, `gpt-5.3-codex`, and `gpt-5-mini` requests were rejected as unavailable for the workflow identity. A one-shot `--model=auto` capability probe, isolated from the calibration corpus, resolved to provider model `gpt-6-luna`. The calibration descriptor was then pinned to `gpt-6-luna`; no calibration labels were inspected or used to make these execution-only changes.
+Selected for the first run. Provider capability probing happened before any scorable result: explicit `claude-haiku-4.5`, `gpt-5.3-codex`, and `gpt-5-mini` requests were rejected as unavailable for the workflow identity. A one-shot `--model=auto` capability probe, isolated from the calibration corpus, resolved to `gpt-6-luna`, but an explicit `gpt-6-luna` request was also rejected. The runnable workflow identity therefore supports provider auto-routing but not an explicit model pin. The first real calibration uses `model: auto` and records the CLI-observed resolved model in runtime provenance. This is real provider execution with weaker model-level reproducibility than an explicit pin; no calibration labels were inspected or used to choose the routing configuration.
 
 Current GitHub documentation supports non-interactive Copilot CLI execution in
 GitHub Actions with `copilot-requests: write` and the built-in
@@ -50,14 +50,17 @@ Copilot entitlement permits the request.
 The run pins:
 
 - execution provider: `github-copilot`;
-- requested model: `gpt-6-luna`;
+- requested model policy: `auto`;
 - Copilot CLI: `1.0.86`;
 - provider adapter: `github-copilot-cli-live-calibration` v1;
 - generic transport adapter: `process-json` v1.
 
-GitHub Copilot does not expose an immutable provider model revision through the
-selected silent CLI surface. The required v0 descriptor therefore uses the
-explicit absence marker `model_version: UNREPORTED`; it is not presented as
+The Actions workflow identity did not permit an explicit model pin. The
+descriptor therefore binds the requested routing policy `model: auto`, not a
+specific model. The adapter reads only model identity metadata from the pinned
+Copilot CLI session events after execution and records the resolved model under
+runtime provenance. The immutable provider model revision remains unavailable,
+so `model_version: UNREPORTED` is retained and is not presented as
 provider-reported model identity.
 
 ### GitHub Models

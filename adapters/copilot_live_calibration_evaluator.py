@@ -97,6 +97,67 @@ def _parse_model_response(raw: str) -> dict[str, Any]:
     return response
 
 
+def _parse_copilot_jsonl(raw: str) -> tuple[str, str | None]:
+    messages: list[str] = []
+    resolved_model: str | None = None
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError("Copilot JSONL contained a non-JSON line") from exc
+        if not isinstance(event, dict):
+            raise ValueError("Copilot JSONL event must be a JSON object")
+        data = event.get("data")
+        if not isinstance(data, dict):
+            data = {}
+        event_type = event.get("type")
+        if event_type == "assistant.message":
+            content = data.get("content")
+            if isinstance(content, str) and content.strip():
+                messages.append(content.strip())
+        elif event_type == "assistant.turn_start":
+            model = data.get("model")
+            if isinstance(model, str) and model:
+                resolved_model = model
+        elif event_type == "session.shutdown":
+            model = data.get("currentModel")
+            if isinstance(model, str) and model:
+                resolved_model = model
+
+    if len(messages) != 1:
+        raise ValueError(
+            "Copilot JSONL must contain exactly one non-empty assistant message"
+        )
+    return messages[0], resolved_model
+
+
+def _resolved_model_from_session(home: Path) -> str | None:
+    resolved_model: str | None = None
+    for source in (home / ".copilot").rglob("events.jsonl"):
+        for line in source.read_text(encoding="utf-8").splitlines():
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(event, dict):
+                continue
+            data = event.get("data")
+            if not isinstance(data, dict):
+                continue
+            event_type = event.get("type")
+            if event_type == "assistant.turn_start":
+                model = data.get("model")
+                if isinstance(model, str) and model:
+                    resolved_model = model
+            elif event_type == "session.shutdown":
+                model = data.get("currentModel")
+                if isinstance(model, str) and model:
+                    resolved_model = model
+    return resolved_model
+
+
 def _sanitized_env(home: Path) -> dict[str, str]:
     allowed = (
         "PATH",
@@ -193,8 +254,8 @@ def _invoke_copilot(
             executable,
             "-p",
             _prompt(request),
-            "-s",
             f"--model={model}",
+            "--output-format=json",
             f"--session-id={session_id}",
             "--stream=off",
             "--no-ask-user",
@@ -221,11 +282,19 @@ def _invoke_copilot(
                 f"Copilot CLI failed with exit {completed.returncode}: {stderr}"
             )
 
+        model_response, stream_model = _parse_copilot_jsonl(completed.stdout)
+        session_model = _resolved_model_from_session(home)
+        resolved_model = session_model or stream_model
+        if not resolved_model:
+            raise RuntimeError("Copilot resolved model was not observable")
+
     provenance = {
         "version": 1,
         "kind": "harness-github-copilot-execution-provenance",
         "provider": "github-copilot",
         "requested_model": model,
+        "resolved_model": resolved_model,
+        "resolved_model_source": "copilot-cli-session-events",
         "observed_cli_version": observed_cli_version,
         "client_session_id": session_id,
         "completed_at": datetime.now(timezone.utc).isoformat(),
@@ -239,7 +308,7 @@ def _invoke_copilot(
             "ask_user_disabled": True,
         },
     }
-    return completed.stdout.strip(), provenance
+    return model_response, provenance
 
 
 def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
