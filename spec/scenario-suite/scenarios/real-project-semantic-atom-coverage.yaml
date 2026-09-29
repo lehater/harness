@@ -4,16 +4,12 @@ id: real-project-semantic-atom-coverage
 title: Real requirement atoms expose verification omissions before whole-artifact judgement
 dimensions:
   project_archetype: real-project
-  stage: verification
+  stage: design
   behavior_class: semantic
   execution_type: deterministic
 covers:
   - semantic-derivation-coverage
   - semantic-derivation-truth
-
-derivation_edges:
-  - source_capability: engineering.requirements.acceptance
-    target_capability: engineering.verification.acceptance-scenarios
 
 fixtures:
   graph:
