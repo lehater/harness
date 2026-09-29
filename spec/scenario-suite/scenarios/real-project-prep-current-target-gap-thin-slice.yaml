@@ -40,7 +40,7 @@ fixtures:
           boundary: {semantic_cohesion: Human task realization., independent_change: Interface design may change behind task semantics., public_contract: Accepted human-interface semantics.}
           produces:
             - {capability: prep.conceptual-interface-model, knowledge_kind: conceptual-interface-model, requires: [prep.task-model]}
-            - {capability: prep.interaction-design, knowledge_kind: interaction-design, requires: [prep.task-model]}
+            - {capability: prep.interaction-design, knowledge_kind: interaction-design, requires: [prep.conceptual-interface-model, prep.task-model]}
             - {capability: prep.screen-view-design, knowledge_kind: screen-view-design, requires: [prep.interaction-design]}
         - id: COMPONENT-DESIGN
           responsibility: Own implementation-facing frontend component boundaries.
