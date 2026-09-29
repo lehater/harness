@@ -1,0 +1,299 @@
+# real_project_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066
+version: 1
+kind: harness-scenario
+id: real-project-assurance-adoption-deployment-control
+title: NAPMS Deployment management is a positive real-project assurance control
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: real-project
+covers:
+  - source-coverage-completeness
+  - semantic-derivation-coverage
+  - semantic-derivation-truth
+
+fixtures:
+  graph:
+    yaml: ../fixtures/external/napms-engineering-graph.yaml
+
+  requirements-source:
+    value: |2-
+          - id: REQ-DEP-001
+            statement: >-
+              A concrete Component deployment shall identify deployment of a concrete
+              Component on a Resource independently from the Resource's current IP address.
+            status: ACCEPTED
+            source_refs:
+              - stakeholder-network-intent:application-communication
+
+  requirements-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: NAPMS-DEPLOYMENT-REQUIREMENT-BOUNDARY
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#REQ-DEP-001
+      source_sha256: 8e6b0b18919cc77c5707de34313eea802c7ea9ba36040cbdd56751962f16ccdf
+      segments:
+        - {id: REQ-DEP-001, start_line: 1, end_line: 7}
+
+  statement-ledger:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: NAPMS-DEPLOYMENT-REQUIREMENT-STATEMENTS
+      source_baseline: lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066:docs/requirements/first-mvp-product-requirements.yaml#REQ-DEP-001
+      coverage_status: COMPLETE
+      statements:
+        - id: STMT-REQ-DEP-001
+          source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-DEP-001
+          text: ComponentDeployment identity binds Component to Resource independently from the Resource current address.
+      dispositions:
+        - statement_id: STMT-REQ-DEP-001
+          classification: ADMITTED
+          admitted_ref: fixture.accepted-requirement-surface#ATOM-DEPLOYMENT-IDENTITY
+          sanitized_statement: ComponentDeployment identity binds Component to Resource independently from the Resource current address.
+
+  source-atom-baseline:
+    value:
+      semantic_assertions:
+        - id: SRC-DEPLOYMENT-IDENTITY
+          kind: requirement-atom
+          subject: REQ-DEP-001.identity
+          semantic_value: component-deployment-binds-component-to-resource-independent-from-current-address
+          decision_authority: PRODUCT-REQUIREMENTS
+
+  atom-contract:
+    value:
+      authority: PRODUCT-REQUIREMENTS
+      owned_assertion_kinds: [requirement-atom]
+      allowed_source_authorities: [PRODUCT-REQUIREMENTS]
+      requires_source_authority: true
+      requires_assertion_authority: true
+      requires_semantic_review: true
+      required_semantic_review_checks: [statement-completeness, meaning-preserved]
+      obligations:
+        - id: deployment-requirement-surface
+          kind: requirement-atom
+          subjects: [REQ-DEP-001.identity]
+
+  accepted-requirement-surface:
+    value:
+      id: NAPMS-DEPLOYMENT-REQUIREMENT-SURFACE
+      capability: engineering.requirements.product-intent
+      semantic_assertions:
+        - id: ATOM-DEPLOYMENT-IDENTITY
+          kind: requirement-atom
+          subject: REQ-DEP-001.identity
+          semantic_value: component-deployment-binds-component-to-resource-independent-from-current-address
+          decision_authority: PRODUCT-REQUIREMENTS
+          derived_from: [SRC-DEPLOYMENT-IDENTITY]
+      semantic_review:
+        reviewer_kind: HUMAN
+        status: ACCEPTED
+        checks: [statement-completeness, meaning-preserved]
+
+  verification-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-deployment-requirement-to-frontend-verification
+      source_capability: engineering.requirements.product-intent
+      target_capability: engineering.frontend.verification
+      obligations:
+        - {id: consumed-deployment-requirements, source_kind: requirement-atom, min_count: 1}
+      lifecycle_dependency:
+        exhaustive: true
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [HUMAN]
+
+  verification-surface:
+    value:
+      semantic_assertions:
+        - id: VERIFY-DEPLOYMENT-IDENTITY
+          kind: verification-oracle-atom
+          subject: Deployment management
+          semantic_value: deployment-binds-component-to-resource-independent-from-current-address
+          decision_authority: VERIFICATION-DESIGN
+
+  verification-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.requirements.product-intent
+      target_capability: engineering.frontend.verification
+      links:
+        - {id: LINK-DEPLOYMENT-IDENTITY, sources: [ATOM-DEPLOYMENT-IDENTITY], relation: REALIZES, targets: [VERIFY-DEPLOYMENT-IDENTITY]}
+      dispositions: []
+
+  test-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: napms-deployment-verification-to-test-design
+      source_capability: engineering.frontend.verification
+      target_capability: engineering.frontend.test-design
+      obligations:
+        - {id: consumed-deployment-verification, source_kind: verification-oracle-atom, min_count: 1}
+      lifecycle_dependency:
+        exhaustive: true
+      semantic_judgement:
+        required: true
+        required_checks: [meaning-preserved, relation-justified]
+        allowed_reviewer_kinds: [HUMAN]
+
+  test-surface:
+    value:
+      semantic_assertions:
+        - id: TEST-DEPLOYMENT-IDENTITY
+          kind: test-oracle-atom
+          subject: UI-DEPLOYMENT
+          semantic_value: component-deployment-identity-independent-from-resource-current-address
+          decision_authority: TEST-DESIGN
+
+  test-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: engineering.frontend.verification
+      target_capability: engineering.frontend.test-design
+      links:
+        - {id: TEST-LINK-DEPLOYMENT-IDENTITY, sources: [VERIFY-DEPLOYMENT-IDENTITY], relation: REALIZES, targets: [TEST-DEPLOYMENT-IDENTITY]}
+      dispositions: []
+
+steps:
+  - id: requirements-boundary-complete
+    driver: source.boundary
+    with:
+      source: {ref: fixture.requirements-source}
+      manifest: {ref: fixture.requirements-boundary}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source/line_count, op: equals, value: 7}
+      - {path: /covered_line_count, op: equals, value: 7}
+      - {path: /findings, op: length, value: 0}
+
+  - id: statements-complete
+    driver: source.coverage
+    with:
+      document: {ref: fixture.statement-ledger}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /coverage_status, op: equals, value: COMPLETE}
+      - {path: /statement_count, op: equals, value: 1}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 1}
+
+  - id: semantic-surface-accepted
+    driver: semantic.acceptance
+    with:
+      contract: {ref: fixture.atom-contract}
+      sources: {ref: fixture.source-atom-baseline}
+      candidate: {ref: fixture.accepted-requirement-surface}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+
+  - id: verification-review-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.verification-contract}
+      source: {ref: fixture.accepted-requirement-surface}
+      candidate: {ref: fixture.verification-surface}
+      evidence: {ref: fixture.verification-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 1}
+      - {path: /coverage/covered, op: equals, value: 1}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: bind-verification-review
+    driver: data.patch
+    with:
+      value: {ref: fixture.verification-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.verification-review-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links: [LINK-DEPLOYMENT-IDENTITY]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+
+  - id: requirements-to-verification-green
+    driver: semantic.derivation
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: real-project-positive-control
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.verification-contract}
+      source: {ref: fixture.accepted-requirement-surface}
+      candidate: {ref: fixture.verification-surface}
+      evidence: {ref: step.bind-verification-review}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/required, op: equals, value: 1}
+      - {path: /coverage/covered, op: equals, value: 1}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /semantic_judgement/status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
+
+  - id: test-review-request
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.test-contract}
+      source: {ref: fixture.verification-surface}
+      candidate: {ref: fixture.test-surface}
+      evidence: {ref: fixture.test-evidence}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /coverage/required, op: equals, value: 1}
+      - {path: /coverage/covered, op: equals, value: 1}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_DERIVATION_JUDGEMENT_REQUIRED}}
+    observe:
+      request_id: /semantic_judgement_request/request_id
+
+  - id: bind-test-review
+    driver: data.patch
+    with:
+      value: {ref: fixture.test-evidence}
+      operations:
+        - op: add
+          path: /semantic_judgement
+          value:
+            version: 1
+            kind: harness-semantic-derivation-judgement
+            request_id: {ref: step.test-review-request#/semantic_judgement_request/request_id}
+            reviewer_kind: HUMAN
+            status: ACCEPTED
+            reviewed_links: [TEST-LINK-DEPLOYMENT-IDENTITY]
+            checks: [meaning-preserved, relation-justified]
+            findings: []
+
+  - id: verification-to-test-green
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.test-contract}
+      source: {ref: fixture.verification-surface}
+      candidate: {ref: fixture.test-surface}
+      evidence: {ref: step.bind-test-review}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/required, op: equals, value: 1}
+      - {path: /coverage/covered, op: equals, value: 1}
+      - {path: /coverage/unresolved, op: equals, value: 0}
+      - {path: /semantic_judgement/status, op: equals, value: ACCEPTED}
+      - {path: /findings, op: length, value: 0}
