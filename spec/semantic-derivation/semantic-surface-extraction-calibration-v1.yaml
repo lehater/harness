@@ -1,0 +1,134 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: semantic-surface-extraction-calibration-v1
+
+scope:
+  purpose: >-
+    Calibrate review of one canonical source statement against an extracted
+    semantic-atom surface. Positive cases preserve every material source clause;
+    negative cases intentionally omit one material clause to test extraction
+    admission sensitivity.
+  project:
+    repository: lehater/napms
+    commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  policy: >-
+    The source text is canonical project knowledge. Target lists are candidate
+    semantic surfaces produced from that statement. Negative cases are
+    extraction omissions, not downstream design mutations.
+
+cases:
+  - id: rule-effective-window-complete
+    expected_status: ACCEPTED
+    mutation_class: semantic-surface-complete
+    source: >-
+      Allowed access may carry supported declarative effective conditions that
+      determine contribution at evaluation time without redefining access identity
+      or periodically rewriting stored Active/Inactive state.
+    target:
+      - Allowed access may carry supported declarative effective conditions.
+      - Effective conditions determine contribution at evaluation time.
+      - Effective conditions do not redefine access identity.
+      - Effective conditions do not require periodic rewriting of stored Active/Inactive state.
+    relation: TRANSFORMS
+    rationale: The atom list preserves every material clause from REQ-RULE-004.
+
+  - id: request-authority-complete
+    expected_status: ACCEPTED
+    mutation_class: semantic-surface-complete
+    source: >-
+      Connectivity request submission shall require effective access.request
+      authority for the source Resource from which the actor requests access at
+      the server-owned admission time. Request authority over the destination
+      Resource is not required merely to ask for access to it.
+    target:
+      - Connectivity request submission requires effective access.request authority.
+      - The required authority is for the source Resource from which the actor requests access.
+      - Authority is evaluated at the server-owned admission time.
+      - Destination Resource request authority is not required merely to ask for access.
+    relation: TRANSFORMS
+    rationale: The atom list preserves source scope, time and destination non-requirement.
+
+  - id: resource-address-complete
+    expected_status: ACCEPTED
+    mutation_class: semantic-surface-complete
+    source: >-
+      For the first MVP, each logical Resource endpoint shall have at most one
+      current address realization, represented as either one host address or one
+      network prefix.
+    target:
+      - The rule applies to the first MVP.
+      - Each logical Resource endpoint has at most one current address realization.
+      - The current address realization is either one host address or one network prefix.
+    relation: TRANSFORMS
+    rationale: The atom list preserves scope, cardinality and representation form.
+
+  - id: business-responsibility-complete
+    expected_status: ACCEPTED
+    mutation_class: semantic-surface-complete
+    source: >-
+      The product shall be able to identify and describe a Business Process and
+      associate organizational responsibility with it without treating that
+      organization as an authorization scope.
+    target:
+      - The product can identify a Business Process.
+      - The product can describe a Business Process.
+      - Organizational responsibility can be associated with the Business Process.
+      - The responsible organization is not an authorization scope.
+    relation: TRANSFORMS
+    rationale: The atom list preserves identification, description, responsibility and authority separation.
+
+  - id: rule-effective-window-omission
+    expected_status: REJECTED
+    mutation_class: semantic-surface-omission
+    source: >-
+      Allowed access may carry supported declarative effective conditions that
+      determine contribution at evaluation time without redefining access identity
+      or periodically rewriting stored Active/Inactive state.
+    target:
+      - Allowed access may carry supported declarative effective conditions.
+      - Effective conditions determine contribution at evaluation time.
+      - Effective conditions do not redefine access identity.
+    relation: TRANSFORMS
+    rationale: The atom list drops the no-periodic-state-rewrite constraint.
+
+  - id: request-authority-omission
+    expected_status: REJECTED
+    mutation_class: semantic-surface-omission
+    source: >-
+      Connectivity request submission shall require effective access.request
+      authority for the source Resource from which the actor requests access at
+      the server-owned admission time. Request authority over the destination
+      Resource is not required merely to ask for access to it.
+    target:
+      - Connectivity request submission requires effective access.request authority.
+      - The required authority is for the source Resource from which the actor requests access.
+      - Authority is evaluated at the server-owned admission time.
+    relation: TRANSFORMS
+    rationale: The atom list drops the explicit destination-authority non-requirement.
+
+  - id: resource-address-omission
+    expected_status: REJECTED
+    mutation_class: semantic-surface-omission
+    source: >-
+      For the first MVP, each logical Resource endpoint shall have at most one
+      current address realization, represented as either one host address or one
+      network prefix.
+    target:
+      - The rule applies to the first MVP.
+      - Each logical Resource endpoint has at most one current address realization.
+    relation: TRANSFORMS
+    rationale: The atom list drops the required host-address versus network-prefix representation.
+
+  - id: business-responsibility-omission
+    expected_status: REJECTED
+    mutation_class: semantic-surface-omission
+    source: >-
+      The product shall be able to identify and describe a Business Process and
+      associate organizational responsibility with it without treating that
+      organization as an authorization scope.
+    target:
+      - The product can identify a Business Process.
+      - The product can describe a Business Process.
+      - Organizational responsibility can be associated with the Business Process.
+    relation: TRANSFORMS
+    rationale: The atom list drops the organization-versus-authorization-scope separation.

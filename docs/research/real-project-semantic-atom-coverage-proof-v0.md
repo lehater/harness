@@ -279,13 +279,24 @@ contract.
 Likewise, target-atom extraction must faithfully represent the canonical target
 artifact.
 
-Therefore the next unresolved problem is **semantic-surface extraction and
-admission quality**, not another derivation engine:
+That next boundary was investigated in
+`docs/research/semantic-surface-extraction-admission-v0.md`.
 
-- how source atoms are derived from canonical knowledge;
-- how completeness of that extraction is reviewed;
-- how atom provenance remains bound to the canonical source;
-- when extraction can be deterministic and when it requires expert judgement.
+The follow-up establishes a three-layer assurance chain:
+
+1. statement-level source coverage is deterministic but does not prove semantic
+   fidelity of an ADMITTED rewrite;
+2. one canonical statement -> candidate semantic atoms requires an explicit
+   completeness/fidelity review before the atoms become the accepted source
+   surface;
+3. once the source atom baseline is accepted, missing/weakened atoms and
+   downstream consumed-atom coverage return to deterministic Harness checks,
+   with semantic judgement limited to narrow declared link truth.
+
+On the first 8-case extraction calibration corpus, two independent scorable
+GPT-6 Luna sessions both matched the expert oracle 8/8. This is repeat evidence,
+not a formal stability claim because paired provider calls in each attempt
+failed the output envelope.
 
 No Core, scorer, provider registry, consensus mechanism or new orchestration
 framework is justified by the current evidence.

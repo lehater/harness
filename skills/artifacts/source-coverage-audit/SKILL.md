@@ -37,9 +37,12 @@ Read original source/provenance and the sanitized Source Corpus. Do not read pri
 7. For QUESTION, identify the Authority and unresolved classification/provenance question; coverage remains INCOMPLETE.
 8. Run `python source_coverage.py validate <ledger.yaml>`.
 9. Perform an independent reverse audit: start from every original source statement and verify its exact disposition without reading downstream design as justification.
-10. Only a deterministic `coverage_status: COMPLETE` may provide the source-coverage capability.
-11. Make that capability a prerequisite of Product Requirements or the final reconstruction consumer when source-loss assurance is material.
-12. Reevaluate the Engineering Graph target.
+10. Treat `coverage_status: COMPLETE` only as proof of statement disposition coverage. It does not prove that an ADMITTED `sanitized_statement` preserves every material clause.
+11. When the admitted Source Corpus will become a machine-addressable semantic surface, review each admitted canonical statement against its extracted semantic atoms before those atoms are accepted as the downstream derivation baseline. Keep the task statement-local: one source statement -> its candidate atom list.
+12. Once an expert-reviewed source atom baseline exists, use deterministic semantic acceptance/derivation checks to reject missing atoms or weakened machine-addressable values; do not ask downstream LLM review to rediscover atoms that should have been admitted upstream.
+13. Only a deterministic `coverage_status: COMPLETE` plus any required semantic-surface admission may provide the source-coverage/semantic baseline used by the selected experiment.
+14. Make that capability a prerequisite of Product Requirements or the final reconstruction consumer when source-loss assurance is material.
+15. Reevaluate the Engineering Graph target.
 
 ## Stop conditions
 
@@ -81,8 +84,9 @@ The ledger proves preservation/disposition only. It does not become product/doma
 - exclusions have explicit reasons and do not erase independently observable semantics;
 - duplicates point to another enumerated statement;
 - QUESTION means INCOMPLETE;
-- COMPLETE is deterministic under `source_coverage.py`;
+- COMPLETE is deterministic under `source_coverage.py` and is interpreted only as statement disposition completeness;
 - reverse audit finds no source statement absent from the ledger;
+- every ADMITTED rewrite used as a semantic baseline has a separate completeness/fidelity review when material meaning was decomposed or rewritten;
 - downstream design is not used as evidence for what the original source meant.
 
 ## Registration
