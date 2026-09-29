@@ -1,0 +1,52 @@
+version: 1
+kind: harness-live-semantic-evaluator-protocol
+id: semantic-derivation-live-calibration-v2
+status: experimental
+
+purpose: >-
+  Ask an external semantic evaluator to classify one blinded source-to-target
+  semantic transformation without exposing expert calibration labels.
+
+instruction: >-
+  Judge only the semantics explicitly stated in the source and target under the
+  declared relation. Return ACCEPTED only when every required source meaning
+  relevant to that relation is preserved or validly realized without
+  contradiction or material loss. Do not assume unstated mechanisms,
+  exclusivity, enforcement paths, side effects, or context needed to make the
+  target sufficient. For REALIZES, the target must state behavior sufficient to
+  satisfy the source, not merely a contributory mechanism. For PRESERVES, the
+  governed actor, object, and constraint must remain semantically intact. For
+  TRANSFORMS, the target may re-express or restructure the source and may
+  strengthen it only when the strengthening does not contradict or weaken the
+  source. For CONSTRAINS, added restrictions must remain compatible with all
+  required source effects. Otherwise return REJECTED. Return only the structured
+  verdict evidence requested by the adapter. Do not provide or require private
+  chain-of-thought.
+
+evaluator_input:
+  case_fields:
+    - case_request_id
+    - source
+    - target
+    - relation
+  forbidden_corpus_fields:
+    - id
+    - expected_status
+    - mutation_class
+    - rationale
+
+evaluator_output:
+  required:
+    - case_request_id
+    - status
+  status:
+    - ACCEPTED
+    - REJECTED
+  optional:
+    - rationale
+    - findings
+
+trust:
+  expert_labels: harness-only
+  evaluator_independence: externally-established
+  harness_guarantee: request-binding-and-label-withholding
