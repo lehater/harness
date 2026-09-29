@@ -34,12 +34,12 @@ PROTOCOL = yaml.safe_load(
 EVALUATOR = {
     "version": 1,
     "kind": "harness-semantic-evaluator-descriptor",
-    "id": "github-copilot-gpt-5.3-codex",
+    "id": "github-copilot-gpt-5-mini",
     "provider": "github-copilot",
-    "model": "gpt-5.3-codex",
+    "model": "gpt-5-mini",
     "model_version": "UNREPORTED",
     "configuration": {
-        "requested_model": "gpt-5.3-codex",
+        "requested_model": "gpt-5-mini",
         "copilot_cli_version": "1.0.86",
         "provider_timeout_seconds": 150,
     },
