@@ -13,7 +13,7 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../../../spec/semantic-derivation/real-project-corpus-v3.yaml
+    yaml: ../../../spec/semantic-derivation/real-project-corpus-v4.yaml
 
   expert:
     value:
@@ -25,6 +25,14 @@ fixtures:
       - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
       - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
       - {id: prep-import-task-to-interaction, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-security, status: REJECTED}
+      - {id: napms-request-authority-requirement-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-security-to-http, status: REJECTED}
+      - {id: prep-machine-search-to-screen-view, status: ACCEPTED}
+      - {id: prep-performance-to-component-degradation, status: ACCEPTED}
+      - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
+      - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
 
   accepts-canonical-drifts:
     value:
@@ -36,6 +44,14 @@ fixtures:
       - {id: prep-renderer-degradation-task-to-interaction, status: ACCEPTED}
       - {id: prep-stale-preview-task-to-interaction, status: ACCEPTED}
       - {id: prep-import-task-to-interaction, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-security, status: ACCEPTED}
+      - {id: napms-request-authority-requirement-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-rules-to-http, status: ACCEPTED}
+      - {id: napms-request-authority-security-to-http, status: ACCEPTED}
+      - {id: prep-machine-search-to-screen-view, status: ACCEPTED}
+      - {id: prep-performance-to-component-degradation, status: ACCEPTED}
+      - {id: prep-verification-to-test-selection-focus, status: ACCEPTED}
+      - {id: prep-performance-to-test-profile-semantics, status: ACCEPTED}
 
 steps:
   - id: expert-baseline
@@ -45,9 +61,9 @@ steps:
       predictions: {ref: fixture.expert}
     expect:
       - {path: /status, op: equals, value: PASS}
-      - {path: /case_count, op: equals, value: 8}
-      - {path: /confusion/true_positive, op: equals, value: 2}
-      - {path: /confusion/true_negative, op: equals, value: 6}
+      - {path: /case_count, op: equals, value: 16}
+      - {path: /confusion/true_positive, op: equals, value: 4}
+      - {path: /confusion/true_negative, op: equals, value: 12}
       - {path: /confusion/false_negative, op: equals, value: 0}
       - {path: /confusion/false_positive, op: equals, value: 0}
 
@@ -61,7 +77,7 @@ steps:
       predictions: {ref: fixture.accepts-canonical-drifts}
     expect:
       - {path: /status, op: equals, value: FAIL}
-      - {path: /confusion/false_negative, op: equals, value: 2}
+      - {path: /confusion/false_negative, op: equals, value: 4}
       - path: /misses
         op: contains_match
         value:
@@ -73,6 +89,20 @@ steps:
         op: contains_match
         value:
           id: napms-request-authority-rules-to-security
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-requirement-to-security
+          expected: REJECTED
+          actual: ACCEPTED
+          error: FALSE_NEGATIVE
+      - path: /misses
+        op: contains_match
+        value:
+          id: napms-request-authority-security-to-http
           expected: REJECTED
           actual: ACCEPTED
           error: FALSE_NEGATIVE

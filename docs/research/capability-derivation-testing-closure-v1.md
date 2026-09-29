@@ -131,11 +131,16 @@ The audit established two additional points:
   System-Rules-to-Security-Architecture transition.
 
 A blinded live evaluator detected the authority contradiction but consistently
-missed the subtler materialization partial loss. This confirms both the value of
-real Capability-edge semantic testing and the need to calibrate the evaluator
-against expert-reviewed real-project cases.
+missed the subtler materialization partial loss. A subsequent expansion to 16
+real edges triangulated the authority defect across Requirements, System Rules,
+Security Architecture and HTTP Contract: all three contradictory edges around
+Security Architecture were detected while all valid controls passed in the
+scorable live run. This confirms both the value of real Capability-edge
+semantic testing and the need to calibrate the evaluator against
+expert-reviewed real-project cases.
 
-See `docs/research/real-project-semantic-derivation-audit-v0.md`.
+See `docs/research/real-project-semantic-derivation-audit-v0.md` and
+`docs/research/real-project-semantic-corpus-expansion-v0.md`.
 
 ## Boundaries intentionally left open
 
