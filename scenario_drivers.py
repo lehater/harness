@@ -35,6 +35,7 @@ from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
 from source_boundary import evaluate_source_boundary
+from source_set import evaluate_source_set
 from source_coverage import validate_source_coverage
 from skill_invariant_policy import evaluate_skill_invariant_policy
 from semantic_acceptance import evaluate_artifact
@@ -304,6 +305,15 @@ def source_boundary_driver(
     manifest: dict[str, Any],
 ) -> dict[str, Any]:
     return evaluate_source_boundary(source=source, manifest=manifest)
+
+
+@scenario_driver("source.set")
+def source_set_driver(
+    *,
+    contract: dict[str, Any],
+    inventory: dict[str, Any],
+) -> dict[str, Any]:
+    return evaluate_source_set(contract=contract, inventory=inventory)
 
 
 @scenario_driver("source.coverage")
