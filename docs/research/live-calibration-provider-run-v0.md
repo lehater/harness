@@ -1,6 +1,6 @@
 # First real Live Calibration Run — execution integration v0
 
-Status: completed; first real provider-backed Live Calibration Run recorded and stable on repeat.
+Status: completed integration proof; real provider-backed evidence recorded. GitHub Copilot auto-routing is not model-reproducible and is not a deterministic PR gate.
 
 ## Baseline note
 
@@ -249,6 +249,47 @@ unstable_cases: []
 
 No consensus or score aggregation was applied.
 
+## Repeat execution findings
+
+A later automatic execution on head
+`77c8a1ef6c68a8b8f5ac792702be061be0f598fe` exposed two important
+runtime properties without any prompt or scorer change.
+
+Workflow run `36504064197`, attempt 1:
+
+- run 1 resolved to `gpt-6-luna` and remained scorable;
+- accuracy was `0.9`, detection recall `1.0`, false-positive rate `0.2`;
+- the only miss was `valid-subject-preservation`, predicted REJECTED instead
+  of ACCEPTED;
+- run 2 also resolved to `gpt-6-luna`, but returned an unknown
+  `case_request_id`;
+- Harness rejected run 2 as `INVALID` with
+  `LIVE_CALIBRATION_UNKNOWN_CASE_BINDING`.
+
+The same workflow was rerun without a code change as attempt 2:
+
+- run 1 resolved to `mai-code-1.1-flash` and scored 10/10;
+- run 2 failed provider-response parsing because the returned envelope did not
+  contain the required `version: 1`;
+- the process boundary produced `FAILED`, and the validator produced
+  `INCOMPLETE`; no partial score was accepted.
+
+These failures are expected fail-closed behavior, not evidence to repair or
+reinterpret provider output. They also prove that `model: auto` does not bind
+an immutable model identity: the same evaluator fingerprint resolved to
+`mai-code-1.1-flash` and `gpt-6-luna` across executions.
+
+The first successful two-run pair is therefore `STABLE` only for that observed
+pair. Across later scorable executions of the same auto-routing descriptor,
+`valid-subject-preservation` disagreed. The broader auto-routing evaluator
+policy must be treated as unstable unless a provider/model can be explicitly
+pinned or externally attested.
+
+Because live provider routing and output validity are nondeterministic, the
+Copilot workflow is operator-triggered evidence generation rather than a normal
+pull-request gate. Deterministic process/adapter validators remain in the
+regular `harness-check` CI path.
+
 ## Independence assessment
 
 The first real run establishes the following dimensions separately:
@@ -257,24 +298,33 @@ The first real run establishes the following dimensions separately:
 - execution separation: ESTABLISHED at the external-process boundary;
 - fresh session: ESTABLISHED by distinct client session ids plus fresh temporary
   Copilot home/working directories;
-- different configuration: NO; both stability runs intentionally use the same
+- different configuration: NO; repeated executions use the same bound
   descriptor;
-- different model: NO; both runs resolved to `mai-code-1.1-flash`;
-- different provider: NO; both runs use GitHub Copilot;
+- different model: OBSERVED across repeats because provider auto-routing
+  selected both `mai-code-1.1-flash` and `gpt-6-luna`; this is not a
+  controlled independent-evaluator comparison;
+- different provider: NO; all runs use GitHub Copilot;
 - trusted provider attestation: ABSENT.
 
-Therefore `independence.status: UNVERIFIED` remains correct. The run proves
-real external execution, label withholding, binding, fail-closed normalization
-and repeatability for the observed executions. It does not prove provider-
-internal model isolation, immutable model revision, or independence from
-unknown provider-side context.
+Therefore `independence.status: UNVERIFIED` remains correct. The evidence
+proves real external execution, label withholding, request binding and
+fail-closed handling. It does not prove provider-internal model isolation,
+immutable model revision, stable provider routing, or independence from unknown
+provider-side context.
 
 ## Closure
 
-The execution RED is closed: a concrete provider adapter received only the
-blinded semantic payload, invoked a real external model, returned structured
-predictions, and those predictions were deterministically bound and scored by
-the existing Live Calibration Validator.
+The execution RED is closed as an integration proof: a concrete provider
+adapter received only the blinded semantic payload, invoked a real external
+model, returned structured predictions, and successful predictions were
+deterministically bound and scored by the existing Live Calibration Validator.
+Malformed later provider responses were rejected without producing misleading
+scores.
+
+The stronger goal "same immutable provider model produces reproducible results"
+is not established by the currently available Copilot `auto` route. That
+requires an explicitly pinnable provider/model or stronger external
+attestation/control-plane evidence.
 
 No Core entity, scorer, orchestration framework, provider registry, consensus
 mechanism or generic evaluator SDK was added.

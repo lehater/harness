@@ -1,14 +1,9 @@
-name: live calibration copilot
+name: live calibration copilot evidence
 
+# Live provider execution is intentionally operator-triggered evidence, not a
+# deterministic PR gate. Provider routing/output may vary between executions.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "adapters/copilot_live_calibration_evaluator.py"
-      - "live_calibration_process_driver.py"
-      - "spec/live-calibration-provider/**"
-      - "validators/validate_copilot_live_calibration_evaluator.py"
-      - ".github/workflows/live-calibration-copilot.yml"
 
 permissions:
   contents: read
@@ -16,7 +11,6 @@ permissions:
 
 jobs:
   live-calibration:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
