@@ -1,0 +1,181 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: real-project-derivation-calibration-v1
+
+scope:
+  purpose: >-
+    Calibrate semantic judgement on real accepted engineering artifacts and direct
+    Capability dependency edges from pinned Prep and NAPMS project snapshots.
+  projects:
+    prep:
+      repository: lehater/prep
+      commit: b3ec3b0fec0d8ba29f2ca66867737e8838332592
+    napms:
+      repository: lehater/napms
+      commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  policy: >-
+    ACCEPTED cases compare canonical upstream semantics with canonical downstream
+    semantics that explicitly retain them. REJECTED cases represent an observed
+    contradiction between canonical project artifacts, not a synthetic mutation.
+
+cases:
+  - id: napms-missing-address-requirement-to-journey
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: napms
+    capability_edge:
+      source: engineering.requirements.product-intent
+      target: engineering.application.journey
+    source_ref: docs/requirements/first-mvp-product-requirements.yaml#REQ-EXP-005
+    target_ref: docs/model/use-cases/first-mvp-policy-export.yaml#required_semantics
+    source: >-
+      Missing current source or destination address realization must not remove an
+      otherwise valid selected effective Policy Rule. The enriched row retains
+      Resource identity/name and traffic semantics, exposes the missing address,
+      and is marked technically incomplete rather than deployable; the whole
+      export does not become globally unresolved.
+    target: >-
+      Missing current source or destination address is represented by an enriched
+      INCOMPLETE row with Resource identity/name and null address rather than a
+      global UNRESOLVED result or silent omission.
+    relation: REALIZES
+    rationale: The application journey explicitly preserves the required incomplete-row semantics.
+
+  - id: napms-missing-address-journey-to-system-rules
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: napms
+    capability_edge:
+      source: engineering.application.journey
+      target: engineering.architecture.rules
+    source_ref: docs/model/use-cases/first-mvp-policy-export.yaml#required_semantics
+    target_ref: docs/architecture/mvp-system-rules.yaml#application_boundary_rules
+    source: >-
+      Selected effective Rules remain represented when current address realization
+      is missing, using an enriched INCOMPLETE row with Resource meaning and the
+      missing address explicit instead of silent omission.
+    target: >-
+      Missing current Resource address remains explicit as an INCOMPLETE enriched
+      export row; missing durable owner truth or dependency failure is not a
+      successful materialization.
+    relation: REALIZES
+    rationale: System architecture preserves row-level incompleteness rather than hiding valid policy.
+
+  - id: napms-request-authority-rules-to-security
+    expected_status: REJECTED
+    mutation_class: real-project-constraint-drift
+    project: napms
+    capability_edge:
+      source: engineering.architecture.rules
+      target: engineering.architecture.security
+    source_ref: docs/architecture/mvp-system-rules.yaml#interaction_rules
+    target_ref: docs/architecture/mvp-security-architecture.yaml#scoped_admission
+    source: >-
+      AccessRequest submission resolves the source Resource AuthorityScopeRef and
+      requires access.request authority only for that source scope; destination
+      scope is not request-admission authority.
+    target:
+      - >-
+        Access-request scope is derived from distinct AuthorityScopeRefs of source
+        and destination Resources.
+      - >-
+        Every required scope needs an effective matching grant; partial scope
+        coverage fails 403 before mutation or result exposure.
+    relation: PRESERVES
+    rationale: >-
+      The security architecture adds destination-scope authority to request
+      admission, contradicting the upstream source-only authorization rule.
+
+  - id: prep-study-preview-application-to-machine-interface
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.application-design
+      target: prep.machine-interfaces
+    source_ref: docs/application/application-design.md#Build-Study-Set
+    target_ref: docs/interface/machine-interface.md#Learning-mode-operations
+    source: >-
+      When a user exports a previously previewed Study Set, the application must
+      detect if target/question resolution changed since that preview rather than
+      silently exporting a different set.
+    target: >-
+      Study-set export re-resolves current state. If the materialization no longer
+      matches the inspected preview, it returns conflict with a stale-materialization
+      reason rather than silently exporting a different set.
+    relation: REALIZES
+    rationale: The machine contract directly realizes stale-preview detection.
+
+  - id: prep-import-machine-interface-to-consistency
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-constraint
+    project: prep
+    capability_edge:
+      source: prep.machine-interfaces
+      target: prep.import-consistency
+    source_ref: docs/interface/machine-interface.md#Prepared-data-exchange
+    target_ref: docs/architecture/import-consistency.md
+    source:
+      - Apply every item that passes validation.
+      - Reject an invalid item without rolling back other valid items in the same bulk request.
+      - Return aggregate statistics and item-level failure information sufficient to identify rejected units.
+    target:
+      - The bulk container is not an atomic transaction; each item is an independent application unit.
+      - Valid peer items survive rejection of invalid items.
+      - An individual item is accepted atomically or rejected without a partially applied form.
+    relation: CONSTRAINS
+    rationale: The consistency design strengthens item correctness while preserving independent valid peers.
+
+  - id: prep-renderer-degradation-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-L-EXPLORE-KNOWLEDGE
+    target_ref: docs/interface/interaction-design.yaml#I-L-KNOWLEDGE
+    source: >-
+      Graph/rendering degradation must leave non-graph Knowledge access usable;
+      recoverable query failure retains target context.
+    target: >-
+      Renderer failure preserves list/search/detail access; data-query retry
+      preserves target/filter context.
+    relation: REALIZES
+    rationale: Interaction recovery explicitly preserves the task-level fallback and context.
+
+  - id: prep-stale-preview-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-L-STUDY-QUESTIONS
+    target_ref: docs/interface/interaction-design.yaml#I-L-STUDY
+    source: >-
+      A stale Study Set preview can be rebuilt; an empty Study Set is a valid
+      explicit result.
+    target: >-
+      Study interaction exposes valid-empty preview and stale-preview conflict;
+      conflict requires rebuild and reinspection.
+    relation: REALIZES
+    rationale: The interaction contract preserves both valid-empty and stale-preview recovery semantics.
+
+  - id: prep-import-task-to-interaction
+    expected_status: ACCEPTED
+    mutation_class: real-project-valid-realization
+    project: prep
+    capability_edge:
+      source: prep.task-model
+      target: prep.interaction-design
+    source_ref: docs/application/task-model.yaml#TASK-C-IMPORT-DATA
+    target_ref: docs/interface/interaction-design.yaml#I-C-IMPORT
+    source: >-
+      Invalid envelope blocks the request; rejected items remain identifiable and
+      correctable while valid peers stay applied.
+    target: >-
+      Invalid or rejected items remain identifiable for correction; valid peer
+      items are not rolled back after accepted envelope processing.
+    relation: REALIZES
+    rationale: The interaction recovery path retains the task-level partial-import semantics.
