@@ -19,12 +19,12 @@ fixtures:
     value:
       version: 1
       kind: harness-semantic-evaluator-descriptor
-      id: github-copilot-gpt-5-mini
+      id: github-copilot-gpt-6-luna
       provider: github-copilot
-      model: gpt-5-mini
+      model: gpt-6-luna
       model_version: UNREPORTED
       configuration:
-        requested_model: gpt-5-mini
+        requested_model: gpt-6-luna
         copilot_cli_version: "1.0.86"
         provider_timeout_seconds: 150
         model_input: blinded-cases-plus-protocol-instruction-only
@@ -60,7 +60,7 @@ steps:
       - {path: /calibration/missing, op: length, value: 0}
       - {path: /predictions, op: length, value: 10}
       - {path: /execution/state, op: equals, value: COMPLETED}
-      - {path: /execution/provider_provenance/requested_model, op: equals, value: gpt-5-mini}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: gpt-6-luna}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
 
@@ -85,7 +85,7 @@ steps:
       - {path: /calibration/missing, op: length, value: 0}
       - {path: /predictions, op: length, value: 10}
       - {path: /execution/state, op: equals, value: COMPLETED}
-      - {path: /execution/provider_provenance/requested_model, op: equals, value: gpt-5-mini}
+      - {path: /execution/provider_provenance/requested_model, op: equals, value: gpt-6-luna}
       - {path: /execution/provider_provenance/observed_cli_version, op: equals, value: "1.0.86"}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
 
