@@ -40,7 +40,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          PROBE_HOME="$(mktemp -d)"
+          export PROBE_HOME="$(mktemp -d)"
           HOME="$PROBE_HOME" \
           COPILOT_HOME="$PROBE_HOME/.copilot" \
           COPILOT_AUTO_UPDATE=false \
@@ -61,20 +61,30 @@ jobs:
           import json
           from pathlib import Path
 
+          import os
+
           resolved = None
-          for raw in Path("copilot-model-probe.jsonl").read_text(
-              encoding="utf-8"
-          ).splitlines():
-              try:
-                  event = json.loads(raw)
-              except json.JSONDecodeError:
-                  continue
-              if event.get("type") == "session.shutdown":
+          sources = [Path("copilot-model-probe.jsonl")]
+          sources.extend(
+              Path(os.environ["PROBE_HOME"]).rglob("events.jsonl")
+          )
+          for source in sources:
+              for raw in source.read_text(encoding="utf-8").splitlines():
+                  try:
+                      event = json.loads(raw)
+                  except json.JSONDecodeError:
+                      continue
                   data = event.get("data") or {}
-                  resolved = data.get("currentModel") or resolved
-              if event.get("type") == "assistant.turn_start":
-                  data = event.get("data") or {}
-                  resolved = data.get("model") or resolved
+                  if event.get("type") == "session.shutdown":
+                      resolved = data.get("currentModel") or resolved
+                  if event.get("type") == "assistant.turn_start":
+                      resolved = data.get("model") or resolved
+                  if event.get("type") == "session.model_change":
+                      resolved = (
+                          data.get("model")
+                          or data.get("currentModel")
+                          or resolved
+                      )
           if not resolved:
               raise SystemExit("Copilot auto model could not be resolved")
           print(f"COPILOT_AUTO_RESOLVED_MODEL={resolved}")
