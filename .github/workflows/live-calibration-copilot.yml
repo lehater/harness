@@ -4,6 +4,9 @@ name: live calibration copilot evidence
 # deterministic PR gate. Provider routing/output may vary between executions.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - experiment/real-project-semantic-audit
 
 permissions:
   contents: read
