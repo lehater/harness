@@ -277,13 +277,23 @@ The same workflow was rerun without a code change as attempt 2:
 These failures are expected fail-closed behavior, not evidence to repair or
 reinterpret provider output. They also prove that `model: auto` does not bind
 an immutable model identity: the same evaluator fingerprint resolved to
-`mai-code-1.1-flash` and `gpt-6-luna` across executions.
+`mai-code-1.1-flash` and `gpt-6-luna` across executions. The semantic mismatch
+on the v1 subject-preservation case is retained as historical evidence of
+cross-model interpretation under an ambiguous oracle, not as a model-quality
+ranking.
 
 The first successful two-run pair is therefore `STABLE` only for that observed
 pair. Across later scorable executions of the same auto-routing descriptor,
-`valid-subject-preservation` disagreed. The broader auto-routing evaluator
-policy must be treated as unstable unless a provider/model can be explicitly
-pinned or externally attested.
+`valid-subject-preservation` disagreed. Subsequent disagreement analysis found
+that the v1 case itself was under-specified: the source stated an owner-only edit
+invariant while the target stated only owner-only UI action availability. The
+`gpt-6-luna` rejection was therefore semantically defensible and must not be
+used as standalone evidence that one model is worse. Corpus/protocol v2 make
+that distinction explicit; see `semantic-disagreement-analysis-v0.md`.
+
+`model: auto` remains non-reproducible at model identity, and later malformed
+provider responses remain operational evidence that this route is unsuitable
+as a deterministic PR gate.
 
 Because live provider routing and output validity are nondeterministic, the
 Copilot workflow is operator-triggered evidence generation rather than a normal

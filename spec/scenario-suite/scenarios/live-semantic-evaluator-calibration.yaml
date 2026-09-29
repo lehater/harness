@@ -12,10 +12,10 @@ covers:
 
 fixtures:
   corpus:
-    yaml: ../../../spec/semantic-derivation/calibration-corpus-v1.yaml
+    yaml: ../../../spec/semantic-derivation/calibration-corpus-v2.yaml
 
   protocol:
-    yaml: ../../../spec/semantic-derivation/live-calibration-protocol-v1.yaml
+    yaml: ../../../spec/semantic-derivation/live-calibration-protocol-v2.yaml
 
   evaluator:
     value:
@@ -37,7 +37,7 @@ steps:
       evaluator: {ref: fixture.evaluator}
       run_id: RUN-A
     expect:
-      - {path: /cases, op: length, value: 10}
+      - {path: /cases, op: length, value: 11}
       - {path: /cases/0/case_request_id, op: exists}
       - {path: /cases/0/id, op: not_exists}
       - {path: /cases/0/expected_status, op: not_exists}
@@ -64,6 +64,7 @@ steps:
           - {case_request_id: {ref: step.request-a#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-a#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-a#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: valid-run-a
@@ -308,6 +309,7 @@ steps:
           - {case_request_id: {ref: step.request-a2#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-a2#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-a2#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-a2#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: unstable-run
@@ -359,6 +361,7 @@ steps:
           - {case_request_id: {ref: step.request-b#/cases/7/case_request_id}, status: REJECTED}
           - {case_request_id: {ref: step.request-b#/cases/8/case_request_id}, status: ACCEPTED}
           - {case_request_id: {ref: step.request-b#/cases/9/case_request_id}, status: REJECTED}
+          - {case_request_id: {ref: step.request-b#/cases/10/case_request_id}, status: REJECTED}
       operations: []
 
   - id: valid-run-b

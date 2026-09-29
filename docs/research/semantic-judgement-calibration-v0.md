@@ -19,7 +19,7 @@ Harness does not generate the semantic verdict. It owns:
 
 Canonical bootstrap corpus:
 
-`spec/semantic-derivation/calibration-corpus-v1.yaml`
+`spec/semantic-derivation/calibration-corpus-v2.yaml`
 
 Each case has:
 
@@ -42,7 +42,7 @@ Initial semantic classes:
 - valid strengthening — ACCEPTED;
 - semantic partial loss — REJECTED;
 - valid subject preservation — ACCEPTED;
-- semantic outcome substitution — REJECTED.
+- semantic outcome substitution — REJECTED;\n- semantic enforcement gap — REJECTED.
 
 The 10-case corpus is deliberately balanced between defect cases and valid
 controls, including near-miss cases whose wording is related but whose semantic
@@ -115,7 +115,7 @@ This protocol measures agreement with the expert corpus. It does not establish
 that the expert labels are universally correct, nor does it estimate production
 error rates from the 10 bootstrap cases.
 
-The next calibration work is:
+A live disagreement on v1 exposed an ambiguity in `valid-subject-preservation`:\nthe target restricted a UI action but did not explicitly state edit-execution\nenforcement. Corpus/protocol v2 remove that ambiguity and preserve the original\nwording as the negative `semantic-enforcement-gap` control. See\n`docs/research/semantic-disagreement-analysis-v0.md`.\n\nThe next calibration work is:
 
 1. DDD / security / consistency / lifecycle-specific semantic cases;
 2. independently reviewed labels;
