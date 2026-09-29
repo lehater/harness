@@ -23,12 +23,12 @@ from live_calibration import (
 )
 
 CORPUS = yaml.safe_load(
-    (ROOT / "spec/semantic-derivation/calibration-corpus-v1.yaml").read_text(
+    (ROOT / "spec/semantic-derivation/calibration-corpus-v2.yaml").read_text(
         encoding="utf-8"
     )
 )
 PROTOCOL = yaml.safe_load(
-    (ROOT / "spec/semantic-derivation/live-calibration-protocol-v1.yaml").read_text(
+    (ROOT / "spec/semantic-derivation/live-calibration-protocol-v2.yaml").read_text(
         encoding="utf-8"
     )
 )
