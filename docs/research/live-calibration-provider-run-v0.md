@@ -39,7 +39,7 @@ the protocol.
 
 ### GitHub Copilot CLI
 
-Selected for the first run.
+Selected for the first run. The first CI probe requested `claude-haiku-4.5`, but the provider rejected that model as unavailable for the active account. The bound configuration was therefore changed before any scorable run to the Copilot long-term-support model `gpt-5.3-codex`; no calibration labels were inspected or used to make this change.
 
 Current GitHub documentation supports non-interactive Copilot CLI execution in
 GitHub Actions with `copilot-requests: write` and the built-in
@@ -50,7 +50,7 @@ Copilot entitlement permits the request.
 The run pins:
 
 - execution provider: `github-copilot`;
-- requested model: `claude-haiku-4.5`;
+- requested model: `gpt-5.3-codex`;
 - Copilot CLI: `1.0.86`;
 - provider adapter: `github-copilot-cli-live-calibration` v1;
 - generic transport adapter: `process-json` v1.

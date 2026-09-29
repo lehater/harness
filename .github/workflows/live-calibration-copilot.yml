@@ -72,7 +72,7 @@ jobs:
           for slot in ("run-1", "run-2"):
               evaluation = observations.get(slot, {}).get("evaluation")
               if evaluation:
-                  summary[slot] = {
+                  item = {
                       "run_id": evaluation["run_id"],
                       "request_id": evaluation["request_id"],
                       "status": evaluation["status"],
@@ -80,14 +80,18 @@ jobs:
                       "protocol": evaluation["protocol"],
                       "evaluator_fingerprint": evaluation["evaluator"]["fingerprint"],
                       "independence": evaluation["independence"],
-                      "confusion": evaluation["calibration"]["confusion"],
-                      "metrics": evaluation["calibration"]["metrics"],
-                      "mutation_classes": evaluation["calibration"]["mutation_classes"],
-                      "misses": evaluation["calibration"]["misses"],
-                      "provider_provenance": evaluation["execution"].get(
-                          "provider_provenance"
-                      ),
+                      "findings": evaluation.get("findings", []),
+                      "execution": evaluation.get("execution", {}),
                   }
+                  calibration = evaluation.get("calibration")
+                  if isinstance(calibration, dict):
+                      item.update({
+                          "confusion": calibration["confusion"],
+                          "metrics": calibration["metrics"],
+                          "mutation_classes": calibration["mutation_classes"],
+                          "misses": calibration["misses"],
+                      })
+                  summary[slot] = item
           stability = observations.get("stability", {}).get("stability")
           if stability:
               summary["stability"] = stability

@@ -34,12 +34,12 @@ PROTOCOL = yaml.safe_load(
 EVALUATOR = {
     "version": 1,
     "kind": "harness-semantic-evaluator-descriptor",
-    "id": "github-copilot-claude-haiku-4.5",
+    "id": "github-copilot-gpt-5.3-codex",
     "provider": "github-copilot",
-    "model": "claude-haiku-4.5",
+    "model": "gpt-5.3-codex",
     "model_version": "UNREPORTED",
     "configuration": {
-        "requested_model": "claude-haiku-4.5",
+        "requested_model": "gpt-5.3-codex",
         "copilot_cli_version": "1.0.86",
         "provider_timeout_seconds": 150,
     },
