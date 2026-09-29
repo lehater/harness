@@ -70,16 +70,70 @@ establish edit-execution prevention.
 This is an operational/protocol-output failure, not a semantic disagreement.
 Harness failed closed as designed.
 
-## Interim result
+## Execution 2
 
-The first scorable v3 execution resolved to the same model
-(`gpt-6-luna`) that had rejected the ambiguous v1
-`valid-subject-preservation` case. With the ambiguity removed, it scored all
-14 v3 cases correctly.
+GitHub Actions run: `36511822435`, attempt 1.
 
-This is direct evidence supporting the diagnosis that the original mismatch was
-caused by the calibration task/oracle wording rather than by that mismatch alone
-demonstrating inferior model quality.
+Artifact: `live-calibration-evidence`, id `11009515395`, digest
+`sha256:d46e2fb3e6883a0ff7a3cf6f18ad9e336da82e276d954ba0688226e87d43b3eb`.
 
-One complete run is not stability evidence. A further independent live
-execution is required before recording v3 repeat stability.
+Run 1:
+
+- run id: `GH-36511822435-1-1`;
+- resolved model: `gpt-6-luna`;
+- TP=7, TN=7, FN=0, FP=0;
+- detection recall: `1.0`;
+- false-positive rate: `0.0`;
+- accuracy: `1.0`;
+- misses: none.
+
+Run 2:
+
+- run id: `GH-36511822435-1-2`;
+- resolved model: `gpt-6-luna`;
+- TP=7, TN=7, FN=0, FP=0;
+- detection recall: `1.0`;
+- false-positive rate: `0.0`;
+- accuracy: `1.0`;
+- misses: none.
+
+The two complete request-bound runs produced the same 14 verdicts. Existing
+stability evaluation returned:
+
+```yaml
+status: STABLE
+unstable_cases: []
+```
+
+Across both executions there are therefore three scorable gpt-6-luna v3 runs,
+all with the same 14/14 verdict vector. The remaining failed invocation from
+Execution 1 was an output-envelope failure and was not scored.
+
+## Result
+
+The first scorable v3 execution and both repeated runs resolved to the same
+model (`gpt-6-luna`) that had rejected the ambiguous v1
+`valid-subject-preservation` case.
+
+After the oracle/task wording was made explicit, gpt-6-luna:
+
+- ACCEPTED the explicit owner-only execution enforcement case;
+- REJECTED the UI-only enforcement-gap case;
+- matched all other v3 expert labels;
+- repeated the complete verdict vector without semantic instability.
+
+This is direct evidence that the original v1 mismatch was caused by an
+under-specified calibration case/protocol boundary, not evidence by itself that
+gpt-6-luna was a worse semantic evaluator.
+
+It does not prove universal evaluator correctness. Corpus v3 is still a small
+bootstrap corpus, and provider `model: auto` remains operationally
+non-reproducible at model identity. The provider also still occasionally emits
+malformed structured output.
+
+The durable conclusion is narrower: semantic disagreement should first be
+treated as a possible specification/oracle defect. Only disagreement that
+survives an ambiguity audit is meaningful evidence about evaluator behavior.
+
+The temporary branch-only push trigger used to obtain this evidence was removed
+before integration; the live provider workflow remains operator-triggered.
