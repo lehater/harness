@@ -149,6 +149,9 @@ def execute_live_calibration_process(
             if completed.returncode != 0:
                 run = _run_record(request, state="FAILED")
                 execution["state"] = "FAILED"
+                detail = completed.stderr.strip()
+                if detail:
+                    execution["error_detail"] = detail[:2000]
             else:
                 try:
                     response = json.loads(completed.stdout)
