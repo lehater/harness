@@ -1,0 +1,119 @@
+version: 1
+kind: harness-semantic-judgement-calibration-corpus
+id: semantic-derivation-calibration-v3
+cases:
+  - id: semantic-weakening
+    expected_status: REJECTED
+    mutation_class: semantic-weakening
+    source: Unauthorized actors must not execute resource edits.
+    target: Warn unauthorized actors but allow the edit to proceed.
+    relation: REALIZES
+    rationale: Warning plus execution weakens mandatory denial.
+
+  - id: semantic-inversion
+    expected_status: REJECTED
+    mutation_class: semantic-inversion
+    source: Validation failure preserves all valid entered values.
+    target: Validation failure clears all entered values.
+    relation: REALIZES
+    rationale: Clearing values contradicts preservation.
+
+  - id: semantic-subject-swap
+    expected_status: REJECTED
+    mutation_class: semantic-subject-swap
+    source: Actor may edit only RESOURCE-A.
+    target: Actor may edit RESOURCE-B.
+    relation: PRESERVES
+    rationale: The target changes the governed object.
+
+  - id: valid-paraphrase
+    expected_status: ACCEPTED
+    mutation_class: valid-paraphrase
+    source: Unauthorized actors must not execute resource edits.
+    target: Deny edit execution when the actor lacks authorization.
+    relation: TRANSFORMS
+    rationale: The target preserves the denial semantics.
+
+  - id: valid-decomposition
+    expected_status: ACCEPTED
+    mutation_class: valid-decomposition
+    source: On validation failure preserve valid entered values and explain the invalid field.
+    target:
+      - On validation failure, preserve all valid entered values.
+      - On validation failure, explain the invalid field.
+    relation: REALIZES
+    rationale: The target explicitly preserves the trigger and decomposes both required effects without loss.
+
+  - id: valid-aggregation
+    expected_status: ACCEPTED
+    mutation_class: valid-aggregation
+    source:
+      - Unauthorized actors must not execute resource edits.
+      - Successful resource edits must expose the changed state.
+    target: Unauthorized resource edits are denied; every successful authorized resource edit exposes the changed state.
+    relation: TRANSFORMS
+    rationale: The target explicitly combines the denial and successful-edit visibility constraints without weakening either.
+
+  - id: valid-strengthening
+    expected_status: ACCEPTED
+    mutation_class: valid-strengthening
+    source: Unauthorized actors must not execute resource edits.
+    target: Hide the edit action for unauthorized actors and reject every resource-edit execution attempt by an unauthorized actor.
+    relation: REALIZES
+    rationale: The target adds UI prevention while explicitly preserving the mandatory execution denial.
+
+  - id: semantic-partial-loss
+    expected_status: REJECTED
+    mutation_class: semantic-partial-loss
+    source: On validation failure preserve valid entered values and explain the invalid field.
+    target: On validation failure, preserve valid entered values.
+    relation: REALIZES
+    rationale: The target drops the required invalid-field explanation.
+
+  - id: valid-subject-preservation
+    expected_status: ACCEPTED
+    mutation_class: valid-subject-preservation
+    source: Only the owner of the current resource may edit that resource.
+    target: Permit an edit of the current resource only when the actor owns that same resource; reject the edit otherwise.
+    relation: REALIZES
+    rationale: The target preserves actor and resource identity and explicitly enforces the owner-only edit constraint.
+
+  - id: semantic-outcome-substitution
+    expected_status: REJECTED
+    mutation_class: semantic-outcome-substitution
+    source: Successful resource edits must expose the changed state to the actor.
+    target: Successful resource edits write an audit record.
+    relation: REALIZES
+    rationale: Audit recording is related but does not satisfy visible changed-state semantics.
+
+  - id: semantic-enforcement-gap
+    expected_status: REJECTED
+    mutation_class: semantic-enforcement-gap
+    source: Only the owner of the current resource may edit that resource.
+    target: Enable the current resource edit action only for its owner.
+    relation: REALIZES
+    rationale: Restricting a UI action does not state that non-owner edits are rejected through every execution path.
+
+  - id: valid-preservation
+    expected_status: ACCEPTED
+    mutation_class: valid-preservation
+    source: Actor may edit only RESOURCE-A.
+    target: Actor may edit RESOURCE-A and must not edit any other resource.
+    relation: PRESERVES
+    rationale: The target preserves both the permitted object and the exclusion of all other objects.
+
+  - id: valid-constraint-strengthening
+    expected_status: ACCEPTED
+    mutation_class: valid-constraint-strengthening
+    source: Every resource edit must require an authenticated actor.
+    target: Every resource edit must require an authenticated actor who also completes a second authentication factor.
+    relation: CONSTRAINS
+    rationale: The added authentication constraint preserves the source requirement while strengthening it.
+
+  - id: semantic-constraint-weakening
+    expected_status: REJECTED
+    mutation_class: semantic-constraint-weakening
+    source: Every resource edit must require an authenticated actor.
+    target: Resource edits from the internal network may proceed without an authenticated actor.
+    relation: CONSTRAINS
+    rationale: The target removes the required authentication constraint for a class of edits.

@@ -23,7 +23,7 @@ from live_calibration import (
 )
 
 CORPUS = yaml.safe_load(
-    (ROOT / "spec/semantic-derivation/calibration-corpus-v2.yaml").read_text(
+    (ROOT / "spec/semantic-derivation/calibration-corpus-v3.yaml").read_text(
         encoding="utf-8"
     )
 )
