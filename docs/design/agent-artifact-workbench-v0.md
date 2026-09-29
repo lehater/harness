@@ -251,7 +251,11 @@ For reconstruction/blind work where original source material is sanitized, filte
 The assurance path is:
 
 ```text
-original independently evidenced source
+selected immutable source baseline
+        ↓
+lossless source boundary / deterministic native item inventory
+        ↓
+covered source unit -> statement enumeration review
         ↓
 statement-level source ledger
         ↓
@@ -270,7 +274,9 @@ RECONSTRUCTION-READY
 
 These gates are independent:
 
-- **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification. It does not by itself prove that an ADMITTED rewrite or extracted semantic surface preserved every material clause of that statement.
+- **Source Boundary COMPLETE** proves every line/item in the selected immutable source entered a review unit exactly once; it does not interpret semantic meaning.
+- **Statement Enumeration Review** checks one bounded source unit at a time so a material statement cannot disappear before the source ledger.
+- **Source Coverage COMPLETE** proves no enumerated source statement disappeared silently during sanitization/classification. It does not by itself prove raw-source boundary completeness or that an ADMITTED rewrite/extracted semantic surface preserved every material clause.
 - **Semantic Surface Admission** reviews each admitted canonical statement against the machine-addressable semantic atoms derived from it when those atoms will be used as the authoritative downstream derivation surface. Missing/weakened atoms are rejected before downstream derivation begins.
 - **Structural COMPLETE** proves every declared capability/prerequisite has an accepted unblocked provider.
 - **Semantic challenge PASS** proves an implementation consumer is not still forced to make a material upstream decision from the accepted closure.
