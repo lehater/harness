@@ -153,10 +153,18 @@ truth of a declared link. The corresponding atomic live-calibration task also
 detected all four omission links in every scorable run, unlike the earlier
 whole-oracle comparison.
 
+The source-side trust-boundary investigation was subsequently completed through
+lossless source boundaries, local statement enumeration, semantic-surface
+admission and contract-relative source-set assurance. The resulting closure is
+recorded in `docs/research/source-to-derivation-assurance-closure-v1.md`.
+
 See `docs/research/real-project-semantic-derivation-audit-v0.md`,
 `docs/research/real-project-semantic-corpus-expansion-v0.md`,
-`docs/research/verification-oracle-partial-loss-audit-v0.md` and
-`docs/research/real-project-semantic-atom-coverage-proof-v0.md`.
+`docs/research/verification-oracle-partial-loss-audit-v0.md`,
+`docs/research/real-project-semantic-atom-coverage-proof-v0.md`,
+`docs/research/semantic-surface-extraction-admission-v0.md`,
+`docs/research/source-boundary-statement-enumeration-v0.md` and
+`docs/research/source-set-evidence-boundary-v0.md`.
 
 ## Boundaries intentionally left open
 
