@@ -369,14 +369,16 @@ relevant source file / interview / external evidence
 lossless source-boundary validation
 ```
 
-Therefore the next trust boundary is **Source Set / Evidence Boundary
-Completeness**:
+That next boundary was investigated in
+`docs/research/source-set-evidence-boundary-v0.md`.
 
-- what evidence sources belong to the selected problem scope;
-- how source provenance and source-set inclusion are established;
-- how a missing source channel/artifact is detected or explicitly dispositioned.
+The follow-up establishes that open-world evidence completeness cannot be
+proven generically. Harness can instead prove deterministic source-set closure
+relative to an accepted acquisition contract over arbitrary project-owned
+evidence channel ids. Missing, unresolved or undersatisfied required channels
+fail closed before per-artifact source-boundary review.
 
-This is distinct from statement enumeration and downstream Capability
+This remains distinct from statement enumeration and downstream Capability
 derivation.
 
 ## Architecture consequence
