@@ -1,0 +1,377 @@
+version: 1
+kind: harness-scenario
+id: real-project-prep-current-target-gap-thin-slice
+title: Prep current-target-gap thin slice distinguishes explicit deferral from semantic loss
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: semantic
+  execution_type: real-project
+covers:
+  - source-coverage-completeness
+  - semantic-derivation-coverage
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: PREP-CURRENT-TARGET-GAP-THIN-SLICE
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted learner problem evidence.
+          boundary: {semantic_cohesion: Learner problem evidence., independent_change: Problem evidence may change before product semantics., public_contract: Accepted problem evidence.}
+          produces:
+            - {capability: prep.problem-evidence, knowledge_kind: problem-evidence, requires: []}
+        - id: PRODUCT-REQUIREMENTS
+          responsibility: Own product intent and current product scope.
+          boundary: {semantic_cohesion: Product outcomes and scope., independent_change: Product scope may change before downstream design., public_contract: Accepted product semantics.}
+          produces:
+            - {capability: prep.product-intent, knowledge_kind: product-requirements, requires: [prep.problem-evidence]}
+            - {capability: prep.product-capabilities, knowledge_kind: product-requirements, requires: [prep.product-intent]}
+        - id: APPLICATION-DESIGN
+          responsibility: Own application behavior and user task semantics.
+          boundary: {semantic_cohesion: Application and task behavior., independent_change: Application flow may change behind product semantics., public_contract: Accepted application and task behavior.}
+          produces:
+            - {capability: prep.application-design, knowledge_kind: application-design, requires: [prep.product-capabilities]}
+            - {capability: prep.task-model, knowledge_kind: task-model, requires: [prep.application-design, prep.product-capabilities]}
+        - id: HUMAN-INTERFACE-DESIGN
+          responsibility: Own human interaction semantics and screen/view composition.
+          boundary: {semantic_cohesion: Human task realization., independent_change: Interface design may change behind task semantics., public_contract: Accepted human-interface semantics.}
+          produces:
+            - {capability: prep.conceptual-interface-model, knowledge_kind: conceptual-interface-model, requires: [prep.task-model]}
+            - {capability: prep.interaction-design, knowledge_kind: interaction-design, requires: [prep.task-model]}
+            - {capability: prep.screen-view-design, knowledge_kind: screen-view-design, requires: [prep.interaction-design]}
+        - id: COMPONENT-DESIGN
+          responsibility: Own implementation-facing frontend component boundaries.
+          boundary: {semantic_cohesion: Pre-code frontend component contracts., independent_change: Components may change behind interface contracts., public_contract: Code-facing frontend structure.}
+          produces:
+            - {capability: prep.frontend-component-design, knowledge_kind: component-design, requires: [prep.screen-view-design]}
+      consumers:
+        - {id: PRECODE-THIN-SLICE, purpose: Trace selected meaning to the coding boundary., requires: [prep.frontend-component-design]}
+      terminal_capabilities: []
+
+  problem-source:
+    value: |-
+      A person needs to move from their current state of knowledge or ability to a desired state.
+      The person's current state is only partially observable.
+      The person must establish enough current state to identify meaningful differences.
+      Those differences guide what requires attention next.
+
+  problem-boundary:
+    value:
+      version: 1
+      kind: harness-source-boundary
+      id: PREP-CURRENT-TARGET-GAP-PROBLEM-BOUNDARY
+      source_baseline: lehater/prep@b3ec3b0fec0d8ba29f2ca66867737e8838332592:docs/vision/problem-space.md#current-target-gap
+      source_sha256: 400f74f59d7344ceba6ab3d3531e2706e5cebb859775ef7b11172fedd9cc49a7
+      segments: [{id: selected-unit, start_line: 1, end_line: 4}]
+
+  problem-statements:
+    value:
+      version: 1
+      kind: harness-source-coverage
+      id: PREP-CURRENT-TARGET-GAP-PROBLEM-STATEMENTS
+      source_baseline: lehater/prep@b3ec3b0fec0d8ba29f2ca66867737e8838332592:docs/vision/problem-space.md#current-target-gap
+      coverage_status: COMPLETE
+      statements:
+        - {id: STMT-GAP, source_ref: docs/vision/problem-space.md#current-target-gap, text: The learner needs enough evidence-backed current state to identify meaningful differences from the desired state and decide what requires attention.}
+      dispositions:
+        - {statement_id: STMT-GAP, classification: ADMITTED, admitted_ref: accepted-problem#GAP, sanitized_statement: The learner needs enough evidence-backed current state to identify meaningful differences from the desired state and decide what requires attention.}
+
+  problem-source-atoms:
+    value:
+      semantic_assertions:
+        - {id: SRC-GAP, kind: problem-atom, subject: current-target-gap, semantic_value: establish-enough-current-state-to-identify-target-relative-differences-and-attention, decision_authority: DISCOVERY}
+
+  problem-acceptance-contract:
+    value:
+      authority: DISCOVERY
+      owned_assertion_kinds: [problem-atom]
+      allowed_source_authorities: [DISCOVERY]
+      requires_source_authority: true
+      requires_assertion_authority: true
+      requires_semantic_review: true
+      required_semantic_review_checks: [statement-completeness, meaning-preserved]
+      obligations:
+        - {id: selected-problem-meaning, kind: problem-atom, subjects: [current-target-gap]}
+
+  accepted-problem:
+    value:
+      capability: prep.problem-evidence
+      semantic_assertions:
+        - {id: PROBLEM-GAP, kind: problem-atom, subject: current-target-gap, semantic_value: establish-enough-current-state-to-identify-target-relative-differences-and-attention, decision_authority: DISCOVERY, derived_from: [SRC-GAP]}
+      semantic_review: {reviewer_kind: HUMAN, status: ACCEPTED, checks: [statement-completeness, meaning-preserved]}
+
+  intent-surface:
+    value:
+      capability: prep.product-intent
+      semantic_assertions:
+        - {id: INTENT-GAP, kind: intent-atom, subject: current-target-gap, semantic_value: use-evidence-of-current-capability-to-focus-on-meaningful-target-relative-gaps, decision_authority: PRODUCT-REQUIREMENTS}
+
+  product-surface:
+    value:
+      capability: prep.product-capabilities
+      semantic_assertions:
+        - {id: PC09-DEFERRED, kind: current-scope-atom, subject: PC-09.current-scope, semantic_value: current-position-and-gap-behavior-exists-but-statistics-to-learner-state-gaps-priorities-replanning-is-explicitly-deferred, decision_authority: PRODUCT-REQUIREMENTS}
+
+  application-surface:
+    value:
+      capability: prep.application-design
+      semantic_assertions:
+        - {id: APP-DEFERRED, kind: application-scope-atom, subject: current-target-gap, semantic_value: current-flow-stops-at-factual-statistics-and-defers-learner-state-gaps-priorities-replanning, decision_authority: APPLICATION-DESIGN}
+
+  task-surface:
+    value:
+      capability: prep.task-model
+      semantic_assertions:
+        - {id: TASK-FACTS, kind: task-scope-atom, subject: TASK-L-REVIEW-FACTS, semantic_value: learner-inspects-factual-review-evidence-without-mastery-readiness-retention-inference, decision_authority: APPLICATION-DESIGN}
+
+  conceptual-surface:
+    value:
+      capability: prep.conceptual-interface-model
+      semantic_assertions:
+        - {id: UI-FACTS, kind: interface-atom, subject: REVIEW-FACTS, semantic_value: recorded-factual-review-observations-without-mastery-inference, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  interaction-surface:
+    value:
+      capability: prep.interaction-design
+      semantic_assertions:
+        - {id: INTERACTION-FACTS, kind: interaction-atom, subject: I-L-STATISTICS, semantic_value: inspect-factual-aggregates-and-review-history, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  screen-surface:
+    value:
+      capability: prep.screen-view-design
+      semantic_assertions:
+        - {id: SCREEN-FACTS, kind: screen-atom, subject: L-05-TARGET-STATISTICS, semantic_value: show-factual-review-observations-without-target-mastery-readiness-proficiency-retention-labels, decision_authority: HUMAN-INTERFACE-DESIGN}
+        - {id: SCREEN-FUTURE-BLOCK, kind: screen-scope-atom, subject: future-learner-state-overlay, semantic_value: inferred-current-state-overlay-not-currently-implementable-until-accepted-inference-exists, decision_authority: HUMAN-INTERFACE-DESIGN}
+
+  component-surface:
+    value:
+      capability: prep.frontend-component-design
+      semantic_assertions:
+        - {id: COMPONENT-BLOCK, kind: component-constraint-atom, subject: progress-assumptions, semantic_value: do-not-invent-or-reuse-experimental-progress-assumptions-as-product-state, decision_authority: COMPONENT-DESIGN}
+
+  activated-product-surface:
+    value:
+      capability: prep.product-capabilities
+      semantic_assertions:
+        - {id: PC09-ACTIVATED, kind: current-scope-atom, subject: PC-09.current-scope, semantic_value: learner-must-see-current-evidence-backed-position-relative-to-target-and-meaningful-gaps, decision_authority: PRODUCT-REQUIREMENTS}
+
+  activated-task-surface:
+    value:
+      capability: prep.task-model
+      semantic_assertions:
+        - {id: TASK-CURRENT-GAPS, kind: task-scope-atom, subject: current-target-gap, semantic_value: learner-inspects-current-evidence-backed-position-relative-to-target-and-meaningful-gaps, decision_authority: APPLICATION-DESIGN}
+
+  problem-to-intent:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-problem-to-intent-gap
+      source_capability: prep.problem-evidence
+      target_capability: prep.product-intent
+      obligations: [{id: selected-problem, source_kind: problem-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  problem-to-intent-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: prep.problem-evidence
+      target_capability: prep.product-intent
+      links: [{id: P2I, sources: [PROBLEM-GAP], relation: TRANSFORMS, targets: [INTENT-GAP]}]
+      dispositions: []
+
+  intent-to-product:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-intent-to-product-gap
+      source_capability: prep.product-intent
+      target_capability: prep.product-capabilities
+      obligations: [{id: selected-intent, source_kind: intent-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  intent-to-product-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: prep.product-intent
+      target_capability: prep.product-capabilities
+      links: [{id: I2P, sources: [INTENT-GAP], relation: TRANSFORMS, targets: [PC09-DEFERRED]}]
+      dispositions: []
+
+  product-to-application:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-product-to-application-gap
+      source_capability: prep.product-capabilities
+      target_capability: prep.application-design
+      obligations: [{id: current-scope, source_kind: current-scope-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  product-to-application-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: prep.product-capabilities
+      target_capability: prep.application-design
+      links: [{id: P2A, sources: [PC09-DEFERRED], relation: PRESERVES, targets: [APP-DEFERRED]}]
+      dispositions: []
+  missing-application-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.product-capabilities, target_capability: prep.application-design, links: [], dispositions: []}
+
+  application-to-task:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-application-to-task-gap
+      source_capability: prep.application-design
+      target_capability: prep.task-model
+      obligations: [{id: application-scope, source_kind: application-scope-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  application-to-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: prep.application-design
+      target_capability: prep.task-model
+      links: [{id: A2T, sources: [APP-DEFERRED], relation: TRANSFORMS, targets: [TASK-FACTS]}]
+      dispositions: []
+
+  task-to-conceptual:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-task-to-conceptual-gap
+      source_capability: prep.task-model
+      target_capability: prep.conceptual-interface-model
+      obligations: [{id: task-scope, source_kind: task-scope-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  task-to-conceptual-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: prep.task-model
+      target_capability: prep.conceptual-interface-model
+      links: [{id: T2C, sources: [TASK-FACTS], relation: REALIZES, targets: [UI-FACTS]}]
+      dispositions: []
+  missing-conceptual-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.task-model, target_capability: prep.conceptual-interface-model, links: [], dispositions: []}
+
+  task-to-interaction:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-task-to-interaction-gap
+      source_capability: prep.task-model
+      target_capability: prep.interaction-design
+      obligations: [{id: task-scope, source_kind: task-scope-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  task-to-interaction-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.task-model, target_capability: prep.interaction-design, links: [{id: T2I, sources: [TASK-FACTS], relation: REALIZES, targets: [INTERACTION-FACTS]}], dispositions: []}
+
+  interaction-to-screen:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-interaction-to-screen-gap
+      source_capability: prep.interaction-design
+      target_capability: prep.screen-view-design
+      obligations: [{id: interaction-scope, source_kind: interaction-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: true}
+      semantic_judgement: {required: false}
+  interaction-to-screen-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.interaction-design, target_capability: prep.screen-view-design, links: [{id: I2S, sources: [INTERACTION-FACTS], relation: REALIZES, targets: [SCREEN-FACTS]}], dispositions: []}
+
+  screen-to-component:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      id: prep-screen-to-component-gap
+      source_capability: prep.screen-view-design
+      target_capability: prep.frontend-component-design
+      obligations: [{id: screen-scope, source_kind: screen-scope-atom, min_count: 1}]
+      lifecycle_dependency: {exhaustive: false}
+      semantic_judgement: {required: false}
+  screen-to-component-evidence:
+    value: {version: 1, kind: harness-semantic-derivation-evidence, source_capability: prep.screen-view-design, target_capability: prep.frontend-component-design, links: [{id: S2C, sources: [SCREEN-FUTURE-BLOCK], relation: PRESERVES, targets: [COMPONENT-BLOCK]}], dispositions: []}
+
+steps:
+  - id: source-boundary
+    driver: source.boundary
+    with: {source: {ref: fixture.problem-source}, manifest: {ref: fixture.problem-boundary}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /covered_line_count, op: equals, value: 4}
+  - id: source-statements
+    driver: source.coverage
+    with: {document: {ref: fixture.problem-statements}}
+    expect:
+      - {path: /valid, op: equals, value: true}
+      - {path: /classification_counts/ADMITTED, op: equals, value: 1}
+  - id: source-semantics
+    driver: semantic.acceptance
+    with: {contract: {ref: fixture.problem-acceptance-contract}, sources: {ref: fixture.problem-source-atoms}, candidate: {ref: fixture.accepted-problem}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: problem-to-intent
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.problem-to-intent}, source: {ref: fixture.accepted-problem}, candidate: {ref: fixture.intent-surface}, evidence: {ref: fixture.problem-to-intent-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /coverage/covered, op: equals, value: 1}
+  - id: intent-to-product
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.intent-to-product}, source: {ref: fixture.intent-surface}, candidate: {ref: fixture.product-surface}, evidence: {ref: fixture.intent-to-product-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: real-product-to-application
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.product-to-application}, source: {ref: fixture.product-surface}, candidate: {ref: fixture.application-surface}, evidence: {ref: fixture.product-to-application-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: sensitivity-activated-product
+    driver: semantic.derivation
+    benchmark: {metrics: [mutation_detection, root_cause_localization], mutation_class: activate-PC09-without-application-design}
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.product-to-application}, source: {ref: fixture.activated-product-surface}, candidate: {ref: fixture.application-surface}, evidence: {ref: fixture.missing-application-evidence}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: PC09-ACTIVATED, owner_authority: APPLICATION-DESIGN}}
+  - id: application-to-task
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.application-to-task}, source: {ref: fixture.application-surface}, candidate: {ref: fixture.task-surface}, evidence: {ref: fixture.application-to-task-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: task-to-conceptual
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.task-to-conceptual}, source: {ref: fixture.task-surface}, candidate: {ref: fixture.conceptual-surface}, evidence: {ref: fixture.task-to-conceptual-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: sensitivity-activated-task
+    driver: semantic.derivation
+    benchmark: {metrics: [mutation_detection, root_cause_localization], mutation_class: activate-current-gap-task-without-interface}
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.task-to-conceptual}, source: {ref: fixture.activated-task-surface}, candidate: {ref: fixture.conceptual-surface}, evidence: {ref: fixture.missing-conceptual-evidence}}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: TASK-CURRENT-GAPS, owner_authority: HUMAN-INTERFACE-DESIGN}}
+  - id: task-to-interaction
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.task-to-interaction}, source: {ref: fixture.task-surface}, candidate: {ref: fixture.interaction-surface}, evidence: {ref: fixture.task-to-interaction-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: interaction-to-screen
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.interaction-to-screen}, source: {ref: fixture.interaction-surface}, candidate: {ref: fixture.screen-surface}, evidence: {ref: fixture.interaction-to-screen-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: screen-to-component-precode
+    driver: semantic.derivation
+    with: {graph: {ref: fixture.graph}, contract: {ref: fixture.screen-to-component}, source: {ref: fixture.screen-surface}, candidate: {ref: fixture.component-surface}, evidence: {ref: fixture.screen-to-component-evidence}}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
