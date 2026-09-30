@@ -37,6 +37,10 @@ def run_mutations(model,authorities,proof):
     m=copy.deepcopy(model); next(t for t in m["templates"] if t["id"]=="COMPLETION-CRITERIA").setdefault("requires",[]).append({"template":"DATA-DESIGN"}); r=materialize(m,authorities,proof,base["project_facts"],base["request"]); assert r["status"]=="MATERIALIZATION_CONFLICT",r
     pf=copy.deepcopy(base["project_facts"]); pf["facts"]=[x for x in pf["facts"] if x["predicate"]!="machine_interface_subjects"]; r=materialize(model,authorities,proof,pf,base["request"]); assert r["status"]=="BLOCKED" and "SUBJECT_INVENTORY_REQUIRED" in codes(r),r
     m=copy.deepcopy(model); pd=next(x for x in m["predicates"] if x["id"]=="machine_interface_subjects"); pd["type"]="string"; pd.pop("finite",None); assert "UNBOUNDED_SCOPE" in {e["code"] for e in validate_reference_model(m,authorities,proof)}
+    m=copy.deepcopy(model); next(t for t in m["templates"] if t["id"]=="PRODUCT-INTENT")["applicability"]={"candidate_when":{"predicate":"durable_state","equals":"true"}}; assert "PREDICATE_LITERAL_TYPE" in {e["code"] for e in validate_reference_model(m,authorities,proof)}
+    pf=copy.deepcopy(base["project_facts"]); pf["activated_concerns"]=["valid.concern",42]; r=materialize(model,authorities,proof,pf,base["request"]); assert r["status"]=="PROJECT_EVIDENCE_INVALID" and "PROJECT_CONCERN_INVALID" in codes(r),r
+    req=copy.deepcopy(base["request"]); req["project_id"]="###"; r=materialize(model,authorities,proof,base["project_facts"],req); assert r["status"]=="REQUEST_INVALID",r
+    req=copy.deepcopy(base["request"]); req["consumer_id"]=authorities["authorities"][0]["id"]; r=materialize(model,authorities,proof,base["project_facts"],req); assert r["status"]=="REFERENCE_MODEL_GAP" and "GENERATED_GRAPH_INVALID" in codes(r),r
 def kinds(graph): return {p["knowledge_kind"] for a in graph.get("authorities",[]) or [] for p in a.get("produces",[]) or [] if p.get("knowledge_kind")}
 def run_regressions(model,authorities,proof):
     for s in load(REGRESSIONS)["scenarios"]:
