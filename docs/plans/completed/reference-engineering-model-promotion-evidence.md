@@ -1,6 +1,8 @@
 # Reference Engineering Model promotion evidence
 
-Status: active research
+Status: completed
+
+Closure: R1/R2/R3 completed. Canonical promotion is deferred; see `docs/research/reference-engineering-model-promotion-decision-v0.md`.
 
 ## Goal
 
