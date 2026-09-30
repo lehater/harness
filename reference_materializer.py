@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import Any
 import yaml
 
+from engineering_graph import validate_engineering_graph
+from harness import CoreError
+
 _ALLOWED_PREDICATE_TYPES={"boolean","string","enum","number","string_list"}
 
 def load_yaml(path):
@@ -32,7 +35,10 @@ def validate_expr(expr,predicates,where):
         if keys-{"predicate","equals"}: return [diag("INVALID_EXPRESSION",f"{where}: predicate expression has unknown fields")]
         pid=expr.get("predicate")
         if pid not in predicates: return [diag("UNKNOWN_PREDICATE",f"{where}: unknown predicate {pid}",predicate=pid)]
-        return [] if "equals" in expr else [diag("INVALID_EXPRESSION",f"{where}: predicate expression requires equals")]
+        if "equals" not in expr: return [diag("INVALID_EXPRESSION",f"{where}: predicate expression requires equals")]
+        if not value_matches(expr["equals"],predicates[pid]):
+            return [diag("PREDICATE_LITERAL_TYPE",f"{where}: equals value does not match predicate type",predicate=pid)]
+        return []
     if "all" in expr or "any" in expr:
         op="all" if "all" in expr else "any"
         if keys!={op} or not isinstance(expr[op],list) or not expr[op]: return [diag("INVALID_EXPRESSION",f"{where}: {op} requires a non-empty list")]
@@ -78,7 +84,7 @@ def validate_reference_model(model,authority_catalog,proof_contract):
         if pid in defs: errors.append(diag("PREDICATE_DUPLICATE",f"duplicate predicate {pid}",predicate=pid)); continue
         if row.get("type") not in _ALLOWED_PREDICATE_TYPES: errors.append(diag("PREDICATE_TYPE_INVALID",f"{pid}: invalid type",predicate=pid))
         defs[pid]=row
-    pids=set(defs); authorities=authority_index(authority_catalog); by_id={}; routes={}
+    authorities=authority_index(authority_catalog); by_id={}; routes={}
     canonical={c for values in proof_claims(proof_contract).values() for c in values}
     for t in model.get("templates",[]) or []:
         if not isinstance(t,dict) or not isinstance(t.get("id"),str): errors.append(diag("TEMPLATE_ID_INVALID","template id is required")); continue
@@ -93,7 +99,7 @@ def validate_reference_model(model,authority_catalog,proof_contract):
             routes.setdefault(claim,[]).append(tid)
         app=t.get("applicability",{}) or {}
         for key in ("candidate_when","required_when","not_applicable_when"):
-            if key in app: errors.extend(validate_expr(app[key],pids,f"{tid}.applicability.{key}"))
+            if key in app: errors.extend(validate_expr(app[key],defs,f"{tid}.applicability.{key}"))
         for pid in predicate_refs(app.get("candidate_when"))|predicate_refs(app.get("required_when")):
             pdef=defs.get(pid,{})
             if pdef.get("source_class")=="template-output" and pdef.get("producer_template")==tid:
@@ -107,7 +113,7 @@ def validate_reference_model(model,authority_catalog,proof_contract):
             elif pdef.get("type")!="string_list" or pdef.get("finite") is not True: errors.append(diag("UNBOUNDED_SCOPE",f"{tid}: subjects_from must be finite string_list",template=tid,predicate=src))
         for i,r in enumerate(t.get("requires",[]) or []):
             if not isinstance(r,dict) or not isinstance(r.get("template"),str): errors.append(diag("REQUIRES_INVALID",f"{tid}: invalid requirement {i}",template=tid)); continue
-            if "when" in r: errors.extend(validate_expr(r["when"],pids,f"{tid}.requires[{i}].when"))
+            if "when" in r: errors.extend(validate_expr(r["when"],defs,f"{tid}.requires[{i}].when"))
     for claim in sorted(canonical):
         rs=routes.get(claim,[])
         if not rs: errors.append(diag("CLAIM_UNROUTED",f"canonical claim has no template: {claim}",claim=claim))
@@ -146,6 +152,9 @@ def normalize_project_facts(model,doc):
         if pid in values and values[pid]!=row["value"]: diags.append(diag("PROJECT_EVIDENCE_CONFLICT",f"conflicting accepted values for {pid}",predicate=pid)); continue
         values[pid]=copy.deepcopy(row["value"])
     concerns=doc.get("activated_concerns",[]) or []
+    if not isinstance(concerns,list) or any(not isinstance(x,str) or not x for x in concerns):
+        diags.append(diag("PROJECT_CONCERN_INVALID","activated_concerns must be a list of non-empty strings"))
+        return values,[],diags
     return values,sorted(set(concerns)),diags
 
 def slug(v): return re.sub(r"[^a-z0-9]+","-",v.lower()).strip("-")
@@ -159,7 +168,7 @@ def materialize(model,authority_catalog,proof_contract,project_facts,request):
     if diags:return {"version":1,"kind":"harness-reference-materialization-result","status":"PROJECT_EVIDENCE_INVALID","diagnostics":diags}
     if request.get("version")!=1 or request.get("kind")!="harness-reference-materialization-request": return {"version":1,"kind":"harness-reference-materialization-result","status":"REQUEST_INVALID","diagnostics":[diag("REQUEST_HEADER","unexpected request header")]}
     project_id=request.get("project_id"); roots=request.get("roots",[]) or []; ts={x["id"]:x for x in model["templates"]}
-    if not isinstance(project_id,str) or not project_id or not roots or any(r not in ts for r in roots): return {"version":1,"kind":"harness-reference-materialization-result","status":"REQUEST_INVALID","diagnostics":[diag("REQUEST_FIELDS","invalid project_id or roots")]}
+    if not isinstance(project_id,str) or not project_id or not slug(project_id) or not isinstance(roots,list) or not roots or any(not isinstance(r,str) or r not in ts for r in roots): return {"version":1,"kind":"harness-reference-materialization-result","status":"REQUEST_INVALID","diagnostics":[diag("REQUEST_FIELDS","invalid project_id or roots")]}
     pm=proof_claims(proof_contract); claim_route={claim:t["id"] for t in model["templates"] for claim in t.get("claim_surface",[]) or []}
     states={}; active={tid:set() for tid in ts}
     for tid,t in ts.items():
@@ -245,6 +254,10 @@ def materialize(model,authority_catalog,proof_contract,project_facts,request):
         src=ai[aid]; b=src.get("boundary",{}) or {}; resp=src.get("responsibility",aid)
         authorities.append({"id":aid,"responsibility":resp,"boundary":{"semantic_cohesion":b.get("semantic_cohesion",resp),"independent_change":b.get("independent_change",resp),"public_contract":b.get("public_contract",resp)},"produces":sorted(prods[aid],key=lambda x:x["capability"])})
     graph={"version":1,"kind":"harness-engineering-graph","id":slug(project_id).upper(),"default_subject":project_id,"authorities":authorities,"consumers":[{"id":request.get("consumer_id") or "TARGET","purpose":request.get("purpose") or "Consume materialized engineering knowledge.","requires":sorted(consumer,key=lambda x:(x["capability"],x.get("subject","")))}],"terminal_capabilities":[]}
+    try:
+        validate_engineering_graph(graph)
+    except CoreError as exc:
+        return {"version":1,"kind":"harness-reference-materialization-result","status":"REFERENCE_MODEL_GAP","template_status":status_rows,"diagnostics":diags+[diag("GENERATED_GRAPH_INVALID",str(exc))]}
     return {"version":1,"kind":"harness-reference-materialization-result","status":"STABLE","template_status":status_rows,"diagnostics":diags,"graph":graph}
 
 def main():
