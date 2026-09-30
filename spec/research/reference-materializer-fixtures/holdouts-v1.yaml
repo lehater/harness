@@ -966,7 +966,6 @@
           "CONCURRENCY-CONSISTENCY",
           "RUNTIME-ARCHITECTURE",
           "SECURITY-ARCHITECTURE",
-          "SECURITY-ANALYSIS",
           "OPERABILITY-DESIGN"
         ],
         "forbidden_templates": [
