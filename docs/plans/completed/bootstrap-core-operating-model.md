@@ -1,6 +1,8 @@
 # Bootstrap external Harness operating model
 
-Status: active implementation
+Status: completed
+
+Closure: the repository-independent Harness boundary was established and the active work has moved to Reference Engineering Model promotion evidence.
 
 ## Goal
 
