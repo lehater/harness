@@ -75,3 +75,7 @@ Sources:
 Each scenario declares only a subset of required and forbidden templates. The materializer must remain deterministic and every `STABLE` graph must pass the existing Engineering Graph validator.
 
 If any hold-out produces a different status or violates an asserted required/forbidden template, record the mismatch as a falsification result before considering any Reference Model change.
+
+## First-run calibration
+
+The first CI run rejected the Prometheus exporter oracle because the fixture required `SECURITY-ANALYSIS` from `network_exposed` alone. That expectation was stronger than both the accepted project facts and the frozen v0 applicability contract. The fixture was corrected to require `SECURITY-ARCHITECTURE` only; the Reference Model was not changed.
