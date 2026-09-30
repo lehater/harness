@@ -1,38 +1,30 @@
 # Active Harness work
 
-Current: `reference-engineering-model-promotion-evidence.md`
+Current: none.
 
-Goal: determine, through independent evidence, whether the optional Reference Engineering Model should remain a research layer or is strong enough for a later canonical-promotion decision.
+State: stable; Reference Engineering Model promotion-evidence cycle closed.
 
-State: research planning
+## Current baseline
 
-## Baseline
+- `main` contains the validated Reference Engineering Model v0 research layer.
+- second independent external hold-out validation is complete;
+- evolution/migration research is complete;
+- Safety/AI specialization proof-semantics research is complete;
+- Reference Engineering Model v0 remains optional and non-canonical;
+- Harness Core is unchanged.
 
-- `main` contains the validated Reference Engineering Model v0 research result from PR #114.
-- Reference Engineering Model v0 is optional and non-canonical.
-- It materializes the existing Engineering Graph and does not extend Harness Core.
-- The post-merge `harness core` workflow is green.
+## Promotion decision
 
-## Current research frontier
+Canonical promotion is deferred.
 
-1. independent frozen external hold-out validation;
-2. reference-model version evolution and migration semantics;
-3. explicit proof semantics for safety-critical and AI/agentic specializations.
+See `docs/research/reference-engineering-model-promotion-decision-v0.md`.
 
-These are separate research questions. Passing one does not imply the others pass.
+## Remaining blockers
 
-## Canonical-promotion gate
+- bind materialization evidence to Reference Model fingerprint and other provenance inputs;
+- define canonical Safety proof ownership/claims;
+- define canonical AI proof ownership/claims and executable coverage.
 
-Do not promote the Reference Engineering Model unless all of the following are supported by evidence:
+## Next candidate work
 
-- independent hold-outs remain compatible with the frozen model;
-- version evolution and migration are defined and reproducible;
-- known specialization gaps have explicit semantics;
-- materialization remains deterministic and fail-closed;
-- no new Harness Core concepts are required;
-- project-specific truth remains outside the Reference Model;
-- generated Engineering Graphs remain valid under existing validators.
-
-## Next
-
-Run the independent external hold-out research first. Keep evolution/migration and specialization semantics as separate follow-up work until that evidence is available.
+The smallest engineering follow-up is materialization provenance binding. Do not reopen canonical-promotion evaluation until its evidence is available.
