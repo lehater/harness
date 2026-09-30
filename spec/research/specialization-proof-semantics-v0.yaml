@@ -1,0 +1,66 @@
+version: 1
+kind: harness-specialization-proof-semantics-research
+id: SPECIALIZATION-PROOF-SEMANTICS-V0
+status: research
+
+decision:
+  reference_model_behavior: keep-reference-model-gap
+  harness_core_change: none
+  reason: >-
+    Safety and AI specializations have independently meaningful proof obligations,
+    but canonical semantic claims and single Authority ownership are not yet stable.
+
+specializations:
+  specialized.safety:
+    canonicalization: blocked
+    activation: material harm to people, property, mission, or environment
+    external_basis:
+      - https://swehb.nasa.gov/spaces/SWEHBVC/pages/50888880/SWE-023+-+Software+Safety-Critical+Requirements
+      - https://swehb.nasa.gov/spaces/SWEHBVC/pages/50889421/SWE-192+-+Software+Hazardous+Requirements
+    proof_obligations:
+      - id: safety-hazard-model
+        responsibility: Identify hazardous events, causes, unsafe states, controls, and mitigations relevant to software behavior.
+        candidate_authorities: [PRODUCT-REQUIREMENTS, SYSTEM-ARCHITECTURE]
+      - id: safety-control-requirements
+        responsibility: Derive explicit software safety requirements and safe-state/control behavior from accepted hazard analysis.
+        candidate_authorities: [PRODUCT-REQUIREMENTS, SYSTEM-ARCHITECTURE]
+      - id: safety-traceable-verification
+        responsibility: Trace hazardous events and mitigations to safety-critical requirements and recorded verification evidence.
+        candidate_authorities: [VERIFICATION-DESIGN, TEST-DESIGN]
+    unresolved:
+      - canonical Authority ownership for hazard analysis versus derived safety requirements
+      - stable semantic claim names and minimum proof surface
+      - domain-specific certification and assurance boundaries
+
+  specialized.ai:
+    canonicalization: blocked
+    activation: AI/ML/agentic behavior whose uncertainty, autonomy, or socio-technical context changes risk
+    external_basis:
+      - https://www.nist.gov/itl/ai-risk-management-framework
+      - https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+      - https://airc.nist.gov/airmf-resources/playbook/measure/
+    proof_obligations:
+      - id: ai-use-risk-context
+        responsibility: Define intended use, context, affected actors, capability boundaries, limitations, and relevant AI risk scenarios.
+        candidate_authorities: [PRODUCT-REQUIREMENTS, QUALITY-DESIGN]
+      - id: ai-human-oversight
+        responsibility: Define when and how human oversight, intervention, or escalation is required for AI-supported behavior.
+        candidate_authorities: [PRODUCT-REQUIREMENTS, HUMAN-INTERFACE-DESIGN]
+      - id: ai-measurement-evaluation
+        responsibility: Define evaluation methods, benchmarks, uncertainty measures, and evidence for AI risks and trustworthiness characteristics.
+        candidate_authorities: [QUALITY-DESIGN, VERIFICATION-DESIGN]
+      - id: ai-runtime-risk-monitoring
+        responsibility: Define post-deployment monitoring and feedback needed to detect changed AI risk or behavior.
+        candidate_authorities: [OPERABILITY-DESIGN, VERIFICATION-DESIGN]
+    unresolved:
+      - AI RMF vocabulary is externally evolving
+      - canonical Authority ownership across product, quality, verification, and operations
+      - stable project-independent semantic claim names
+      - agentic-specific proof semantics beyond general AI risk management
+
+promotion_gate:
+  - every obligation has one canonical semantic owner
+  - stable semantic claim vocabulary exists in the canonical proof contract
+  - independent fixtures demonstrate both positive coverage and omission sensitivity
+  - specialization materializes without inventing project-specific truth
+  - Reference Model no longer needs a gap fallback for the specialization
