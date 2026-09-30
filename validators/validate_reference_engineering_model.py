@@ -8,13 +8,13 @@ ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
 from engineering_graph import validate_engineering_graph
 from reference_materializer import load_yaml,materialize,validate_reference_model
 MODEL=ROOT/"spec/research/reference-engineering-model-v0.yaml"; AUTHORITIES=ROOT/"catalogs/software-authorities-v0.yaml"; PROOF=ROOT/"spec/engineering-coverage/semantic-proof-contract-v1.yaml"
-HOLDOUTS=ROOT/"spec/research/reference-materializer-fixtures/holdouts-v0.yaml"; REGRESSIONS=ROOT/"spec/research/reference-materializer-fixtures/regressions-v0.yaml"
+HOLDOUTS=ROOT/"spec/research/reference-materializer-fixtures/holdouts-v0.yaml"; HOLDOUTS_V1=ROOT/"spec/research/reference-materializer-fixtures/holdouts-v1.yaml"; REGRESSIONS=ROOT/"spec/research/reference-materializer-fixtures/regressions-v0.yaml"
 def load(path):
     v=yaml.safe_load(path.read_text(encoding="utf-8")) or {}; assert isinstance(v,dict),path; return v
 def required(r): return {x["template"] for x in r.get("template_status",[]) or [] if x.get("status")=="REQUIRED"}
 def codes(r): return {x["code"] for x in r.get("diagnostics",[]) or []}
-def run_holdouts(model,authorities,proof):
-    suite=load(HOLDOUTS); assert suite["kind"]=="harness-reference-materializer-fixtures"
+def run_holdouts(model,authorities,proof,path):
+    suite=load(path); assert suite["kind"]=="harness-reference-materializer-fixtures"
     for s in suite["scenarios"]:
         r=materialize(model,authorities,proof,s["project_facts"],s["request"]); e=s["expect"]; assert r["status"]==e["status"],(s["id"],r)
         actual=required(r); assert set(e.get("required_templates",[]))<=actual,(s["id"],actual); assert not(set(e.get("forbidden_templates",[]))&actual),(s["id"],actual)
@@ -50,5 +50,5 @@ def run_regressions(model,authorities,proof):
 def main():
     model=load_yaml(MODEL); authorities=load_yaml(AUTHORITIES); proof=load_yaml(PROOF); errors=validate_reference_model(model,authorities,proof); assert not errors,errors; assert len(model["templates"])==39; assert len(model["predicates"])==46
     canonical={claim for row in (proof.get("proofs",{}) or {}).values() for claim in (row.get("accepted_semantic_claims",[]) or [])}; routed={claim for t in model["templates"] for claim in t.get("claim_surface",[]) or []}; assert routed==canonical; assert len(canonical)==118
-    run_holdouts(model,authorities,proof); run_mutations(model,authorities,proof); run_regressions(model,authorities,proof); print("reference engineering model v0: PASS"); return 0
+    run_holdouts(model,authorities,proof,HOLDOUTS); run_holdouts(model,authorities,proof,HOLDOUTS_V1); run_mutations(model,authorities,proof); run_regressions(model,authorities,proof); print("reference engineering model v0: PASS"); return 0
 if __name__=="__main__": raise SystemExit(main())
