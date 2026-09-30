@@ -11,6 +11,7 @@ harness-check:
 	python validators/validate_reference_applicability_research.py
 	python validators/validate_reference_engineering_model.py
 	python validators/validate_reference_model_evolution.py
+	python validators/validate_specialization_proof_semantics.py
 	python validators/validate_project_behavior_evals.py
 	python validators/validate_project_engineering_status.py
 	python validators/validate_project_status_e2e.py
