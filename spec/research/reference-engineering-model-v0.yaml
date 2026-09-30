@@ -1,0 +1,2234 @@
+{
+  "version": 1,
+  "kind": "harness-reference-engineering-model",
+  "id": "REFERENCE-ENGINEERING-MODEL-V0",
+  "status": "research",
+  "semantics": {
+    "authority_types": "Reuse Authority ids from catalogs/software-authorities-v0.yaml; project Authorities are instantiated only for materialized capabilities.",
+    "capability_templates": "Reusable independently accepted engineering-knowledge contracts; they are not project CapabilityIds.",
+    "claim_surface": "Allowed reusable semantic proof vocabulary for the template; competence is not proof.",
+    "primary_claims": "Claims intrinsic to every materialized instance of the template.",
+    "activated_claims": "Activated concern claims are added only when exact concern applicability is accepted.",
+    "requires": "Semantic knowledge prerequisites only; never workflow ordering.",
+    "applicability": "Evidence-driven and three-valued. Absence is UNKNOWN, not false.",
+    "scope": "Project CapabilityIds are singleton or expand only from a finite accepted subject inventory."
+  },
+  "predicates": [
+    {
+      "id": "user_needs_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "human_interface",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "task_model_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "screen_view_design_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "presentation_system_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "domain_strategy_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "multiple_model_languages",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "translation_boundary",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "domain_use_case_contract_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "domain_semantics_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "domain_subjects",
+      "type": "string_list",
+      "source_class": "accepted-project-fact",
+      "finite": true
+    },
+    {
+      "id": "application_orchestration",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "runtime_topology_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "machine_interface",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "machine_interface_subjects",
+      "type": "string_list",
+      "source_class": "accepted-project-fact",
+      "finite": true
+    },
+    {
+      "id": "screen_subjects",
+      "type": "string_list",
+      "source_class": "accepted-project-fact",
+      "finite": true
+    },
+    {
+      "id": "durable_state",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "persistence_independent",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "concurrent_mutation",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "retries",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "multiple_writers",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "replicated_state",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "quality_constraints_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "hard_realtime",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "internet_exposed",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "network_exposed",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "credentials",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "privileged_operations",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "external_identity_provider",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "security_analysis_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "normative_source",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "production_runtime",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "external_dependencies",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "operability_contract_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "mixed_version_window",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "irreversible_transform",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "separate_schema_migration",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "engineering_policy_selected",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "component_contract_needed",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "executable_oracle_gap",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "acceptance_scenarios_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "verification_scenarios_complete",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "toolchain_selection_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "repository_realization_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "safety_harm_potential",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
+      "id": "ai_behavior",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    }
+  ],
+  "templates": [
+    {
+      "id": "PROBLEM-EVIDENCE",
+      "authority_type": "DISCOVERY",
+      "knowledge_kind": "problem-evidence",
+      "claim_surface": [
+        "engineering.intent.problem"
+      ],
+      "primary_claims": [
+        "engineering.intent.problem"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": []
+    },
+    {
+      "id": "USER-NEEDS",
+      "authority_type": "DISCOVERY",
+      "knowledge_kind": "user-needs",
+      "applicability": {
+        "candidate_when": {
+          "predicate": "user_needs_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "user_needs_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "user_needs_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PROBLEM-EVIDENCE"
+        }
+      ]
+    },
+    {
+      "id": "PRODUCT-INTENT",
+      "authority_type": "PRODUCT-REQUIREMENTS",
+      "knowledge_kind": "product-requirements",
+      "claim_surface": [
+        "engineering.intent.scope",
+        "engineering.intent.behavior",
+        "engineering.intent.quality-targets"
+      ],
+      "primary_claims": [
+        "engineering.intent.scope",
+        "engineering.intent.behavior"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PROBLEM-EVIDENCE"
+        },
+        {
+          "template": "USER-NEEDS",
+          "when": {
+            "predicate": "user_needs_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "PRODUCT-ACCEPTANCE",
+      "authority_type": "PRODUCT-REQUIREMENTS",
+      "knowledge_kind": "product-requirements",
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "DOMAIN-STRATEGY",
+      "authority_type": "DOMAIN-STRATEGY",
+      "knowledge_kind": "domain-strategy",
+      "claim_surface": [
+        "engineering.domain.boundaries"
+      ],
+      "primary_claims": [
+        "engineering.domain.boundaries"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "domain_strategy_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "domain_strategy_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "domain_strategy_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "MODEL-CONTEXT-STRATEGY",
+      "authority_type": "MODEL-CONTEXT-STRATEGY",
+      "knowledge_kind": "model-context-strategy",
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "multiple_model_languages",
+              "equals": true
+            },
+            {
+              "predicate": "translation_boundary",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "multiple_model_languages",
+              "equals": true
+            },
+            {
+              "predicate": "translation_boundary",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "multiple_model_languages",
+              "equals": false
+            },
+            {
+              "predicate": "translation_boundary",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "DOMAIN-STRATEGY",
+          "when": {
+            "predicate": "domain_strategy_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "DOMAIN-USE-CASE",
+      "authority_type": "DOMAIN-USE-CASE-DESIGN",
+      "knowledge_kind": "domain-use-case",
+      "applicability": {
+        "candidate_when": {
+          "predicate": "domain_use_case_contract_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "domain_use_case_contract_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "domain_use_case_contract_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "DOMAIN-STRATEGY",
+          "when": {
+            "predicate": "domain_strategy_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "DOMAIN-MODEL",
+      "authority_type": "TACTICAL-DOMAIN-DESIGN",
+      "knowledge_kind": "domain-model",
+      "claim_surface": [
+        "engineering.domain.model",
+        "engineering.domain.invariants",
+        "engineering.domain.time",
+        "engineering.domain.provenance"
+      ],
+      "primary_claims": [
+        "engineering.domain.model"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "domain_semantics_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "domain_semantics_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "domain_semantics_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "per_subject",
+        "subjects_from": "domain_subjects"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "DOMAIN-STRATEGY",
+          "when": {
+            "predicate": "domain_strategy_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "MODEL-CONTEXT-STRATEGY",
+          "when": {
+            "any": [
+              {
+                "predicate": "multiple_model_languages",
+                "equals": true
+              },
+              {
+                "predicate": "translation_boundary",
+                "equals": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "APPLICATION-FAILURE-CONTRACT",
+      "authority_type": "APPLICATION-DESIGN",
+      "knowledge_kind": "application-design",
+      "claim_surface": [
+        "engineering.application.failures",
+        "engineering.reliability.failure-semantics",
+        "engineering.reliability.dependency-failure"
+      ],
+      "primary_claims": [
+        "engineering.application.failures"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "APPLICATION-ORCHESTRATION",
+      "authority_type": "APPLICATION-DESIGN",
+      "knowledge_kind": "application-design",
+      "claim_surface": [
+        "engineering.application.use-cases",
+        "engineering.application.orchestration"
+      ],
+      "primary_claims": [
+        "engineering.application.orchestration"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "application_orchestration",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "application_orchestration",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "application_orchestration",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "DOMAIN-USE-CASE",
+          "when": {
+            "predicate": "domain_use_case_contract_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "APPLICATION-FAILURE-CONTRACT"
+        }
+      ]
+    },
+    {
+      "id": "TASK-MODEL",
+      "authority_type": "APPLICATION-DESIGN",
+      "knowledge_kind": "task-model",
+      "applicability": {
+        "candidate_when": {
+          "predicate": "task_model_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "task_model_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "task_model_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "APPLICATION-ORCHESTRATION",
+          "when": {
+            "predicate": "application_orchestration",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "USER-JOURNEY",
+      "authority_type": "APPLICATION-DESIGN",
+      "knowledge_kind": "user-journey-design",
+      "claim_surface": [
+        "engineering.interface.human.journeys"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.journeys"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "human_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "TASK-MODEL",
+          "when": {
+            "predicate": "task_model_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "SYSTEM-STRUCTURE",
+      "authority_type": "SYSTEM-ARCHITECTURE",
+      "knowledge_kind": "system-architecture",
+      "claim_surface": [
+        "engineering.architecture.structure",
+        "engineering.architecture.decisions"
+      ],
+      "primary_claims": [
+        "engineering.architecture.structure"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "APPLICATION-ORCHESTRATION",
+          "when": {
+            "predicate": "application_orchestration",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "SYSTEM-BOUNDARY-RULES",
+      "authority_type": "SYSTEM-ARCHITECTURE",
+      "knowledge_kind": "system-architecture",
+      "claim_surface": [
+        "engineering.architecture.boundaries",
+        "engineering.architecture.communication"
+      ],
+      "primary_claims": [
+        "engineering.architecture.boundaries"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-STRUCTURE"
+        }
+      ]
+    },
+    {
+      "id": "RUNTIME-ARCHITECTURE",
+      "authority_type": "SYSTEM-ARCHITECTURE",
+      "knowledge_kind": "system-architecture",
+      "claim_surface": [
+        "engineering.architecture.deployment"
+      ],
+      "primary_claims": [
+        "engineering.architecture.deployment"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "runtime_topology_material",
+              "equals": true
+            },
+            {
+              "predicate": "production_runtime",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "runtime_topology_material",
+              "equals": true
+            },
+            {
+              "predicate": "production_runtime",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "runtime_topology_material",
+              "equals": false
+            },
+            {
+              "predicate": "production_runtime",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-STRUCTURE"
+        }
+      ]
+    },
+    {
+      "id": "MACHINE-INTERFACE-CONTRACT",
+      "authority_type": "MACHINE-INTERFACE-DESIGN",
+      "knowledge_kind": "interface-contract",
+      "claim_surface": [
+        "engineering.interface.machine.contract",
+        "engineering.interface.machine.errors",
+        "engineering.interface.machine.compatibility"
+      ],
+      "primary_claims": [
+        "engineering.interface.machine.contract"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "machine_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "machine_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "machine_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "per_subject",
+        "subjects_from": "machine_interface_subjects"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "SYSTEM-BOUNDARY-RULES"
+        }
+      ]
+    },
+    {
+      "id": "CONCEPTUAL-INTERFACE-MODEL",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "conceptual-interface-model",
+      "claim_surface": [
+        "engineering.interface.human.conceptual-model"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.conceptual-model"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "human_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "USER-JOURNEY"
+        }
+      ]
+    },
+    {
+      "id": "INFORMATION-ARCHITECTURE",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "information-architecture-design",
+      "claim_surface": [
+        "engineering.interface.human.information-architecture"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.information-architecture"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "human_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "CONCEPTUAL-INTERFACE-MODEL"
+        }
+      ]
+    },
+    {
+      "id": "INTERACTION-DESIGN",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "interaction-design",
+      "claim_surface": [
+        "engineering.interface.human.interaction",
+        "engineering.interface.human.usability",
+        "engineering.interface.human.accessibility",
+        "engineering.interface.human.i18n"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.interaction"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "human_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "CONCEPTUAL-INTERFACE-MODEL"
+        },
+        {
+          "template": "INFORMATION-ARCHITECTURE"
+        }
+      ]
+    },
+    {
+      "id": "INTERFACE-TOPOLOGY",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "interface-topology-design",
+      "claim_surface": [
+        "engineering.interface.human.navigation-topology"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.navigation-topology"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "human_interface",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "human_interface",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "INFORMATION-ARCHITECTURE"
+        }
+      ]
+    },
+    {
+      "id": "PRESENTATION-SYSTEM",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "presentation-system-design",
+      "claim_surface": [
+        "engineering.interface.human.presentation-system",
+        "engineering.interface.human.responsiveness"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.presentation-system"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "presentation_system_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "presentation_system_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "presentation_system_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "INTERACTION-DESIGN"
+        },
+        {
+          "template": "INTERFACE-TOPOLOGY"
+        }
+      ]
+    },
+    {
+      "id": "SCREEN-VIEW-DESIGN",
+      "authority_type": "HUMAN-INTERFACE-DESIGN",
+      "knowledge_kind": "screen-view-design",
+      "claim_surface": [
+        "engineering.interface.human.screen-composition"
+      ],
+      "primary_claims": [
+        "engineering.interface.human.screen-composition"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "screen_view_design_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "screen_view_design_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "screen_view_design_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "per_subject",
+        "subjects_from": "screen_subjects"
+      },
+      "requires": [
+        {
+          "template": "INTERACTION-DESIGN"
+        },
+        {
+          "template": "INTERFACE-TOPOLOGY"
+        },
+        {
+          "template": "PRESENTATION-SYSTEM",
+          "when": {
+            "predicate": "presentation_system_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "DATA-DESIGN",
+      "authority_type": "DATA-DESIGN",
+      "knowledge_kind": "data-design",
+      "claim_surface": [
+        "engineering.data.model",
+        "engineering.data.integrity",
+        "engineering.data.lifecycle",
+        "engineering.data.quality",
+        "engineering.data.provenance",
+        "engineering.data.reproducibility",
+        "engineering.data.classification",
+        "engineering.reliability.durability",
+        "engineering.governance.data"
+      ],
+      "primary_claims": [
+        "engineering.data.model"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "durable_state",
+              "equals": true
+            },
+            {
+              "predicate": "persistence_independent",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "durable_state",
+              "equals": true
+            },
+            {
+              "predicate": "persistence_independent",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "durable_state",
+              "equals": false
+            },
+            {
+              "predicate": "persistence_independent",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-STRUCTURE"
+        }
+      ]
+    },
+    {
+      "id": "CONCURRENCY-CONSISTENCY",
+      "authority_type": "CONCURRENCY-CONSISTENCY-DESIGN",
+      "knowledge_kind": "concurrency-consistency-design",
+      "claim_surface": [
+        "engineering.reliability.consistency",
+        "engineering.reliability.retry-idempotency"
+      ],
+      "primary_claims": [
+        "engineering.reliability.consistency"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "concurrent_mutation",
+              "equals": true
+            },
+            {
+              "predicate": "retries",
+              "equals": true
+            },
+            {
+              "predicate": "multiple_writers",
+              "equals": true
+            },
+            {
+              "predicate": "replicated_state",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "concurrent_mutation",
+              "equals": true
+            },
+            {
+              "predicate": "retries",
+              "equals": true
+            },
+            {
+              "predicate": "multiple_writers",
+              "equals": true
+            },
+            {
+              "predicate": "replicated_state",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "concurrent_mutation",
+              "equals": false
+            },
+            {
+              "predicate": "retries",
+              "equals": false
+            },
+            {
+              "predicate": "multiple_writers",
+              "equals": false
+            },
+            {
+              "predicate": "replicated_state",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "APPLICATION-FAILURE-CONTRACT"
+        },
+        {
+          "template": "SYSTEM-STRUCTURE"
+        },
+        {
+          "template": "DATA-DESIGN",
+          "when": {
+            "predicate": "durable_state",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "QUALITY-DESIGN",
+      "authority_type": "QUALITY-DESIGN",
+      "knowledge_kind": "quality-design",
+      "claim_surface": [
+        "engineering.quality.performance.latency",
+        "engineering.quality.performance.throughput",
+        "engineering.quality.performance.resource-efficiency",
+        "engineering.quality.performance.capacity",
+        "engineering.quality.compatibility.interoperability",
+        "engineering.quality.compatibility.coexistence",
+        "engineering.quality.maintainability.modularity",
+        "engineering.quality.maintainability.reusability",
+        "engineering.quality.maintainability.analysability",
+        "engineering.quality.maintainability.modifiability",
+        "engineering.quality.maintainability.testability",
+        "engineering.quality.flexibility.adaptability",
+        "engineering.quality.flexibility.scalability",
+        "engineering.quality.flexibility.installability",
+        "engineering.quality.flexibility.replaceability",
+        "engineering.reliability.availability",
+        "engineering.reliability.fault-tolerance",
+        "engineering.reliability.recovery"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "quality_constraints_material",
+              "equals": true
+            },
+            {
+              "predicate": "hard_realtime",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "quality_constraints_material",
+              "equals": true
+            },
+            {
+              "predicate": "hard_realtime",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "quality_constraints_material",
+              "equals": false
+            },
+            {
+              "predicate": "hard_realtime",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "SECURITY-ARCHITECTURE",
+      "authority_type": "SECURITY-ARCHITECTURE",
+      "knowledge_kind": "security-architecture",
+      "claim_surface": [
+        "engineering.security.boundaries",
+        "engineering.security.identity",
+        "engineering.security.authorization",
+        "engineering.security.confidentiality",
+        "engineering.security.integrity",
+        "engineering.security.accountability",
+        "engineering.security.availability-abuse"
+      ],
+      "primary_claims": [
+        "engineering.security.boundaries"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "internet_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "network_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "credentials",
+              "equals": true
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": true
+            },
+            {
+              "predicate": "external_identity_provider",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "internet_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "network_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "credentials",
+              "equals": true
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": true
+            },
+            {
+              "predicate": "external_identity_provider",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "internet_exposed",
+              "equals": false
+            },
+            {
+              "predicate": "network_exposed",
+              "equals": false
+            },
+            {
+              "predicate": "credentials",
+              "equals": false
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": false
+            },
+            {
+              "predicate": "external_identity_provider",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "SYSTEM-BOUNDARY-RULES"
+        }
+      ]
+    },
+    {
+      "id": "SECURITY-ANALYSIS",
+      "authority_type": "SECURITY-ANALYSIS",
+      "knowledge_kind": "security-analysis",
+      "claim_surface": [
+        "engineering.security.threat-analysis",
+        "engineering.security.vulnerability-management",
+        "engineering.security.secure-development"
+      ],
+      "primary_claims": [
+        "engineering.security.threat-analysis"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "security_analysis_material",
+              "equals": true
+            },
+            {
+              "predicate": "internet_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "credentials",
+              "equals": true
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "security_analysis_material",
+              "equals": true
+            },
+            {
+              "predicate": "internet_exposed",
+              "equals": true
+            },
+            {
+              "predicate": "credentials",
+              "equals": true
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "security_analysis_material",
+              "equals": false
+            },
+            {
+              "predicate": "internet_exposed",
+              "equals": false
+            },
+            {
+              "predicate": "credentials",
+              "equals": false
+            },
+            {
+              "predicate": "privileged_operations",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-BOUNDARY-RULES"
+        },
+        {
+          "template": "SECURITY-ARCHITECTURE",
+          "when": {
+            "any": [
+              {
+                "predicate": "internet_exposed",
+                "equals": true
+              },
+              {
+                "predicate": "network_exposed",
+                "equals": true
+              },
+              {
+                "predicate": "credentials",
+                "equals": true
+              },
+              {
+                "predicate": "privileged_operations",
+                "equals": true
+              },
+              {
+                "predicate": "external_identity_provider",
+                "equals": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "OBLIGATION-COVERAGE",
+      "authority_type": "OBLIGATION-ANALYSIS",
+      "claim_surface": [
+        "engineering.governance.external-obligations",
+        "engineering.governance.privacy",
+        "engineering.governance.audit",
+        "engineering.governance.ownership"
+      ],
+      "primary_claims": [
+        "engineering.governance.external-obligations"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "normative_source",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "normative_source",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "normative_source",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "TRANSITION-CONTRACT",
+      "authority_type": "CHANGE-TRANSITION-DESIGN",
+      "claim_surface": [
+        "engineering.transition.compatibility",
+        "engineering.transition.data-migration",
+        "engineering.transition.rollout",
+        "engineering.transition.deprecation",
+        "engineering.transition.revalidation",
+        "engineering.delivery.migration",
+        "engineering.delivery.rollback"
+      ],
+      "primary_claims": [
+        "engineering.transition.compatibility"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "mixed_version_window",
+              "equals": true
+            },
+            {
+              "predicate": "irreversible_transform",
+              "equals": true
+            },
+            {
+              "predicate": "separate_schema_migration",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "mixed_version_window",
+              "equals": true
+            },
+            {
+              "predicate": "irreversible_transform",
+              "equals": true
+            },
+            {
+              "predicate": "separate_schema_migration",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "mixed_version_window",
+              "equals": false
+            },
+            {
+              "predicate": "irreversible_transform",
+              "equals": false
+            },
+            {
+              "predicate": "separate_schema_migration",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-STRUCTURE"
+        },
+        {
+          "template": "DATA-DESIGN",
+          "when": {
+            "predicate": "durable_state",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "OPERABILITY-DESIGN",
+      "authority_type": "OPERABILITY-DESIGN",
+      "knowledge_kind": "operability-design",
+      "claim_surface": [
+        "engineering.operability.configuration",
+        "engineering.operability.logging",
+        "engineering.operability.metrics",
+        "engineering.operability.tracing",
+        "engineering.operability.health",
+        "engineering.operability.alerting",
+        "engineering.operability.incident",
+        "engineering.operability.admin",
+        "engineering.operability.capacity"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "any": [
+            {
+              "predicate": "production_runtime",
+              "equals": true
+            },
+            {
+              "predicate": "external_dependencies",
+              "equals": true
+            },
+            {
+              "predicate": "operability_contract_material",
+              "equals": true
+            }
+          ]
+        },
+        "required_when": {
+          "any": [
+            {
+              "predicate": "production_runtime",
+              "equals": true
+            },
+            {
+              "predicate": "external_dependencies",
+              "equals": true
+            },
+            {
+              "predicate": "operability_contract_material",
+              "equals": true
+            }
+          ]
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "production_runtime",
+              "equals": false
+            },
+            {
+              "predicate": "external_dependencies",
+              "equals": false
+            },
+            {
+              "predicate": "operability_contract_material",
+              "equals": false
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "RUNTIME-ARCHITECTURE"
+        },
+        {
+          "template": "APPLICATION-FAILURE-CONTRACT"
+        }
+      ]
+    },
+    {
+      "id": "ENGINEERING-POLICY",
+      "authority_type": "ENGINEERING-POLICY",
+      "knowledge_kind": "engineering-policy",
+      "claim_surface": [
+        "engineering.engineering.principles",
+        "engineering.engineering.time",
+        "engineering.engineering.configuration",
+        "engineering.engineering.code-quality"
+      ],
+      "primary_claims": [
+        "engineering.engineering.principles"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "engineering_policy_selected",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "engineering_policy_selected",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "engineering_policy_selected",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        }
+      ]
+    },
+    {
+      "id": "COMPONENT-DESIGN",
+      "authority_type": "COMPONENT-DESIGN",
+      "knowledge_kind": "component-design",
+      "claim_surface": [
+        "engineering.engineering.components",
+        "engineering.engineering.error-handling"
+      ],
+      "primary_claims": [
+        "engineering.engineering.components"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "component_contract_needed",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "component_contract_needed",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "component_contract_needed",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-BOUNDARY-RULES"
+        },
+        {
+          "template": "APPLICATION-ORCHESTRATION",
+          "when": {
+            "predicate": "application_orchestration",
+            "equals": true
+          }
+        },
+        {
+          "template": "ENGINEERING-POLICY",
+          "when": {
+            "predicate": "engineering_policy_selected",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "DESIGN-VERIFICATION-OBLIGATIONS",
+      "authority_type": "VERIFICATION-DESIGN",
+      "knowledge_kind": "verification-strategy",
+      "claim_surface": [
+        "engineering.verification.strategy",
+        "engineering.verification.requirement-traceability",
+        "engineering.verification.functional",
+        "engineering.verification.quality",
+        "engineering.verification.security",
+        "engineering.verification.reliability",
+        "engineering.verification.architecture",
+        "engineering.verification.data"
+      ],
+      "primary_claims": [
+        "engineering.verification.strategy",
+        "engineering.verification.requirement-traceability"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-ACCEPTANCE"
+        },
+        {
+          "template": "SYSTEM-STRUCTURE"
+        }
+      ]
+    },
+    {
+      "id": "REALIZATION-VERIFICATION-PLAN",
+      "authority_type": "VERIFICATION-DESIGN",
+      "knowledge_kind": "verification-strategy",
+      "claim_surface": [
+        "engineering.verification.interface.machine",
+        "engineering.verification.interface.human",
+        "engineering.verification.interface.presentation"
+      ],
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "DESIGN-VERIFICATION-OBLIGATIONS"
+        },
+        {
+          "template": "COMPONENT-DESIGN",
+          "when": {
+            "predicate": "component_contract_needed",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "ACCEPTANCE-SCENARIOS",
+      "authority_type": "VERIFICATION-DESIGN",
+      "knowledge_kind": "acceptance-scenarios",
+      "applicability": {
+        "candidate_when": {
+          "predicate": "acceptance_scenarios_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "acceptance_scenarios_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "acceptance_scenarios_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "DESIGN-VERIFICATION-OBLIGATIONS"
+        }
+      ]
+    },
+    {
+      "id": "TEST-DESIGN",
+      "authority_type": "TEST-DESIGN",
+      "knowledge_kind": "test-design",
+      "applicability": {
+        "candidate_when": {
+          "predicate": "executable_oracle_gap",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "executable_oracle_gap",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "all": [
+            {
+              "predicate": "executable_oracle_gap",
+              "equals": false
+            },
+            {
+              "predicate": "verification_scenarios_complete",
+              "equals": true
+            }
+          ]
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "REALIZATION-VERIFICATION-PLAN"
+        },
+        {
+          "template": "ACCEPTANCE-SCENARIOS",
+          "when": {
+            "predicate": "acceptance_scenarios_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "IMPLEMENTATION-STACK",
+      "authority_type": "IMPLEMENTATION-DESIGN",
+      "knowledge_kind": "implementation-design",
+      "claim_surface": [
+        "engineering.dependency.inventory",
+        "engineering.dependency.trust",
+        "engineering.dependency.versioning",
+        "engineering.dependency.license",
+        "engineering.dependency.vulnerability",
+        "engineering.delivery.reproducible-build",
+        "engineering.delivery.provenance",
+        "engineering.delivery.integrity"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "toolchain_selection_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "toolchain_selection_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "toolchain_selection_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "SYSTEM-STRUCTURE"
+        }
+      ]
+    },
+    {
+      "id": "IMPLEMENTATION-PLAN",
+      "authority_type": "IMPLEMENTATION-DESIGN",
+      "knowledge_kind": "implementation-design",
+      "claim_surface": [
+        "engineering.delivery.release"
+      ],
+      "primary_claims": [
+        "engineering.delivery.release"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "repository_realization_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "repository_realization_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "repository_realization_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "PRODUCT-INTENT"
+        },
+        {
+          "template": "SYSTEM-BOUNDARY-RULES"
+        },
+        {
+          "template": "REALIZATION-VERIFICATION-PLAN"
+        },
+        {
+          "template": "APPLICATION-FAILURE-CONTRACT"
+        },
+        {
+          "template": "DOMAIN-STRATEGY",
+          "when": {
+            "predicate": "domain_strategy_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "MODEL-CONTEXT-STRATEGY",
+          "when": {
+            "any": [
+              {
+                "predicate": "multiple_model_languages",
+                "equals": true
+              },
+              {
+                "predicate": "translation_boundary",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "DOMAIN-USE-CASE",
+          "when": {
+            "predicate": "domain_use_case_contract_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "DOMAIN-MODEL",
+          "when": {
+            "predicate": "domain_semantics_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "APPLICATION-ORCHESTRATION",
+          "when": {
+            "predicate": "application_orchestration",
+            "equals": true
+          }
+        },
+        {
+          "template": "TASK-MODEL",
+          "when": {
+            "predicate": "task_model_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "USER-JOURNEY",
+          "when": {
+            "predicate": "human_interface",
+            "equals": true
+          }
+        },
+        {
+          "template": "RUNTIME-ARCHITECTURE",
+          "when": {
+            "any": [
+              {
+                "predicate": "runtime_topology_material",
+                "equals": true
+              },
+              {
+                "predicate": "production_runtime",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "MACHINE-INTERFACE-CONTRACT",
+          "when": {
+            "predicate": "machine_interface",
+            "equals": true
+          }
+        },
+        {
+          "template": "PRESENTATION-SYSTEM",
+          "when": {
+            "predicate": "presentation_system_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "SCREEN-VIEW-DESIGN",
+          "when": {
+            "predicate": "screen_view_design_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "DATA-DESIGN",
+          "when": {
+            "any": [
+              {
+                "predicate": "durable_state",
+                "equals": true
+              },
+              {
+                "predicate": "persistence_independent",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "CONCURRENCY-CONSISTENCY",
+          "when": {
+            "any": [
+              {
+                "predicate": "concurrent_mutation",
+                "equals": true
+              },
+              {
+                "predicate": "retries",
+                "equals": true
+              },
+              {
+                "predicate": "multiple_writers",
+                "equals": true
+              },
+              {
+                "predicate": "replicated_state",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "QUALITY-DESIGN",
+          "when": {
+            "any": [
+              {
+                "predicate": "quality_constraints_material",
+                "equals": true
+              },
+              {
+                "predicate": "hard_realtime",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "SECURITY-ARCHITECTURE",
+          "when": {
+            "any": [
+              {
+                "predicate": "internet_exposed",
+                "equals": true
+              },
+              {
+                "predicate": "network_exposed",
+                "equals": true
+              },
+              {
+                "predicate": "credentials",
+                "equals": true
+              },
+              {
+                "predicate": "privileged_operations",
+                "equals": true
+              },
+              {
+                "predicate": "external_identity_provider",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "SECURITY-ANALYSIS",
+          "when": {
+            "any": [
+              {
+                "predicate": "security_analysis_material",
+                "equals": true
+              },
+              {
+                "predicate": "internet_exposed",
+                "equals": true
+              },
+              {
+                "predicate": "credentials",
+                "equals": true
+              },
+              {
+                "predicate": "privileged_operations",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "OBLIGATION-COVERAGE",
+          "when": {
+            "predicate": "normative_source",
+            "equals": true
+          }
+        },
+        {
+          "template": "TRANSITION-CONTRACT",
+          "when": {
+            "any": [
+              {
+                "predicate": "mixed_version_window",
+                "equals": true
+              },
+              {
+                "predicate": "irreversible_transform",
+                "equals": true
+              },
+              {
+                "predicate": "separate_schema_migration",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "OPERABILITY-DESIGN",
+          "when": {
+            "any": [
+              {
+                "predicate": "production_runtime",
+                "equals": true
+              },
+              {
+                "predicate": "external_dependencies",
+                "equals": true
+              },
+              {
+                "predicate": "operability_contract_material",
+                "equals": true
+              }
+            ]
+          }
+        },
+        {
+          "template": "ENGINEERING-POLICY",
+          "when": {
+            "predicate": "engineering_policy_selected",
+            "equals": true
+          }
+        },
+        {
+          "template": "COMPONENT-DESIGN",
+          "when": {
+            "predicate": "component_contract_needed",
+            "equals": true
+          }
+        },
+        {
+          "template": "ACCEPTANCE-SCENARIOS",
+          "when": {
+            "predicate": "acceptance_scenarios_material",
+            "equals": true
+          }
+        },
+        {
+          "template": "TEST-DESIGN",
+          "when": {
+            "predicate": "executable_oracle_gap",
+            "equals": true
+          }
+        },
+        {
+          "template": "IMPLEMENTATION-STACK",
+          "when": {
+            "predicate": "toolchain_selection_material",
+            "equals": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "COMPLETION-CRITERIA",
+      "authority_type": "IMPLEMENTATION-DESIGN",
+      "knowledge_kind": "implementation-design",
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "IMPLEMENTATION-PLAN"
+        },
+        {
+          "template": "REALIZATION-VERIFICATION-PLAN"
+        }
+      ]
+    }
+  ]
+}
