@@ -1,0 +1,34 @@
+version: 1
+kind: harness-reference-model-evolution-contract
+id: REFERENCE-MODEL-EVOLUTION-V0
+status: research
+
+purpose: >-
+  Determine whether Reference Engineering Model snapshots can evolve without losing
+  reproducibility or silently orphaning project capabilities.
+
+invariants:
+  - id: immutable-snapshot-identity
+    rule: Every Reference Model snapshot has a deterministic content fingerprint.
+  - id: explicit-destructive-mapping
+    rule: Removed template or predicate identities require an explicit rename, split, merge, or predicate-rename mapping.
+  - id: additions-are-not-renames
+    rule: New identities are additions unless an explicit migration operation maps them from removed identities.
+  - id: rematerialize-on-model-change
+    rule: Any Reference Model fingerprint change requires project rematerialization before currentness can be claimed.
+  - id: obsolete-capability-detection
+    rule: Project capabilities present before rematerialization and absent afterward are explicit obsolete candidates, never silently retained.
+  - id: historical-reproducibility
+    rule: Reproducing historical materialization requires the exact Reference Model snapshot, project-fact snapshot, request, and materializer semantics.
+
+operations:
+  - rename_template
+  - split_template
+  - merge_templates
+  - rename_predicate
+
+promotion_blocker:
+  current_materialization_result: >-
+    Reference Model v0 materialization is deterministic but the emitted result does
+    not currently carry the Reference Model fingerprint. Historical provenance
+    therefore depends on retaining external snapshot identity.
