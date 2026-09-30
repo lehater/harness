@@ -169,7 +169,7 @@ def materialize(model,authority_catalog,proof_contract,project_facts,request):
         elif nv is True: states[tid]="NOT_APPLICABLE"
         elif cv is True: states[tid]="UNRESOLVED"
         else: states[tid]="UNASSESSED"
-    gap=False; conflict=False
+    gap=False; conflict=any(d.get("code")=="APPLICABILITY_CONFLICT" for d in diags)
     for concern in concerns:
         cs=pm.get(concern)
         if not cs: diags.append(diag("REFERENCE_MODEL_GAP",f"activated concern has no canonical proof route: {concern}",concern=concern)); gap=True; continue
