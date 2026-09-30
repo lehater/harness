@@ -1,0 +1,269 @@
+version: 1
+kind: harness-reference-materializer-regressions
+id: REFERENCE-MATERIALIZER-REGRESSIONS-V0
+scenarios:
+- id: regression-prep
+  existing_graph: spec/scenario-suite/fixtures/external/prep-engineering-graph.yaml
+  project_facts:
+    version: 1
+    kind: harness-project-facts
+    facts:
+    - predicate: user_needs_material
+      value: true
+    - predicate: human_interface
+      value: true
+    - predicate: task_model_material
+      value: true
+    - predicate: screen_view_design_material
+      value: true
+    - predicate: presentation_system_material
+      value: true
+    - predicate: domain_strategy_material
+      value: true
+    - predicate: multiple_model_languages
+      value: true
+    - predicate: translation_boundary
+      value: true
+    - predicate: domain_use_case_contract_material
+      value: false
+    - predicate: domain_semantics_material
+      value: true
+    - predicate: domain_subjects
+      value:
+      - KNOWLEDGE
+      - LEARNING
+      - LEARNER
+    - predicate: application_orchestration
+      value: true
+    - predicate: runtime_topology_material
+      value: true
+    - predicate: machine_interface
+      value: true
+    - predicate: machine_interface_subjects
+      value:
+      - HTTP
+    - predicate: screen_subjects
+      value:
+      - KNOWLEDGE
+      - LEARNING
+      - PROGRESS
+    - predicate: durable_state
+      value: true
+    - predicate: persistence_independent
+      value: true
+    - predicate: concurrent_mutation
+      value: true
+    - predicate: retries
+      value: false
+    - predicate: multiple_writers
+      value: false
+    - predicate: replicated_state
+      value: false
+    - predicate: quality_constraints_material
+      value: true
+    - predicate: hard_realtime
+      value: false
+    - predicate: internet_exposed
+      value: false
+    - predicate: network_exposed
+      value: true
+    - predicate: credentials
+      value: false
+    - predicate: privileged_operations
+      value: false
+    - predicate: external_identity_provider
+      value: false
+    - predicate: security_analysis_material
+      value: false
+    - predicate: normative_source
+      value: false
+    - predicate: production_runtime
+      value: false
+    - predicate: external_dependencies
+      value: false
+    - predicate: operability_contract_material
+      value: false
+    - predicate: mixed_version_window
+      value: false
+    - predicate: irreversible_transform
+      value: false
+    - predicate: separate_schema_migration
+      value: false
+    - predicate: engineering_policy_selected
+      value: true
+    - predicate: component_contract_needed
+      value: true
+    - predicate: executable_oracle_gap
+      value: true
+    - predicate: acceptance_scenarios_material
+      value: false
+    - predicate: toolchain_selection_material
+      value: true
+    - predicate: repository_realization_material
+      value: true
+    - predicate: safety_harm_potential
+      value: false
+    - predicate: ai_behavior
+      value: false
+    activated_concerns:
+    - intent.scope
+    - intent.behavior
+    - architecture.structure
+    - architecture.boundaries
+    - application.failures
+    - engineering.error-handling
+    - verification.strategy
+    - verification.requirement-traceability
+    - verification.functional
+    - verification.architecture
+    - domain.model
+    - interface.human.journeys
+    - interface.human.presentation-system
+    - interface.human.screen-composition
+    - reliability.consistency
+  request:
+    version: 1
+    kind: harness-reference-materialization-request
+    project_id: regression-prep
+    consumer_id: IMPLEMENTATION
+    purpose: Regression materialization only.
+    roots:
+    - COMPLETION-CRITERIA
+  expect:
+    status: STABLE
+    minimum_kind_coverage: 0.8
+    legacy_kind_equivalents: {}
+- id: regression-napms
+  existing_graph: spec/scenario-suite/fixtures/external/napms-engineering-graph.yaml
+  project_facts:
+    version: 1
+    kind: harness-project-facts
+    facts:
+    - predicate: user_needs_material
+      value: true
+    - predicate: human_interface
+      value: true
+    - predicate: task_model_material
+      value: true
+    - predicate: screen_view_design_material
+      value: true
+    - predicate: presentation_system_material
+      value: true
+    - predicate: domain_strategy_material
+      value: true
+    - predicate: multiple_model_languages
+      value: false
+    - predicate: translation_boundary
+      value: false
+    - predicate: domain_use_case_contract_material
+      value: true
+    - predicate: domain_semantics_material
+      value: true
+    - predicate: domain_subjects
+      value:
+      - ACCESS-POLICY
+      - RESOURCE-CATALOGUE
+    - predicate: application_orchestration
+      value: true
+    - predicate: runtime_topology_material
+      value: true
+    - predicate: machine_interface
+      value: true
+    - predicate: machine_interface_subjects
+      value:
+      - HTTP
+    - predicate: screen_subjects
+      value:
+      - POLICY
+      - RESOURCE
+      - REQUEST
+    - predicate: durable_state
+      value: true
+    - predicate: persistence_independent
+      value: true
+    - predicate: concurrent_mutation
+      value: false
+    - predicate: retries
+      value: false
+    - predicate: multiple_writers
+      value: false
+    - predicate: replicated_state
+      value: false
+    - predicate: quality_constraints_material
+      value: true
+    - predicate: hard_realtime
+      value: false
+    - predicate: internet_exposed
+      value: true
+    - predicate: network_exposed
+      value: true
+    - predicate: credentials
+      value: true
+    - predicate: privileged_operations
+      value: true
+    - predicate: external_identity_provider
+      value: true
+    - predicate: security_analysis_material
+      value: true
+    - predicate: normative_source
+      value: false
+    - predicate: production_runtime
+      value: true
+    - predicate: external_dependencies
+      value: true
+    - predicate: operability_contract_material
+      value: true
+    - predicate: mixed_version_window
+      value: false
+    - predicate: irreversible_transform
+      value: false
+    - predicate: separate_schema_migration
+      value: false
+    - predicate: engineering_policy_selected
+      value: false
+    - predicate: component_contract_needed
+      value: true
+    - predicate: executable_oracle_gap
+      value: true
+    - predicate: acceptance_scenarios_material
+      value: true
+    - predicate: toolchain_selection_material
+      value: true
+    - predicate: repository_realization_material
+      value: true
+    - predicate: safety_harm_potential
+      value: false
+    - predicate: ai_behavior
+      value: false
+    activated_concerns:
+    - intent.scope
+    - intent.behavior
+    - architecture.structure
+    - architecture.boundaries
+    - application.failures
+    - engineering.error-handling
+    - verification.strategy
+    - verification.requirement-traceability
+    - verification.functional
+    - verification.architecture
+    - security.threat-analysis
+    - operability.health
+    - data.model
+    - interface.machine.contract
+  request:
+    version: 1
+    kind: harness-reference-materialization-request
+    project_id: regression-napms
+    consumer_id: IMPLEMENTATION
+    purpose: Regression materialization only.
+    roots:
+    - COMPLETION-CRITERIA
+  expect:
+    status: STABLE
+    minimum_kind_coverage: 0.8
+    legacy_kind_equivalents:
+      domain-strategy: strategic-domain-design
+      conceptual-interface-model: human-interface-design
+      information-architecture-design: human-interface-design
+      interaction-design: human-interface-design
+      interface-topology-design: human-interface-design

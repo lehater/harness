@@ -1,0 +1,74 @@
+version: 1
+kind: harness-reference-materialization-contract
+id: REFERENCE-MATERIALIZATION-V0
+status: research
+
+purpose: >-
+  Deterministically materialize a project Engineering Graph from reusable reference
+  engineering knowledge and one immutable snapshot of accepted project truth without
+  changing Harness Core semantics.
+
+inputs:
+  reference_model: harness-reference-engineering-model
+  authority_catalog: harness-authority-catalog
+  semantic_proof_contract: harness-concern-semantic-proof-contract
+  project_facts:
+    kind: harness-project-facts
+    fields:
+      facts: finite accepted predicate assertions with project-owned provenance
+      activated_concerns: optional accepted concern applicability ids
+  request:
+    kind: harness-reference-materialization-request
+    fields:
+      project_id: required
+      roots: one or more root Reference Capability Template ids
+      consumer_id: optional project Consumer label
+      purpose: optional terminal-target description
+
+result_statuses:
+  STABLE: one deterministic fixed point was materialized for the immutable input snapshot
+  BLOCKED: materialization needs accepted scope/subject truth that is not present
+  UNRESOLVED: applicability was activated but evidence cannot prove REQUIRED or NOT_APPLICABLE
+  REFERENCE_MODEL_GAP: accepted concern/specialization cannot be routed to modeled reusable knowledge
+  REFERENCE_MODEL_INVALID: reference vocabulary, dependency or scope rules are structurally invalid
+  PROJECT_EVIDENCE_INVALID: project facts violate the declared predicate vocabulary
+  PROJECT_EVIDENCE_CONFLICT: accepted project facts assert incompatible values for one predicate
+  MATERIALIZATION_CONFLICT: semantic necessity conflicts with accepted N/A/applicability evidence
+  REQUEST_INVALID: requested roots or project identity are invalid
+
+fixed_point_invariants:
+  - id: snapshot-purity
+    rule: Materialization never mutates accepted project truth; new accepted knowledge starts a new snapshot/epoch.
+  - id: no-negation-by-absence
+    rule: Missing evidence is UNKNOWN, never false and never proof of NOT_APPLICABLE.
+  - id: independent-activation
+    rule: A template may not be activated solely by a predicate produced by the same template.
+  - id: finite-scope
+    rule: Subject expansion uses only finite accepted project-owned inventories.
+  - id: production-dag
+    rule: The union of possible Reference Capability dependency rules must be acyclic.
+  - id: semantic-dependencies-only
+    rule: REQUIRES represents knowledge necessity, never phase/workflow ordering.
+  - id: na-is-evidence-backed
+    rule: A required dependency cannot silently delete a template proven NOT_APPLICABLE; the result is a conflict.
+  - id: no-fake-na-capability
+    rule: NOT_APPLICABLE is assessment knowledge and never materializes a project CapabilityId.
+  - id: exact-claim-materialization
+    rule: A template claim_surface is competence, not proof; generated project capabilities emit only primary and explicitly activated claims.
+  - id: existing-core-boundary
+    rule: Output is an ordinary harness-engineering-graph consumed by existing Core/Engineering Graph evaluators.
+
+validation_order:
+  - validate predicate vocabulary
+  - validate Authority Type references
+  - validate semantic claim surfaces against canonical proof vocabulary
+  - validate template references
+  - validate potential dependency DAG
+  - validate finite scope schemas
+  - normalize accepted project facts and reject contradictions
+  - evaluate evidence-driven applicability
+  - route explicitly activated concerns
+  - expand required dependencies to a fixed point
+  - expand finite scopes/subjects
+  - bind exact project CapabilityIds and semantic claims
+  - validate the generated Engineering Graph with the existing validator

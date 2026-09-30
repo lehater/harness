@@ -16,6 +16,7 @@ on:
       - "validators/**"
       - "harness.py"
       - "engineering_graph.py"
+      - "reference_materializer.py"
       - "engineering_coverage.py"
       - "coverage_planner.py"
       - "coverage_obligations.py"

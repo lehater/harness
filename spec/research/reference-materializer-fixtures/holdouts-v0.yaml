@@ -1,0 +1,2569 @@
+{
+  "version": 1,
+  "kind": "harness-reference-materializer-fixtures",
+  "id": "REFERENCE-MATERIALIZER-HOLDOUTS-V0",
+  "scenarios": [
+    {
+      "id": "holdout-ephemeral-cli",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": false
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "CLI"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": false
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": false
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-ephemeral-cli",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "MACHINE-INTERFACE-CONTRACT",
+          "IMPLEMENTATION-PLAN",
+          "TEST-DESIGN"
+        ],
+        "forbidden_templates": [
+          "DATA-DESIGN",
+          "CONCURRENCY-CONSISTENCY",
+          "SECURITY-ARCHITECTURE",
+          "OPERABILITY-DESIGN",
+          "TRANSITION-CONTRACT"
+        ]
+      }
+    },
+    {
+      "id": "holdout-library-sdk",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": false
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "IN-PROCESS-API"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": false
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": false
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": true
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "quality.compatibility.interoperability",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-library-sdk",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "MACHINE-INTERFACE-CONTRACT",
+          "QUALITY-DESIGN",
+          "IMPLEMENTATION-STACK"
+        ],
+        "forbidden_templates": [
+          "DATA-DESIGN",
+          "OPERABILITY-DESIGN",
+          "SECURITY-ARCHITECTURE"
+        ]
+      }
+    },
+    {
+      "id": "holdout-offline-sync",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "SYNC-API"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": true
+          },
+          {
+            "predicate": "retries",
+            "value": true
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": true
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "data.model",
+          "intent.behavior",
+          "intent.scope",
+          "reliability.consistency",
+          "reliability.retry-idempotency",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-offline-sync",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "DATA-DESIGN",
+          "CONCURRENCY-CONSISTENCY",
+          "RUNTIME-ARCHITECTURE"
+        ],
+        "forbidden_templates": [
+          "TRANSITION-CONTRACT"
+        ]
+      }
+    },
+    {
+      "id": "holdout-event-sourced-service",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "EVENT"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": true
+          },
+          {
+            "predicate": "retries",
+            "value": true
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": true
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "data.lifecycle",
+          "intent.behavior",
+          "intent.scope",
+          "quality.compatibility.coexistence",
+          "reliability.consistency",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-event-sourced-service",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "DATA-DESIGN",
+          "CONCURRENCY-CONSISTENCY",
+          "QUALITY-DESIGN"
+        ],
+        "forbidden_templates": []
+      }
+    },
+    {
+      "id": "holdout-kubernetes-controller",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "KUBERNETES-API"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": false
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": false
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": true
+          },
+          {
+            "predicate": "retries",
+            "value": true
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": true
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": true
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": true
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": true
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "operability.health",
+          "reliability.retry-idempotency",
+          "security.boundaries",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-kubernetes-controller",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "CONCURRENCY-CONSISTENCY",
+          "OPERABILITY-DESIGN",
+          "SECURITY-ARCHITECTURE"
+        ],
+        "forbidden_templates": [
+          "DATA-DESIGN"
+        ]
+      }
+    },
+    {
+      "id": "holdout-distributed-consensus",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "RPC"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": true
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": true
+          },
+          {
+            "predicate": "replicated_state",
+            "value": true
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": true
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": true
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "quality.performance.latency",
+          "reliability.consistency",
+          "reliability.durability",
+          "transition.compatibility",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-distributed-consensus",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "CONCURRENCY-CONSISTENCY",
+          "DATA-DESIGN",
+          "QUALITY-DESIGN",
+          "TRANSITION-CONTRACT"
+        ],
+        "forbidden_templates": []
+      }
+    },
+    {
+      "id": "holdout-multitenant-saas",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "HTTP"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": true
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": true
+          },
+          {
+            "predicate": "network_exposed",
+            "value": true
+          },
+          {
+            "predicate": "credentials",
+            "value": true
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": true
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": true
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": true
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": true
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": true
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": true
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "data.classification",
+          "intent.behavior",
+          "intent.scope",
+          "operability.logging",
+          "security.authorization",
+          "security.threat-analysis",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-multitenant-saas",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "SECURITY-ARCHITECTURE",
+          "SECURITY-ANALYSIS",
+          "DATA-DESIGN",
+          "OPERABILITY-DESIGN",
+          "QUALITY-DESIGN"
+        ],
+        "forbidden_templates": [
+          "TRANSITION-CONTRACT"
+        ]
+      }
+    },
+    {
+      "id": "holdout-regulated-payments",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "HTTP"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": true
+          },
+          {
+            "predicate": "retries",
+            "value": true
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": true
+          },
+          {
+            "predicate": "network_exposed",
+            "value": true
+          },
+          {
+            "predicate": "credentials",
+            "value": true
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": true
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": true
+          },
+          {
+            "predicate": "normative_source",
+            "value": true
+          },
+          {
+            "predicate": "production_runtime",
+            "value": true
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": true
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": true
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "data.integrity",
+          "governance.external-obligations",
+          "intent.behavior",
+          "intent.scope",
+          "security.threat-analysis",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.security",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-regulated-payments",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "OBLIGATION-COVERAGE",
+          "SECURITY-ANALYSIS",
+          "CONCURRENCY-CONSISTENCY",
+          "DATA-DESIGN"
+        ],
+        "forbidden_templates": []
+      }
+    },
+    {
+      "id": "holdout-zero-downtime-migration",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "HTTP"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": true
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": true
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": true
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": true
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": true
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": true
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "transition.compatibility",
+          "transition.data-migration",
+          "transition.rollout",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-zero-downtime-migration",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "STABLE",
+        "required_templates": [
+          "TRANSITION-CONTRACT",
+          "DATA-DESIGN",
+          "RUNTIME-ARCHITECTURE"
+        ],
+        "forbidden_templates": []
+      }
+    },
+    {
+      "id": "holdout-safety-critical",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": false
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "CLI"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": false
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": false
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": true
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": false
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": true
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": false
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "specialized.safety",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-safety-critical",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "REFERENCE_MODEL_GAP",
+        "required_templates": [
+          "QUALITY-DESIGN"
+        ],
+        "forbidden_templates": []
+      }
+    },
+    {
+      "id": "holdout-ai-agentic",
+      "project_facts": {
+        "version": 1,
+        "kind": "harness-project-facts",
+        "facts": [
+          {
+            "predicate": "user_needs_material",
+            "value": false
+          },
+          {
+            "predicate": "human_interface",
+            "value": false
+          },
+          {
+            "predicate": "task_model_material",
+            "value": false
+          },
+          {
+            "predicate": "screen_view_design_material",
+            "value": false
+          },
+          {
+            "predicate": "presentation_system_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_strategy_material",
+            "value": false
+          },
+          {
+            "predicate": "multiple_model_languages",
+            "value": false
+          },
+          {
+            "predicate": "translation_boundary",
+            "value": false
+          },
+          {
+            "predicate": "domain_use_case_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_semantics_material",
+            "value": false
+          },
+          {
+            "predicate": "domain_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "application_orchestration",
+            "value": false
+          },
+          {
+            "predicate": "runtime_topology_material",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface",
+            "value": true
+          },
+          {
+            "predicate": "machine_interface_subjects",
+            "value": [
+              "CLI"
+            ]
+          },
+          {
+            "predicate": "screen_subjects",
+            "value": [
+              "DEFAULT"
+            ]
+          },
+          {
+            "predicate": "durable_state",
+            "value": false
+          },
+          {
+            "predicate": "persistence_independent",
+            "value": false
+          },
+          {
+            "predicate": "concurrent_mutation",
+            "value": false
+          },
+          {
+            "predicate": "retries",
+            "value": false
+          },
+          {
+            "predicate": "multiple_writers",
+            "value": false
+          },
+          {
+            "predicate": "replicated_state",
+            "value": false
+          },
+          {
+            "predicate": "quality_constraints_material",
+            "value": false
+          },
+          {
+            "predicate": "hard_realtime",
+            "value": false
+          },
+          {
+            "predicate": "internet_exposed",
+            "value": false
+          },
+          {
+            "predicate": "network_exposed",
+            "value": false
+          },
+          {
+            "predicate": "credentials",
+            "value": false
+          },
+          {
+            "predicate": "privileged_operations",
+            "value": false
+          },
+          {
+            "predicate": "external_identity_provider",
+            "value": false
+          },
+          {
+            "predicate": "security_analysis_material",
+            "value": false
+          },
+          {
+            "predicate": "normative_source",
+            "value": false
+          },
+          {
+            "predicate": "production_runtime",
+            "value": true
+          },
+          {
+            "predicate": "external_dependencies",
+            "value": false
+          },
+          {
+            "predicate": "operability_contract_material",
+            "value": false
+          },
+          {
+            "predicate": "mixed_version_window",
+            "value": false
+          },
+          {
+            "predicate": "irreversible_transform",
+            "value": false
+          },
+          {
+            "predicate": "separate_schema_migration",
+            "value": false
+          },
+          {
+            "predicate": "engineering_policy_selected",
+            "value": false
+          },
+          {
+            "predicate": "component_contract_needed",
+            "value": true
+          },
+          {
+            "predicate": "executable_oracle_gap",
+            "value": true
+          },
+          {
+            "predicate": "acceptance_scenarios_material",
+            "value": false
+          },
+          {
+            "predicate": "verification_scenarios_complete",
+            "value": false
+          },
+          {
+            "predicate": "toolchain_selection_material",
+            "value": true
+          },
+          {
+            "predicate": "repository_realization_material",
+            "value": true
+          },
+          {
+            "predicate": "safety_harm_potential",
+            "value": false
+          },
+          {
+            "predicate": "ai_behavior",
+            "value": true
+          }
+        ],
+        "activated_concerns": [
+          "application.failures",
+          "architecture.boundaries",
+          "architecture.structure",
+          "intent.behavior",
+          "intent.scope",
+          "specialized.ai",
+          "verification.architecture",
+          "verification.functional",
+          "verification.requirement-traceability",
+          "verification.strategy"
+        ]
+      },
+      "request": {
+        "version": 1,
+        "kind": "harness-reference-materialization-request",
+        "project_id": "holdout-ai-agentic",
+        "consumer_id": "IMPLEMENTATION",
+        "purpose": "Independent hold-out materialization.",
+        "roots": [
+          "COMPLETION-CRITERIA"
+        ]
+      },
+      "expect": {
+        "status": "REFERENCE_MODEL_GAP",
+        "required_templates": [
+          "RUNTIME-ARCHITECTURE"
+        ],
+        "forbidden_templates": []
+      }
+    }
+  ]
+}
