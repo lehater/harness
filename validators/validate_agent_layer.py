@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Validate the active agent-facing Harness layer."""
+"""Validate the explicit Harness skill-surface model and active skill contracts."""
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -13,30 +14,53 @@ sys.path.insert(0, str(ROOT))
 from harness import CoreError  # noqa: E402
 from target_state import validate_profile  # noqa: E402
 
+SURFACE_REGISTRY = ROOT / "skills/skill-surface-registry-v0.yaml"
+ARTIFACT_REGISTRY = ROOT / "skills/artifact-skill-registry-v0.yaml"
 
-def _skill_files(namespace: str) -> list[Path]:
-    return sorted((ROOT / "skills" / namespace).glob("*/SKILL.md"))
+ALLOWED_SURFACES = {"maintainer", "consumer"}
+ALLOWED_ROUTE_CLASSES = {"operation", "method", "artifact-production"}
+ALLOWED_LIFECYCLES = {"active", "deprecated", "archived"}
+ALLOWED_ROUTE_STATUS = {"routed", "unrouted", "not-applicable"}
 
 
-def _validate_frontmatter(path: Path, text: str, errors: list[str]) -> None:
+def _load_mapping(path: Path) -> dict[str, Any]:
+    try:
+        value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise CoreError(f"cannot load {path.relative_to(ROOT)}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise CoreError(f"{path.relative_to(ROOT)} must contain a mapping")
+    return value
+
+
+def _physical_skill_paths() -> set[str]:
+    return {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "skills").glob("*/*/SKILL.md")
+        if path.is_file()
+    }
+
+
+def _frontmatter(path: Path, text: str, errors: list[str]) -> dict[str, Any] | None:
     if not text.startswith("---\n"):
         errors.append(f"skill missing frontmatter: {path.relative_to(ROOT)}")
-        return
+        return None
     end = text.find("\n---\n", 4)
     if end < 0:
         errors.append(f"skill has unterminated frontmatter: {path.relative_to(ROOT)}")
-        return
+        return None
     try:
         metadata = yaml.safe_load(text[4:end])
     except yaml.YAMLError as exc:
         errors.append(f"skill invalid frontmatter {path.relative_to(ROOT)}: {exc}")
-        return
+        return None
     if not isinstance(metadata, dict):
         errors.append(f"skill frontmatter must be a mapping: {path.relative_to(ROOT)}")
-        return
+        return None
     for key in ("name", "description"):
         if not isinstance(metadata.get(key), str) or not metadata[key].strip():
             errors.append(f"skill frontmatter missing {key}: {path.relative_to(ROOT)}")
+    return metadata
 
 
 def _require(path: Path, text: str, fragments: tuple[str, ...], errors: list[str]) -> None:
@@ -47,57 +71,226 @@ def _require(path: Path, text: str, fragments: tuple[str, ...], errors: list[str
             )
 
 
-def _validate_agent_skills(errors: list[str]) -> int:
-    paths = _skill_files("agent")
-    if not paths:
-        errors.append("no active agent skills under skills/agent/**")
-        return 0
-    for path in paths:
+def _validate_surface_registry(errors: list[str]) -> list[dict[str, Any]]:
+    try:
+        registry = _load_mapping(SURFACE_REGISTRY)
+    except CoreError as exc:
+        errors.append(str(exc))
+        return []
+
+    if registry.get("version") != 1:
+        errors.append("skill surface registry version must be 1")
+    if registry.get("kind") != "harness-skill-surface-registry":
+        errors.append("unexpected skill surface registry kind")
+    if not isinstance(registry.get("id"), str) or not registry["id"]:
+        errors.append("skill surface registry id is required")
+
+    entries = registry.get("skills")
+    if not isinstance(entries, list):
+        errors.append("skill surface registry skills must be a list")
+        return []
+
+    seen_ids: set[str] = set()
+    seen_paths: set[str] = set()
+    normalized: list[dict[str, Any]] = []
+
+    for index, item in enumerate(entries):
+        label = f"skill surface entry #{index + 1}"
+        if not isinstance(item, dict):
+            errors.append(f"{label} must be a mapping")
+            continue
+
+        required = {
+            "id", "path", "surface", "route_class", "lifecycle", "route_status"
+        }
+        missing = sorted(required - set(item))
+        if missing:
+            errors.append(f"{label} missing fields: {', '.join(missing)}")
+            continue
+
+        skill_id = item["id"]
+        path_value = item["path"]
+        surface = item["surface"]
+        route_class = item["route_class"]
+        lifecycle = item["lifecycle"]
+        route_status = item["route_status"]
+
+        if not isinstance(skill_id, str) or not skill_id:
+            errors.append(f"{label} id must be a non-empty string")
+            continue
+        if skill_id in seen_ids:
+            errors.append(f"duplicate skill id in surface registry: {skill_id}")
+        seen_ids.add(skill_id)
+
+        if not isinstance(path_value, str) or not path_value:
+            errors.append(f"{skill_id}: path must be a non-empty string")
+            continue
+        if path_value in seen_paths:
+            errors.append(f"duplicate skill path in surface registry: {path_value}")
+        seen_paths.add(path_value)
+
+        if surface not in ALLOWED_SURFACES:
+            errors.append(f"{skill_id}: invalid surface {surface!r}")
+        if route_class not in ALLOWED_ROUTE_CLASSES:
+            errors.append(f"{skill_id}: invalid route_class {route_class!r}")
+        if lifecycle not in ALLOWED_LIFECYCLES:
+            errors.append(f"{skill_id}: invalid lifecycle {lifecycle!r}")
+        if route_status not in ALLOWED_ROUTE_STATUS:
+            errors.append(f"{skill_id}: invalid route_status {route_status!r}")
+
+        knowledge_kind = item.get("knowledge_kind")
+        if route_class != "artifact-production" and knowledge_kind is not None:
+            errors.append(
+                f"{skill_id}: knowledge_kind is only valid for artifact-production"
+            )
+        if route_status == "routed" and route_class == "artifact-production":
+            if not isinstance(knowledge_kind, str) or not knowledge_kind:
+                errors.append(
+                    f"{skill_id}: routed artifact-production requires knowledge_kind"
+                )
+        if lifecycle == "active" and route_status == "not-applicable":
+            errors.append(f"{skill_id}: active skill cannot have not-applicable routing")
+        if lifecycle in {"deprecated", "archived"} and route_status != "not-applicable":
+            errors.append(
+                f"{skill_id}: non-active skill must have route_status not-applicable"
+            )
+        if route_status == "unrouted":
+            note = item.get("route_note")
+            if not isinstance(note, str) or not note.strip():
+                errors.append(f"{skill_id}: unrouted skill requires route_note")
+
+        path = ROOT / path_value
+        if not path.is_file():
+            errors.append(f"{skill_id}: registered skill does not exist: {path_value}")
+            continue
+
         text = path.read_text(encoding="utf-8")
-        _validate_frontmatter(path, text, errors)
-        _require(path, text, ("## Trigger", "## Inputs", "## Procedure"), errors)
-    return len(paths)
+        metadata = _frontmatter(path, text, errors)
+        if metadata is not None and metadata.get("name") != skill_id:
+            errors.append(
+                f"{path_value}: frontmatter name {metadata.get('name')!r} "
+                f"does not match registered id {skill_id!r}"
+            )
+
+        normalized.append(item)
+
+    physical = _physical_skill_paths()
+    registered = {item["path"] for item in normalized if isinstance(item.get("path"), str)}
+    missing_from_registry = sorted(physical - registered)
+    stale_registry_paths = sorted(registered - physical)
+    if missing_from_registry:
+        errors.append(
+            "active-looking SKILL.md files missing from surface registry: "
+            + ", ".join(missing_from_registry)
+        )
+    if stale_registry_paths:
+        errors.append(
+            "surface registry references missing SKILL.md files: "
+            + ", ".join(stale_registry_paths)
+        )
+
+    return normalized
 
 
-def _validate_artifact_skills(errors: list[str]) -> int:
+def _validate_artifact_registry_alignment(
+    entries: list[dict[str, Any]], errors: list[str]
+) -> None:
+    try:
+        registry = _load_mapping(ARTIFACT_REGISTRY)
+    except CoreError as exc:
+        errors.append(str(exc))
+        return
+
+    routes = registry.get("routes")
+    if not isinstance(routes, list):
+        errors.append("artifact skill registry routes must be a list")
+        return
+
+    actual: dict[str, str] = {}
+    for item in routes:
+        if not isinstance(item, dict):
+            errors.append("artifact skill registry route must be a mapping")
+            continue
+        kind = item.get("knowledge_kind")
+        path = item.get("skill")
+        if not isinstance(kind, str) or not kind or not isinstance(path, str) or not path:
+            errors.append("artifact skill registry route requires knowledge_kind and skill")
+            continue
+        if kind in actual:
+            errors.append(f"duplicate artifact knowledge_kind route: {kind}")
+        actual[kind] = path
+
+    expected = {
+        item["knowledge_kind"]: item["path"]
+        for item in entries
+        if item.get("lifecycle") == "active"
+        and item.get("route_class") == "artifact-production"
+        and item.get("route_status") == "routed"
+        and isinstance(item.get("knowledge_kind"), str)
+    }
+    if actual != expected:
+        errors.append(
+            "artifact registry does not match routed artifact-production skills "
+            f"(expected={expected!r}, actual={actual!r})"
+        )
+
+
+def _validate_skill_contracts(
+    entries: list[dict[str, Any]], errors: list[str]
+) -> tuple[int, int, int]:
+    operation_count = 0
+    method_count = 0
+    artifact_count = 0
     decision_governed = {
         "application-design",
         "domain-model",
         "implementation-design",
         "system-architecture",
     }
-    paths = _skill_files("artifacts")
-    if not paths:
-        errors.append("no active artifact skills under skills/artifacts/**")
-        return 0
-    for path in paths:
+
+    for item in entries:
+        if item.get("lifecycle") != "active":
+            continue
+        path = ROOT / item["path"]
         text = path.read_text(encoding="utf-8")
-        _validate_frontmatter(path, text, errors)
-        _require(
-            path,
-            text,
-            (
-                "## Trigger",
-                "## Inputs",
-                "## Read boundary",
-                "## Procedure",
-                "## Stop conditions",
-                "## Registration",
-                "## Human projection",
-            ),
-            errors,
-        )
-        if "## Output schema" not in text and "## Output contract" not in text:
-            errors.append(
-                f"artifact skill {path.relative_to(ROOT)} must define Output schema or Output contract"
+        route_class = item["route_class"]
+
+        if route_class == "operation":
+            operation_count += 1
+            _require(path, text, ("## Trigger", "## Inputs", "## Procedure"), errors)
+        elif route_class == "method":
+            method_count += 1
+            _require(path, text, ("## Trigger", "## Inputs", "## Procedure"), errors)
+        elif route_class == "artifact-production":
+            artifact_count += 1
+            _require(
+                path,
+                text,
+                (
+                    "## Trigger",
+                    "## Inputs",
+                    "## Read boundary",
+                    "## Procedure",
+                    "## Stop conditions",
+                    "## Registration",
+                    "## Human projection",
+                ),
+                errors,
             )
-        if "acceptance" not in text.lower():
-            errors.append(
-                f"artifact skill {path.relative_to(ROOT)} must define acceptance checks"
-            )
-        if path.parent.name in decision_governed:
-            _require(path, text, ("## Decision exploration",), errors)
-    return len(paths)
+            if "## Output schema" not in text and "## Output contract" not in text:
+                errors.append(
+                    f"artifact-production skill {path.relative_to(ROOT)} "
+                    "must define Output schema or Output contract"
+                )
+            if "acceptance" not in text.lower():
+                errors.append(
+                    f"artifact-production skill {path.relative_to(ROOT)} "
+                    "must define acceptance checks"
+                )
+            if item["id"] in decision_governed:
+                _require(path, text, ("## Decision exploration",), errors)
+
+    return operation_count, method_count, artifact_count
 
 
 def _validate_starter_profile(errors: list[str]) -> None:
@@ -132,8 +325,11 @@ def _validate_starter_profile(errors: list[str]) -> None:
 def main() -> int:
     errors: list[str] = []
 
-    agent_count = _validate_agent_skills(errors)
-    artifact_count = _validate_artifact_skills(errors)
+    entries = _validate_surface_registry(errors)
+    _validate_artifact_registry_alignment(entries, errors)
+    operation_count, method_count, artifact_count = _validate_skill_contracts(
+        entries, errors
+    )
 
     workbench = ROOT / "docs/design/agent-artifact-workbench-v0.md"
     if not workbench.is_file():
@@ -147,9 +343,18 @@ def main() -> int:
             print(f"- {error}", file=sys.stderr)
         return 1
 
+    archived_count = sum(
+        item.get("lifecycle") == "archived" for item in entries
+    )
+    unrouted_count = sum(
+        item.get("lifecycle") == "active" and item.get("route_status") == "unrouted"
+        for item in entries
+    )
     print(
         "Harness agent-layer validation passed "
-        f"({agent_count} agent skills, {artifact_count} artifact skills)"
+        f"({operation_count} operations, {method_count} methods, "
+        f"{artifact_count} artifact producers, {archived_count} archived, "
+        f"{unrouted_count} explicitly unrouted)"
     )
     return 0
 
