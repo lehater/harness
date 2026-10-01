@@ -85,6 +85,36 @@ A subsystem-specific validator remains useful, but it does not substitute for a
 cross-layer scenario when the consumer-visible behavior spans multiple Harness
 mechanisms.
 
+## Audit and evolution capture discipline
+
+Repository-level findings and improvement ideas must be classified before they
+are recorded. The canonical routing policy is
+`docs/audit/README.md`.
+
+When asked to "record", "capture", "remember", "add to the audit", or otherwise
+persist a Harness observation:
+
+1. read `docs/audit/README.md`;
+2. search both ledgers for the same root cause/direction before creating a new
+   identifier;
+3. use `docs/audit/harness-audit-backlog.md` / `HARN-*` only for behavior
+   that is demonstrably wrong against an invariant, contract or reproducible
+   scenario;
+4. use `docs/audit/harness-evolution-radar.md` / `EVO-*` for optional
+   recommendations, research questions and ideas that may improve Harness but
+   are not current defects;
+5. put accepted normative decisions in the owning canonical spec/ADR rather
+   than leaving the Radar as the source of truth; update the related
+   `EVO-*` to `ADOPTED`;
+6. if an `EVO-*` investigation proves a defect, create/reuse the appropriate
+   `HARN-*` and cross-link them;
+7. when uncertain whether something is a defect, do not inflate it into the
+   defect backlog without evidence. Capture it as `RESEARCH`/`CAPTURED` in
+   the Evolution Radar and state what evidence would promote or reject it.
+
+The ledgers are cumulative. Repeated audits update existing entries instead of
+creating duplicate root causes.
+
 ## Change discipline
 
 Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a universal semantic DSL without a concrete consumer failure.
@@ -100,6 +130,9 @@ Add an acceptance fixture reproducing that failure before changing Core behavior
 
 ## Source map
 
+- `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
+- `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
+- `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.

@@ -8,6 +8,8 @@ questions without turning them into defects or mandatory backlog work.
 This file is deliberately separate from
 `docs/audit/harness-audit-backlog.md`.
 
+Classification and routing rules are canonicalized in `docs/audit/README.md`.
+
 ## Classification
 
 ### Types
