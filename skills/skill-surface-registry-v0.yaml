@@ -83,8 +83,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: concurrency-consistency-design
     path: skills/artifacts/concurrency-consistency-design/SKILL.md
     surface: consumer
@@ -104,15 +103,13 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: data-governance-lifecycle-analysis
     path: skills/artifacts/data-governance-lifecycle-analysis/SKILL.md
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: domain-model
     path: skills/artifacts/domain-model/SKILL.md
     surface: consumer
@@ -146,8 +143,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: human-interface-design
     path: skills/artifacts/human-interface-design/SKILL.md
     surface: consumer
@@ -160,8 +156,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: implementation-design
     path: skills/artifacts/implementation-design/SKILL.md
     surface: consumer
@@ -202,8 +197,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: model-context-strategy
     path: skills/artifacts/model-context-strategy/SKILL.md
     surface: consumer
@@ -216,8 +210,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: operability-design
     path: skills/artifacts/operability-design/SKILL.md
     surface: consumer
@@ -230,8 +223,7 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: pinned-source-entity-set
     path: skills/artifacts/pinned-source-entity-set/SKILL.md
     surface: consumer
@@ -272,15 +264,13 @@ skills:
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: reliability-analysis
     path: skills/artifacts/reliability-analysis/SKILL.md
     surface: consumer
     route_class: method
     lifecycle: active
-    route_status: unrouted
-    route_note: "Non-owning analysis/method routing is not implemented yet."
+    route_status: routed
   - id: screen-view-design
     path: skills/artifacts/screen-view-design/SKILL.md
     surface: consumer

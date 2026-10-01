@@ -82,6 +82,7 @@ does not live in this root bootstrap file.
 
 - `skills/maintainer-operation-registry-v0.yaml` — active Harness-maintainer operation routes.
 - `skills/consumer-operation-registry-v0.yaml` — active Harness-consumer operation routes.
+- `skills/consumer-method-registry-v0.yaml` — canonical-concern to non-owning consumer method routes.
 - `skills/skill-surface-registry-v0.yaml` — explicit skill surface/type/lifecycle inventory.
 - `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.

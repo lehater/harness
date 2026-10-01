@@ -1,0 +1,64 @@
+version: 1
+kind: harness-consumer-method-registry
+id: CONSUMER-METHODS-V0
+status: audit-ratchet
+
+routes:
+  - method: concurrency-consistency-analysis
+    skill: skills/artifacts/concurrency-consistency-analysis/SKILL.md
+    concern_any: [reliability.consistency]
+
+  - method: data-evidence-analysis
+    skill: skills/artifacts/data-evidence-analysis/SKILL.md
+    concern_any: [data.quality, data.provenance, data.reproducibility]
+
+  - method: data-governance-lifecycle-analysis
+    skill: skills/artifacts/data-governance-lifecycle-analysis/SKILL.md
+    concern_any: [data.lifecycle, governance.data]
+
+  - method: external-dependency-analysis
+    skill: skills/artifacts/external-dependency-analysis/SKILL.md
+    concern_any:
+      - dependency.inventory
+      - dependency.trust
+      - dependency.versioning
+      - dependency.license
+      - dependency.vulnerability
+
+  - method: human-interface-quality-analysis
+    skill: skills/artifacts/human-interface-quality-analysis/SKILL.md
+    concern_any:
+      - interface.human.usability
+      - interface.human.accessibility
+      - interface.human.responsiveness
+
+  - method: internationalization-localization-analysis
+    skill: skills/artifacts/internationalization-localization-analysis/SKILL.md
+    concern_any: [interface.human.i18n]
+
+  - method: obligation-analysis
+    skill: skills/artifacts/obligation-analysis/SKILL.md
+    concern_any: [governance.external-obligations]
+
+  - method: performance-capacity-analysis
+    skill: skills/artifacts/performance-capacity-analysis/SKILL.md
+    concern_any:
+      - quality.performance.latency
+      - quality.performance.throughput
+      - quality.performance.resource-efficiency
+      - quality.performance.capacity
+      - operability.capacity
+
+  - method: recovery-continuity-analysis
+    skill: skills/artifacts/recovery-continuity-analysis/SKILL.md
+    concern_any: [reliability.recovery]
+
+  - method: reliability-analysis
+    skill: skills/artifacts/reliability-analysis/SKILL.md
+    concern_any:
+      - reliability.failure-semantics
+      - reliability.availability
+      - reliability.fault-tolerance
+      - reliability.retry-idempotency
+      - reliability.durability
+      - reliability.dependency-failure

@@ -114,6 +114,7 @@ contexts:
       - decision_explorer_request
       - decision_pipeline
       - graph_doctor
+      - method_router
       - semantic_admission
       - semantic_closure
       - semantic_questions

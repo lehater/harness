@@ -18,6 +18,7 @@ SURFACE_REGISTRY = ROOT / "skills/skill-surface-registry-v0.yaml"
 ARTIFACT_REGISTRY = ROOT / "skills/artifact-skill-registry-v0.yaml"
 CONSUMER_OPERATION_REGISTRY = ROOT / "skills/consumer-operation-registry-v0.yaml"
 MAINTAINER_OPERATION_REGISTRY = ROOT / "skills/maintainer-operation-registry-v0.yaml"
+METHOD_REGISTRY = ROOT / "skills/consumer-method-registry-v0.yaml"
 
 ALLOWED_SURFACES = {"maintainer", "consumer"}
 ALLOWED_ROUTE_CLASSES = {"operation", "method", "artifact-production"}
@@ -341,6 +342,61 @@ def _validate_operation_registry_alignment(
             f"(expected={sorted(expected_paths)!r}, actual={sorted(actual_paths)!r})"
         )
 
+
+def _validate_method_registry_alignment(
+    entries: list[dict[str, Any]], errors: list[str]
+) -> None:
+    try:
+        registry = _load_mapping(METHOD_REGISTRY)
+    except CoreError as exc:
+        errors.append(str(exc))
+        return
+
+    if registry.get("version") != 1:
+        errors.append("consumer method registry version must be 1")
+    if registry.get("kind") != "harness-consumer-method-registry":
+        errors.append("unexpected consumer method registry kind")
+
+    routes = registry.get("routes")
+    if not isinstance(routes, list):
+        errors.append("consumer method registry routes must be a list")
+        return
+
+    actual_paths: set[str] = set()
+    methods: set[str] = set()
+    for item in routes:
+        if not isinstance(item, dict):
+            errors.append("consumer method route must be a mapping")
+            continue
+        method = item.get("method")
+        path = item.get("skill")
+        if not isinstance(method, str) or not method:
+            errors.append("consumer method route requires method")
+            continue
+        if method in methods:
+            errors.append(f"duplicate consumer method id: {method}")
+        methods.add(method)
+        if not isinstance(path, str) or not path:
+            errors.append(f"{method}: consumer method skill path is required")
+            continue
+        if path in actual_paths:
+            errors.append(f"consumer method skill routed more than once: {path}")
+        actual_paths.add(path)
+
+    expected_paths = {
+        item["path"]
+        for item in entries
+        if item.get("lifecycle") == "active"
+        and item.get("surface") == "consumer"
+        and item.get("route_class") == "method"
+        and item.get("route_status") == "routed"
+    }
+    if actual_paths != expected_paths:
+        errors.append(
+            "consumer method registry does not match routed consumer methods "
+            f"(expected={sorted(expected_paths)!r}, actual={sorted(actual_paths)!r})"
+        )
+
 def _validate_skill_contracts(
     entries: list[dict[str, Any]], errors: list[str]
 ) -> tuple[int, int, int]:
@@ -447,6 +503,7 @@ def main() -> int:
         expected_kind="harness-maintainer-operation-registry",
         surface="maintainer",
     )
+    _validate_method_registry_alignment(entries, errors)
     operation_count, method_count, artifact_count = _validate_skill_contracts(
         entries, errors
     )
