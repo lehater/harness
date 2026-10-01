@@ -844,10 +844,12 @@ missing TL1-TL3 deterministic or human-authored tests.
 
 No new HARN defect is allocated from this pass.
 
-Two non-defect research/assurance directions are persisted:
+The audit dispositions have since diverged:
 
-- EVO-033 — project-model discovery assurance;
-- EVO-034 — ability-to-evidence assurance model.
+- EVO-033 — project-model discovery assurance remains a captured research
+  direction;
+- EVO-034 — ability-to-evidence assurance model is ADOPTED and its normative
+  policy is owned by `docs/design/harness-assurance-policy-v0.md`.
 
 Existing items remain relevant and are not duplicated:
 

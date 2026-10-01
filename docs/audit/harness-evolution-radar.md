@@ -94,7 +94,7 @@ separate defect has been demonstrated.
 | EVO-031 | RESEARCH | CAPTURED | Evaluator calibration | Define calibration-corpus representativeness and drift/recalibration triggers so passing a small bootstrap corpus is not treated as broad evaluator-quality proof. |
 | EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
 | EVO-033 | RESEARCH | CAPTURED | Project-model discovery assurance | Prove selected-scope unfamiliar-repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies with independent holdouts and repeated clean-context semantic convergence. |
-| EVO-034 | RECOMMENDATION | CAPTURED | Capability assurance | Add an independent Harness Ability -> failure modes -> required evidence/oracle model so green registered tests cannot hide an unmodelled responsibility. |
+| EVO-034 | RECOMMENDATION | ADOPTED | Capability assurance | Canonical Harness Assurance Policy now requires ability-driven evidence, bottom-up test levels, explicit oracle strength, and separation between evidence sufficiency and CI execution. |
 
 ## Detailed entries
 
@@ -1232,43 +1232,35 @@ which the Integration Contract does not make a Harness responsibility.
 ### EVO-034 — Ability-to-evidence assurance model
 
 **Type:** RECOMMENDATION  
-**Status:** CAPTURED
+**Status:** ADOPTED
 
-**Direction**
+The accepted assurance direction is canonicalized in
+`docs/design/harness-assurance-policy-v0.md`.
 
-Create a small independent assurance registry that maps:
+The policy establishes:
 
-~~~text
-Harness ability
--> observable contract
--> material failure modes
--> required evidence classes
--> minimum acceptable oracle class
--> current evidence refs
--> release-critical flag
-~~~
+- smallest-falsifiable-surface testing;
+- bottom-up promotion from TL0 structural evidence through TL6 independent
+  real-project holdout evidence;
+- synthetic-first mechanism testing and controlled composition;
+- micro-project evidence before real-project system/portability evidence;
+- agent/evaluator runs only for judgement-dependent responsibilities;
+- explicit oracle classes and independence;
+- Ability -> observable contract -> failure modes -> required evidence as the
+  denominator for assurance, rather than test/scenario counts;
+- separation of evidence sufficiency from CI execution policy.
 
-Scenario Suite requirements, validators, real-project regressions, holdouts and
-provider-backed evals should reference this model. Test/scenario count must not
-become the denominator.
+The exact machine-readable Ability-to-Evidence registry remains a separate
+implementation concern. Adoption of the architecture does not imply that the
+registry already exists.
 
-**Why useful**
+**Why adopted**
 
-AUD-021 found that the existing CI registry strongly guarantees that known
-validators/tests are inventoried and executed, while Scenario Suite strongly
-guarantees coverage of requirements already present in its catalog. Neither
-mechanism independently proves that the catalog contains every material Harness
-responsibility.
-
-The model should preserve heterogeneous evidence rather than aggregate it into a
-single percentage. A deterministic Core ability and a judgement-heavy agent
-discovery ability require different evidence maturity.
-
-**Not a defect**
-
-The current assurance system is internally coherent and has extensive useful
-coverage. This direction strengthens the validity of future release claims; it
-does not by itself demonstrate incorrect current runtime behavior.
+AUD-021 showed that the existing CI and Scenario Suite inventories can prove
+that known checks/requirements are present while still missing an entire
+Harness responsibility. The follow-up assurance review also established that a
+large real repository is a poor first oracle for an isolated mechanism: it
+increases cost and reduces failure localization.
 
 **Related**
 
@@ -1276,3 +1268,5 @@ does not by itself demonstrate incorrect current runtime behavior.
 - EVO-001
 - EVO-031
 - EVO-032
+- EVO-033
+- `docs/design/harness-assurance-policy-v0.md`

@@ -17,6 +17,7 @@ This is a Maintainer operation. It is not exported to target repositories.
 
 - requested Harness change or confirmed HARN finding;
 - relevant canonical design/specification;
+- `docs/design/harness-assurance-policy-v0.md`;
 - current non-main branch state;
 - existing Scenario Suite/acceptance coverage;
 - related EVO/HARN records when present.
@@ -25,17 +26,21 @@ This is a Maintainer operation. It is not exported to target repositories.
 
 1. Confirm work is occurring on a non-main branch. Never implement directly on
    `main`.
-2. Identify the owning bounded context/layer and the canonical contract that
-   defines the behavior. Do not let a skill or README become a second semantic
-   owner.
+2. Identify the owning bounded context/layer, affected Harness
+   ability/responsibility, material failure mode, and the canonical contract
+   that defines the behavior. Do not let a skill or README become a second
+   semantic owner.
 3. If the change touches CI triggers, gate composition, validator/test inventory
    or check ordering, load `docs/design/ci-execution-policy-v0.md` and
    `spec/ci/check-registry-v0.yaml` before editing execution behavior.
 4. State/reuse the concrete failure, invariant or accepted architecture
    decision that justifies the change.
-5. Before changing observable behavior, add or update the smallest failing
-   deterministic acceptance/scenario evidence that expresses the intended
-   invariant when such an oracle exists.
+5. Apply `docs/design/harness-assurance-policy-v0.md`: choose the lowest test
+   level that can falsify the affected failure mode. Before changing observable
+   behavior, add or update the smallest failing deterministic
+   acceptance/scenario evidence that expresses the intended invariant when such
+   an oracle exists. Do not substitute a larger real-project/E2E test for a
+   missing lower-level mechanism oracle.
 6. For a Core extension, require the concrete consumer failure and acceptance
    fixture required by `docs/design/core-v0.md`; do not add workflow/process
    entities without demonstrated need.

@@ -9,7 +9,10 @@ classified. It exists to keep CI lazy, cheap during iteration, exhaustive before
 integration, and resistant to gradual cost regressions.
 
 It does not define product semantics or replace subsystem acceptance contracts.
-It governs execution of evidence that already exists.
+It governs execution of evidence that already exists. Evidence sufficiency,
+test-level selection, oracle strength, and the role of synthetic versus
+real-project evidence are owned by
+`docs/design/harness-assurance-policy-v0.md`.
 
 ## Terms
 

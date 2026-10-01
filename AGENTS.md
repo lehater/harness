@@ -65,8 +65,9 @@ Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a
 universal semantic DSL without a concrete consumer failure.
 
 All Harness behavior/Core changes must route through the registered
-`change-harness` Maintainer operation; detailed acceptance/scenario procedure
-does not live in this root bootstrap file.
+`change-harness` Maintainer operation. Evidence sufficiency and test-scope
+selection are owned by `docs/design/harness-assurance-policy-v0.md`; detailed
+acceptance/scenario procedure does not live in this root bootstrap file.
 
 ## Source map
 
@@ -86,6 +87,7 @@ does not live in this root bootstrap file.
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
+- `docs/design/harness-assurance-policy-v0.md` — canonical evidence-selection, test-level and oracle policy for Harness changes/release claims.
 - `docs/design/ci-execution-policy-v0.md` — canonical Harness CI execution/lazy-gate policy.
 - `spec/ci/check-registry-v0.yaml` — machine-readable CI check inventory, cost/stage classification and workflow roles.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
