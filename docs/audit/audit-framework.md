@@ -45,7 +45,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-14 | Empirical agent behavior | Does a real agent select and execute the intended route/skill under representative tasks? | UNASSESSED | — |
 | AP-15 | Observability / diagnosability | Can a maintainer explain why a route/state/action was produced from available evidence? | UNASSESSED | — |
 | AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | live-calibration contracts |
-| AP-17 | Security / trust boundaries | Can repository content, tool output or prompt injection cross an authority/tool trust boundary? | UNASSESSED | — |
+| AP-17 | Security / trust boundaries | Can repository content, tool output or prompt injection cross an authority/tool trust boundary? | COVERED | AUD-011 |
 | AP-18 | Performance / cost / context efficiency | Does Harness avoid unnecessary context, validation, CI and evaluator work? | PARTIAL | AUD-008/AUD-009 (CI only) |
 | AP-19 | Recovery / crash consistency | Can interrupted multi-step application work resume without contradictory published state? | PARTIAL | AUD-002 / HARN-012 |
 | AP-20 | Versioning / compatibility | Can Harness/contracts/Consumer Pack evolve without silently invalidating projects? | PARTIAL | AUD-006/AUD-007 |
@@ -75,6 +75,7 @@ Do not rerun every perspective after every change.
 | AUD-008 | 2026-10-01 | CI cost, trigger selectivity, duplicate execution, validator coverage and lazy-gate ordering | Strengthened HARN-H03/H04 and added HARN-H05. |
 | AUD-009 | 2026-10-01 | CI policy enforcement and post-correction verification | Verified HARN-H03/H04/H05 corrections. |
 | AUD-010 | 2026-10-01 | AP-13 instruction ownership/routing and operation composition | First `audit-harness` run found HARN-021: internal-route parent authorization is declared but not enforced by runtime routing. Existing composite operation naming itself is compatible with the new contract when rerouted by operation id. |
+| AUD-011 | 2026-10-01 | AP-17 security / trust boundaries | Existing provider/external-execution paths contain useful fail-closed controls, but HARN-022 records the missing general instruction-vs-data trust boundary for project content/tool evidence consumed by agents. HARN-H01 remains the separate known filesystem-output safety issue. |
 
 ## Finding handoff contract
 
