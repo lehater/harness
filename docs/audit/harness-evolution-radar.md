@@ -61,7 +61,7 @@ separate defect has been demonstrated.
 
 | ID | Type | Status | Area | Direction |
 |---|---|---|---|---|
-| EVO-001 | RECOMMENDATION | VALIDATED | Skill engineering | Add behavioral execution evals for important Harness skills. |
+| EVO-001 | RECOMMENDATION | ADOPTED | Skill engineering | Behavioral execution evals for judgement-dependent Harness responsibilities are canonicalized in the Agent Behavioral Evaluation Protocol; runner implementation remains separate work. |
 | EVO-002 | RECOMMENDATION | VALIDATED | Skill engineering | Define a common Harness skill anatomy with explicit applicability, procedure and verification evidence. |
 | EVO-003 | RESEARCH | CAPTURED | DDD / skills | Evaluate a distinct Method / Procedure Library boundary for reusable engineering methods. |
 | EVO-004 | RECOMMENDATION | VALIDATED | Routing | Preserve deterministic routing for artifact-production skills; use intent/trigger routing only where work is genuinely selected from natural language. |
@@ -101,7 +101,7 @@ separate defect has been demonstrated.
 ### EVO-001 — Behavioral execution evals for skills
 
 **Type:** RECOMMENDATION  
-**Status:** VALIDATED
+**Status:** ADOPTED
 
 **Direction**
 
@@ -153,6 +153,12 @@ additional assurance over procedure quality.
 - EVO-017
 
 ---
+
+The accepted evaluation architecture is now owned by
+`docs/design/harness-agent-behavioral-evaluation-v0.md`. It defines clean
+contexts, observable control traces, semantic normalization, oracle isolation,
+and repeated-run comparison without requiring private reasoning. This adoption
+does not imply that the runner or all catalogued agent cases are implemented.
 
 ### EVO-002 — Common Harness skill anatomy
 
