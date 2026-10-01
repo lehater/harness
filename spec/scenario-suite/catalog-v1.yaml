@@ -266,6 +266,12 @@ requirements:
     description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
     min_scenarios: 1
 
+  - id: semantic-evaluation-current-snapshot
+    category: semantic
+    enforcement: required
+    description: A current semantic evaluation set rejects duplicate records for one semantic identity instead of selecting by list order or replaying stale Question proposals.
+    min_scenarios: 1
+
   - id: acceptance-policy-currentness
     category: lifecycle
     enforcement: required
