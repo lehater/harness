@@ -453,37 +453,49 @@ Expected semantic result:
 
 Authority partition remains unchanged.
 
-## TD-AUTH-005 — Ambiguous split becomes Question
+## TD-AUTH-005 — Ambiguous Authority ownership fails closed
 
 **Abilities:** HA-A04, HA-A13  
 **Failure modes:** A04-F01/F02 under insufficient evidence, A13-F01  
-**Methods:** EM-02  
-**Minimum level:** TL1  
+**Methods:** EM-02, EM-09  
+**Minimum level:** TL1 judgement case  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
+
+This design has two explicit subcases because "ownership is ambiguous" can mean
+two different things.
+
+### Case A — deciding Authority already exists
 
 Fixture:
 
-Decision atoms admit two plausible partitionings and the evidence does not
-establish independent change/public contract.
+Two partitions are plausible, but an existing accepted Authority explicitly owns
+the decision about the disputed semantic boundary.
 
 Expected semantic result:
 
-No confident invented Authority split/merge.
+- the agent does not invent a confident split/merge;
+- the unresolved decision is surfaced as a Question owned by that existing
+  Authority;
+- no duplicate canonical ownership is created.
 
-Review finding: a generic Core Question is **not yet a valid universal oracle**
-for this case because the boundary uncertainty may exist precisely because no
-deciding Authority can yet be identified. The bootstrap contract instead stops
-when no Authority can be identified.
+### Case B — no deciding Authority can be identified
 
-Before this design can become READY, choose one bounded case:
+Fixture:
 
-- an existing Authority explicitly owns the boundary decision, in which case a
-  Question to that Authority is valid; or
-- no owner exists, in which case the expected result is a procedure-level
-  stop/escalation rather than a Core Question.
+The evidence is insufficient both to choose the boundary and to identify an
+Authority that owns the missing decision.
 
-Do not implement the current ambiguous form.
+Expected semantic result:
+
+- the agent does not invent an Authority solely to make the model complete;
+- the bootstrap/design procedure hits its existing stop condition;
+- the run is reported as unresolved/escalated at the procedure boundary;
+- no Core Question is fabricated because Core Question ownership itself would be
+  unsupported.
+
+This split removes the previous circular oracle where an "appropriate Authority"
+was assumed while Authority identity was the unresolved subject.
 
 ## TD-AUTH-006 — Reference boundary trap
 
@@ -689,33 +701,55 @@ Expected semantic result:
 
 NOT_APPLICABLE with explicit evidence/disposition.
 
-## TD-APP-003 — Silence remains UNKNOWN
+## TD-APP-003 — Silence cannot prove non-applicability or completion
 
 **Abilities:** HA-A06  
 **Failure modes:** A06-F01, A06-F03  
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
+
+This invariant is tested separately for each semantic owner.
+
+### Case A — Project Authority Assessment
 
 Fixture:
 
-No accepted evidence establishes applicability or non-applicability.
+The current Authority catalog contains an Authority with no accepted
+project-specific applicability evidence.
 
-Review finding:
+Expected semantic result:
 
-This design currently crosses semantic owners. Project Authority Assessment uses
-UNASSESSED for absence, while Engineering Coverage may conservatively activate a
-mandatory/manual concern as missing work instead of returning UNKNOWN.
+The assessment remains `UNASSESSED`. Silence must not become
+`NOT_APPLICABLE`.
 
-Before implementation, split this design into owner-specific cases:
+Implementation review:
 
-- Project Authority Assessment: silence -> UNASSESSED;
-- Engineering Coverage: silence follows concern policy and must never become
-  evidence-backed NOT_APPLICABLE or false completion.
+Existing Authority-status/assessment evidence is reusable; map the exact case
+before adding any new test.
 
-The invariant "silence must not prove N/A/COMPLETE" remains valid; one generic
-expected state does not.
+### Case B — Engineering Coverage manual/mandatory concern
+
+Fixture:
+
+A selected implementation scope has no project decision disposing a concern
+that repository concern policy activates conservatively (for example a manual
+activation class).
+
+Expected semantic result:
+
+The concern remains visible as missing/unresolved coverage work and
+`completion_ready` is false. Silence must not become an evidence-backed
+`NOT_APPLICABLE` disposition.
+
+Implementation review:
+
+Current Engineering Coverage regression for manual activation classes already
+covers the central invariant, so only a missing owner-specific delta should be
+added.
+
+The two owners intentionally do not share one generic `UNKNOWN` state.
 
 ## TD-APP-004 — Unresolved evidence becomes QUESTION
 
@@ -958,37 +992,58 @@ Semantic route follows the changed responsibility, not shared vocabulary.
 These designs are intentionally blocked until SF-01 through SF-05 TL1 oracles
 are reviewed.
 
-## TD-COMP-001 — Evidence to project knowledge topology
+## TD-COMP-001 — Design-target to bootstrap realization handoff
 
-**Abilities:** HA-A04, HA-A05, HA-A12  
-**Failure modes:** omission, invention, wrong boundary, missing/unnecessary edge  
-**Methods:** EM-07  
+**Abilities:** HA-A05, HA-A08, HA-A09, HA-A12  
+**Failure modes:** semantic identity loss between target selection and bootstrap, duplicate truth, wrong dependency/ownership projection  
+**Methods:** EM-07, EM-09 where agent execution is used  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
+
+Review correction:
+
+The earlier version incorrectly described an implicit universal pipeline
+`evidence -> Capability -> Authority -> dependencies` as if Harness exposed
+three standalone deterministic formation mechanisms. It does not.
+
+The canonical composition boundary is the handoff between routed
+responsibilities.
 
 Pipeline:
 
 ~~~text
-accepted synthetic evidence
--> Capability identities
--> Authority partition
--> prerequisite edges
+reviewed design-profile result / selected expectations
+        ↓
+project-bootstrap-reconcile
+        ↓ when direct realization is unavailable
+bootstrap-existing-project
+        ↓
+minimal Core/project realization
 ~~~
 
 Fixture:
 
-Combine a reviewed subset of SF-01, SF-02, and SF-03 without adding repository
-files.
+- a reviewed synthetic design target declares a small set of required semantic
+  Capability identities and prerequisite ordering;
+- accepted project artifacts exist for a subset;
+- one project-owned canonical graph/projection may be present in the reuse
+  variant;
+- one required capability is intentionally missing;
+- source artifacts contain no extra answer labels beyond normal project truth.
 
-Expected result:
+Expected semantic result:
 
-One normalized project-knowledge topology matching all three independent oracles.
+- Capability semantic identities from the reviewed target are preserved rather
+  than renamed into unrelated Reference templates;
+- existing project-owned truth is reused;
+- only required Authorities/artifacts for the selected scope are realized;
+- declared semantic prerequisite ordering is preserved;
+- missing capability remains missing/CREATE rather than being invented;
+- unresolved ownership/semantic evidence follows bootstrap stop/Question rules.
 
-Purpose:
-
-Detect semantic translation loss between mechanisms without yet introducing
-bootstrap/source-selection noise.
+This TL2 design tests **handoff fidelity**, not raw Capability/Authority
+discovery. Raw formation remains covered by TD-CAP-* and TD-AUTH-* agent cases.
 
 ## TD-COMP-002 — Applicability to Question/coverage frontier
 
@@ -1767,23 +1822,58 @@ Expected result:
 Semantic disagreement across repeated identical requests is measured and
 reported rather than overwritten.
 
-## TD-EVAL-005 — Drift/recalibration trigger
+## TD-EVAL-005 — Calibration validity and recalibration triggers
 
 **Abilities:** HA-A20  
 **Failure modes:** A20-F05/F06  
 **Methods:** EM-12, EM-14  
 **Minimum level:** TL4 operational-assurance track  
 **Oracle:** O4  
-**Status:** DESIGN
+**Status:** READY
 
-Cases:
+Calibration evidence is valid only for its explicitly bound evaluation
+population.
 
-Change evaluator model/version, protocol, judgement relation, or introduce a
-new observed failure class.
+### Hard invalidation triggers
+
+Prior calibration must not be reused as if unchanged when any bound identity
+changes materially:
+
+- provider;
+- model;
+- model version;
+- model configuration that can affect judgement;
+- evaluator adapter/version;
+- calibration protocol;
+- labelled corpus version/content.
 
 Expected result:
 
-Prior calibration is not silently generalized beyond its declared population.
+The new evaluator configuration has no inherited PASS claim until it is
+recalibrated against the applicable frozen corpus/protocol.
+
+### Coverage-expansion trigger
+
+When a real disagreement reveals a material semantic failure class not
+represented by the calibration corpus, the existing calibration remains valid
+only for its old declared population.
+
+Expected result:
+
+- the new failure class is recorded;
+- corpus representativeness is explicitly insufficient for claims covering that
+  class;
+- an independently reviewed case/corpus extension is required before a broader
+  claim is made.
+
+### Non-trigger
+
+Elapsed time alone is not defined as a universal recalibration trigger in v0.
+A time-based policy may be added later only with evidence that it improves drift
+detection.
+
+This design deliberately separates request-binding invalidation from statistical
+claims about representativeness.
 
 ## TD-EVAL-006 — Oracle independence declaration
 
