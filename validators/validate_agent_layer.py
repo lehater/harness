@@ -16,6 +16,7 @@ from target_state import validate_profile  # noqa: E402
 
 SURFACE_REGISTRY = ROOT / "skills/skill-surface-registry-v0.yaml"
 ARTIFACT_REGISTRY = ROOT / "skills/artifact-skill-registry-v0.yaml"
+OPERATION_REGISTRY = ROOT / "skills/consumer-operation-registry-v0.yaml"
 
 ALLOWED_SURFACES = {"maintainer", "consumer"}
 ALLOWED_ROUTE_CLASSES = {"operation", "method", "artifact-production"}
@@ -235,6 +236,104 @@ def _validate_artifact_registry_alignment(
         )
 
 
+
+def _validate_operation_registry_alignment(
+    entries: list[dict[str, Any]], errors: list[str]
+) -> None:
+    try:
+        registry = _load_mapping(OPERATION_REGISTRY)
+    except CoreError as exc:
+        errors.append(str(exc))
+        return
+
+    if registry.get("version") != 1:
+        errors.append("consumer operation registry version must be 1")
+    if registry.get("kind") != "harness-consumer-operation-registry":
+        errors.append("unexpected consumer operation registry kind")
+    if not isinstance(registry.get("id"), str) or not registry["id"]:
+        errors.append("consumer operation registry id is required")
+
+    routes = registry.get("routes")
+    if not isinstance(routes, list):
+        errors.append("consumer operation registry routes must be a list")
+        return
+
+    actual_paths: set[str] = set()
+    public_operations: set[str] = set()
+    operation_ids: set[str] = set()
+    public_triggers: set[str] = set()
+    internal_refs: list[tuple[str, list[str]]] = []
+
+    for item in routes:
+        if not isinstance(item, dict):
+            errors.append("consumer operation route must be a mapping")
+            continue
+        operation = item.get("operation")
+        path = item.get("skill")
+        exposure = item.get("exposure")
+        if not isinstance(operation, str) or not operation:
+            errors.append("consumer operation route requires operation")
+            continue
+        if operation in operation_ids:
+            errors.append(f"duplicate consumer operation id: {operation}")
+        operation_ids.add(operation)
+        if not isinstance(path, str) or not path:
+            errors.append(f"{operation}: consumer operation skill path is required")
+            continue
+        if path in actual_paths:
+            errors.append(f"consumer operation skill routed more than once: {path}")
+        actual_paths.add(path)
+        if exposure not in {"public", "internal"}:
+            errors.append(f"{operation}: invalid exposure {exposure!r}")
+            continue
+
+        if exposure == "public":
+            trigger = item.get("trigger")
+            if not isinstance(trigger, str) or not trigger:
+                errors.append(f"{operation}: public route requires trigger")
+            elif trigger in public_triggers:
+                errors.append(f"duplicate public operation trigger: {trigger}")
+            else:
+                public_triggers.add(trigger)
+            public_operations.add(operation)
+            if "invoked_by" in item:
+                errors.append(f"{operation}: public route must not declare invoked_by")
+        else:
+            invoked_by = item.get("invoked_by")
+            if (
+                not isinstance(invoked_by, list)
+                or not invoked_by
+                or not all(isinstance(value, str) and value for value in invoked_by)
+            ):
+                errors.append(f"{operation}: internal route requires invoked_by")
+            else:
+                internal_refs.append((operation, invoked_by))
+            if "trigger" in item:
+                errors.append(f"{operation}: internal route must not expose trigger")
+
+    for operation, parents in internal_refs:
+        missing = sorted(set(parents) - public_operations)
+        if missing:
+            errors.append(
+                f"{operation}: invoked_by references non-public operations: "
+                + ", ".join(missing)
+            )
+
+    expected_paths = {
+        item["path"]
+        for item in entries
+        if item.get("lifecycle") == "active"
+        and item.get("surface") == "consumer"
+        and item.get("route_class") == "operation"
+        and item.get("route_status") == "routed"
+    }
+    if actual_paths != expected_paths:
+        errors.append(
+            "consumer operation registry does not match routed consumer operations "
+            f"(expected={sorted(expected_paths)!r}, actual={sorted(actual_paths)!r})"
+        )
+
+
 def _validate_skill_contracts(
     entries: list[dict[str, Any]], errors: list[str]
 ) -> tuple[int, int, int]:
@@ -327,6 +426,7 @@ def main() -> int:
 
     entries = _validate_surface_registry(errors)
     _validate_artifact_registry_alignment(entries, errors)
+    _validate_operation_registry_alignment(entries, errors)
     operation_count, method_count, artifact_count = _validate_skill_contracts(
         entries, errors
     )

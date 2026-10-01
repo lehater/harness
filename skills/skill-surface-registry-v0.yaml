@@ -12,43 +12,37 @@ skills:
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: decision-pipeline
     path: skills/agent/decision-pipeline/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: design-profile
     path: skills/agent/design-profile/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: human-documentation-projection
     path: skills/agent/human-documentation-projection/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: project-bootstrap-reconcile
     path: skills/agent/project-bootstrap-reconcile/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: project-engineering-status
     path: skills/agent/project-engineering-status/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
-    route_status: unrouted
-    route_note: "Consumer operation routing registry is not implemented yet."
+    route_status: routed
   - id: acceptance-scenarios
     path: skills/artifacts/acceptance-scenarios/SKILL.md
     surface: consumer
