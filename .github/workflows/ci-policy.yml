@@ -7,6 +7,10 @@ on:
       - "docs/design/ci-execution-policy-v0.md"
       - "spec/ci/**"
       - "validators/validate_ci_policy.py"
+      - "validators/validate_assurance_registry.py"
+      - "spec/assurance/harness-assurance-registry-v0.yaml"
+      - "docs/design/harness-assurance-registry-v0.md"
+      - "docs/design/harness-ability-to-evidence-v0.md"
       - "Makefile"
   push:
     branches: [main]
@@ -15,6 +19,10 @@ on:
       - "docs/design/ci-execution-policy-v0.md"
       - "spec/ci/**"
       - "validators/validate_ci_policy.py"
+      - "validators/validate_assurance_registry.py"
+      - "spec/assurance/harness-assurance-registry-v0.yaml"
+      - "docs/design/harness-assurance-registry-v0.md"
+      - "docs/design/harness-ability-to-evidence-v0.md"
       - "Makefile"
 
 permissions:
@@ -30,3 +38,4 @@ jobs:
           python-version: "3.10"
       - run: pip install PyYAML
       - run: python validators/validate_ci_policy.py
+      - run: python validators/validate_assurance_registry.py
