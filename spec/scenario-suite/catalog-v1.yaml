@@ -331,6 +331,12 @@ requirements:
     description: An existing Core provider without lifecycle evidence is surfaced as an UNKNOWN lifecycle gap and never as CREATE work.
     min_scenarios: 1
 
+  - id: decision-failed-validation-retry
+    category: decision
+    enforcement: required
+    description: FAILED_VALIDATION remains visible and non-READY until an explicit retry, including failed CREATE with no current provider.
+    min_scenarios: 1
+
   - id: decision-execution-assurance
     category: decision
     enforcement: required
