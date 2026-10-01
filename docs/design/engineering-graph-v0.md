@@ -252,7 +252,7 @@ A consumer contract answers **which classes of engineering knowledge are needed*
 
 A project completeness policy may additionally answer **for which subjects those capabilities must exist**.
 
-Both may contribute production/consumer requirements to the projected Engineering Graph.
+Both may contribute production/consumer requirements to the projected Engineering Graph. The accepted Engineering Graph owns the concrete project topology, but not the claim that this topology is exhaustive. Selected-scope completeness and applicability are owned by Engineering Coverage. An optional Reference Engineering Model may propose reusable graph materialization, but neither a successful materialization nor absence of a reference template proves completeness or non-applicability. The canonical ownership boundary is defined in `docs/design/model-completeness-ownership-v0.md`.
 
 In v0, independent subject coverage is represented by distinct CapabilityIds, for example:
 

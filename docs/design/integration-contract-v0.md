@@ -137,6 +137,13 @@ A project may claim its design/documentation closure complete only when all appl
 
 The aggregate check is disposable derived evidence. It must not become another source of product/domain/architecture truth.
 
+Completeness ownership is defined by `docs/design/model-completeness-ownership-v0.md`.
+The Project Model owns the accepted concrete graph; Engineering Coverage owns the
+selected-scope completeness/applicability verdict. Reference Engineering Model
+materialization, when used, is only a proposal source behind the project-owned
+integration boundary and cannot substitute for Coverage or make its proposed
+graph canonical by itself.
+
 A project should expose one normal local/CI command that fails if any of the applicable assertions above fail. Separate workflows may retain redundant checks, but a green structural target alone must never be presented as full implementation-documentation closure.
 ## Portability invariant
 

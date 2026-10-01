@@ -75,7 +75,7 @@ The Application Layer coordinates the feedback loop. No bounded context may depe
 
 The largest conceptual overlap is between Reference Engineering Model and Engineering Coverage.
 
-The target rule is:
+The rule is now canonicalized in `docs/design/model-completeness-ownership-v0.md`:
 
 - **Coverage owns the question "is the selected project/scope sufficiently covered?"**
 - **Reference Model owns the reusable mapping "given accepted project facts/concerns, which reusable capability templates could realize the required knowledge?"**
@@ -207,7 +207,7 @@ Do not start with a repository-wide package move.
 2. Remove BC-01/BC-02 by separating pure Coverage evaluation from integration and skill routing. **Done on the audit branch.**
 3. Remove BC-03 by splitting the Decision request contract from its application builder. **Done on the audit branch.**
 4. Introduce stable published read models at context boundaries, especially Assurance -> Coverage.
-5. Resolve `HARN-008` explicitly: Coverage owns completeness; Reference Model owns reusable materialization.
+5. Resolve `HARN-008` explicitly: Coverage owns completeness; Reference Model owns reusable materialization. **Canonical ownership contract added on the audit branch.**
 6. Fix functional P0 invariants inside their owning contexts.
 7. Only then physically move modules under `src/harness/<context>/...`.
 

@@ -79,7 +79,7 @@ separate defect has been demonstrated.
 | EVO-016 | IDEA | CAPTURED | External methods | Allow Harness application orchestration to consume external Agent-Skill-like engineering procedures without making them project truth. |
 | EVO-017 | RESEARCH | CAPTURED | Skill evaluation | Split skill quality measurement into structural, routing and behavioral tiers appropriate to Harness semantics. |
 | EVO-018 | RECOMMENDATION | VALIDATED | Skill identity | Treat published skill names/identities as compatibility contracts and require explicit alias/migration handling when renamed. AUD-016 confirmed this matters specifically at controlled Consumer Pack upgrades. |
-| EVO-019 | RESEARCH | CAPTURED | Reference vs Coverage | Test the target ownership rule: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. |
+| EVO-019 | RESEARCH | ADOPTED | Reference vs Coverage | Ownership is canonicalized: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. Reference Model promotion quality remains tracked separately by EVO-012/EVO-033. |
 | EVO-020 | IDEA | CAPTURED | Context lifecycle | Define restartable agent-session boundaries from durable project artifacts so long-running work can resume without conversation history becoming project truth. |
 | EVO-021 | RECOMMENDATION | ADOPTED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
 | EVO-022 | RESEARCH | ADOPTED | Agent routing | Add an explicit registry/router and overlap tests for `skills/agent/**`; keep artifact routing deterministic by `knowledge_kind`. |
@@ -730,7 +730,7 @@ Current repository-local renames may still be manageable mechanically.
 ### EVO-019 — Reference Model / Coverage ownership experiment
 
 **Type:** RESEARCH  
-**Status:** CAPTURED
+**Status:** ADOPTED
 
 **Hypothesis**
 
@@ -760,11 +760,16 @@ Apply this rule to at least:
 Measure whether any context must duplicate another context's truth to complete
 the loop.
 
-**Possible outcomes**
+**Outcome**
 
-- validated -> promote the ownership relationship to canonical architecture;
-- fails -> refine the boundaries before promoting Reference Model;
-- exposes false completeness -> link/create a HARN defect.
+The ownership relationship is now canonicalized by
+`docs/design/model-completeness-ownership-v0.md` and enforced structurally by
+the bounded-context map: Coverage does not depend on Reference Model internals,
+and Reference materialization does not own the accepted project graph.
+
+This adoption does **not** promote the current Reference Engineering Model.
+Evidence for reusable model promotion remains EVO-012; unfamiliar-project
+discovery assurance remains EVO-033.
 
 **Related**
 
