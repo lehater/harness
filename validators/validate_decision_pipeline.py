@@ -182,6 +182,53 @@ def main() -> int:
     assert baseline[0]["purpose"] == "CURRENT_ACCEPTED_BASELINE", redo_a
     assert "future_candidate" in redo_a["decision_request"]["forbidden_inputs"], redo_a
 
+    failure_set = {
+        "version": 1,
+        "kind": "harness-decision-failure-set",
+        "failures": [
+            {
+                "capability": "arch.b",
+                "failure_id": "ARCH-B-ATTEMPT-1",
+                "stage": "REVIEW_OPTIONS",
+                "finding": "Decision space remained materially incomplete.",
+            }
+        ],
+    }
+    failed = derive_decision_roadmap(
+        graph=GRAPH,
+        model=MODEL,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+        decision_failures=failure_set,
+    )
+    assert failed["frontier_status"] == "FAILED_VALIDATION", failed
+    assert "arch.b" not in caps(failed["ready"]), failed
+    assert next(
+        item
+        for item in failed["failed_validation"]
+        if item["capability"] == "arch.b"
+    )["retry_required"] is True, failed
+
+    retried_create = derive_decision_roadmap(
+        graph=GRAPH,
+        model=MODEL,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+        decision_failures=failure_set,
+        redo_capabilities=["arch.b"],
+    )
+    retried_b = next(
+        item
+        for item in retried_create["ready"]
+        if item["capability"] == "arch.b"
+    )
+    assert retried_b["reason"] == "EXPLICIT_RETRY_FAILED_VALIDATION", retried_b
+    assert retried_b["decision_request_mode"] == "CREATE", retried_b
+
     # HARN-004: an existing Core provider without lifecycle evidence is an
     # integration/currentness gap, not missing canonical knowledge. It must
     # never be sent through CREATE and must preserve artifact-level blockers.
@@ -339,7 +386,7 @@ def main() -> int:
 
     print(
         "decision pipeline: PASS "
-        "(single frontier + sequential stages + current-baseline redo + idempotence)"
+        "(single frontier + persisted failure + explicit retry + idempotence)"
     )
     return 0
 

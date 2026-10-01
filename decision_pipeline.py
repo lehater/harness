@@ -36,6 +36,49 @@ def _load(path: str | Path) -> dict[str, Any]:
     return value
 
 
+def decision_failure_index(
+    document: dict[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    if document is None:
+        return {}
+    if (
+        document.get("version") != 1
+        or document.get("kind") != "harness-decision-failure-set"
+    ):
+        raise CoreError("unexpected decision failure document")
+    result: dict[str, dict[str, Any]] = {}
+    for item in document.get("failures", []) or []:
+        if not isinstance(item, dict):
+            raise CoreError("decision failure must be a mapping")
+        capability = item.get("capability")
+        failure_id = item.get("failure_id")
+        stage = item.get("stage")
+        finding = item.get("finding")
+        if not isinstance(capability, str) or not capability:
+            raise CoreError("decision failure capability is required")
+        if capability in result:
+            raise CoreError(
+                f"duplicate decision failure capability: {capability}"
+            )
+        if not isinstance(failure_id, str) or not failure_id:
+            raise CoreError(
+                f"decision failure {capability} requires failure_id"
+            )
+        if stage not in PIPELINE_STAGES:
+            raise CoreError(
+                f"decision failure {capability} stage must be a pipeline stage"
+            )
+        if not (
+            (isinstance(finding, str) and finding.strip())
+            or (isinstance(finding, dict) and finding)
+        ):
+            raise CoreError(
+                f"decision failure {capability} requires reproducible finding evidence"
+            )
+        result[capability] = dict(item)
+    return result
+
+
 def _core_providers(
     realized: dict[str, Any],
     capability: str,
@@ -150,6 +193,7 @@ def derive_decision_roadmap(
     lifecycle: dict[str, Any],
     decision_contracts: dict[str, Any],
     decision_policy: dict[str, Any] | None,
+    decision_failures: dict[str, Any] | None = None,
     redo_capabilities: Iterable[str] = (),
 ) -> dict[str, Any]:
     """Derive work without role-specific frontiers or execution stops.
@@ -163,6 +207,7 @@ def derive_decision_roadmap(
     producers = producer_index(graph)
     lifecycle_by_capability = lifecycle_index(lifecycle)
     states = lifecycle_states(graph, realized, lifecycle)
+    failures = decision_failure_index(decision_failures)
     redo = set(redo_capabilities)
 
     selected = {
@@ -180,6 +225,7 @@ def derive_decision_roadmap(
     blocked_items: list[dict[str, Any]] = []
     waiting: list[dict[str, Any]] = []
     lifecycle_gaps: list[dict[str, Any]] = []
+    failed_validation: list[dict[str, Any]] = []
 
     for expectation in profile["expectations"]:
         capability = expectation["capability"]
@@ -222,6 +268,7 @@ def derive_decision_roadmap(
         current_provider = _selected_provider(
             realized, lifecycle_by_capability, capability
         )
+        failure = failures.get(capability)
         if is_current and capability not in redo:
             completed.append(
                 {
@@ -247,13 +294,35 @@ def derive_decision_roadmap(
             )
             continue
 
+        if failure is not None and capability not in redo:
+            failed_validation.append(
+                {
+                    "capability": capability,
+                    "authority": authority,
+                    "state": "FAILED_VALIDATION",
+                    "failure_id": failure["failure_id"],
+                    "stage": failure["stage"],
+                    "finding": failure["finding"],
+                    "retry_required": True,
+                }
+            )
+            continue
+
         if capability in redo:
             if current_provider is None:
-                raise CoreError(
-                    f"explicit redo requires current provider for {capability}"
+                if failure is None:
+                    raise CoreError(
+                        f"explicit redo requires current provider for {capability}"
+                    )
+                mode = "CREATE"
+                reason = "EXPLICIT_RETRY_FAILED_VALIDATION"
+            else:
+                mode = "REDO"
+                reason = (
+                    "EXPLICIT_RETRY_FAILED_VALIDATION"
+                    if failure is not None
+                    else "EXPLICIT_REDO"
                 )
-            mode = "REDO"
-            reason = "EXPLICIT_REDO"
         elif current_provider is not None:
             mode = "REVISION"
             reason = "REVISE_NONCURRENT_PROVIDER"
@@ -311,10 +380,19 @@ def derive_decision_roadmap(
         "version": 1,
         "kind": "harness-decision-roadmap",
         "target": target,
-        "frontier_status": "READY" if ready else "EMPTY",
+        "frontier_status": (
+            "READY"
+            if ready
+            else "FAILED_VALIDATION"
+            if failed_validation
+            else "EMPTY"
+        ),
         "ready": sorted(ready, key=lambda item: item["capability"]),
         "completed": sorted(completed, key=lambda item: item["capability"]),
         "blocked": sorted(blocked_items, key=lambda item: item["capability"]),
+        "failed_validation": sorted(
+            failed_validation, key=lambda item: item["capability"]
+        ),
         "lifecycle_gaps": sorted(
             lifecycle_gaps, key=lambda item: item["capability"]
         ),
@@ -323,7 +401,8 @@ def derive_decision_roadmap(
         ),
         "execution_rule": (
             "Run one READY capability through the complete pipeline, persist "
-            "its outcome, then recompute this roadmap."
+            "its outcome, then recompute this roadmap. FAILED_VALIDATION remains "
+            "non-READY until explicitly retried."
         ),
     }
 
@@ -338,6 +417,7 @@ def main() -> int:
     parser.add_argument("lifecycle")
     parser.add_argument("decision_policy")
     parser.add_argument("--redo", action="append", default=[])
+    parser.add_argument("--decision-failures")
     parser.add_argument(
         "--decision-contracts",
         default="spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml",
@@ -351,6 +431,11 @@ def main() -> int:
         lifecycle=_load(args.lifecycle),
         decision_contracts=_load(args.decision_contracts),
         decision_policy=_load(args.decision_policy),
+        decision_failures=(
+            _load(args.decision_failures)
+            if args.decision_failures
+            else None
+        ),
         redo_capabilities=args.redo,
     )
     print(json.dumps(value, indent=2, sort_keys=False))

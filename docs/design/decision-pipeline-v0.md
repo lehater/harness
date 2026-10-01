@@ -45,6 +45,14 @@ canonical provider merely to fill integration metadata.
 After one READY Capability reaches a terminal outcome, recompute the roadmap.
 Do not freeze a project-wide role frontier.
 
+`FAILED_VALIDATION` is persisted outside Core as
+`harness-decision-failure-set` evidence keyed by Capability. While that
+evidence remains current, ordinary roadmap recomputation exposes the Capability
+under `failed_validation` and does not make it READY again. An explicit redo
+acknowledges retry intent. If the failed attempt was CREATE and therefore has no
+current provider, retry remains CREATE mode; it must not fabricate a REDO
+baseline.
+
 Possible terminal outcomes are:
 
 - `CURRENT` — semantic admission succeeded;
@@ -118,6 +126,12 @@ CURRENT Capability
 ```
 
 Redo does not waive blockers or upstream currentness.
+
+For a failed CREATE, explicit redo means "retry the failed pipeline attempt", not
+"redo accepted knowledge". The roadmap therefore emits
+`EXPLICIT_RETRY_FAILED_VALIDATION` with `decision_request_mode: CREATE`.
+A new terminal result replaces/clears the persisted failure evidence through the
+caller integration; this orchestration evidence never becomes Core truth.
 
 ## Core boundary
 

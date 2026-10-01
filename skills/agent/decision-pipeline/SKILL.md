@@ -17,6 +17,7 @@ explicitly requested REDO.
 - accepted prerequisite/support artifacts;
 - for REVISION/REDO, the current accepted provider baseline;
 - the knowledge-kind Decision Governance contract and project policy.
+- persisted Decision Pipeline failure evidence when a previous attempt ended in FAILED_VALIDATION.
 
 ## Read boundary
 
@@ -61,9 +62,11 @@ Any open material gap blocks choice.
 ## Failure discipline
 
 A malformed decision space discovered after the review gate is
-FAILED_VALIDATION. Do not introduce an automatic role-switch/reexploration
-workflow. Correct the failing procedure/evidence and explicitly redo the
-Capability.
+FAILED_VALIDATION. Persist reproducible failure evidence. Ordinary roadmap
+recomputation must keep that Capability non-READY until an explicit retry.
+Correct the failing procedure/evidence and explicitly redo the Capability. A
+failed CREATE retries in CREATE mode because no accepted current provider exists;
+do not invent a REDO baseline.
 
 ## Output contract
 
@@ -72,7 +75,8 @@ Persist only the evidence appropriate to the actual result:
 - CURRENT: accepted Decision Exploration + Decision Governance + candidate
   admission/lifecycle evidence;
 - BLOCKED: Core Questions plus any useful noncanonical analysis;
-- FAILED_VALIDATION: validation finding sufficient to reproduce the defect.
+- FAILED_VALIDATION: persisted failure-set entry with Capability, failure id,
+  failing pipeline stage and validation finding sufficient to reproduce the defect.
 
 ## Registration
 

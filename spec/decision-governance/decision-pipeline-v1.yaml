@@ -18,12 +18,15 @@ roadmap:
     - ready
     - completed
     - blocked
+    - failed_validation
     - waiting_upstream
   rules:
     - READY requires all direct prerequisites CURRENT and no unresolved Core blocker.
     - CURRENT capabilities are omitted from ordinary READY work.
     - explicit redo may include a CURRENT capability but never bypasses prerequisites or blockers.
     - after one Capability reaches a terminal outcome, recompute the roadmap before choosing more work.
+    - persisted FAILED_VALIDATION evidence keeps missing/noncurrent work out of READY until explicit retry.
+    - explicit retry of a failed CREATE remains CREATE mode when no accepted current provider exists.
 
 pipeline:
   stages:
@@ -61,3 +64,4 @@ core_boundary:
   - no Stage/Role/Task/Workflow entity is added to Core.
   - Questions remain the only canonical unresolved-semantic feedback mechanism.
   - roadmap and pipeline stages are derived execution procedure, not project truth.
+  - decision failure evidence is orchestration evidence outside Core and is replaced by the caller when a later attempt reaches a new terminal outcome.
