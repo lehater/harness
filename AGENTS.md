@@ -89,7 +89,9 @@ acceptance/scenario procedure does not live in this root bootstrap file.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
 - `docs/design/harness-assurance-policy-v0.md` — canonical evidence-selection, test-level and oracle policy for Harness changes/release claims.
 - `docs/design/harness-ability-to-evidence-v0.md` — canonical Harness ability/failure-mode/evidence blueprint used to design assurance before implementation.
-- `docs/design/harness-test-design-catalog-v0.md` — concrete framework-neutral test designs for reviewed assurance gaps; implementation follows only after oracle/boundary review.
+- `docs/design/harness-test-design-catalog-v0.md` — reviewed framework-neutral test designs and implementation dispositions for Harness assurance gaps.
+- `docs/design/harness-agent-behavioral-evaluation-v0.md` — clean-context behavioural-eval protocol for judgement-dependent agent responsibilities.
+- `docs/design/harness-assurance-registry-v0.md` — design for the future machine-readable Ability -> requirement -> evidence assurance denominator/self-test.
 - `docs/design/ci-execution-policy-v0.md` — canonical Harness CI execution/lazy-gate policy.
 - `spec/ci/check-registry-v0.yaml` — machine-readable CI check inventory, cost/stage classification and workflow roles.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
