@@ -120,7 +120,11 @@ integration:
     Routed artifact production must use the strict semantic-admission path when
     full engineering closure is claimed. That path derives admissible source
     Authorities from Engineering Graph prerequisites, validates canonical
-    read/write provenance, requires the knowledge-kind semantic review contract,
+    read/write provenance, and accepts canonical semantic source assertions only
+    from the lifecycle-selected provider artifacts of declared prerequisite
+    capabilities. Read access, including same-Authority supporting closure, does
+    not by itself authorize semantic provenance. The path requires the
+    knowledge-kind semantic review contract,
     composes the Harness-generated candidate-free Decision Explorer Request,
     request-bound pre-choice Decision Exploration and Decision Governance for
     participating knowledge kinds, and records a capability acceptance identity

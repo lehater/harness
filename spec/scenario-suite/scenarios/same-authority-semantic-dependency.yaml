@@ -1,0 +1,119 @@
+version: 1
+kind: harness-scenario
+id: same-authority-semantic-dependency-requires-production-edge
+title: Same-Authority semantic support must be declared in production topology
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-dependency-topology
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SAME-AUTHORITY-SEMANTIC-DEPENDENCY
+      authorities:
+        - id: PRODUCT
+          responsibility: Own product decisions.
+          boundary:
+            semantic_cohesion: Product semantics.
+            independent_change: Product decisions change independently.
+            public_contract: Accepted target product knowledge.
+          produces:
+            - capability: demo.target
+              knowledge_kind: test-semantic
+              requires: []
+      consumers:
+        - id: TARGET-CONSUMER
+          purpose: Consume accepted target knowledge.
+          requires: [demo.target]
+      terminal_capabilities: []
+
+  model:
+    value:
+      artifacts:
+        - id: SUPPORT
+          authority: PRODUCT
+          path: docs/support.yaml
+          provides: []
+          depends_on: []
+        - id: TARGET
+          authority: PRODUCT
+          path: docs/target.yaml
+          provides: [demo.target]
+          depends_on: [SUPPORT]
+      questions: []
+
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: SAME-AUTHORITY-SEMANTIC-DEPENDENCY-REGISTRY
+      routes:
+        - knowledge_kind: test-semantic
+          skill: skills/artifacts/test-semantic/SKILL.md
+
+  contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-semantic-contracts
+      id: SAME-AUTHORITY-SEMANTIC-DEPENDENCY-CONTRACTS
+      defaults:
+        requires_source_authority: true
+        requires_assertion_authority: true
+        requires_semantic_review: true
+        required_review_checks: [source-discipline, authority-boundary, no-invention]
+      contracts:
+        - knowledge_kind: test-semantic
+          owned_assertion_kinds: [target-assertion]
+          obligations: []
+
+  sources:
+    value:
+      semantic_assertions:
+        - id: SUPPORT-FACT
+          kind: supporting-fact
+          subject: TARGET
+          semantic_value: Existing same-Authority support fact.
+          decision_authority: PRODUCT
+          source_artifact: SUPPORT
+
+  candidate:
+    value:
+      id: TARGET
+      capability: demo.target
+      path: docs/target.yaml
+      changed_paths: [docs/target.yaml]
+      canonical_references:
+        - artifact: TARGET
+          referenced_path: docs/support.yaml
+      semantic_assertions:
+        - id: TARGET-ASSERTION
+          kind: target-assertion
+          subject: TARGET
+          semantic_value: Target meaning derived from support.
+          derived_from: [SUPPORT-FACT]
+          decision_authority: PRODUCT
+      semantic_review:
+        status: ACCEPTED
+        checks: [source-discipline, authority-boundary, no-invention]
+
+steps:
+  - id: reject-hidden-same-authority-semantic-source
+    driver: semantic.admission
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      skill_registry: {ref: fixture.registry}
+      knowledge_contracts: {ref: fixture.contracts}
+      capability: demo.target
+      sources: {ref: fixture.sources}
+      candidate: {ref: fixture.candidate}
+      acceptance_id: TARGET-2
+    expect_error:
+      type: CoreError
+      contains: outside declared production prerequisites for demo.target

@@ -114,7 +114,12 @@ CURRENT chain restored
 ```
 
 Staleness follows Engineering Graph production prerequisites, not arbitrary
-file dependencies.
+file dependencies. Strict semantic admission therefore rejects material semantic
+provenance from a canonical artifact that is merely readable through
+same-Authority `depends_on` support but is absent from the target production's
+declared prerequisite capabilities. If that support is semantically material,
+the Engineering Graph must expose it as a prerequisite so it receives an
+acceptance/currentness baseline.
 
 ## Admission integration
 

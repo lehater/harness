@@ -304,6 +304,138 @@ def main() -> int:
     )
 
 
+    hidden_graph = copy.deepcopy(GRAPH)
+    product_authority = next(
+        item
+        for item in hidden_graph["authorities"]
+        if item["id"] == "PRODUCT-REQUIREMENTS"
+    )
+    product_authority["produces"].append(
+        {
+            "capability": "example.product-context",
+            "knowledge_kind": "product-requirements",
+            "requires": [],
+        }
+    )
+    hidden_graph["consumers"].append(
+        {
+            "id": "PRODUCT-CONTEXT-CONSUMER",
+            "purpose": "Keep the support capability public for the regression fixture.",
+            "requires": ["example.product-context"],
+        }
+    )
+
+    hidden_model = copy.deepcopy(MODEL)
+    hidden_model["artifacts"].extend(
+        [
+            {
+                "id": "PRODUCT-CONTEXT",
+                "authority": "PRODUCT-REQUIREMENTS",
+                "path": "docs/product-context.yaml",
+                "provides": ["example.product-context"],
+                "depends_on": [],
+            },
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT-REQUIREMENTS",
+                "path": "docs/requirements.yaml",
+                "provides": ["example.requirements"],
+                "depends_on": ["NEEDS", "PRODUCT-CONTEXT"],
+            },
+        ]
+    )
+
+    hidden_sources = {
+        "semantic_assertions": [
+            {
+                "id": "PRODUCT-CONTEXT-SOURCE",
+                "kind": "product-input",
+                "subject": "request-admission",
+                "semantic_value": "Use the existing same-Authority support decision.",
+                "decision_authority": "PRODUCT-REQUIREMENTS",
+                "source_artifact": "PRODUCT-CONTEXT",
+            }
+        ]
+    }
+    hidden_candidate = candidate()
+    hidden_candidate["canonical_references"].append(
+        {
+            "artifact": "REQUIREMENTS",
+            "referenced_path": "docs/product-context.yaml",
+        }
+    )
+    hidden_candidate["semantic_assertions"][0]["derived_from"] = [
+        "PRODUCT-CONTEXT-SOURCE"
+    ]
+
+    expect_core_error(
+        lambda: admit_artifact(
+            graph=hidden_graph,
+            model=hidden_model,
+            skill_registry=registry,
+            knowledge_contracts=contracts,
+            capability="example.requirements",
+            sources=hidden_sources,
+            candidate=hidden_candidate,
+            acceptance_id="REQ-HIDDEN-SOURCE",
+            lifecycle=LIFECYCLE,
+        ),
+        "outside declared production prerequisites for example.requirements",
+    )
+
+    declared_graph = copy.deepcopy(hidden_graph)
+    declared_product = next(
+        item
+        for item in declared_graph["authorities"]
+        if item["id"] == "PRODUCT-REQUIREMENTS"
+    )
+    declared_requirements = next(
+        item
+        for item in declared_product["produces"]
+        if item["capability"] == "example.requirements"
+    )
+    declared_requirements["requires"].append("example.product-context")
+
+    declared_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=declared_graph,
+        knowledge_contracts=contracts,
+        decision_contracts=decision_contracts,
+        decision_policy=None,
+    )
+    declared_lifecycle = copy.deepcopy(LIFECYCLE)
+    declared_lifecycle["providers"][0]["acceptance_policy_fingerprint"] = (
+        declared_policy_fingerprints["example.user-needs"]
+    )
+    declared_lifecycle["providers"].append(
+        {
+            "artifact": "PRODUCT-CONTEXT",
+            "capability": "example.product-context",
+            "acceptance_id": "PRODUCT-CONTEXT-1",
+            "acceptance_policy_fingerprint": declared_policy_fingerprints[
+                "example.product-context"
+            ],
+            "accepted_prerequisites": {},
+        }
+    )
+
+    declared_result = admit_artifact(
+        graph=declared_graph,
+        model=hidden_model,
+        skill_registry=registry,
+        knowledge_contracts=contracts,
+        decision_contracts=decision_contracts,
+        capability="example.requirements",
+        sources=hidden_sources,
+        candidate=hidden_candidate,
+        acceptance_id="REQ-DECLARED-SOURCE",
+        lifecycle=declared_lifecycle,
+    )
+    assert declared_result["status"] == "ACCEPTED", declared_result
+    assert declared_result["lifecycle_assertion"]["accepted_prerequisites"] == {
+        "example.user-needs": "NEEDS-1",
+        "example.product-context": "PRODUCT-CONTEXT-1",
+    }
+
     bad_review = candidate()
     bad_review["semantic_review"]["checks"].remove(
         "no-downstream-design-promotion"
@@ -360,7 +492,8 @@ def main() -> int:
 
     print(
         "semantic admission: PASS "
-        "(direction + review + provenance + write boundary + derivation lifecycle baseline)"
+        "(direction + review + provenance + declared dependency topology + "
+        "write boundary + derivation lifecycle baseline)"
     )
     return 0
 

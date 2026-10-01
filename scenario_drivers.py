@@ -40,6 +40,7 @@ from source_set import evaluate_source_set
 from source_coverage import validate_source_coverage
 from skill_invariant_policy import evaluate_skill_invariant_policy
 from semantic_acceptance import evaluate_artifact
+from semantic_admission import admit_artifact
 from semantic_closure import evaluate_semantic_closure
 from semantic_derivation import evaluate_derivation
 from workspace import load_workspace, render_workspace
@@ -180,6 +181,11 @@ def semantic_acceptance(
     candidate: dict[str, Any],
 ) -> dict[str, Any]:
     return evaluate_artifact(contract, sources, candidate)
+
+
+@scenario_driver("semantic.admission")
+def semantic_admission(**kwargs: Any) -> dict[str, Any]:
+    return admit_artifact(**kwargs)
 
 
 @scenario_driver("semantic.derivation")

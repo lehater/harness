@@ -279,9 +279,13 @@ def _validate_source_assertion_artifacts(
     context: dict[str, Any],
     sources: dict[str, Any],
     candidate: dict[str, Any],
+    prerequisite_artifact_ids: set[str],
 ) -> None:
     artifacts = _artifact_index(model)
     allowed_paths = set(context["access"]["read"])
+    allowed_semantic_source_artifacts = set(prerequisite_artifact_ids)
+    candidate_capability = candidate.get("capability")
+
     source_by_id = {
         item["id"]: item
         for item in sources.get("semantic_assertions", []) or []
@@ -309,6 +313,12 @@ def _validate_source_assertion_artifacts(
                 raise CoreError(
                     f"source assertion {source_id} comes from canonical artifact "
                     f"outside Authority read boundary: {source_artifact}"
+                )
+            if source_artifact not in allowed_semantic_source_artifacts:
+                raise CoreError(
+                    f"source assertion {source_id} uses canonical artifact "
+                    f"{source_artifact} outside declared production prerequisites "
+                    f"for {candidate_capability}"
                 )
             source_authority = source.get("decision_authority")
             if source_authority != artifact["authority"]:
@@ -496,21 +506,22 @@ def admit_artifact(
             f"context status {context['status']}"
         )
 
+    prerequisite_capabilities = [
+        item["capability"] for item in production.get("requires", []) or []
+    ]
+
     changed_paths = _validate_candidate_write_set(realized, context, candidate)
     references = candidate.get("canonical_references", []) or []
     if not isinstance(references, list):
         raise CoreError("candidate canonical_references must be a list")
     validate_extracted_references(context, references)
-    _validate_source_assertion_artifacts(realized, context, sources, candidate)
 
-    prerequisite_capabilities = [
-        item["capability"] for item in production.get("requires", []) or []
-    ]
     allowed_source_authorities = {authority}
     for prerequisite in prerequisite_capabilities:
         allowed_source_authorities.add(producers[prerequisite])
 
     baseline: dict[str, str] = {}
+    prerequisite_artifact_ids: set[str] = set()
     if prerequisite_capabilities:
         if lifecycle is None:
             raise CoreError(
@@ -531,6 +542,15 @@ def admit_artifact(
                     f"{states[prerequisite]['state']}, not CURRENT"
                 )
             baseline[prerequisite] = index[prerequisite]["acceptance_id"]
+            prerequisite_artifact_ids.add(index[prerequisite]["artifact"])
+
+    _validate_source_assertion_artifacts(
+        realized,
+        context,
+        sources,
+        candidate,
+        prerequisite_artifact_ids,
+    )
 
     semantic_baseline = _accepted_prerequisite_semantics(
         capability=capability,

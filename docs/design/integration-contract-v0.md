@@ -87,6 +87,8 @@ Harness may derive an ephemeral bounded execution context for one Authority from
 
 The context contains accepted upstream provider artifacts, same-Authority supporting closure, owned artifacts, public outputs, downstream consumers, blockers and allowed canonical read/write paths.
 
+Same-Authority supporting closure grants read access only. It does not authorize those artifacts as semantic provenance for strict admission. A supporting artifact that materially contributes accepted semantics must provide a CapabilityId declared in the selected production's Engineering Graph prerequisites so lifecycle currentness can baseline it.
+
 It is routing data, not a CanonicalArtifact, task, approval, stage or workflow state.
 
 Projects may provide format-specific reference extractors, but Harness owns validation against the derived allowed-read boundary. Write-set validation must reject changes to canonical artifacts outside the selected Authority and must reject production while required inputs are blocked.

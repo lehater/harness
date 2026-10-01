@@ -218,6 +218,12 @@ requirements:
     description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
     min_scenarios: 1
 
+  - id: semantic-dependency-topology
+    category: semantic
+    enforcement: required
+    description: Strict semantic admission rejects readable canonical source artifacts that are not represented by the target production's declared prerequisite capabilities.
+    min_scenarios: 1
+
   - id: semantic-derivation-coverage
     category: semantic
     enforcement: required

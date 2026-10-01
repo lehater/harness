@@ -63,6 +63,8 @@ Example:
 
 This allows one Authority to own several related outputs without forcing every output to wait for the union of all Authority inputs.
 
+A production's `requires` list is also the complete lifecycle boundary for material semantic dependencies outside the target artifact itself. If accepted semantics for one capability are derived from another canonical artifact, that source knowledge must be exposed through a CapabilityId listed in the target production's `requires`, even when both artifacts belong to the same Authority. Same-Authority `depends_on` support may remain readable execution context, but it does not create a semantic prerequisite or a lifecycle baseline.
+
 If two outputs are semantically unrelated, that remains evidence that the Authority should be split. Different prerequisite sets alone do not force a split.
 
 ## Capability
