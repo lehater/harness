@@ -1,0 +1,150 @@
+version: 1
+kind: harness-scenario
+id: project-frontier-composes-cross-layer-work
+title: Project frontier composes decision semantic and coverage work
+dimensions:
+  project_archetype: synthetic
+  stage: implementation
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - project-next-action-frontier
+
+fixtures:
+  complete_decision:
+    value:
+      version: 1
+      kind: harness-decision-roadmap
+      target: IMPLEMENTATION
+      frontier_status: COMPLETE
+      ready: []
+      completed: [{capability: demo.design, authority: DESIGN, state: CURRENT}]
+      blocked: []
+      failed_validation: []
+      lifecycle_gaps: []
+      waiting_upstream: []
+  complete_semantic:
+    value:
+      version: 1
+      kind: harness-semantic-closure-evaluation
+      target: IMPLEMENTATION
+      status: COMPLETE
+      structural_status: COMPLETE
+      semantic_gaps: []
+      currentness_gaps: []
+      question_frontier: []
+      revalidate: []
+      pending: []
+  complete_coverage:
+    value:
+      version: 1
+      kind: harness-engineering-coverage-evaluation
+      consumer: IMPLEMENTATION
+      completion_ready: true
+      work_items: []
+      question_frontier: []
+  coverage_gap:
+    value:
+      version: 1
+      kind: harness-engineering-coverage-evaluation
+      consumer: IMPLEMENTATION
+      completion_ready: false
+      work_items:
+        - action: MODEL_PRODUCTION_CONTRACT
+          concern: reliability.failure-semantics
+          candidate_authorities: [APPLICATION-DESIGN]
+      question_frontier: []
+  blocked_decision:
+    value:
+      version: 1
+      kind: harness-decision-roadmap
+      target: IMPLEMENTATION
+      frontier_status: BLOCKED
+      ready: []
+      completed: []
+      blocked:
+        - capability: demo.design
+          authority: DESIGN
+          state: BLOCKED
+          reason: CORE_QUESTION
+          questions: [Q-DESIGN]
+      failed_validation: []
+      lifecycle_gaps: []
+      waiting_upstream: []
+  semantic_gap:
+    value:
+      version: 1
+      kind: harness-semantic-closure-evaluation
+      target: IMPLEMENTATION
+      status: INCOMPLETE
+      structural_status: COMPLETE
+      semantic_gaps:
+        - capability: demo.design
+          authority: DESIGN
+          artifact: DESIGN
+          code: SEMANTIC_ADMISSION_REQUIRED
+          findings: []
+      currentness_gaps: []
+      question_frontier: []
+      revalidate: []
+      pending: []
+
+steps:
+  - id: complete
+    driver: project.frontier
+    with:
+      target: IMPLEMENTATION
+      decision_roadmap: {ref: fixture.complete_decision}
+      semantic_closure: {ref: fixture.complete_semantic}
+      engineering_coverage: {ref: fixture.complete_coverage}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /next_actions, op: length, value: 0}
+
+  - id: coverage-work
+    driver: project.frontier
+    with:
+      target: IMPLEMENTATION
+      decision_roadmap: {ref: fixture.complete_decision}
+      semantic_closure: {ref: fixture.complete_semantic}
+      engineering_coverage: {ref: fixture.coverage_gap}
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - path: /next_actions
+        op: contains_match
+        value:
+          source: ENGINEERING_COVERAGE
+          action: MODEL_PRODUCTION_CONTRACT
+          concern: reliability.failure-semantics
+
+  - id: semantic-work
+    driver: project.frontier
+    with:
+      target: IMPLEMENTATION
+      decision_roadmap: {ref: fixture.complete_decision}
+      semantic_closure: {ref: fixture.semantic_gap}
+      engineering_coverage: {ref: fixture.complete_coverage}
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - path: /next_actions
+        op: contains_match
+        value:
+          source: SEMANTIC_CLOSURE
+          action: VALIDATE_SEMANTICS
+          capability: demo.design
+
+  - id: blocked
+    driver: project.frontier
+    with:
+      target: IMPLEMENTATION
+      decision_roadmap: {ref: fixture.blocked_decision}
+      semantic_closure: {ref: fixture.complete_semantic}
+      engineering_coverage: {ref: fixture.complete_coverage}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - path: /blocked
+        op: contains_match
+        value:
+          source: DECISION_ROADMAP
+          capability: demo.design
+          questions: [Q-DESIGN]

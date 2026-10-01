@@ -337,6 +337,12 @@ requirements:
     description: FAILED_VALIDATION remains visible and non-READY until an explicit retry, including failed CREATE with no current provider.
     min_scenarios: 1
 
+  - id: project-next-action-frontier
+    category: routing
+    enforcement: required
+    description: Application orchestration composes decision, semantic and coverage read models into one unambiguous next-action frontier and distinguishes COMPLETE/BLOCKED/WAITING/INCOMPLETE.
+    min_scenarios: 1
+
   - id: decision-execution-assurance
     category: decision
     enforcement: required

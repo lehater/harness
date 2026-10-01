@@ -84,7 +84,7 @@ steps:
       decision_contracts: {ref: fixture.contracts}
       decision_policy: {ref: fixture.policy}
     expect:
-      - {path: /frontier_status, op: equals, value: EMPTY}
+      - {path: /frontier_status, op: equals, value: COMPLETE}
       - {path: /ready, op: length, value: 0}
       - {path: /completed, op: contains_match, value: {capability: demo.architecture, state: CURRENT}}
 
