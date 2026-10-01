@@ -21,6 +21,8 @@ AUD-005 found:
   project bootstrap/reconcile has overlapping entry procedures.
 - **HARN-018:** inactive pre-Core `SKILL.md` files remain exposed in executable
   form.
+- **HARN-019:** eleven non-owning `judgement_only` procedures are classified but
+  have no explicit invocation/router contract.
 - task procedures are duplicated across `AGENTS.md`, workbench docs and skills;
 - generic artifact mechanics are repeated across dozens of artifact skills.
 
@@ -59,7 +61,25 @@ all cases              -> applicability/coverage diagnostics -> status
 Retire `bootstrap-existing-project` as a separately routable skill after
 coverage is preserved.
 
-## Phase 3 — Route audit/evolution capture through a skill
+## Phase 3 — Non-owning analysis/method routing
+
+Do not leave `judgement_only` skills as manually discoverable exceptions.
+
+1. Define a route class for non-owning analysis/method procedures.
+2. Route from explicit Coverage/Application findings or user intent, not from
+   project `CapabilityId` ownership.
+3. Move these procedures to a clearer namespace if the Method / Procedure
+   Library experiment validates that boundary.
+4. Extend validation so every active procedure is reachable through exactly one
+   declared route class.
+
+Do not assign fake `knowledge_kind` values to non-owning analyses just to make
+the artifact router accept them.
+
+**Done when:** all eleven current `judgement_only` skills are either explicitly
+routable, promoted to a real capability provider, or retired.
+
+## Phase 4 — Route audit/evolution capture through a skill
 
 Create `skills/agent/capture-harness-observation/SKILL.md`.
 
@@ -74,7 +94,7 @@ Procedure:
 Then reduce the detailed audit procedure in `AGENTS.md` to a bootstrap routing
 rule.
 
-## Phase 4 — Route Harness behavior changes through a skill
+## Phase 5 — Route Harness behavior changes through a skill
 
 Create one active agent workflow for changing observable Harness behavior:
 
@@ -88,7 +108,7 @@ Create one active agent workflow for changing observable Harness behavior:
 Move Scenario Suite and Core-extension procedural text out of `AGENTS.md`.
 Keep `core-v0.md` and `scenario-suite-v0.md` as contract owners.
 
-## Phase 5 — Quarantine inactive skills
+## Phase 6 — Quarantine inactive skills
 
 For `skills/core/**`, `skills/ddd/**`, and
 `skills/software-product/**`:
@@ -98,7 +118,7 @@ For `skills/core/**`, `skills/ddd/**`, and
 3. move historical material out of executable `SKILL.md` form;
 4. fail validation on unregistered active-looking skills.
 
-## Phase 6 — Clarify documentation ownership
+## Phase 7 — Clarify documentation ownership
 
 Refactor without semantic change:
 
@@ -110,7 +130,7 @@ Refactor without semantic change:
 
 Prefer links over copied procedural paragraphs.
 
-## Phase 7 — Pilot common artifact-production procedure
+## Phase 8 — Pilot common artifact-production procedure
 
 Do not deduplicate all artifact skills at once.
 
@@ -125,7 +145,7 @@ Pilot `product-requirements`, `domain-model`, and
 
 Reject the abstraction if it merely moves complexity.
 
-## Phase 8 — Review remaining conditional global policies
+## Phase 9 — Review remaining conditional global policies
 
 For large root instruction blocks such as provider-backed LLM execution policy,
 apply:
@@ -136,7 +156,7 @@ task-specific procedure?    -> skill
 Harness policy/semantics?   -> canonical policy/spec
 ```
 
-## Phase 9 — Fresh-context verification
+## Phase 10 — Fresh-context verification
 
 Add behavioral/routing fixtures for at least:
 
@@ -160,6 +180,6 @@ Add behavioral/routing fixtures for at least:
 
 ## Order
 
-Implement Phases 1-5 first because they remove demonstrated routing/discovery
-defects. Phases 6-9 are scalability cleanup and should follow after the active
+Implement Phases 1-6 first because they remove demonstrated routing/discovery
+defects. Phases 7-10 are scalability cleanup and should follow after the active
 routing surface is stable.

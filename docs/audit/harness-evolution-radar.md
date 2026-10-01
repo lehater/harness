@@ -87,6 +87,7 @@ separate defect has been demonstrated.
 | EVO-024 | RESEARCH | CAPTURED | Artifact skills | Pilot a common artifact-production procedure so artifact skills carry domain-specific deltas instead of repeating generic registration/projection/acceptance mechanics. |
 | EVO-025 | RECOMMENDATION | VALIDATED | Skill lifecycle | Quarantine or migrate inactive pre-Core `SKILL.md` files so discovery surfaces expose only active skills. |
 | EVO-026 | RECOMMENDATION | CAPTURED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
+| EVO-027 | RESEARCH | INVESTIGATING | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
 
 ## Detailed entries
 
@@ -918,3 +919,34 @@ design/spec owners.
 
 The goal is not to delete examples, but to remove independently maintained
 copies of the same executable procedure.
+
+
+### EVO-027 — Routing for non-owning analysis/method skills
+
+**Type:** RESEARCH  
+**Status:** INVESTIGATING
+
+Eleven current `judgement_only` skills are deliberately not artifact providers,
+but they are still executable procedures. Their selection therefore needs an
+explicit owner.
+
+Candidate direction:
+
+```text
+Engineering Coverage / Application evidence
+        -> analysis/method route
+        -> reliability-analysis / obligation-analysis / ...
+        -> findings routed to semantic owners
+
+Capability + knowledge_kind
+        -> artifact route
+        -> artifact-production skill
+```
+
+Do not force non-owning analyses into `knowledge_kind` merely to reuse the
+artifact router. That would confuse "procedure that discovers/routes gaps" with
+"provider of accepted project knowledge".
+
+This is a concrete place to test EVO-003's Method / Procedure Library boundary.
+
+Related defect: HARN-019.
