@@ -5,6 +5,10 @@ Status: canonical repository working policy for audit/evolution capture.
 This directory separates three different kinds of knowledge. Do not merge them
 into one backlog.
 
+Audit perspectives, selection guidance, coverage and `AUD-*` run history are
+owned by `docs/audit/audit-framework.md`. This file owns classification and
+persistence routing for observations.
+
 ## Routing rule
 
 ```text

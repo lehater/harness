@@ -4,6 +4,11 @@ id: MAINTAINER-OPERATIONS-V0
 status: audit-ratchet
 
 routes:
+  - operation: audit-harness
+    skill: skills/maintainer/audit-harness/SKILL.md
+    exposure: public
+    trigger: harness-audit
+
   - operation: capture-harness-observation
     skill: skills/maintainer/capture-harness-observation/SKILL.md
     exposure: public

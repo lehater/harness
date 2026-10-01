@@ -821,22 +821,22 @@ Useful sources include:
 ### EVO-021 — Instruction ownership hierarchy
 
 **Type:** RECOMMENDATION  
-**Status:** VALIDATED
+**Status:** ADOPTED
 
-Adopt one scalable ownership chain:
+The accepted ownership/scoping contract is canonicalized in
+`docs/design/agent-instruction-architecture-v0.md`; cross-operation composition
+is owned by `docs/design/operation-orchestration-v0.md`.
 
 ```text
-AGENTS.md       = always-on repository invariants + bootstrap
-agent router    = choose the applicable workflow
+AGENTS.md       = scoped bootstrap/index
+registry/router = typed procedure discovery
 SKILL.md        = executable task procedure
 canonical spec  = semantic/normative source of truth
 README          = human-facing summary/projection
 ```
 
 A skill consumes canonical policy; it does not become a second policy owner.
-AUD-005 found concrete routing ambiguity where this ownership is currently
-distributed. The hierarchy itself is an architecture recommendation; HARN-017
-tracks the demonstrated defect.
+HARN-017 remains the historical routing defect that motivated the registry work.
 
 ### EVO-022 — Agent-skill registry and routing evaluation
 

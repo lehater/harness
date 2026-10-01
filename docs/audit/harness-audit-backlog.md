@@ -61,45 +61,10 @@ These are real issues but are deliberately lower priority until the functional m
 | HARN-H04 | P2 | FIXED | Test infrastructure | `spec/ci/check-registry-v0.yaml` is now the explicit validator/test inventory with stage, cost and disposition. `validate_harness.py` and `tests/test_lifecycle_experiment.py` are registered and included in `make harness-check`; the aggregate is ordered policy -> focused -> deferred -> exhaustive. CI-P04/P03 enforce the inventory and ordering. |
 | HARN-H05 | P2 | FIXED | CI execution policy | Exhaustive `harness core` is draft-gated and runs for non-draft integration candidates; Greenfield `push` is restricted to `main`, and its non-cheap job is also draft-gated because GitHub PR path filters use the cumulative PR diff. Only the cheap `CI policy` guard remains automatic during relevant draft CI edits. On commit bd76092, both Harness and Greenfield jobs were skipped while CI policy passed. |
 
-## Audit perspectives
 
-Each substantial audit should explicitly cover one or more of these perspectives and append only new root causes:
+## Audit execution
 
-1. **State-machine consistency** — every reachable state has one meaning and one deterministic next action.
-2. **End-to-end agent loop** — bootstrap → frontier → produce → admit → persist → recompute → closure.
-3. **Existing-project migration** — partial metadata, legacy providers, mixed canonical formats, gradual adoption.
-4. **Idempotence and replay** — rerunning commands/evaluators with unchanged inputs must not invent new work or change truth.
-5. **Change propagation** — upstream revision, split/merge, added/removed semantics, provider replacement, Question lifecycle.
-6. **Failure semantics** — distinguish semantic uncertainty, invalid evidence, missing metadata, unsupported capability, and implementation lag.
-7. **Granularity consistency** — project / Consumer / Authority / Artifact / Capability / subject / assertion must not be mixed accidentally.
-8. **Completeness / omission resistance** — absent engineering territory must not silently look complete.
-9. **Cross-layer consistency** — structural, semantic, lifecycle, coverage and decision layers must not contradict each other.
-10. **Portability** — the same semantics must work for greenfield, mature legacy, multi-consumer and partially modeled repositories.
-11. **Minimality / necessity** — derived layers must add information not already represented elsewhere and must not create parallel truth.
-12. **Adversarial model cases** — multiple providers, multi-capability artifacts, stale evidence, partial projections, conflicting Questions, reordered operations.
-13. **Instruction ownership / skill routing** — always-on rules, task procedures, canonical policies and inactive guidance must have one explicit owner and deterministic discovery/routing.
+Reusable perspectives, audit protocol, coverage and `AUD-*` run history are
+owned by `docs/audit/audit-framework.md`.
 
-## Audit runs
-
-| Run | Date | Perspectives | Result |
-|---|---|---|---|
-| AUD-001 | 2026-10-01 | Functional state machine, completeness, lifecycle, provider semantics | Established HARN-001..008. |
-| AUD-002 | 2026-10-01 | Replay/idempotence, grouped work, contract evolution, end-to-end persistence, hidden same-Authority dependencies | Added HARN-009..013 and additional evidence to HARN-002/HARN-007. |
-| AUD-003 | 2026-10-01 | Graph evolution and Decision Pipeline failure/retry semantics | Added HARN-014..015. |
-| AUD-004 | 2026-10-01 | Strategic/tactical DDD decomposition of Harness itself, bounded contexts and dependency direction | Added HARN-016, refined HARN-007/HARN-008, and established a machine-enforced context-map ratchet. |
-| AUD-005 | 2026-10-01 | Instruction ownership, skill routing, discovery lifecycle and procedural duplication | Added HARN-017..019; captured AGENTS/workbench/artifact-skill scaling work in EVO-021..027 and an active migration plan. |
-| AUD-006 | 2026-10-01 | Accepted skill-surface architecture vs current repository realization | Completed full skill inventory, refined HARN-019, added HARN-020, and identified implementation gaps between the accepted Maintainer/Consumer distribution contract and current filesystem/validators. |
-| AUD-007 | 2026-10-01 | Post-migration skill/distribution re-audit from clean source/consumer environments | HARN-017..020 no longer reproduced; verified typed surfaces, public/internal operation routing, concern-driven methods, legacy quarantine, clean-target wrapper bootstrap and Consumer Pack isolation. |
-| AUD-008 | 2026-10-01 | CI cost, trigger selectivity, duplicate execution, validator coverage and lazy-gate ordering | Quantified the PR gate cost, strengthened HARN-H03/H04 with exact inventory evidence, and added HARN-H05 for eager/double-trigger execution. Detailed evidence and staged correction plan are in `docs/audit/harness-ci-audit.md`. |
-| AUD-009 | 2026-10-01 | CI policy enforcement and post-correction verification | HARN-H03/H04/H05 no longer reproduce under the canonical CI policy. Final draft verification on bd76092: CI policy run 36868615780 passed; Harness run 36868615767 and Greenfield run 36868615957 both skipped their jobs. |
-
-## Audit protocol
-
-For every new finding:
-
-1. Search this ledger by root cause and affected invariant.
-2. Reuse the existing ID if the root cause is already present.
-3. Add new evidence to that item rather than duplicating it.
-4. Before a fix, add a failing regression/acceptance scenario that expresses the intended invariant.
-5. Mark `FIXED` only after implementation and regression evidence exist on this branch.
-6. Mark `VERIFIED` only after a later independent audit perspective fails to reproduce the defect.
+This backlog contains findings only.

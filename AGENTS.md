@@ -45,14 +45,15 @@ Provider-backed semantic assurance must follow
 selected procedure actually invokes an external LLM evaluator. Deterministic
 validation remains preferred when it can answer the question.
 
-## Maintainer routing
+## Instruction and operation routing
 
-- Use `capture-harness-observation` for repository-level HARN/EVO/accepted
-  decision capture; `docs/audit/README.md` remains the classification policy.
-- Use `change-harness` for changes to Harness behavior, contracts, routing,
-  validators or architecture. The skill owns the execution procedure;
-  `docs/design/core-v0.md` and `docs/design/scenario-suite-v0.md` remain the
-  normative contracts.
+Instruction ownership/scoping is defined by
+`docs/design/agent-instruction-architecture-v0.md`. Composition across routed
+operations is defined by `docs/design/operation-orchestration-v0.md`.
+
+Resolve Maintainer work through `skills/maintainer-operation-registry-v0.yaml`
+and `skill_router.py`. Task procedures and classification rules belong to the
+selected skill and its canonical contracts, not to this bootstrap file.
 
 ## Change discipline
 
@@ -72,8 +73,11 @@ does not live in this root bootstrap file.
 - `skills/skill-surface-registry-v0.yaml` — explicit skill surface/type/lifecycle inventory.
 - `skill_router.py` — typed skill discovery entrypoint over Maintainer/Consumer operation, method and artifact registries.
 - `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
+- `docs/audit/audit-framework.md` — reusable Harness audit perspectives, coverage and AUD run history.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
+- `docs/design/agent-instruction-architecture-v0.md` — canonical instruction ownership/scoping contract.
+- `docs/design/operation-orchestration-v0.md` — canonical coordinator/router/operation composition contract.
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `docs/design/harness-consumer-pack-v0.md` — pinned Consumer Pack binding, materialization and validation contract.
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
