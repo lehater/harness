@@ -10,6 +10,7 @@ dimensions:
 covers:
   - create-work-skill-routing
   - blocked-work-not-routed
+  - instruction-data-trust-boundary
 
 fixtures:
   graph:
@@ -56,7 +57,7 @@ steps:
       registry: {ref: fixture.registry}
     expect:
       - {path: /target_status, op: equals, value: READY}
-      - {path: /routed, op: contains_match, value: {knowledge_kind: verification-strategy, capabilities: [demo.verification]}}
+      - {path: /routed, op: contains_match, value: {knowledge_kind: verification-strategy, capabilities: [demo.verification], instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]}}
       - {path: /unrouted, op: length, value: 0}
 
   - id: block

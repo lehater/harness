@@ -10,6 +10,7 @@ from typing import Any
 from agent_router import validate_skill_registry
 from engineering_coverage import evaluate_with_repository_policy, load, load_scope_source
 from integration_alignment import validate_project_alignment
+from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 ROOT = Path(__file__).resolve().parent
 
@@ -37,7 +38,12 @@ def _route_production_work(work_items: list[dict[str, Any]], registry: dict[str,
             elif knowledge_kind not in routes:
                 current["execution_route"] = {"status": "UNROUTED", "reason": "NO_REGISTERED_SKILL", "knowledge_kind": knowledge_kind}
             else:
-                current["execution_route"] = {"status": "ROUTED", "knowledge_kind": knowledge_kind, "skill": routes[knowledge_kind]}
+                current["execution_route"] = {
+                    "status": "ROUTED",
+                    "knowledge_kind": knowledge_kind,
+                    "skill": routes[knowledge_kind],
+                    "instruction_contracts": list(GLOBAL_INSTRUCTION_CONTRACTS),
+                }
         result.append(current)
     return result
 

@@ -9,6 +9,7 @@ dimensions:
   execution_type: deterministic
 covers:
   - project-next-action-frontier
+  - instruction-data-trust-boundary
 
 fixtures:
   complete_decision:
@@ -88,6 +89,30 @@ fixtures:
       question_frontier: []
       revalidate: []
       pending: []
+  ready_decision:
+    value:
+      version: 1
+      kind: harness-decision-roadmap
+      target: IMPLEMENTATION
+      frontier_status: READY
+      ready:
+        - capability: demo.design
+          authority: DESIGN
+          reason: CREATE_MISSING_PROVIDER
+          decision_request_mode: CREATE
+          pipeline: [PRODUCE_CANDIDATE, SEMANTIC_ADMISSION]
+      completed: []
+      blocked: []
+      failed_validation: []
+      lifecycle_gaps: []
+      waiting_upstream: []
+  create_routing:
+    value:
+      routed:
+        - capabilities: [demo.design]
+          skill: skills/artifacts/system-architecture/SKILL.md
+          instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]
+      unrouted: []
 
 steps:
   - id: complete
@@ -132,6 +157,27 @@ steps:
           source: SEMANTIC_CLOSURE
           action: VALIDATE_SEMANTICS
           capability: demo.design
+
+  - id: routed-capability
+    driver: project.frontier
+    with:
+      target: IMPLEMENTATION
+      decision_roadmap: {ref: fixture.ready_decision}
+      semantic_closure: {ref: fixture.complete_semantic}
+      engineering_coverage: {ref: fixture.complete_coverage}
+      create_routing: {ref: fixture.create_routing}
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - path: /next_actions
+        op: contains_match
+        value:
+          source: DECISION_ROADMAP
+          action: RUN_CAPABILITY_PIPELINE
+          capability: demo.design
+          execution_route:
+            status: ROUTED
+            skill: skills/artifacts/system-architecture/SKILL.md
+            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]
 
   - id: blocked
     driver: project.frontier

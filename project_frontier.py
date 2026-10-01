@@ -46,6 +46,19 @@ def _require_kind(
             )
 
 
+def _routed_instruction_contracts(route: dict[str, Any]) -> list[str]:
+    contracts = route.get("instruction_contracts")
+    if (
+        not isinstance(contracts, list)
+        or not contracts
+        or any(not isinstance(item, str) or not item for item in contracts)
+    ):
+        raise CoreError(
+            "routed execution path requires non-empty instruction_contracts"
+        )
+    return list(contracts)
+
+
 def _routing_index(
     create_routing: dict[str, Any] | None,
 ) -> dict[str, dict[str, Any]]:
@@ -64,6 +77,15 @@ def _routing_index(
                     **(
                         {"skill": item["skill"]}
                         if isinstance(item.get("skill"), str)
+                        else {}
+                    ),
+                    **(
+                        {
+                            "instruction_contracts": _routed_instruction_contracts(
+                                item
+                            )
+                        }
+                        if status == "ROUTED"
                         else {}
                     ),
                     **(
@@ -203,6 +225,12 @@ def compose_project_frontier(
 
     capability_coverage: dict[str, list[dict[str, Any]]] = {}
     for item in engineering_coverage.get("work_items", []) or []:
+        execution_route = item.get("execution_route")
+        if (
+            isinstance(execution_route, dict)
+            and execution_route.get("status") == "ROUTED"
+        ):
+            _routed_instruction_contracts(execution_route)
         action = item.get("action")
         capability = item.get("capability")
         if (

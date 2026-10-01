@@ -101,6 +101,9 @@ def main() -> int:
                 {
                     "capabilities": ["demo.architecture"],
                     "skill": "skills/artifacts/system-architecture/SKILL.md",
+                    "instruction_contracts": [
+                        "docs/design/agent-instruction-architecture-v0.md"
+                    ],
                 }
             ],
             "unrouted": [],
@@ -114,6 +117,9 @@ def main() -> int:
     )
     assert capability["action"] == "RUN_CAPABILITY_PIPELINE", capability
     assert capability["execution_route"]["status"] == "ROUTED", capability
+    assert capability["execution_route"]["instruction_contracts"] == [
+        "docs/design/agent-instruction-architecture-v0.md"
+    ], capability
     assert capability["coverage_requirements"][0]["concerns"] == [
         "architecture.structure"
     ], capability
@@ -126,6 +132,40 @@ def main() -> int:
         item.get("action") == "MODEL_PRODUCTION_CONTRACT"
         for item in ready["next_actions"]
     ), ready
+
+    try:
+        compose_project_frontier(
+            target="IMPLEMENTATION",
+            decision_roadmap=decision(
+                "READY",
+                ready=[
+                    {
+                        "capability": "demo.architecture",
+                        "authority": "SYSTEM-ARCHITECTURE",
+                        "reason": "CREATE_MISSING_PROVIDER",
+                        "decision_request_mode": "CREATE",
+                        "pipeline": [],
+                    }
+                ],
+            ),
+            semantic_closure=semantic(status="INCOMPLETE"),
+            engineering_coverage=coverage(),
+            create_routing={
+                "routed": [
+                    {
+                        "capabilities": ["demo.architecture"],
+                        "skill": "skills/artifacts/system-architecture/SKILL.md",
+                    }
+                ],
+                "unrouted": [],
+            },
+        )
+    except CoreError as exc:
+        assert "instruction_contracts" in str(exc), exc
+    else:
+        raise AssertionError(
+            "Project Frontier must reject routed work without trust contracts"
+        )
 
     semantic_only = compose_project_frontier(
         target="IMPLEMENTATION",

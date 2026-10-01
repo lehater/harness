@@ -80,6 +80,10 @@ def main() -> int:
         assert routed["knowledge_kind"] == "verification-strategy", routed
         assert routed["capabilities"] == ["example.verification"], routed
         assert routed["skill"] == "skills/artifacts/verification-strategy/SKILL.md", routed
+        assert routed["instruction_contracts"] == [
+            "docs/design/agent-instruction-architecture-v0.md"
+        ], routed
+        assert (ROOT / routed["instruction_contracts"][0]).is_file(), routed
     except Exception as exc:
         errors.append(f"registered route: {exc}")
 

@@ -15,6 +15,7 @@ from engineering_graph import (
     validate_engineering_graph,
 )
 from harness import CoreError
+from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -149,6 +150,7 @@ def route_create_work(
             {
                 **base,
                 "skill": skill,
+                "instruction_contracts": list(GLOBAL_INSTRUCTION_CONTRACTS),
             }
         )
 
