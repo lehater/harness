@@ -14,6 +14,7 @@ from capability_lifecycle import evaluate_lifecycle_target, lifecycle_index, lif
 from engineering_graph import derive_profile, evaluate_engineering_target, production_index, validate_realization
 from harness import CoreError, question_frontier
 from semantic_acceptance import evaluation_index
+from semantic_admission import derive_acceptance_policy_fingerprints
 from semantic_questions import append_question_proposals, proposals_from_evaluation_set
 
 
@@ -32,8 +33,29 @@ def evaluate_semantic_closure(
     skill_registry: dict[str, Any],
     semantic_evaluations: dict[str, Any],
     lifecycle: dict[str, Any],
+    knowledge_contracts: dict[str, Any] | None = None,
+    knowledge_contract_overlays: list[dict[str, Any]] | None = None,
+    decision_contracts: dict[str, Any] | None = None,
+    decision_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     validate_skill_registry(skill_registry)
+    if knowledge_contracts is None:
+        knowledge_contracts = load_yaml(
+            Path(__file__).resolve().parent
+            / "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
+        )
+    if decision_contracts is None:
+        decision_contracts = load_yaml(
+            Path(__file__).resolve().parent
+            / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+        )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=graph,
+        knowledge_contracts=knowledge_contracts,
+        knowledge_contract_overlays=knowledge_contract_overlays,
+        decision_contracts=decision_contracts,
+        decision_policy=decision_policy,
+    )
 
     proposals = proposals_from_evaluation_set(semantic_evaluations)
     projected_model = append_question_proposals(model, proposals)
@@ -44,7 +66,12 @@ def evaluate_semantic_closure(
     productions = production_index(graph)
     evaluations = evaluation_index([semantic_evaluations])
     lifecycle_by_capability = lifecycle_index(lifecycle)
-    states = lifecycle_states(graph, realized, lifecycle)
+    states = lifecycle_states(
+        graph,
+        realized,
+        lifecycle,
+        current_acceptance_policy_fingerprints=current_policy_fingerprints,
+    )
 
     routed_kinds = {
         item["knowledge_kind"]
@@ -181,10 +208,32 @@ def evaluate_semantic_closure(
             )
             continue
 
+        if admission.get("acceptance_policy_fingerprint") != lifecycle_item.get(
+            "acceptance_policy_fingerprint"
+        ):
+            currentness_gaps.append(
+                {
+                    "capability": capability,
+                    "authority": expectation["authority"],
+                    "state": "ACCEPTANCE_POLICY_EVIDENCE_MISMATCH",
+                    "semantic_policy_fingerprint": admission.get(
+                        "acceptance_policy_fingerprint"
+                    ),
+                    "lifecycle_policy_fingerprint": lifecycle_item.get(
+                        "acceptance_policy_fingerprint"
+                    ),
+                }
+            )
+            continue
+
         satisfied.append(capability)
 
     lifecycle_target = evaluate_lifecycle_target(
-        graph, target, realized, lifecycle
+        graph,
+        target,
+        realized,
+        lifecycle,
+        current_acceptance_policy_fingerprints=current_policy_fingerprints,
     )
     proposal_ids = [item["id"] for item in proposals]
     frontier = question_frontier(realized, proposal_ids) if proposal_ids else []
@@ -233,6 +282,20 @@ def main() -> int:
         "--skill-registry",
         default="skills/artifact-skill-registry-v0.yaml",
     )
+    parser.add_argument(
+        "--knowledge-contracts",
+        default="spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml",
+    )
+    parser.add_argument(
+        "--knowledge-contract-overlay",
+        action="append",
+        default=[],
+    )
+    parser.add_argument(
+        "--decision-contracts",
+        default="spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml",
+    )
+    parser.add_argument("--decision-policy")
     args = parser.parse_args()
     result = evaluate_semantic_closure(
         graph=load_yaml(args.graph),
@@ -241,6 +304,16 @@ def main() -> int:
         skill_registry=load_yaml(args.skill_registry),
         semantic_evaluations=load_yaml(args.semantic_evaluations),
         lifecycle=load_yaml(args.lifecycle),
+        knowledge_contracts=load_yaml(args.knowledge_contracts),
+        knowledge_contract_overlays=[
+            load_yaml(path) for path in args.knowledge_contract_overlay
+        ],
+        decision_contracts=load_yaml(args.decision_contracts),
+        decision_policy=(
+            load_yaml(args.decision_policy)
+            if args.decision_policy
+            else None
+        ),
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "COMPLETE" else 1

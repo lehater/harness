@@ -45,6 +45,7 @@ Each provider assertion contains:
   that capability was accepted;
 - optional fingerprints for its accepted semantic atoms;
 - optional exhaustive prerequisite-semantic baselines containing both consumed-atom fingerprints and the complete accepted upstream source surface.
+- optional `acceptance_policy_fingerprint` binding the accepted provider to the effective semantic/decision/evaluator rules used by strict admission.
 
 The acceptance identity remains Capability-granular. When no authoritative
 semantic baseline is available, lifecycle retains the conservative
@@ -65,6 +66,7 @@ A Capability is CURRENT only when:
 3. for a prerequisite without a semantic baseline, its recorded acceptance
    identity equals the current acceptance identity;
 4. for a prerequisite with an exhaustive semantic baseline, every consumed atom still exists with the recorded fingerprint and the complete upstream semantic surface has the same atom ids and fingerprints as when the derivation was accepted. A changed, added or removed atom that was previously dispositioned as irrelevant changes the exhaustive decision surface and therefore requires revalidation.
+5. when the caller supplies current acceptance-policy fingerprints, the provider's recorded `acceptance_policy_fingerprint` matches the current fingerprint for that Capability. A missing or different baseline is STALE because currentness under changed acceptance rules has not been proven.
 
 ### STALE
 

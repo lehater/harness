@@ -50,6 +50,7 @@ contexts:
     subdomain: core
     responsibility: Own semantic evaluation, derivation proof, acceptance identity and capability currentness.
     modules:
+      - acceptance_policy
       - capability_lifecycle
       - derivation_test_coverage
       - live_calibration

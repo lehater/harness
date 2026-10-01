@@ -8,7 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from capability_lifecycle import evaluate_lifecycle_target
+from capability_lifecycle import evaluate_lifecycle_target, lifecycle_states
 from harness import CoreError
 
 
@@ -193,7 +193,29 @@ def main() -> int:
             "exhaustive semantic baseline without source surface must fail"
         )
 
-    print("capability lifecycle: PASS (CURRENT/STALE/UNKNOWN + REVALIDATE)")
+    policy_bound = projection()
+    policy_bound["providers"][0]["acceptance_policy_fingerprint"] = "sha256:source-policy-v1"
+    policy_bound["providers"][1]["acceptance_policy_fingerprint"] = "sha256:use-policy-v1"
+    policy_states = lifecycle_states(
+        GRAPH,
+        MODEL,
+        policy_bound,
+        current_acceptance_policy_fingerprints={
+            "source.identity": "sha256:source-policy-v2",
+            "use.result": "sha256:use-policy-v1",
+        },
+    )
+    assert policy_states["source.identity"]["state"] == "STALE", policy_states
+    assert any(
+        item.get("mode") == "ACCEPTANCE_POLICY"
+        for item in policy_states["source.identity"]["mismatches"]
+    ), policy_states
+    assert policy_states["use.result"]["state"] == "STALE", policy_states
+
+    print(
+        "capability lifecycle: PASS "
+        "(CURRENT/STALE/UNKNOWN + policy-bound REVALIDATE)"
+    )
     return 0
 
 

@@ -78,7 +78,10 @@ fixtures:
           findings: []
           semantic_claims: {accepted: []}
           question_proposals: []
-          admission: {status: ACCEPTED, acceptance_id: SOURCE-2}
+          admission:
+            status: ACCEPTED
+            acceptance_id: SOURCE-2
+            acceptance_policy_fingerprint: sha256:83b5edb2ec08b85ee97186f500caac33b1b16a64074db407835d9143236dfb10
         - version: 1
           kind: harness-artifact-semantic-evaluation
           artifact: APPLICATION
@@ -87,7 +90,32 @@ fixtures:
           findings: []
           semantic_claims: {accepted: []}
           question_proposals: []
-          admission: {status: ACCEPTED, acceptance_id: APPLICATION-1}
+          admission:
+            status: ACCEPTED
+            acceptance_id: APPLICATION-1
+            acceptance_policy_fingerprint: sha256:63c2db1143e07e493cd323f144f601ee7af47a163c25d84f7fcdf3c8eddc96f0
+  knowledge_contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-semantic-contracts
+      id: semantic-closure-contracts/v1
+      defaults:
+        requires_assertion_authority: true
+        requires_source_authority: true
+        requires_semantic_review: true
+        required_review_checks: [source-discipline, authority-boundary, no-invention]
+      contracts:
+        - knowledge_kind: problem-evidence
+          required_review_checks: [evidence-not-solution]
+        - knowledge_kind: application-design
+          required_review_checks: [orchestration-not-domain-reownership]
+  decision_contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-decision-contracts
+      id: semantic-closure-decisions/v1
+      policy_defaults: {exploration: EXPLORE, autonomy: CONSERVATIVE}
+      contracts: []
   lifecycle:
     value:
       version: 1
@@ -96,10 +124,12 @@ fixtures:
         - artifact: SOURCE
           capability: demo.source
           acceptance_id: SOURCE-2
+          acceptance_policy_fingerprint: sha256:83b5edb2ec08b85ee97186f500caac33b1b16a64074db407835d9143236dfb10
           accepted_prerequisites: {}
         - artifact: APPLICATION
           capability: demo.application
           acceptance_id: APPLICATION-1
+          acceptance_policy_fingerprint: sha256:63c2db1143e07e493cd323f144f601ee7af47a163c25d84f7fcdf3c8eddc96f0
           accepted_prerequisites:
             demo.source: SOURCE-1
 
@@ -122,6 +152,8 @@ steps:
       skill_registry: {ref: fixture.registry}
       semantic_evaluations: {ref: fixture.evaluations}
       lifecycle: {ref: fixture.lifecycle}
+      knowledge_contracts: {ref: fixture.knowledge_contracts}
+      decision_contracts: {ref: fixture.decision_contracts}
     expect:
       - {path: /status, op: equals, value: INCOMPLETE}
       - {path: /structural_status, op: equals, value: COMPLETE}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import copy
 import sys
 import yaml
 
@@ -9,7 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness import CoreError
-from semantic_admission import admit_artifact, knowledge_contract_index
+from semantic_admission import (
+    admit_artifact,
+    derive_acceptance_policy_fingerprints,
+    knowledge_contract_index,
+)
 from semantic_derivation import evaluate_derivation
 
 
@@ -177,6 +182,18 @@ def main() -> int:
     contracts = load(
         "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
     )
+    decision_contracts = load(
+        "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+    )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=GRAPH,
+        knowledge_contracts=contracts,
+        decision_contracts=decision_contracts,
+        decision_policy=None,
+    )
+    LIFECYCLE["providers"][0]["acceptance_policy_fingerprint"] = (
+        current_policy_fingerprints["example.user-needs"]
+    )
     contract_index = knowledge_contract_index(contracts)
     assert {
         "dependency-topology-explicit-where-material",
@@ -254,6 +271,38 @@ def main() -> int:
         }
     }
     assert result["lifecycle_assertion"]["semantic_atom_fingerprints"], result
+    assert result["admission"]["acceptance_policy_fingerprint"] == (
+        current_policy_fingerprints["example.requirements"]
+    ), result
+    assert result["lifecycle_assertion"]["acceptance_policy_fingerprint"] == (
+        current_policy_fingerprints["example.requirements"]
+    ), result
+
+    changed_contracts = copy.deepcopy(contracts)
+    changed_user_needs = next(
+        item
+        for item in changed_contracts["contracts"]
+        if item["knowledge_kind"] == "user-needs"
+    )
+    changed_user_needs.setdefault("required_review_checks", []).append(
+        "policy-change-probe"
+    )
+    expect_core_error(
+        lambda: admit_artifact(
+            graph=GRAPH,
+            model=MODEL,
+            skill_registry=registry,
+            knowledge_contracts=changed_contracts,
+            decision_contracts=decision_contracts,
+            capability="example.requirements",
+            sources=sources(),
+            candidate=candidate(),
+            acceptance_id="REQ-POLICY-STALE",
+            lifecycle=LIFECYCLE,
+        ),
+        "prerequisite example.user-needs is STALE",
+    )
+
 
     bad_review = candidate()
     bad_review["semantic_review"]["checks"].remove(

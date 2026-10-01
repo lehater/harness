@@ -194,6 +194,13 @@ to an active artifact skill:
   explicitly accepted;
 - the provider must have a CURRENT capability lifecycle assertion whose
   acceptance identity matches the semantic admission;
+- semantic admission and lifecycle evidence must carry the same
+  `acceptance_policy_fingerprint`, derived from the effective knowledge-kind
+  semantic contract (including overlays), decision contract, effective decision
+  policy and versioned semantic-admission evaluator contract;
+- strict closure recomputes that fingerprint from the current rules; a missing
+  or changed fingerprint makes the accepted provider STALE and requires
+  revalidation;
 - its recorded prerequisite acceptance identities must match the currently
   selected prerequisite identities.
 
@@ -205,3 +212,9 @@ owning Authorities revalidate.
 The canonical strict check is `semantic_closure.py`. Projects may wrap it in
 their own CI entrypoint, but a green structural target alone must not be
 presented as full engineering closure.
+
+Acceptance-policy fingerprints identify effective rules, not files. Changes that
+alter semantic obligations, overlays, decision axes/policy or evaluator contract
+must change the fingerprint. The evaluator contract identifier is intentionally
+versioned and must be bumped whenever semantic-admission behavior changes in a
+way that can alter acceptance.

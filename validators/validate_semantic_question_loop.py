@@ -10,7 +10,11 @@ sys.path.insert(0, str(ROOT))
 
 from engineering_graph import evaluate_engineering_target, realize_core_model
 from harness import resolve_question, unresolved_questions
-from semantic_admission import admit_artifact, load_yaml
+from semantic_admission import (
+    admit_artifact,
+    derive_acceptance_policy_fingerprints,
+    load_yaml,
+)
 from semantic_closure import evaluate_semantic_closure
 from semantic_questions import append_question_proposals
 
@@ -150,6 +154,15 @@ def main() -> int:
     registry = load_yaml(ROOT / "skills/artifact-skill-registry-v0.yaml")
     base_contracts = load_yaml(
         ROOT / "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
+    )
+    decision_contracts = load_yaml(
+        ROOT / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+    )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=GRAPH,
+        knowledge_contracts=base_contracts,
+        decision_contracts=decision_contracts,
+        decision_policy=None,
     )
 
     rejected = admit_artifact(
@@ -318,6 +331,14 @@ def main() -> int:
             "acceptance_id": "INTERACTION-1",
         },
     }
+    for provider in lifecycle["providers"]:
+        provider["acceptance_policy_fingerprint"] = (
+            current_policy_fingerprints[provider["capability"]]
+        )
+    interaction_eval["admission"]["acceptance_policy_fingerprint"] = (
+        current_policy_fingerprints["example.interaction"]
+    )
+
     bundle = {
         "version": 1,
         "kind": "harness-semantic-evaluation-set",

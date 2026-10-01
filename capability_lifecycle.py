@@ -34,6 +34,7 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
         capability = item.get("capability")
         artifact = item.get("artifact")
         acceptance_id = item.get("acceptance_id")
+        acceptance_policy_fingerprint = item.get("acceptance_policy_fingerprint")
         baseline = item.get("accepted_prerequisites", {})
         semantic_atoms = item.get("semantic_atom_fingerprints", {})
         semantic_baseline = item.get("accepted_prerequisite_semantics", {})
@@ -41,6 +42,16 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise CoreError("lifecycle provider artifact/capability/acceptance_id are required")
         if capability in result:
             raise CoreError(f"duplicate lifecycle capability: {capability}")
+        if (
+            acceptance_policy_fingerprint is not None
+            and (
+                not isinstance(acceptance_policy_fingerprint, str)
+                or not acceptance_policy_fingerprint
+            )
+        ):
+            raise CoreError(
+                f"invalid acceptance policy fingerprint for {capability}"
+            )
         if not isinstance(baseline, dict) or any(
             not isinstance(k, str)
             or not k
@@ -138,6 +149,8 @@ def lifecycle_states(
     graph: dict[str, Any],
     model: dict[str, Any],
     projection: dict[str, Any],
+    *,
+    current_acceptance_policy_fingerprints: dict[str, str] | None = None,
 ) -> dict[str, dict[str, Any]]:
     lifecycle = validate_projection(graph, model, projection)
     productions = production_index(graph)
@@ -165,6 +178,27 @@ def lifecycle_states(
         )
         mismatches: list[dict[str, Any]] = []
         baseline = item.get("accepted_prerequisites", {})
+
+        current_policy_fingerprint = (
+            current_acceptance_policy_fingerprints.get(capability)
+            if current_acceptance_policy_fingerprints is not None
+            else None
+        )
+        accepted_policy_fingerprint = item.get(
+            "acceptance_policy_fingerprint"
+        )
+        if (
+            current_policy_fingerprint is not None
+            and accepted_policy_fingerprint != current_policy_fingerprint
+        ):
+            mismatches.append(
+                {
+                    "capability": capability,
+                    "mode": "ACCEPTANCE_POLICY",
+                    "accepted_policy_fingerprint": accepted_policy_fingerprint,
+                    "current_policy_fingerprint": current_policy_fingerprint,
+                }
+            )
 
         semantic_baseline = item.get("accepted_prerequisite_semantics", {})
         for prerequisite in required:
@@ -276,10 +310,17 @@ def evaluate_lifecycle_target(
     target: str,
     model: dict[str, Any],
     projection: dict[str, Any],
+    *,
+    current_acceptance_policy_fingerprints: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     realized = validate_realization(graph, model)
     profile = derive_profile(graph, target)
-    states = lifecycle_states(graph, realized, projection)
+    states = lifecycle_states(
+        graph,
+        realized,
+        projection,
+        current_acceptance_policy_fingerprints=current_acceptance_policy_fingerprints,
+    )
     artifacts = realized.get("artifacts", []) or []
     expectations = {e["id"]: e for e in profile["expectations"]}
 

@@ -14,10 +14,14 @@ from typing import Any
 
 import yaml
 
+from acceptance_policy import build_acceptance_policy_baseline
 from agent_router import validate_skill_registry
 from authority_context import build_authority_context, validate_extracted_references
 from capability_lifecycle import lifecycle_index, lifecycle_states
-from decision_execution_assurance import evaluate_execution_assurance
+from decision_execution_assurance import (
+    effective_execution_assurance,
+    evaluate_execution_assurance,
+)
 from decision_exploration import evaluate_decision_exploration
 from decision_explorer_request import build_decision_explorer_request
 from decision_governance import (
@@ -135,6 +139,82 @@ def effective_knowledge_contract(
                 list(result.get(field, []) or []),
                 list(item.get(field, []) or []),
             )
+    return result
+
+
+def derive_acceptance_policy_baseline(
+    *,
+    knowledge_kind: str,
+    knowledge_contracts: dict[str, Any],
+    knowledge_contract_overlays: list[dict[str, Any]] | None = None,
+    decision_contracts: dict[str, Any] | None = None,
+    decision_policy: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    semantic_contracts = knowledge_contract_index(knowledge_contracts)
+    kind_contract = semantic_contracts.get(knowledge_kind)
+    if kind_contract is None:
+        raise CoreError(
+            f"knowledge_kind {knowledge_kind} has no semantic admission contract"
+        )
+    effective_semantic = effective_knowledge_contract(
+        kind_contract,
+        knowledge_kind,
+        knowledge_contract_overlays,
+    )
+    if decision_contracts is None:
+        decision_contracts = load_yaml(
+            Path(__file__).resolve().parent
+            / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+        )
+    decision_contract = decision_contract_index(decision_contracts).get(
+        knowledge_kind
+    )
+    decision_axis_policies = axis_policies(
+        decision_contract,
+        decision_policy,
+    )
+    return build_acceptance_policy_baseline(
+        knowledge_kind=knowledge_kind,
+        semantic_contract=effective_semantic,
+        decision_contract=decision_contract,
+        decision_axis_policies=decision_axis_policies,
+        execution_assurance=effective_execution_assurance(
+            decision_policy,
+            knowledge_kind,
+        ),
+    )
+
+
+def derive_acceptance_policy_fingerprints(
+    *,
+    graph: dict[str, Any],
+    knowledge_contracts: dict[str, Any],
+    knowledge_contract_overlays: list[dict[str, Any]] | None = None,
+    decision_contracts: dict[str, Any] | None = None,
+    decision_policy: dict[str, Any] | None = None,
+) -> dict[str, str]:
+    if decision_contracts is None:
+        decision_contracts = load_yaml(
+            Path(__file__).resolve().parent
+            / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+        )
+    semantic_contracts = knowledge_contract_index(knowledge_contracts)
+    result: dict[str, str] = {}
+    for capability, production in production_index(graph).items():
+        knowledge_kind = production.get("knowledge_kind")
+        if (
+            not isinstance(knowledge_kind, str)
+            or knowledge_kind not in semantic_contracts
+        ):
+            continue
+        baseline = derive_acceptance_policy_baseline(
+            knowledge_kind=knowledge_kind,
+            knowledge_contracts=knowledge_contracts,
+            knowledge_contract_overlays=knowledge_contract_overlays,
+            decision_contracts=decision_contracts,
+            decision_policy=decision_policy,
+        )
+        result[capability] = baseline["fingerprint"]
     return result
 
 
@@ -389,6 +469,23 @@ def admit_artifact(
         decision_contract,
         decision_policy,
     )
+    acceptance_policy = build_acceptance_policy_baseline(
+        knowledge_kind=knowledge_kind,
+        semantic_contract=kind_contract,
+        decision_contract=decision_contract,
+        decision_axis_policies=decision_axis_policies,
+        execution_assurance=effective_execution_assurance(
+            decision_policy,
+            knowledge_kind,
+        ),
+    )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=graph,
+        knowledge_contracts=knowledge_contracts,
+        knowledge_contract_overlays=knowledge_contract_overlays,
+        decision_contracts=decision_contracts,
+        decision_policy=decision_policy,
+    )
 
     context = build_authority_context(
         graph, realized, authority, [capability]
@@ -420,7 +517,12 @@ def admit_artifact(
                 f"capability {capability} has prerequisites and requires a "
                 "capability lifecycle projection for semantic admission"
             )
-        states = lifecycle_states(graph, realized, lifecycle)
+        states = lifecycle_states(
+            graph,
+            realized,
+            lifecycle,
+            current_acceptance_policy_fingerprints=current_policy_fingerprints,
+        )
         index = lifecycle_index(lifecycle)
         for prerequisite in prerequisite_capabilities:
             if states[prerequisite]["state"] != "CURRENT":
@@ -565,6 +667,8 @@ def admit_artifact(
         "accepted_prerequisites": baseline,
         "accepted_prerequisite_semantics": semantic_baseline,
         "semantic_contract": "knowledge-kind-semantic-contracts/v1",
+        "acceptance_policy": acceptance_policy,
+        "acceptance_policy_fingerprint": acceptance_policy["fingerprint"],
         "decision_exploration": exploration_evaluation["status"],
         "decision_explorer_request_id": (
             explorer_request.get("request_id")
@@ -580,6 +684,7 @@ def admit_artifact(
             "artifact": candidate["id"],
             "capability": capability,
             "acceptance_id": acceptance_id,
+            "acceptance_policy_fingerprint": acceptance_policy["fingerprint"],
             "accepted_prerequisites": baseline,
             **(
                 {"accepted_prerequisite_semantics": semantic_baseline}
