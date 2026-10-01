@@ -18,6 +18,7 @@ This is a Maintainer operation. It is not exported to target repositories.
 - requested Harness change or confirmed HARN finding;
 - relevant canonical design/specification;
 - `docs/design/harness-assurance-policy-v0.md`;
+- `docs/design/harness-ability-to-evidence-v0.md`;
 - current non-main branch state;
 - existing Scenario Suite/acceptance coverage;
 - related EVO/HARN records when present.
@@ -26,9 +27,10 @@ This is a Maintainer operation. It is not exported to target repositories.
 
 1. Confirm work is occurring on a non-main branch. Never implement directly on
    `main`.
-2. Identify the owning bounded context/layer, affected Harness
-   ability/responsibility, material failure mode, and the canonical contract
-   that defines the behavior. Do not let a skill or README become a second
+2. Identify the owning bounded context/layer and map the change to the
+   applicable canonical Harness ability/failure mode in
+   `docs/design/harness-ability-to-evidence-v0.md`; identify the canonical
+   contract that defines the behavior. Do not let a skill or README become a second
    semantic owner.
 3. If the change touches CI triggers, gate composition, validator/test inventory
    or check ordering, load `docs/design/ci-execution-policy-v0.md` and

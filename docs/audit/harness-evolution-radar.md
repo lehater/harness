@@ -1235,7 +1235,9 @@ which the Integration Contract does not make a Harness responsibility.
 **Status:** ADOPTED
 
 The accepted assurance direction is canonicalized in
-`docs/design/harness-assurance-policy-v0.md`.
+`docs/design/harness-assurance-policy-v0.md`, and the first canonical
+human-readable Ability-to-Evidence denominator is defined in
+`docs/design/harness-ability-to-evidence-v0.md`.
 
 The policy establishes:
 
@@ -1250,9 +1252,9 @@ The policy establishes:
   denominator for assurance, rather than test/scenario counts;
 - separation of evidence sufficiency from CI execution policy.
 
-The exact machine-readable Ability-to-Evidence registry remains a separate
-implementation concern. Adoption of the architecture does not imply that the
-registry already exists.
+The human-readable model now exists. A machine-readable Ability-to-Evidence
+registry remains a separate implementation concern and should be introduced
+only when it adds enforcement value beyond the canonical design model.
 
 **Why adopted**
 
@@ -1270,3 +1272,4 @@ increases cost and reduces failure localization.
 - EVO-032
 - EVO-033
 - `docs/design/harness-assurance-policy-v0.md`
+- `docs/design/harness-ability-to-evidence-v0.md`

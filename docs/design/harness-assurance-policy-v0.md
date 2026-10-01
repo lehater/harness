@@ -45,6 +45,7 @@ Harness Assurance Policy
 
 Ability-to-Evidence model
     owns what Harness responsibilities/failure modes require evidence
+    (docs/design/harness-ability-to-evidence-v0.md)
 
 tests / validators / scenarios / eval protocols
     provide concrete evidence
@@ -309,8 +310,10 @@ A high test level with a weak oracle is not automatically strong evidence.
 
 ## Ability-to-Evidence contract
 
-The canonical assurance model should preserve, for each material Harness
-ability:
+The canonical model is
+`docs/design/harness-ability-to-evidence-v0.md`.
+
+It preserves, for each material Harness ability:
 
 - stable ability identity;
 - observable contract;
@@ -324,8 +327,9 @@ ability:
 - known gaps;
 - release-critical flag.
 
-The exact machine-readable registry format is not defined by this policy.
-Introducing or changing that representation is a separate implementation change.
+The current canonical model is intentionally human-readable design. The exact
+machine-readable registry format is not defined by this policy. Introducing or
+changing that representation is a separate implementation change.
 
 ## Change procedure
 
