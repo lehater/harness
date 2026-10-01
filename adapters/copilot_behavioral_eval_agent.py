@@ -113,6 +113,17 @@ def _response_contract(dimension: str) -> dict[str, Any]:
     }
 
 
+def _blinded_fixture(value: Any) -> Any:
+    """Remove evaluation-only envelope metadata before provider execution."""
+    if not isinstance(value, dict):
+        return value
+    return {
+        key: item
+        for key, item in value.items()
+        if key not in {"version", "kind", "id"}
+    }
+
+
 def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
     if request.get("version") != 1:
         raise ValueError("behavioral request version must be 1")
@@ -145,7 +156,7 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
         "trusted_instructions": _trusted_instruction_bundle(request),
         "user_task": user_task,
         "selected_scope": selected_scope,
-        "repository_fixture": request.get("repository_fixture"),
+        "repository_fixture": _blinded_fixture(request.get("repository_fixture")),
         "write_policy": request.get("write_policy"),
         "allowed_tools": request.get("allowed_tools"),
         "semantic_dimension": dimension,
