@@ -1,0 +1,16 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-003-FIXTURE-V1
+atoms:
+  - id: P1
+    statement: "Payment creation must accept idempotency keys."
+    source_path: "docs/contracts.md"
+  - id: P2
+    statement: "A retry using the same idempotency key must not create a second charge."
+    source_path: "docs/contracts.md"
+  - id: A1
+    statement: "Audit records must be retained for seven years."
+    source_path: "docs/contracts.md"
+  - id: A2
+    statement: "Audit-retention changes are accepted and revalidated independently from payment retry semantics."
+    source_path: "docs/contracts.md"

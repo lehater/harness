@@ -1,0 +1,16 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-AUTH-002-FIXTURE-V1
+atoms:
+  - id: P1
+    statement: "Payment creation accepts an idempotency key."
+    source_path: "docs/contracts.md"
+  - id: P2
+    statement: "Duplicate keyed retries are governed by the payment public contract."
+    source_path: "docs/contracts.md"
+  - id: A1
+    statement: "Audit records are retained for seven years."
+    source_path: "docs/contracts.md"
+  - id: A2
+    statement: "Audit-retention policy has its own public contract and can change/revalidate independently from payment creation."
+    source_path: "docs/contracts.md"

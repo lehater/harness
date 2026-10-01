@@ -1,0 +1,29 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-CAP-002
+abilities: [HA-A05]
+failure_modes: [A05-F02]
+test_level: TL1
+fixture_revision: TD-CAP-002-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Identify any independently provable engineering knowledge required by the accepted evidence. Descriptive material is evidence only when it actually establishes a requirement or decision."
+selected_scope: "payment-api-contract-readiness"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+  - docs/design/harness-ability-to-evidence-v0.md
+  - skills/agent/design-profile/SKILL.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [capability_partition]
+pass_criteria:
+  require_dimensions: [capability_partition]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

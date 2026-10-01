@@ -1,0 +1,29 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-CAP-004
+abilities: [HA-A05]
+failure_modes: [A05-F03, A05-F04]
+test_level: TL1
+fixture_revision: TD-CAP-004-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Partition repeated or differently worded evidence into semantic Capabilities without duplicating one independently provable surface."
+selected_scope: "payment-retry-contract"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+  - docs/design/harness-ability-to-evidence-v0.md
+  - skills/agent/design-profile/SKILL.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [capability_partition]
+pass_criteria:
+  require_dimensions: [capability_partition]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

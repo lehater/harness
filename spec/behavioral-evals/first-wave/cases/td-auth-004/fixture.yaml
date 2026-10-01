@@ -1,0 +1,20 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-AUTH-004-FIXTURE-V1
+atoms:
+  - id: I1
+    statement: "Customer identity verification rules form one public contract."
+    source_path: "modules/retention/payment.md"
+    module_label: "audit"
+  - id: I2
+    statement: "Identity-verification rule changes are accepted together with the customer identity contract."
+    source_path: "docs/security/identity.md"
+    module_label: "payments"
+  - id: R1
+    statement: "Audit retention duration forms a separate public contract."
+    source_path: "docs/mixed-contracts.md"
+    module_label: "identity"
+  - id: R2
+    statement: "Retention duration can change and revalidate independently from identity verification."
+    source_path: "modules/payment/retention.md"
+    module_label: "security"

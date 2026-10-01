@@ -39,7 +39,12 @@ workflow_roles:
   role: external
   cost_class: heavy
   draft_behavior: manual
-  rationale: Provider-backed calibration has a 10 minute timeout and is intentionally operator-triggered.
+  rationale: Provider-backed calibration has a 10 minute timeout and is intentionally operator-triggered.- path: .github/workflows/behavioral-eval-copilot.yml
+  role: external
+  cost_class: heavy
+  draft_behavior: manual
+  rationale: Provider-backed agent judgement evidence is intentionally operator-triggered and outside ordinary PR gates.
+
 checks:
 - id: ci_policy
   command: python validators/validate_ci_policy.py
@@ -53,6 +58,11 @@ checks:
   disposition: full_gate
 - id: behavioral_eval
   command: python validators/validate_behavioral_eval.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: behavioral_eval_cases
+  command: python validators/validate_behavioral_eval_cases.py
   stage: focused
   cost_class: cheap
   disposition: full_gate

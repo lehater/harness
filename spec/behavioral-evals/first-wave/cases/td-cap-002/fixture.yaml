@@ -1,0 +1,16 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-002-FIXTURE-V1
+atoms:
+  - id: N1
+    statement: "A tutorial example uses Redis caching while demonstrating request handling."
+    source_path: "examples/tutorial.md"
+  - id: N2
+    statement: "A sample log line contains the words retry and security."
+    source_path: "examples/log-output.txt"
+  - id: N3
+    statement: "A benchmark note mentions metrics collected during a historical experiment."
+    source_path: "notes/benchmark.md"
+  - id: N4
+    statement: "The repository contains folders named cache, retries, security, and metrics."
+    source_path: "README.md"

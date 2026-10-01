@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Validate first-wave behavioral cases and Copilot adapter boundary without a live call."""
+from __future__ import annotations
+
+import json
+import shutil
+import sys
+import tempfile
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from behavioral_eval import build_execution_request, load_case
+from adapters.copilot_behavioral_eval_agent import (
+    _model_payload,
+    _parse_model_response,
+)
+
+BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
+MANIFEST = yaml.safe_load((BASE / "manifest-v0.yaml").read_text(encoding="utf-8"))
+EXPECTED = {
+    "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
+    "TD-AUTH-001", "TD-AUTH-002", "TD-AUTH-004",
+    "TD-ROUTE-001", "TD-ROUTE-002", "TD-ROUTE-003",
+}
+assert MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+entries = MANIFEST["cases"]
+assert {item["design"] for item in entries} == EXPECTED
+
+descriptor = {
+    "version": 1,
+    "kind": "harness-agent-descriptor",
+    "id": "boundary-test",
+    "provider": "github-copilot",
+    "model": "gpt-6-luna",
+    "model_version": "UNREPORTED",
+    "configuration": {
+        "requested_model": "gpt-6-luna",
+        "model_selection": "explicit",
+        "copilot_cli_version": "1.0.86",
+        "provider_timeout_seconds": 150,
+    },
+}
+
+for entry in entries:
+    template = BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(encoding="utf-8")
+        assert "__HARNESS_REVISION__" in rendered
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["normalization_profile"]["dimensions"] == [entry["dimension"]]
+
+        request = build_execution_request(
+            binding,
+            run_id=f"{entry['design']}-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        assert "oracle_ref" not in request
+        assert "pass_criteria" not in request
+        payload = _model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        assert "harness-test-design-catalog" not in serialized
+        assert "spec/behavioral-evals" not in serialized
+
+        fixture = binding.fixture
+        if entry["dimension"] in {"capability_partition", "authority_partition"}:
+            atoms = fixture.get("atoms")
+            assert isinstance(atoms, list)
+            atom_ids = {atom["id"] for atom in atoms}
+            oracle_groups = binding.oracle["dimensions"][entry["dimension"]]["groups"]
+            assert all(set(group) <= atom_ids for group in oracle_groups)
+            field = "capabilities" if entry["dimension"] == "capability_partition" else "authorities"
+            sample = {
+                "version": 1,
+                "kind": "harness-agent-behavioral-model-response",
+                "output": {field: [{"support_atoms": group} for group in oracle_groups]},
+            }
+            parsed = _parse_model_response(json.dumps(sample), entry["dimension"])
+            assert parsed["output"][field] == sample["output"][field]
+        else:
+            expected = binding.oracle["dimensions"]["selected_operation"]
+            registry = yaml.safe_load(
+                (ROOT / "skills/consumer-operation-registry-v0.yaml").read_text(
+                    encoding="utf-8"
+                )
+            )
+            public = {
+                item["operation"]
+                for item in registry["routes"]
+                if item.get("exposure") == "public"
+            }
+            assert expected in public
+            parsed = _parse_model_response(
+                json.dumps({
+                    "version": 1,
+                    "kind": "harness-agent-behavioral-model-response",
+                    "selected_operation": expected,
+                }),
+                "selected_operation",
+            )
+            assert parsed["selected_operation"] == expected
+
+print(f"first-wave behavioral eval cases: PASS ({len(entries)} cases)")

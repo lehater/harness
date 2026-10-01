@@ -1,0 +1,4 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-ROUTE-002-FIXTURE-V1
+project_context: "Existing target repository; no additional route label is supplied."

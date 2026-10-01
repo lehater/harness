@@ -9,6 +9,9 @@ on:
       - "validators/validate_ci_policy.py"
       - "validators/validate_assurance_registry.py"
       - "validators/validate_behavioral_eval.py"
+      - "validators/validate_behavioral_eval_cases.py"
+      - "adapters/copilot_behavioral_eval_agent.py"
+      - "spec/behavioral-evals/**"
       - "behavioral_eval.py"
       - "spec/behavioral-eval-integration/**"
       - "spec/assurance/harness-assurance-registry-v0.yaml"
@@ -24,6 +27,9 @@ on:
       - "validators/validate_ci_policy.py"
       - "validators/validate_assurance_registry.py"
       - "validators/validate_behavioral_eval.py"
+      - "validators/validate_behavioral_eval_cases.py"
+      - "adapters/copilot_behavioral_eval_agent.py"
+      - "spec/behavioral-evals/**"
       - "behavioral_eval.py"
       - "spec/behavioral-eval-integration/**"
       - "spec/assurance/harness-assurance-registry-v0.yaml"
@@ -46,3 +52,4 @@ jobs:
       - run: python validators/validate_ci_policy.py
       - run: python validators/validate_assurance_registry.py
       - run: python validators/validate_behavioral_eval.py
+      - run: python validators/validate_behavioral_eval_cases.py
