@@ -65,7 +65,7 @@ separate defect has been demonstrated.
 | EVO-002 | RECOMMENDATION | VALIDATED | Skill engineering | Define a common Harness skill anatomy with explicit applicability, procedure and verification evidence. |
 | EVO-003 | RESEARCH | CAPTURED | DDD / skills | Evaluate a distinct Method / Procedure Library boundary for reusable engineering methods. |
 | EVO-004 | RECOMMENDATION | VALIDATED | Routing | Preserve deterministic routing for artifact-production skills; use intent/trigger routing only where work is genuinely selected from natural language. |
-| EVO-005 | RECOMMENDATION | CAPTURED | Context engineering | Make progressive disclosure and minimal-context loading an explicit Harness skill-design principle. |
+| EVO-005 | RECOMMENDATION | ADOPTED | Context engineering | Progressive disclosure/minimal-context loading is now canonicalized in `docs/design/agent-instruction-architecture-v0.md`; empirical context-cost measurement remains future assurance work. |
 | EVO-006 | RECOMMENDATION | CAPTURED | Skill composition | Prefer cross-skill composition over copying shared procedures into many skills. |
 | EVO-007 | RECOMMENDATION | CAPTURED | Portability | Keep reusable skills model-neutral and describe capabilities/procedures rather than runtime-specific workarounds. |
 | EVO-008 | IDEA | CAPTURED | Agent reliability | Add Red Flags / anti-rationalization guidance selectively to judgement-heavy skills. |
@@ -277,7 +277,10 @@ This records a design direction to preserve rather than a current failure.
 ### EVO-005 — Progressive disclosure and context budget
 
 **Type:** RECOMMENDATION  
-**Status:** CAPTURED
+**Status:** ADOPTED
+
+The normative direction is now owned by
+`docs/design/agent-instruction-architecture-v0.md`.
 
 **Direction**
 
@@ -294,10 +297,11 @@ Make minimal-context loading a first-class skill-design principle:
 This reinforces Harness's Authority Context and clean-context goals while
 reducing stale-context influence.
 
-**Evidence needed**
+**Remaining assurance**
 
-Measure context size and behavioral quality on a representative long workflow
-before and after progressive loading.
+AUD-015 confirmed the architecture is adopted, but Harness still has no measured
+real-agent context/token baseline. Measure context size and behavioral quality on
+a representative long workflow before treating AP-18 as fully covered.
 
 **Not a defect**
 

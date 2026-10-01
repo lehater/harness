@@ -46,7 +46,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-15 | Observability / diagnosability | Can a maintainer explain why a route/state/action was produced from available evidence? | PARTIAL | AUD-013 |
 | AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | live-calibration contracts |
 | AP-17 | Security / trust boundaries | Can repository content, tool output or prompt injection cross an authority/tool trust boundary? | COVERED | AUD-011 |
-| AP-18 | Performance / cost / context efficiency | Does Harness avoid unnecessary context, validation, CI and evaluator work? | PARTIAL | AUD-008/AUD-009 (CI only) |
+| AP-18 | Performance / cost / context efficiency | Does Harness avoid unnecessary context, validation, CI and evaluator work? | PARTIAL | AUD-015 |
 | AP-19 | Recovery / crash consistency | Can interrupted multi-step application work resume without contradictory published state? | COVERED | AUD-014 / HARN-012 |
 | AP-20 | Versioning / compatibility | Can Harness/contracts/Consumer Pack evolve without silently invalidating projects? | PARTIAL | AUD-006/AUD-007 |
 | AP-21 | Provenance / reproducibility | Can state be traced to the exact policy/evidence/version that produced it? | PARTIAL | AUD-002 |
@@ -79,6 +79,7 @@ Do not rerun every perspective after every change.
 | AUD-012 | 2026-10-01 | AP-14 empirical agent behavior | Reused EVO-001. Current Scenario Suite `agent-evaluation` cases validate synthetic/structured agentic evidence and deterministic boundaries; they do not execute an agent that discovers a route, reads the selected `SKILL.md`, acts on a fixture and is graded on the resulting trace/artifact. No new defect ID allocated. |
 | AUD-013 | 2026-10-01 | AP-15 observability / diagnosability | Derived state is generally explainable through source/reason/evidence/findings fields, but routed operation selection has no durable decision trace linking user/task intent -> chosen operation -> registry route -> consumed canonical contracts. Captured as EVO-030 rather than a current defect. |
 | AUD-014 | 2026-10-01 | AP-19 recovery / crash consistency | Reused and strengthened HARN-012. Capability completion is still persisted as several separately owned artifacts/projections with no canonical atomic apply/commit boundary; interruption can expose mixed state and recomputation from a partial result. No distinct second root cause found. |
+| AUD-015 | 2026-10-01 | AP-18 performance / cost / context efficiency | CI cost/selectivity remains covered by AUD-008/009. Agent-context review found progressive disclosure now canonical in `agent-instruction-architecture-v0.md`; reused/adopted EVO-005. No measured real-agent context/token baseline exists yet, so AP-18 remains PARTIAL. |
 
 ## Finding handoff contract
 
