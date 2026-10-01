@@ -171,13 +171,14 @@ def _validate_surface_registry(errors: list[str]) -> list[dict[str, Any]]:
             errors.append(f"{skill_id}: registered skill does not exist: {path_value}")
             continue
 
-        text = path.read_text(encoding="utf-8")
-        metadata = _frontmatter(path, text, errors)
-        if metadata is not None and metadata.get("name") != skill_id:
-            errors.append(
-                f"{path_value}: frontmatter name {metadata.get('name')!r} "
-                f"does not match registered id {skill_id!r}"
-            )
+        if lifecycle != "archived":
+            text = path.read_text(encoding="utf-8")
+            metadata = _frontmatter(path, text, errors)
+            if metadata is not None and metadata.get("name") != skill_id:
+                errors.append(
+                    f"{path_value}: frontmatter name {metadata.get('name')!r} "
+                    f"does not match registered id {skill_id!r}"
+                )
 
         normalized.append(item)
 
