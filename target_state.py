@@ -11,7 +11,7 @@ import yaml
 
 from harness import (
     CoreError,
-    blocked,
+    artifact_blockers,
     capability_blockers,
     unblocked_capability_providers,
     validate_model,
@@ -202,10 +202,11 @@ def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dic
                 []
                 if available_providers
                 else sorted(
-                    {
+                    set(capability_blockers(model, capability))
+                    | {
                         question
                         for provider in providers
-                        for question in blocked(model, provider)
+                        for question in artifact_blockers(model, provider)
                     }
                 )
             )

@@ -17,7 +17,7 @@ from engineering_graph import (
 )
 from harness import (
     CoreError,
-    blocked,
+    artifact_blockers,
     capability_blockers,
     capability_resolve,
     unblocked_capability_providers,
@@ -163,7 +163,9 @@ def build_authority_context(
                 )
             if not available_providers:
                 for provider in providers:
-                    provider_blockers.update(blocked(realized, provider))
+                    provider_blockers.update(
+                        artifact_blockers(realized, provider)
+                    )
 
         all_blockers = sorted(
             set(direct_capability_blockers) | provider_blockers
