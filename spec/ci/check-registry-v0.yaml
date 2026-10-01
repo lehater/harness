@@ -1,0 +1,363 @@
+version: 1
+kind: harness-ci-check-registry
+id: HARNESS-CI-CHECKS-V0
+status: active
+policy: docs/design/ci-execution-policy-v0.md
+stage_order:
+- policy
+- focused
+- deferred
+- exhaustive
+cost_classes:
+  cheap:
+    nominal_seconds: <2
+  medium:
+    nominal_seconds: 2-10
+  heavy:
+    nominal_seconds: '>10'
+full_gate:
+  makefile_target: harness-check
+  workflow: .github/workflows/harness.yml
+  command: make harness-check
+  policy_first_command: python validators/validate_ci_policy.py
+workflow_roles:
+- path: .github/workflows/harness.yml
+  role: exhaustive
+- path: .github/workflows/greenfield-engineering-graph.yml
+  role: focused
+- path: .github/workflows/live-calibration-copilot.yml
+  role: external
+checks:
+- id: ci_policy
+  command: python validators/validate_ci_policy.py
+  stage: policy
+  cost_class: cheap
+  disposition: full_gate
+- id: context_boundaries
+  command: python validators/validate_context_boundaries.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: core
+  command: python validators/validate_core.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: adapters
+  command: python validators/validate_adapters.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: target_state
+  command: python validators/validate_target_state.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: engineering_graph
+  command: python validators/validate_engineering_graph.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: authority_catalog
+  command: python validators/validate_authority_catalog.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: authority_boundary_research
+  command: python validators/validate_authority_boundary_research.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: ddd_authority_research
+  command: python validators/validate_ddd_authority_research.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: reference_applicability_research
+  command: python validators/validate_reference_applicability_research.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: reference_engineering_model
+  command: python validators/validate_reference_engineering_model.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: reference_model_evolution
+  command: python validators/validate_reference_model_evolution.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: specialization_proof_semantics
+  command: python validators/validate_specialization_proof_semantics.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: project_behavior_evals
+  command: python validators/validate_project_behavior_evals.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: project_engineering_status
+  command: python validators/validate_project_engineering_status.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: project_status_e2e
+  command: python validators/validate_project_status_e2e.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: agent_router
+  command: python validators/validate_agent_router.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: workspace
+  command: python validators/validate_workspace.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: agent_layer
+  command: python validators/validate_agent_layer.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: instruction_ownership
+  command: python validators/validate_instruction_ownership.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: skill_router
+  command: python validators/validate_skill_router.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: fresh_context_routing
+  command: python validators/validate_fresh_context_routing.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: consumer_pack
+  command: python validators/validate_consumer_pack.py
+  stage: deferred
+  cost_class: medium
+  disposition: full_gate
+  rationale: AUD-008 measured this distribution check at about three seconds; defer until focused checks pass.
+- id: consumer_wrapper
+  command: python validators/validate_consumer_wrapper.py
+  stage: deferred
+  cost_class: medium
+  disposition: full_gate
+  rationale: AUD-008 measured this distribution check at about three seconds; defer until focused checks pass.
+- id: method_router
+  command: python validators/validate_method_router.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: source_coverage
+  command: python validators/validate_source_coverage.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: user_facing_application
+  command: python validators/validate_user_facing_application.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: frontend_screen_contracts
+  command: python validators/validate_frontend_screen_contracts.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: frontend_ux_closure
+  command: python validators/validate_frontend_ux_closure.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: unified_model
+  command: python validators/validate_unified_model.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: graph_doctor
+  command: python validators/validate_graph_doctor.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: human_projection
+  command: python validators/validate_human_projection.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_map_experiment
+  command: python validators/validate_coverage_map_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_derivation_experiment
+  command: python validators/validate_coverage_derivation_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_planner_experiment
+  command: python validators/validate_coverage_planner_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: concern_proof_model
+  command: python validators/validate_concern_proof_model.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: engineering_graph_semantic_claims_experiment
+  command: python validators/validate_engineering_graph_semantic_claims_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: concern_activation_policy
+  command: python validators/validate_concern_activation_policy.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: concern_activation_experiment
+  command: python validators/validate_concern_activation_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_control_loop_experiment
+  command: python validators/validate_coverage_control_loop_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: concern_activation_scaling
+  command: python validators/validate_concern_activation_scaling.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: authority_role_projection_experiment
+  command: python validators/validate_authority_role_projection_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: consumer_scoped_activation
+  command: python validators/validate_consumer_scoped_activation.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: consumer_scoped_coverage_proof
+  command: python validators/validate_consumer_scoped_coverage_proof.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: intra_consumer_scope
+  command: python validators/validate_intra_consumer_scope.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: subject_scoped_coverage
+  command: python validators/validate_subject_scoped_coverage.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: subject_obligations
+  command: python validators/validate_subject_obligations.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: engineering_coverage
+  command: python validators/validate_engineering_coverage.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: repository_realization_design
+  command: python validators/validate_repository_realization_design.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: architecture_driver_closure
+  command: python validators/validate_architecture_driver_closure.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_blocker_transition
+  command: python validators/validate_coverage_blocker_transition.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: coverage_production_contract_overlay
+  command: python validators/validate_coverage_production_contract_overlay.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: semantic_acceptance
+  command: python validators/validate_semantic_acceptance.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: skill_invariant_policy
+  command: python validators/validate_skill_invariant_policy.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: capability_lifecycle
+  command: python validators/validate_capability_lifecycle.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: decision_governance
+  command: python validators/validate_decision_governance.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: decision_pipeline
+  command: python validators/validate_decision_pipeline.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: project_frontier
+  command: python validators/validate_project_frontier.py
+  stage: focused
+  cost_class: cheaap
+  disposition: full_gate
+- id: semantic_admission
+  command: python validators/validate_semantic_admission.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: semantic_question_loop
+  command: python validators/validate_semantic_question_loop.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: semantic_closure
+  command: python validators/validate_semantic_closure.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: scenario_suite
+  command: python validators/validate_scenario_suite.py
+  stage: exhaustive
+  cost_class: heavy
+  disposition: full_gate
+  rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: live_calibration_process_driver
+  command: python validators/validate_live_calibration_process_driver.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+- id: copilot_live_calibration_evaluator
+  command: python validators/validate_copilot_live_calibration_evaluator.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+- id: harness
+  command: python validators/validate_harness.py
+  stage: focused
+  cost_class: cheap
+  disposition: unresolved
+- id: lifecycle_experiment
+  command: python -m unittest tests/test_lifecycle_experiment.py
+  stage: focused
+  cost_class: cheap
+  disposition: unresolved

@@ -28,24 +28,29 @@ This is a Maintainer operation. It is not exported to target repositories.
 2. Identify the owning bounded context/layer and the canonical contract that
    defines the behavior. Do not let a skill or README become a second semantic
    owner.
-3. State/reuse the concrete failure, invariant or accepted architecture
+3. If the change touches CI triggers, gate composition, validator/test inventory
+   or check ordering, load `docs/design/ci-execution-policy-v0.md` and
+   `spec/ci/check-registry-v0.yaml` before editing execution behavior.
+4. State/reuse the concrete failure, invariant or accepted architecture
    decision that justifies the change.
-4. Before changing observable behavior, add or update the smallest failing
+5. Before changing observable behavior, add or update the smallest failing
    deterministic acceptance/scenario evidence that expresses the intended
    invariant when such an oracle exists.
-5. For a Core extension, require the concrete consumer failure and acceptance
+6. For a Core extension, require the concrete consumer failure and acceptance
    fixture required by `docs/design/core-v0.md`; do not add workflow/process
    entities without demonstrated need.
-6. If the change affects cross-layer consumer-visible behavior, classify/update
+7. If the change affects cross-layer consumer-visible behavior, classify/update
    it in the Scenario Suite according to
    `docs/design/scenario-suite-v0.md`. A subsystem validator does not replace a
    cross-layer scenario when several Harness mechanisms participate.
-7. Implement the smallest coherent change and update canonical contracts,
+8. Implement the smallest coherent change and update canonical contracts,
    registries and migrations together.
-8. Run the smallest deterministic affected validators/tests during iteration.
-9. Run the full applicable repository gate (`make harness-check` / PR workflow)
+9. Run the smallest deterministic affected validators/tests during iteration.
+   For CI topology/inventory changes, run `python validators/validate_ci_policy.py`
+   before broader checks so policy failures stop expensive work early.
+10. Run the full applicable repository gate (`make harness-check` / PR workflow)
    on a coherent candidate.
-10. Keep integration as a draft/non-main change until all applicable checks are
+11. Keep integration as a draft/non-main change until all applicable checks are
     green and the resulting Harness behavior has been reviewed. Integration to
     `main` is a separate squash-merge action.
 
