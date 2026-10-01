@@ -65,6 +65,13 @@ Possible terminal outcomes are:
 - `BLOCKED` — unresolved semantics were published as Core Questions;
 - `FAILED_VALIDATION` — the execution/evidence itself is invalid.
 
+A terminal outcome is not visible merely because its component evidence has been
+computed. The coordinator prepares the complete next Project Publication and
+publishes it against the revision from which the work was derived. Core changes,
+semantic evaluation, lifecycle assertion, Question resolution and failure
+evidence therefore cross one logical visibility boundary. See
+`docs/design/project-publication-v0.md`.
+
 ## Option formation
 
 Decision Exploration is the option-formation evidence.
@@ -136,8 +143,9 @@ Redo does not waive blockers or upstream currentness.
 For a failed CREATE, explicit redo means "retry the failed pipeline attempt", not
 "redo accepted knowledge". The roadmap therefore emits
 `EXPLICIT_RETRY_FAILED_VALIDATION` with `decision_request_mode: CREATE`.
-A new terminal result replaces/clears the persisted failure evidence through the
-caller integration; this orchestration evidence never becomes Core truth.
+A new terminal result replaces/clears the persisted failure evidence in the
+same atomic Project Publication as the other terminal-result facts; this
+orchestration evidence never becomes Core truth.
 
 ## Core boundary
 

@@ -43,8 +43,13 @@ before option formation is complete.
 5. Any ESCALATED decision uses the existing Core Question mechanism.
 6. PRODUCE CANDIDATE from the reviewed/accepted decision dispositions.
 7. Run strict SEMANTIC ADMISSION with the same Decision Exploration request mode.
-8. Finish as CURRENT, BLOCKED or FAILED_VALIDATION.
-9. Recompute the Decision Roadmap and continue with another READY Capability.
+8. Form the complete next Project Publication for CURRENT, BLOCKED or
+   FAILED_VALIDATION against the revision from which this work started.
+9. Atomically publish that revision through the direct publication helper or the
+   project-native adapter transaction. Do not persist Core/evaluation/lifecycle/
+   failure components independently.
+10. Recompute the Decision Roadmap from the newly published revision and continue
+    with another READY Capability.
 
 ## Critical review requirement
 
@@ -70,13 +75,17 @@ do not invent a REDO baseline.
 
 ## Output contract
 
-Persist only the evidence appropriate to the actual result:
+Prepare only the evidence appropriate to the actual result, then commit it
+through one Project Publication transition:
 
 - CURRENT: accepted Decision Exploration + Decision Governance + candidate
-  admission/lifecycle evidence;
+  Core realization + admission/lifecycle evidence, with any resolved Question
+  state and previous failure entry cleared coherently;
 - BLOCKED: Core Questions plus any useful noncanonical analysis;
-- FAILED_VALIDATION: persisted failure-set entry with Capability, failure id,
-  failing pipeline stage and validation finding sufficient to reproduce the defect.
+- FAILED_VALIDATION: failure-set entry with Capability, failure id, failing
+  pipeline stage and validation finding sufficient to reproduce the defect.
+
+The terminal result is published only after the complete snapshot validates.
 
 ## Registration
 

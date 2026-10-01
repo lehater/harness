@@ -93,6 +93,25 @@ It is routing data, not a CanonicalArtifact, task, approval, stage or workflow s
 
 Projects may provide format-specific reference extractors, but Harness owns validation against the derived allowed-read boundary. Write-set validation must reject changes to canonical artifacts outside the selected Authority and must reject production while required inputs are blocked.
 
+## Atomic project publication
+
+A terminal Capability result can update Core realization, semantic evaluation,
+lifecycle evidence, Questions and Decision Pipeline failure evidence together.
+Those coordinated facts must be exposed to strict agent-loop readers as one
+logical project revision.
+
+The canonical publication contract is `docs/design/project-publication-v0.md`.
+Direct declaration may persist one atomic publication document. Project-native
+adapters may use their own database transaction, immutable repository commit,
+snapshot pointer or equivalent mechanism, but must expose the same atomic
+visibility and compare-and-swap semantics.
+
+The publication envelope owns no engineering semantics. Its component documents
+remain owned by Project Model, Knowledge Assurance and Decision contracts.
+Legacy/static integrations may continue to supply separate inputs for inspection
+and migration, but sequentially writing those inputs is not sufficient evidence
+of crash-consistent Capability completion.
+
 ## CI boundary
 
 Permanent project CI should verify the contract, not preserve pilot experiments. A normal integration check should obtain a pinned Harness version, derive inputs when adapters are used, validate the Engineering Graph and Core realization, evaluate selected Consumer(s), and enforce project-owned target assertions.

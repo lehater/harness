@@ -333,6 +333,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: project_publication
+  command: python validators/validate_project_publication.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: semantic_admission
   command: python validators/validate_semantic_admission.py
   stage: focused

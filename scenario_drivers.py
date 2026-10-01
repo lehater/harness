@@ -32,6 +32,11 @@ from human_projection import compile_manifest
 from integration_alignment import validate_project_alignment
 from harness import resolve_question, validate_model
 from project_frontier import compose_project_frontier
+from project_publication import (
+    build_project_publication,
+    prepare_capability_transition,
+    validate_project_publication,
+)
 from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
@@ -316,6 +321,26 @@ def project_authority_bootstrap(
 @scenario_driver("project.frontier")
 def project_frontier_driver(**kwargs: Any) -> dict[str, Any]:
     return compose_project_frontier(**kwargs)
+
+
+@scenario_driver("publication.build")
+def publication_build_driver(**kwargs: Any) -> dict[str, Any]:
+    return build_project_publication(**kwargs)
+
+
+@scenario_driver("publication.transition")
+def publication_transition_driver(**kwargs: Any) -> dict[str, Any]:
+    return prepare_capability_transition(**kwargs)
+
+
+@scenario_driver("publication.validate")
+def publication_validate_driver(
+    *,
+    graph: dict[str, Any],
+    publication: dict[str, Any],
+) -> dict[str, Any]:
+    validate_project_publication(graph, publication)
+    return {"status": "VALID", "revision": publication["revision"]}
 
 
 @scenario_driver("project.status")

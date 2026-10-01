@@ -29,7 +29,9 @@ typed schema or project validator
         ↓
 semantic acceptance by the agent
         ↓
-register CanonicalArtifact + provides + dependencies
+prepare coherent Core + semantic + lifecycle result
+        ↓
+atomically publish one Project Publication revision
         ↓
 render human documentation
         ↓
@@ -180,7 +182,11 @@ Before registering `provides`, the agent must establish all of the following:
 9. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
 10. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
-Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
+Registration in the Core graph remains the semantic ownership boundary. When
+one agent action also changes semantic evaluation, lifecycle, Questions or
+failure evidence, those coordinated facts become visible through the atomic
+Project Publication boundary defined by `project-publication-v0.md`. No
+separate workflow-state entity is introduced.
 
 ## Semantic completeness and automatic Questions
 
@@ -370,8 +376,10 @@ currentness. In REDO/REVISION, the current accepted provider is an allowed
 baseline input to option formation; only the future candidate/preselected
 solution remains forbidden.
 
-After one Capability reaches CURRENT, BLOCKED or FAILED_VALIDATION, recompute
-the frontier. See `docs/design/decision-pipeline-v0.md` and
+After one Capability reaches CURRENT, BLOCKED or FAILED_VALIDATION, atomically
+publish the complete terminal result and only then recompute the frontier. See
+`docs/design/decision-pipeline-v0.md`,
+`docs/design/project-publication-v0.md` and
 `skills/agent/decision-pipeline/SKILL.md`.
 
 ## Mandatory strict admission for routed artifact skills

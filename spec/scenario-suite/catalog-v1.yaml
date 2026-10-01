@@ -99,6 +99,9 @@ required_drivers:
   - graph.doctor
   - project.authority_bootstrap
   - project.frontier
+  - publication.build
+  - publication.transition
+  - publication.validate
   - project.status
   - canonical.project
   - canonical.alignment
@@ -354,6 +357,12 @@ requirements:
     category: routing
     enforcement: required
     description: Application orchestration composes decision, semantic and coverage read models into one unambiguous next-action frontier and distinguishes COMPLETE/BLOCKED/WAITING/INCOMPLETE.
+    min_scenarios: 1
+
+  - id: capability-publication-atomicity
+    category: integration
+    enforcement: required
+    description: A terminal Capability result becomes visible only as one coherent revision; partial component mutation and stale-writer publication fail closed.
     min_scenarios: 1
 
   - id: decision-execution-assurance

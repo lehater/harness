@@ -1,0 +1,157 @@
+version: 1
+kind: harness-scenario
+id: capability-publication-is-atomic
+title: Capability completion publishes one coherent project revision
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: integration
+  execution_type: deterministic
+covers:
+  - capability-publication-atomicity
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: CAPABILITY-PUBLICATION
+      authorities:
+        - id: PRODUCT
+          responsibility: Own product knowledge.
+          boundary:
+            semantic_cohesion: Product semantics.
+            independent_change: Product semantics change independently.
+            public_contract: Accepted product requirement.
+          produces:
+            - capability: demo.requirement
+              knowledge_kind: product-requirements
+              requires: []
+      consumers:
+        - id: TARGET
+          purpose: Consume product requirement.
+          requires: [demo.requirement]
+      terminal_capabilities: []
+
+  empty-core:
+    value: {artifacts: [], questions: []}
+  empty-evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations: []
+  empty-lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers: []
+  empty-failures:
+    value:
+      version: 1
+      kind: harness-decision-failure-set
+      failures: []
+
+  current-core:
+    value:
+      artifacts:
+        - id: REQUIREMENT
+          authority: PRODUCT
+          path: docs/requirement.yaml
+          provides: [demo.requirement]
+          depends_on: []
+      questions: []
+  current-evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: REQUIREMENT
+          capability: demo.requirement
+          status: ACCEPTED
+          obligations: {expected: [], satisfied: [], dispositions: []}
+          findings: []
+          semantic_claims: {accepted: []}
+          admission:
+            status: ACCEPTED
+            acceptance_id: REQ-1
+  current-lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: REQUIREMENT
+          capability: demo.requirement
+          acceptance_id: REQ-1
+          accepted_prerequisites: {}
+
+steps:
+  - id: initial
+    driver: publication.build
+    with:
+      graph: {ref: fixture.graph}
+      core_model: {ref: fixture.empty-core}
+      semantic_evaluations: {ref: fixture.empty-evaluations}
+      lifecycle: {ref: fixture.empty-lifecycle}
+      decision_failures: {ref: fixture.empty-failures}
+    expect:
+      - {path: /kind, op: equals, value: harness-project-publication}
+      - {path: /parent_revision, op: equals, value: null}
+
+  - id: current
+    driver: publication.transition
+    benchmark:
+      metrics: [blocking_behavior, false_positive_control]
+      mutation_class: coherent-capability-publication
+    with:
+      graph: {ref: fixture.graph}
+      current_publication: {ref: step.initial}
+      expected_revision: {ref: step.initial#/revision}
+      capability: demo.requirement
+      outcome: CURRENT
+      core_model: {ref: fixture.current-core}
+      semantic_evaluations: {ref: fixture.current-evaluations}
+      lifecycle: {ref: fixture.current-lifecycle}
+      decision_failures: {ref: fixture.empty-failures}
+    expect:
+      - {path: /parent_revision, op: equals, value: {ref: step.initial#/revision}}
+      - {path: /state/lifecycle/providers/0/acceptance_id, op: equals, value: REQ-1}
+      - {path: /state/semantic_evaluations/semantic_evaluations/0/admission/acceptance_id, op: equals, value: REQ-1}
+
+  - id: partial-lifecycle-write
+    driver: data.patch
+    with:
+      value: {ref: step.current}
+      operations:
+        - op: replace
+          path: /state/lifecycle/providers/0/acceptance_id
+          value: REQ-PARTIAL
+
+  - id: reject-partial-publication
+    driver: publication.validate
+    benchmark:
+      metrics: [mutation_detection, root_cause_localization]
+      mutation_class: partial-publication
+    with:
+      graph: {ref: fixture.graph}
+      publication: {ref: step.partial-lifecycle-write}
+    expect_error:
+      type: CoreError
+      contains: acceptance identity mismatch
+
+  - id: reject-stale-writer
+    driver: publication.transition
+    with:
+      graph: {ref: fixture.graph}
+      current_publication: {ref: step.current}
+      expected_revision: {ref: step.initial#/revision}
+      capability: demo.requirement
+      outcome: CURRENT
+      core_model: {ref: fixture.current-core}
+      semantic_evaluations: {ref: fixture.current-evaluations}
+      lifecycle: {ref: fixture.current-lifecycle}
+      decision_failures: {ref: fixture.empty-failures}
+    expect_error:
+      type: CoreError
+      contains: compare-and-swap failed

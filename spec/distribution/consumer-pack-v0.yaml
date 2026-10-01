@@ -38,6 +38,7 @@ root_files:
   - live_calibration.py
   - method_router.py
   - project_frontier.py
+  - project_publication.py
   - project_status.py
   - reference_materializer.py
   - reference_model_evolution.py
