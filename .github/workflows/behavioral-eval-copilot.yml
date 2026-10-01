@@ -2,15 +2,6 @@ name: behavioral eval copilot evidence
 
 on:
   workflow_dispatch:
-    inputs:
-      model:
-        description: Agent model; GPT-6 Luna is the default assurance baseline.
-        required: true
-        default: gpt-6-luna
-        type: choice
-        options:
-          - gpt-6-luna
-          - auto
 
 permissions:
   contents: read
@@ -34,18 +25,14 @@ jobs:
 
       - name: Install pinned Copilot CLI
         run: |
-          npm install -g @github/copilot@1.0.86
+          npm install -g @github/copilot@1.0.91
           copilot --version
 
-      - name: Materialize agent descriptor
+      - name: Materialize provider-auto baseline agent descriptor
         shell: bash
         run: |
-          MODEL="${{ inputs.model }}"
-          if [[ "${MODEL}" == "auto" ]]; then
-            MODEL_SELECTION="provider-auto"
-          else
-            MODEL_SELECTION="explicit"
-          fi
+          MODEL="auto"
+          MODEL_SELECTION="provider-auto"
           sed \
             -e "s/__MODEL__/${MODEL}/g" \
             -e "s/__MODEL_SELECTION__/${MODEL_SELECTION}/g" \
