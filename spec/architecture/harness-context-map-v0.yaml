@@ -138,6 +138,7 @@ contexts:
       - workspace
 
 ignored_modules:
+  - behavioral_eval
   - authority_role_projection_experiment
   - concern_activation_experiment
   - coverage_control_loop_experiment
