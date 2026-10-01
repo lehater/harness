@@ -1,6 +1,6 @@
 # Harness Agent Behavioral Evaluation Protocol v0
 
-Status: canonical assurance design; runner not implemented.
+Status: canonical assurance design; minimal reusable runner implemented.
 
 ## Purpose
 
@@ -401,6 +401,23 @@ Behavioural failures should be classified before changing prompts/skills:
 
 `ORACLE_AMBIGUITY` is a test-design defect, not an agent failure.
 
+## Implemented minimal substrate
+
+The first reusable substrate is implemented in `behavioral_eval.py` with
+deterministic contract coverage in `validators/validate_behavioral_eval.py`.
+
+The initial adapter boundary is provider-neutral JSON-over-process. Each run gets
+a fresh HOME and isolated working directory; the request contains the frozen
+case/fixture/config binding but excludes the oracle, pass criteria, prior run
+results, and private reasoning. Semantic normalization and scoring remain
+separate from execution. The initial normalizers cover only the dimensions
+required by the first reviewed cases: selected operation, Capability partition,
+and Authority partition.
+
+This substrate is not itself behavioral evidence for Capability/Authority
+formation. Such evidence exists only when a real judgement-dependent adapter
+executes the reviewed cases.
+
 ## Implementation architecture
 
 A future runner should have four separable parts:
@@ -455,8 +472,9 @@ This protocol does not:
 
 ## Implementation gate
 
-Do not implement an agent-eval runner until the reviewed Test Design Catalog
-identifies a smallest READY batch that actually requires it.
+The runner gate is satisfied by the reviewed first formation and task-intent
+batches. Future runner features remain gated by a concrete READY case that
+requires them.
 
-The runner exists to execute accepted evidence designs; it is not itself the
-source of the assurance denominator.
+The runner executes accepted evidence designs; it is not itself the source of
+the assurance denominator.

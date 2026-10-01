@@ -8,6 +8,9 @@ on:
       - "spec/ci/**"
       - "validators/validate_ci_policy.py"
       - "validators/validate_assurance_registry.py"
+      - "validators/validate_behavioral_eval.py"
+      - "behavioral_eval.py"
+      - "spec/behavioral-eval-integration/**"
       - "spec/assurance/harness-assurance-registry-v0.yaml"
       - "docs/design/harness-assurance-registry-v0.md"
       - "docs/design/harness-ability-to-evidence-v0.md"
@@ -20,6 +23,9 @@ on:
       - "spec/ci/**"
       - "validators/validate_ci_policy.py"
       - "validators/validate_assurance_registry.py"
+      - "validators/validate_behavioral_eval.py"
+      - "behavioral_eval.py"
+      - "spec/behavioral-eval-integration/**"
       - "spec/assurance/harness-assurance-registry-v0.yaml"
       - "docs/design/harness-assurance-registry-v0.md"
       - "docs/design/harness-ability-to-evidence-v0.md"
@@ -39,3 +45,4 @@ jobs:
       - run: pip install PyYAML
       - run: python validators/validate_ci_policy.py
       - run: python validators/validate_assurance_registry.py
+      - run: python validators/validate_behavioral_eval.py

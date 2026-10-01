@@ -1,0 +1,8 @@
+version: 1
+kind: harness-behavioral-eval-synthetic-fixture
+id: BEHAVIORAL-EVAL-SUBSTRATE-FIXTURE-V1
+atoms:
+  - id: E1
+    text: Payment creation accepts an idempotency key.
+  - id: E2
+    text: Retry safety must be established before implementation readiness.

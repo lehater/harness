@@ -51,6 +51,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: behavioral_eval
+  command: python validators/validate_behavioral_eval.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: context_boundaries
   command: python validators/validate_context_boundaries.py
   stage: focused

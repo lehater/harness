@@ -87,6 +87,8 @@ acceptance/scenario procedure does not live in this root bootstrap file.
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
+- `behavioral_eval.py` — provider-neutral clean-context behavioral-evaluation runner, semantic normalizer and scorer.
+- `validators/validate_behavioral_eval.py` — deterministic substrate contract/self-test; it is not agent-quality evidence.
 - `docs/design/harness-assurance-policy-v0.md` — canonical evidence-selection, test-level and oracle policy for Harness changes/release claims.
 - `docs/design/harness-ability-to-evidence-v0.md` — canonical Harness ability/failure-mode/evidence blueprint used to design assurance before implementation.
 - `docs/design/harness-test-design-catalog-v0.md` — reviewed framework-neutral test designs and implementation dispositions for Harness assurance gaps.

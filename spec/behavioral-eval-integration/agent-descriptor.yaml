@@ -1,0 +1,8 @@
+version: 1
+kind: harness-agent-descriptor
+id: behavioral-eval-substrate-stub
+provider: deterministic-stub
+model: deterministic-stub
+model_version: "1"
+configuration:
+  purpose: substrate-validation-only
