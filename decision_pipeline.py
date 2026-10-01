@@ -36,6 +36,17 @@ def _load(path: str | Path) -> dict[str, Any]:
     return value
 
 
+def _core_providers(
+    realized: dict[str, Any],
+    capability: str,
+) -> list[dict[str, Any]]:
+    return [
+        artifact
+        for artifact in realized.get("artifacts", []) or []
+        if capability in (artifact.get("provides", []) or [])
+    ]
+
+
 def _selected_provider(
     realized: dict[str, Any],
     lifecycle_by_capability: dict[str, dict[str, Any]],
@@ -62,8 +73,11 @@ def _direct_blockers(
 ) -> list[str]:
     result = set(capability_blockers(realized, capability))
     provider = _selected_provider(realized, lifecycle_by_capability, capability)
-    if provider is not None:
-        result.update(blocked(realized, provider["id"]))
+    providers = [provider] if provider is not None else _core_providers(
+        realized, capability
+    )
+    for candidate in providers:
+        result.update(blocked(realized, candidate["id"]))
     return sorted(result)
 
 
@@ -165,6 +179,7 @@ def derive_decision_roadmap(
     completed: list[dict[str, Any]] = []
     blocked_items: list[dict[str, Any]] = []
     waiting: list[dict[str, Any]] = []
+    lifecycle_gaps: list[dict[str, Any]] = []
 
     for expectation in profile["expectations"]:
         capability = expectation["capability"]
@@ -213,6 +228,21 @@ def derive_decision_roadmap(
                     "capability": capability,
                     "authority": authority,
                     "state": "CURRENT",
+                }
+            )
+            continue
+
+        core_providers = _core_providers(realized, capability)
+        if current_provider is None and core_providers:
+            lifecycle_gaps.append(
+                {
+                    "capability": capability,
+                    "authority": authority,
+                    "state": "UNKNOWN",
+                    "reason": "LIFECYCLE_ASSERTION_MISSING",
+                    "providers": sorted(
+                        provider["id"] for provider in core_providers
+                    ),
                 }
             )
             continue
@@ -285,6 +315,9 @@ def derive_decision_roadmap(
         "ready": sorted(ready, key=lambda item: item["capability"]),
         "completed": sorted(completed, key=lambda item: item["capability"]),
         "blocked": sorted(blocked_items, key=lambda item: item["capability"]),
+        "lifecycle_gaps": sorted(
+            lifecycle_gaps, key=lambda item: item["capability"]
+        ),
         "waiting_upstream": sorted(
             waiting, key=lambda item: item["capability"]
         ),

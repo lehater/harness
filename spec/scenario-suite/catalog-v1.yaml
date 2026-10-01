@@ -312,6 +312,12 @@ requirements:
     description: CURRENT work is omitted by default while explicit REDO remains bounded and repeatable.
     min_scenarios: 1
 
+  - id: decision-existing-provider-lifecycle-gap
+    category: decision
+    enforcement: required
+    description: An existing Core provider without lifecycle evidence is surfaced as an UNKNOWN lifecycle gap and never as CREATE work.
+    min_scenarios: 1
+
   - id: decision-execution-assurance
     category: decision
     enforcement: required

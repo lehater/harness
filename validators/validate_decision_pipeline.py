@@ -182,6 +182,69 @@ def main() -> int:
     assert baseline[0]["purpose"] == "CURRENT_ACCEPTED_BASELINE", redo_a
     assert "future_candidate" in redo_a["decision_request"]["forbidden_inputs"], redo_a
 
+    # HARN-004: an existing Core provider without lifecycle evidence is an
+    # integration/currentness gap, not missing canonical knowledge. It must
+    # never be sent through CREATE and must preserve artifact-level blockers.
+    legacy_model = {
+        "artifacts": [
+            *MODEL["artifacts"],
+            {
+                "id": "ARCH-B",
+                "authority": "ARCH",
+                "path": "b.md",
+                "provides": ["arch.b"],
+                "depends_on": ["SOURCE"],
+            },
+        ],
+        "questions": [],
+    }
+    legacy = derive_decision_roadmap(
+        graph=GRAPH,
+        model=legacy_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert "arch.b" not in caps(legacy["ready"]), legacy
+    assert next(
+        item
+        for item in legacy["lifecycle_gaps"]
+        if item["capability"] == "arch.b"
+    ) == {
+        "capability": "arch.b",
+        "authority": "ARCH",
+        "state": "UNKNOWN",
+        "reason": "LIFECYCLE_ASSERTION_MISSING",
+        "providers": ["ARCH-B"],
+    }, legacy
+
+    legacy_blocked_model = {
+        **legacy_model,
+        "questions": [
+            {
+                "id": "Q-B",
+                "authority": "ARCH",
+                "text": "Which existing architecture semantics apply?",
+                "blocks": ["ARCH-B"],
+            }
+        ],
+    }
+    legacy_blocked = derive_decision_roadmap(
+        graph=GRAPH,
+        model=legacy_blocked_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert next(
+        item
+        for item in legacy_blocked["blocked"]
+        if item["capability"] == "arch.b"
+    )["questions"] == ["Q-B"], legacy_blocked
+    assert "arch.b" not in caps(legacy_blocked["lifecycle_gaps"]), legacy_blocked
+
     # Explicit redo never bypasses a Core Question.
     blocked_model = {
         **MODEL,

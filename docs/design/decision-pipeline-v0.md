@@ -35,6 +35,13 @@ Capability lifecycle currentness.
 A Capability is READY when its direct prerequisites are CURRENT and it is not
 blocked by an unresolved Core Question. CURRENT work is omitted by default.
 
+An existing Core provider without a matching lifecycle assertion is not missing
+knowledge and must never enter CREATE. The roadmap reports it under
+`lifecycle_gaps` with state `UNKNOWN`. Existing-project reconciliation must
+establish accepted lifecycle evidence for the existing provider (or replace it
+through an explicit semantic change); Harness must not create a duplicate
+canonical provider merely to fill integration metadata.
+
 After one READY Capability reaches a terminal outcome, recompute the roadmap.
 Do not freeze a project-wide role frontier.
 
