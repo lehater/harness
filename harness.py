@@ -103,11 +103,38 @@ def validate_model(model: dict[str, Any]) -> None:
                 )
         resolution = question.get("resolution")
         if resolution is not None:
-            if resolution not in artifacts:
-                raise CoreError(f"question {question_id} resolves to unknown artifact: {resolution}")
-            if artifacts[resolution]["authority"] != authority:
+            if not isinstance(resolution, dict):
+                raise CoreError(
+                    f"question {question_id} resolution must bind artifact and semantic acceptance identities"
+                )
+            artifact_id = resolution.get("artifact")
+            acceptance_id = resolution.get("acceptance_id")
+            supersedes = resolution.get("supersedes_acceptance_id")
+            if not isinstance(artifact_id, str) or not artifact_id:
+                raise CoreError(f"question {question_id} resolution artifact is required")
+            if artifact_id not in artifacts:
+                raise CoreError(
+                    f"question {question_id} resolves to unknown artifact: {artifact_id}"
+                )
+            if artifacts[artifact_id]["authority"] != authority:
                 raise CoreError(
                     f"question {question_id} resolution artifact must belong to addressed authority {authority}"
+                )
+            if not isinstance(acceptance_id, str) or not acceptance_id:
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id is required"
+                )
+            if acceptance_id == "ABSENT":
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id cannot be ABSENT"
+                )
+            if not isinstance(supersedes, str) or not supersedes:
+                raise CoreError(
+                    f"question {question_id} resolution supersedes_acceptance_id is required"
+                )
+            if acceptance_id == supersedes:
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id must differ from supersedes_acceptance_id"
                 )
 
 
@@ -284,7 +311,20 @@ def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     }
 
 
-def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) -> dict[str, Any]:
+def resolve_question(
+    model: dict[str, Any],
+    question_id: str,
+    artifact_id: str,
+    acceptance_id: str,
+    supersedes_acceptance_id: str,
+) -> dict[str, Any]:
+    """Resolve a Question only across an explicit semantic acceptance transition.
+
+    Acceptance identities are opaque to Core. The caller/integration owns their
+    semantic validity, while Core enforces that resolution cannot claim the same
+    accepted identity it supersedes. Use the reserved value ABSENT only to state
+    that no prior accepted semantic identity existed.
+    """
     validate_model(model)
     result = copy.deepcopy(model)
     artifacts = _by_id(result.get("artifacts", []), "artifact")
@@ -298,7 +338,21 @@ def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) 
         raise CoreError(
             f"resolution artifact {artifact_id} is not owned by addressed authority {question['authority']}"
         )
-    question["resolution"] = artifact_id
+    if not isinstance(acceptance_id, str) or not acceptance_id:
+        raise CoreError("resolution acceptance_id is required")
+    if acceptance_id == "ABSENT":
+        raise CoreError("resolution acceptance_id cannot be ABSENT")
+    if not isinstance(supersedes_acceptance_id, str) or not supersedes_acceptance_id:
+        raise CoreError("resolution supersedes_acceptance_id is required")
+    if acceptance_id == supersedes_acceptance_id:
+        raise CoreError(
+            "resolution acceptance_id must differ from supersedes_acceptance_id"
+        )
+    question["resolution"] = {
+        "artifact": artifact_id,
+        "acceptance_id": acceptance_id,
+        "supersedes_acceptance_id": supersedes_acceptance_id,
+    }
     validate_model(result)
     return result
 
@@ -331,6 +385,8 @@ def main() -> int:
         elif name == "resolve-question":
             command.add_argument("question")
             command.add_argument("artifact")
+            command.add_argument("acceptance_id")
+            command.add_argument("supersedes_acceptance_id")
             command.add_argument("--write", action="store_true")
 
     args = parser.parse_args()
@@ -350,7 +406,13 @@ def main() -> int:
     elif args.command == "next-action":
         _emit(next_action(model, args.capability))
     elif args.command == "resolve-question":
-        resolved = resolve_question(model, args.question, args.artifact)
+        resolved = resolve_question(
+            model,
+            args.question,
+            args.artifact,
+            args.acceptance_id,
+            args.supersedes_acceptance_id,
+        )
         if args.write:
             Path(args.model).write_text(yaml.safe_dump(resolved, sort_keys=False), encoding="utf-8")
         else:

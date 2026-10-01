@@ -35,7 +35,7 @@ to separate registries; it is not a flat intent classifier.
 - `depends_on` expresses declared canonical-artifact dependency.
 - A `Question` is addressed to the `Authority` that may decide the missing semantics.
 - A Question may block an existing artifact with `blocks` or prevent formation of a not-yet-provided capability with `blocks_capabilities`.
-- A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
+- A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority and the new opaque semantic acceptance identity; resolving against an unchanged acceptance identity is invalid.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
 ## Conditional policies

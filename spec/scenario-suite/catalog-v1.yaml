@@ -76,6 +76,7 @@ required_drivers:
   - authority.context
   - source.coverage
   - core.validate
+  - core.resolve_question
   - data.patch
   - engineering.target
   - semantic.acceptance
@@ -123,6 +124,12 @@ requirements:
 
   - id: recurring-question-reopen
     description: A recurring semantic gap reopens a previously resolved deterministic Question.
+    min_scenarios: 1
+
+  - id: question-resolution-acceptance-transition
+    category: semantic
+    enforcement: required
+    description: A Question resolves only when the addressed Authority binds it to a distinct accepted semantic identity transition.
     min_scenarios: 1
 
   - id: lifecycle-currentness

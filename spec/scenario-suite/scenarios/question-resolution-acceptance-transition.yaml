@@ -1,0 +1,57 @@
+version: 1
+kind: harness-scenario
+id: question-resolution-requires-new-acceptance
+title: Question resolution requires a distinct accepted semantic identity
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - question-resolution-acceptance-transition
+
+fixtures:
+  model:
+    value:
+      authorities:
+        - {id: DOMAIN}
+      artifacts:
+        - id: DOMAIN-MODEL
+          authority: DOMAIN
+          path: docs/domain.yaml
+          provides: [demo.domain]
+          depends_on: []
+      questions:
+        - id: Q-DOMAIN
+          authority: DOMAIN
+          text: Which domain semantics are accepted?
+          blocks_capabilities: [demo.domain]
+
+steps:
+  - id: unchanged
+    driver: core.resolve_question
+    with:
+      model: {ref: fixture.model}
+      question_id: Q-DOMAIN
+      artifact_id: DOMAIN-MODEL
+      acceptance_id: DOMAIN-1
+      supersedes_acceptance_id: DOMAIN-1
+    expect_error:
+      type: CoreError
+      contains: must differ
+
+  - id: changed
+    driver: core.resolve_question
+    with:
+      model: {ref: fixture.model}
+      question_id: Q-DOMAIN
+      artifact_id: DOMAIN-MODEL
+      acceptance_id: DOMAIN-2
+      supersedes_acceptance_id: DOMAIN-1
+    expect:
+      - path: /questions/0/resolution
+        op: equals
+        value:
+          artifact: DOMAIN-MODEL
+          acceptance_id: DOMAIN-2
+          supersedes_acceptance_id: DOMAIN-1

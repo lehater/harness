@@ -116,7 +116,28 @@ def main() -> int:
                 raise CoreError("blocked mismatch")
 
             resolution = expect["resolution"]
-            resolved = resolve_question(copy.deepcopy(model), resolution["question"], resolution["artifact"])
+            try:
+                resolve_question(
+                    copy.deepcopy(model),
+                    resolution["question"],
+                    resolution["artifact"],
+                    resolution["acceptance_id"],
+                    resolution["acceptance_id"],
+                )
+            except CoreError:
+                pass
+            else:
+                raise CoreError(
+                    "resolve-question accepted an unchanged semantic acceptance identity"
+                )
+
+            resolved = resolve_question(
+                copy.deepcopy(model),
+                resolution["question"],
+                resolution["artifact"],
+                resolution["acceptance_id"],
+                resolution["supersedes_acceptance_id"],
+            )
             after_action = resolution.get("next_action")
             if after_action:
                 actual_after = next_action(resolved, after_action["capability"])
@@ -138,6 +159,8 @@ def main() -> int:
                     copy.deepcopy(model),
                     external_resolution["question"],
                     external_resolution["artifact"],
+                    external_resolution["acceptance_id"],
+                    external_resolution["supersedes_acceptance_id"],
                 )
                 if unresolved_questions(externally_resolved) != sorted(
                     external_resolution["unresolved_after"]

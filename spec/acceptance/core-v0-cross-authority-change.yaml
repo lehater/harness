@@ -138,12 +138,16 @@ expect:
   resolution:
     question: Q-POLICY-WITHDRAWAL
     artifact: POLICY-DOMAIN
+    acceptance_id: POLICY-DOMAIN-2
+    supersedes_acceptance_id: POLICY-DOMAIN-1
     unresolved_after: [Q-POLICY-RETENTION]
     blocked_after: [Q-POLICY-RETENTION]
 
   external_resolution:
     question: Q-POLICY-RETENTION
     artifact: POLICY-RETENTION-DECISION
+    acceptance_id: POLICY-RETENTION-2
+    supersedes_acceptance_id: ABSENT
     unresolved_after: [Q-POLICY-WITHDRAWAL]
     frontier_after:
       status: BLOCKED

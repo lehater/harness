@@ -353,17 +353,20 @@ def main() -> int:
         GRAPH,
         append_question_proposals(complete_model, [question]),
     )
-    resolved = resolve_question(realized, question["id"], "TASK-MODEL")
-    assert unresolved_questions(resolved) == [], resolved
-
-    reopened = append_question_proposals(resolved, [question])
-    assert unresolved_questions(reopened) == [question["id"]], reopened
-    reopened_target = evaluate_engineering_target(
-        GRAPH,
-        "IMPLEMENTATION",
-        reopened,
-    )
-    assert reopened_target["status"] == "BLOCKED", reopened_target
+    try:
+        resolve_question(
+            realized,
+            question["id"],
+            "TASK-MODEL",
+            "TASK-INCOMPLETE",
+            "TASK-INCOMPLETE",
+        )
+    except Exception as exc:
+        assert "must differ" in str(exc), exc
+    else:
+        raise AssertionError(
+            "Question resolution must reject unchanged semantic identity"
+        )
 
     accepted = admit_artifact(
         graph=GRAPH,
@@ -376,6 +379,24 @@ def main() -> int:
         acceptance_id="TASK-COMPLETE",
     )
     assert accepted["status"] == "ACCEPTED", accepted
+
+    resolved = resolve_question(
+        realized,
+        question["id"],
+        "TASK-MODEL",
+        accepted["admission"]["acceptance_id"],
+        "TASK-INCOMPLETE",
+    )
+    assert unresolved_questions(resolved) == [], resolved
+    reopened = append_question_proposals(resolved, [question])
+    assert unresolved_questions(reopened) == [question["id"]], reopened
+    reopened_target = evaluate_engineering_target(
+        GRAPH,
+        "IMPLEMENTATION",
+        reopened,
+    )
+    assert reopened_target["status"] == "BLOCKED", reopened_target
+
     updated_lifecycle = copy.deepcopy(lifecycle)
     updated_lifecycle["providers"][0] = accepted["lifecycle_assertion"]
     fixed_bundle = {

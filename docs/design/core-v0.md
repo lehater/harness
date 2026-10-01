@@ -9,7 +9,7 @@ Harness Core manages boundaries of engineering knowledge and decision ownership.
 - **CapabilityId** — a value identifier for knowledge/capability provided by canonical artifacts. Multiple providers are allowed only inside one Authority.
 - **Question** — a material unresolved semantic gap addressed to the Authority allowed to decide it.
 
-A Question contains no final semantic answer. Resolution means the addressed Authority changed canonical truth and the Question now references the canonical artifact containing that decision.
+A Question contains no final semantic answer. Resolution means the addressed Authority changed canonical truth and the Question now references the canonical artifact containing that decision plus the new opaque semantic `acceptance_id` and the identity it supersedes. Core does not interpret the identity; project integration must supply it from accepted semantic/project-native evidence. `ABSENT` is reserved for `supersedes_acceptance_id` when no prior accepted semantic identity existed.
 
 ## Relations
 
@@ -19,7 +19,7 @@ A Question contains no final semantic answer. Resolution means the addressed Aut
 - Question is addressed to one Authority.
 - An unresolved Question may `blocks` existing downstream artifacts.
 - An unresolved Question may `blocks_capabilities` when the semantic gap prevents a required capability from being formed before any provider artifact exists.
-- A resolved Question has `resolution: <artifact-id>` and that artifact must belong to the addressed Authority.
+- A resolved Question has `resolution: {artifact, acceptance_id, supersedes_acceptance_id}`; the artifact must belong to the addressed Authority and the two identities must differ.
 
 ## Project model
 
@@ -54,7 +54,7 @@ questions:
 - `resolve MODEL CAPABILITY_ID`
 - `owner MODEL CAPABILITY_ID`
 - `blocked MODEL ARTIFACT`
-- `resolve-question MODEL QUESTION ARTIFACT [--write]`
+- `resolve-question MODEL QUESTION ARTIFACT ACCEPTANCE_ID SUPERSEDES_ACCEPTANCE_ID [--write]`
 
 Core validates declared ownership, references, dependencies and capability ownership. It does not interpret arbitrary artifact semantics.
 

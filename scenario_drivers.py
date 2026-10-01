@@ -30,7 +30,7 @@ from frontend_screen_contracts import evaluate_frontend_screen_contracts
 from graph_doctor import diagnose_project
 from human_projection import compile_manifest
 from integration_alignment import validate_project_alignment
-from harness import validate_model
+from harness import resolve_question, validate_model
 from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
@@ -141,6 +141,24 @@ def data_patch(*, value: Any, operations: list[dict[str, Any]]) -> Any:
 def core_validate(*, model: dict[str, Any]) -> dict[str, Any]:
     validate_model(model)
     return {"status": "VALID"}
+
+
+@scenario_driver("core.resolve_question")
+def core_resolve_question(
+    *,
+    model: dict[str, Any],
+    question_id: str,
+    artifact_id: str,
+    acceptance_id: str,
+    supersedes_acceptance_id: str,
+) -> dict[str, Any]:
+    return resolve_question(
+        model,
+        question_id,
+        artifact_id,
+        acceptance_id,
+        supersedes_acceptance_id,
+    )
 
 
 @scenario_driver("engineering.target")
