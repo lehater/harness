@@ -88,6 +88,8 @@ does not live in this root bootstrap file.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
 - `docs/design/core-v0.md` — current Core boundary and model.
+- `docs/design/harness-consumer-pack-v0.md` — pinned Consumer Pack binding, materialization and validation contract.
+- `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.

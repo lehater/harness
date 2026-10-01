@@ -13,6 +13,7 @@ Status: active audit-branch migration plan.
 - Phase 4/5: Maintainer capture/change operations extracted from `AGENTS.md`; full PR workflow passed.
 - Phase 3: deterministic concern-driven Consumer Method Router implemented; full PR workflow run 953 passed.
 - Phase 7: inactive pre-Core procedures quarantined as non-executable legacy documentation; full PR workflow run 955 passed.
+- Phase 6: Consumer Pack definition/binding/materializer is being implemented in the current checkpoint.
 
 ## Goal
 

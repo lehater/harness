@@ -111,6 +111,7 @@ contexts:
     modules:
       - agent_router
       - authority_context
+      - consumer_pack
       - decision_explorer_request
       - decision_pipeline
       - graph_doctor

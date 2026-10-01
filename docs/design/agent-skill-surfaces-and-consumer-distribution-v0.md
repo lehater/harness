@@ -280,3 +280,12 @@ The next concrete work is:
 4. add local materialization/bootstrap behavior;
 5. test local override and pinned CI behavior;
 6. ensure inactive/maintainer skills are not visible through Consumer discovery.
+
+
+## Concrete v0 distribution contract
+
+`docs/design/harness-consumer-pack-v0.md` and
+`spec/distribution/consumer-pack-v0.yaml` define the first executable
+realization of this decision. `consumer_pack.py` materializes and validates
+the pack, validates immutable target bindings, supports exact-revision Git sync
+and an explicit local development override.

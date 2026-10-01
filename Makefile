@@ -19,6 +19,7 @@ harness-check:
 	python validators/validate_agent_router.py
 	python validators/validate_workspace.py
 	python validators/validate_agent_layer.py
+	python validators/validate_consumer_pack.py
 	python validators/validate_method_router.py
 	python validators/validate_source_coverage.py
 	python validators/validate_user_facing_application.py
