@@ -57,8 +57,9 @@ These are real issues but are deliberately lower priority until the functional m
 |---|---|---|---|---|
 | HARN-H01 | P1 | DEFERRED | Filesystem safety | Human projection output/source paths are not constrained strongly enough to the project root; destructive output handling can target an unintended directory. |
 | HARN-H02 | P1 | DEFERRED | Delivery invariant | Repository rules do not technically enforce the PR + green-gate invariant described in `AGENTS.md`. |
-| HARN-H03 | P1 | DEFERRED | CI coverage | Main PR workflow uses a manual path allowlist and currently omits multiple runtime Python modules. |
-| HARN-H04 | P2 | DEFERRED | Test infrastructure | Validation is split across many bespoke scripts and not all repository validators/tests participate in the normal aggregate check. |
+| HARN-H03 | P1 | DEFERRED | CI coverage | Main PR workflow uses a manual path allowlist. AUD-008 found that 25 of 53 top-level Python runtime modules are absent from that allowlist, so a runtime change can bypass the normal PR gate entirely. |
+| HARN-H04 | P2 | DEFERRED | Test infrastructure | Validation is split across bespoke scripts. AUD-008 found 63 validator scripts while `make harness-check` invokes 62, omitting `validators/validate_harness.py`; `tests/test_lifecycle_experiment.py` is also outside the aggregate gate. The 62 validators launch sequentially as separate Python processes. |
+| HARN-H05 | P2 | DEFERRED | CI execution policy | Full `make harness-check` executes on every matching `pull_request` synchronization, including draft PR commits, despite the repository rule that full gates are checkpoint/final-candidate work. On the current draft branch AUD-008 observed 27 `harness core` runs (26 completed) consuming about 22.2 runner-minutes; the targeted greenfield workflow also listens to both unrestricted `push` and `pull_request`, allowing duplicate execution for one branch commit with an open PR. |
 
 ## Audit perspectives
 
@@ -89,6 +90,7 @@ Each substantial audit should explicitly cover one or more of these perspectives
 | AUD-005 | 2026-10-01 | Instruction ownership, skill routing, discovery lifecycle and procedural duplication | Added HARN-017..019; captured AGENTS/workbench/artifact-skill scaling work in EVO-021..027 and an active migration plan. |
 | AUD-006 | 2026-10-01 | Accepted skill-surface architecture vs current repository realization | Completed full skill inventory, refined HARN-019, added HARN-020, and identified implementation gaps between the accepted Maintainer/Consumer distribution contract and current filesystem/validators. |
 | AUD-007 | 2026-10-01 | Post-migration skill/distribution re-audit from clean source/consumer environments | HARN-017..020 no longer reproduced; verified typed surfaces, public/internal operation routing, concern-driven methods, legacy quarantine, clean-target wrapper bootstrap and Consumer Pack isolation. |
+| AUD-008 | 2026-10-01 | CI cost, trigger selectivity, duplicate execution, validator coverage and lazy-gate ordering | Quantified the PR gate cost, strengthened HARN-H03/H04 with exact inventory evidence, and added HARN-H05 for eager/double-trigger execution. Detailed evidence and staged correction plan are in `docs/audit/harness-ci-audit.md`. |
 
 ## Audit protocol
 
