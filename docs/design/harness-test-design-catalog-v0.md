@@ -241,10 +241,15 @@ remain empty.
 
 Fixture:
 
-Evidence contains two independently decidable obligations:
+Evidence contains two plainly separate substantive knowledge surfaces:
 
-1. payment retry/idempotency semantics;
-2. audit-retention semantics with its own acceptance/revalidation lifecycle.
+1. payment retry/idempotency semantics, expressed by two mutually supporting atoms;
+2. audit-retention semantics, expressed by one material atom.
+
+No meta-atom describing the expected split, lifecycle independence, or
+revalidation rule is included in the provider fixture. Such an atom would be
+boundary/oracle evidence rather than part of either Capability's semantic
+content and would make exact support-atom scoring ambiguous.
 
 They may appear in one source document.
 
