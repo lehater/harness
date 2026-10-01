@@ -137,6 +137,7 @@ EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
     "TD-AUTH-001", "TD-AUTH-002", "TD-AUTH-004",
     "TD-ROUTE-001", "TD-ROUTE-002", "TD-ROUTE-003",
+    "TD-COMP-001",
 }
 assert MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
 entries = MANIFEST["cases"]
@@ -194,8 +195,10 @@ for entry in entries:
         assert entry["design"] not in serialized
         prompt_bytes = len(_prompt(request).encode("utf-8"))
         provider_prompt_bytes[entry["design"]] = prompt_bytes
-        assert prompt_bytes <= max_per_case, (
-            entry["design"], prompt_bytes, max_per_case
+        case_limit = entry.get("max_prompt_bytes", max_per_case)
+        assert isinstance(case_limit, int) and case_limit >= max_per_case
+        assert prompt_bytes <= case_limit, (
+            entry["design"], prompt_bytes, case_limit
         )
         trusted_paths = {
             item["path"] for item in payload["trusted_instructions"]
@@ -227,6 +230,11 @@ for entry in entries:
             }
             parsed = _parse_model_response(json.dumps(sample), entry["dimension"])
             assert parsed["output"][field] == sample["output"][field]
+        elif entry["dimension"] == "bootstrap_realization":
+            assert entry["design"] == "TD-COMP-001"
+            contract = _response_contract("bootstrap_realization")
+            assert "core_model" in contract["schema"]["output"]
+            assert entry["max_prompt_bytes"] == 32000
         else:
             contract = _response_contract("selected_operation")
             assert contract["schema"]["selected_operation"] == (
