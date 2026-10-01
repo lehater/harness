@@ -117,6 +117,7 @@ contexts:
       - decision_pipeline
       - graph_doctor
       - method_router
+      - project_frontier
       - semantic_admission
       - semantic_closure
       - semantic_questions

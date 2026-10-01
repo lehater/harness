@@ -63,29 +63,19 @@ Use:
 ```text
 target Consumer
         ↓
-Engineering Graph recursive closure
+Engineering Graph / Core / lifecycle / semantic / coverage read models
         ↓
-derived Design Profile
+Project Frontier
         ↓
-target state
+READY action / FAILED_VALIDATION / BLOCKED / INCOMPLETE / WAITING / COMPLETE
         ↓
-CREATE / WAIT / PENDING / COMPLETE
-        ↓
-agent_router for actionable CREATE
-        ↓
-grouped artifact work by Authority + subject + knowledge_kind
-        ↓
-registered artifact skill when available
-        ↓
-Explorer Request → pre-choice exploration when required
+Capability action → Decision Pipeline + artifact skill
+Coverage action   → owning coverage/reconciliation procedure
+Question blocker  → owning Authority
         ↓
 candidate → governance → validation → semantic acceptance → Core provider
         ↓
-reevaluate target Consumer
-        ↓
-when structurally COMPLETE, evaluate Engineering Coverage + applicable project validators
-        ↓
-claim implementation-documentation closure only when the derived conjunction passes
+recompute source read models + Project Frontier
 ```
 
 If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent still has a valid CREATE frontier. It performs the work manually under the production contract or develops a reusable skill only when repeated consumer evidence justifies one.
@@ -96,7 +86,7 @@ If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent st
 
 The handoff must fail closed when any applicable concern/subject remains non-terminal, a registered semantic claim lacks its deterministic validator evidence, an accepted requirement lacks verification disposition, a required TEST disposition lacks executable Test Design, a conditional architecture/repository precondition fails, or a blocking Question remains.
 
-Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results.
+Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results through `project_frontier.py`. Agents consume that projection rather than manually assigning precedence between Target State, Decision Roadmap, Semantic Closure and Engineering Coverage.
 ## Responsibilities
 
 ### Core and target state

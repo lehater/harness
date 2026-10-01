@@ -86,6 +86,7 @@ does not live in this root bootstrap file.
 - `docs/design/decision-explorer-execution-assurance-v0.md` — experimental boundary between request binding and externally attested isolated Explorer execution.
 - `docs/design/live-calibration-validator-v0.md` — blinded, request-bound live semantic-evaluator calibration above Core.
 - `docs/design/decision-pipeline-v0.md` — experimental sequential Decision Pipeline and derived Capability frontier.
+- `docs/design/project-frontier-v0.md` — canonical Application Layer next-action composition over Decision Roadmap, Semantic Closure and Engineering Coverage.
 - `skills/agent/decision-pipeline/SKILL.md` — sequential option-formation, review, choice/escalation and admission procedure for decision-governed work.
 - `docs/design/frontend-design-v0.md` — canonical user-facing/frontend engineering knowledge boundary and consumer closure.
 - `docs/design/graph-doctor-v1.md` — canonical aggregate graph/model diagnostic contract.
@@ -97,6 +98,7 @@ does not live in this root bootstrap file.
 - `docs/legacy/skills/**` — quarantined pre-Core procedure text; historical documentation only, never active skill discovery.
 - `harness.py` — Core v0 structural operations.
 - `target_state.py` — target-state evaluator above Core.
+- `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
 - `workspace.py` — managed knowledge validation and rendering.

@@ -385,7 +385,13 @@ def derive_decision_roadmap(
             if ready
             else "FAILED_VALIDATION"
             if failed_validation
-            else "EMPTY"
+            else "BLOCKED"
+            if blocked_items
+            else "INCOMPLETE"
+            if lifecycle_gaps
+            else "WAITING"
+            if waiting
+            else "COMPLETE"
         ),
         "ready": sorted(ready, key=lambda item: item["capability"]),
         "completed": sorted(completed, key=lambda item: item["capability"]),

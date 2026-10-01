@@ -31,6 +31,7 @@ from graph_doctor import diagnose_project
 from human_projection import compile_manifest
 from integration_alignment import validate_project_alignment
 from harness import resolve_question, validate_model
+from project_frontier import compose_project_frontier
 from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
@@ -304,6 +305,11 @@ def project_authority_bootstrap(
         core=core,
         authority_migrations=authority_migrations,
     )
+
+
+@scenario_driver("project.frontier")
+def project_frontier_driver(**kwargs: Any) -> dict[str, Any]:
+    return compose_project_frontier(**kwargs)
 
 
 @scenario_driver("project.status")

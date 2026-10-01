@@ -254,6 +254,7 @@ def main() -> int:
         decision_policy=POLICY,
     )
     assert "arch.b" not in caps(legacy["ready"]), legacy
+    assert legacy["frontier_status"] == "INCOMPLETE", legacy
     assert next(
         item
         for item in legacy["lifecycle_gaps"]
@@ -314,6 +315,7 @@ def main() -> int:
         redo_capabilities=["arch.a"],
     )
     assert "arch.a" not in caps(blocked["ready"]), blocked
+    assert blocked["frontier_status"] == "BLOCKED", blocked
     assert next(
         item for item in blocked["blocked"] if item["capability"] == "arch.a"
     )["questions"] == ["Q-A"], blocked
@@ -366,7 +368,7 @@ def main() -> int:
         decision_contracts=contracts,
         decision_policy=POLICY,
     )
-    assert empty["frontier_status"] == "EMPTY", empty
+    assert empty["frontier_status"] == "COMPLETE", empty
     assert empty["ready"] == [], empty
 
     try:

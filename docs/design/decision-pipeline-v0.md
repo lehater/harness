@@ -35,6 +35,12 @@ Capability lifecycle currentness.
 A Capability is READY when its direct prerequisites are CURRENT and it is not
 blocked by an unresolved Core Question. CURRENT work is omitted by default.
 
+The roadmap top-level `frontier_status` is not a generic empty/non-empty flag.
+It is one of `READY`, `FAILED_VALIDATION`, `BLOCKED`, `INCOMPLETE`,
+`WAITING` or `COMPLETE`. This preserves the reason no Capability is READY
+and lets the Application Layer compose the roadmap without reverse-engineering
+its buckets.
+
 An existing Core provider without a matching lifecycle assertion is not missing
 knowledge and must never enter CREATE. The roadmap reports it under
 `lifecycle_gaps` with state `UNKNOWN`. Existing-project reconciliation must
@@ -138,3 +144,7 @@ caller integration; this orchestration evidence never becomes Core truth.
 Pipeline stages, roadmap buckets and execution outcomes remain orchestration
 procedure above Core. Core continues to own only Authorities,
 CanonicalArtifacts, CapabilityIds, dependencies and Questions.
+
+The cross-layer `project_frontier.py` projection consumes this roadmap together
+with Semantic Closure and Engineering Coverage. Decision Pipeline does not own
+their precedence or redefine their domain states.

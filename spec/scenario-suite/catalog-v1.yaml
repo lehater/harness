@@ -98,6 +98,7 @@ required_drivers:
   - engineering.coverage
   - graph.doctor
   - project.authority_bootstrap
+  - project.frontier
   - project.status
   - canonical.project
   - canonical.alignment

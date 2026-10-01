@@ -14,6 +14,7 @@ work_unit:
 
 roadmap:
   source_of_truth: derived
+  frontier_statuses: [READY, FAILED_VALIDATION, BLOCKED, INCOMPLETE, WAITING, COMPLETE]
   buckets:
     - ready
     - completed
@@ -25,6 +26,7 @@ roadmap:
     - CURRENT capabilities are omitted from ordinary READY work.
     - explicit redo may include a CURRENT capability but never bypasses prerequisites or blockers.
     - after one Capability reaches a terminal outcome, recompute the roadmap before choosing more work.
+    - frontier_status is READY when executable capability work exists; otherwise FAILED_VALIDATION, BLOCKED, INCOMPLETE, WAITING or COMPLETE identify the actual non-ready shape instead of an ambiguous EMPTY state.
     - persisted FAILED_VALIDATION evidence keeps missing/noncurrent work out of READY until explicit retry.
     - explicit retry of a failed CREATE remains CREATE mode when no accepted current provider exists.
 

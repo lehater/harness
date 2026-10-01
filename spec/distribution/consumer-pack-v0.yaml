@@ -37,6 +37,7 @@ root_files:
   - integration_alignment.py
   - live_calibration.py
   - method_router.py
+  - project_frontier.py
   - project_status.py
   - reference_materializer.py
   - reference_model_evolution.py
