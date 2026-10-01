@@ -1,0 +1,32 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-COMP-001
+abilities: [HA-A05, HA-A08, HA-A09, HA-A12]
+failure_modes: [A05-F01, A09-F01, A09-F02, A09-F03, A12-F01]
+test_level: TL2
+fixture_revision: TD-COMP-001-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Realize the reviewed design target against this existing project using the authorized bootstrap/reconcile operation chain."
+selected_scope: "checkout-payment-design"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/agent-instruction-architecture-v0.md
+  - docs/design/operation-orchestration-v0.md
+  - docs/design/core-v0.md
+  - docs/design/target-state-v0.md
+  - skills/agent/project-bootstrap-reconcile/SKILL.md
+  - skills/agent/bootstrap-existing-project/SKILL.md
+allowed_tools: []
+write_policy: captured-output
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [bootstrap_realization]
+pass_criteria:
+  require_dimensions: [bootstrap_realization]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

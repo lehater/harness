@@ -361,6 +361,128 @@ def _canonical_groups(value: Any, *, field: str) -> list[list[str]]:
     return sorted(groups)
 
 
+def _canonical_target_state(value: Any, label: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise BehavioralEvalError(f"{label} must be a mapping")
+
+    def normalize_items(name: str) -> list[dict[str, Any]]:
+        raw = value.get(name)
+        if not isinstance(raw, list):
+            raise BehavioralEvalError(f"{label}.{name} must be a list")
+        items: list[dict[str, Any]] = []
+        for index, item in enumerate(raw):
+            if not isinstance(item, dict):
+                raise BehavioralEvalError(f"{label}.{name}[{index}] must be a mapping")
+            normalized = {
+                key: item[key]
+                for key in ("expectation", "subject", "capability", "authority")
+                if key in item
+            }
+            if "depends_on" in item:
+                normalized["depends_on"] = sorted(
+                    _require_string_list(
+                        item["depends_on"],
+                        f"{label}.{name}[{index}].depends_on",
+                        nonempty=False,
+                    )
+                )
+            if "questions" in item:
+                normalized["questions"] = sorted(
+                    _require_string_list(
+                        item["questions"],
+                        f"{label}.{name}[{index}].questions",
+                        nonempty=False,
+                    )
+                )
+            items.append(normalized)
+        return sorted(items, key=lambda item: json.dumps(item, sort_keys=True))
+
+    status = value.get("status")
+    if status not in {"COMPLETE", "READY", "BLOCKED"}:
+        raise BehavioralEvalError(f"{label}.status is invalid")
+    return {
+        "status": status,
+        "satisfied": sorted(
+            _require_string_list(value.get("satisfied"), f"{label}.satisfied", nonempty=False)
+        ),
+        "create": normalize_items("create"),
+        "wait": normalize_items("wait"),
+        "pending": normalize_items("pending"),
+    }
+
+
+def _canonical_bootstrap_model(model: Any) -> dict[str, Any]:
+    if not isinstance(model, dict):
+        raise BehavioralEvalError("bootstrap core_model must be a mapping")
+    try:
+        from harness import validate_model
+        validate_model(model)
+    except Exception as exc:
+        raise BehavioralEvalError(f"bootstrap core_model is invalid: {exc}") from exc
+
+    authorities = model.get("authorities")
+    artifacts = model.get("artifacts")
+    questions = model.get("questions")
+    if not all(isinstance(value, list) for value in (authorities, artifacts, questions)):
+        raise BehavioralEvalError("bootstrap core_model collections must be lists")
+
+    id_to_path = {item["id"]: item["path"] for item in artifacts}
+    normalized_artifacts = [
+        {
+            "path": item["path"],
+            "authority": item["authority"],
+            "provides": sorted(item.get("provides", []) or []),
+            "depends_on_paths": sorted(
+                id_to_path[dependency] for dependency in (item.get("depends_on", []) or [])
+            ),
+        }
+        for item in artifacts
+    ]
+    return {
+        "authorities": sorted(item["id"] for item in authorities),
+        "artifacts": sorted(
+            normalized_artifacts,
+            key=lambda item: json.dumps(item, sort_keys=True),
+        ),
+        "question_count": len(questions),
+    }
+
+
+def _canonical_bootstrap_oracle(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise BehavioralEvalError("oracle bootstrap_realization must be a mapping")
+    core = value.get("core_model")
+    if not isinstance(core, dict):
+        raise BehavioralEvalError("oracle bootstrap_realization.core_model must be a mapping")
+    artifacts = core.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise BehavioralEvalError("oracle bootstrap_realization.core_model.artifacts must be a list")
+    normalized_artifacts = []
+    for item in artifacts:
+        if not isinstance(item, dict):
+            raise BehavioralEvalError("oracle bootstrap artifact must be a mapping")
+        normalized_artifacts.append({
+            "path": item.get("path"),
+            "authority": item.get("authority"),
+            "provides": sorted(item.get("provides", []) or []),
+            "depends_on_paths": sorted(item.get("depends_on_paths", []) or []),
+        })
+    return {
+        "core_model": {
+            "authorities": sorted(core.get("authorities", []) or []),
+            "artifacts": sorted(
+                normalized_artifacts,
+                key=lambda item: json.dumps(item, sort_keys=True),
+            ),
+            "question_count": core.get("question_count"),
+        },
+        "target_state": _canonical_target_state(
+            value.get("target_state"),
+            "oracle bootstrap_realization.target_state",
+        ),
+    }
+
+
 def normalize_result(binding: FrozenBinding, response: dict[str, Any]) -> dict[str, Any]:
     dimensions = binding.case["normalization_profile"]["dimensions"]
     output = response.get("output") or {}
@@ -377,6 +499,14 @@ def normalize_result(binding: FrozenBinding, response: dict[str, Any]) -> dict[s
             normalized[dimension] = _canonical_groups(output.get("capabilities"), field="capabilities")
         elif dimension == "authority_partition":
             normalized[dimension] = _canonical_groups(output.get("authorities"), field="authorities")
+        elif dimension == "bootstrap_realization":
+            normalized[dimension] = {
+                "core_model": _canonical_bootstrap_model(output.get("core_model")),
+                "target_state": _canonical_target_state(
+                    output.get("target_state"),
+                    "bootstrap target_state",
+                ),
+            }
         else:
             raise BehavioralEvalError(f"unsupported normalization dimension: {dimension}")
     return normalized
@@ -398,6 +528,8 @@ def _normalize_oracle_dimension(name: str, value: Any) -> Any:
             atoms = _require_string_list(group, f"oracle {name}.groups[{index}]")
             normalized.append(sorted(set(atoms)))
         return sorted(normalized)
+    if name == "bootstrap_realization":
+        return _canonical_bootstrap_oracle(value)
     raise BehavioralEvalError(f"unsupported oracle dimension: {name}")
 
 
@@ -423,6 +555,7 @@ def score_result(binding: FrozenBinding, normalized: dict[str, Any]) -> dict[str
                     "selected_operation": "WRONG_OPERATION",
                     "capability_partition": "WRONG_GRANULARITY",
                     "authority_partition": "WRONG_AUTHORITY_PARTITION",
+                    "bootstrap_realization": "WRONG_BOOTSTRAP_REALIZATION",
                 }[name],
                 "dimension": name,
             })

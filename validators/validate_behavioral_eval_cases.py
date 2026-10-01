@@ -14,8 +14,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from behavioral_eval import build_execution_request, load_case
+from behavioral_eval import (
+    build_execution_request,
+    load_case,
+    normalize_result,
+    score_result,
+)
 from adapters.copilot_behavioral_eval_agent import (
+    _bootstrap_route_context,
     _model_payload,
     _observed_cli_version,
     _parse_copilot_jsonl,
@@ -251,6 +257,108 @@ for entry in entries:
             )
             assert parsed["selected_operation"] == expected
 
+COMP_TEMPLATE = BASE / "cases" / "td-comp-001" / "case.yaml.tmpl"
+assert COMP_TEMPLATE.is_file()
+with tempfile.TemporaryDirectory(prefix="behavioral-comp-case-") as temp:
+    temp_root = Path(temp)
+    shutil.copytree(COMP_TEMPLATE.parent, temp_root / "case")
+    comp_runtime = temp_root / "case" / "case.yaml"
+    comp_rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(encoding="utf-8")
+    comp_runtime.write_text(
+        comp_rendered.replace("__HARNESS_REVISION__", "a" * 40),
+        encoding="utf-8",
+    )
+    comp_binding = load_case(comp_runtime)
+    assert comp_binding.case["case_id"] == "TD-COMP-001"
+    assert comp_binding.case["test_level"] == "TL2"
+    assert comp_binding.case["normalization_profile"]["dimensions"] == [
+        "bootstrap_realization"
+    ]
+
+    comp_request = build_execution_request(
+        comp_binding,
+        run_id="TD-COMP-001-BOUNDARY",
+        agent_descriptor=descriptor,
+        agent_descriptor_sha256="b" * 64,
+    )
+    comp_payload = _model_payload(comp_request)
+    assert comp_payload["authorized_operation_chain"] == [
+        {"operation": "project-bootstrap-reconcile", "exposure": "public"},
+        {
+            "operation": "bootstrap-existing-project",
+            "exposure": "internal",
+            "invoked_by": "project-bootstrap-reconcile",
+        },
+    ]
+    comp_routes = _bootstrap_route_context()
+    assert comp_routes["entry"]["exposure"] == "public"
+    assert comp_routes["internal"]["exposure"] == "internal"
+    assert comp_routes["internal"]["invoked_by"] == "project-bootstrap-reconcile"
+
+    comp_model = {
+        "authorities": [{"id": "PAYMENT-DESIGN"}],
+        "artifacts": [{
+            "id": "LOCAL-ARTIFACT-ID",
+            "authority": "PAYMENT-DESIGN",
+            "path": "docs/payment-api.md",
+            "provides": ["payment.idempotency-contract"],
+            "depends_on": [],
+        }],
+        "questions": [],
+    }
+    from target_state import evaluate_target_state
+    comp_target = evaluate_target_state(
+        comp_binding.fixture["reviewed_design_profile"],
+        comp_model,
+    )
+    comp_parsed = _parse_model_response(
+        json.dumps({
+            "version": 1,
+            "kind": "harness-agent-behavioral-model-response",
+            "output": {"core_model": comp_model},
+        }),
+        "bootstrap_realization",
+    )
+    comp_response = {
+        "run_status": "COMPLETED",
+        "output": {
+            **comp_parsed["output"],
+            "target_state": comp_target,
+        },
+    }
+    comp_normalized = normalize_result(comp_binding, comp_response)
+    assert score_result(comp_binding, comp_normalized)["status"] == "PASS"
+
+    mutated_model = json.loads(json.dumps(comp_model))
+    mutated_model["artifacts"].append({
+        "id": "DUPLICATE-PROVIDER",
+        "authority": "PAYMENT-DESIGN",
+        "path": "docs/duplicate-payment-api.md",
+        "provides": ["payment.idempotency-contract"],
+        "depends_on": [],
+    })
+    mutated_normalized = normalize_result(
+        comp_binding,
+        {
+            "run_status": "COMPLETED",
+            "output": {
+                "core_model": mutated_model,
+                "target_state": evaluate_target_state(
+                    comp_binding.fixture["reviewed_design_profile"],
+                    mutated_model,
+                ),
+            },
+        },
+    )
+    mutated_score = score_result(comp_binding, mutated_normalized)
+    assert mutated_score["status"] == "FAIL"
+    assert mutated_score["findings"] == [{
+        "code": "WRONG_BOOTSTRAP_REALIZATION",
+        "dimension": "bootstrap_realization",
+    }]
+    comp_prompt_bytes = len(_prompt(comp_request).encode("utf-8"))
+    assert comp_prompt_bytes > 0
+
 contaminated = dict(request)
 contaminated["trusted_instruction_entrypoint"] = [
     "docs/design/harness-ability-to-evidence-v0.md"
@@ -267,5 +375,6 @@ assert total_prompt_bytes <= max_suite, (total_prompt_bytes, max_suite)
 print(
     f"first-wave behavioral eval cases: PASS ({len(entries)} cases); "
     f"provider_prompt_utf8_bytes total={total_prompt_bytes} "
-    f"max_case={max(provider_prompt_bytes.values())}"
+    f"max_case={max(provider_prompt_bytes.values())}; "
+    f"td_comp_001_prompt_utf8_bytes={comp_prompt_bytes}"
 )

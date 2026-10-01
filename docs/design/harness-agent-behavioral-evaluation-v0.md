@@ -240,7 +240,10 @@ Supported semantic IR dimensions:
 - selected Consumer closure;
 - omitted oracle obligations;
 - invented obligations;
-- final frontier/status.
+- final frontier/status;
+- bootstrap realization as a normalized Core-model projection plus deterministic
+  Target State result when provider judgement owns model formation but not
+  structural validation.
 
 ### Capability semantic identity
 

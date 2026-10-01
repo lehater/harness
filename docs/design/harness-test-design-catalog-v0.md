@@ -1026,6 +1026,13 @@ are reviewed.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** the provider-neutral behavioral runner supports a
+`bootstrap_realization` semantic dimension for this case. The adapter
+deterministically authorizes `project-bootstrap-reconcile` followed by internal
+`bootstrap-existing-project`; the provider realizes only the Core model, then
+Core validation and Target State evaluation run deterministically. The design
+remains READY until provider-backed execution is accepted.
+
 Review correction:
 
 The earlier version incorrectly described an implicit universal pipeline
