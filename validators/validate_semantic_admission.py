@@ -248,6 +248,9 @@ def main() -> int:
         "example.user-needs": {
             "exhaustive": True,
             "semantic_atoms": derivation["lifecycle_dependency"]["semantic_atoms"],
+            "source_surface_fingerprints": derivation["lifecycle_dependency"][
+                "source_surface_fingerprints"
+            ],
         }
     }
     assert result["lifecycle_assertion"]["semantic_atom_fingerprints"], result

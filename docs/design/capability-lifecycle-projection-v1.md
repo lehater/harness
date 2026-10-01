@@ -31,6 +31,9 @@ providers:
         exhaustive: true
         semantic_atoms:
           REQ-AUTHORIZATION: SAF-...
+        source_surface_fingerprints:
+          REQ-AUTHORIZATION: SAF-...
+          REQ-NONAPPLICABLE-NOTE: SAF-...
 ```
 
 Each provider assertion contains:
@@ -41,7 +44,7 @@ Each provider assertion contains:
 - the exact current prerequisite Capability acceptance identities against which
   that capability was accepted;
 - optional fingerprints for its accepted semantic atoms;
-- optional exhaustive consumed-atom baselines for individual prerequisites.
+- optional exhaustive prerequisite-semantic baselines containing both consumed-atom fingerprints and the complete accepted upstream source surface.
 
 The acceptance identity remains Capability-granular. When no authoritative
 semantic baseline is available, lifecycle retains the conservative
@@ -61,9 +64,7 @@ A Capability is CURRENT only when:
 2. every production prerequisite is CURRENT;
 3. for a prerequisite without a semantic baseline, its recorded acceptance
    identity equals the current acceptance identity;
-4. for a prerequisite with a semantic baseline, every consumed atom still
-   exists with the recorded fingerprint. Unconsumed atom changes do not make the
-   downstream Capability stale.
+4. for a prerequisite with an exhaustive semantic baseline, every consumed atom still exists with the recorded fingerprint and the complete upstream semantic surface has the same atom ids and fingerprints as when the derivation was accepted. A changed, added or removed atom that was previously dispositioned as irrelevant changes the exhaustive decision surface and therefore requires revalidation.
 
 ### STALE
 
@@ -120,10 +121,9 @@ candidate. It publishes semantic atom fingerprints for accepted assertions.
 For non-root productions, admission fails unless every production prerequisite
 is CURRENT and therefore has an acceptance identity that can be recorded in the
 new baseline. When ACCEPTED and exhaustive semantic-derivation evaluations are supplied,
-admission records a self-describing `exhaustive: true` baseline plus the
-consumed-source fingerprints under
-`accepted_prerequisite_semantics`. Non-exhaustive derivation evaluations are
-not trusted for selective lifecycle baselines.
+admission records a self-describing `exhaustive: true` baseline with both the
+consumed-source fingerprints and `source_surface_fingerprints` for every
+upstream semantic assertion that was classified during derivation. Non-exhaustive derivation evaluations are not trusted for selective lifecycle baselines.
 
 `semantic_closure.py` requires the selected lifecycle assertion to match the
 ACCEPTED semantic-admission identity for every routed capability in the

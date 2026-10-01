@@ -169,6 +169,30 @@ def main() -> int:
             "non-exhaustive semantic lifecycle baseline must fail"
         )
 
+    missing_surface = projection(identity="ID2", accepted="ID2")
+    missing_surface["providers"][0]["semantic_atom_fingerprints"] = {
+        "ATOM-A": "HASH-A-1",
+    }
+    missing_surface["providers"][1]["accepted_prerequisite_semantics"] = {
+        "source.identity": {
+            "exhaustive": True,
+            "semantic_atoms": {"ATOM-A": "HASH-A-1"},
+        }
+    }
+    try:
+        evaluate_lifecycle_target(
+            GRAPH,
+            "IMPLEMENTATION",
+            MODEL,
+            missing_surface,
+        )
+    except CoreError:
+        pass
+    else:
+        raise AssertionError(
+            "exhaustive semantic baseline without source surface must fail"
+        )
+
     print("capability lifecycle: PASS (CURRENT/STALE/UNKNOWN + REVALIDATE)")
     return 0
 

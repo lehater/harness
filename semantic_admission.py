@@ -288,13 +288,26 @@ def _accepted_prerequisite_semantics(
                 or not fingerprint
                 for atom_id, fingerprint in dependency["semantic_atoms"].items()
             )
+            or not isinstance(dependency.get("source_surface_fingerprints"), dict)
+            or not dependency["source_surface_fingerprints"]
+            or any(
+                not isinstance(atom_id, str)
+                or not atom_id
+                or not isinstance(fingerprint, str)
+                or not fingerprint
+                for atom_id, fingerprint
+                in dependency["source_surface_fingerprints"].items()
+            )
         ):
             raise CoreError(
-                f"lifecycle dependency evidence for {source_capability} must be exhaustive and contain consumed semantic atoms"
+                f"lifecycle dependency evidence for {source_capability} must be exhaustive and contain consumed semantic atoms plus the complete source surface"
             )
         result[source_capability] = {
             "exhaustive": True,
             "semantic_atoms": dict(dependency["semantic_atoms"]),
+            "source_surface_fingerprints": dict(
+                dependency["source_surface_fingerprints"]
+            ),
         }
     return result
 

@@ -77,9 +77,21 @@ def lifecycle_index(projection: dict[str, Any]) -> dict[str, dict[str, Any]]:
                     for atom_id, fingerprint
                     in baseline_entry["semantic_atoms"].items()
                 )
+                or not isinstance(
+                    baseline_entry.get("source_surface_fingerprints"), dict
+                )
+                or not baseline_entry["source_surface_fingerprints"]
+                or any(
+                    not isinstance(atom_id, str)
+                    or not atom_id
+                    or not isinstance(fingerprint, str)
+                    or not fingerprint
+                    for atom_id, fingerprint
+                    in baseline_entry["source_surface_fingerprints"].items()
+                )
             ):
                 raise CoreError(
-                    f"prerequisite semantic baseline for {capability} must be exhaustive and contain semantic_atoms"
+                    f"prerequisite semantic baseline for {capability} must be exhaustive and contain semantic_atoms plus source_surface_fingerprints"
                 )
         result[capability] = item
     return result
@@ -176,24 +188,39 @@ def lifecycle_states(
             semantic_entry = semantic_baseline.get(prerequisite)
             if semantic_entry is not None:
                 consumed_atoms = semantic_entry["semantic_atoms"]
+                accepted_surface = semantic_entry["source_surface_fingerprints"]
                 current_atoms = upstream_provider.get(
                     "semantic_atom_fingerprints",
                     {},
                 )
-                changed_atoms: list[dict[str, Any]] = []
-                for atom_id, accepted_fingerprint in sorted(
-                    consumed_atoms.items()
-                ):
-                    current_fingerprint = current_atoms.get(atom_id)
-                    if current_fingerprint != accepted_fingerprint:
-                        changed_atoms.append(
-                            {
-                                "id": atom_id,
-                                "accepted_fingerprint": accepted_fingerprint,
-                                "current_fingerprint": current_fingerprint,
-                            }
-                        )
-                if changed_atoms:
+
+                def changed_atom_rows(
+                    accepted_atoms: dict[str, str],
+                    current_atom_map: dict[str, str],
+                ) -> list[dict[str, Any]]:
+                    rows: list[dict[str, Any]] = []
+                    for atom_id in sorted(set(accepted_atoms) | set(current_atom_map)):
+                        accepted_fingerprint = accepted_atoms.get(atom_id)
+                        current_fingerprint = current_atom_map.get(atom_id)
+                        if current_fingerprint != accepted_fingerprint:
+                            rows.append(
+                                {
+                                    "id": atom_id,
+                                    "accepted_fingerprint": accepted_fingerprint,
+                                    "current_fingerprint": current_fingerprint,
+                                }
+                            )
+                    return rows
+
+                consumed_changes = changed_atom_rows(
+                    consumed_atoms,
+                    {atom_id: current_atoms.get(atom_id) for atom_id in consumed_atoms},
+                )
+                surface_changes = changed_atom_rows(
+                    accepted_surface,
+                    current_atoms,
+                )
+                if consumed_changes:
                     mismatches.append(
                         {
                             "capability": prerequisite,
@@ -201,7 +228,18 @@ def lifecycle_states(
                             "accepted_acceptance_id": accepted,
                             "current_acceptance_id": current,
                             "upstream_state": upstream["state"],
-                            "changed_atoms": changed_atoms,
+                            "changed_atoms": consumed_changes,
+                        }
+                    )
+                elif surface_changes:
+                    mismatches.append(
+                        {
+                            "capability": prerequisite,
+                            "mode": "SEMANTIC_SURFACE",
+                            "accepted_acceptance_id": accepted,
+                            "current_acceptance_id": current,
+                            "upstream_state": upstream["state"],
+                            "changed_atoms": surface_changes,
                         }
                     )
                 continue

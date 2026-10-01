@@ -632,12 +632,18 @@ def evaluate_derivation(
                 source_id: semantic_assertion_fingerprint(
                     source_assertions[source_id]
                 )
-                for source_id in sorted(
-                    covered_sources
-                    if lifecycle_exhaustive
-                    else required_sources & covered_sources
-                )
+                for source_id in sorted(required_sources & covered_sources)
             },
+            **(
+                {
+                    "source_surface_fingerprints": {
+                        source_id: semantic_assertion_fingerprint(assertion)
+                        for source_id, assertion in sorted(source_assertions.items())
+                    }
+                }
+                if lifecycle_exhaustive
+                else {}
+            ),
             **(
                 {"unaccounted_sources": lifecycle_unaccounted}
                 if lifecycle_exhaustive and lifecycle_unaccounted
