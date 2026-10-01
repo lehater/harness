@@ -358,6 +358,18 @@ skills:
     lifecycle: active
     route_status: routed
     knowledge_kind: verification-strategy
+  - id: capture-harness-observation
+    path: skills/maintainer/capture-harness-observation/SKILL.md
+    surface: maintainer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: change-harness
+    path: skills/maintainer/change-harness/SKILL.md
+    surface: maintainer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
   - id: agent-harness-design
     path: skills/core/agent-harness-design/SKILL.md
     surface: maintainer

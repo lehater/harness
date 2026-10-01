@@ -6,6 +6,12 @@ Status: active audit-branch migration plan.
 
 `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md` is the normative architecture for Maintainer vs Consumer skill surfaces and physical Consumer Pack materialization. This plan implements that decision; it must not invent a different distribution model.
 
+## Progress
+
+- Phase 1: explicit skill surface/type/lifecycle registry implemented; full PR workflow passed.
+- Phase 2: public bootstrap ambiguity removed with Consumer Operation Registry; full PR workflow passed.
+- Phase 4/5: Maintainer capture/change operations are being extracted from `AGENTS.md` in the current checkpoint.
+
 ## Goal
 
 Move Harness from prose-distributed agent instructions to one scalable ownership

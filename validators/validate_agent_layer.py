@@ -16,7 +16,8 @@ from target_state import validate_profile  # noqa: E402
 
 SURFACE_REGISTRY = ROOT / "skills/skill-surface-registry-v0.yaml"
 ARTIFACT_REGISTRY = ROOT / "skills/artifact-skill-registry-v0.yaml"
-OPERATION_REGISTRY = ROOT / "skills/consumer-operation-registry-v0.yaml"
+CONSUMER_OPERATION_REGISTRY = ROOT / "skills/consumer-operation-registry-v0.yaml"
+MAINTAINER_OPERATION_REGISTRY = ROOT / "skills/maintainer-operation-registry-v0.yaml"
 
 ALLOWED_SURFACES = {"maintainer", "consumer"}
 ALLOWED_ROUTE_CLASSES = {"operation", "method", "artifact-production"}
@@ -237,25 +238,32 @@ def _validate_artifact_registry_alignment(
 
 
 
+
 def _validate_operation_registry_alignment(
-    entries: list[dict[str, Any]], errors: list[str]
+    entries: list[dict[str, Any]],
+    errors: list[str],
+    *,
+    registry_path: Path,
+    expected_kind: str,
+    surface: str,
 ) -> None:
     try:
-        registry = _load_mapping(OPERATION_REGISTRY)
+        registry = _load_mapping(registry_path)
     except CoreError as exc:
         errors.append(str(exc))
         return
 
+    label = f"{surface} operation"
     if registry.get("version") != 1:
-        errors.append("consumer operation registry version must be 1")
-    if registry.get("kind") != "harness-consumer-operation-registry":
-        errors.append("unexpected consumer operation registry kind")
+        errors.append(f"{label} registry version must be 1")
+    if registry.get("kind") != expected_kind:
+        errors.append(f"unexpected {label} registry kind")
     if not isinstance(registry.get("id"), str) or not registry["id"]:
-        errors.append("consumer operation registry id is required")
+        errors.append(f"{label} registry id is required")
 
     routes = registry.get("routes")
     if not isinstance(routes, list):
-        errors.append("consumer operation registry routes must be a list")
+        errors.append(f"{label} registry routes must be a list")
         return
 
     actual_paths: set[str] = set()
@@ -266,22 +274,22 @@ def _validate_operation_registry_alignment(
 
     for item in routes:
         if not isinstance(item, dict):
-            errors.append("consumer operation route must be a mapping")
+            errors.append(f"{label} route must be a mapping")
             continue
         operation = item.get("operation")
         path = item.get("skill")
         exposure = item.get("exposure")
         if not isinstance(operation, str) or not operation:
-            errors.append("consumer operation route requires operation")
+            errors.append(f"{label} route requires operation")
             continue
         if operation in operation_ids:
-            errors.append(f"duplicate consumer operation id: {operation}")
+            errors.append(f"duplicate {label} id: {operation}")
         operation_ids.add(operation)
         if not isinstance(path, str) or not path:
-            errors.append(f"{operation}: consumer operation skill path is required")
+            errors.append(f"{operation}: {label} skill path is required")
             continue
         if path in actual_paths:
-            errors.append(f"consumer operation skill routed more than once: {path}")
+            errors.append(f"{label} skill routed more than once: {path}")
         actual_paths.add(path)
         if exposure not in {"public", "internal"}:
             errors.append(f"{operation}: invalid exposure {exposure!r}")
@@ -292,7 +300,7 @@ def _validate_operation_registry_alignment(
             if not isinstance(trigger, str) or not trigger:
                 errors.append(f"{operation}: public route requires trigger")
             elif trigger in public_triggers:
-                errors.append(f"duplicate public operation trigger: {trigger}")
+                errors.append(f"duplicate public {label} trigger: {trigger}")
             else:
                 public_triggers.add(trigger)
             public_operations.add(operation)
@@ -323,16 +331,15 @@ def _validate_operation_registry_alignment(
         item["path"]
         for item in entries
         if item.get("lifecycle") == "active"
-        and item.get("surface") == "consumer"
+        and item.get("surface") == surface
         and item.get("route_class") == "operation"
         and item.get("route_status") == "routed"
     }
     if actual_paths != expected_paths:
         errors.append(
-            "consumer operation registry does not match routed consumer operations "
+            f"{label} registry does not match routed {label}s "
             f"(expected={sorted(expected_paths)!r}, actual={sorted(actual_paths)!r})"
         )
-
 
 def _validate_skill_contracts(
     entries: list[dict[str, Any]], errors: list[str]
@@ -426,7 +433,20 @@ def main() -> int:
 
     entries = _validate_surface_registry(errors)
     _validate_artifact_registry_alignment(entries, errors)
-    _validate_operation_registry_alignment(entries, errors)
+    _validate_operation_registry_alignment(
+        entries,
+        errors,
+        registry_path=CONSUMER_OPERATION_REGISTRY,
+        expected_kind="harness-consumer-operation-registry",
+        surface="consumer",
+    )
+    _validate_operation_registry_alignment(
+        entries,
+        errors,
+        registry_path=MAINTAINER_OPERATION_REGISTRY,
+        expected_kind="harness-maintainer-operation-registry",
+        surface="maintainer",
+    )
     operation_count, method_count, artifact_count = _validate_skill_contracts(
         entries, errors
     )

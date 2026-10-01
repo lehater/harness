@@ -12,26 +12,20 @@ The optional managed workspace in `docs/design/managed-knowledge-v0.md` lets a t
 
 The current operating model is agent-driven. `docs/design/agent-artifact-workbench-v0.md` defines how an agent turns an actionable target-state gap into candidate knowledge, semantic acceptance, Core registration and generated documentation.
 
-## Consumer startup
+## Skill surfaces
 
-When Harness is used with another repository:
+Ordinary work in this repository uses the Maintainer Skill Surface declared by
+`skills/maintainer-operation-registry-v0.yaml`.
 
-Before substantial engineering work, ensure the target repository has a current Harness realization. If realization is absent, outdated or unknown, use `skills/agent/project-bootstrap-reconcile/SKILL.md`; do not manually recreate Harness-owned structural state. Use `skills/agent/project-engineering-status/SKILL.md` when project-wide engineering status is requested.
+Target repositories using Harness enter through the Consumer Skill Surface
+declared by `skills/consumer-operation-registry-v0.yaml` plus deterministic
+artifact routing in `skills/artifact-skill-registry-v0.yaml`. Consumer
+procedures may be exercised here for fixtures/dogfooding, but they are not the
+default maintainer workflow.
 
-1. read `docs/design/core-v0.md`;
-2. read the target repository's own instructions and identify the selected task/scope;
-   If the selected work writes production implementation code, select a Consumer whose recursive capability closure contains `knowledge_kind: implementation-design`. Consumer names and purpose prose do not classify implementation intent, and a structurally `COMPLETE` non-implementation Consumer never authorizes production coding. Disposable prototype/evidence code may use a smaller Consumer only when the project explicitly keeps it noncanonical.
-3. choose or adapt the smallest justified Design Profile, using `skills/agent/design-profile/SKILL.md` when needed;
-4. run the public `project-bootstrap-reconcile` operation when the target realization is absent, outdated, incomplete or unknown; it may internally use `bootstrap-existing-project` to locate only the canonical artifacts required by the selected profile/scope;
-5. evaluate target state without inventing missing knowledge;
-6. obey expectation `depends_on`: act only on `CREATE`; do not design `PENDING` knowledge early;
-7. for a `CREATE`, load the matching artifact skill under `skills/artifacts/**` when one exists;
-8. validate the artifact candidate, perform semantic acceptance, and only then register `provides` in the Core graph;
-9. when the selected implementation Consumer becomes structurally `COMPLETE`, evaluate Engineering Coverage and all applicable deterministic project/traceability validators before claiming implementation-documentation closure;
-10. when the project opts into a managed `.harness/` workspace, render and verify generated documentation;
-11. if implementation exposes an unresolved semantic case, reopen the owning knowledge through a Core `Question` instead of choosing an implementation convention silently.
-
-Harness Core/project semantics do not require a repository-to-repository ownership binding. Agent-enabled consumer projects may separately pin and materialize a Harness Consumer Pack as tooling; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md`. The managed workspace remains a target-project-local opt-in format.
+Do not reconstruct task-specific procedures from this file. Resolve the
+applicable registered operation/method/artifact procedure and then read its
+`SKILL.md`.
 
 ## Core rules
 
@@ -65,71 +59,30 @@ This policy optimizes recurring assurance cost without changing semantic truth:
 expert-reviewed canonical knowledge remains the oracle and model choice never
 defines correctness.
 
-## Scenario Suite discipline
+## Maintainer routing
 
-The Scenario Suite in `docs/design/scenario-suite-v0.md` is the cross-layer
-executable behavioral specification of Harness.
-
-When a change adds or materially changes externally observable Harness
-behavior:
-
-1. classify the behavior in `spec/scenario-suite/catalog-v1.yaml`;
-2. add or update a reusable scenario when deterministic observation is
-   possible;
-3. use `planned` only when the functional surface is known but a stable
-   executable oracle is not yet available;
-4. promote stable coverage to `required`;
-5. prefer invariant assertions and mutations over full-output golden files.
-
-A subsystem-specific validator remains useful, but it does not substitute for a
-cross-layer scenario when the consumer-visible behavior spans multiple Harness
-mechanisms.
-
-## Audit and evolution capture discipline
-
-Repository-level findings and improvement ideas must be classified before they
-are recorded. The canonical routing policy is
-`docs/audit/README.md`.
-
-When asked to "record", "capture", "remember", "add to the audit", or otherwise
-persist a Harness observation:
-
-1. read `docs/audit/README.md`;
-2. search both ledgers for the same root cause/direction before creating a new
-   identifier;
-3. use `docs/audit/harness-audit-backlog.md` / `HARN-*` only for behavior
-   that is demonstrably wrong against an invariant, contract or reproducible
-   scenario;
-4. use `docs/audit/harness-evolution-radar.md` / `EVO-*` for optional
-   recommendations, research questions and ideas that may improve Harness but
-   are not current defects;
-5. put accepted normative decisions in the owning canonical spec/ADR rather
-   than leaving the Radar as the source of truth; update the related
-   `EVO-*` to `ADOPTED`;
-6. if an `EVO-*` investigation proves a defect, create/reuse the appropriate
-   `HARN-*` and cross-link them;
-7. when uncertain whether something is a defect, do not inflate it into the
-   defect backlog without evidence. Capture it as `RESEARCH`/`CAPTURED` in
-   the Evolution Radar and state what evidence would promote or reject it.
-
-The ledgers are cumulative. Repeated audits update existing entries instead of
-creating duplicate root causes.
+- Use `capture-harness-observation` for repository-level HARN/EVO/accepted
+  decision capture; `docs/audit/README.md` remains the classification policy.
+- Use `change-harness` for changes to Harness behavior, contracts, routing,
+  validators or architecture. The skill owns the execution procedure;
+  `docs/design/core-v0.md` and `docs/design/scenario-suite-v0.md` remain the
+  normative contracts.
 
 ## Change discipline
 
-Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a universal semantic DSL without a concrete consumer failure.
+Do not add Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine,
+Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules or a
+universal semantic DSL without a concrete consumer failure.
 
-A Core extension requires a failure case that states:
-- what the consumer attempted;
-- which canonical truth was available;
-- what was missing;
-- why Authority / CanonicalArtifact / CapabilityId / Question / dependency were insufficient;
-- what incorrect workaround would otherwise be required.
-
-Add an acceptance fixture reproducing that failure before changing Core behavior.
+All Harness behavior/Core changes must route through the registered
+`change-harness` Maintainer operation; detailed acceptance/scenario procedure
+does not live in this root bootstrap file.
 
 ## Source map
 
+- `skills/maintainer-operation-registry-v0.yaml` — active Harness-maintainer operation routes.
+- `skills/consumer-operation-registry-v0.yaml` — active Harness-consumer operation routes.
+- `skills/skill-surface-registry-v0.yaml` — explicit skill surface/type/lifecycle inventory.
 - `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.

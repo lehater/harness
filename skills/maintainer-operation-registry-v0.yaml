@@ -1,0 +1,15 @@
+version: 1
+kind: harness-maintainer-operation-registry
+id: MAINTAINER-OPERATIONS-V0
+status: audit-ratchet
+
+routes:
+  - operation: capture-harness-observation
+    skill: skills/maintainer/capture-harness-observation/SKILL.md
+    exposure: public
+    trigger: harness-observation-capture
+
+  - operation: change-harness
+    skill: skills/maintainer/change-harness/SKILL.md
+    exposure: public
+    trigger: harness-change
