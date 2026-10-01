@@ -90,6 +90,7 @@ separate defect has been demonstrated.
 | EVO-027 | RESEARCH | ADOPTED | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
 | EVO-028 | RECOMMENDATION | ADOPTED | Skill distribution | Separate Maintainer and Consumer skill surfaces; distribute the Consumer surface as a pinned locally materialized pack rather than copied project skills. |
 | EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
+| EVO-030 | RECOMMENDATION | CAPTURED | Orchestration observability | Add a minimal operation-decision trace so maintainers can reconstruct task intent -> selected operation -> resolved skill/contracts without persisting private reasoning. |
 
 ## Detailed entries
 
@@ -1015,3 +1016,50 @@ Promotion should require:
 
 Until then the skill remains development-side research material and is excluded
 from the Consumer Pack because its surface entry is `route_status: unrouted`.
+
+
+### EVO-030 — Operation decision trace
+
+**Type:** RECOMMENDATION  
+**Status:** CAPTURED
+
+**Direction**
+
+Add a minimal, non-semantic execution trace for routed operations:
+
+```text
+task/use-case reference
+-> selected surface + operation id
+-> registry/router resolution
+-> selected skill identity
+-> canonical contracts actually loaded
+-> terminal disposition / next semantic responsibility
+```
+
+The trace should record observable routing facts only. It must not persist private
+chain-of-thought and must not become project truth or a workflow-state model.
+
+**Why useful**
+
+AUD-013 found that Harness read models such as Project Frontier and Graph Doctor
+already expose source/reason/evidence sufficient for deterministic state
+diagnosis. The orchestration boundary is weaker: `skill_router.py` returns the
+resolved route, but there is no durable evidence connecting the originating
+maintainer/consumer task to the operation chosen by the coordinator or the
+contracts consumed by that operation.
+
+This makes post-hoc diagnosis of a wrong operation selection dependent on chat
+history rather than repository/runtime evidence.
+
+**Not a defect**
+
+The current architecture does not promise durable orchestration tracing, and
+routing remains deterministic once an operation id is supplied. This is an
+observability improvement, not proof of incorrect current behavior.
+
+**Related**
+
+- AP-15 / AUD-013
+- AP-21 provenance / reproducibility
+- EVO-020 restartable agent-session boundaries
+- `docs/design/operation-orchestration-v0.md`
