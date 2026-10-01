@@ -8,7 +8,11 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from capability_lifecycle import evaluate_lifecycle_target, lifecycle_states
+from capability_lifecycle import (
+    evaluate_lifecycle_target,
+    lifecycle_states,
+    obsolete_lifecycle_rows,
+)
 from harness import CoreError
 
 
@@ -192,6 +196,34 @@ def main() -> int:
         raise AssertionError(
             "exhaustive semantic baseline without source surface must fail"
         )
+
+    renamed_graph = copy.deepcopy(GRAPH)
+    source_production = renamed_graph["authorities"][0]["produces"][0]
+    source_production["capability"] = "source.identity.v2"
+    use_production = renamed_graph["authorities"][1]["produces"][0]
+    use_production["requires"] = ["source.identity.v2"]
+
+    evolved_states = lifecycle_states(
+        renamed_graph,
+        MODEL,
+        projection(),
+    )
+    assert evolved_states["source.identity.v2"]["state"] == "UNKNOWN", evolved_states
+    assert evolved_states["use.result"]["state"] == "STALE", evolved_states
+    assert any(
+        item.get("mode") == "PREREQUISITE_TOPOLOGY"
+        and item.get("accepted_prerequisites") == ["source.identity"]
+        and item.get("current_prerequisites") == ["source.identity.v2"]
+        for item in evolved_states["use.result"]["mismatches"]
+    ), evolved_states
+    assert obsolete_lifecycle_rows(renamed_graph, projection()) == [
+        {
+            "capability": "source.identity",
+            "artifact": "SOURCE",
+            "acceptance_id": "ID1",
+            "reason": "CAPABILITY_NOT_IN_ENGINEERING_GRAPH",
+        }
+    ]
 
     policy_bound = projection()
     policy_bound["providers"][0]["acceptance_policy_fingerprint"] = "sha256:source-policy-v1"

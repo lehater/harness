@@ -118,31 +118,50 @@ def validate_projection(
     lifecycle = lifecycle_index(projection)
     artifacts = {a["id"]: a for a in realized.get("artifacts", []) or []}
 
+    active: dict[str, dict[str, Any]] = {}
     for capability, item in lifecycle.items():
+        production = productions.get(capability)
+        if production is None:
+            # Graph evolution may retire a CapabilityId while historical/project
+            # storage still contains its previous lifecycle assertion. It is
+            # inert and must never be transferred to a new CapabilityId.
+            continue
+
         artifact = artifacts.get(item["artifact"])
         if artifact is None or capability not in (artifact.get("provides", []) or []):
             raise CoreError(
                 f"lifecycle provider does not match Core provider: {capability}"
             )
-        production = productions.get(capability)
-        if production is None:
-            raise CoreError(
-                f"lifecycle capability is not in Engineering Graph production topology: {capability}"
-            )
-        expected = {r["capability"] for r in production["requires"]}
-        actual = set(item.get("accepted_prerequisites", {}))
-        if actual != expected:
-            raise CoreError(
-                f"lifecycle baseline for {capability} must cover exactly production prerequisites; "
-                f"expected {sorted(expected)}, got {sorted(actual)}"
-            )
+
+        accepted = set(item.get("accepted_prerequisites", {}))
         semantic_actual = set(item.get("accepted_prerequisite_semantics", {}))
-        if not semantic_actual.issubset(expected):
+        if not semantic_actual.issubset(accepted):
             raise CoreError(
-                f"semantic lifecycle baseline for {capability} references non-prerequisites; "
-                f"expected subset of {sorted(expected)}, got {sorted(semantic_actual)}"
+                f"semantic lifecycle baseline for {capability} references prerequisites "
+                f"outside its accepted baseline; expected subset of {sorted(accepted)}, "
+                f"got {sorted(semantic_actual)}"
             )
-    return lifecycle
+        active[capability] = item
+    return active
+
+
+def obsolete_lifecycle_rows(
+    graph: dict[str, Any],
+    projection: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Return lifecycle assertions whose CapabilityIds are absent from the graph."""
+    productions = production_index(graph)
+    lifecycle = lifecycle_index(projection)
+    return [
+        {
+            "capability": capability,
+            "artifact": item["artifact"],
+            "acceptance_id": item["acceptance_id"],
+            "reason": "CAPABILITY_NOT_IN_ENGINEERING_GRAPH",
+        }
+        for capability, item in sorted(lifecycle.items())
+        if capability not in productions
+    ]
 
 
 def lifecycle_states(
@@ -195,6 +214,17 @@ def lifecycle_states(
         required = required_capabilities(capability)
         mismatches: list[dict[str, Any]] = []
         baseline = item.get("accepted_prerequisites", {})
+        accepted_topology = set(baseline)
+        current_topology = set(required)
+        if accepted_topology != current_topology:
+            mismatches.append(
+                {
+                    "capability": capability,
+                    "mode": "PREREQUISITE_TOPOLOGY",
+                    "accepted_prerequisites": sorted(accepted_topology),
+                    "current_prerequisites": sorted(current_topology),
+                }
+            )
 
         current_policy_fingerprint = (
             current_acceptance_policy_fingerprints.get(capability)

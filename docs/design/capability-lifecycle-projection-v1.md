@@ -121,6 +121,29 @@ declared prerequisite capabilities. If that support is semantically material,
 the Engineering Graph must expose it as a prerequisite so it receives an
 acceptance/currentness baseline.
 
+## Graph evolution and identity reconciliation
+
+A lifecycle projection is a currentness projection, not an identity-migration
+authority. Engineering Graph evolution therefore follows fail-safe identity
+semantics:
+
+- a lifecycle assertion whose CapabilityId is no longer produced by the current
+  Engineering Graph is **obsolete** and inert; it does not invalidate the graph
+  and cannot satisfy any new CapabilityId;
+- when an existing CapabilityId's direct prerequisite set changes, its previous
+  acceptance remains evidence that a provider existed, but its lifecycle state is
+  STALE with a PREREQUISITE_TOPOLOGY mismatch until the owning Authority
+  revalidates against the new prerequisite contract;
+- rename, split and merge are never inferred from names, artifacts or list
+  position. A newly introduced CapabilityId follows ordinary MISSING/UNKNOWN
+  and semantic-admission rules and receives a new acceptance identity;
+- obsolete rows may be retained in project-native history, but should be pruned
+  from the next current publication snapshot. obsolete_lifecycle_rows exposes
+  them deterministically for that reconciliation.
+
+This keeps migration explicit without introducing a workflow or transferring
+semantic acceptance across changed identities.
+
 ## Admission integration
 
 `semantic_admission.py` emits the lifecycle assertion for an ACCEPTED

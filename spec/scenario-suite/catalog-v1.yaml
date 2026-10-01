@@ -282,6 +282,12 @@ requirements:
     description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
     min_scenarios: 1
 
+  - id: lifecycle-graph-evolution-reconciliation
+    category: lifecycle
+    enforcement: required
+    description: Removed CapabilityIds become inert lifecycle history while changed prerequisite topology makes retained capabilities stale without transferring acceptance to new identities.
+    min_scenarios: 1
+
   - id: semantic-evaluation-current-snapshot
     category: semantic
     enforcement: required

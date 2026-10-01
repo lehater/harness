@@ -1,0 +1,89 @@
+version: 1
+kind: harness-scenario
+id: lifecycle-reconciles-graph-evolution
+title: Lifecycle treats removed identities as obsolete and changed topology as stale
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - lifecycle-graph-evolution-reconciliation
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: LIFECYCLE-GRAPH-EVOLUTION
+      authorities:
+        - id: SOURCE
+          responsibility: Own source knowledge.
+          boundary:
+            semantic_cohesion: Source semantics.
+            independent_change: Source changes independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: source.identity.v2
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: USE
+          responsibility: Own derived knowledge.
+          boundary:
+            semantic_cohesion: Derived semantics.
+            independent_change: Derived knowledge changes independently.
+            public_contract: Accepted derived knowledge.
+          produces:
+            - capability: use.result
+              knowledge_kind: domain-model
+              requires: [source.identity.v2]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume derived knowledge.
+          requires: [use.result]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: SOURCE
+          authority: SOURCE
+          path: docs/source.md
+          provides: [source.identity]
+          depends_on: []
+        - id: USE
+          authority: USE
+          path: docs/use.md
+          provides: [use.result]
+          depends_on: [SOURCE]
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: SOURCE
+          capability: source.identity
+          acceptance_id: SOURCE-1
+          accepted_prerequisites: {}
+        - artifact: USE
+          capability: use.result
+          acceptance_id: USE-1
+          accepted_prerequisites:
+            source.identity: SOURCE-1
+
+steps:
+  - id: currentness
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /source.identity.v2/state, op: equals, value: UNKNOWN}
+      - {path: /use.result/state, op: equals, value: STALE}
+      - path: /use.result/mismatches
+        op: contains_match
+        value:
+          mode: PREREQUISITE_TOPOLOGY
+          accepted_prerequisites: [source.identity]
+          current_prerequisites: [source.identity.v2]
