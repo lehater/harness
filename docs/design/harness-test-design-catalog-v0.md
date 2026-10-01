@@ -162,6 +162,8 @@ A design may move to READY only when:
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Fixture:
 
 A small accepted evidence set states that an API accepts idempotency keys for
@@ -204,6 +206,8 @@ A dedicated semantic fixture/eval contract, not a Core validator.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Fixture:
 
 Accepted project evidence contains examples, implementation notes, filenames,
@@ -233,6 +237,8 @@ remain empty.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-003/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Fixture:
 
 Evidence contains two independently decidable obligations:
@@ -260,6 +266,8 @@ Assertions:
 **Minimum level:** TL1  
 **Oracle:** O1  
 **Status:** READY
+
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
 
 Fixture:
 
@@ -364,6 +372,8 @@ Same normalized Capability identities and granularity.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Fixture:
 
 Several decision atoms jointly define one public contract and always
@@ -386,6 +396,8 @@ Assertions:
 **Minimum level:** TL1  
 **Oracle:** O1  
 **Status:** READY
+
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
 
 Fixture:
 
@@ -438,6 +450,8 @@ Ambiguous ownership is tested separately by TD-AUTH-005.
 **Minimum level:** TL1  
 **Oracle:** O1  
 **Status:** READY
+
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
 
 Base fixture:
 
@@ -827,6 +841,8 @@ coverage is unchanged.
 **Oracle:** O1 for intended route  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Task:
 
 A user asks to start using Harness on an existing project or reconcile an
@@ -850,6 +866,8 @@ behavioral proof until an agent actually selects it.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
+
 Task:
 
 A user asks what engineering work is currently missing/blocked/ready for a
@@ -872,6 +890,8 @@ A request to define the target knowledge closure belongs to
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1  
 **Status:** READY
+
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-003/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented; provider-backed judgement evidence has not yet been accepted, so the design remains READY.
 
 Task:
 

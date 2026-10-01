@@ -88,6 +88,10 @@ acceptance/scenario procedure does not live in this root bootstrap file.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
 - `behavioral_eval.py` — provider-neutral clean-context behavioral-evaluation runner, semantic normalizer and scorer.
+- `spec/behavioral-evals/first-wave/manifest-v0.yaml` — reviewed first-wave Capability/Authority/task-intent behavioural case inventory.
+- `adapters/copilot_behavioral_eval_agent.py` — provider adapter for clean-context judgement runs; oracle/pass criteria are not provider inputs.
+- `validators/validate_behavioral_eval_cases.py` — deterministic first-wave case/adapter boundary validation; not judgement evidence.
+- `.github/workflows/behavioral-eval-copilot.yml` — operator-triggered external provider execution for first-wave behavioural evidence.
 - `validators/validate_behavioral_eval.py` — deterministic substrate contract/self-test; it is not agent-quality evidence.
 - `docs/design/harness-assurance-policy-v0.md` — canonical evidence-selection, test-level and oracle policy for Harness changes/release claims.
 - `docs/design/harness-ability-to-evidence-v0.md` — canonical Harness ability/failure-mode/evidence blueprint used to design assurance before implementation.

@@ -35,6 +35,8 @@ abilities:
       - A05-F08
     requirements:
       - A05-R01
+      - A05-R02
+      - A05-R03
 
 requirements:
   - id: A19-R01
@@ -75,13 +77,41 @@ requirements:
       - A05-F03
       - A05-F04
       - A05-F05
-      - A05-F06
-      - A05-F07
-      - A05-F08
-    purpose: Isolated synthetic Capability formation and granularity falsification.
+    purpose: Isolated synthetic Capability discovery and granularity falsification.
     required:
       test_levels: [TL1]
       methods_any: [EM-02, EM-05]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A05-R02
+    ability: HA-A05
+    failure_modes:
+      - A05-F06
+      - A05-F07
+    purpose: Controlled project-shaped proof that Reference vocabulary does not suppress novel project Capability formation.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-05, EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A05-R03
+    ability: HA-A05
+    failure_modes:
+      - A05-F08
+    purpose: Repeated clean-context Capability-set convergence.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09]
       oracle_minimum: O1
       judgement_execution: true
     substitution:
@@ -108,3 +138,25 @@ evidence:
     verified_at_revision: null
     limitations:
       - Proves registry denominator/provenance semantics only; it does not provide Capability-formation behavioral evidence.
+
+  - id: EVID-CAP-FIRST-WAVE-TL1
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+    satisfies:
+      - A05-R01
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    status: ready
+    verified_at_revision: null
+    limitations:
+      - The executable cases and provider boundary exist, but no accepted provider-backed run record is registered yet.
+      - This evidence slot covers TD-CAP-001..004 only and does not establish Reference-vocabulary/novel-Capability or repeated-run proof.

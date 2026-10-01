@@ -48,10 +48,12 @@ The reviewed minimum implementation is:
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
 - `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M08 meta-self-tests.
 
-The seed is intentionally incomplete: it includes a release-critical HA-A05 proof
-slot with no admissible evidence until the reviewed formation evaluations are
-implemented. Registry validity therefore remains separate from release-claim
-completeness.
+The seed is intentionally incomplete. HA-A05 is split into separate TL1
+discovery/granularity, TL3 Reference-vocabulary/novel-Capability, and TL4
+clean-context convergence proof slots. The first-wave TL1 execution surface is
+registered as `ready`, which is deliberately non-admissible until an accepted
+provider-backed run record exists. Registry validity therefore remains separate
+from release-claim completeness.
 
 ## Core model
 

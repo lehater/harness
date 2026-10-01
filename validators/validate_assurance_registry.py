@@ -393,7 +393,9 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
 
     report = assurance_report(registry)
     assert report["summary"]["release_claim_ready"] is False
-    assert report["abilities"]["HA-A05"]["missing_requirements"] == ["A05-R01"]
+    assert set(report["abilities"]["HA-A05"]["missing_requirements"]) == {
+        "A05-R01", "A05-R02", "A05-R03"
+    }
     passed.append("AR-M01")
 
     def candidate(
@@ -426,13 +428,13 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     wrong_level = copy.deepcopy(registry)
     wrong_level["evidence"].append(candidate("META-WRONG-LEVEL", level="TL6"))
     validate_structure(wrong_level)
-    assert assurance_report(wrong_level)["abilities"]["HA-A05"]["status"] == "INCOMPLETE"
+    assert "A05-R01" in assurance_report(wrong_level)["abilities"]["HA-A05"]["missing_requirements"]
     passed.append("AR-M02")
 
     weak_oracle = copy.deepcopy(registry)
     weak_oracle["evidence"].append(candidate("META-WEAK-ORACLE", oracle="O0"))
     validate_structure(weak_oracle)
-    assert assurance_report(weak_oracle)["abilities"]["HA-A05"]["status"] == "INCOMPLETE"
+    assert "A05-R01" in assurance_report(weak_oracle)["abilities"]["HA-A05"]["missing_requirements"]
     passed.append("AR-M03")
 
     wrong_execution = copy.deepcopy(registry)
@@ -440,7 +442,7 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
         candidate("META-WRONG-EXECUTION", execution="deterministic")
     )
     validate_structure(wrong_execution)
-    assert assurance_report(wrong_execution)["abilities"]["HA-A05"]["status"] == "INCOMPLETE"
+    assert "A05-R01" in assurance_report(wrong_execution)["abilities"]["HA-A05"]["missing_requirements"]
     passed.append("AR-M04")
 
     missing_ref = copy.deepcopy(registry)

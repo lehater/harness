@@ -418,6 +418,25 @@ This substrate is not itself behavioral evidence for Capability/Authority
 formation. Such evidence exists only when a real judgement-dependent adapter
 executes the reviewed cases.
 
+## First-wave executable cases
+
+The first reviewed judgement cases are materialized under
+`spec/behavioral-evals/first-wave/**` for TD-CAP-001..004,
+TD-AUTH-001/002/004, and TD-ROUTE-001..003.
+
+Execution uses the provider-neutral runner plus
+`adapters/copilot_behavioral_eval_agent.py`. The provider receives the frozen
+task, blinded fixture data, and explicitly declared normal Harness instruction
+surfaces; it does not receive the oracle, pass criteria, prior run conclusions,
+or evaluation fixture metadata.
+
+`.github/workflows/behavioral-eval-copilot.yml` is intentionally
+`workflow_dispatch`-only under the CI Execution Policy. Deterministic
+`validators/validate_behavioral_eval_cases.py` proves case/schema/oracle
+isolation and adapter request/response boundaries, but does not count as
+judgement evidence. A TD remains READY until an accepted provider-backed run
+exists for that case.
+
 ## Implementation architecture
 
 A future runner should have four separable parts:
