@@ -146,7 +146,7 @@ The following modules should be treated as orchestration/process-manager code ra
 - `agent_router.py`
 - `authority_context.py`
 - `decision_pipeline.py`
-- `decision_explorer_request.py` (currently mixed; see violation below)
+- `decision_explorer_request.py`
 - `semantic_admission.py`
 - `semantic_closure.py`
 - `semantic_questions.py`
@@ -157,45 +157,22 @@ This reclassification explains why `semantic_admission.py` legitimately coordina
 
 ## Current boundary violations
 
-The import ratchet currently contains exactly three explicit violations.
+The import ratchet currently contains no explicit violations. BC-01 and BC-02 were removed by introducing an application-level Coverage orchestration boundary, and BC-03 was removed by separating the pure Decision Explorer request contract from application-level request derivation.
 
-### BC-01: Coverage -> Integration
+### BC-01: Coverage -> Integration — resolved
 
-`engineering_coverage.py` calls `integration_alignment.validate_project_alignment`.
+`engineering_coverage.py` now consumes only an already resolved Project Model realization.
+Repository-native projection/alignment moved to `coverage_application.py`, which coordinates the Integration ACL before invoking the pure Coverage evaluator.
 
-Why this is wrong: repository projection/alignment is an anti-corruption concern. The Coverage domain should receive an already resolved Project Model view.
+### BC-02: Coverage -> Application — resolved
 
-Target fix:
+Coverage now emits unrouted Coverage work items only. `coverage_application.py` decorates those derived work items with registered skill routes for application execution. Coverage output therefore remains valid when no agent/skill subsystem exists, while the application-facing scenario/API retains routed work.
 
-    project-native state
-      -> Integration ACL
-      -> Project Model DTO
-      -> Coverage evaluator
+### BC-03: Decision -> Application — resolved
 
-### BC-02: Coverage -> Application
+`decision_explorer_contract.py` now owns the pure Decision Explorer request shape, deterministic request identity and evidence-binding validation inside the Decision bounded context.
 
-`engineering_coverage.py` calls `agent_router.validate_skill_registry` and attaches skill routes to Coverage work items.
-
-Why this is wrong: Coverage owns missing engineering obligations, not how an agent executes them.
-
-Target fix:
-
-    CoverageGap / ProduceCapability
-      -> Application routing
-      -> Skill registry
-
-Coverage output remains valid even when no agent/skill subsystem exists.
-
-### BC-03: Decision -> Application
-
-`decision_exploration.py` imports `decision_explorer_request.py`, while that module also builds requests using Authority Context, Lifecycle and Engineering Graph.
-
-The file contains two responsibilities:
-
-1. Decision-context request value/binding contract;
-2. application-level request construction from project state.
-
-Target fix: split them. Decision Exploration depends only on the pure request contract; Application owns the builder.
+`decision_explorer_request.py` remains in the Application Layer and derives concrete request inputs from Authority Context, Lifecycle and Engineering Graph before delegating request construction to the pure Decision contract. `decision_exploration.py` depends only on `decision_explorer_contract.py`, so the Decision bounded context no longer imports Application orchestration.
 
 ## Existing audit findings explained by the context map
 
@@ -216,7 +193,7 @@ This is evidence that the defects are not independent accidents; several are man
 
 - every root runtime module must belong to one context/layer or be explicitly classified as research/test;
 - domain contexts may import only declared upstream contexts;
-- the three existing violations are explicit temporary exceptions;
+- any temporary violation must be explicitly declared, and the current map declares none;
 - a new undeclared violation fails validation;
 - once a known violation disappears, the validator fails until its exception is removed.
 
@@ -227,8 +204,8 @@ This prevents architecture debt from growing while allowing incremental correcti
 Do not start with a repository-wide package move.
 
 1. Establish context ownership and the import ratchet. **Done on the audit branch.**
-2. Remove BC-01/BC-02 by separating pure Coverage evaluation from integration and skill routing.
-3. Remove BC-03 by splitting the Decision request contract from its application builder.
+2. Remove BC-01/BC-02 by separating pure Coverage evaluation from integration and skill routing. **Done on the audit branch.**
+3. Remove BC-03 by splitting the Decision request contract from its application builder. **Done on the audit branch.**
 4. Introduce stable published read models at context boundaries, especially Assurance -> Coverage.
 5. Resolve `HARN-008` explicitly: Coverage owns completeness; Reference Model owns reusable materialization.
 6. Fix functional P0 invariants inside their owning contexts.

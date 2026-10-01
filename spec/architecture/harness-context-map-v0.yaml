@@ -69,6 +69,7 @@ contexts:
     modules:
       - decision_execution_assurance
       - decision_exploration
+      - decision_explorer_contract
       - decision_governance
     may_depend_on: []
 
@@ -113,6 +114,7 @@ contexts:
       - agent_router
       - authority_context
       - consumer_pack
+      - coverage_application
       - decision_explorer_request
       - decision_pipeline
       - graph_doctor
@@ -150,13 +152,4 @@ shared_kernel_imports:
   harness:
     - CoreError
 
-known_violations:
-  - from_module: engineering_coverage
-    to_module: integration_alignment
-    reason: Coverage currently resolves repository projection internally; alignment must move to the application/integration boundary.
-  - from_module: engineering_coverage
-    to_module: agent_router
-    reason: Coverage currently performs skill routing; routing must move to the application layer.
-  - from_module: decision_exploration
-    to_module: decision_explorer_request
-    reason: decision_explorer_request currently mixes a Decision request contract with an application-level request builder and must be split.
+known_violations: []

@@ -5,6 +5,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
+from coverage_application import evaluate_project_coverage
 from engineering_coverage import evaluate_with_repository_policy, load
 
 
@@ -12,7 +13,7 @@ def main():
     graph=load(ROOT/"spec/research/scope-activation-fixture-graph.yaml")
     core=load(ROOT/"spec/research/scope-activation-fixture-core.yaml")
 
-    result=evaluate_with_repository_policy(
+    pure=evaluate_with_repository_policy(
         graph=graph,
         realization=core,
         consumer="IMPLEMENTATION",
@@ -39,6 +40,31 @@ def main():
                     "requires":["fixture.mvp.data-design"],
                 }
             ],
+        },
+    )
+
+    pure_items=[item for item in pure["work_items"] if item.get("capability")=="fixture.mvp.data-lifecycle-design"]
+    assert len(pure_items)==1
+    assert "execution_route" not in pure_items[0]
+    assert "routed_production_count" not in pure
+
+    result=evaluate_project_coverage(
+        graph=graph,
+        realization=core,
+        consumer="IMPLEMENTATION",
+        scope="mvp",
+        scope_roots=["fixture.mvp.implementation-design"],
+        project_overlay={"activate":[{"concern":"data.lifecycle","rationale":"Fixture requires explicit data lifecycle."}],"decisions":[]},
+        production_contract_overlay={
+            "version":1,
+            "kind":"harness-production-contract-overlay",
+            "productions":[{
+                "authority":"DATA-DESIGN",
+                "capability":"fixture.mvp.data-lifecycle-design",
+                "semantic_claims":["engineering.data.lifecycle"],
+                "knowledge_kind":"data-design",
+                "requires":["fixture.mvp.data-design"],
+            }],
         },
     )
 

@@ -21,8 +21,10 @@ root_files:
   - concern_activation.py
   - coverage_obligations.py
   - coverage_planner.py
+  - coverage_application.py
   - decision_execution_assurance.py
   - decision_exploration.py
+  - decision_explorer_contract.py
   - decision_explorer_request.py
   - decision_governance.py
   - decision_pipeline.py

@@ -23,7 +23,7 @@ from decision_exploration import evaluate_decision_exploration
 from derivation_test_coverage import evaluate_derivation_test_coverage
 from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
-from engineering_coverage import evaluate_with_repository_policy
+from coverage_application import evaluate_project_coverage
 from engineering_graph import evaluate_engineering_target
 from frontend_interface_knowledge import evaluate_frontend_ux_closure
 from frontend_screen_contracts import evaluate_frontend_screen_contracts
@@ -295,7 +295,7 @@ def decision_roadmap(**kwargs: Any) -> dict[str, Any]:
 
 @scenario_driver("engineering.coverage")
 def engineering_coverage(**kwargs: Any) -> dict[str, Any]:
-    return evaluate_with_repository_policy(**kwargs)
+    return evaluate_project_coverage(**kwargs)
 
 
 @scenario_driver("graph.doctor")
