@@ -103,6 +103,45 @@ def main() -> int:
     assert mvp["work_item_count"] == len(mvp["work_items"])
     assert not mvp["completion_ready"]
 
+    # HARN-001: manual activation classes are omission-resistant. Silence must
+    # surface them as active coverage obligations instead of allowing them to
+    # disappear from the coverage state.
+    for concern in (
+        "governance.external-obligations",
+        "governance.privacy",
+        "specialized.safety",
+        "specialized.ai",
+        "specialized.regulated",
+    ):
+        assert concern in mvp_rows, concern
+        assert any(
+            item.get("source") == "MANUAL_ACTIVATION_CLASS"
+            for item in mvp_rows[concern]["activation_provenance"]
+        ), mvp_rows[concern]
+
+    privacy_na = evaluate_with_repository_policy(
+        graph=load(ROOT / "spec/research/scope-activation-fixture-graph.yaml"),
+        realization=load(ROOT / "spec/research/scope-activation-fixture-core.yaml"),
+        consumer="IMPLEMENTATION",
+        scope="mvp",
+        scope_roots=["fixture.mvp.implementation-design"],
+        project_overlay={
+            "decisions": [
+                {
+                    "concern": "governance.privacy",
+                    "state": "NOT_APPLICABLE",
+                    "rationale": "Fixture contains no personal or sensitive data.",
+                    "evidence": ["fixture:no-personal-data"],
+                }
+            ]
+        },
+    )
+    privacy_row = {
+        row["concern"]: row for row in privacy_na["rows"]
+    }["governance.privacy"]
+    assert privacy_row["state"] == "NOT_APPLICABLE"
+    assert privacy_row["action"] == "NONE"
+
     partial = subject_eval("subject-coverage-fixture-core-partial.yaml")
     complete = subject_eval("subject-coverage-fixture-core-complete.yaml")
 

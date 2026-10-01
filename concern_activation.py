@@ -226,6 +226,23 @@ def derive_activation(
                 "signals": evidence,
             })
 
+    for item in policy.get("manual_activation_classes", []) or []:
+        if isinstance(item, str):
+            concern = item
+            reason = None
+        elif isinstance(item, dict) and item.get("concern"):
+            concern = item["concern"]
+            reason = item.get("reason")
+        else:
+            raise ValueError("manual activation class must be a concern id or mapping")
+        entry = {
+            "source": "MANUAL_ACTIVATION_CLASS",
+            "policy": policy.get("id"),
+        }
+        if reason:
+            entry["reason"] = reason
+        provenance.setdefault(concern, []).append(entry)
+
     selected_scope = overlay.get("scope")
 
     def applies_to_scope(item: dict[str, Any]) -> bool:
