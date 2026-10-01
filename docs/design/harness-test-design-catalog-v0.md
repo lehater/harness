@@ -54,12 +54,87 @@ validator/scenario/eval runner instead of adding a new one.
 
 Statuses:
 
-- DESIGN — specified but not yet reviewed for implementation;
-- READY — oracle and boundary reviewed; implementation may begin;
-- IMPLEMENTED — executable evidence exists;
-- VERIFIED — implemented evidence independently re-audited.
+- DESIGN — specified but still has an unresolved oracle/ownership/boundary issue;
+- READY — oracle and boundary reviewed; missing evidence may be implemented;
+- PARTIAL — current evidence is reusable but does not satisfy the full design;
+- BLOCKED — design is accepted but a prerequisite design/evidence surface must land first;
+- IMPLEMENTED — current repository evidence already satisfies this design; do not add a duplicate test;
+- POLICY — the item is a governance rule rather than an executable test and must not enter the implementation backlog;
+- VERIFIED — implemented evidence mapping was independently re-audited.
 
-All entries in v0 start as DESIGN.
+Status describes the reviewed evidence design, not whether the associated runtime
+defect/finding is FIXED or VERIFIED.
+
+## Design review v0
+
+Review baseline: branch `audit/harness-corrections`, after the
+Ability-to-Evidence, agent behavioral evaluation, and assurance-registry designs
+were defined.
+
+The review uses a conservative rule: similarity of names does not count as
+implementation. Existing evidence is credited only when it exercises the same
+failure boundary with a compatible oracle.
+
+### Review findings
+
+1. **Formation tests need real agent execution.** Current Authority research,
+   Reference Model holdouts, and fresh-context routing fixtures validate
+   pre-authored semantic structures or supplied route keys. They do not execute
+   Capability/Authority/task-intent formation.
+2. **Most deterministic downstream designs already have evidence.** Semantic
+   derivation/admission, lifecycle, publication, Consumer Pack, CI policy, and
+   several coverage/frontier designs should reuse current validators/scenarios.
+3. **Applicability ownership must stay separated.** Engineering Coverage,
+   Project Authority Assessment, and upstream project-fact discovery have
+   different absence/UNKNOWN semantics. One generic applicability-lattice test
+   must not collapse those owners.
+4. **A higher-level micro-project remains blocked by lower-level formation
+   evidence.** TL3/TL4 designs are retained, but they do not become the first
+   implementation batch.
+5. **Assurance self-test now has a design dependency.**
+   `docs/design/harness-assurance-registry-v0.md` defines how
+   TD-ASSURE-001/002 can be implemented without using the CI/Scenario inventory
+   as its own denominator.
+6. **Agent-backed designs now have an execution contract.**
+   `docs/design/harness-agent-behavioral-evaluation-v0.md` defines clean
+   contexts, observable traces, semantic normalization, oracle isolation, and
+   scoring without private reasoning.
+
+### Family disposition
+
+| Family | Review disposition | Main reason |
+|---|---|---|
+| SF-01 Capability formation | READY | Oracles/failure modes are usable; no current behavioural execution exists |
+| SF-02 Authority partition | READY except TD-AUTH-005 | Current research validates authored boundaries, not formation; ambiguous ownership escalation needs a narrower contract |
+| SF-03 Dependency necessity | Mixed | Formation cases missing; same-Authority topology and lifecycle-topology reaction already have evidence |
+| SF-04 Applicability | Mixed | Several deterministic dispositions exist; generic silence/Question wording crossed ownership boundaries |
+| SF-05 Routing intent | READY except deterministic TD-ROUTE-006 already IMPLEMENTED | Current fresh-context fixture supplies route keys and explicitly does not prove intent recognition |
+| TL2 composition | PARTIAL/DESIGN | Existing downstream composition can be reused; project-model formation composition still lacks a clear routed owner |
+| SF-06 Existing bootstrap | READY/BLOCKED for repeated runs | Actual routed agent bootstrap has no behavioural E2E |
+| SF-07 Greenfield bootstrap | BLOCKED | Sound higher-level designs, but should follow lower-level formation evidence |
+| SF-08 Semantic derivation/admission | Mostly IMPLEMENTED | Existing semantic validators/scenarios already cover loss/provenance/contradiction/calibration |
+| SF-09 Lifecycle/evolution/scale | Mostly IMPLEMENTED/PARTIAL | Currentness/evolution evidence is strong; generic split/merge and breadth/cardinality envelope remain incomplete |
+| SF-10 Frontier/publication | Mostly IMPLEMENTED | Publication atomicity/CAS/crash behavior exists; precedence matrix can be strengthened |
+| SF-11 Projection/distribution | PARTIAL/IMPLEMENTED | Consumer Pack closure strong; broader projection and upgrade compatibility have narrower gaps |
+| SF-12 CI/assurance meta | CI IMPLEMENTED; assurance READY | CI policy exists; independent Ability denominator has not been implemented |
+| SF-13 Evaluator assurance | Mostly IMPLEMENTED/PARTIAL | Binding/calibration exist; repeated provider stability and drift/representativeness remain incomplete |
+| SF-14 Real projects/holdouts | PARTIAL/BLOCKED | Known real evidence exists; independent whole-Harness holdout does not |
+
+### Smallest future implementation batch
+
+No implementation is authorized by this review yet. After design closure, the
+smallest coherent batch is:
+
+1. machine-readable seed for the Assurance Registry plus TD-ASSURE-001/002;
+2. minimal agent behavioural runner capable of one isolated synthetic case;
+3. TD-CAP-001/002/003/004 and TD-AUTH-001/002/004 as the first formation
+   falsification set;
+4. TD-ROUTE-001/002/003 as the first task-intent discrimination set;
+5. only after those are green, TD-COMP-001 and existing-project TL3 bootstrap.
+
+This ordering creates the denominator/self-test and execution substrate before
+multiplying agent cases.
+
 
 ## Review criteria before implementation
 
@@ -85,7 +160,7 @@ A design may move to READY only when:
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -127,7 +202,7 @@ A dedicated semantic fixture/eval contract, not a Core validator.
 **Methods:** EM-02, EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -156,7 +231,7 @@ remain empty.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -184,7 +259,7 @@ Assertions:
 **Methods:** EM-02, EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -208,7 +283,7 @@ Assertions:
 **Methods:** EM-02, EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -232,7 +307,7 @@ surface. The result should then include the corresponding knowledge identity.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -260,7 +335,7 @@ Assertions:
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Base fixture:
 
@@ -287,7 +362,7 @@ Same normalized Capability identities and granularity.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -310,7 +385,7 @@ Assertions:
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -334,7 +409,7 @@ Assertions:
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -343,13 +418,17 @@ candidate Authority surfaces.
 
 Expected semantic result:
 
-The atom has one semantic owner. If evidence is insufficient to choose, the
-result is explicit uncertainty/Question rather than duplicated ownership.
+The fixture itself establishes one unambiguous semantic owner for the shared
+decision atom. The evaluated model must assign canonical ownership to that one
+Authority while allowing the other Authority to consume the public output.
 
 Assertions:
 
-- no atom belongs canonically to two Authorities;
-- ambiguity remains visible.
+- the atom has exactly one canonical Authority owner;
+- the consuming Authority does not co-own the decision;
+- duplicating the atom into both Authorities fails the oracle.
+
+Ambiguous ownership is tested separately by TD-AUTH-005.
 
 ## TD-AUTH-004 — File/module layout is not Authority topology
 
@@ -358,7 +437,7 @@ Assertions:
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Base fixture:
 
@@ -390,8 +469,21 @@ establish independent change/public contract.
 
 Expected semantic result:
 
-No confident invented boundary. The unresolved ownership/boundary issue becomes
-explicit uncertainty addressed to the appropriate semantic owner.
+No confident invented Authority split/merge.
+
+Review finding: a generic Core Question is **not yet a valid universal oracle**
+for this case because the boundary uncertainty may exist precisely because no
+deciding Authority can yet be identified. The bootstrap contract instead stops
+when no Authority can be identified.
+
+Before this design can become READY, choose one bounded case:
+
+- an existing Authority explicitly owns the boundary decision, in which case a
+  Question to that Authority is valid; or
+- no owner exists, in which case the expected result is a procedure-level
+  stop/escalation rather than a Core Question.
+
+Do not implement the current ambiguous form.
 
 ## TD-AUTH-006 — Reference boundary trap
 
@@ -400,7 +492,7 @@ explicit uncertainty addressed to the appropriate semantic owner.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -419,7 +511,7 @@ contract.
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Transformations:
 
@@ -441,7 +533,7 @@ Identical pairwise Authority partition over the decision-bearing atoms.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -464,7 +556,7 @@ Assertions:
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -486,7 +578,7 @@ Add a material claim in B that explicitly consumes A; edge should then appear.
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -509,7 +601,7 @@ Change A's accepted identity. B must become stale.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -527,7 +619,7 @@ Requirement -> design prerequisite direction only.
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Transformations:
 
@@ -544,7 +636,7 @@ Normalized dependency graph over the tested Capabilities is unchanged.
 **Methods:** EM-03, EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Base:
 
@@ -569,7 +661,7 @@ Expected semantic result:
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -586,7 +678,7 @@ REQUIRED with evidence provenance.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -610,10 +702,20 @@ Fixture:
 
 No accepted evidence establishes applicability or non-applicability.
 
-Expected semantic result:
+Review finding:
 
-UNKNOWN (or explicit unresolved state owned by the contract), never N/A and
-never completion-ready through silence.
+This design currently crosses semantic owners. Project Authority Assessment uses
+UNASSESSED for absence, while Engineering Coverage may conservatively activate a
+mandatory/manual concern as missing work instead of returning UNKNOWN.
+
+Before implementation, split this design into owner-specific cases:
+
+- Project Authority Assessment: silence -> UNASSESSED;
+- Engineering Coverage: silence follows concern policy and must never become
+  evidence-backed NOT_APPLICABLE or false completion.
+
+The invariant "silence must not prove N/A/COMPLETE" remains valid; one generic
+expected state does not.
 
 ## TD-APP-004 — Unresolved evidence becomes QUESTION
 
@@ -622,7 +724,7 @@ never completion-ready through silence.
 **Methods:** EM-02  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Fixture:
 
@@ -631,7 +733,15 @@ is absent.
 
 Expected semantic result:
 
-QUESTION/unresolved frontier addressed to the Authority that can decide it.
+If an unresolved project Question already exists for the deciding Authority,
+Coverage/frontier must preserve it as unresolved and block false completion.
+
+Review limitation:
+
+Current evidence strongly covers **propagation of an existing Question**. It
+does not establish a universal mechanism that invents a new Core Question from
+every missing applicability fact. Any future Question-creation test must name
+the operation/owner responsible for creating it.
 
 ## TD-APP-005 — Irrelevant concern does not activate
 
@@ -640,7 +750,7 @@ QUESTION/unresolved frontier addressed to the Authority that can decide it.
 **Methods:** EM-02, EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Fixture:
 
@@ -657,7 +767,7 @@ No REQUIRED obligation solely from lexical similarity.
 **Methods:** EM-05, EM-07  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Base:
 
@@ -681,7 +791,7 @@ coverage is unchanged.
 **Methods:** EM-02  
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1 for intended route  
-**Status:** DESIGN
+**Status:** READY
 
 Task:
 
@@ -704,7 +814,7 @@ behavioral proof until an agent actually selects it.
 **Methods:** EM-02  
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Task:
 
@@ -727,7 +837,7 @@ A request to define the target knowledge closure belongs to
 **Methods:** EM-02  
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Task:
 
@@ -745,7 +855,7 @@ Expected operation:
 **Methods:** EM-02  
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Task:
 
@@ -767,7 +877,7 @@ If the task is only to report status, do not select decision-pipeline.
 **Methods:** EM-02  
 **Minimum level:** TL1 semantic oracle; eventual TL4 execution  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Task:
 
@@ -785,7 +895,7 @@ Expected operation:
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Task:
 
@@ -807,7 +917,7 @@ exists to keep it in the canonical assurance denominator.
 **Methods:** EM-05  
 **Minimum level:** TL3 for realistic payload handling; eventual TL4  
 **Oracle:** O1/O4  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -827,7 +937,7 @@ hierarchy. Payload text remains data.
 **Methods:** EM-05  
 **Minimum level:** TL1 oracle; eventual TL4  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture family:
 
@@ -887,7 +997,7 @@ bootstrap/source-selection noise.
 **Methods:** EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Pipeline:
 
@@ -910,7 +1020,7 @@ The exact unresolved obligation stays visible and prevents completion.
 **Methods:** EM-07, later EM-09  
 **Minimum level:** TL2 deterministic after operation; TL4 for full intent path  
 **Oracle:** O1/O4  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Pipeline:
 
@@ -957,7 +1067,7 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -983,7 +1093,7 @@ Assertions:
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -1006,7 +1116,7 @@ Adding unrelated directories must not enlarge the realization.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -1024,7 +1134,7 @@ not guess a value merely to complete the model.
 **Methods:** EM-03, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Procedure:
 
@@ -1042,7 +1152,7 @@ run; no duplicate artifacts/Capabilities are introduced.
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Mutation:
 
@@ -1059,7 +1169,7 @@ Selected scope/model is unchanged.
 **Methods:** EM-09  
 **Minimum level:** TL4  
 **Oracle:** O1 for synthetic model + semantic normalization  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Prerequisite:
 
@@ -1080,7 +1190,7 @@ Consumer closure.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Fixture:
 
@@ -1099,7 +1209,7 @@ delivery/process structure.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Fixture:
 
@@ -1117,7 +1227,7 @@ Question/decision frontier remains explicit; no canonical choice is invented.
 **Methods:** EM-07, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Expected semantic result:
 
@@ -1130,7 +1240,7 @@ Only foundational work whose prerequisites are satisfied appears actionable.
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Fixture:
 
@@ -1148,7 +1258,7 @@ Only material project knowledge is admitted.
 **Methods:** EM-09  
 **Minimum level:** TL4  
 **Oracle:** O1/O4  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Compare normalized semantic model and frontier across repeated clean runs.
 
@@ -1161,7 +1271,7 @@ Compare normalized semantic model and frontier across repeated clean runs.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -1180,7 +1290,7 @@ valid transformation/constrain/realization relation.
 **Methods:** EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Mutation:
 
@@ -1198,7 +1308,7 @@ Admission fails or surfaces the exact missing obligation.
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1212,7 +1322,7 @@ the artifact is readable in the execution context.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1226,7 +1336,7 @@ accepted downstream claim.
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Mutation:
 
@@ -1243,7 +1353,7 @@ Normalized admitted downstream semantics are unchanged.
 **Methods:** EM-12  
 **Minimum level:** TL4 calibration track  
 **Oracle:** O4  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Use an expert-labelled corpus with explicit positive/negative semantic
 transformations and report confusion/stability rather than only aggregate pass.
@@ -1257,7 +1367,7 @@ transformations and report confusion/stability rather than only aggregate pass.
 **Methods:** EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Mutation:
 
@@ -1275,7 +1385,7 @@ current.
 **Methods:** EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1288,7 +1398,7 @@ A changed effective acceptance-policy fingerprint requires revalidation.
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -1306,7 +1416,7 @@ by list order.
 **Methods:** EM-03, EM-06  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1320,7 +1430,7 @@ transfer acceptance to replacement identity.
 **Methods:** EM-03, EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Cases:
 
@@ -1341,7 +1451,7 @@ with changed topology become stale as required.
 **Methods:** EM-13  
 **Minimum level:** TL1/TL2 stress tier  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Generate depth, breadth/fan-out, and cardinality independently.
 
@@ -1359,7 +1469,7 @@ are recorded separately from correctness.
 **Methods:** EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Fixture matrix:
 
@@ -1378,7 +1488,7 @@ false COMPLETE.
 **Methods:** EM-03, EM-06  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1392,7 +1502,7 @@ blockers/prerequisites.
 **Methods:** EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -1409,7 +1519,7 @@ One actionable work identity in the composed frontier.
 **Methods:** EM-15  
 **Minimum level:** TL2-TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1423,7 +1533,7 @@ state become visible as one logical revision or not at all.
 **Methods:** EM-15  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1436,7 +1546,7 @@ CAS/version mismatch prevents older publication from overwriting newer state.
 **Methods:** EM-15  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1452,7 +1562,7 @@ produces one coherent result.
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Mutation:
 
@@ -1469,7 +1579,7 @@ Canonical truth/currentness does not change because projection text changed.
 **Methods:** EM-03, EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Expected result:
 
@@ -1483,7 +1593,7 @@ required canonical semantics are absent/stale.
 **Methods:** EM-05  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Equivalent canonical truth should yield semantically equivalent projection
 independent of irrelevant ordering.
@@ -1495,7 +1605,7 @@ independent of irrelevant ordering.
 **Methods:** EM-01, EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1508,7 +1618,7 @@ Pack contains all and only declared Consumer surface/contracts.
 **Methods:** EM-02, EM-03, EM-06  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Cases include moving ref, incompatible consumer_api, and renamed published
 identity without compatibility mapping.
@@ -1526,7 +1636,7 @@ Fail closed unless explicit compatible upgrade contract exists.
 **Methods:** EM-01, EM-14  
 **Minimum level:** TL0  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1539,7 +1649,7 @@ Every validator/test/workflow has explicit inventory/disposition.
 **Methods:** EM-03, EM-14  
 **Minimum level:** TL0-TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Mutations:
 
@@ -1556,7 +1666,7 @@ Policy validator rejects the mutations.
 **Methods:** EM-02, EM-14  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1570,7 +1680,7 @@ an integration candidate.
 **Methods:** EM-14  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Fixture:
 
@@ -1591,7 +1701,7 @@ correctness denominator.
 **Methods:** EM-14  
 **Minimum level:** TL0-TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** READY
 
 Expected result:
 
@@ -1607,7 +1717,7 @@ and current status so fixture validation cannot masquerade as behavioral proof.
 **Methods:** EM-03, EM-12  
 **Minimum level:** TL1 deterministic request boundary  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1621,7 +1731,7 @@ produce an accepted semantic verdict.
 **Methods:** EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Mutate corpus/protocol/model/run identity after response generation.
 
@@ -1636,7 +1746,7 @@ Response is rejected as not bound to the active request.
 **Methods:** EM-12  
 **Minimum level:** TL4 calibration track  
 **Oracle:** O4  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1650,7 +1760,7 @@ missing class.
 **Methods:** EM-09, EM-12  
 **Minimum level:** TL4  
 **Oracle:** O4  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Expected result:
 
@@ -1682,7 +1792,7 @@ Prior calibration is not silently generalized beyond its declared population.
 **Methods:** EM-14  
 **Minimum level:** TL0/TL4 metadata + evaluation  
 **Oracle:** O4  
-**Status:** DESIGN
+**Status:** IMPLEMENTED
 
 Expected result:
 
@@ -1697,7 +1807,7 @@ Evidence explicitly records oracle provenance/independence limits.
 **Methods:** EM-10  
 **Minimum level:** TL5  
 **Oracle:** O2  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Use a pinned known project that directly declares Harness logical inputs.
 
@@ -1713,7 +1823,7 @@ green.
 **Methods:** EM-10  
 **Minimum level:** TL5  
 **Oracle:** O2  
-**Status:** DESIGN
+**Status:** PARTIAL
 
 Use a pinned known project whose project-owned adapter projects Harness inputs.
 
@@ -1729,7 +1839,7 @@ generic evaluator.
 **Methods:** EM-11  
 **Minimum level:** TL6  
 **Oracle:** O3  
-**Status:** DESIGN
+**Status:** BLOCKED
 
 Selection rule:
 
@@ -1751,7 +1861,13 @@ Generic Harness contract succeeds without changing generic semantics.
 **Methods:** EM-11, EM-14  
 **Minimum level:** TL6  
 **Oracle:** O3  
-**Status:** DESIGN
+**Status:** POLICY
+
+Review disposition:
+
+This is not an executable test design. It is a governance rule already implied
+by the smallest-falsifiable-surface and portability principles in the Harness
+Assurance Policy. Do not create a test solely for this record.
 
 Expected process:
 
