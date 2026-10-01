@@ -172,7 +172,7 @@ Engineering Graph validation and structural target-state evaluation do not gener
 
 `agent_router.py` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
 
-When several simultaneously actionable capabilities share the same Authority, subject and knowledge kind, the router groups them into one artifact-work item. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities. Grouping is an agent execution projection, not a Core task entity.
+When several simultaneously actionable capabilities share the same Authority, subject, knowledge kind and effective direct prerequisite contract, the router groups them into one artifact-work item. The prerequisite contract compares each required CapabilityId together with its effective subject, so list ordering does not matter and an omitted subject is equivalent to the graph default subject. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities from the same accepted input boundary. Capabilities with different prerequisite contracts remain separate work items even when one Authority and skill could eventually co-materialize them; strict semantic admission and lifecycle baselines remain capability-specific. Grouping is an agent execution projection, not a Core task entity.
 
 ## Derived target
 

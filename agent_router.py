@@ -78,7 +78,11 @@ def route_create_work(
         for item in registry.get("routes", [])
     }
 
-    groups: dict[tuple[str, str, str | None], list[dict[str, Any]]] = {}
+    default_subject = graph.get("default_subject", graph["id"])
+    groups: dict[
+        tuple[str, str, str, tuple[tuple[str, str], ...]],
+        list[dict[str, Any]],
+    ] = {}
     untyped: list[dict[str, Any]] = []
 
     for item in result["create"]:
@@ -88,7 +92,21 @@ def route_create_work(
         if knowledge_kind is None:
             untyped.append(item)
             continue
-        key = (item["authority"], item["subject"], knowledge_kind)
+        prerequisite_signature = tuple(
+            sorted(
+                (
+                    requirement["capability"],
+                    requirement.get("subject", default_subject),
+                )
+                for requirement in production.get("requires", []) or []
+            )
+        )
+        key = (
+            item["authority"],
+            item["subject"],
+            knowledge_kind,
+            prerequisite_signature,
+        )
         groups.setdefault(key, []).append(item)
 
     routed: list[dict[str, Any]] = []
@@ -105,7 +123,12 @@ def route_create_work(
             }
         )
 
-    for (authority, subject, knowledge_kind), items in sorted(groups.items()):
+    for (
+        authority,
+        subject,
+        knowledge_kind,
+        _prerequisite_signature,
+    ), items in sorted(groups.items()):
         base = {
             "authority": authority,
             "subject": subject,

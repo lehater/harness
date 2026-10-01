@@ -177,6 +177,97 @@ def main() -> int:
         errors.append(f"grouped artifact work: {exc}")
 
     try:
+        split_graph = {
+            "version": 1,
+            "kind": "harness-engineering-graph",
+            "id": "SPLIT-ROUTER-BOUNDARY",
+            "authorities": [
+                {
+                    "id": "DISCOVERY",
+                    "responsibility": "Own accepted source knowledge.",
+                    "boundary": boundary("Discovery"),
+                    "produces": [
+                        {
+                            "capability": "example.source-a",
+                            "knowledge_kind": "problem-evidence",
+                            "requires": [],
+                        },
+                        {
+                            "capability": "example.source-b",
+                            "knowledge_kind": "problem-evidence",
+                            "requires": [],
+                        },
+                    ],
+                },
+                {
+                    "id": "PRODUCT",
+                    "responsibility": "Own product requirements.",
+                    "boundary": boundary("Product"),
+                    "produces": [
+                        {
+                            "capability": "example.product-a",
+                            "knowledge_kind": "product-requirements",
+                            "requires": ["example.source-a"],
+                        },
+                        {
+                            "capability": "example.product-b",
+                            "knowledge_kind": "product-requirements",
+                            "requires": ["example.source-b"],
+                        },
+                    ],
+                },
+            ],
+            "consumers": [
+                {
+                    "id": "IMPLEMENTATION",
+                    "purpose": "Build",
+                    "requires": ["example.product-a", "example.product-b"],
+                }
+            ],
+            "terminal_capabilities": [],
+        }
+        split_model = {
+            "artifacts": [
+                {
+                    "id": "SOURCE-A",
+                    "authority": "DISCOVERY",
+                    "path": "docs/source-a.md",
+                    "provides": ["example.source-a"],
+                    "depends_on": [],
+                },
+                {
+                    "id": "SOURCE-B",
+                    "authority": "DISCOVERY",
+                    "path": "docs/source-b.md",
+                    "provides": ["example.source-b"],
+                    "depends_on": [],
+                },
+            ],
+            "questions": [],
+        }
+        result = route_create_work(
+            split_graph,
+            "IMPLEMENTATION",
+            split_model,
+            registry,
+        )
+        product_work = [
+            item
+            for item in result["routed"]
+            if item["knowledge_kind"] == "product-requirements"
+        ]
+        assert len(product_work) == 2, product_work
+        assert {
+            tuple(item["capabilities"])
+            for item in product_work
+        } == {
+            ("example.product-a",),
+            ("example.product-b",),
+        }, product_work
+    except Exception as exc:
+        errors.append(f"prerequisite-boundary grouping: {exc}")
+
+    try:
         blocked_model = {
             "artifacts": [],
             "questions": [

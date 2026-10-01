@@ -151,6 +151,12 @@ requirements:
     description: Actionable CREATE work is routed to the registered knowledge-kind skill.
     min_scenarios: 1
 
+  - id: create-work-prerequisite-boundary
+    category: routing
+    enforcement: required
+    description: CREATE capabilities with different effective direct prerequisite contracts remain separate artifact-work items even when Authority, subject and knowledge kind match.
+    min_scenarios: 1
+
   - id: blocked-work-not-routed
     description: Blocked work remains WAIT and is not sent to an artifact producer.
     min_scenarios: 1
