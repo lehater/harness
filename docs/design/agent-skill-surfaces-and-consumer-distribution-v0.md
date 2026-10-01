@@ -284,11 +284,10 @@ The next concrete work is:
 
 ## Concrete v0 distribution contract
 
-`docs/design/harness-consumer-pack-v0.md` and
+`docs/design/harness-consumer-pack-v0.md`,
+`docs/design/harness-consumer-wrapper-v0.md` and
 `spec/distribution/consumer-pack-v0.yaml` define the first executable
-realization of this decision. `consumer_pack.py` materializes and validates
-the pack, validates immutable target bindings, supports exact-revision Git sync
-and an explicit local development override.
+realization of this decision. `consumer_pack.py` materializes and validates the pack. The standard-library `distribution/harnessw.py` closes clean-target bootstrap by reading the pinned JSON binding, fetching the exact revision and invoking that revision's pack materializer. Local development override remains explicit.
 
 
 ## Typed discovery entrypoint

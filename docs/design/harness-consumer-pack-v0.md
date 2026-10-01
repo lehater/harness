@@ -25,17 +25,23 @@ part of the pack.
 
 ## Binding
 
-A target repository may persist a small tooling binding such as
-`.harness/harness-binding.yaml`:
+A target repository persists a small bootstrap-safe tooling binding at
+`.harness/harness-binding.json`:
 
-```yaml
-version: 1
-kind: harness-consumer-binding
-consumer_api: v0
-source:
-  repository: https://github.com/lehater/harness.git
-  revision: <40-hex immutable commit>
+```json
+{
+  "version": 1,
+  "kind": "harness-consumer-binding",
+  "consumer_api": "v0",
+  "source": {
+    "repository": "https://github.com/lehater/harness.git",
+    "revision": "<40-hex immutable commit>"
+  }
+}
 ```
+
+JSON is the v0 bootstrap format so the target-repository wrapper can validate
+its pin before any Harness/PyYAML runtime exists.
 
 The binding is tooling metadata, not Project Model or canonical engineering
 truth.
@@ -93,9 +99,28 @@ another Harness root module that is not exported, pack creation fails.
 This prevents a source refactor from silently creating an incomplete
 distribution.
 
+## Clean-target bootstrap
+
+A target repository that needs clone-and-run operation commits the small
+standard-library wrapper defined by `harness-consumer-wrapper-v0.md` as
+`.harness/harnessw.py` next to the JSON binding.
+
+```text
+git clone target
+  -> python .harness/harnessw.py sync
+  -> exact Harness revision
+  -> validated local Consumer Pack
+  -> skill_router.py
+```
+
+The wrapper is transport bootstrap only. It does not contain or copy Harness
+skills into the target repository.
+
 ## Sync and cache
 
-`consumer_pack.py sync` accepts a binding and a cache directory.
+Once Harness source/tooling is available, `consumer_pack.py sync` accepts the
+same binding (JSON is valid YAML input) and a cache directory. The wrapper
+uses that machinery after resolving the pinned revision.
 
 Normal mode clones/checks out the exact immutable revision and materializes:
 
@@ -121,3 +146,10 @@ uses its registries or skills.
 
 Future compatibility migration belongs in the distribution contract, not in a
 target project's semantic graph.
+
+
+## Wrapper ownership
+
+The canonical wrapper contract is `docs/design/harness-consumer-wrapper-v0.md`.
+
+Only the wrapper and binding are target-repository bootstrap tooling. The Consumer Pack remains cache/materialized tooling and project semantic truth remains in the target repository's normal Harness/project artifacts.

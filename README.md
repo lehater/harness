@@ -190,3 +190,8 @@ validates project/capability alignment for the selected Consumer before compilin
 
 See `docs/design/human-documentation-projection-v1.md` and
 `skills/agent/human-documentation-projection/SKILL.md`.
+
+
+## Consumer bootstrap
+
+A target repository does not copy Harness skills. For clone-and-run use it keeps only `.harness/harnessw.py` plus `.harness/harness-binding.json`; the wrapper materializes the pinned Consumer Pack into local cache and returns its path. See `docs/design/harness-consumer-wrapper-v0.md`.

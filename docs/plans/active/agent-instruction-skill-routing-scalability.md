@@ -13,7 +13,7 @@ Status: active audit-branch migration plan.
 - Phase 4/5: Maintainer capture/change operations extracted from `AGENTS.md`; full PR workflow passed.
 - Phase 3: deterministic concern-driven Consumer Method Router implemented; full PR workflow run 953 passed.
 - Phase 7: inactive pre-Core procedures quarantined as non-executable legacy documentation; full PR workflow run 955 passed.
-- Phase 6: Consumer Pack definition/binding/materializer implemented and validated in run 957; clean target-repository bootstrap still needs an external transport/loader path that does not assume Harness tooling is already installed.
+- Phase 6: Consumer Pack builder validated in run 957; a standard-library target wrapper + JSON immutable binding are being added to close clean-clone bootstrap in the current checkpoint.
 - Phase 10: conditional LLM execution policy removed from always-loaded `AGENTS.md`; full PR workflow run 958 passed.
 - Phase 8: documentation ownership is structurally clean; an instruction-ownership ratchet is being added to prevent task procedures from drifting back into root `AGENTS.md`.
 - Phase 11: typed route entrypoint and deterministic fresh-context routing fixtures implemented; full PR workflow run 960 passed.

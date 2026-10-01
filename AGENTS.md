@@ -76,6 +76,7 @@ does not live in this root bootstrap file.
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `docs/design/harness-consumer-pack-v0.md` — pinned Consumer Pack binding, materialization and validation contract.
+- `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
