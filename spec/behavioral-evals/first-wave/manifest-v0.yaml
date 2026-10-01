@@ -3,8 +3,8 @@ kind: harness-agent-behavioral-eval-manifest
 id: FIRST-WAVE-BEHAVIORAL-EVALS-V1
 provider_prompt_budget:
   metric: utf8_bytes
-  max_per_case: 40000
-  max_suite: 300000
+  max_per_case: 25000
+  max_suite: 210000
 cases:
   - {design: TD-CAP-001, template: cases/td-cap-001/case.yaml.tmpl, dimension: capability_partition}
   - {design: TD-CAP-002, template: cases/td-cap-002/case.yaml.tmpl, dimension: capability_partition}
