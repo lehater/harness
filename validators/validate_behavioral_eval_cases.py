@@ -18,6 +18,7 @@ from behavioral_eval import build_execution_request, load_case
 from adapters.copilot_behavioral_eval_agent import (
     _model_payload,
     _observed_cli_version,
+    _parse_copilot_jsonl,
     _parse_model_response,
     _prompt,
     _response_contract,
@@ -25,6 +26,39 @@ from adapters.copilot_behavioral_eval_agent import (
 
 ADAPTER = ROOT / "adapters" / "copilot_behavioral_eval_agent.py"
 assert ADAPTER.is_file()
+
+sample_jsonl = "\n".join([
+    json.dumps({
+        "type": "assistant.usage",
+        "data": {
+            "model": "gpt-5.4",
+            "inputTokens": 1200,
+            "outputTokens": 80,
+            "reasoningTokens": 20,
+            "cacheReadTokens": 300,
+            "cacheWriteTokens": 40,
+        },
+    }),
+    json.dumps({
+        "type": "assistant.message",
+        "data": {"content": '{"version":1}'},
+    }),
+    json.dumps({
+        "type": "session.shutdown",
+        "data": {"currentModel": "auto"},
+    }),
+])
+message, resolved_model, usage = _parse_copilot_jsonl(sample_jsonl)
+assert message == '{"version":1}'
+assert resolved_model == "gpt-5.4"
+assert usage["turn_count"] == 1
+assert usage["totals"] == {
+    "input_tokens": 1200,
+    "output_tokens": 80,
+    "reasoning_tokens": 20,
+    "cache_read_tokens": 300,
+    "cache_write_tokens": 40,
+}
 assert ADAPTER.stat().st_mode & stat.S_IXUSR, "Copilot behavioral adapter must be executable"
 
 with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:

@@ -215,9 +215,19 @@ def _parse_model_response(raw: str, dimension: str) -> dict[str, Any]:
     return {"output": {field: normalized_groups}}
 
 
-def _parse_copilot_jsonl(raw: str) -> tuple[str, str | None]:
+def _parse_copilot_jsonl(
+    raw: str,
+) -> tuple[str, str | None, dict[str, Any]]:
     messages: list[str] = []
-    resolved_model: str | None = None
+    fallback_model: str | None = None
+    usage_turns: list[dict[str, Any]] = []
+    token_fields = {
+        "inputTokens": "input_tokens",
+        "outputTokens": "output_tokens",
+        "reasoningTokens": "reasoning_tokens",
+        "cacheReadTokens": "cache_read_tokens",
+        "cacheWriteTokens": "cache_write_tokens",
+    }
     for line in raw.splitlines():
         if not line.strip():
             continue
@@ -227,21 +237,56 @@ def _parse_copilot_jsonl(raw: str) -> tuple[str, str | None]:
         data = event.get("data")
         if not isinstance(data, dict):
             data = {}
-        if event.get("type") == "assistant.message":
+        event_type = event.get("type")
+        if event_type == "assistant.message":
             content = data.get("content")
             if isinstance(content, str) and content.strip():
                 messages.append(content.strip())
-        elif event.get("type") == "assistant.turn_start":
+        elif event_type == "assistant.usage":
+            turn: dict[str, Any] = {}
             model = data.get("model")
             if isinstance(model, str) and model:
-                resolved_model = model
-        elif event.get("type") == "session.shutdown":
+                turn["model"] = model
+            for source, target in token_fields.items():
+                value = data.get(source)
+                if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                    turn[target] = value
+            usage_turns.append(turn)
+        elif event_type == "session.shutdown":
             model = data.get("currentModel")
             if isinstance(model, str) and model:
-                resolved_model = model
+                fallback_model = model
+
     if len(messages) != 1:
         raise ValueError("Copilot JSONL must contain exactly one assistant message")
-    return messages[0], resolved_model
+
+    models = sorted({
+        turn["model"]
+        for turn in usage_turns
+        if isinstance(turn.get("model"), str) and turn["model"]
+    })
+    if len(models) == 1:
+        resolved_model: str | None = models[0]
+    elif len(models) > 1:
+        resolved_model = "mixed"
+    else:
+        resolved_model = fallback_model
+
+    totals: dict[str, int] = {}
+    for target in token_fields.values():
+        values = [
+            turn[target]
+            for turn in usage_turns
+            if isinstance(turn.get(target), int)
+        ]
+        if values:
+            totals[target] = sum(values)
+    usage = {
+        "turn_count": len(usage_turns),
+        "turns": usage_turns,
+        "totals": totals,
+    }
+    return messages[0], resolved_model, usage
 
 
 def _observed_cli_version(executable: str, env: dict[str, str]) -> str:
@@ -341,7 +386,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
                 f"Copilot CLI failed with exit {completed.returncode}: "
                 + completed.stderr.strip().replace("\n", " ")[:1500]
             )
-        raw_message, resolved_model = _parse_copilot_jsonl(completed.stdout)
+        raw_message, resolved_model, usage = _parse_copilot_jsonl(completed.stdout)
         if not resolved_model:
             resolved_model = model
 
@@ -352,6 +397,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         "observed_cli_version": observed_cli,
         "client_session_id": session_id,
         "provider_prompt_utf8_bytes": len(provider_prompt.encode("utf-8")),
+        "usage": usage,
         "execution": {
             "fresh_provider_home": True,
             "isolated_provider_working_directory": True,
