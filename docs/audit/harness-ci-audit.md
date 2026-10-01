@@ -229,11 +229,15 @@ Implemented after the audit under the canonical CI policy:
 - `validate_harness.py` and `tests/test_lifecycle_experiment.py` are now explicit full-gate checks;
 - `make harness-check` is ordered `policy -> focused -> deferred -> exhaustive`, with the ~27 s Scenario Suite in the last stage.
 
-Observed on correction commit `d486066c2b286db0a5c3538ee37a195e1f71da27`:
+Initial correction commit `d486066c2b286db0a5c3538ee37a195e1f71da27` made the exhaustive Harness job skip drafts and passed CI policy. A follow-up observation showed that GitHub `pull_request.paths` uses the cumulative PR diff, so the Greenfield workflow still launched on later unrelated draft commits. The same HARN-H05 execution-policy root cause was tightened by draft-gating non-cheap focused workflows.
 
-- `harness core` run 36867907806: **skipped** on the draft PR;
-- `CI policy` run 36867907865: **passed**;
-- `Greenfield Engineering Graph` run 36867907826: **passed**.
+Final draft verification on `bd760921e96073b8f4164e5e2afd95447ab927d2`:
+
+- `harness core` run 36868615767: job **skipped**;
+- `Greenfield Engineering Graph` run 36868615957: job **skipped**;
+- `CI policy` run 36868615780: **passed**.
+
+Thus relevant draft CI edits retain one cheap automatic policy guard while non-cheap deterministic work is deferred.
 
 The branch remains draft. Full repository validation is intentionally deferred until a coherent integration candidate; unrelated functional finding HARN-009 remains open and is not altered by this CI correction.
 
