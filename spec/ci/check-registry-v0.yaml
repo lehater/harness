@@ -318,6 +318,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: deep_dependency_graphs
+  command: python validators/validate_deep_dependency_graphs.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: decision_governance
   command: python validators/validate_decision_governance.py
   stage: focused

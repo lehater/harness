@@ -54,6 +54,7 @@ harness-check:
 	python validators/validate_semantic_acceptance.py
 	python validators/validate_skill_invariant_policy.py
 	python validators/validate_capability_lifecycle.py
+	python validators/validate_deep_dependency_graphs.py
 	python validators/validate_decision_governance.py
 	python validators/validate_decision_pipeline.py
 	python validators/validate_project_frontier.py

@@ -37,19 +37,21 @@ def _capability_closure(doc: dict[str, Any], roots: list[str]) -> set[str]:
                 productions[production["capability"]] = production
 
     closure: set[str] = set()
-    def include(capability: str) -> None:
+    pending = list(reversed(roots))
+    while pending:
+        capability = pending.pop()
         if capability in closure:
-            return
+            continue
         closure.add(capability)
         production = productions.get(capability)
         if not production:
-            return
+            continue
+        upstream_capabilities: list[str] = []
         for requirement in production.get("requires", []) or []:
             upstream = requirement if isinstance(requirement, str) else requirement.get("capability")
-            if upstream:
-                include(upstream)
-    for capability in roots:
-        include(capability)
+            if upstream and upstream not in closure:
+                upstream_capabilities.append(upstream)
+        pending.extend(reversed(upstream_capabilities))
     return closure
 
 

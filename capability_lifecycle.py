@@ -156,26 +156,43 @@ def lifecycle_states(
     productions = production_index(graph)
     memo: dict[str, dict[str, Any]] = {}
 
-    def state(capability: str) -> dict[str, Any]:
-        if capability in memo:
-            return memo[capability]
-
-        item = lifecycle.get(capability)
-        if item is None:
-            result = {
-                "state": "UNKNOWN",
-                "capability": capability,
-                "reason": "lifecycle coverage unavailable",
-            }
-            memo[capability] = result
-            return result
-
+    def required_capabilities(capability: str) -> list[str]:
         production = productions.get(capability)
-        required = (
+        return (
             []
             if production is None
             else [r["capability"] for r in production["requires"]]
         )
+
+    def changed_atom_rows(
+        accepted_atoms: dict[str, str],
+        current_atom_map: dict[str, str],
+    ) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for atom_id in sorted(set(accepted_atoms) | set(current_atom_map)):
+            accepted_fingerprint = accepted_atoms.get(atom_id)
+            current_fingerprint = current_atom_map.get(atom_id)
+            if current_fingerprint != accepted_fingerprint:
+                rows.append(
+                    {
+                        "id": atom_id,
+                        "accepted_fingerprint": accepted_fingerprint,
+                        "current_fingerprint": current_fingerprint,
+                    }
+                )
+        return rows
+
+    def finalize(capability: str) -> None:
+        item = lifecycle.get(capability)
+        if item is None:
+            memo[capability] = {
+                "state": "UNKNOWN",
+                "capability": capability,
+                "reason": "lifecycle coverage unavailable",
+            }
+            return
+
+        required = required_capabilities(capability)
         mismatches: list[dict[str, Any]] = []
         baseline = item.get("accepted_prerequisites", {})
 
@@ -202,7 +219,7 @@ def lifecycle_states(
 
         semantic_baseline = item.get("accepted_prerequisite_semantics", {})
         for prerequisite in required:
-            upstream = state(prerequisite)
+            upstream = memo[prerequisite]
             upstream_provider = lifecycle.get(prerequisite, {})
             current = upstream_provider.get("acceptance_id")
             accepted = baseline.get(prerequisite)
@@ -227,28 +244,12 @@ def lifecycle_states(
                     "semantic_atom_fingerprints",
                     {},
                 )
-
-                def changed_atom_rows(
-                    accepted_atoms: dict[str, str],
-                    current_atom_map: dict[str, str],
-                ) -> list[dict[str, Any]]:
-                    rows: list[dict[str, Any]] = []
-                    for atom_id in sorted(set(accepted_atoms) | set(current_atom_map)):
-                        accepted_fingerprint = accepted_atoms.get(atom_id)
-                        current_fingerprint = current_atom_map.get(atom_id)
-                        if current_fingerprint != accepted_fingerprint:
-                            rows.append(
-                                {
-                                    "id": atom_id,
-                                    "accepted_fingerprint": accepted_fingerprint,
-                                    "current_fingerprint": current_fingerprint,
-                                }
-                            )
-                    return rows
-
                 consumed_changes = changed_atom_rows(
                     consumed_atoms,
-                    {atom_id: current_atoms.get(atom_id) for atom_id in consumed_atoms},
+                    {
+                        atom_id: current_atoms.get(atom_id)
+                        for atom_id in consumed_atoms
+                    },
                 )
                 surface_changes = changed_atom_rows(
                     accepted_surface,
@@ -298,12 +299,30 @@ def lifecycle_states(
         if mismatches:
             result["mismatches"] = mismatches
         memo[capability] = result
-        return result
 
-    for capability in productions:
-        state(capability)
+    for root in productions:
+        if root in memo:
+            continue
+        stack: list[tuple[str, bool]] = [(root, False)]
+        while stack:
+            capability, expanded = stack.pop()
+            if capability in memo:
+                continue
+            if expanded:
+                finalize(capability)
+                continue
+
+            item = lifecycle.get(capability)
+            if item is None:
+                finalize(capability)
+                continue
+
+            stack.append((capability, True))
+            for prerequisite in reversed(required_capabilities(capability)):
+                if prerequisite not in memo:
+                    stack.append((prerequisite, False))
+
     return memo
-
 
 def evaluate_lifecycle_target(
     graph: dict[str, Any],

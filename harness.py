@@ -61,19 +61,29 @@ def validate_model(model: dict[str, Any]) -> None:
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(artifact_id: str) -> None:
-        if artifact_id in visiting:
-            raise CoreError(f"artifact dependency cycle at: {artifact_id}")
-        if artifact_id in visited:
-            return
-        visiting.add(artifact_id)
-        for dep in artifacts[artifact_id].get("depends_on", []) or []:
-            visit(dep)
-        visiting.remove(artifact_id)
-        visited.add(artifact_id)
-
     for artifact_id in artifacts:
-        visit(artifact_id)
+        if artifact_id in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(artifact_id, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(f"artifact dependency cycle at: {current}")
+            visiting.add(current)
+            stack.append((current, True))
+            dependencies = artifacts[current].get("depends_on", []) or []
+            for dep in reversed(dependencies):
+                if dep in visiting:
+                    raise CoreError(f"artifact dependency cycle at: {dep}")
+                if dep not in visited:
+                    stack.append((dep, False))
 
     for question_id, question in questions.items():
         authority = question.get("authority")

@@ -86,19 +86,33 @@ def validate_profile(profile: dict[str, Any], model: dict[str, Any] | None = Non
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(expectation_id: str) -> None:
-        if expectation_id in visited:
-            return
-        if expectation_id in visiting:
-            raise CoreError(f"design profile expectation dependency cycle at: {expectation_id}")
-        visiting.add(expectation_id)
-        for dependency in indexed[expectation_id].get("depends_on", []):
-            visit(dependency)
-        visiting.remove(expectation_id)
-        visited.add(expectation_id)
-
     for expectation_id in indexed:
-        visit(expectation_id)
+        if expectation_id in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(expectation_id, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(
+                    f"design profile expectation dependency cycle at: {current}"
+                )
+            visiting.add(current)
+            stack.append((current, True))
+            dependencies = indexed[current].get("depends_on", [])
+            for dependency in reversed(dependencies):
+                if dependency in visiting:
+                    raise CoreError(
+                        f"design profile expectation dependency cycle at: {dependency}"
+                    )
+                if dependency not in visited:
+                    stack.append((dependency, False))
 
 
 def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:

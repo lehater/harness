@@ -52,19 +52,29 @@ def _source_nodes(graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(node_id: str) -> None:
-        if node_id in visiting:
-            raise CoreError(f"source graph dependency cycle at: {node_id}")
-        if node_id in visited:
-            return
-        visiting.add(node_id)
-        for dep in result[node_id].get("depends_on", []) or []:
-            visit(dep)
-        visiting.remove(node_id)
-        visited.add(node_id)
-
     for node_id in result:
-        visit(node_id)
+        if node_id in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(node_id, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(f"source graph dependency cycle at: {current}")
+            visiting.add(current)
+            stack.append((current, True))
+            dependencies = result[current].get("depends_on", []) or []
+            for dep in reversed(dependencies):
+                if dep in visiting:
+                    raise CoreError(f"source graph dependency cycle at: {dep}")
+                if dep not in visited:
+                    stack.append((dep, False))
     return result
 
 
