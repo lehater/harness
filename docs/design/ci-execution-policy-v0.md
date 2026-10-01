@@ -71,7 +71,9 @@ time.
 ### CI-P04 — explicit inventory
 
 Every `validators/validate_*.py` file and every `tests/test_*.py` file must have
-an explicit entry in `spec/ci/check-registry-v0.yaml`.
+an explicit entry in `spec/ci/check-registry-v0.yaml`. Every
+`.github/workflows/*.yml` / `.yaml` file must also have an explicit
+`workflow_roles` entry so a new workflow cannot appear outside policy.
 
 Every registered check declares an explicit disposition. A `full_gate` check
 must appear in `make harness-check`; a `standalone` check must state why it is
@@ -83,8 +85,10 @@ becoming optional.
 ### CI-P05 — explicit cost and ownership of expensive work
 
 Every registered check declares `cost_class` and `stage`. `medium` or `heavy`
-checks must include a rationale. Measured cost growth that crosses a cost class
-boundary requires the registry to be updated.
+checks must include a rationale. The early `policy` and `focused` stages admit
+only `cheap` checks; costlier checks belong in `deferred` or `exhaustive`.
+Measured cost growth that crosses a cost class boundary requires the registry
+to be updated.
 
 Cost classes are intentionally coarse:
 

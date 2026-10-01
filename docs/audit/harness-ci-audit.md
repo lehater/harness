@@ -1,6 +1,6 @@
 # Harness CI Audit
 
-Status: audit evidence and correction plan. No CI behavior changed by this audit.
+Status: correction implemented and policy-validated on the audit branch; no integration to `main`.
 
 Date: 2026-10-01
 Branch: `audit/harness-corrections`
@@ -215,6 +215,27 @@ Only after the three-tier split proves useful:
 This enables safe affected-check selection and closes the structural part of
 HARN-H04. It should be introduced incrementally; a full dependency solver is
 not justified yet.
+
+## Correction outcome
+
+Implemented after the audit under the canonical CI policy:
+
+- `docs/design/ci-execution-policy-v0.md` defines the execution invariants;
+- `spec/ci/check-registry-v0.yaml` inventories every validator/test and every workflow role;
+- `validators/validate_ci_policy.py` is the first full-gate command and rejects unregistered checks/workflows, early expensive checks, path-filtered final gates, draft exhaustive execution, stage-order regressions and overlapping branch event ownership;
+- `harness.yml` has no PR path allowlist and gates its exhaustive job on a non-draft PR;
+- `greenfield-engineering-graph.yml` restricts `push` to `main`;
+- `ci-policy.yml` gives draft CI edits a cheap automatic guard;
+- `validate_harness.py` and `tests/test_lifecycle_experiment.py` are now explicit full-gate checks;
+- `make harness-check` is ordered `policy -> focused -> deferred -> exhaustive`, with the ~27 s Scenario Suite in the last stage.
+
+Observed on correction commit `d486066c2b286db0a5c3538ee37a195e1f71da27`:
+
+- `harness core` run 36867907806: **skipped** on the draft PR;
+- `CI policy` run 36867907865: **passed**;
+- `Greenfield Engineering Graph` run 36867907826: **passed**.
+
+The branch remains draft. Full repository validation is intentionally deferred until a coherent integration candidate; unrelated functional finding HARN-009 remains open and is not altered by this CI correction.
 
 ## What should not be optimized first
 

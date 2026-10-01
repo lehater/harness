@@ -57,9 +57,9 @@ These are real issues but are deliberately lower priority until the functional m
 |---|---|---|---|---|
 | HARN-H01 | P1 | DEFERRED | Filesystem safety | Human projection output/source paths are not constrained strongly enough to the project root; destructive output handling can target an unintended directory. |
 | HARN-H02 | P1 | DEFERRED | Delivery invariant | Repository rules do not technically enforce the PR + green-gate invariant described in `AGENTS.md`. |
-| HARN-H03 | P1 | DEFERRED | CI coverage | Main PR workflow uses a manual path allowlist. AUD-008 found that 25 of 53 top-level Python runtime modules are absent from that allowlist, so a runtime change can bypass the normal PR gate entirely. |
-| HARN-H04 | P2 | DEFERRED | Test infrastructure | Validation is split across bespoke scripts. AUD-008 found 63 validator scripts while `make harness-check` invokes 62, omitting `validators/validate_harness.py`; `tests/test_lifecycle_experiment.py` is also outside the aggregate gate. The 62 validators launch sequentially as separate Python processes. |
-| HARN-H05 | P2 | DEFERRED | CI execution policy | Full `make harness-check` executes on every matching `pull_request` synchronization, including draft PR commits, despite the repository rule that full gates are checkpoint/final-candidate work. On the current draft branch AUD-008 observed 27 `harness core` runs (26 completed) consuming about 22.2 runner-minutes; the targeted greenfield workflow also listens to both unrestricted `push` and `pull_request`, allowing duplicate execution for one branch commit with an open PR. |
+| HARN-H03 | P1 | FIXED | CI coverage | The exhaustive PR gate no longer uses a path allowlist. CI-P02 now rejects path-filtered final gates, so runtime changes cannot silently bypass integration validation. Verified by CI policy run 36867907865. |
+| HARN-H04 | P2 | FIXED | Test infrastructure | `spec/ci/check-registry-v0.yaml` is now the explicit validator/test inventory with stage, cost and disposition. `validate_harness.py` and `tests/test_lifecycle_experiment.py` are registered and included in `make harness-check`; the aggregate is ordered policy -> focused -> deferred -> exhaustive. CI-P04/P03 enforce the inventory and ordering. |
+| HARN-H05 | P2 | FIXED | CI execution policy | Exhaustive `harness core` is draft-gated and runs for non-draft integration candidates; Greenfield `push` is restricted to `main`, removing PR-branch duplicate ownership. A separate cheap `CI policy` workflow validates CI changes during draft iteration. On correction commit d486066, `harness core` was skipped while CI policy and Greenfield checks passed. |
 
 ## Audit perspectives
 
@@ -91,6 +91,7 @@ Each substantial audit should explicitly cover one or more of these perspectives
 | AUD-006 | 2026-10-01 | Accepted skill-surface architecture vs current repository realization | Completed full skill inventory, refined HARN-019, added HARN-020, and identified implementation gaps between the accepted Maintainer/Consumer distribution contract and current filesystem/validators. |
 | AUD-007 | 2026-10-01 | Post-migration skill/distribution re-audit from clean source/consumer environments | HARN-017..020 no longer reproduced; verified typed surfaces, public/internal operation routing, concern-driven methods, legacy quarantine, clean-target wrapper bootstrap and Consumer Pack isolation. |
 | AUD-008 | 2026-10-01 | CI cost, trigger selectivity, duplicate execution, validator coverage and lazy-gate ordering | Quantified the PR gate cost, strengthened HARN-H03/H04 with exact inventory evidence, and added HARN-H05 for eager/double-trigger execution. Detailed evidence and staged correction plan are in `docs/audit/harness-ci-audit.md`. |
+| AUD-009 | 2026-10-01 | CI policy enforcement and post-correction verification | HARN-H03/H04/H05 no longer reproduce under the canonical CI policy. Run 36867907865 passed the policy validator, Greenfield run 36867907826 passed, and exhaustive run 36867907806 was skipped on the draft PR as intended. |
 
 ## Audit protocol
 

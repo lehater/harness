@@ -79,6 +79,8 @@ does not live in this root bootstrap file.
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
+- `docs/design/ci-execution-policy-v0.md` — canonical Harness CI execution/lazy-gate policy.
+- `spec/ci/check-registry-v0.yaml` — machine-readable CI check inventory, cost/stage classification and workflow roles.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
