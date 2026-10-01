@@ -108,7 +108,106 @@ def projection(identity="ID1", accepted="ID1"):
     }
 
 
+def test_capability_question_granularity() -> None:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "CAPABILITY-QUESTION-GRANULARITY",
+        "authorities": [
+            {
+                "id": "PRODUCT",
+                "responsibility": "Own product requirements.",
+                "boundary": {
+                    "semantic_cohesion": "Product semantics.",
+                    "independent_change": "Product requirements change independently.",
+                    "public_contract": "Accepted product requirements.",
+                },
+                "produces": [
+                    {
+                        "capability": "product.intent",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                    {
+                        "capability": "product.acceptance",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "INTENT-CONSUMER",
+                "purpose": "Consume product intent.",
+                "requires": ["product.intent"],
+            },
+            {
+                "id": "ACCEPTANCE-CONSUMER",
+                "purpose": "Consume acceptance semantics.",
+                "requires": ["product.acceptance"],
+            },
+        ],
+        "terminal_capabilities": [],
+    }
+    model = {
+        "artifacts": [
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT",
+                "path": "docs/requirements.md",
+                "provides": ["product.intent", "product.acceptance"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [
+            {
+                "id": "Q-ACCEPTANCE",
+                "authority": "PRODUCT",
+                "text": "Which acceptance behavior is required?",
+                "blocks_capabilities": ["product.acceptance"],
+            }
+        ],
+    }
+    lifecycle = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": "REQUIREMENTS",
+                "capability": "product.intent",
+                "acceptance_id": "INTENT-1",
+                "accepted_prerequisites": {},
+            },
+            {
+                "artifact": "REQUIREMENTS",
+                "capability": "product.acceptance",
+                "acceptance_id": "ACCEPTANCE-1",
+                "accepted_prerequisites": {},
+            },
+        ],
+    }
+
+    intent = evaluate_lifecycle_target(
+        graph,
+        "INTENT-CONSUMER",
+        model,
+        lifecycle,
+    )
+    acceptance = evaluate_lifecycle_target(
+        graph,
+        "ACCEPTANCE-CONSUMER",
+        model,
+        lifecycle,
+    )
+    assert intent["status"] == "COMPLETE", intent
+    assert intent["wait"] == [], intent
+    assert acceptance["status"] == "BLOCKED", acceptance
+    assert acceptance["wait"][0]["questions"] == ["Q-ACCEPTANCE"], acceptance
+
+
 def main() -> int:
+    test_capability_question_granularity()
     result = evaluate_lifecycle_target(
         GRAPH, "IMPLEMENTATION", MODEL, projection()
     )

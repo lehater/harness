@@ -14,7 +14,7 @@ from typing import Any
 import yaml
 
 from engineering_graph import derive_profile, production_index, validate_realization
-from harness import CoreError, blocked, capability_blockers
+from harness import CoreError, artifact_blockers, capability_blockers
 
 
 def _load(path: str | Path) -> dict[str, Any]:
@@ -418,13 +418,31 @@ def evaluate_lifecycle_target(
                     if lifecycle_provider is not None
                     and a["id"] == lifecycle_provider["artifact"]
                 ]
-                blockers = sorted(
-                    {
-                        q
-                        for a in (selected or providers)
-                        for q in blocked(realized, a["id"])
-                    }
+                direct_blockers = set(
+                    capability_blockers(realized, capability)
                 )
+                if selected:
+                    provider_blockers = {
+                        q
+                        for a in selected
+                        for q in artifact_blockers(realized, a["id"])
+                    }
+                else:
+                    usable = [
+                        a
+                        for a in providers
+                        if not artifact_blockers(realized, a["id"])
+                    ]
+                    provider_blockers = (
+                        set()
+                        if usable
+                        else {
+                            q
+                            for a in providers
+                            for q in artifact_blockers(realized, a["id"])
+                        }
+                    )
+                blockers = sorted(direct_blockers | provider_blockers)
                 if blockers:
                     wait.append(
                         {

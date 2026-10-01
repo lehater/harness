@@ -396,6 +396,12 @@ requirements:
     description: A blocked historical provider does not block a CapabilityId when another same-Authority provider is structurally usable; only usable alternatives enter Authority input context.
     min_scenarios: 1
 
+  - id: capability-question-granularity
+    category: lifecycle
+    enforcement: required
+    description: A capability-scoped Question blocks only that CapabilityId when one CanonicalArtifact materializes several capabilities; artifact-scoped blocks remain whole-artifact.
+    min_scenarios: 1
+
   - id: project-authority-migration
     category: authority
     enforcement: required

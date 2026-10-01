@@ -24,8 +24,8 @@ A Question contains no final semantic answer. Resolution means the addressed Aut
 - CanonicalArtifact provides CapabilityId.
 - CanonicalArtifact may `depends_on` other CanonicalArtifact IDs.
 - Question is addressed to one Authority.
-- An unresolved Question may `blocks` existing downstream artifacts.
-- An unresolved Question may `blocks_capabilities` when the semantic gap prevents a required capability from being formed before any provider artifact exists.
+- An unresolved Question may `blocks` a CanonicalArtifact when the unresolved semantics make the artifact as a whole unusable; the artifact dependency impact remains artifact-wide.
+- An unresolved Question may `blocks_capabilities` when the unresolved semantics concern a specific CapabilityId, whether or not a provider artifact already exists. Other capabilities co-materialized by the same artifact remain independently usable unless separately blocked.
 - A resolved Question has `resolution: {artifact, acceptance_id, supersedes_acceptance_id}`; the artifact must belong to the addressed Authority and the two identities must differ.
 
 ## Project model
@@ -113,7 +113,7 @@ The BLS slice justifies one small Core extension: unresolved Questions may block
 Observed usage guidance:
 
 - `Question` is exceptional, not a mandatory work item.
-- use `blocks_capabilities` only when the unresolved semantic decision prevents creation of a provider that does not yet exist; use artifact `blocks` when a provider already exists.
+- choose blocker scope by semantic granularity, not provider existence: use `blocks_capabilities` for a capability-specific gap even when its provider artifact already exists; use artifact `blocks` only when the whole CanonicalArtifact is unusable.
 - `affected` is a dependency-impact closure, not a mandatory file-change list.
 - target repositories remain authoritative for semantic and dependency truth; a Core model should project existing project truth rather than create a second canonical graph.
 - Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.

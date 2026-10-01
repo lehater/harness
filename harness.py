@@ -209,7 +209,8 @@ def capability_blockers(model: dict[str, Any], capability_id: str) -> list[str]:
     )
 
 
-def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
+def artifact_blockers(model: dict[str, Any], artifact_id: str) -> list[str]:
+    """Return unresolved Questions whose scope is the artifact as a whole."""
     validate_model(model)
     artifacts = _by_id(model.get("artifacts", []), "artifact")
     if artifact_id not in artifacts:
@@ -221,6 +222,19 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
         for seed in question.get("blocks", []) or []:
             if artifact_id == seed or artifact_id in affected(model, seed):
                 result.add(question["id"])
+    return sorted(result)
+
+
+def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
+    """Legacy conservative artifact projection including capability blockers."""
+    validate_model(model)
+    artifacts = _by_id(model.get("artifacts", []), "artifact")
+    if artifact_id not in artifacts:
+        raise CoreError(f"unknown artifact: {artifact_id}")
+    result: set[str] = set(artifact_blockers(model, artifact_id))
+    for question in model.get("questions", []):
+        if question.get("resolution") is not None:
+            continue
         for capability in question.get("blocks_capabilities", []) or []:
             providers = [
                 artifact["id"]
@@ -239,10 +253,12 @@ def unblocked_capability_providers(
 ) -> list[str]:
     """Return structurally usable providers for one CapabilityId."""
     providers = capability_resolve(model, capability_id)
+    if capability_blockers(model, capability_id):
+        return []
     return [
         provider
         for provider in providers
-        if not blocked(model, provider)
+        if not artifact_blockers(model, provider)
     ]
 
 
@@ -322,10 +338,11 @@ def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
         []
         if available
         else sorted(
-            {
+            set(capability_blockers(model, capability_id))
+            | {
                 question
                 for artifact_id in providers
-                for question in blocked(model, artifact_id)
+                for question in artifact_blockers(model, artifact_id)
             }
         )
     )

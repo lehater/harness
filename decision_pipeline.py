@@ -18,7 +18,7 @@ from engineering_graph import (
     production_index,
     validate_realization,
 )
-from harness import CoreError, blocked, capability_blockers
+from harness import CoreError, artifact_blockers, capability_blockers
 
 PIPELINE_STAGES = [
     "FORM_OPTIONS",
@@ -116,11 +116,22 @@ def _direct_blockers(
 ) -> list[str]:
     result = set(capability_blockers(realized, capability))
     provider = _selected_provider(realized, lifecycle_by_capability, capability)
-    providers = [provider] if provider is not None else _core_providers(
-        realized, capability
-    )
+    if provider is not None:
+        result.update(artifact_blockers(realized, provider["id"]))
+        return sorted(result)
+
+    providers = _core_providers(realized, capability)
+    if result:
+        return sorted(result)
+    usable = [
+        candidate
+        for candidate in providers
+        if not artifact_blockers(realized, candidate["id"])
+    ]
+    if usable:
+        return []
     for candidate in providers:
-        result.update(blocked(realized, candidate["id"]))
+        result.update(artifact_blockers(realized, candidate["id"]))
     return sorted(result)
 
 

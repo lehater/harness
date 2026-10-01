@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from harness import (  # noqa: E402
     CoreError,
     affected,
+    artifact_blockers,
     blocked,
     capability_owner,
     next_action,
@@ -60,12 +61,57 @@ def test_multiple_provider_alternative() -> None:
     assert action["providers"] == ["SOURCE-CURRENT", "SOURCE-OLD"], action
 
 
+def test_capability_question_granularity() -> None:
+    model = {
+        "authorities": [{"id": "PRODUCT"}],
+        "artifacts": [
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT",
+                "path": "docs/requirements.md",
+                "provides": ["product.intent", "product.acceptance"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [
+            {
+                "id": "Q-ACCEPTANCE",
+                "authority": "PRODUCT",
+                "text": "Which acceptance behavior is required?",
+                "blocks_capabilities": ["product.acceptance"],
+            }
+        ],
+    }
+
+    acceptance = next_action(model, "product.acceptance")
+    intent = next_action(model, "product.intent")
+    assert acceptance["action"] == "WAIT", acceptance
+    assert acceptance["questions"] == ["Q-ACCEPTANCE"], acceptance
+    assert intent["action"] == "DESIGN", intent
+    assert artifact_blockers(model, "REQUIREMENTS") == []
+    assert blocked(model, "REQUIREMENTS") == ["Q-ACCEPTANCE"]
+
+    whole_artifact = copy.deepcopy(model)
+    whole_artifact["questions"].append(
+        {
+            "id": "Q-ARTIFACT",
+            "authority": "PRODUCT",
+            "text": "The requirements artifact as a whole is unusable.",
+            "blocks": ["REQUIREMENTS"],
+        }
+    )
+    intent = next_action(whole_artifact, "product.intent")
+    assert intent["action"] == "WAIT", intent
+    assert intent["questions"] == ["Q-ARTIFACT"], intent
+
+
 def main() -> int:
     errors: list[str] = []
     try:
         test_multiple_provider_alternative()
+        test_capability_question_granularity()
     except Exception as exc:
-        errors.append(f"multiple provider alternative: {exc}")
+        errors.append(f"Core focused regression: {exc}")
     required = [ROOT / "harness.py", ROOT / "docs/design/core-v0.md"]
     for path in required:
         if not path.is_file():
