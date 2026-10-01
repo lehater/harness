@@ -78,7 +78,7 @@ separate defect has been demonstrated.
 | EVO-015 | RESEARCH | CAPTURED | Skill compatibility | Evaluate compatibility with the broader Agent Skills conventions without making Harness depend on one agent/runtime. |
 | EVO-016 | IDEA | CAPTURED | External methods | Allow Harness application orchestration to consume external Agent-Skill-like engineering procedures without making them project truth. |
 | EVO-017 | RESEARCH | CAPTURED | Skill evaluation | Split skill quality measurement into structural, routing and behavioral tiers appropriate to Harness semantics. |
-| EVO-018 | RECOMMENDATION | CAPTURED | Skill identity | Treat published skill names/identities as compatibility contracts and require explicit alias/migration handling when renamed. |
+| EVO-018 | RECOMMENDATION | VALIDATED | Skill identity | Treat published skill names/identities as compatibility contracts and require explicit alias/migration handling when renamed. AUD-016 confirmed this matters specifically at controlled Consumer Pack upgrades. |
 | EVO-019 | RESEARCH | CAPTURED | Reference vs Coverage | Test the target ownership rule: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. |
 | EVO-020 | IDEA | CAPTURED | Context lifecycle | Define restartable agent-session boundaries from durable project artifacts so long-running work can resume without conversation history becoming project truth. |
 | EVO-021 | RECOMMENDATION | ADOPTED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
@@ -696,7 +696,7 @@ Missing:
 ### EVO-018 — Stable skill identity and migration
 
 **Type:** RECOMMENDATION  
-**Status:** CAPTURED
+**Status:** VALIDATED
 
 **Direction**
 
@@ -710,6 +710,12 @@ breaking references.
 
 As Harness skills become reusable across repositories, skill identity becomes
 part of the integration surface.
+
+AUD-016 confirmed the compatibility boundary: the Consumer Pack protects an
+installed project by pinning an immutable Harness revision and API, but a
+deliberate upgrade may still rename a published operation/method/skill identity.
+Without an alias/migration contract, target-owned references can break at that
+explicit upgrade boundary.
 
 **Not a defect**
 
