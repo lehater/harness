@@ -315,10 +315,38 @@ def main() -> int:
         redo_capabilities=["arch.a"],
     )
     assert "arch.a" not in caps(blocked["ready"]), blocked
-    assert blocked["frontier_status"] == "BLOCKED", blocked
+    assert blocked["frontier_status"] == "READY", blocked
     assert next(
         item for item in blocked["blocked"] if item["capability"] == "arch.a"
     )["questions"] == ["Q-A"], blocked
+
+    fully_blocked_model = {
+        **MODEL,
+        "questions": [
+            {
+                "id": "Q-A",
+                "authority": "ARCH",
+                "text": "Which accepted architecture semantics apply?",
+                "blocks_capabilities": ["arch.a"],
+            },
+            {
+                "id": "Q-B",
+                "authority": "ARCH",
+                "text": "Which architecture B semantics apply?",
+                "blocks_capabilities": ["arch.b"],
+            },
+        ],
+    }
+    fully_blocked = derive_decision_roadmap(
+        graph=GRAPH,
+        model=fully_blocked_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert fully_blocked["ready"] == [], fully_blocked
+    assert fully_blocked["frontier_status"] == "BLOCKED", fully_blocked
 
     # Complete the selected target: a repeated ordinary invocation becomes a no-op.
     complete_model = {
