@@ -13,7 +13,8 @@ Status: active audit-branch migration plan.
 - Phase 4/5: Maintainer capture/change operations extracted from `AGENTS.md`; full PR workflow passed.
 - Phase 3: deterministic concern-driven Consumer Method Router implemented; full PR workflow run 953 passed.
 - Phase 7: inactive pre-Core procedures quarantined as non-executable legacy documentation; full PR workflow run 955 passed.
-- Phase 6: Consumer Pack definition/binding/materializer is being implemented in the current checkpoint.
+- Phase 6: Consumer Pack definition/binding/materializer implemented; full PR workflow run 957 passed.
+- Phase 10: conditional LLM execution policy is being removed from always-loaded `AGENTS.md` in the current checkpoint.
 
 ## Goal
 
@@ -91,8 +92,7 @@ Do not leave `judgement_only` skills as manually discoverable exceptions.
 Do not assign fake `knowledge_kind` values to non-owning analyses just to make
 the artifact router accept them.
 
-**Done when:** all eleven current `judgement_only` skills are either explicitly
-routable, promoted to a real capability provider, or retired.
+**Done when:** non-owning judgement procedures are explicitly routable; conditional producers are either routed under an accepted production contract or explicitly excluded from Consumer discovery pending promotion.
 
 ## Phase 4 — Route audit/evolution capture through a skill
 

@@ -1,0 +1,20 @@
+version: 1
+kind: harness-llm-execution-policy
+id: LLM-EXECUTION-POLICY-V1
+status: canonical
+scope: harness-owned-provider-backed-assurance
+
+rules:
+  deterministic_first: true
+  default_model: gpt-6-luna
+  default_reasoning_tier: normal
+  stronger_tier_requires_explicit_scenario_need: true
+  preserve_provider_model_provenance: true
+  auto_is_explicit_fallback_only: true
+  fail_closed_when_default_model_cannot_be_explicitly_requested: true
+  auto_routed_result_does_not_establish_default_model_baseline: true
+
+semantic_boundary:
+  - Model choice never defines semantic correctness.
+  - Expert-reviewed canonical knowledge remains the oracle.
+  - This policy optimizes recurring assurance cost and execution consistency.

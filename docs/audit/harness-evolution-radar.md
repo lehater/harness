@@ -89,6 +89,7 @@ separate defect has been demonstrated.
 | EVO-026 | RECOMMENDATION | CAPTURED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
 | EVO-027 | RESEARCH | INVESTIGATING | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
 | EVO-028 | RECOMMENDATION | ADOPTED | Skill distribution | Separate Maintainer and Consumer skill surfaces; distribute the Consumer surface as a pinned locally materialized pack rather than copied project skills. |
+| EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
 
 ## Detailed entries
 
@@ -974,3 +975,27 @@ Summary:
 - explicit local checkout override supports Harness/consumer co-development.
 
 Further normative changes belong in the design contract, not this Radar entry.
+
+
+### EVO-029 — CHANGE-TRANSITION-DESIGN producer promotion
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+`change-transition-design` is not a non-owning method. Research evidence
+supports a conditional CHANGE-TRANSITION-DESIGN Authority, and the Reference
+Engineering Model contains a conditional TRANSITION-CONTRACT template, but that
+research template does not yet publish a canonical `knowledge_kind`.
+
+Do not assign a fake method route or invent a production kind merely to eliminate
+an unrouted source file.
+
+Promotion should require:
+
+- Reference Model ownership/applicability to be accepted beyond research status;
+- a stable project Capability/knowledge-kind contract;
+- evidence from materially different transition cases;
+- clear admission/currentness semantics for the resulting transition contract.
+
+Until then the skill remains development-side research material and is excluded
+from the Consumer Pack because its surface entry is `route_status: unrouted`.

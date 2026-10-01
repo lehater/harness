@@ -37,27 +37,12 @@ applicable registered operation/method/artifact procedure and then read its
 - A Question never stores the final semantic answer. Resolution references the canonical artifact changed by the addressed Authority.
 - Harness validates declared structure, ownership, references, dependencies and capability ownership. It does not infer arbitrary engineering semantics.
 
-## LLM execution cost policy
+## Conditional policies
 
-For Harness-owned work that requires a provider-backed LLM evaluator or other
-LLM-backed assurance:
-
-- prefer deterministic validation whenever it can answer the question;
-- use GPT-6 Luna as the default and cost baseline for LLM-backed checks and
-  experiments;
-- use the normal context/reasoning tier unless a scenario explicitly requires
-  a stronger setting;
-- do not silently substitute `auto` or a more expensive model as the baseline;
-  any such use must be an explicit task-specific exception and must retain
-  provider/model provenance;
-- if the active provider identity cannot execute an explicit GPT-6 Luna request,
-  fail closed or use `auto` only as explicitly requested research evidence;
-  an auto-routed non-Luna result is not the repository's default evaluator
-  baseline.
-
-This policy optimizes recurring assurance cost without changing semantic truth:
-expert-reviewed canonical knowledge remains the oracle and model choice never
-defines correctness.
+Provider-backed semantic assurance must follow
+`spec/assurance/llm-execution-policy-v1.yaml`. Load that policy only when the
+selected procedure actually invokes an external LLM evaluator. Deterministic
+validation remains preferred when it can answer the question.
 
 ## Maintainer routing
 
@@ -90,6 +75,7 @@ does not live in this root bootstrap file.
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `docs/design/harness-consumer-pack-v0.md` — pinned Consumer Pack binding, materialization and validation contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
+- `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
 - `docs/design/managed-knowledge-v0.md` — optional managed canonical knowledge and generated-document contract.
 - `docs/design/agent-artifact-workbench-v0.md` — current agent-operated artifact creation and semantic acceptance loop.
