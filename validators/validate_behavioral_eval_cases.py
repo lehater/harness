@@ -73,8 +73,13 @@ for entry in entries:
         payload = _model_payload(request)
         serialized = json.dumps(payload, sort_keys=True)
         assert entry["design"] not in serialized
-        assert "harness-test-design-catalog" not in serialized
-        assert "spec/behavioral-evals" not in serialized
+        trusted_paths = {
+            item["path"] for item in payload["trusted_instructions"]
+        }
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+        assert all("spec/behavioral-evals" not in path for path in trusted_paths)
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
 
         fixture = binding.fixture
         if entry["dimension"] in {"capability_partition", "authority_partition"}:
