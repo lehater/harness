@@ -1,0 +1,98 @@
+version: 1
+kind: harness-fresh-context-routing-fixtures
+id: FRESH-CONTEXT-ROUTING-V0
+
+semantics:
+  - Natural-language intent recognition belongs to the agent/model layer and is not proven by this deterministic fixture.
+  - These cases prove that once a fresh agent identifies repository context and route class, Harness exposes one declared executable procedure.
+  - Maintainer and Consumer surfaces are tested as different physical environments.
+
+cases:
+  - id: maintainer-record-defect
+    environment: maintainer-source
+    prompt_example: "Record this Harness defect."
+    route:
+      class: operation
+      surface: maintainer
+      operation: capture-harness-observation
+    expect_skill: skills/maintainer/capture-harness-observation/SKILL.md
+
+  - id: maintainer-save-evolution-idea
+    environment: maintainer-source
+    prompt_example: "Save this improvement idea for later research."
+    route:
+      class: operation
+      surface: maintainer
+      operation: capture-harness-observation
+    expect_skill: skills/maintainer/capture-harness-observation/SKILL.md
+
+  - id: maintainer-change-harness
+    environment: maintainer-source
+    prompt_example: "Change observable Harness behavior."
+    route:
+      class: operation
+      surface: maintainer
+      operation: change-harness
+    expect_skill: skills/maintainer/change-harness/SKILL.md
+
+  - id: consumer-start-project
+    environment: consumer-pack
+    prompt_example: "Start Harness work in this existing project."
+    route:
+      class: operation
+      surface: consumer
+      operation: project-bootstrap-reconcile
+    expect_skill: skills/agent/project-bootstrap-reconcile/SKILL.md
+
+  - id: consumer-status
+    environment: consumer-pack
+    prompt_example: "Show current engineering status."
+    route:
+      class: operation
+      surface: consumer
+      operation: project-engineering-status
+    expect_skill: skills/agent/project-engineering-status/SKILL.md
+
+  - id: consumer-method-from-concern
+    environment: consumer-pack
+    prompt_example: "Analyze retry/idempotency reliability."
+    route:
+      class: method
+      concerns:
+        - reliability.retry-idempotency
+    expect_methods:
+      - reliability-analysis
+
+  - id: consumer-artifact-production
+    environment: consumer-pack
+    prompt_example: "Produce missing Product Requirements knowledge."
+    route:
+      class: artifact-production
+      knowledge_kind: product-requirements
+    expect_skill: skills/artifacts/product-requirements/SKILL.md
+
+  - id: consumer-internal-bootstrap-not-public
+    environment: consumer-pack
+    prompt_example: "Call the old bootstrap helper directly."
+    route:
+      class: operation
+      surface: consumer
+      operation: bootstrap-existing-project
+    expect_error: internal
+
+  - id: consumer-maintainer-route-unavailable
+    environment: consumer-pack
+    prompt_example: "Modify the Harness framework itself."
+    route:
+      class: operation
+      surface: maintainer
+      operation: change-harness
+    expect_error: not available
+
+  - id: unrouted-transition-producer-hidden
+    environment: consumer-pack
+    prompt_example: "Use change-transition-design as a registered producer."
+    route:
+      class: artifact-production
+      knowledge_kind: change-transition-design
+    expect_error: no artifact skill registered

@@ -317,3 +317,23 @@ repository.
 Internal Consumer operations (for example `bootstrap-existing-project`) are not
 public route entries and require explicit composition allowance from a public
 operation.
+
+
+## Fresh-context verification boundary
+
+`spec/agent-routing/fresh-context-v0.yaml` records representative new-agent
+entry scenarios for Maintainer source and materialized Consumer Pack
+environments.
+
+The deterministic validator proves:
+
+- repository context selects a physically valid surface;
+- typed route inputs resolve to one declared procedure;
+- internal Consumer helpers are not public entries;
+- Maintainer operations are unavailable from Consumer Pack;
+- unrouted research producers are not accidentally discoverable as artifact
+  routes.
+
+It deliberately does **not** claim that a language model will always classify
+arbitrary natural-language prompts into the correct structured route. That is a
+separate behavioral-evaluation problem tracked by the Evolution Radar.

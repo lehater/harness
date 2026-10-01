@@ -15,7 +15,7 @@ Status: active audit-branch migration plan.
 - Phase 7: inactive pre-Core procedures quarantined as non-executable legacy documentation; full PR workflow run 955 passed.
 - Phase 6: Consumer Pack definition/binding/materializer implemented; full PR workflow run 957 passed.
 - Phase 10: conditional LLM execution policy removed from always-loaded `AGENTS.md`; full PR workflow run 958 passed.
-- Phase 11: typed route entrypoint and source-vs-Consumer-Pack fresh-context routing checks are being implemented in the current checkpoint.
+- Phase 11: typed route entrypoint implemented; full PR workflow run 959 passed. Deterministic fresh-context routing fixtures are being added in the current checkpoint.
 
 ## Goal
 
