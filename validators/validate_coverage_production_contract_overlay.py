@@ -7,6 +7,7 @@ sys.path.insert(0,str(ROOT))
 
 from coverage_application import evaluate_project_coverage
 from engineering_coverage import evaluate_with_repository_policy, load
+from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 
 def main():
@@ -97,6 +98,7 @@ def main():
         "status":"ROUTED",
         "knowledge_kind":"data-design",
         "skill":"skills/artifacts/data-design/SKILL.md",
+        "instruction_contracts": list(GLOBAL_INSTRUCTION_CONTRACTS),
     }
     assert result["routed_production_count"] == 1
 
