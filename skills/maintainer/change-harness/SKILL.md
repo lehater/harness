@@ -38,11 +38,15 @@ This is a Maintainer operation. It is not exported to target repositories.
 4. State/reuse the concrete failure, invariant or accepted architecture
    decision that justifies the change.
 5. Apply `docs/design/harness-assurance-policy-v0.md`: choose the lowest test
-   level that can falsify the affected failure mode. Before changing observable
-   behavior, add or update the smallest failing deterministic
-   acceptance/scenario evidence that expresses the intended invariant when such
-   an oracle exists. Do not substitute a larger real-project/E2E test for a
-   missing lower-level mechanism oracle.
+   level that can falsify the affected failure mode. Reuse reviewed evidence or
+   a reviewed Test Design from
+   `docs/design/harness-test-design-catalog-v0.md` before inventing a new test
+   shape. Before changing observable behavior, add or update the smallest
+   failing deterministic acceptance/scenario evidence that expresses the
+   intended invariant when such an oracle exists. For judgement-dependent
+   behavior, use the behavioral-evaluation protocol rather than pretending a
+   supplied route/model key proves agent judgement. Do not substitute a larger
+   real-project/E2E test for a missing lower-level mechanism oracle.
 6. For a Core extension, require the concrete consumer failure and acceptance
    fixture required by `docs/design/core-v0.md`; do not add workflow/process
    entities without demonstrated need.
