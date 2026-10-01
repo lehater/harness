@@ -54,15 +54,35 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
             operation="bootstrap-existing-project",
             root=root,
         ),
-        "internal",
+        "requires invoked_by parent operation",
     )
+    _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="bootstrap-existing-project",
+            root=root,
+            invoked_by="project-engineering-status",
+        ),
+        "not authorized",
+    )
+    _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="bootstrap-existing-project",
+            root=root,
+            invoked_by="not-a-real-operation",
+        ),
+        "not a registered operation",
+    )
+
     internal = route_operation(
         surface="consumer",
         operation="bootstrap-existing-project",
         root=root,
-        allow_internal=True,
+        invoked_by="project-bootstrap-reconcile",
     )
     assert internal["exposure"] == "internal"
+    assert internal["invoked_by"] == "project-bootstrap-reconcile"
 
     _expect_error(
         lambda: route_artifact(knowledge_kind="change-transition-design", root=root),

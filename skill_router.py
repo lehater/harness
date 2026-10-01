@@ -32,36 +32,78 @@ def _route_operation(
     *,
     surface: str,
     operation: str,
-    allow_internal: bool = False,
+    invoked_by: str | None = None,
 ) -> dict[str, Any]:
     routes = registry.get("routes")
     if not isinstance(routes, list):
         raise CoreError(f"{surface} operation registry routes must be a list")
-    for item in routes:
-        if not isinstance(item, dict):
-            continue
-        if item.get("operation") != operation:
-            continue
-        exposure = item.get("exposure")
-        if exposure == "internal" and not allow_internal:
-            raise CoreError(
-                f"{surface} operation {operation!r} is internal and not a public entry"
+
+    route_by_operation = {
+        item.get("operation"): item
+        for item in routes
+        if isinstance(item, dict)
+        and isinstance(item.get("operation"), str)
+        and item.get("operation")
+    }
+    item = route_by_operation.get(operation)
+    if item is None:
+        raise CoreError(f"unknown {surface} operation: {operation}")
+
+    exposure = item.get("exposure")
+    if exposure not in {"public", "internal"}:
+        raise CoreError(
+            f"{surface} operation {operation!r} has invalid exposure {exposure!r}"
+        )
+
+    if exposure == "internal":
+        allowed_parents = item.get("invoked_by")
+        if (
+            not isinstance(allowed_parents, list)
+            or not allowed_parents
+            or not all(
+                isinstance(parent, str) and parent
+                for parent in allowed_parents
             )
-        if exposure not in {"public", "internal"}:
+        ):
             raise CoreError(
-                f"{surface} operation {operation!r} has invalid exposure {exposure!r}"
+                f"{surface} internal operation {operation!r} has invalid invoked_by authorization"
             )
-        skill = item.get("skill")
-        if not isinstance(skill, str) or not skill:
-            raise CoreError(f"{surface} operation {operation!r} has no skill")
-        return {
-            "surface": surface,
-            "route_class": "operation",
-            "route_key": operation,
-            "skill": skill,
-            "exposure": exposure,
-        }
-    raise CoreError(f"unknown {surface} operation: {operation}")
+        if not isinstance(invoked_by, str) or not invoked_by:
+            raise CoreError(
+                f"{surface} operation {operation!r} is internal and requires "
+                "invoked_by parent operation"
+            )
+        parent = route_by_operation.get(invoked_by)
+        if parent is None:
+            raise CoreError(
+                f"{surface} operation {operation!r} parent {invoked_by!r} "
+                "is not a registered operation"
+            )
+        if parent.get("exposure") != "public":
+            raise CoreError(
+                f"{surface} operation {operation!r} parent {invoked_by!r} "
+                "is not a public operation"
+            )
+        if invoked_by not in allowed_parents:
+            raise CoreError(
+                f"{surface} operation {operation!r} is not authorized for "
+                f"parent {invoked_by!r}"
+            )
+
+    skill = item.get("skill")
+    if not isinstance(skill, str) or not skill:
+        raise CoreError(f"{surface} operation {operation!r} has no skill")
+
+    result = {
+        "surface": surface,
+        "route_class": "operation",
+        "route_key": operation,
+        "skill": skill,
+        "exposure": exposure,
+    }
+    if exposure == "internal":
+        result["invoked_by"] = invoked_by
+    return result
 
 
 def route_operation(
@@ -69,7 +111,7 @@ def route_operation(
     surface: str,
     operation: str,
     root: str | Path = ROOT,
-    allow_internal: bool = False,
+    invoked_by: str | None = None,
 ) -> dict[str, Any]:
     root = Path(root)
     if surface == "maintainer":
@@ -86,7 +128,7 @@ def route_operation(
         load_yaml(path),
         surface=surface,
         operation=operation,
-        allow_internal=allow_internal,
+        invoked_by=invoked_by,
     )
 
 
@@ -148,7 +190,7 @@ def main() -> int:
     operation = sub.add_parser("operation")
     operation.add_argument("--surface", choices=("maintainer", "consumer"), required=True)
     operation.add_argument("--operation", required=True)
-    operation.add_argument("--allow-internal", action="store_true")
+    operation.add_argument("--invoked-by")
     operation.add_argument("--root", default=".")
 
     method = sub.add_parser("method")
@@ -167,7 +209,7 @@ def main() -> int:
             surface=args.surface,
             operation=args.operation,
             root=args.root,
-            allow_internal=args.allow_internal,
+            invoked_by=args.invoked_by,
         )
     elif args.route_class == "method":
         result = route_method(

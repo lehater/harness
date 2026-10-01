@@ -31,8 +31,9 @@ router.
 4. Ordinary substeps inside one responsibility do not require rerouting.
 5. Public operations are valid use-case entrypoints.
 6. Internal operations are composable implementation procedures. They are
-   reachable only from declared parent public operations and are resolved with
-   the router's internal-route allowance.
+   reachable only from a concrete declared parent public operation. Runtime
+   routing must supply that parent operation identity and validate it against the
+   internal route's registry `invoked_by` authorization.
 7. The router resolves routes; it is not a workflow/state-machine engine.
 8. Operation sequencing is not project truth and must not introduce Stage,
    Phase, Gate, Handoff or universal workflow-state entities into Core.
@@ -82,21 +83,25 @@ not to a hard-coded physical skill-to-skill call.
 
 A public operation may require a reusable internal operation. The parent skill
 may reference the internal **operation id**. The coordinator then resolves that
-id through the router with internal routing enabled.
+id through the router while supplying the parent operation identity.
 
 ```text
 project-bootstrap-reconcile
     ↓ needs minimal Core bootstrap
 bootstrap-existing-project
     ↓
-skill_router --allow-internal
+skill_router operation --surface consumer \
+  --operation bootstrap-existing-project \
+  --invoked-by project-bootstrap-reconcile
     ↓
 registered internal skill
 ```
 
 The registry's `invoked_by` relation is the machine-readable authorization for
-that composition. A direct `SKILL.md` filesystem path is not the orchestration
-contract.
+that composition. The router verifies both that the supplied parent is a
+registered public operation and that the target internal route authorizes it.
+A boolean internal-routing bypass is not a valid authorization contract. A
+direct `SKILL.md` filesystem path is not the orchestration contract.
 
 ## Failure and retry
 

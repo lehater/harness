@@ -1,0 +1,60 @@
+version: 1
+kind: harness-scenario
+id: internal-operation-parent-authorization
+title: Internal operation routing enforces declared parent identity
+dimensions:
+  project_archetype: synthetic
+  stage: bootstrap
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - internal-operation-parent-authorization
+
+steps:
+  - id: public-entry
+    driver: skill.operation
+    with:
+      surface: consumer
+      operation: project-bootstrap-reconcile
+    expect:
+      - {path: /exposure, op: equals, value: public}
+      - {path: /route_key, op: equals, value: project-bootstrap-reconcile}
+
+  - id: reject-direct-internal
+    driver: skill.operation
+    benchmark:
+      metrics: [blocking_behavior, mutation_detection]
+      mutation_class: missing-internal-parent
+    with:
+      surface: consumer
+      operation: bootstrap-existing-project
+    expect_error:
+      type: CoreError
+      contains: requires invoked_by parent operation
+
+  - id: reject-wrong-parent
+    driver: skill.operation
+    benchmark:
+      metrics: [blocking_behavior, root_cause_localization]
+      mutation_class: unauthorized-internal-parent
+    with:
+      surface: consumer
+      operation: bootstrap-existing-project
+      invoked_by: project-engineering-status
+    expect_error:
+      type: CoreError
+      contains: not authorized
+
+  - id: allow-declared-parent
+    driver: skill.operation
+    benchmark:
+      metrics: [false_positive_control]
+      mutation_class: authorized-internal-parent
+    with:
+      surface: consumer
+      operation: bootstrap-existing-project
+      invoked_by: project-bootstrap-reconcile
+    expect:
+      - {path: /exposure, op: equals, value: internal}
+      - {path: /invoked_by, op: equals, value: project-bootstrap-reconcile}
+      - {path: /route_key, op: equals, value: bootstrap-existing-project}

@@ -44,6 +44,7 @@ from source_boundary import evaluate_source_boundary
 from source_set import evaluate_source_set
 from source_coverage import validate_source_coverage
 from skill_invariant_policy import evaluate_skill_invariant_policy
+from skill_router import route_operation
 from semantic_acceptance import evaluate_artifact
 from semantic_admission import admit_artifact
 from semantic_closure import evaluate_semantic_closure
@@ -511,6 +512,21 @@ def frontend_screen_contracts_driver(
         screen_design,
         interface_contract,
         screen_ids=set(screen_ids) if screen_ids is not None else None,
+    )
+
+
+@scenario_driver("skill.operation")
+def skill_operation_driver(
+    *,
+    surface: str,
+    operation: str,
+    invoked_by: str | None = None,
+) -> dict[str, Any]:
+    return route_operation(
+        surface=surface,
+        operation=operation,
+        invoked_by=invoked_by,
+        root=Path(__file__).resolve().parent,
     )
 
 

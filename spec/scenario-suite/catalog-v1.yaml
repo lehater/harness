@@ -111,6 +111,7 @@ required_drivers:
   - human.compile_manifest
   - frontend.ux_closure
   - frontend.screen_contracts
+  - skill.operation
   - skill.invariant_policy
 
 requirements:
@@ -399,6 +400,12 @@ requirements:
     category: frontend
     enforcement: required
     description: Frontend screen and UX closure rejects missing query/action/state/provider or presentation semantics.
+    min_scenarios: 1
+
+  - id: internal-operation-parent-authorization
+    category: routing
+    enforcement: required
+    description: Internal operations resolve only when the runtime caller supplies a registered public parent authorized by the target route's invoked_by contract.
     min_scenarios: 1
 
   - id: skill-invariant-policy
