@@ -1,6 +1,6 @@
 # Agent Instruction and Skill Routing Scalability Plan
 
-Status: active audit-branch migration plan.
+Status: implementation complete on audit branch; final integration validation pending. Main remains unchanged.
 
 ## Accepted distribution decision
 
@@ -13,10 +13,11 @@ Status: active audit-branch migration plan.
 - Phase 4/5: Maintainer capture/change operations extracted from `AGENTS.md`; full PR workflow passed.
 - Phase 3: deterministic concern-driven Consumer Method Router implemented; full PR workflow run 953 passed.
 - Phase 7: inactive pre-Core procedures quarantined as non-executable legacy documentation; full PR workflow run 955 passed.
-- Phase 6: Consumer Pack builder validated in run 957; a standard-library target wrapper + JSON immutable binding are being added to close clean-clone bootstrap in the current checkpoint.
+- Phase 6: Consumer Pack + standard-library target wrapper + immutable JSON binding implemented; clean-target exact-revision bootstrap passed full PR workflow run 962.
 - Phase 10: conditional LLM execution policy removed from always-loaded `AGENTS.md`; full PR workflow run 958 passed.
-- Phase 8: documentation ownership is structurally clean; an instruction-ownership ratchet is being added to prevent task procedures from drifting back into root `AGENTS.md`.
+- Phase 8: documentation ownership ratcheted; root `AGENTS.md` is bootstrap/always-on policy only and full PR workflow run 961 passed.
 - Phase 11: typed route entrypoint and deterministic fresh-context routing fixtures implemented; full PR workflow run 960 passed.
+- Phase 9: pilot completed across `product-requirements`, `domain-model`, and `verification-strategy`; no base procedure extracted. EVO-024 is PARKED pending behavioral/context evidence.
 
 ## Goal
 
@@ -208,3 +209,14 @@ Add behavioral/routing fixtures for at least:
 ## Order
 
 Implement Phases 1-7 first because they establish the accepted routing/distribution boundary and remove demonstrated discovery defects. Phases 8-11 are scalability cleanup and should follow after the active routing surface is stable.
+
+## Final integration gate
+
+Do not merge this branch yet. Before squash integration into `main`:
+
+1. run the complete PR workflow on the final branch head;
+2. confirm the clean-target wrapper test still resolves the exact pinned revision and executes the Consumer Pack router;
+3. re-run the post-migration skill-surface audit/validators from the final head;
+4. inspect the final branch diff for unintended Core/semantic changes outside the accepted migration;
+5. keep the PR draft until all applicable checks are green and the updated Harness is judged operational as a whole;
+6. integrate only by squash merge so the cumulative audit/refactor history becomes one reviewed mainline commit.

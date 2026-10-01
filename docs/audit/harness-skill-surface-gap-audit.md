@@ -2,8 +2,10 @@
 
 Date: 2026-10-01  
 Run: AUD-006  
-Status: current-state audit against
+Status: historical pre-migration snapshot against
 `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md`.
+
+Post-migration verification is recorded in `docs/audit/harness-skill-surface-post-migration-audit.md` (AUD-007).
 
 ## Question
 

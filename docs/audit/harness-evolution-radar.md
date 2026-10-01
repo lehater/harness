@@ -82,12 +82,12 @@ separate defect has been demonstrated.
 | EVO-019 | RESEARCH | CAPTURED | Reference vs Coverage | Test the target ownership rule: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. |
 | EVO-020 | IDEA | CAPTURED | Context lifecycle | Define restartable agent-session boundaries from durable project artifacts so long-running work can resume without conversation history becoming project truth. |
 | EVO-021 | RECOMMENDATION | ADOPTED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
-| EVO-022 | RESEARCH | INVESTIGATING | Agent routing | Add an explicit registry/router and overlap tests for `skills/agent/**`; keep artifact routing deterministic by `knowledge_kind`. |
-| EVO-023 | RECOMMENDATION | VALIDATED | Root instructions | Shrink `AGENTS.md` to always-on invariants, bootstrap/routing rules and minimal navigation; remove task-specific workflows from it. |
-| EVO-024 | RESEARCH | CAPTURED | Artifact skills | Pilot a common artifact-production procedure so artifact skills carry domain-specific deltas instead of repeating generic registration/projection/acceptance mechanics. |
-| EVO-025 | RECOMMENDATION | VALIDATED | Skill lifecycle | Quarantine or migrate inactive pre-Core `SKILL.md` files so discovery surfaces expose only active skills. |
-| EVO-026 | RECOMMENDATION | CAPTURED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
-| EVO-027 | RESEARCH | INVESTIGATING | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
+| EVO-022 | RESEARCH | ADOPTED | Agent routing | Add an explicit registry/router and overlap tests for `skills/agent/**`; keep artifact routing deterministic by `knowledge_kind`. |
+| EVO-023 | RECOMMENDATION | ADOPTED | Root instructions | Shrink `AGENTS.md` to always-on invariants, bootstrap/routing rules and minimal navigation; remove task-specific workflows from it. |
+| EVO-024 | RESEARCH | PARKED | Artifact skills | Pilot a common artifact-production procedure so artifact skills carry domain-specific deltas instead of repeating generic registration/projection/acceptance mechanics. |
+| EVO-025 | RECOMMENDATION | ADOPTED | Skill lifecycle | Quarantine or migrate inactive pre-Core `SKILL.md` files so discovery surfaces expose only active skills. |
+| EVO-026 | RECOMMENDATION | ADOPTED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
+| EVO-027 | RESEARCH | ADOPTED | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
 | EVO-028 | RECOMMENDATION | ADOPTED | Skill distribution | Separate Maintainer and Consumer skill surfaces; distribute the Consumer surface as a pinned locally materialized pack rather than copied project skills. |
 | EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
 
@@ -841,7 +841,7 @@ tracks the demonstrated defect.
 ### EVO-022 — Agent-skill registry and routing evaluation
 
 **Type:** RESEARCH  
-**Status:** INVESTIGATING
+**Status:** ADOPTED
 
 Introduce a machine-readable registry for active `skills/agent/**` with stable
 identity, trigger class, exclusions and explicit precedence/composition where
@@ -856,7 +856,7 @@ Related: HARN-017, EVO-004, EVO-017.
 ### EVO-023 — Minimal root AGENTS
 
 **Type:** RECOMMENDATION  
-**Status:** VALIDATED
+**Status:** ADOPTED
 
 Keep root `AGENTS.md` for information required before task classification:
 repository-wide safety/workflow invariants, truth-boundary invariants and the
@@ -869,7 +869,7 @@ disclosure, not merely shortening the file.
 ### EVO-024 — Common artifact-production procedure
 
 **Type:** RESEARCH  
-**Status:** CAPTURED
+**Status:** PARKED
 
 AUD-005 found `Human projection` in 45 artifact skills, registration-related
 text in 41, and semantic-acceptance references in at least 23.
@@ -896,10 +896,21 @@ Pilot only on `product-requirements`, `domain-model` and
 `verification-strategy` first. Self-contained repetition may still win; let
 behavioral evidence decide.
 
+**Pilot result (AUD-007)**
+
+The three skills share a structural skeleton, but their acceptance, registration,
+read-boundary and decision semantics remain materially different. The reusable
+part is already owned by the common semantic-admission/workbench contracts.
+Extracting a base procedure now would add another indirection layer without
+proven behavioral or context-budget benefit.
+
+Keep the idea PARKED until behavioral evals or measured context duplication show
+a concrete failure that a shared procedure would remove.
+
 ### EVO-025 — Quarantine inactive skills
 
 **Type:** RECOMMENDATION  
-**Status:** VALIDATED
+**Status:** ADOPTED
 
 Inactive procedures should not remain indistinguishable from active
 `SKILL.md` discovery. Classify legacy skills as promote/archive/delete. Move
@@ -911,7 +922,7 @@ Related defect: HARN-018.
 ### EVO-026 — README/workbench ownership discipline
 
 **Type:** RECOMMENDATION  
-**Status:** CAPTURED
+**Status:** ADOPTED
 
 Keep `README.md` as product explanation and links. Keep
 `agent-artifact-workbench-v0.md` focused on Application-layer concepts,
@@ -926,7 +937,7 @@ copies of the same executable procedure.
 ### EVO-027 — Routing for non-owning analysis/method skills
 
 **Type:** RESEARCH  
-**Status:** INVESTIGATING
+**Status:** ADOPTED
 
 Eleven current `judgement_only` skills are deliberately not artifact providers,
 but they are still executable procedures. Their selection therefore needs an
