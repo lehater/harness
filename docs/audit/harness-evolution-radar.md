@@ -91,6 +91,7 @@ separate defect has been demonstrated.
 | EVO-028 | RECOMMENDATION | ADOPTED | Skill distribution | Separate Maintainer and Consumer skill surfaces; distribute the Consumer surface as a pinned locally materialized pack rather than copied project skills. |
 | EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
 | EVO-030 | RECOMMENDATION | CAPTURED | Orchestration observability | Add a minimal operation-decision trace so maintainers can reconstruct task intent -> selected operation -> resolved skill/contracts without persisting private reasoning. |
+| EVO-031 | RESEARCH | CAPTURED | Evaluator calibration | Define calibration-corpus representativeness and drift/recalibration triggers so passing a small bootstrap corpus is not treated as broad evaluator-quality proof. |
 
 ## Detailed entries
 
@@ -1073,3 +1074,55 @@ observability improvement, not proof of incorrect current behavior.
 - AP-21 provenance / reproducibility
 - EVO-020 restartable agent-session boundaries
 - `docs/design/operation-orchestration-v0.md`
+
+
+### EVO-031 — Calibration representativeness and drift
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+**Question**
+
+What evidence is sufficient to treat a semantic evaluator calibration as
+representative for the Harness judgements it will actually perform, and when
+must that calibration be reopened?
+
+The current mechanism already binds corpus/protocol/evaluator configuration,
+scores false positives/false negatives and can detect repeated-run instability.
+The remaining question is distribution coverage rather than scorer mechanics.
+
+**Why useful**
+
+AUD-018 confirmed that the ambiguity-audited v3 corpus is a strong bootstrap
+oracle and has repeated real-provider evidence, but it still contains only a
+small controlled set of semantic transformations. A perfect score on that corpus
+must not be generalized into universal evaluator correctness.
+
+Candidate reopening triggers include:
+
+- evaluator model/version/configuration changes;
+- protocol changes;
+- new judgement relation or mutation class;
+- production disagreement not represented in the corpus;
+- recurring false-positive/false-negative class;
+- materially new project/domain text shape.
+
+**Evidence needed**
+
+Grow the corpus from observed real failure classes while preserving explicit
+expert labels and ambiguity audits. Track coverage by judgement relation and
+failure class, and test whether additional cases materially change evaluator
+error estimates before defining a minimum recurring calibration policy.
+
+**Not a defect**
+
+Current Harness already reports the calibration scope and fails closed on
+invalid/incomplete runs. This is assurance-depth research, not incorrect current
+behavior.
+
+**Related**
+
+- AP-16 / AUD-018
+- `docs/research/semantic-calibration-corpus-audit-v0.md`
+- `docs/research/live-calibration-v3-evidence.md`
+- `docs/design/live-calibration-validator-v0.md`

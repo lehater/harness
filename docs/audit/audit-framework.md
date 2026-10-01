@@ -44,7 +44,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-13 | Instruction ownership / routing | Does every instruction/procedure have one owner and deterministic discovery? | COVERED | AUD-010 |
 | AP-14 | Empirical agent behavior | Does a real agent select and execute the intended route/skill under representative tasks? | PARTIAL | AUD-012 |
 | AP-15 | Observability / diagnosability | Can a maintainer explain why a route/state/action was produced from available evidence? | PARTIAL | AUD-013 |
-| AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | live-calibration contracts |
+| AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | AUD-018 |
 | AP-17 | Security / trust boundaries | Can repository content, tool output or prompt injection cross an authority/tool trust boundary? | COVERED | AUD-011 |
 | AP-18 | Performance / cost / context efficiency | Does Harness avoid unnecessary context, validation, CI and evaluator work? | PARTIAL | AUD-015 |
 | AP-19 | Recovery / crash consistency | Can interrupted multi-step application work resume without contradictory published state? | COVERED | AUD-014 / HARN-012 |
@@ -82,6 +82,7 @@ Do not rerun every perspective after every change.
 | AUD-015 | 2026-10-01 | AP-18 performance / cost / context efficiency | CI cost/selectivity remains covered by AUD-008/009. Agent-context review found progressive disclosure now canonical in `agent-instruction-architecture-v0.md`; reused/adopted EVO-005. No measured real-agent context/token baseline exists yet, so AP-18 remains PARTIAL. |
 | AUD-016 | 2026-10-01 | AP-20 versioning / compatibility | Consumer Pack transport is pinned to immutable revision + `consumer_api` and fails closed on incompatible API. Contract-policy currentness is covered by fixed HARN-011. Remaining semantic graph rename/split/merge migration is HARN-014; published skill identity/rename compatibility is the non-defect EVO-018, now VALIDATED. No new root cause found. |
 | AUD-017 | 2026-10-01 | AP-21 provenance / reproducibility | Policy/evaluator/source/run identities are generally fingerprinted or immutably pinned, and lifecycle binds accepted prerequisite identities. Remaining provenance gaps map to existing HARN-013 (hidden same-Authority semantic dependency can escape lifecycle baseline) and EVO-030 (no durable operation-decision trace). No new root cause found. |
+| AUD-018 | 2026-10-01 | AP-16 evaluator quality / calibration | Calibration machinery is fail-closed and measures confusion, per-class accuracy, binding and repeated-run stability against audited expert labels. Real v3 evidence includes repeated 14/14 runs, but the corpus remains a small bootstrap distribution. Captured EVO-031 for representativeness/drift policy; AP-16 remains PARTIAL. |
 
 ## Finding handoff contract
 
