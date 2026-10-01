@@ -92,6 +92,7 @@ separate defect has been demonstrated.
 | EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
 | EVO-030 | RECOMMENDATION | CAPTURED | Orchestration observability | Add a minimal operation-decision trace so maintainers can reconstruct task intent -> selected operation -> resolved skill/contracts without persisting private reasoning. |
 | EVO-031 | RESEARCH | CAPTURED | Evaluator calibration | Define calibration-corpus representativeness and drift/recalibration triggers so passing a small bootstrap corpus is not treated as broad evaluator-quality proof. |
+| EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
 
 ## Detailed entries
 
@@ -1126,3 +1127,45 @@ behavior.
 - `docs/research/semantic-calibration-corpus-audit-v0.md`
 - `docs/research/live-calibration-v3-evidence.md`
 - `docs/design/live-calibration-validator-v0.md`
+
+
+### EVO-032 — Supported scale envelope and stress fixtures
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+**Question**
+
+What project-model sizes and shapes should Harness explicitly support, and which
+stress fixtures are needed to prove that envelope?
+
+AUD-019 found one concrete depth defect (HARN-023), but absence of a published
+scale envelope makes it difficult to distinguish implementation defects from
+unsupported pathological inputs in other dimensions.
+
+Candidate independent dimensions:
+
+- dependency depth;
+- dependency breadth / fan-out;
+- number of Authorities/Capabilities/Artifacts/Questions;
+- number of Consumers and coverage obligations;
+- repeated recomputation after one upstream change;
+- multi-provider and multi-subject density.
+
+**Evidence needed**
+
+Add generated deterministic fixtures at representative sizes and measure both
+correctness and runtime/memory. Start with a small tier that is cheap enough for
+local/CI regression and a larger opt-in benchmark tier. Define limits only from
+observed behavior and real-project needs rather than arbitrary round numbers.
+
+**Not a defect**
+
+The missing envelope itself does not prove incorrect current behavior. HARN-023
+tracks the concrete deep-recursion failure class separately.
+
+**Related**
+
+- AP-22 / AUD-019
+- HARN-023
+- AP-18 performance / cost

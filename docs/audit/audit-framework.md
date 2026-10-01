@@ -50,7 +50,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-19 | Recovery / crash consistency | Can interrupted multi-step application work resume without contradictory published state? | COVERED | AUD-014 / HARN-012 |
 | AP-20 | Versioning / compatibility | Can Harness/contracts/Consumer Pack evolve without silently invalidating projects? | COVERED | AUD-016 |
 | AP-21 | Provenance / reproducibility | Can state be traced to the exact policy/evidence/version that produced it? | COVERED | AUD-017 |
-| AP-22 | Scale / stress / pathological graphs | Does behavior remain correct at large graph/question/artifact counts and deep dependency chains? | UNASSESSED | — |
+| AP-22 | Scale / stress / pathological graphs | Does behavior remain correct at large graph/question/artifact counts and deep dependency chains? | PARTIAL | AUD-019 |
 | AP-23 | Human control / explainability | Are human decision points, uncertainty and consequences explicit enough for safe intervention? | UNASSESSED | — |
 
 ## Re-audit triggers
@@ -83,6 +83,7 @@ Do not rerun every perspective after every change.
 | AUD-016 | 2026-10-01 | AP-20 versioning / compatibility | Consumer Pack transport is pinned to immutable revision + `consumer_api` and fails closed on incompatible API. Contract-policy currentness is covered by fixed HARN-011. Remaining semantic graph rename/split/merge migration is HARN-014; published skill identity/rename compatibility is the non-defect EVO-018, now VALIDATED. No new root cause found. |
 | AUD-017 | 2026-10-01 | AP-21 provenance / reproducibility | Policy/evaluator/source/run identities are generally fingerprinted or immutably pinned, and lifecycle binds accepted prerequisite identities. Remaining provenance gaps map to existing HARN-013 (hidden same-Authority semantic dependency can escape lifecycle baseline) and EVO-030 (no durable operation-decision trace). No new root cause found. |
 | AUD-018 | 2026-10-01 | AP-16 evaluator quality / calibration | Calibration machinery is fail-closed and measures confusion, per-class accuracy, binding and repeated-run stability against audited expert labels. Real v3 evidence includes repeated 14/14 runs, but the corpus remains a small bootstrap distribution. Captured EVO-031 for representativeness/drift policy; AP-16 remains PARTIAL. |
+| AUD-019 | 2026-10-01 | AP-22 scale / stress / pathological graphs | Found HARN-023: multiple canonical DAG traversals recurse over unbounded project-defined depth and can hit Python recursion limits on a valid deep graph. Existing scaling checks do not establish a supported graph-size/depth envelope. Captured EVO-032; AP-22 remains PARTIAL pending broader volume/stress evidence. |
 
 ## Finding handoff contract
 
