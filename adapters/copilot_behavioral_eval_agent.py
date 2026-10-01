@@ -289,6 +289,128 @@ def _parse_copilot_jsonl(
     return messages[0], resolved_model, usage
 
 
+
+def _otel_value(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    for key in ("stringValue", "boolValue", "doubleValue"):
+        if key in value:
+            return value[key]
+    if "intValue" in value:
+        raw = value["intValue"]
+        if isinstance(raw, int) and not isinstance(raw, bool):
+            return raw
+        if isinstance(raw, str):
+            try:
+                return int(raw)
+            except ValueError:
+                return raw
+    return value
+
+
+def _otel_attributes(value: Any) -> dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    if not isinstance(value, list):
+        return {}
+    attrs: dict[str, Any] = {}
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        key = item.get("key")
+        if not isinstance(key, str) or not key:
+            continue
+        attrs[key] = _otel_value(item.get("value"))
+    return attrs
+
+
+def _walk_dicts(value: Any):
+    if isinstance(value, dict):
+        yield value
+        for item in value.values():
+            yield from _walk_dicts(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _walk_dicts(item)
+
+
+def _parse_copilot_otel_jsonl(
+    raw: str,
+    *,
+    session_id: str,
+) -> tuple[str | None, dict[str, Any]]:
+    turns: list[dict[str, Any]] = []
+    numeric_fields = {
+        "gen_ai.usage.input_tokens": "input_tokens",
+        "gen_ai.usage.output_tokens": "output_tokens",
+        "gen_ai.usage.cache_read.input_tokens": "cache_read_tokens",
+        "gen_ai.usage.cache_creation.input_tokens": "cache_write_tokens",
+        "gen_ai.usage.reasoning_tokens": "reasoning_tokens",
+        "github.copilot.nano_aiu": "nano_aiu",
+    }
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        try:
+            document = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        for candidate in _walk_dicts(document):
+            attrs = _otel_attributes(candidate.get("attributes"))
+            if attrs.get("gen_ai.operation.name") != "chat":
+                continue
+            conversation = attrs.get("gen_ai.conversation.id")
+            if isinstance(conversation, str) and conversation and conversation != session_id:
+                continue
+
+            turn: dict[str, Any] = {}
+            requested = attrs.get("gen_ai.request.model")
+            resolved = attrs.get("gen_ai.response.model")
+            if isinstance(requested, str) and requested:
+                turn["requested_model"] = requested
+            if isinstance(resolved, str) and resolved:
+                turn["model"] = resolved
+            for source, target in numeric_fields.items():
+                value = attrs.get(source)
+                if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+                    turn[target] = value
+                elif isinstance(value, float) and value >= 0 and value.is_integer():
+                    turn[target] = int(value)
+            cost = attrs.get("github.copilot.cost")
+            if isinstance(cost, (int, float)) and not isinstance(cost, bool) and cost >= 0:
+                turn["cost_multiplier"] = cost
+            turns.append(turn)
+
+    response_models = sorted({
+        turn["model"]
+        for turn in turns
+        if isinstance(turn.get("model"), str) and turn["model"]
+    })
+    if len(response_models) == 1:
+        resolved_model: str | None = response_models[0]
+    elif len(response_models) > 1:
+        resolved_model = "mixed"
+    else:
+        resolved_model = None
+
+    totals: dict[str, int | float] = {}
+    for target in (*numeric_fields.values(), "cost_multiplier"):
+        values = [
+            turn[target]
+            for turn in turns
+            if isinstance(turn.get(target), (int, float))
+            and not isinstance(turn.get(target), bool)
+        ]
+        if values:
+            totals[target] = sum(values)
+    return resolved_model, {
+        "source": "copilot-otel-file",
+        "turn_count": len(turns),
+        "turns": turns,
+        "totals": totals,
+    }
+
+
 def _observed_cli_version(executable: str, env: dict[str, str]) -> str:
     completed = subprocess.run(
         [executable, "--version"],
@@ -351,6 +473,13 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         home.mkdir()
         work.mkdir()
         env = _provider_env(home)
+        otel_path = root / "copilot-otel.jsonl"
+        env.update({
+            "COPILOT_OTEL_ENABLED": "true",
+            "COPILOT_OTEL_EXPORTER_TYPE": "file",
+            "COPILOT_OTEL_FILE_EXPORTER_PATH": str(otel_path),
+            "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT": "false",
+        })
         observed_cli = _observed_cli_version(executable, env)
         if observed_cli != expected_cli:
             raise RuntimeError(
@@ -386,9 +515,24 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
                 f"Copilot CLI failed with exit {completed.returncode}: "
                 + completed.stderr.strip().replace("\n", " ")[:1500]
             )
-        raw_message, resolved_model, usage = _parse_copilot_jsonl(completed.stdout)
-        if not resolved_model:
-            resolved_model = model
+        raw_message, event_model, event_usage = _parse_copilot_jsonl(completed.stdout)
+        otel_model: str | None = None
+        otel_usage: dict[str, Any] = {
+            "source": "copilot-otel-file",
+            "turn_count": 0,
+            "turns": [],
+            "totals": {},
+        }
+        if otel_path.is_file():
+            otel_model, otel_usage = _parse_copilot_otel_jsonl(
+                otel_path.read_text(encoding="utf-8"),
+                session_id=session_id,
+            )
+        resolved_model = otel_model or event_model or model
+        usage = otel_usage if otel_usage["turn_count"] else {
+            **event_usage,
+            "source": "copilot-jsonl-events",
+        }
 
     provenance = {
         "provider": "github-copilot",
@@ -405,6 +549,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
             "builtin_mcps_disabled": True,
             "remote_session_disabled": True,
             "external_tools_available": False,
+            "otel_content_capture_disabled": True,
         },
     }
     return raw_message, provenance

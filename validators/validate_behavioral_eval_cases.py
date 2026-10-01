@@ -19,6 +19,7 @@ from adapters.copilot_behavioral_eval_agent import (
     _model_payload,
     _observed_cli_version,
     _parse_copilot_jsonl,
+    _parse_copilot_otel_jsonl,
     _parse_model_response,
     _prompt,
     _response_contract,
@@ -58,6 +59,54 @@ assert usage["totals"] == {
     "reasoning_tokens": 20,
     "cache_read_tokens": 300,
     "cache_write_tokens": 40,
+}
+
+sample_otel = "\n".join([
+    json.dumps({
+        "name": "chat auto",
+        "attributes": {
+            "gen_ai.operation.name": "chat",
+            "gen_ai.conversation.id": "session-1",
+            "gen_ai.request.model": "auto",
+            "gen_ai.response.model": "gpt-5.4",
+            "gen_ai.usage.input_tokens": 2345,
+            "gen_ai.usage.output_tokens": 91,
+            "gen_ai.usage.cache_read.input_tokens": 512,
+            "gen_ai.usage.cache_creation.input_tokens": 128,
+            "github.copilot.nano_aiu": 750000000,
+            "github.copilot.cost": 1,
+        },
+    }),
+    json.dumps({
+        "resourceSpans": [{
+            "scopeSpans": [{
+                "spans": [{
+                    "name": "chat auto",
+                    "attributes": [
+                        {"key": "gen_ai.operation.name", "value": {"stringValue": "chat"}},
+                        {"key": "gen_ai.conversation.id", "value": {"stringValue": "other-session"}},
+                        {"key": "gen_ai.response.model", "value": {"stringValue": "ignored-model"}},
+                        {"key": "gen_ai.usage.input_tokens", "value": {"intValue": "999999"}},
+                    ],
+                }],
+            }],
+        }],
+    }),
+])
+otel_model, otel_usage = _parse_copilot_otel_jsonl(
+    sample_otel,
+    session_id="session-1",
+)
+assert otel_model == "gpt-5.4"
+assert otel_usage["source"] == "copilot-otel-file"
+assert otel_usage["turn_count"] == 1
+assert otel_usage["totals"] == {
+    "input_tokens": 2345,
+    "output_tokens": 91,
+    "cache_read_tokens": 512,
+    "cache_write_tokens": 128,
+    "nano_aiu": 750000000,
+    "cost_multiplier": 1,
 }
 assert ADAPTER.stat().st_mode & stat.S_IXUSR, "Copilot behavioral adapter must be executable"
 
