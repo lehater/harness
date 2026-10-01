@@ -596,33 +596,39 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
             "limitations": limitations or ["meta-test fixture"],
         }
 
-    def without_active_cap_baseline() -> dict[str, Any]:
-        value = copy.deepcopy(registry)
-        baseline = next(
-            item for item in value["evidence"]
-            if item["id"] == "EVID-CAP-FIRST-WAVE-TL1"
-        )
-        baseline["status"] = "ready"
-        return value
+    requirements_by_id = {
+        item["id"]: item for item in registry["requirements"]
+    }
+    cap_requirement = requirements_by_id["A05-R01"]
 
-    wrong_level = without_active_cap_baseline()
-    wrong_level["evidence"].append(candidate("META-WRONG-LEVEL", level="TL6"))
-    validate_structure(wrong_level)
-    assert "A05-R01" in assurance_report(wrong_level)["abilities"]["HA-A05"]["missing_requirements"]
+    wrong_level_candidate = candidate("META-WRONG-LEVEL", level="TL6")
+    wrong_level_reason = admissibility_reason(
+        wrong_level_candidate,
+        cap_requirement,
+    )
+    assert wrong_level_reason is not None and "test_level=" in wrong_level_reason
     passed.append("AR-M02")
 
-    weak_oracle = without_active_cap_baseline()
-    weak_oracle["evidence"].append(candidate("META-WEAK-ORACLE", oracle="O0"))
-    validate_structure(weak_oracle)
-    assert "A05-R01" in assurance_report(weak_oracle)["abilities"]["HA-A05"]["missing_requirements"]
+    weak_oracle_candidate = candidate("META-WEAK-ORACLE", oracle="O0")
+    weak_oracle_reason = admissibility_reason(
+        weak_oracle_candidate,
+        cap_requirement,
+    )
+    assert weak_oracle_reason is not None and "oracle_class=" in weak_oracle_reason
     passed.append("AR-M03")
 
-    wrong_execution = without_active_cap_baseline()
-    wrong_execution["evidence"].append(
-        candidate("META-WRONG-EXECUTION", execution="deterministic")
+    wrong_execution_candidate = candidate(
+        "META-WRONG-EXECUTION",
+        execution="deterministic",
     )
-    validate_structure(wrong_execution)
-    assert "A05-R01" in assurance_report(wrong_execution)["abilities"]["HA-A05"]["missing_requirements"]
+    wrong_execution_reason = admissibility_reason(
+        wrong_execution_candidate,
+        cap_requirement,
+    )
+    assert (
+        wrong_execution_reason is not None
+        and "execution_nature=" in wrong_execution_reason
+    )
     passed.append("AR-M04")
 
     missing_ref = copy.deepcopy(registry)
