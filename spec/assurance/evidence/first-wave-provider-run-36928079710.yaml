@@ -16,6 +16,23 @@ agent_descriptor:
   model_selection: provider-auto
   copilot_cli_version: "1.0.91"
   sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 1cdbbf15d426d4f549e4521abd948eff813ab1b4}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: 00fa1e91ed0d4a64186c6f4e4e467c142f59dfe8}
+    - {path: docs/design/core-v0.md, git_blob_sha: 03cde75282fb20f28705e4d24422efbc14238c85}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: 121a29f1861637d0331ab29ea0603fa459d3d101}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: c05eade2b2d37a750e9de357c732178f14087486}
+    - {path: behavioral_eval.py, git_blob_sha: 41f045a61796f6ba0b0321bcbc2be201bef871d3}
+    - {path: adapters/copilot_behavioral_eval_agent.py, git_blob_sha: cf36b5e8dfac6db4b5361962c2ce5ccb163f9610}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 6b59aa0061fea07384e5b830082115edf6f2ce65}
+currentness:
+  state: stale
+  reason: >-
+    Root AGENTS.md changed after this run, so the provider-visible instruction
+    context no longer matches the accepted execution exactly. The run remains
+    historical evidence for its recorded revision but is not current evidence.
 outcome:
   run_status: COMPLETED
   correctness: PASS

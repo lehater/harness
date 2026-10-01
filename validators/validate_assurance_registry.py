@@ -279,6 +279,50 @@ def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def _git_blob_sha(value: bytes) -> str:
+    header = f"blob {len(value)}\0".encode("ascii")
+    return hashlib.sha1(header + value).hexdigest()
+
+
+def _validate_execution_bindings(
+    run_record: dict[str, Any],
+    *,
+    root: Path,
+    evidence_id: str,
+) -> None:
+    bindings = run_record.get("execution_bindings")
+    if not isinstance(bindings, dict):
+        raise RegistryError(
+            f"{evidence_id}: provider run record requires execution_bindings"
+        )
+    files = _mapping_list(bindings.get("files"), f"{evidence_id} execution bindings")
+    if not files:
+        raise RegistryError(f"{evidence_id}: execution_bindings.files must be non-empty")
+    seen: set[str] = set()
+    for item in files:
+        path = item.get("path")
+        expected = item.get("git_blob_sha")
+        if not isinstance(path, str) or not path:
+            raise RegistryError(f"{evidence_id}: execution binding path is required")
+        if path in seen:
+            raise RegistryError(f"{evidence_id}: duplicate execution binding {path}")
+        seen.add(path)
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{40}", expected):
+            raise RegistryError(
+                f"{evidence_id}: invalid git_blob_sha for execution binding {path}"
+            )
+        target = root / path
+        if not target.is_file():
+            raise RegistryError(
+                f"{evidence_id}: missing execution-bound file {path}"
+            )
+        actual = _git_blob_sha(target.read_bytes())
+        if actual != expected:
+            raise RegistryError(
+                f"{evidence_id}: execution binding is stale for {path}"
+            )
+
+
 def _validate_provider_run_binding(
     evidence_item: dict[str, Any],
     root: Path,
@@ -305,6 +349,11 @@ def _validate_provider_run_binding(
         raise RegistryError(f"{evidence_id}: invalid provider run record kind")
     if run_record.get("status") != "accepted":
         raise RegistryError(f"{evidence_id}: provider run record is not accepted")
+    _validate_execution_bindings(
+        run_record,
+        root=root,
+        evidence_id=evidence_id,
+    )
     revision = run_record.get("harness_revision")
     if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise RegistryError(f"{evidence_id}: invalid provider run revision")
@@ -502,14 +551,20 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
 
     report = assurance_report(registry)
     assert report["summary"]["release_claim_ready"] is False
-    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == ["A04-R01"]
-    assert report["abilities"]["HA-A04"]["missing_requirements"] == ["A04-R02", "A04-R03"]
-    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == ["A05-R01"]
-    assert report["abilities"]["HA-A05"]["missing_requirements"] == ["A05-R02", "A05-R03"]
+    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == []
+    assert report["abilities"]["HA-A04"]["missing_requirements"] == [
+        "A04-R01", "A04-R02", "A04-R03"
+    ]
+    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == []
+    assert report["abilities"]["HA-A05"]["missing_requirements"] == [
+        "A05-R01", "A05-R02", "A05-R03"
+    ]
     assert set(report["abilities"]["HA-A16"]["satisfied_requirements"]) == {
-        "A16-R01", "A16-R02", "A16-R03", "A16-R04"
+        "A16-R02", "A16-R03", "A16-R04"
     }
-    assert report["abilities"]["HA-A16"]["missing_requirements"] == ["A16-R05", "A16-R06"]
+    assert report["abilities"]["HA-A16"]["missing_requirements"] == [
+        "A16-R01", "A16-R05", "A16-R06"
+    ]
     passed.append("AR-M01")
 
     def candidate(
@@ -623,6 +678,28 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     assert "A19-R01" in limited_report["abilities"]["HA-A19"]["satisfied_requirements"]
     assert "A19-R03" in limited_report["abilities"]["HA-A19"]["missing_requirements"]
     passed.append("AR-M08")
+
+    stale_binding = {
+        "execution_bindings": {
+            "files": [
+                {
+                    "path": "AGENTS.md",
+                    "git_blob_sha": "0" * 40,
+                }
+            ]
+        }
+    }
+    try:
+        _validate_execution_bindings(
+            stale_binding,
+            root=ROOT,
+            evidence_id="META-STALE-PROVIDER-BINDING",
+        )
+    except RegistryError as exc:
+        assert "execution binding is stale" in str(exc)
+    else:
+        raise AssertionError("AR-M09 stale provider execution binding was accepted")
+    passed.append("AR-M09")
 
     return passed
 

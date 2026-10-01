@@ -325,9 +325,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Provider-visible root AGENTS.md changed after run 36928079710; current prompt binding is stale.
       - Accepted provider-backed run 36928079710 covers TD-CAP-001..004 at TL1 with exact fixture/oracle bindings.
       - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
       - Does not establish Reference-vocabulary/novel-Capability or repeated clean-context proof.
@@ -350,9 +351,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Provider-visible root AGENTS.md changed after run 36928079710; current prompt binding is stale.
       - Accepted provider-backed run 36928079710 covers TD-AUTH-001/002/004 at TL1 with exact fixture/oracle bindings.
       - Does not establish joint-ownership/Reference-bias or repeated clean-context proof.
 
@@ -374,9 +376,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Provider-visible root AGENTS.md changed after run 36928079710; current prompt binding is stale.
       - Accepted provider-backed run 36928079710 covers TD-ROUTE-001..003 natural-language intent at TL1.
       - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
 

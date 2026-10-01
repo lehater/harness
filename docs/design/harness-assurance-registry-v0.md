@@ -54,19 +54,20 @@ obligations. HA-A05 is split into separate TL1 discovery/granularity, TL3
 Reference-vocabulary/novel-Capability, and TL4 clean-context convergence proof
 slots.
 
-The first-wave TL1 judgement evidence is now admitted from provider-backed run
-`36928079710`. Its durable repository record is
-`spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`. Active
-judgement evidence names the exact case subset it satisfies, and registry
-validation re-hashes the current rendered case, fixture, and oracle against the
-accepted run bindings. A later fixture/oracle/template change therefore makes
-the old run stale instead of silently preserving coverage.
+Provider-backed run `36928079710` is preserved as durable historical
+evidence in
+`spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`.
+Provider-backed evidence is bound not only to case/fixture/oracle content but
+also to the provider-visible instruction surfaces and execution files that
+formed the run. Registry validation compares those Git blob identities with the
+current repository before active judgement evidence can satisfy a proof slot.
 
-The admitted run satisfies A04-R01, A05-R01, and A16-R01 only. Existing
-deterministic routing evidence separately satisfies A16-R02..R04. A04-R02/R03,
-A05-R02/R03, and A16-R05/R06 remain missing, so registry validity remains
-separate from release-claim completeness and `release_claim_ready` remains
-false.
+The root `AGENTS.md` changed after run `36928079710`, so its first-wave
+evidence records are currently `stale`. They no longer satisfy A04-R01,
+A05-R01, or A16-R01 until the reviewed cases are repeated under the current
+instruction/runtime bindings. Existing deterministic routing evidence still
+satisfies A16-R02..R04. Registry validity therefore remains separate from
+release-claim completeness and `release_claim_ready` remains false.
 
 ## Core model
 
