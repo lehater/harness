@@ -48,15 +48,25 @@ The reviewed minimum implementation is:
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
 - `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M08 meta-self-tests.
 
-The seed is intentionally incomplete. It now includes HA-A04 Authority
-formation, HA-A05 Capability formation, HA-A16 routing, and HA-A19 assurance
-self-test obligations. HA-A05 is split into separate TL1 discovery/granularity,
-TL3 Reference-vocabulary/novel-Capability, and TL4 clean-context convergence
-proof slots. First-wave judgement execution surfaces are registered as
-`ready`, which is deliberately non-admissible until accepted provider-backed
-run records exist. Existing deterministic routing evidence is mapped only to
-deterministic A16 proof slots. Registry validity therefore remains separate from
-release-claim completeness.
+The seed is intentionally incomplete. It includes HA-A04 Authority formation,
+HA-A05 Capability formation, HA-A16 routing, and HA-A19 assurance self-test
+obligations. HA-A05 is split into separate TL1 discovery/granularity, TL3
+Reference-vocabulary/novel-Capability, and TL4 clean-context convergence proof
+slots.
+
+The first-wave TL1 judgement evidence is now admitted from provider-backed run
+`36928079710`. Its durable repository record is
+`spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`. Active
+judgement evidence names the exact case subset it satisfies, and registry
+validation re-hashes the current rendered case, fixture, and oracle against the
+accepted run bindings. A later fixture/oracle/template change therefore makes
+the old run stale instead of silently preserving coverage.
+
+The admitted run satisfies A04-R01, A05-R01, and A16-R01 only. Existing
+deterministic routing evidence separately satisfies A16-R02..R04. A04-R02/R03,
+A05-R02/R03, and A16-R05/R06 remain missing, so registry validity remains
+separate from release-claim completeness and `release_claim_ready` remains
+false.
 
 ## Core model
 
