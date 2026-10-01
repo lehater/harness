@@ -131,6 +131,11 @@ The public `addyosmani/agent-skills` repository uses structural, routing and
 behavioral skill evals. Harness already has Scenario Suite infrastructure that
 can provide the project-specific side of this idea.
 
+AUD-012 confirmed the remaining boundary: current Scenario Suite cases marked
+`execution_type: agent-evaluation` feed synthetic/structured evidence into
+deterministic Harness drivers. They do not execute a real agent from
+`AGENTS.md -> skill_router -> SKILL.md` and grade its observable trace/artifact.
+
 **Not a defect**
 
 Harness may remain functionally correct without agent-execution evals. This is

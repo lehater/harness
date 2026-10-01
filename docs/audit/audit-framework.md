@@ -42,7 +42,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-11 | Minimality / necessity | Does every derived layer add information without creating parallel truth? | COVERED | AUD-006 |
 | AP-12 | Adversarial model cases | Do multiple providers, stale evidence, conflicting Questions and reordered operations remain safe? | COVERED | AUD-003 |
 | AP-13 | Instruction ownership / routing | Does every instruction/procedure have one owner and deterministic discovery? | COVERED | AUD-010 |
-| AP-14 | Empirical agent behavior | Does a real agent select and execute the intended route/skill under representative tasks? | UNASSESSED | — |
+| AP-14 | Empirical agent behavior | Does a real agent select and execute the intended route/skill under representative tasks? | PARTIAL | AUD-012 |
 | AP-15 | Observability / diagnosability | Can a maintainer explain why a route/state/action was produced from available evidence? | UNASSESSED | — |
 | AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | live-calibration contracts |
 | AP-17 | Security / trust boundaries | Can repository content, tool output or prompt injection cross an authority/tool trust boundary? | COVERED | AUD-011 |
@@ -76,6 +76,7 @@ Do not rerun every perspective after every change.
 | AUD-009 | 2026-10-01 | CI policy enforcement and post-correction verification | Verified HARN-H03/H04/H05 corrections. |
 | AUD-010 | 2026-10-01 | AP-13 instruction ownership/routing and operation composition | First `audit-harness` run found HARN-021: internal-route parent authorization is declared but not enforced by runtime routing. Existing composite operation naming itself is compatible with the new contract when rerouted by operation id. |
 | AUD-011 | 2026-10-01 | AP-17 security / trust boundaries | Existing provider/external-execution paths contain useful fail-closed controls, but HARN-022 records the missing general instruction-vs-data trust boundary for project content/tool evidence consumed by agents. HARN-H01 remains the separate known filesystem-output safety issue. |
+| AUD-012 | 2026-10-01 | AP-14 empirical agent behavior | Reused EVO-001. Current Scenario Suite `agent-evaluation` cases validate synthetic/structured agentic evidence and deterministic boundaries; they do not execute an agent that discovers a route, reads the selected `SKILL.md`, acts on a fixture and is graded on the resulting trace/artifact. No new defect ID allocated. |
 
 ## Finding handoff contract
 
