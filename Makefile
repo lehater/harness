@@ -23,8 +23,6 @@ harness-check:
 	python validators/validate_instruction_ownership.py
 	python validators/validate_skill_router.py
 	python validators/validate_fresh_context_routing.py
-	python validators/validate_consumer_pack.py
-	python validators/validate_consumer_wrapper.py
 	python validators/validate_method_router.py
 	python validators/validate_source_coverage.py
 	python validators/validate_user_facing_application.py
@@ -62,6 +60,10 @@ harness-check:
 	python validators/validate_semantic_admission.py
 	python validators/validate_semantic_question_loop.py
 	python validators/validate_semantic_closure.py
+	python validators/validate_harness.py
+	python -m unittest tests/test_lifecycle_experiment.py
+	python validators/validate_consumer_pack.py
+	python validators/validate_consumer_wrapper.py
 	python validators/validate_scenario_suite.py
 	python validators/validate_live_calibration_process_driver.py
 	python validators/validate_copilot_live_calibration_evaluator.py

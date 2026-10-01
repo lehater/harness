@@ -21,6 +21,8 @@ full_gate:
   command: make harness-check
   policy_first_command: python validators/validate_ci_policy.py
 workflow_roles:
+- path: .github/workflows/ci-policy.yml
+  role: focused
 - path: .github/workflows/harness.yml
   role: exhaustive
 - path: .github/workflows/greenfield-engineering-graph.yml
@@ -355,9 +357,9 @@ checks:
   command: python validators/validate_harness.py
   stage: focused
   cost_class: cheap
-  disposition: unresolved
+  disposition: full_gate
 - id: lifecycle_experiment
   command: python -m unittest tests/test_lifecycle_experiment.py
   stage: focused
   cost_class: cheap
-  disposition: unresolved
+  disposition: full_gate

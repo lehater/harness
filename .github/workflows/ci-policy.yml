@@ -1,0 +1,32 @@
+name: CI policy
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "docs/design/ci-execution-policy-v0.md"
+      - "spec/ci/**"
+      - "validators/validate_ci_policy.py"
+      - "Makefile"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - "docs/design/ci-execution-policy-v0.md"
+      - "spec/ci/**"
+      - "validators/validate_ci_policy.py"
+      - "Makefile"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install PyYAML
+      - run: python validators/validate_ci_policy.py

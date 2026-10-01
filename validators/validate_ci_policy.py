@@ -165,6 +165,11 @@ def main() -> int:
             errors.append(f"CI-P04 unresolved check disposition: {check_id}")
         if cost in {"medium", "heavy"} and not str(check.get("rationale", "")).strip():
             errors.append(f"CI-P05 {cost} check {check_id} requires rationale")
+        if stage in {"policy", "focused"} and cost in {"medium", "heavy"}:
+            errors.append(
+                f"CI-P05 early-stage check {check_id} must be cheap; "
+                f"found {cost} in {stage}"
+            )
         if disposition == "standalone" and not str(check.get("rationale", "")).strip():
             errors.append(f"CI-P04 standalone check {check_id} requires rationale")
         path = referenced_python_path(command)
@@ -242,12 +247,16 @@ def main() -> int:
         errors.append("CI-P04 workflow_roles must be a list")
         roles = []
 
+    registered_workflows: set[str] = set()
+
     for entry in roles:
         if not isinstance(entry, dict):
             errors.append("CI-P04 workflow role entry must be a mapping")
             continue
         relative = str(entry.get("path", ""))
         role = str(entry.get("role", ""))
+        if relative:
+            registered_workflows.add(relative)
         if role not in VALID_ROLES:
             errors.append(f"CI-P04 workflow {relative} has unknown role: {role}")
             continue
@@ -300,6 +309,16 @@ def main() -> int:
                     "CI-P08 external workflow must be workflow_dispatch-only: "
                     f"{relative} has {sorted(event_names)}"
                 )
+
+    discovered_workflows = {
+        str(path.relative_to(ROOT))
+        for pattern in (".github/workflows/*.yml", ".github/workflows/*.yaml")
+        for path in ROOT.glob(pattern)
+    }
+    for relative in sorted(discovered_workflows - registered_workflows):
+        errors.append(f"CI-P04 workflow is unregistered: {relative}")
+    for relative in sorted(registered_workflows - discovered_workflows):
+        errors.append(f"CI-P04 registered workflow does not exist: {relative}")
 
     if errors:
         print("Harness CI policy validation failed:")

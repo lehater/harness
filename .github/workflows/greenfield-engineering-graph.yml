@@ -7,6 +7,7 @@ on:
       - ".github/workflows/greenfield-engineering-graph.yml"
       - "engineering_graph.py"
   push:
+    branches: [main]
     paths:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"
