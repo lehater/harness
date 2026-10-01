@@ -50,6 +50,12 @@ Ability-to-Evidence model
 tests / validators / scenarios / eval protocols
     provide concrete evidence
 
+Agent Behavioral Evaluation Protocol
+    owns clean-context execution/normalization for judgement-dependent agent evidence
+
+Assurance Registry
+    will project Ability requirements and evidence refs into a machine-checkable denominator
+
 CI Execution Policy
     owns when registered deterministic evidence executes
 ~~~
@@ -59,6 +65,12 @@ owners of future testing policy.
 
 Provider-backed semantic assurance additionally follows
 `spec/assurance/llm-execution-policy-v1.yaml`.
+
+Judgement-dependent whole-agent evidence follows
+`docs/design/harness-agent-behavioral-evaluation-v0.md`.
+
+The future machine-readable assurance denominator follows
+`docs/design/harness-assurance-registry-v0.md`.
 
 ## Normative principles
 
