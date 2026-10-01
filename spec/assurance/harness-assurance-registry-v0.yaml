@@ -18,6 +18,24 @@ abilities:
       - A19-R01
       - A19-R02
 
+  - id: HA-A04
+    title: Authority boundary formation
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: judgement-dependent
+    failure_modes:
+      - A04-F01
+      - A04-F02
+      - A04-F03
+      - A04-F04
+      - A04-F05
+      - A04-F06
+    requirements:
+      - A04-R01
+      - A04-R02
+      - A04-R03
+
   - id: HA-A05
     title: Capability discovery and granularity
     contract_ref:
@@ -37,6 +55,29 @@ abilities:
       - A05-R01
       - A05-R02
       - A05-R03
+
+  - id: HA-A16
+    title: Agent/method/artifact routing
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A16-F01
+      - A16-F02
+      - A16-F03
+      - A16-F04
+      - A16-F05
+      - A16-F06
+      - A16-F07
+      - A16-F08
+    requirements:
+      - A16-R01
+      - A16-R02
+      - A16-R03
+      - A16-R04
+      - A16-R05
+      - A16-R06
 
 requirements:
   - id: A19-R01
@@ -64,6 +105,48 @@ requirements:
       methods_any: [EM-14]
       oracle_minimum: O1
       judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A04-R01
+    ability: HA-A04
+    failure_modes: [A04-F01, A04-F02, A04-F04]
+    purpose: Isolated synthetic Authority split/merge and irrelevant-layout partition judgement.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-05]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A04-R02
+    ability: HA-A04
+    failure_modes: [A04-F03, A04-F05]
+    purpose: Authority overlap/joint-ownership and Reference-vocabulary bias falsification.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-05]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A04-R03
+    ability: HA-A04
+    failure_modes: [A04-F06]
+    purpose: Repeated clean-context Authority-partition convergence.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
     substitution:
       higher_level_alone_allowed: false
     release_applicable: true
@@ -119,6 +202,90 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A16-R01
+    ability: HA-A16
+    failure_modes: [A16-F01]
+    purpose: Natural-language task intent selects the intended public operation.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A16-R02
+    ability: HA-A16
+    failure_modes: [A16-F02]
+    purpose: Internal operation authorization is enforced by the deterministic typed router.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A16-R03
+    ability: HA-A16
+    failure_modes: [A16-F03, A16-F04]
+    purpose: Explicit method and artifact keys route deterministically to the registered skill surfaces.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A16-R04
+    ability: HA-A16
+    failure_modes: [A16-F05, A16-F06]
+    purpose: Actionability and prerequisite boundaries constrain CREATE-to-skill composition.
+    required:
+      test_levels: [TL2]
+      methods_any: [EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A16-R05
+    ability: HA-A16
+    failure_modes: [A16-F07]
+    purpose: Project/tool payload cannot acquire instruction authority or change the selected route.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-05, EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A16-R06
+    ability: HA-A16
+    failure_modes: [A16-F08]
+    purpose: Same frozen task converges on the same public operation across clean contexts.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
 evidence:
   - id: EVID-ASSURE-REGISTRY-SELFTEST
     providers:
@@ -160,3 +327,99 @@ evidence:
     limitations:
       - The executable cases and provider boundary exist, but no accepted provider-backed run record is registered yet.
       - This evidence slot covers TD-CAP-001..004 only and does not establish Reference-vocabulary/novel-Capability or repeated-run proof.
+
+  - id: EVID-AUTH-FIRST-WAVE-TL1
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+    satisfies: [A04-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    status: ready
+    verified_at_revision: null
+    limitations:
+      - Covers TD-AUTH-001/002/004 execution surfaces; no accepted provider-backed run record exists yet.
+      - Does not establish joint-ownership/Reference-bias or repeated clean-context proof.
+
+  - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+    satisfies: [A16-R01]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    status: ready
+    verified_at_revision: null
+    limitations:
+      - Covers TD-ROUTE-001..003 execution surfaces; no accepted provider-backed task-intent run exists yet.
+      - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
+
+  - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
+    providers:
+      - validators/validate_skill_router.py
+    source_refs:
+      - path: validators/validate_skill_router.py
+      - path: skills/consumer-operation-registry-v0.yaml
+    satisfies: [A16-R02]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves explicit operation-id authorization only; it does not prove task-intent recognition.
+
+  - id: EVID-A16-METHOD-ARTIFACT-ROUTING
+    providers:
+      - validators/validate_method_router.py
+      - validators/validate_skill_router.py
+    source_refs:
+      - path: validators/validate_method_router.py
+      - path: validators/validate_skill_router.py
+      - path: skills/consumer-method-registry-v0.yaml
+      - path: skills/artifact-skill-registry-v0.yaml
+    satisfies: [A16-R03]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves explicit concern/knowledge-kind routing, not natural-language operation selection.
+
+  - id: EVID-A16-ACTIONABILITY-GROUPING
+    providers:
+      - validators/validate_agent_router.py
+    source_refs:
+      - path: validators/validate_agent_router.py
+      - path: agent_router.py
+    satisfies: [A16-R04]
+    test_level: TL2
+    methods: [EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves deterministic WAIT suppression and prerequisite-sensitive CREATE grouping after semantic graph inputs already exist.
