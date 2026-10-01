@@ -1,0 +1,110 @@
+version: 1
+kind: harness-assurance-registry
+id: HARNESS-ASSURANCE-REGISTRY-V0
+status: initial-seed
+policy: docs/design/harness-assurance-policy-v0.md
+semantic_owner: docs/design/harness-ability-to-evidence-v0.md
+
+abilities:
+  - id: HA-A19
+    title: CI and validation execution policy
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A19-F06
+    requirements:
+      - A19-R01
+      - A19-R02
+
+  - id: HA-A05
+    title: Capability discovery and granularity
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: judgement-dependent
+    failure_modes:
+      - A05-F01
+      - A05-F02
+      - A05-F03
+      - A05-F04
+      - A05-F05
+      - A05-F06
+      - A05-F07
+      - A05-F08
+    requirements:
+      - A05-R01
+
+requirements:
+  - id: A19-R01
+    ability: HA-A19
+    failure_modes:
+      - A19-F06
+    purpose: Ability denominator detects missing required evidence independently from executable-test inventory.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-14]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A19-R02
+    ability: HA-A19
+    failure_modes:
+      - A19-F06
+    purpose: Evidence references expose level, method, oracle, execution nature, status, provenance, and limitations.
+    required:
+      test_levels: [TL0, TL1]
+      methods_any: [EM-14]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A05-R01
+    ability: HA-A05
+    failure_modes:
+      - A05-F01
+      - A05-F02
+      - A05-F03
+      - A05-F04
+      - A05-F05
+      - A05-F06
+      - A05-F07
+      - A05-F08
+    purpose: Isolated synthetic Capability formation and granularity falsification.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-05]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+evidence:
+  - id: EVID-ASSURE-REGISTRY-SELFTEST
+    providers:
+      - validators/validate_assurance_registry.py
+    source_refs:
+      - path: validators/validate_assurance_registry.py
+      - path: spec/assurance/harness-assurance-registry-v0.yaml
+    satisfies:
+      - A19-R01
+      - A19-R02
+    test_level: TL1
+    methods: [EM-14]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves registry denominator/provenance semantics only; it does not provide Capability-formation behavioral evidence.

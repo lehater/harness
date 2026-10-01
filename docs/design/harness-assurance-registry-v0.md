@@ -1,6 +1,6 @@
 # Harness Assurance Registry Design v0
 
-Status: canonical assurance design; machine-readable registry not implemented.
+Status: canonical assurance design; initial machine-readable seed implemented.
 
 ## Purpose
 
@@ -40,6 +40,18 @@ CI Policy
 
 The registry must not become a second independent semantic owner for ability
 definitions.
+
+## Implemented initial seed
+
+The reviewed minimum implementation is:
+
+- `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
+- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M08 meta-self-tests.
+
+The seed is intentionally incomplete: it includes a release-critical HA-A05 proof
+slot with no admissible evidence until the reviewed formation evaluations are
+implemented. Registry validity therefore remains separate from release-claim
+completeness.
 
 ## Core model
 
@@ -361,9 +373,7 @@ means is not allowed.
 
 This design does not:
 
-- implement the YAML registry;
-- choose its final file path;
-- add a validator;
+- mechanically encode every human-readable Ability/failure statement in the initial seed;
 - automatically classify arbitrary tests;
 - treat test counts as coverage;
 - require every ability to have the same levels/methods;
@@ -371,12 +381,9 @@ This design does not:
 
 ## Implementation gate
 
-Do not implement the machine-readable registry until the current Test Design
-Catalog review has identified:
+The initial implementation gate is satisfied by the reviewed Test Design
+Catalog and the smallest useful registry seed. Expansion remains gated by the
+same rule: add only reviewed Ability/failure/evidence relationships and map
+existing evidence before introducing new proof infrastructure.
 
-- which designs are already satisfied by existing evidence;
-- which requirements remain genuinely missing;
-- the smallest useful registry seed.
-
-The first registry should encode only reviewed ability/failure/evidence
-relationships, not mechanically transcribe every prose line.
+Do not mechanically transcribe every prose line into the registry.

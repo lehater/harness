@@ -1735,7 +1735,9 @@ an integration candidate.
 **Methods:** EM-14  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `validators/validate_assurance_registry.py`
 
 Fixture:
 
@@ -1756,7 +1758,9 @@ correctness denominator.
 **Methods:** EM-14  
 **Minimum level:** TL0-TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `validators/validate_assurance_registry.py`
 
 Expected result:
 

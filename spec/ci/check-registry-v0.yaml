@@ -46,6 +46,11 @@ checks:
   stage: policy
   cost_class: cheap
   disposition: full_gate
+- id: assurance_registry
+  command: python validators/validate_assurance_registry.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: context_boundaries
   command: python validators/validate_context_boundaries.py
   stage: focused
