@@ -44,6 +44,8 @@ Non-defect recommendations, research questions and optional future directions be
 | HARN-014 | P1 | OPEN | Graph evolution / migration | Capability Lifecycle fails hard when a previously tracked CapabilityId disappears from a revised Engineering Graph. Generic project graph rename/split/merge has no canonical migration/reconciliation path: an old lifecycle row becomes an exception instead of an explicit obsolete/migrate state, while the new Capability can independently appear as CREATE. | `capability_lifecycle.py::validate_projection`; rename/split/merge handling exists only in Reference Model evolution research, not the ordinary project Engineering Graph lifecycle. |
 | HARN-015 | P0 | OPEN | Decision failure state | `FAILED_VALIDATION` is declared a terminal Decision Pipeline outcome but is not an input to the roadmap and has no persisted derived state. Recomputing after failure exposes the same missing/noncurrent capability as READY again. The documented instruction to explicitly redo is impossible for failed CREATE because `decision_pipeline.py` rejects `--redo` when no current provider exists. | `decision_pipeline.py` terminal outcomes, redo branch and `explicit redo requires current provider`; no scenario currently covers FAILED_VALIDATION replay. |
 | HARN-016 | P1 | IN_PROGRESS | DDD bounded contexts | Harness runtime modules have no enforced bounded-context ownership, allowing domain contexts to depend on orchestration/integration internals. DDD audit found three concrete import inversions: Coverage -> Integration, Coverage -> Application, and Decision -> mixed application request builder. A machine-readable context map and ratchet validator now prevent additional violations while these three are removed. | `spec/architecture/harness-context-map-v0.yaml`, `validators/validate_context_boundaries.py`, `docs/audit/harness-ddd-context-map.md`. |
+| HARN-017 | P1 | OPEN | Agent skill routing | Active `skills/agent/**` have no machine-readable routing/precedence contract. `AGENTS.md` manually selects some workflows, while `bootstrap-existing-project` and `project-bootstrap-reconcile` overlap for absent/unknown existing-project Harness state. `validate_agent_layer.py` validates shape only and cannot detect routing overlap. A new agent therefore has more than one plausible startup procedure and must synthesize precedence from prose. | `AGENTS.md` Consumer startup; `skills/agent/bootstrap-existing-project/SKILL.md`; `skills/agent/project-bootstrap-reconcile/SKILL.md`; `validators/validate_agent_layer.py`. |
+| HARN-018 | P1 | OPEN | Skill lifecycle / discovery | Repository docs declare `skills/core/**`, `skills/ddd/**` and `skills/software-product/**` retained pre-Core/inactive, but those paths still contain ordinary `SKILL.md` files with valid frontmatter and no machine-readable inactive/quarantine mechanism. A consumer that discovers procedures from the `SKILL.md` surface can treat obsolete workflows as active and bypass the v0 agent layer. | `README.md` and `AGENTS.md` active-layer declarations versus legacy `skills/**/SKILL.md`; active validators ignore those namespaces rather than making them undiscoverable. |
 
 ## Deferred hardening findings
 
@@ -72,6 +74,7 @@ Each substantial audit should explicitly cover one or more of these perspectives
 10. **Portability** — the same semantics must work for greenfield, mature legacy, multi-consumer and partially modeled repositories.
 11. **Minimality / necessity** — derived layers must add information not already represented elsewhere and must not create parallel truth.
 12. **Adversarial model cases** — multiple providers, multi-capability artifacts, stale evidence, partial projections, conflicting Questions, reordered operations.
+13. **Instruction ownership / skill routing** — always-on rules, task procedures, canonical policies and inactive guidance must have one explicit owner and deterministic discovery/routing.
 
 ## Audit runs
 
@@ -81,6 +84,7 @@ Each substantial audit should explicitly cover one or more of these perspectives
 | AUD-002 | 2026-10-01 | Replay/idempotence, grouped work, contract evolution, end-to-end persistence, hidden same-Authority dependencies | Added HARN-009..013 and additional evidence to HARN-002/HARN-007. |
 | AUD-003 | 2026-10-01 | Graph evolution and Decision Pipeline failure/retry semantics | Added HARN-014..015. |
 | AUD-004 | 2026-10-01 | Strategic/tactical DDD decomposition of Harness itself, bounded contexts and dependency direction | Added HARN-016, refined HARN-007/HARN-008, and established a machine-enforced context-map ratchet. |
+| AUD-005 | 2026-10-01 | Instruction ownership, skill routing, discovery lifecycle and procedural duplication | Added HARN-017..018; captured AGENTS/workbench/artifact-skill scaling work in EVO-021..026 and an active migration plan. |
 
 ## Audit protocol
 

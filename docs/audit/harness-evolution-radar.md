@@ -81,6 +81,12 @@ separate defect has been demonstrated.
 | EVO-018 | RECOMMENDATION | CAPTURED | Skill identity | Treat published skill names/identities as compatibility contracts and require explicit alias/migration handling when renamed. |
 | EVO-019 | RESEARCH | CAPTURED | Reference vs Coverage | Test the target ownership rule: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. |
 | EVO-020 | IDEA | CAPTURED | Context lifecycle | Define restartable agent-session boundaries from durable project artifacts so long-running work can resume without conversation history becoming project truth. |
+| EVO-021 | RECOMMENDATION | VALIDATED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
+| EVO-022 | RESEARCH | INVESTIGATING | Agent routing | Add an explicit registry/router and overlap tests for `skills/agent/**`; keep artifact routing deterministic by `knowledge_kind`. |
+| EVO-023 | RECOMMENDATION | VALIDATED | Root instructions | Shrink `AGENTS.md` to always-on invariants, bootstrap/routing rules and minimal navigation; remove task-specific workflows from it. |
+| EVO-024 | RESEARCH | CAPTURED | Artifact skills | Pilot a common artifact-production procedure so artifact skills carry domain-specific deltas instead of repeating generic registration/projection/acceptance mechanics. |
+| EVO-025 | RECOMMENDATION | VALIDATED | Skill lifecycle | Quarantine or migrate inactive pre-Core `SKILL.md` files so discovery surfaces expose only active skills. |
+| EVO-026 | RECOMMENDATION | CAPTURED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
 
 ## Detailed entries
 
@@ -805,3 +811,110 @@ Useful sources include:
 - recurring agent mistakes not enforceable by current deterministic contracts;
 - opportunities to delete or simplify a Harness abstraction;
 - evidence that a research layer is mature enough for canonicalization.
+
+
+---
+
+### EVO-021 — Instruction ownership hierarchy
+
+**Type:** RECOMMENDATION  
+**Status:** VALIDATED
+
+Adopt one scalable ownership chain:
+
+```text
+AGENTS.md       = always-on repository invariants + bootstrap
+agent router    = choose the applicable workflow
+SKILL.md        = executable task procedure
+canonical spec  = semantic/normative source of truth
+README          = human-facing summary/projection
+```
+
+A skill consumes canonical policy; it does not become a second policy owner.
+AUD-005 found concrete routing ambiguity where this ownership is currently
+distributed. The hierarchy itself is an architecture recommendation; HARN-017
+tracks the demonstrated defect.
+
+### EVO-022 — Agent-skill registry and routing evaluation
+
+**Type:** RESEARCH  
+**Status:** INVESTIGATING
+
+Introduce a machine-readable registry for active `skills/agent/**` with stable
+identity, trigger class, exclusions and explicit precedence/composition where
+needed. Add positive/negative/overlap routing fixtures.
+
+Use project startup as the first collision case. Artifact-production routing
+remains deterministic through `knowledge_kind -> skill`; do not replace that
+with lexical routing.
+
+Related: HARN-017, EVO-004, EVO-017.
+
+### EVO-023 — Minimal root AGENTS
+
+**Type:** RECOMMENDATION  
+**Status:** VALIDATED
+
+Keep root `AGENTS.md` for information required before task classification:
+repository-wide safety/workflow invariants, truth-boundary invariants and the
+instruction to discover/apply the active routed skill.
+
+Move task-specific audit capture, project startup, Scenario Suite change
+procedure and similar workflows into routed skills. This is progressive
+disclosure, not merely shortening the file.
+
+### EVO-024 — Common artifact-production procedure
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+AUD-005 found `Human projection` in 45 artifact skills, registration-related
+text in 41, and semantic-acceptance references in at least 23.
+
+Test whether generic mechanics can be expressed once:
+
+```text
+common artifact procedure:
+  candidate lifecycle
+  generic Question discipline
+  semantic-admission handoff
+  registration semantics
+  human projection rules
+
+artifact-specific skill:
+  inputs/read boundary
+  judgement procedure
+  stop conditions
+  output contract
+  domain-specific acceptance
+```
+
+Pilot only on `product-requirements`, `domain-model` and
+`verification-strategy` first. Self-contained repetition may still win; let
+behavioral evidence decide.
+
+### EVO-025 — Quarantine inactive skills
+
+**Type:** RECOMMENDATION  
+**Status:** VALIDATED
+
+Inactive procedures should not remain indistinguishable from active
+`SKILL.md` discovery. Classify legacy skills as promote/archive/delete. Move
+historical material to non-executable documentation form; promote only skills
+with an active consumer and registry entry.
+
+Related defect: HARN-018.
+
+### EVO-026 — README/workbench ownership discipline
+
+**Type:** RECOMMENDATION  
+**Status:** CAPTURED
+
+Keep `README.md` as product explanation and links. Keep
+`agent-artifact-workbench-v0.md` focused on Application-layer concepts,
+invariants and boundaries. Put operational sequences, stop conditions and
+checklists in routed skills. Keep normative domain rules in their canonical
+design/spec owners.
+
+The goal is not to delete examples, but to remove independently maintained
+copies of the same executable procedure.
