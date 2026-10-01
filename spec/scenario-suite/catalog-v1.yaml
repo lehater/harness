@@ -408,6 +408,12 @@ requirements:
     description: Internal operations resolve only when the runtime caller supplies a registered public parent authorized by the target route's invoked_by contract.
     min_scenarios: 1
 
+  - id: instruction-data-trust-boundary
+    category: agent
+    enforcement: required
+    description: Every routed agent procedure exposes the canonical instruction trust contract so project/tool payloads cannot become instruction authority merely through their content.
+    min_scenarios: 1
+
   - id: skill-invariant-policy
     category: agent
     enforcement: required

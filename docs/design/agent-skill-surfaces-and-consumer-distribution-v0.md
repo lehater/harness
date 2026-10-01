@@ -313,6 +313,11 @@ A Consumer Pack contains the same router but not the Maintainer Operation
 Registry, so maintainer operations are structurally unavailable in a target
 repository.
 
+Every successful route also exposes the canonical `instruction_contracts`
+required before project/tool payloads are consumed. This keeps the repository-
+wide content trust boundary identical on the Maintainer and Consumer surfaces
+without copying the rule into every skill.
+
 Internal Consumer operations (for example `bootstrap-existing-project`) are not
 public route entries and require explicit composition allowance from a public
 operation.

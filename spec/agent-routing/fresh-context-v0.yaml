@@ -6,6 +6,7 @@ semantics:
   - Natural-language intent recognition belongs to the agent/model layer and is not proven by this deterministic fixture.
   - These cases prove that once a fresh agent identifies repository context and route class, Harness exposes one declared executable procedure.
   - Maintainer and Consumer surfaces are tested as different physical environments.
+  - Every successful route exposes the canonical instruction trust contract before project/tool payloads are consumed.
 
 cases:
   - id: maintainer-record-defect

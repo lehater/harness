@@ -22,6 +22,8 @@ REQUIRED_BOOTSTRAP_MARKERS = (
     "skills/artifact-skill-registry-v0.yaml",
     "skill_router.py",
     "Do not reconstruct task-specific procedures from this file.",
+    "instruction_contracts",
+    "canonical instruction trust boundary",
     "Never push or commit changes directly to",
 )
 
@@ -50,6 +52,22 @@ def main() -> int:
     for relative in CANONICAL_POLICY_FILES:
         if not (ROOT / relative).is_file():
             errors.append(f"canonical policy/contract missing: {relative}")
+
+    instruction_architecture = (
+        ROOT / "docs/design/agent-instruction-architecture-v0.md"
+    ).read_text(encoding="utf-8")
+    for marker in (
+        "## Content trust boundary",
+        "delivery channel and registered",
+        "data/evidence by default",
+        "tool/provider results",
+        "instruction_contracts",
+    ):
+        if marker not in instruction_architecture:
+            errors.append(
+                "agent instruction architecture missing trust-boundary marker: "
+                + marker
+            )
 
     for forbidden_detail in (
         "use GPT-6 Luna as the default",

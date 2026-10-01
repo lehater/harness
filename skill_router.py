@@ -14,6 +14,34 @@ from method_router import route_methods, load_yaml as load_method_yaml
 
 
 ROOT = Path(__file__).resolve().parent
+GLOBAL_INSTRUCTION_CONTRACTS = (
+    "docs/design/agent-instruction-architecture-v0.md",
+)
+
+
+def _instruction_contracts(root: Path) -> list[str]:
+    contracts = list(GLOBAL_INSTRUCTION_CONTRACTS)
+    missing = [
+        relative
+        for relative in contracts
+        if not (root / relative).is_file()
+    ]
+    if missing:
+        raise CoreError(
+            "required agent instruction contracts are unavailable: "
+            + ", ".join(missing)
+        )
+    return contracts
+
+
+def _with_instruction_contracts(
+    result: dict[str, Any],
+    root: Path,
+) -> dict[str, Any]:
+    return {
+        **result,
+        "instruction_contracts": _instruction_contracts(root),
+    }
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -124,11 +152,14 @@ def route_operation(
         raise CoreError(
             f"{surface} operation registry is not available in this distribution"
         )
-    return _route_operation(
-        load_yaml(path),
-        surface=surface,
-        operation=operation,
-        invoked_by=invoked_by,
+    return _with_instruction_contracts(
+        _route_operation(
+            load_yaml(path),
+            surface=surface,
+            operation=operation,
+            invoked_by=invoked_by,
+        ),
+        root,
     )
 
 
@@ -150,12 +181,15 @@ def route_artifact(
         skill = item.get("skill")
         if not isinstance(skill, str) or not skill:
             raise CoreError(f"artifact route {knowledge_kind!r} has no skill")
-        return {
-            "surface": "consumer",
-            "route_class": "artifact-production",
-            "route_key": knowledge_kind,
-            "skill": skill,
-        }
+        return _with_instruction_contracts(
+            {
+                "surface": "consumer",
+                "route_class": "artifact-production",
+                "route_key": knowledge_kind,
+                "skill": skill,
+            },
+            root,
+        )
     raise CoreError(f"no artifact skill registered for knowledge_kind: {knowledge_kind}")
 
 
@@ -174,11 +208,14 @@ def route_method(
         concerns=concerns,
         method=method,
     )
-    return {
-        "surface": "consumer",
-        "route_class": "method",
-        **routed,
-    }
+    return _with_instruction_contracts(
+        {
+            "surface": "consumer",
+            "route_class": "method",
+            **routed,
+        },
+        root,
+    )
 
 
 def main() -> int:

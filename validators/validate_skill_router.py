@@ -13,6 +13,13 @@ from consumer_pack import materialize_pack  # noqa: E402
 from harness import CoreError  # noqa: E402
 from skill_router import route_artifact, route_method, route_operation  # noqa: E402
 
+TRUST_CONTRACT = "docs/design/agent-instruction-architecture-v0.md"
+
+
+def _assert_instruction_contract(result: dict, root: Path) -> None:
+    assert result.get("instruction_contracts") == [TRUST_CONTRACT], result
+    assert (root / TRUST_CONTRACT).is_file(), (root, TRUST_CONTRACT)
+
 
 def _expect_error(fn, fragment: str) -> None:
     try:
@@ -30,7 +37,9 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
         "route_class": "artifact-production",
         "route_key": "product-requirements",
         "skill": "skills/artifacts/product-requirements/SKILL.md",
+        "instruction_contracts": [TRUST_CONTRACT],
     }
+    _assert_instruction_contract(product, root)
 
     reliability = route_method(
         concerns=["reliability.failure-semantics"],
@@ -39,6 +48,7 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     assert [item["method"] for item in reliability["routed"]] == [
         "reliability-analysis"
     ]
+    _assert_instruction_contract(reliability, root)
 
     status = route_operation(
         surface="consumer",
@@ -47,6 +57,7 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     )
     assert status["skill"] == "skills/agent/project-engineering-status/SKILL.md"
     assert status["exposure"] == "public"
+    _assert_instruction_contract(status, root)
 
     _expect_error(
         lambda: route_operation(
@@ -83,6 +94,7 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     )
     assert internal["exposure"] == "internal"
     assert internal["invoked_by"] == "project-bootstrap-reconcile"
+    _assert_instruction_contract(internal, root)
 
     _expect_error(
         lambda: route_artifact(knowledge_kind="change-transition-design", root=root),
@@ -98,6 +110,7 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
         assert capture["skill"] == (
             "skills/maintainer/capture-harness-observation/SKILL.md"
         )
+        _assert_instruction_contract(capture, root)
     else:
         _expect_error(
             lambda: route_operation(

@@ -90,6 +90,13 @@ Harness development checkout.
 All paths referenced by Consumer operation/method/artifact registries must exist
 inside the materialized pack.
 
+Every successful typed route also returns `instruction_contracts`. The target
+agent loads those contracts before consuming project/tool payloads or executing
+the selected skill. Consumer Pack materialization must therefore contain the
+same canonical instruction-trust contract used by Harness source execution; a
+target repository cannot silently lose that boundary merely because its own
+`AGENTS.md` differs from the Harness repository bootstrap.
+
 ## Runtime closure
 
 The pack definition explicitly lists public root runtime modules. Materialization
