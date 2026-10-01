@@ -28,11 +28,11 @@ jobs:
           npm install -g @github/copilot@1.0.91
           copilot --version
 
-      - name: Materialize explicit baseline agent descriptor
+      - name: Materialize provider-auto baseline agent descriptor
         shell: bash
         run: |
-          MODEL="gpt-6-luna"
-          MODEL_SELECTION="explicit"
+          MODEL="auto"
+          MODEL_SELECTION="provider-auto"
           sed \
             -e "s/__MODEL__/${MODEL}/g" \
             -e "s/__MODEL_SELECTION__/${MODEL_SELECTION}/g" \

@@ -6,15 +6,29 @@ scope: harness-owned-provider-backed-assurance
 
 rules:
   deterministic_first: true
-  default_model: gpt-6-luna
   default_reasoning_tier: normal
   stronger_tier_requires_explicit_scenario_need: true
   preserve_provider_model_provenance: true
-  auto_is_explicit_fallback_only: true
-  fail_closed_when_default_model_cannot_be_explicitly_requested: true
-  auto_routed_result_does_not_establish_default_model_baseline: true
+  preferred_model_when_explicit_selection_is_supported: gpt-6-luna
+  github_copilot_execution_mode: provider-auto
+  provider_auto_requires_resolved_model_provenance: true
+  provider_auto_requires_token_usage_provenance_when_available: true
+  mixed_model_evidence_must_not_claim_single_model_baseline: true
+  model_specific_claim_requires_all_relevant_runs_to_resolve_to_that_model: true
+  fail_closed_when_resolved_model_provenance_is_missing: true
+
+provider_constraints:
+  github-copilot:
+    explicit_model_selection_supported: false
+    execution_mode: provider-auto
+    rationale: >-
+      The authorized GitHub Copilot execution path used by Harness fails when a
+      concrete model is requested explicitly. Provider-auto is therefore the
+      supported execution mode; OpenTelemetry provenance records the model
+      actually selected for every behavioral case.
 
 semantic_boundary:
   - Model choice never defines semantic correctness.
   - Expert-reviewed canonical knowledge remains the oracle.
-  - This policy optimizes recurring assurance cost and execution consistency.
+  - Provider-auto evidence is provider-backed judgement evidence, not evidence of one fixed model unless every relevant run resolves to that model.
+  - This policy optimizes recurring assurance cost and execution consistency without claiming unsupported provider controls.

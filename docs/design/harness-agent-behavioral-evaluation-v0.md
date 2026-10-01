@@ -166,7 +166,7 @@ Every repeated run receives the same:
 - selected scope;
 - instruction entrypoints;
 - allowed tools;
-- provider/model descriptor unless model variation is the experiment.
+- provider execution descriptor. When the provider only supports auto-routing, the requested execution mode remains fixed as `provider-auto`; the resolved model may vary and must be recorded per run. Such evidence is not a single-model baseline unless every relevant run resolves to the same model.
 
 ## Observable execution trace
 

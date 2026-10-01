@@ -30,8 +30,9 @@ WORKFLOW = ROOT / ".github" / "workflows" / "behavioral-eval-copilot.yml"
 assert ADAPTER.is_file()
 workflow_text = WORKFLOW.read_text(encoding="utf-8")
 assert "${{ inputs.model }}" not in workflow_text
-assert 'MODEL="gpt-6-luna"' in workflow_text
-assert 'MODEL_SELECTION="explicit"' in workflow_text
+assert 'MODEL="auto"' in workflow_text
+assert 'MODEL_SELECTION="provider-auto"' in workflow_text
+assert 'MODEL="gpt-6-luna"' not in workflow_text
 
 sample_jsonl = "\n".join([
     json.dumps({
@@ -147,11 +148,11 @@ descriptor = {
     "kind": "harness-agent-descriptor",
     "id": "boundary-test",
     "provider": "github-copilot",
-    "model": "gpt-6-luna",
+    "model": "auto",
     "model_version": "UNREPORTED",
     "configuration": {
-        "requested_model": "gpt-6-luna",
-        "model_selection": "explicit",
+        "requested_model": "auto",
+        "model_selection": "provider-auto",
         "copilot_cli_version": "1.0.91",
         "provider_timeout_seconds": 150,
     },
