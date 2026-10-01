@@ -23,12 +23,23 @@ full_gate:
 workflow_roles:
 - path: .github/workflows/ci-policy.yml
   role: focused
+  cost_class: cheap
+  draft_behavior: allow
 - path: .github/workflows/harness.yml
   role: exhaustive
+  cost_class: heavy
+  draft_behavior: skip
+  rationale: AUD-008 measured the full gate at about 50 seconds; never run it automatically for draft iteration.
 - path: .github/workflows/greenfield-engineering-graph.yml
   role: focused
+  cost_class: medium
+  draft_behavior: skip
+  rationale: Historical runs are about 8-15 seconds and PR path filters use cumulative PR diffs; skip automatic draft execution.
 - path: .github/workflows/live-calibration-copilot.yml
   role: external
+  cost_class: heavy
+  draft_behavior: manual
+  rationale: Provider-backed calibration has a 10 minute timeout and is intentionally operator-triggered.
 checks:
 - id: ci_policy
   command: python validators/validate_ci_policy.py

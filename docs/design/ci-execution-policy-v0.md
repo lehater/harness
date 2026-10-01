@@ -73,7 +73,8 @@ time.
 Every `validators/validate_*.py` file and every `tests/test_*.py` file must have
 an explicit entry in `spec/ci/check-registry-v0.yaml`. Every
 `.github/workflows/*.yml` / `.yaml` file must also have an explicit
-`workflow_roles` entry so a new workflow cannot appear outside policy.
+`workflow_roles` entry declaring role, cost class, and draft behavior so a new
+workflow cannot appear outside policy.
 
 Every registered check declares an explicit disposition. A `full_gate` check
 must appear in `make harness-check`; a `standalone` check must state why it is
@@ -88,7 +89,10 @@ Every registered check declares `cost_class` and `stage`. `medium` or `heavy`
 checks must include a rationale. The early `policy` and `focused` stages admit
 only `cheap` checks; costlier checks belong in `deferred` or `exhaustive`.
 Measured cost growth that crosses a cost class boundary requires the registry
-to be updated.
+to be updated. A focused workflow that is allowed to execute automatically on
+draft PRs must itself be `cheap`; costlier focused workflows declare
+`draft_behavior: skip` and run only for an integration candidate or explicit
+operator action.
 
 Cost classes are intentionally coarse:
 

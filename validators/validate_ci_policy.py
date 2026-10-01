@@ -17,6 +17,7 @@ DRAFT_SAFE_PULL_REQUEST_TYPES = {"ready_for_review"}
 VALID_ROLES = {"exhaustive", "focused", "external"}
 VALID_COSTS = {"cheap", "medium", "heavy"}
 VALID_DISPOSITIONS = {"full_gate", "standalone", "unresolved"}
+VALID_DRAFT_BEHAVIORS = {"allow", "skip", "manual"}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -255,8 +256,17 @@ def main() -> int:
             continue
         relative = str(entry.get("path", ""))
         role = str(entry.get("role", ""))
+        workflow_cost = str(entry.get("cost_class", ""))
+        draft_behavior = str(entry.get("draft_behavior", ""))
+        rationale = str(entry.get("rationale", "")).strip()
         if relative:
             registered_workflows.add(relative)
+        if workflow_cost not in VALID_COSTS:
+            errors.append(f"CI-P05 workflow {relative} has unknown cost_class: {workflow_cost}")
+        if workflow_cost in {"medium", "heavy"} and not rationale:
+            errors.append(f"CI-P05 {workflow_cost} workflow {relative} requires rationale")
+        if draft_behavior not in VALID_DRAFT_BEHAVIORS:
+            errors.append(f"CI-P01 workflow {relative} has unknown draft_behavior: {draft_behavior}")
         if role not in VALID_ROLES:
             errors.append(f"CI-P04 workflow {relative} has unknown role: {role}")
             continue
@@ -268,6 +278,10 @@ def main() -> int:
         events = workflow_events(workflow)
 
         if role == "exhaustive":
+            if draft_behavior != "skip":
+                errors.append(
+                    f"CI-P01 exhaustive workflow must declare draft_behavior skip: {relative}"
+                )
             pr = events.get("pull_request")
             if "pull_request" not in events:
                 errors.append(f"CI-P02 exhaustive workflow lacks pull_request trigger: {relative}")
@@ -295,6 +309,23 @@ def main() -> int:
                 )
 
         elif role == "focused":
+            if draft_behavior not in {"allow", "skip"}:
+                errors.append(
+                    f"CI-P01 focused workflow {relative} must declare draft_behavior allow or skip"
+                )
+            if draft_behavior == "allow" and workflow_cost != "cheap":
+                errors.append(
+                    f"CI-P05 draft-enabled focused workflow must be cheap: {relative}"
+                )
+            if (
+                draft_behavior == "skip"
+                and "pull_request" in events
+                and pull_request_may_run_on_draft(events.get("pull_request"))
+                and not exhaustive_jobs_have_draft_guard(workflow)
+            ):
+                errors.append(
+                    f"CI-P01 focused workflow declared skip but can run jobs on draft PR updates: {relative}"
+                )
             if "pull_request" in events and "push" in events:
                 if not push_is_main_only(events.get("push")):
                     errors.append(
@@ -303,6 +334,10 @@ def main() -> int:
                     )
 
         elif role == "external":
+            if draft_behavior != "manual":
+                errors.append(
+                    f"CI-P08 external workflow must declare draft_behavior manual: {relative}"
+                )
             event_names = set(events)
             if event_names != {"workflow_dispatch"}:
                 errors.append(
