@@ -56,7 +56,7 @@ python engineering_graph.py evaluate <engineering-graph> <consumer> <core-realiz
 
 For agent execution, actionable CREATE results may additionally be routed with `agent_router.py`.
 
-CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch.
+CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch. Agent-facing consumer skill distribution follows the same separation: the pinned Harness Consumer Pack is tooling, not project semantic truth; see `agent-skill-surfaces-and-consumer-distribution-v0.md`.
 
 ## Derived Design Profiles
 

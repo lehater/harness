@@ -81,13 +81,14 @@ separate defect has been demonstrated.
 | EVO-018 | RECOMMENDATION | CAPTURED | Skill identity | Treat published skill names/identities as compatibility contracts and require explicit alias/migration handling when renamed. |
 | EVO-019 | RESEARCH | CAPTURED | Reference vs Coverage | Test the target ownership rule: Coverage proves completeness, Reference Model proposes reusable realizations, Project Model owns the accepted project graph. |
 | EVO-020 | IDEA | CAPTURED | Context lifecycle | Define restartable agent-session boundaries from durable project artifacts so long-running work can resume without conversation history becoming project truth. |
-| EVO-021 | RECOMMENDATION | VALIDATED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
+| EVO-021 | RECOMMENDATION | ADOPTED | Instruction architecture | Standardize the ownership chain: AGENTS bootstrap/invariants -> router -> task skill -> canonical policy/spec. |
 | EVO-022 | RESEARCH | INVESTIGATING | Agent routing | Add an explicit registry/router and overlap tests for `skills/agent/**`; keep artifact routing deterministic by `knowledge_kind`. |
 | EVO-023 | RECOMMENDATION | VALIDATED | Root instructions | Shrink `AGENTS.md` to always-on invariants, bootstrap/routing rules and minimal navigation; remove task-specific workflows from it. |
 | EVO-024 | RESEARCH | CAPTURED | Artifact skills | Pilot a common artifact-production procedure so artifact skills carry domain-specific deltas instead of repeating generic registration/projection/acceptance mechanics. |
 | EVO-025 | RECOMMENDATION | VALIDATED | Skill lifecycle | Quarantine or migrate inactive pre-Core `SKILL.md` files so discovery surfaces expose only active skills. |
 | EVO-026 | RECOMMENDATION | CAPTURED | Documentation ownership | Keep README/workbench documents descriptive or semantic-contract oriented; task execution procedures should route into skills instead of being independently maintained in several prose files. |
 | EVO-027 | RESEARCH | INVESTIGATING | Method/analysis routing | Give non-owning `judgement_only` analysis skills an explicit routing surface, likely outside the artifact-production registry. |
+| EVO-028 | RECOMMENDATION | ADOPTED | Skill distribution | Separate Maintainer and Consumer skill surfaces; distribute the Consumer surface as a pinned locally materialized pack rather than copied project skills. |
 
 ## Detailed entries
 
@@ -950,3 +951,26 @@ artifact router. That would confuse "procedure that discovers/routes gaps" with
 This is a concrete place to test EVO-003's Method / Procedure Library boundary.
 
 Related defect: HARN-019.
+
+
+### EVO-028 — Maintainer / Consumer skill surfaces and distribution
+
+**Type:** RECOMMENDATION  
+**Status:** ADOPTED
+
+The architectural decision is now owned by
+`docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md`.
+
+Summary:
+
+- Harness-maintenance skills remain inside the Harness development surface;
+- target repositories activate only the Harness Consumer Surface;
+- Consumer procedures are distributed as a pinned versioned Consumer Pack;
+- agents read the exact pack from local materialization, not remote per-skill
+  links;
+- target projects reference stable identities, not Harness source-tree paths;
+- checkout/submodule/package/cache are transport choices, not semantic
+  contracts;
+- explicit local checkout override supports Harness/consumer co-development.
+
+Further normative changes belong in the design contract, not this Radar entry.

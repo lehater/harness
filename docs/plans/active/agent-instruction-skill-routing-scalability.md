@@ -2,6 +2,10 @@
 
 Status: active audit-branch migration plan.
 
+## Accepted distribution decision
+
+`docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md` is the normative architecture for Maintainer vs Consumer skill surfaces and physical Consumer Pack materialization. This plan implements that decision; it must not invent a different distribution model.
+
 ## Goal
 
 Move Harness from prose-distributed agent instructions to one scalable ownership
@@ -36,7 +40,7 @@ AUD-005 found:
 
 ## Phase 1 — Active agent-skill registry
 
-1. Add a machine-readable registry for every `skills/agent/**` skill.
+1. Split active registry membership into Maintainer and Consumer surfaces; classify every current `skills/agent/**` skill into exactly one exported/default surface (or an explicitly shared support class).
 2. Record trigger class, exclusions and explicit composition/precedence.
 3. Extend `validate_agent_layer.py` to require registry coverage.
 4. Add positive, negative and overlap routing fixtures.
@@ -108,7 +112,17 @@ Create one active agent workflow for changing observable Harness behavior:
 Move Scenario Suite and Core-extension procedural text out of `AGENTS.md`.
 Keep `core-v0.md` and `scenario-suite-v0.md` as contract owners.
 
-## Phase 6 — Quarantine inactive skills
+## Phase 6 — Consumer Pack boundary and materialization
+
+1. Define the smallest pinned Harness distribution identity for target repositories.
+2. Define/build the Consumer Pack export boundary.
+3. Materialize the exact pack locally before consumer routing.
+4. Support an explicit local Harness checkout override for dogfooding without changing the pinned project identity.
+5. Verify that maintainer-only and inactive skills are absent from Consumer discovery.
+
+**Done when:** a clean consumer checkout can resolve one pinned Harness Consumer Pack locally and a fresh agent can enter the Consumer Registry without remote per-skill reads.
+
+## Phase 7 — Quarantine inactive skills
 
 For `skills/core/**`, `skills/ddd/**`, and
 `skills/software-product/**`:
@@ -118,7 +132,7 @@ For `skills/core/**`, `skills/ddd/**`, and
 3. move historical material out of executable `SKILL.md` form;
 4. fail validation on unregistered active-looking skills.
 
-## Phase 7 — Clarify documentation ownership
+## Phase 8 — Clarify documentation ownership
 
 Refactor without semantic change:
 
@@ -130,7 +144,7 @@ Refactor without semantic change:
 
 Prefer links over copied procedural paragraphs.
 
-## Phase 8 — Pilot common artifact-production procedure
+## Phase 9 — Pilot common artifact-production procedure
 
 Do not deduplicate all artifact skills at once.
 
@@ -145,7 +159,7 @@ Pilot `product-requirements`, `domain-model`, and
 
 Reject the abstraction if it merely moves complexity.
 
-## Phase 9 — Review remaining conditional global policies
+## Phase 10 — Review remaining conditional global policies
 
 For large root instruction blocks such as provider-backed LLM execution policy,
 apply:
@@ -156,7 +170,7 @@ task-specific procedure?    -> skill
 Harness policy/semantics?   -> canonical policy/spec
 ```
 
-## Phase 10 — Fresh-context verification
+## Phase 11 — Fresh-context verification
 
 Add behavioral/routing fixtures for at least:
 
@@ -180,6 +194,4 @@ Add behavioral/routing fixtures for at least:
 
 ## Order
 
-Implement Phases 1-6 first because they remove demonstrated routing/discovery
-defects. Phases 7-10 are scalability cleanup and should follow after the active
-routing surface is stable.
+Implement Phases 1-7 first because they establish the accepted routing/distribution boundary and remove demonstrated discovery defects. Phases 8-11 are scalability cleanup and should follow after the active routing surface is stable.

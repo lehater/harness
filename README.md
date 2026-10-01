@@ -16,7 +16,7 @@ Target repositories remain the source of product/domain/architecture truth. Harn
 
 Start with `docs/design/core-v0.md`. For project integration, use `docs/design/integration-contract-v0.md`.
 
-There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
+Harness Core does not require repository-to-repository ownership binding: a target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts. Agent-enabled consumers may separately use a pinned, locally materialized Harness Consumer Pack for tooling/procedures; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md`.
 
 ## Engineering Graph v0
 

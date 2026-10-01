@@ -31,7 +31,7 @@ Before substantial engineering work, ensure the target repository has a current 
 10. when the project opts into a managed `.harness/` workspace, render and verify generated documentation;
 11. if implementation exposes an unresolved semantic case, reopen the owning knowledge through a Core `Question` instead of choosing an implementation convention silently.
 
-No manifest, pin, submodule or repository-to-repository runtime binding is required. The managed workspace is a target-project-local opt-in format.
+Harness Core/project semantics do not require a repository-to-repository ownership binding. Agent-enabled consumer projects may separately pin and materialize a Harness Consumer Pack as tooling; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md`. The managed workspace remains a target-project-local opt-in format.
 
 ## Core rules
 
