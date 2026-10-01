@@ -241,12 +241,17 @@ def main() -> int:
 
     bad = projection()
     bad["providers"][1]["accepted_prerequisites"] = {}
-    try:
-        evaluate_lifecycle_target(GRAPH, "IMPLEMENTATION", MODEL, bad)
-    except CoreError:
-        pass
-    else:
-        raise AssertionError("invalid lifecycle baseline must fail")
+    result = evaluate_lifecycle_target(
+        GRAPH, "IMPLEMENTATION", MODEL, bad
+    )
+    assert result["status"] == "READY", result
+    assert result["revalidate"], result
+    assert any(
+        item.get("mode") == "PREREQUISITE_TOPOLOGY"
+        and item.get("accepted_prerequisites") == []
+        and item.get("current_prerequisites") == ["source.identity"]
+        for item in result["revalidate"][0]["lifecycle"]["mismatches"]
+    ), result
 
     partial_semantic = projection(identity="ID2")
     partial_semantic["providers"][0]["semantic_atom_fingerprints"] = {
