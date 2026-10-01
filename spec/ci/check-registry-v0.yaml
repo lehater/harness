@@ -318,7 +318,7 @@ checks:
 - id: project_frontier
   command: python validators/validate_project_frontier.py
   stage: focused
-  cost_class: cheaap
+  cost_class: cheap
   disposition: full_gate
 - id: semantic_admission
   command: python validators/validate_semantic_admission.py
