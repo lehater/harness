@@ -2,7 +2,7 @@
 
 Status: active audit ledger.
 
-Purpose: keep one cumulative record of Harness defects and design gaps found across repeated audits. New audits must update an existing item when the same root cause is rediscovered instead of creating a duplicate.
+Purpose: keep one cumulative record of Harness defects and design gaps found across repeated audits. New audits must update an existing item when the same root cause is rediscovered instead of creating a duplicate.\n\nNon-defect recommendations, research questions and optional future directions belong in the companion **Harness Evolution Radar**: `docs/audit/harness-evolution-radar.md`. A Radar item is not technical debt unless a separate `HARN-*` defect is demonstrated.
 
 ## Statuses
 
