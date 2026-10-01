@@ -13,6 +13,7 @@ entry:
 # accidentally enlarge the public Consumer distribution.
 root_files:
   - consumer_pack.py
+  - acceptance_policy.py
   - agent_router.py
   - architecture_driver_closure.py
   - authority_context.py
