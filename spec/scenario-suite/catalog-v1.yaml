@@ -265,6 +265,12 @@ requirements:
     description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
     min_scenarios: 1
 
+  - id: acceptance-policy-currentness
+    category: lifecycle
+    enforcement: required
+    description: Accepted capability knowledge becomes stale when the effective acceptance policy changes after admission.
+    min_scenarios: 1
+
   - id: subject-inventory-disposition
     category: coverage
     enforcement: required
