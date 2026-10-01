@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -270,6 +271,102 @@ def validate_structure(registry: dict[str, Any], root: Path = ROOT) -> None:
                     f"{evidence_id}: missing evidence reference {path}"
                 )
 
+        _validate_provider_run_binding(evidence_item, root)
+
+
+
+def _sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
+
+
+def _validate_provider_run_binding(
+    evidence_item: dict[str, Any],
+    root: Path,
+) -> None:
+    if (
+        evidence_item.get("status") not in ACTIVE_EVIDENCE_STATUSES
+        or evidence_item.get("execution_nature") != "judgement-dependent"
+    ):
+        return
+
+    evidence_id = evidence_item["id"]
+    run_ref = evidence_item.get("provider_run_ref")
+    if not isinstance(run_ref, str) or not run_ref:
+        raise RegistryError(
+            f"{evidence_id}: active judgement evidence requires provider_run_ref"
+        )
+    run_path = root / run_ref
+    if not run_path.is_file():
+        raise RegistryError(f"{evidence_id}: missing provider run record {run_ref}")
+    run_record = load_yaml(run_path)
+    if run_record.get("version") != 1:
+        raise RegistryError(f"{evidence_id}: provider run record version must be 1")
+    if run_record.get("kind") != "harness-provider-behavioral-evidence":
+        raise RegistryError(f"{evidence_id}: invalid provider run record kind")
+    if run_record.get("status") != "accepted":
+        raise RegistryError(f"{evidence_id}: provider run record is not accepted")
+    revision = run_record.get("harness_revision")
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise RegistryError(f"{evidence_id}: invalid provider run revision")
+
+    cases = _mapping_list(run_record.get("cases"), f"{evidence_id} provider cases")
+    cases_by_id = _index(cases, f"{evidence_id} provider case")
+    selected = evidence_item.get("case_ids")
+    if not isinstance(selected, list) or not selected or not all(
+        isinstance(item, str) and item for item in selected
+    ):
+        raise RegistryError(f"{evidence_id}: active judgement evidence requires case_ids")
+
+    for case_id in selected:
+        case = cases_by_id.get(case_id)
+        if case is None:
+            raise RegistryError(
+                f"{evidence_id}: provider run record missing case {case_id}"
+            )
+        if case.get("run_status") != "COMPLETED" or case.get("correctness") != "PASS":
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} is not an accepted PASS"
+            )
+
+        for field, digest_field in (
+            ("fixture", "fixture_sha256"),
+            ("oracle", "oracle_sha256"),
+        ):
+            relative = case.get(field)
+            expected = case.get(digest_field)
+            if not isinstance(relative, str) or not relative:
+                raise RegistryError(f"{evidence_id}: {case_id} missing {field} path")
+            path = root / relative
+            if not path.is_file():
+                raise RegistryError(
+                    f"{evidence_id}: {case_id} missing bound {field} {relative}"
+                )
+            actual = _sha256_bytes(path.read_bytes())
+            if actual != expected:
+                raise RegistryError(
+                    f"{evidence_id}: {case_id} {field} binding is stale"
+                )
+
+        template_relative = case.get("template")
+        expected_case = case.get("case_sha256")
+        if not isinstance(template_relative, str) or not template_relative:
+            raise RegistryError(f"{evidence_id}: {case_id} missing template path")
+        template_path = root / template_relative
+        if not template_path.is_file():
+            raise RegistryError(
+                f"{evidence_id}: {case_id} missing bound template {template_relative}"
+            )
+        rendered = template_path.read_text(encoding="utf-8")
+        if "__HARNESS_REVISION__" not in rendered:
+            raise RegistryError(
+                f"{evidence_id}: {case_id} template lacks revision binding"
+            )
+        rendered = rendered.replace("__HARNESS_REVISION__", revision)
+        if _sha256_bytes(rendered.encode("utf-8")) != expected_case:
+            raise RegistryError(
+                f"{evidence_id}: {case_id} case binding is stale"
+            )
+
 
 def _level_admissible(
     evidence_level: str,
@@ -394,9 +491,14 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
 
     report = assurance_report(registry)
     assert report["summary"]["release_claim_ready"] is False
-    assert set(report["abilities"]["HA-A05"]["missing_requirements"]) == {
-        "A05-R01", "A05-R02", "A05-R03"
+    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == ["A04-R01"]
+    assert report["abilities"]["HA-A04"]["missing_requirements"] == ["A04-R02", "A04-R03"]
+    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == ["A05-R01"]
+    assert report["abilities"]["HA-A05"]["missing_requirements"] == ["A05-R02", "A05-R03"]
+    assert set(report["abilities"]["HA-A16"]["satisfied_requirements"]) == {
+        "A16-R01", "A16-R02", "A16-R03", "A16-R04"
     }
+    assert report["abilities"]["HA-A16"]["missing_requirements"] == ["A16-R05", "A16-R06"]
     passed.append("AR-M01")
 
     def candidate(
@@ -421,24 +523,35 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
             "oracle_class": oracle,
             "execution_nature": execution,
             "source_type": "synthetic",
+            "provider_run_ref": "spec/assurance/evidence/first-wave-provider-run-36928079710.yaml",
+            "case_ids": ["TD-CAP-001"],
             "status": "implemented",
             "verified_at_revision": None,
             "limitations": limitations or ["meta-test fixture"],
         }
 
-    wrong_level = copy.deepcopy(registry)
+    def without_active_cap_baseline() -> dict[str, Any]:
+        value = copy.deepcopy(registry)
+        baseline = next(
+            item for item in value["evidence"]
+            if item["id"] == "EVID-CAP-FIRST-WAVE-TL1"
+        )
+        baseline["status"] = "ready"
+        return value
+
+    wrong_level = without_active_cap_baseline()
     wrong_level["evidence"].append(candidate("META-WRONG-LEVEL", level="TL6"))
     validate_structure(wrong_level)
     assert "A05-R01" in assurance_report(wrong_level)["abilities"]["HA-A05"]["missing_requirements"]
     passed.append("AR-M02")
 
-    weak_oracle = copy.deepcopy(registry)
+    weak_oracle = without_active_cap_baseline()
     weak_oracle["evidence"].append(candidate("META-WEAK-ORACLE", oracle="O0"))
     validate_structure(weak_oracle)
     assert "A05-R01" in assurance_report(weak_oracle)["abilities"]["HA-A05"]["missing_requirements"]
     passed.append("AR-M03")
 
-    wrong_execution = copy.deepcopy(registry)
+    wrong_execution = without_active_cap_baseline()
     wrong_execution["evidence"].append(
         candidate("META-WRONG-EXECUTION", execution="deterministic")
     )

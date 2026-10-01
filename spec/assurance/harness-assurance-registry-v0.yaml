@@ -315,6 +315,7 @@ evidence:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
       - path: validators/validate_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies:
       - A05-R01
     test_level: TL1
@@ -322,11 +323,14 @@ evidence:
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    status: ready
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
+    case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
+    status: implemented
     verified_at_revision: null
     limitations:
-      - The executable cases and provider boundary exist, but no accepted provider-backed run record is registered yet.
-      - This evidence slot covers TD-CAP-001..004 only and does not establish Reference-vocabulary/novel-Capability or repeated-run proof.
+      - Accepted provider-backed run 36928079710 covers TD-CAP-001..004 at TL1 with exact fixture/oracle bindings.
+      - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
+      - Does not establish Reference-vocabulary/novel-Capability or repeated clean-context proof.
 
   - id: EVID-AUTH-FIRST-WAVE-TL1
     providers:
@@ -337,16 +341,19 @@ evidence:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
       - path: validators/validate_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies: [A04-R01]
     test_level: TL1
     methods: [EM-02, EM-05]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    status: ready
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
+    case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
+    status: implemented
     verified_at_revision: null
     limitations:
-      - Covers TD-AUTH-001/002/004 execution surfaces; no accepted provider-backed run record exists yet.
+      - Accepted provider-backed run 36928079710 covers TD-AUTH-001/002/004 at TL1 with exact fixture/oracle bindings.
       - Does not establish joint-ownership/Reference-bias or repeated clean-context proof.
 
   - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1
@@ -358,16 +365,19 @@ evidence:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
       - path: validators/validate_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies: [A16-R01]
     test_level: TL1
     methods: [EM-02]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    status: ready
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
+    case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
+    status: implemented
     verified_at_revision: null
     limitations:
-      - Covers TD-ROUTE-001..003 execution surfaces; no accepted provider-backed task-intent run exists yet.
+      - Accepted provider-backed run 36928079710 covers TD-ROUTE-001..003 natural-language intent at TL1.
       - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
 
   - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
