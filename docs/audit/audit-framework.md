@@ -41,7 +41,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-10 | Portability | Do semantics hold across greenfield, legacy, multi-consumer and partial models? | COVERED | AUD-007 |
 | AP-11 | Minimality / necessity | Does every derived layer add information without creating parallel truth? | COVERED | AUD-006 |
 | AP-12 | Adversarial model cases | Do multiple providers, stale evidence, conflicting Questions and reordered operations remain safe? | COVERED | AUD-003 |
-| AP-13 | Instruction ownership / routing | Does every instruction/procedure have one owner and deterministic discovery? | COVERED | AUD-007 |
+| AP-13 | Instruction ownership / routing | Does every instruction/procedure have one owner and deterministic discovery? | COVERED | AUD-010 |
 | AP-14 | Empirical agent behavior | Does a real agent select and execute the intended route/skill under representative tasks? | UNASSESSED | — |
 | AP-15 | Observability / diagnosability | Can a maintainer explain why a route/state/action was produced from available evidence? | UNASSESSED | — |
 | AP-16 | Evaluator quality / calibration | Are semantic evaluators reproducible and calibrated against trusted judgements? | PARTIAL | live-calibration contracts |
@@ -74,6 +74,7 @@ Do not rerun every perspective after every change.
 | AUD-007 | 2026-10-01 | Post-migration skill/distribution re-audit | Verified HARN-017..020 corrections. |
 | AUD-008 | 2026-10-01 | CI cost, trigger selectivity, duplicate execution, validator coverage and lazy-gate ordering | Strengthened HARN-H03/H04 and added HARN-H05. |
 | AUD-009 | 2026-10-01 | CI policy enforcement and post-correction verification | Verified HARN-H03/H04/H05 corrections. |
+| AUD-010 | 2026-10-01 | AP-13 instruction ownership/routing and operation composition | First `audit-harness` run found HARN-021: internal-route parent authorization is declared but not enforced by runtime routing. Existing composite operation naming itself is compatible with the new contract when rerouted by operation id. |
 
 ## Finding handoff contract
 
