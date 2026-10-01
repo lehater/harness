@@ -1,9 +1,9 @@
----
-name: record-project-knowledge
-description: "Use when a discussion produced durable requirements, domain knowledge, architecture decisions, unresolved material questions or execution knowledge that must be fixed in the target repository rather than left in conversation history."
----
+# Legacy: Record Project Knowledge
 
-# Record Project Knowledge
+Status: archived pre-Core procedure. Not executable.  
+Former path: `skills/core/record-project-knowledge/SKILL.md`.
+
+## Historical content
 
 Use the Harness document/knowledge lifecycle.
 

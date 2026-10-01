@@ -1,9 +1,9 @@
----
-name: architecture-review
-description: "Use to critically review target-project architecture or implementation against accepted requirements, domain ownership, ADRs and the smallest justified design. Produce P0-P3 findings without inventing upstream product/domain decisions."
----
+# Legacy: Architecture Review
 
-# Architecture Review
+Status: archived pre-Core procedure. Not executable.  
+Former path: `skills/software-product/architecture-review/SKILL.md`.
+
+## Historical content
 
 Review through these lenses:
 

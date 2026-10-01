@@ -1,9 +1,9 @@
----
-name: resolve-decision
-description: "Use for one bounded product, domain, architecture or engineering choice where the question is known but the correct alternative is not yet accepted."
----
+# Legacy: Resolve Decision
 
-# Resolve Decision
+Status: archived pre-Core procedure. Not executable.  
+Former path: `skills/core/resolve-decision/SKILL.md`.
+
+## Historical content
 
 1. Define one decision question and its owning truth layer.
 2. Inspect relevant target-project canonical evidence before asking for a new decision.

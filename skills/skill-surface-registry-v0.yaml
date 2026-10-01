@@ -361,31 +361,31 @@ skills:
     lifecycle: active
     route_status: routed
   - id: agent-harness-design
-    path: skills/core/agent-harness-design/SKILL.md
+    path: docs/legacy/skills/agent-harness-design.md
     surface: maintainer
     route_class: method
     lifecycle: archived
     route_status: not-applicable
   - id: record-project-knowledge
-    path: skills/core/record-project-knowledge/SKILL.md
+    path: docs/legacy/skills/record-project-knowledge.md
     surface: consumer
     route_class: operation
     lifecycle: archived
     route_status: not-applicable
   - id: resolve-decision
-    path: skills/core/resolve-decision/SKILL.md
+    path: docs/legacy/skills/resolve-decision.md
     surface: consumer
     route_class: method
     lifecycle: archived
     route_status: not-applicable
   - id: domain-model-change
-    path: skills/ddd/domain-model-change/SKILL.md
+    path: docs/legacy/skills/domain-model-change.md
     surface: consumer
     route_class: method
     lifecycle: archived
     route_status: not-applicable
   - id: architecture-review
-    path: skills/software-product/architecture-review/SKILL.md
+    path: docs/legacy/skills/architecture-review.md
     surface: consumer
     route_class: method
     lifecycle: archived

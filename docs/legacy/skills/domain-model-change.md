@@ -1,9 +1,9 @@
----
-name: domain-model-change
-description: "Use when a requirement, design question, code finding or stakeholder clarification may change target-project domain semantics, identity, lifecycle, invariants, responsibility ownership, Bounded Context boundaries or cross-context contracts."
----
+# Legacy: Domain Model Change
 
-# Domain Model Change
+Status: archived pre-Core procedure. Not executable.  
+Former path: `skills/ddd/domain-model-change/SKILL.md`.
+
+## Historical content
 
 1. State the trigger as evidence, not as a conclusion.
 2. Classify the highest affected owner: Requirements, Tactical DDD, Strategic DDD, Architecture or implementation-only.

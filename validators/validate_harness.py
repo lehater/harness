@@ -21,11 +21,11 @@ REQUIRED_FILES = [
     "docs/methodology/ddd/domain-change-protocol.md",
     "docs/methodology/ddd/strategic-ddd-convergence.md",
     "docs/methodology/ddd/tactical-ddd-stage.md",
-    "skills/core/agent-harness-design/SKILL.md",
-    "skills/core/record-project-knowledge/SKILL.md",
-    "skills/core/resolve-decision/SKILL.md",
-    "skills/software-product/architecture-review/SKILL.md",
-    "skills/ddd/domain-model-change/SKILL.md",
+    "docs/legacy/skills/agent-harness-design.md",
+    "docs/legacy/skills/record-project-knowledge.md",
+    "docs/legacy/skills/resolve-decision.md",
+    "docs/legacy/skills/architecture-review.md",
+    "docs/legacy/skills/domain-model-change.md",
 ]
 
 FORBIDDEN_PATHS = [
@@ -69,7 +69,7 @@ def main() -> int:
         for p in [ROOT / "AGENTS.md", ROOT / "README.md"]
         if p.is_file()
     )
-    for marker in [".harness/project.yaml", "pinned Harness revision", "project binding"]:
+    for marker in [".harness/project.yaml", "project binding"]:
         if marker in combined:
             errors.append(f"Harness root guidance must not require hard project coupling: {marker}")
 

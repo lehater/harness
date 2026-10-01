@@ -1,9 +1,9 @@
----
-name: agent-harness-design
-description: "Use when designing, reviewing or simplifying reusable Harness methodology, Skills, routing, context loading, validators or evaluation mechanics. Prefer the smallest change that removes a demonstrated Harness problem."
----
+# Legacy: Agent Harness Design
 
-# Agent Harness Design
+Status: archived pre-Core procedure. Not executable.  
+Former path: `skills/core/agent-harness-design/SKILL.md`.
+
+## Historical content
 
 Audit:
 - source-of-truth ownership;

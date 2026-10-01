@@ -11,7 +11,8 @@ Status: active audit-branch migration plan.
 - Phase 1: explicit skill surface/type/lifecycle registry implemented; full PR workflow passed.
 - Phase 2: public bootstrap ambiguity removed with Consumer Operation Registry; full PR workflow passed.
 - Phase 4/5: Maintainer capture/change operations extracted from `AGENTS.md`; full PR workflow passed.
-- Phase 3: deterministic concern-driven Consumer Method Router is being implemented in the current checkpoint.
+- Phase 3: deterministic concern-driven Consumer Method Router implemented; full PR workflow run 953 passed.
+- Phase 7: inactive pre-Core `SKILL.md` files are being quarantined as non-executable legacy documentation in the current checkpoint.
 
 ## Goal
 

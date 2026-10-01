@@ -157,6 +157,10 @@ def _validate_surface_registry(errors: list[str]) -> list[dict[str, Any]]:
             errors.append(
                 f"{skill_id}: non-active skill must have route_status not-applicable"
             )
+        if lifecycle == "archived" and path_value.endswith("/SKILL.md"):
+            errors.append(
+                f"{skill_id}: archived skill must not remain on SKILL.md discovery surface"
+            )
         if route_status == "unrouted":
             note = item.get("route_note")
             if not isinstance(note, str) or not note.strip():
@@ -178,9 +182,14 @@ def _validate_surface_registry(errors: list[str]) -> list[dict[str, Any]]:
         normalized.append(item)
 
     physical = _physical_skill_paths()
-    registered = {item["path"] for item in normalized if isinstance(item.get("path"), str)}
-    missing_from_registry = sorted(physical - registered)
-    stale_registry_paths = sorted(registered - physical)
+    executable_registered = {
+        item["path"]
+        for item in normalized
+        if item.get("lifecycle") != "archived"
+        and isinstance(item.get("path"), str)
+    }
+    missing_from_registry = sorted(physical - executable_registered)
+    stale_registry_paths = sorted(executable_registered - physical)
     if missing_from_registry:
         errors.append(
             "active-looking SKILL.md files missing from surface registry: "
@@ -188,7 +197,7 @@ def _validate_surface_registry(errors: list[str]) -> list[dict[str, Any]]:
         )
     if stale_registry_paths:
         errors.append(
-            "surface registry references missing SKILL.md files: "
+            "surface registry references non-existent executable SKILL.md files: "
             + ", ".join(stale_registry_paths)
         )
 

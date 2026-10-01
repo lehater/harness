@@ -139,7 +139,7 @@ If the target repository later gains its own canonical graph, prefer projecting 
 
 Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
 
-`skills/agent/**` and `skills/artifacts/**` are the active v0 agent operating layer above Core. Existing `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` and `docs/methodology/**` are retained pre-Core material unless a future consumer-driven migration explicitly promotes them. Active agent skills do not extend Core entities.
+`skills/agent/**`, `skills/maintainer/**` and active `skills/artifacts/**` are the executable agent surfaces above Core. Historical pre-Core procedures are quarantined as non-executable documentation under `docs/legacy/skills/**`; `docs/methodology/**` is also retained pre-Core material unless a future consumer-driven migration explicitly promotes it. Active skills do not extend Core entities.
 
 
 ## Graph Doctor

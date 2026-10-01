@@ -103,7 +103,7 @@ does not live in this root bootstrap file.
 - `profiles/**` — reusable starter Design Profiles.
 - `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.
 - `skills/artifacts/**` — active artifact-specific engineering procedures.
-- `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` — retained pre-Core material; not part of the active v0 agent contract.
+- `docs/legacy/skills/**` — quarantined pre-Core procedure text; historical documentation only, never active skill discovery.
 - `harness.py` — Core v0 structural operations.
 - `target_state.py` — target-state evaluator above Core.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
