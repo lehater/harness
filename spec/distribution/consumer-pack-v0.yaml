@@ -50,6 +50,7 @@ root_files:
   - semantic_judgement_calibration.py
   - semantic_questions.py
   - skill_invariant_policy.py
+  - skill_router.py
   - source_boundary.py
   - source_coverage.py
   - source_set.py

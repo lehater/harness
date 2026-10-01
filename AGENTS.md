@@ -23,9 +23,10 @@ artifact routing in `skills/artifact-skill-registry-v0.yaml`. Consumer
 procedures may be exercised here for fixtures/dogfooding, but they are not the
 default maintainer workflow.
 
-Do not reconstruct task-specific procedures from this file. Resolve the
-applicable registered operation/method/artifact procedure and then read its
-`SKILL.md`.
+Do not reconstruct task-specific procedures from this file. Use `skill_router.py`
+as the typed discovery entrypoint (`operation`, `method`, or
+`artifact-production`), then read the returned `SKILL.md`. The router delegates
+to separate registries; it is not a flat intent classifier.
 
 ## Core rules
 
@@ -69,6 +70,7 @@ does not live in this root bootstrap file.
 - `skills/consumer-operation-registry-v0.yaml` — active Harness-consumer operation routes.
 - `skills/consumer-method-registry-v0.yaml` — canonical-concern to non-owning consumer method routes.
 - `skills/skill-surface-registry-v0.yaml` — explicit skill surface/type/lifecycle inventory.
+- `skill_router.py` — typed skill discovery entrypoint over Maintainer/Consumer operation, method and artifact registries.
 - `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.

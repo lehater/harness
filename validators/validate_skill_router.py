@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Validate the typed Harness skill router in source and Consumer Pack form."""
+from __future__ import annotations
+
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from consumer_pack import materialize_pack  # noqa: E402
+from harness import CoreError  # noqa: E402
+from skill_router import route_artifact, route_method, route_operation  # noqa: E402
+
+
+def _expect_error(fn, fragment: str) -> None:
+    try:
+        fn()
+    except CoreError as exc:
+        assert fragment in str(exc), (fragment, str(exc))
+    else:
+        raise AssertionError(f"expected CoreError containing {fragment!r}")
+
+
+def exercise(root: Path, *, has_maintainer: bool) -> None:
+    product = route_artifact(knowledge_kind="product-requirements", root=root)
+    assert product == {
+        "surface": "consumer",
+        "route_class": "artifact-production",
+        "route_key": "product-requirements",
+        "skill": "skills/artifacts/product-requirements/SKILL.md",
+    }
+
+    reliability = route_method(
+        concerns=["reliability.failure-semantics"],
+        root=root,
+    )
+    assert [item["method"] for item in reliability["routed"]] == [
+        "reliability-analysis"
+    ]
+
+    status = route_operation(
+        surface="consumer",
+        operation="project-engineering-status",
+        root=root,
+    )
+    assert status["skill"] == "skills/agent/project-engineering-status/SKILL.md"
+    assert status["exposure"] == "public"
+
+    _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="bootstrap-existing-project",
+            root=root,
+        ),
+        "internal",
+    )
+    internal = route_operation(
+        surface="consumer",
+        operation="bootstrap-existing-project",
+        root=root,
+        allow_internal=True,
+    )
+    assert internal["exposure"] == "internal"
+
+    _expect_error(
+        lambda: route_artifact(knowledge_kind="change-transition-design", root=root),
+        "no artifact skill registered",
+    )
+
+    if has_maintainer:
+        capture = route_operation(
+            surface="maintainer",
+            operation="capture-harness-observation",
+            root=root,
+        )
+        assert capture["skill"] == (
+            "skills/maintainer/capture-harness-observation/SKILL.md"
+        )
+    else:
+        _expect_error(
+            lambda: route_operation(
+                surface="maintainer",
+                operation="capture-harness-observation",
+                root=root,
+            ),
+            "not available",
+        )
+
+
+def main() -> int:
+    exercise(ROOT, has_maintainer=True)
+
+    with tempfile.TemporaryDirectory(prefix="skill-router-pack-") as temp:
+        pack = Path(temp) / "consumer-pack"
+        materialize_pack(
+            ROOT,
+            pack,
+            binding_revision="b" * 40,
+            effective_revision="validation-source",
+        )
+        exercise(pack, has_maintainer=False)
+        assert (pack / "skill_router.py").is_file()
+
+    print("Typed Harness skill router validation passed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

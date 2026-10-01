@@ -289,3 +289,31 @@ The next concrete work is:
 realization of this decision. `consumer_pack.py` materializes and validates
 the pack, validates immutable target bindings, supports exact-revision Git sync
 and an explicit local development override.
+
+
+## Typed discovery entrypoint
+
+`skill_router.py` is the common technical entrypoint for skill discovery, but
+it does not collapse the three route semantics into one classifier.
+
+```text
+operation
+  -> explicit surface + operation id
+  -> Maintainer or Consumer Operation Registry
+
+method
+  -> explicit method id or canonical Engineering Concern ids
+  -> Consumer Method Registry
+
+artifact-production
+  -> knowledge_kind
+  -> Artifact Skill Registry
+```
+
+A Consumer Pack contains the same router but not the Maintainer Operation
+Registry, so maintainer operations are structurally unavailable in a target
+repository.
+
+Internal Consumer operations (for example `bootstrap-existing-project`) are not
+public route entries and require explicit composition allowance from a public
+operation.

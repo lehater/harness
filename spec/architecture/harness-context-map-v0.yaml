@@ -120,6 +120,7 @@ contexts:
       - semantic_closure
       - semantic_questions
       - skill_invariant_policy
+      - skill_router
     may_depend_on:
       - project-model
       - reference-model
