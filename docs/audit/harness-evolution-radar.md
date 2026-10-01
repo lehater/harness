@@ -93,6 +93,8 @@ separate defect has been demonstrated.
 | EVO-030 | RECOMMENDATION | CAPTURED | Orchestration observability | Add a minimal operation-decision trace so maintainers can reconstruct task intent -> selected operation -> resolved skill/contracts without persisting private reasoning. |
 | EVO-031 | RESEARCH | CAPTURED | Evaluator calibration | Define calibration-corpus representativeness and drift/recalibration triggers so passing a small bootstrap corpus is not treated as broad evaluator-quality proof. |
 | EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
+| EVO-033 | RESEARCH | CAPTURED | Project-model discovery assurance | Prove selected-scope unfamiliar-repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies with independent holdouts and repeated clean-context semantic convergence. |
+| EVO-034 | RECOMMENDATION | CAPTURED | Capability assurance | Add an independent Harness Ability -> failure modes -> required evidence/oracle model so green registered tests cannot hide an unmodelled responsibility. |
 
 ## Detailed entries
 
@@ -1169,3 +1171,98 @@ tracks the concrete deep-recursion failure class separately.
 - AP-22 / AUD-019
 - HARN-023
 - AP-18 performance / cost
+
+
+### EVO-033 — Project-model discovery assurance
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+**Question**
+
+Can the agent-enabled Harness bootstrap/reconcile an unfamiliar project scope
+into a sufficiently accurate project-specific Engineering Graph when the correct
+model cannot be obtained by merely materializing existing Reference Model
+templates?
+
+The experiment should deliberately require:
+
+- a project-specific Capability absent from the current Reference Model;
+- an Authority split/merge decision justified by independent change and public
+  contract evidence;
+- rejection of at least one plausible but irrelevant reference template;
+- explicit Questions where accepted project evidence is insufficient.
+
+Run the actual routed Consumer operation from clean contexts and grade the
+normalized Authorities, Capabilities, dependencies, applicability, Questions and
+Consumer closure against a frozen independent oracle. Exact wording/IDs need not
+match when semantic identities are equivalent.
+
+**Why useful**
+
+AUD-021 found strong deterministic evidence after a graph/project-fact model is
+declared, but no executable evidence for the judgement boundary that forms that
+model from a selected unfamiliar project scope. Existing greenfield scenarios
+start from authored graphs; Reference Model holdouts start from authored project
+facts; real-project scenarios use project snapshots or preselected semantic
+surfaces.
+
+This is intentionally narrower than autonomous repository-wide prose mining,
+which the Integration Contract does not make a Harness responsibility.
+
+**Relationship**
+
+- EVO-001 supplies the general real-agent behavioral-eval direction.
+- EVO-019 tests Reference Model / Coverage / Project Model ownership.
+- EVO-033 focuses specifically on discovery quality, novelty, omission,
+  over-generation and reproducibility of the project model itself.
+
+---
+
+### EVO-034 — Ability-to-evidence assurance model
+
+**Type:** RECOMMENDATION  
+**Status:** CAPTURED
+
+**Direction**
+
+Create a small independent assurance registry that maps:
+
+~~~text
+Harness ability
+-> observable contract
+-> material failure modes
+-> required evidence classes
+-> minimum acceptable oracle class
+-> current evidence refs
+-> release-critical flag
+~~~
+
+Scenario Suite requirements, validators, real-project regressions, holdouts and
+provider-backed evals should reference this model. Test/scenario count must not
+become the denominator.
+
+**Why useful**
+
+AUD-021 found that the existing CI registry strongly guarantees that known
+validators/tests are inventoried and executed, while Scenario Suite strongly
+guarantees coverage of requirements already present in its catalog. Neither
+mechanism independently proves that the catalog contains every material Harness
+responsibility.
+
+The model should preserve heterogeneous evidence rather than aggregate it into a
+single percentage. A deterministic Core ability and a judgement-heavy agent
+discovery ability require different evidence maturity.
+
+**Not a defect**
+
+The current assurance system is internally coherent and has extensive useful
+coverage. This direction strengthens the validity of future release claims; it
+does not by itself demonstrate incorrect current runtime behavior.
+
+**Related**
+
+- AUD-021
+- EVO-001
+- EVO-031
+- EVO-032
