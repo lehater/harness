@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -20,7 +21,7 @@ from adapters.copilot_behavioral_eval_agent import (
     _prompt,
 )
 
-BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
+ADAPTER = ROOT / "adapters" / "copilot_behavioral_eval_agent.py"\nassert ADAPTER.is_file()\nassert ADAPTER.stat().st_mode & stat.S_IXUSR, "Copilot behavioral adapter must be executable"\n\nBASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
 MANIFEST = yaml.safe_load((BASE / "manifest-v0.yaml").read_text(encoding="utf-8"))
 EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
