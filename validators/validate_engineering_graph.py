@@ -332,7 +332,14 @@ def main() -> int:
                  "provides": ["requirements"], "depends_on": []},
             ],
             "questions": [
-                {**feedback_model["questions"][0], "resolution": "REQUIREMENTS-REPAIR"}
+                {
+                    **feedback_model["questions"][0],
+                    "resolution": {
+                        "artifact": "REQUIREMENTS-REPAIR",
+                        "acceptance_id": "REQUIREMENTS-REPAIR-1",
+                        "supersedes_acceptance_id": "REQUIREMENTS-1",
+                    },
+                }
             ],
         }
         repaired_result = evaluate_engineering_target(
