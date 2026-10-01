@@ -19,6 +19,8 @@ from typing import Any
 
 import yaml
 
+from harness import CoreError
+
 
 def semantic_key(item: dict[str, Any]) -> tuple[str, str | None]:
     return (item.get("kind", ""), item.get("subject"))
@@ -484,17 +486,28 @@ def evaluate_artifact(
 def evaluation_index(
     project_docs: list[dict[str, Any]],
 ) -> dict[tuple[str | None, str | None], dict[str, Any]]:
-    """Index generated semantic evaluations by (artifact, capability)."""
+    """Index one current semantic evaluation per (artifact, capability)."""
     result: dict[tuple[str | None, str | None], dict[str, Any]] = {}
+
+    def add(evaluation: dict[str, Any]) -> None:
+        key = (evaluation.get("artifact"), evaluation.get("capability"))
+        if key in result:
+            artifact, capability = key
+            raise CoreError(
+                "duplicate current semantic evaluation: "
+                f"artifact={artifact!r}, capability={capability!r}"
+            )
+        result[key] = evaluation
+
     for doc in project_docs:
         if doc.get("kind") == "harness-artifact-semantic-evaluation":
-            result[(doc.get("artifact"), doc.get("capability"))] = doc
+            add(doc)
         for item in doc.get("semantic_evaluations", []) or []:
             if not isinstance(item, dict):
                 continue
             if item.get("kind") != "harness-artifact-semantic-evaluation":
                 continue
-            result[(item.get("artifact"), item.get("capability"))] = item
+            add(item)
     return result
 
 
