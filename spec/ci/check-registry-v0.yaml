@@ -39,7 +39,8 @@ workflow_roles:
   role: external
   cost_class: heavy
   draft_behavior: manual
-  rationale: Provider-backed calibration has a 10 minute timeout and is intentionally operator-triggered.- path: .github/workflows/behavioral-eval-copilot.yml
+  rationale: Provider-backed calibration has a 10 minute timeout and is intentionally operator-triggered.
+- path: .github/workflows/behavioral-eval-copilot.yml
   role: external
   cost_class: heavy
   draft_behavior: manual
