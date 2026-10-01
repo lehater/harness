@@ -5,4 +5,4 @@ dimensions:
   capability_partition:
     groups:
       - [P1, P2]
-      - [A1, A2]
+      - [A1]

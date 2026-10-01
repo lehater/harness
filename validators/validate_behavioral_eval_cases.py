@@ -204,6 +204,9 @@ for entry in entries:
             if entry["design"] == "TD-CAP-001":
                 assert atom_ids == {"E1"}
                 assert oracle_groups == [["E1"]]
+            if entry["design"] == "TD-CAP-003":
+                assert atom_ids == {"P1", "P2", "A1"}
+                assert sorted(oracle_groups) == sorted([["P1", "P2"], ["A1"]])
             field = "capabilities" if entry["dimension"] == "capability_partition" else "authorities"
             sample = {
                 "version": 1,
