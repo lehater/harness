@@ -88,8 +88,13 @@ def _response_contract(dimension: str) -> dict[str, Any]:
             "schema": {
                 "version": 1,
                 "kind": "harness-agent-behavioral-model-response",
-                "selected_operation": _public_operations(),
+                "selected_operation": "<one string from allowed_selected_operations>",
             },
+            "allowed_selected_operations": _public_operations(),
+            "selection_rules": [
+                "Return exactly one public operation id as selected_operation.",
+                "selected_operation is a string, never a list or mapping.",
+            ],
         }
     field = "capabilities" if dimension == "capability_partition" else "authorities"
     return {

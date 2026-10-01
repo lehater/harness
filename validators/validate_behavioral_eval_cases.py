@@ -20,6 +20,7 @@ from adapters.copilot_behavioral_eval_agent import (
     _observed_cli_version,
     _parse_model_response,
     _prompt,
+    _response_contract,
 )
 
 ADAPTER = ROOT / "adapters" / "copilot_behavioral_eval_agent.py"
@@ -117,6 +118,9 @@ for entry in entries:
             atom_ids = {atom["id"] for atom in atoms}
             oracle_groups = binding.oracle["dimensions"][entry["dimension"]]["groups"]
             assert all(set(group) <= atom_ids for group in oracle_groups)
+            if entry["design"] == "TD-CAP-001":
+                assert atom_ids == {"E1"}
+                assert oracle_groups == [["E1"]]
             field = "capabilities" if entry["dimension"] == "capability_partition" else "authorities"
             sample = {
                 "version": 1,
@@ -126,6 +130,13 @@ for entry in entries:
             parsed = _parse_model_response(json.dumps(sample), entry["dimension"])
             assert parsed["output"][field] == sample["output"][field]
         else:
+            contract = _response_contract("selected_operation")
+            assert contract["schema"]["selected_operation"] == (
+                "<one string from allowed_selected_operations>"
+            )
+            allowed = contract["allowed_selected_operations"]
+            assert isinstance(allowed, list) and allowed
+            assert all(isinstance(item, str) and item for item in allowed)
             expected = binding.oracle["dimensions"]["selected_operation"]
             registry = yaml.safe_load(
                 (ROOT / "skills/consumer-operation-registry-v0.yaml").read_text(

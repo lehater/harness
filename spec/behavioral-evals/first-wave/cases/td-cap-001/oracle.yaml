@@ -4,4 +4,4 @@ id: TD-CAP-001-ORACLE-V1
 dimensions:
   capability_partition:
     groups:
-      - [E1, E2]
+      - [E1]

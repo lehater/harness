@@ -166,10 +166,10 @@ A design may move to READY only when:
 
 Fixture:
 
-A small accepted evidence set states that an API accepts idempotency keys for
-payment creation and that retry safety must be reasoned about before the API
-contract is implementation-ready. No other independent engineering knowledge
-surface is present.
+A minimal accepted evidence set contains exactly one material knowledge atom:
+payment creation accepts an idempotency key. Do not add prerequisite,
+dependency, readiness, or second-surface wording here; those would turn this
+omission/invention case into a granularity or ordering case.
 
 System under test:
 
@@ -178,8 +178,8 @@ materialization.
 
 Expected semantic result:
 
-Exactly one project knowledge identity representing the independently provable
-idempotency/retry contract. Naming is unconstrained.
+Exactly one project knowledge identity representing the idempotency contract.
+Naming is unconstrained.
 
 Assertions:
 

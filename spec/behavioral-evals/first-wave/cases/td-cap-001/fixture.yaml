@@ -5,6 +5,3 @@ atoms:
   - id: E1
     statement: "Payment creation must accept an idempotency key."
     source_path: "docs/api-contract.md"
-  - id: E2
-    statement: "Retry safety must be established before the payment creation contract is implementation-ready."
-    source_path: "docs/reliability.md"
