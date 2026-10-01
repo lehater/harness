@@ -46,28 +46,36 @@ definitions.
 The reviewed minimum implementation is:
 
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
-- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M08 meta-self-tests.
+- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M11 meta-self-tests.
 
 The seed is intentionally incomplete. It includes HA-A04 Authority formation,
-HA-A05 Capability formation, HA-A16 routing, and HA-A19 assurance self-test
-obligations. HA-A05 is split into separate TL1 discovery/granularity, TL3
-Reference-vocabulary/novel-Capability, and TL4 clean-context convergence proof
-slots.
+HA-A05 Capability formation, HA-A09 existing-project bootstrap/reconcile,
+HA-A16 routing, and HA-A19 assurance self-test obligations. HA-A05 remains split
+into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
+Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
+separate TL2 controlled handoff, TL3 existing-project micro-project, TL4
+clean-context/metamorphic, and TL5 known-project proof slots.
 
-Provider-backed run `36928079710` is preserved as durable historical
-evidence in
-`spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`.
-Provider-backed evidence is bound not only to case/fixture/oracle content but
-also to the provider-visible instruction surfaces and execution files that
-formed the run. Registry validation compares those Git blob identities with the
-current repository before active judgement evidence can satisfy a proof slot.
+Provider-backed run `36928079710` is preserved as durable historical evidence
+in `spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`; it
+remains stale for the current Harness because root `AGENTS.md` changed after
+that run.
 
-The root `AGENTS.md` changed after run `36928079710`, so its first-wave
-evidence records are currently `stale`. They no longer satisfy A04-R01,
-A05-R01, or A16-R01 until the reviewed cases are repeated under the current
-instruction/runtime bindings. Existing deterministic routing evidence still
-satisfies A16-R02..R04. Registry validity therefore remains separate from
-release-claim completeness and `release_claim_ready` remains false.
+Provider-backed run `36942421201` is the current accepted execution record in
+`spec/assurance/evidence/first-wave-provider-run-36942421201.yaml`. It
+executed the refreshed ten first-wave cases plus TD-COMP-001 against Harness
+revision `c1a45a1a618fe11e2b2b28a5d3184d177beb5d71`. Active judgement
+evidence is bound to case/fixture/oracle content plus the provider-visible
+instruction and behavior-relevant execution surface by immutable Git blob
+identities. Registry validation compares those bindings with the current
+repository before a proof slot can remain admissible.
+
+The current admitted proof state is deliberately partial: A04-R01 and A05-R01
+are satisfied; A16-R01..R04 are satisfied; and the new HA-A09 TL2 handoff slot
+A09-R01 is satisfied by TD-COMP-001. A04-R02/R03, A05-R02/R03,
+A09-R02/R03/R04, and A16-R05/R06 remain missing. Registry validity therefore
+remains separate from release-claim completeness and
+`release_claim_ready` remains false.
 
 ## Core model
 

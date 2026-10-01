@@ -56,6 +56,25 @@ abilities:
       - A05-R02
       - A05-R03
 
+  - id: HA-A09
+    title: Existing-project bootstrap/reconcile
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A09-F01
+      - A09-F02
+      - A09-F03
+      - A09-F04
+      - A09-F05
+      - A09-F06
+    requirements:
+      - A09-R01
+      - A09-R02
+      - A09-R03
+      - A09-R04
+
   - id: HA-A16
     title: Agent/method/artifact routing
     contract_ref:
@@ -196,6 +215,62 @@ requirements:
       test_levels: [TL4]
       methods_any: [EM-09]
       oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A09-R01
+    ability: HA-A09
+    failure_modes: [A09-F01, A09-F04, A09-F06]
+    purpose: Controlled TL2 design-target to bootstrap-realization handoff preserves accepted project truth, stable identities, and missing-provider honesty.
+    required:
+      test_levels: [TL2]
+      methods_any: [EM-07]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A09-R02
+    ability: HA-A09
+    failure_modes: [A09-F02]
+    purpose: Synthetic existing-project micro-project reuses a project-owned canonical graph/projection instead of creating a second graph.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A09-R03
+    ability: HA-A09
+    failure_modes: [A09-F03, A09-F05]
+    purpose: Repeated clean-context bootstrap is invariant to unrelated repository material and unchanged reruns.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-05, EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A09-R04
+    ability: HA-A09
+    failure_modes: [A09-F01, A09-F02, A09-F03, A09-F04, A09-F05, A09-F06]
+    purpose: Known real-project regression confirms lower-level bootstrap guarantees survive understood real complexity.
+    required:
+      test_levels: [TL5]
+      methods_any: [EM-10]
+      oracle_minimum: O2
       judgement_execution: true
     substitution:
       higher_level_alone_allowed: false
@@ -382,6 +457,106 @@ evidence:
       - Provider-visible root AGENTS.md changed after run 36928079710; current prompt binding is stale.
       - Accepted provider-backed run 36928079710 covers TD-ROUTE-001..003 natural-language intent at TL1.
       - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
+
+  - id: EVID-CAP-FIRST-WAVE-TL1-36942421201
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    satisfies: [A05-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Accepted provider-backed run 36942421201 covers TD-CAP-001..004 at TL1 with current execution bindings.
+      - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
+      - Does not establish Reference-vocabulary/novel-Capability or repeated clean-context proof.
+
+  - id: EVID-AUTH-FIRST-WAVE-TL1-36942421201
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    satisfies: [A04-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Accepted provider-backed run 36942421201 covers TD-AUTH-001/002/004 at TL1 with current execution bindings.
+      - Does not establish joint-ownership/Reference-bias or repeated clean-context proof.
+
+  - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1-36942421201
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    satisfies: [A16-R01]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Accepted provider-backed run 36942421201 covers TD-ROUTE-001..003 natural-language intent at TL1 with current execution bindings.
+      - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
+
+  - id: EVID-BOOT-COMP-TL2-36942421201
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - target_state.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    satisfies: [A09-R01]
+    test_level: TL2
+    methods: [EM-07]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
+    case_ids: [TD-COMP-001]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves the reviewed Design Profile to minimal Core realization handoff for one controlled synthetic fixture.
+      - Does not establish project-owned graph/projection reuse, repeated clean-context idempotence, unrelated-file invariance, or real-project regression.
+      - TD-COMP-001 is TL2 only; it does not satisfy A09-R02, A09-R03, or A09-R04.
 
   - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
     providers:
