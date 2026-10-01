@@ -1185,27 +1185,37 @@ into a sufficiently accurate project-specific Engineering Graph when the correct
 model cannot be obtained by merely materializing existing Reference Model
 templates?
 
-The experiment should deliberately require:
+Use a staged falsification sequence rather than beginning with a large real
+repository:
 
-- a project-specific Capability absent from the current Reference Model;
-- an Authority split/merge decision justified by independent change and public
-  contract evidence;
-- rejection of at least one plausible but irrelevant reference template;
-- explicit Questions where accepted project evidence is insufficient.
+1. isolated synthetic fixtures for project-specific Capability discovery,
+   granularity, Authority split/merge and dependency necessity;
+2. short composed synthetic chains;
+3. a controlled synthetic micro-project containing:
+   - a required Capability absent from the current Reference Model;
+   - an Authority split/merge decision justified by independent change and
+     public contract evidence;
+   - at least one plausible but irrelevant reference-template temptation;
+   - an evidence gap that must remain an explicit Question;
+4. repeated clean-context execution of the actual routed Consumer operation over
+   that micro-project;
+5. only after those layers are stable, known real-project regression and then a
+   frozen independent real-project holdout.
 
-Run the actual routed Consumer operation from clean contexts and grade the
-normalized Authorities, Capabilities, dependencies, applicability, Questions and
-Consumer closure against a frozen independent oracle. Exact wording/IDs need not
-match when semantic identities are equivalent.
+Grade normalized Authorities, Capabilities, dependencies, applicability,
+Questions and Consumer closure against an independently authored oracle. Exact
+wording/IDs need not match when semantic identities are equivalent.
 
 **Why useful**
 
 AUD-021 found strong deterministic evidence after a graph/project-fact model is
 declared, but no executable evidence for the judgement boundary that forms that
-model from a selected unfamiliar project scope. Existing greenfield scenarios
-start from authored graphs; Reference Model holdouts start from authored project
-facts; real-project scenarios use project snapshots or preselected semantic
-surfaces.
+model from a selected unfamiliar project scope. The follow-up assurance
+clarification establishes a bottom-up test order: mechanism-level synthetic
+fixtures first, then composition, controlled micro-projects and repeated agent
+runs. Existing greenfield scenarios start from authored graphs; Reference Model
+holdouts start from authored project facts; real-project scenarios use project
+snapshots or preselected semantic surfaces.
 
 This is intentionally narrower than autonomous repository-wide prose mining,
 which the Integration Contract does not make a Harness responsibility.

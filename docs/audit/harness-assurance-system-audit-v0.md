@@ -15,6 +15,8 @@ Evidence baseline:
 
 This artifact evaluates the test / validation / evaluation / assurance system. It does not change production, test, validator, Scenario Suite or CI implementation.
 
+Methodology clarification: a large real repository is **not** the starting point for testing a Harness mechanism. The preferred progression is isolated synthetic mechanism evidence first, then composition, then a controlled synthetic micro-project, and only after those layers are stable should known or independent real projects be used as system/portability/holdout evidence.
+
 ## 1. Executive conclusion
 
 Harness already has substantial executable evidence for **deterministic behavior after its semantic inputs have been made explicit**.
@@ -229,6 +231,95 @@ Status vocabulary:
 | CI-policy/meta-tests | Yes | PRESENT | Inventory, ordering, draft/final gate policy | Semantic coverage adequacy |
 | Self-test of testing system | Yes | PARTIAL | CI registry prevents unregistered executable checks | No independent ability registry/oracle-strength gate |
 
+## 5.1 Test level hierarchy
+
+The evidence taxonomy above describes **what kind of proof** a test provides.
+Harness also needs an orthogonal hierarchy describing **how much system surface
+is exercised at once**.
+
+The default rule is: use the smallest level that can falsify the mechanism under
+test. A larger project is not a substitute for a missing lower-level oracle.
+
+| Level | Test subject | Typical input | Responsibility | Failure localization |
+|---|---|---|---|---|
+| TL0 | Structural/static contract | Small schema/registry/config fixture | Prove shape, registration and forbidden states | Very high |
+| TL1 | One Harness mechanism | Minimal synthetic structured fixture | Prove one algorithm/policy/transition in isolation | Very high |
+| TL2 | Composition of a few mechanisms | Synthetic structured fixtures crossing 2-4 boundaries | Prove contracts compose without precedence/translation loss | High |
+| TL3 | Synthetic micro-project | Small controlled repository/project fixture with authored oracle | Prove a complete bounded use case while retaining exact expected semantics | High/moderate |
+| TL4 | Repeated agent execution on a synthetic micro-project | Same frozen micro-project, clean agent contexts | Prove judgement/procedure reproducibility without real-project noise | Moderate |
+| TL5 | Known real-project regression | Pinned Prep/NAPMS/Nutrition slice or equivalent | Prove the mechanisms survive real project complexity already understood by maintainers | Lower |
+| TL6 | Independent real-project holdout | Frozen project/domain not used to design the mechanism | Test portability/generalization after lower levels are green | Lowest; use mainly for system-level falsification |
+
+### Why this ordering matters
+
+A failure in a large live repository has poor diagnostic resolution. It may come
+from source selection, Capability discovery, Authority grouping, dependency
+formation, routing, semantic admission, project-specific ambiguity or an
+unrelated integration detail.
+
+The same failure expressed as a TL1/TL2 synthetic fixture can normally identify
+one violated contract directly.
+
+Therefore the preferred development loop is:
+
+~~~text
+mechanism hypothesis
+        ↓
+TL1 minimal synthetic fixture
+        ↓
+TL2 composition fixture
+        ↓
+TL3 controlled micro-project
+        ↓
+TL4 repeated clean-context agent execution when judgement is involved
+        ↓
+TL5 known real-project regression
+        ↓
+TL6 independent real-project holdout
+~~~
+
+Do not promote a mechanism to a larger level merely because the larger fixture
+looks more realistic. Promote it when the smaller level can no longer exercise
+the material interaction being tested.
+
+### Current Harness evidence mapped to test levels
+
+| Existing evidence surface | Approximate level | Current value | Important limit |
+|---|---|---|---|
+| Registry/schema/policy validators | TL0 | Strong | Structural evidence only |
+| Core, target-state, lifecycle, routing and similar focused validators | TL1 | Strong for many deterministic mechanisms | Inputs already encode semantic decisions |
+| Authority-boundary research fixtures | TL1 | Useful boundary-property checks | They validate authored boundaries; they do not discover them |
+| Reference materializer fixtures/holdouts | TL1-TL2 | Strong for declared facts -> known template selection/materialization | They do not test raw evidence -> project facts or novel Capability discovery |
+| Small Scenario Suite cases | TL1-TL2 | Strong cross-layer regression substrate | Scenario author supplies fixtures and coverage claim |
+| Multi-step Scenario Suite cases | TL2 | Strong for precedence, invalidation and semantic derivation composition | Not a full project bootstrap |
+| Greenfield CSV example | TL2-TL3 | Controlled multi-artifact/project-shaped fixture | Engineering Graph is pre-authored; discovery is bypassed |
+| User-facing application example | TL2-TL3 | Broad frontend/project-shaped fixture | Also pre-authored, not agent-derived |
+| Managed-workspace minimal-domain fixture | TL2-TL3 | Useful workspace/artifact integration case | Does not exercise project-model discovery |
+| Synthetic project-behavior eval declarations | TL0/TL1 benchmark specification | Useful expected-behavior corpus | Current validator checks fixture coherence rather than executing discovery |
+| Repeated clean-context agent runs on controlled micro-projects | TL4 | **ABSENT** | Primary missing evidence for judgement-dependent project-model formation |
+| Prep real-project scenarios/snapshots | TL5 | Present | Regression/co-design evidence, not blind holdout |
+| NAPMS real-project scenarios/adoption | TL5 | Present and valuable | Regression/co-design evidence, not independent for mechanisms it helped shape |
+| Nutrition research/validation evidence | TL5 | Present as design/portability evidence | Also participated in model evolution |
+| Whole-Harness independent real-project holdout | TL6 | **ABSENT** | Add only after TL1-TL4 gaps are sufficiently closed |
+| Live semantic calibration | Orthogonal evaluator-assurance track | Present on a small corpus | Measures delegated semantic evaluator quality, not project-size test level |
+
+### Consequence for discovery testing
+
+Capability discovery, Authority boundary formation and bootstrap should be
+decomposed before any whole-repository trial.
+
+~~~text
+TL1: minimal synthetic evidence -> one expected Capability or Authority decision
+TL2: compose discovery + applicability/dependency and include a negative case
+TL3: tiny controlled repository -> bootstrap -> normalized project model -> oracle
+TL4: repeat that micro-project in clean contexts and measure convergence
+TL5/TL6: only then exercise known and independent real projects
+~~~
+
+The same progression applies to Authority boundary discovery and other
+judgement-heavy Harness mechanisms.
+
+
 ## 6. Discovery pipeline audit
 
 The requested discovery chain should not be interpreted as “Harness Core autonomously parses an arbitrary repository”. The valid agent-enabled contract starts from a selected scope and project instructions.
@@ -247,9 +338,11 @@ The requested discovery chain should not be interpreted as “Harness Core auton
 | 10. Consumer closure | Harness | Deterministic | Strong graph/profile/scenario evidence | Contract oracle | STRONG |
 | 11. CREATE/WAIT/PENDING/COMPLETE/frontier | Harness | Deterministic | Strong target/decision/frontier scenarios | Contract oracle | STRONG |
 
-### 6.1 Key negative result
+### 6.1 Eventual system-level gap
 
-No current test was found that executes the full contract:
+After the lower-level mechanisms are isolated and composed, the final bootstrap
+contract still needs system-level evidence. No current test was found that
+executes the full contract:
 
 ~~~text
 fresh agent
@@ -515,39 +608,55 @@ At least some should be frozen holdouts that did not participate in mechanism de
 
 ## 14. Minimum sufficient assurance graph
 
-The minimal suite should not maximize test count. Each layer closes a distinct failure class.
+The minimum suite should grow by **diagnostic scope**, not by realism first.
+Every larger level assumes the lower level already has a usable oracle.
 
 ~~~text
-1. local structural + invariant checks
-   closes malformed state / local safety regressions
+TL0. structural / registry / schema guards
+   prove that invalid representations cannot enter the mechanism
         ↓
-2. deterministic mechanism contracts
-   closes algorithmic state-transition defects
+TL1. isolated synthetic mechanism tests
+   prove one Harness mechanism over minimal positive/negative/mutation cases
         ↓
-3. cross-layer Scenario contracts
-   closes composition / precedence / invalidation defects
+TL2. composed synthetic mechanism tests
+   prove adjacent mechanisms preserve semantics and precedence
         ↓
-4. existing-project + greenfield behavioral E2E
-   closes procedure integration / bootstrap failures
+TL3. controlled synthetic micro-project E2E
+   prove a bounded Harness use case with a fully authored independent oracle
         ↓
-5. frozen independent project holdouts
-   closes fixture/reference vocabulary overfit
+TL4. repeated clean-context agent runs on the same micro-project
+   prove judgement-dependent routing/discovery/procedure reproducibility
         ↓
-6. repeated clean-context agent discovery eval
-   closes non-reproducible / omitted / invented project-model judgement
+TL5. known real-project regressions
+   prove the validated mechanisms survive realistic complexity
         ↓
-7. semantic evaluator calibration where judgement is delegated
-   closes evaluator FP/FN / drift risk
+TL6. independent real-project holdouts
+   challenge portability/generalization after lower layers are stable
         ↓
-8. CI policy + exact integration-candidate full gate
-   proves the selected evidence actually ran for the release candidate
+CI / exact integration-candidate gate
+   proves the required deterministic evidence ran for the candidate
 ~~~
 
-Layer 4 must exercise the actual routed procedure, not call the downstream deterministic functions directly.
+Provider-backed semantic calibration is an orthogonal assurance track and is
+required only where Harness delegates semantic judgement to an evaluator.
 
-Layer 5 must freeze the oracle before execution.
+### Promotion rule
 
-Layer 6 is necessary only for judgement-dependent abilities; it should not be imposed on deterministic Core logic.
+Move upward only when the lower level cannot represent the interaction being
+tested.
+
+Examples:
+
+- a Core transition bug should normally stop at TL1;
+- Project Frontier precedence is naturally TL2;
+- bootstrap/reconcile procedure composition belongs at TL3;
+- agent judgement reproducibility belongs at TL4;
+- project-shape portability belongs at TL5/TL6.
+
+A large repository should **not** be used to discover a mechanism defect that
+could have been expressed as a small synthetic fixture. Real projects are
+expensive, noisy and poor at root-cause localization; their purpose is final
+system/portability evidence.
 
 ## 15. Critical assurance gaps
 
@@ -555,9 +664,14 @@ These priorities are audit-local assurance priorities, not new HARN severities.
 
 ### P0 — release-claim blockers
 
-**ASG-01 — Project-model formation is not end-to-end proven.**
+**ASG-01 — Project-model formation lacks a complete bottom-up assurance chain.**
 
-No executable evidence currently establishes selected-scope unfamiliar repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies -> validated Project Engineering Graph. This prevents a strong claim about bootstrap/discovery usefulness.
+The weakest evidence is not merely the absence of one large end-to-end repository
+test. Capability discovery, Authority boundary formation and related
+judgement-heavy mechanisms first need isolated synthetic oracles and composed
+micro-project evidence. Until TL1-TL4 are closed, a whole-repository E2E failure
+would be difficult to diagnose and a pass would be weak evidence. This prevents
+a strong claim about bootstrap/discovery usefulness.
 
 **ASG-02 — The assurance system has no independent Ability-to-Evidence denominator.**
 
@@ -605,75 +719,110 @@ A maintainer must read validator/scenario/research implementation to distinguish
 
 No implementation is performed by this audit.
 
-### Step 1 — highest information experiment
+### Step 1 — classify current evidence by ability and test level
 
-Create one frozen unfamiliar-repository fixture designed to falsify current assumptions.
+For every release-critical Ability, inventory the existing TL0-TL6 evidence and
+identify the **lowest missing level**.
 
-It must contain:
+Do not start by creating a real-project test. If Capability discovery has no
+isolated synthetic oracle, fill TL1 before designing TL3-TL6.
+
+### Step 2 — close isolated mechanism gaps with synthetic fixtures
+
+Prioritize boundaries currently hidden behind pre-authored graph inputs:
+
+- project-specific Capability discovery;
+- Capability granularity;
+- Authority split/merge decisions;
+- dependency necessity;
+- applicability/UNKNOWN handling;
+- operation selection when task intent must be interpreted.
+
+Each fixture should make one expected semantic result explicit and include at
+least one negative or over-generation case.
+
+### Step 3 — compose adjacent mechanisms
+
+After individual mechanisms have stable oracles, test short chains such as:
+
+~~~text
+accepted evidence
+-> Capability discovery
+-> dependency formation
+-> Authority grouping
+~~~
+
+and:
+
+~~~text
+task intent
+-> operation selection
+-> router
+-> selected skill
+~~~
+
+These remain synthetic TL2 tests so a failure is still localizable.
+
+### Step 4 — build controlled synthetic micro-projects
+
+Create small repository fixtures, typically tens of files rather than a real
+large codebase.
+
+A discovery-focused micro-project should deliberately contain:
 
 - one project-specific required Capability absent from Reference Model templates;
-- one Authority boundary where an attractive reference grouping is intentionally wrong for the project;
-- one irrelevant reference concern that lexical similarity could over-generate;
-- enough accepted project evidence for an independent reviewer to author the expected semantic model.
+- one Authority split/merge case;
+- one irrelevant reference/template temptation;
+- one missing semantic fact that must become a Question;
+- one known Consumer closure.
 
-Run the real Consumer startup route with a fresh agent.
+The oracle is authored independently from the agent run.
 
-This one experiment can simultaneously falsify:
+### Step 5 — repeat micro-project runs in clean contexts
 
-- capability discovery;
-- authority boundary discovery;
-- reference-model bias resistance;
-- omission resistance;
-- over-generation control;
-- operation/skill execution compliance.
+Run the actual routed Consumer operation 3-5 times against the same frozen
+micro-project.
 
-Do not add new discovery algorithms before this experiment.
+Normalize outputs semantically and measure omissions, inventions, Authority
+partition agreement, Capability/dependency agreement, applicability,
+Question ownership and Consumer closure.
 
-### Step 2 — repeat the same experiment in clean contexts
+This is the first level where agent reproducibility is the subject of the test.
 
-Run 3-5 times with identical frozen inputs and normalize outputs semantically. Measure:
+### Step 6 — retain known real projects as regression/system evidence
 
-- omissions;
-- inventions;
-- Authority partition agreement;
-- capability/edge agreement;
-- Question ownership;
-- final closure/frontier agreement.
+Use Prep, NAPMS and similar projects only after the responsible lower-level
+mechanisms are green. Their job is to reveal integration effects that controlled
+fixtures did not model, not to provide the first oracle for a mechanism.
 
-If the runs do not converge, treat that as evidence before changing prompts/skills.
+### Step 7 — add independent real-project holdouts selectively
 
-### Step 3 — add the Ability-to-Evidence registry/model
+Only when TL1-TL4 evidence is credible should an unfamiliar real project be
+frozen as a holdout. Select projects by new failure modes/project shapes, not by
+repository size.
 
-Only after the first experiment clarifies the real boundaries, create a small machine-readable assurance registry:
+### Step 8 — add the Ability-to-Evidence registry/model
+
+Persist the relationship:
 
 ~~~text
 ability
--> observable contract
--> material failure modes
--> required evidence classes
+-> failure modes
+-> minimum required test levels
+-> evidence classes
 -> acceptable oracle class
 -> current evidence refs
 -> release-critical?
 ~~~
 
-Scenario Suite requirements and CI checks should reference this model rather than becoming the denominator themselves.
+Scenario Suite and CI then become executors/evidence providers for that model,
+not the definition of completeness themselves.
 
-### Step 4 — add two behavioral E2E paths
+### Step 9 — widen semantic calibration only where needed
 
-Minimum:
-
-- existing project with reusable project-owned graph/projection;
-- greenfield/minimal project with no prior Harness realization.
-
-Both should execute routed skills, not merely call graph evaluators.
-
-### Step 5 — promote a small holdout portfolio
-
-Freeze materially different projects before running them. Prefer archetypes that add new failure modes rather than more examples of the same service shape.
-
-### Step 6 — widen semantic calibration only where evidence shows value
-
-Extend evaluator/provider/model variation after discovery/agent boundaries are measurable. Do not spend provider budget to compensate for missing deterministic or human-authored oracles.
+Extend evaluator/provider/model variation where delegated semantic judgement is
+actually release-critical. Do not spend evaluator budget to compensate for
+missing TL1-TL3 deterministic or human-authored tests.
 
 ## 17. Answers to the audit quality questions
 
@@ -688,7 +837,7 @@ Extend evaluator/provider/model variation after discovery/agent boundaries are m
 9. **Can it reproducibly discover an Authority boundary?** Not currently demonstrated.
 10. **Is raw repository -> Project Engineering Graph proven E2E?** No. Also, the valid contract is selected-scope agent bootstrap, not autonomous repository-wide prose mining.
 11. **Which failure modes cannot the current suite detect reliably?** Systematic agent omission/invention during model formation, incompatible graphs across clean runs, catalogue-level assurance omission, and broad reference-vocabulary overfit outside current holdouts.
-12. **What is the minimum release assurance suite?** The eight-layer graph in section 14, with live-agent layers only for judgement-dependent responsibilities.
+12. **What is the minimum release assurance suite?** The staged TL0-TL6 graph in section 14: isolate mechanisms first, compose them, prove them on controlled micro-projects, measure agent reproducibility there, and only then use known/independent real projects.
 13. **What should “this Harness version performs its purpose” mean?** Every release-critical ability has an observable contract, material failure modes have adequate evidence with stated oracle strength, judgement-dependent abilities have independent reproducible evidence, open false-COMPLETE defects are absent, and the exact candidate passed its required deterministic gate.
 
 ## 18. Audit dispositions
