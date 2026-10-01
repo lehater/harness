@@ -22,7 +22,8 @@ VALID_EVIDENCE_STATUSES = {
     "stale",
     "retired",
 }
-VALID_EXECUTION_NATURES = {"deterministic", "judgement-dependent"}
+VALID_ABILITY_EXECUTION_NATURES = {"deterministic", "judgement-dependent", "mixed"}
+VALID_EVIDENCE_EXECUTION_NATURES = {"deterministic", "judgement-dependent"}
 VALID_SOURCE_TYPES = {
     "synthetic",
     "known-project",
@@ -104,7 +105,7 @@ def validate_structure(registry: dict[str, Any], root: Path = ROOT) -> None:
             raise RegistryError(f"unknown ability id: {ability_id}")
         if not isinstance(ability.get("release_critical"), bool):
             raise RegistryError(f"{ability_id}: release_critical must be boolean")
-        if ability.get("execution_nature") not in VALID_EXECUTION_NATURES:
+        if ability.get("execution_nature") not in VALID_ABILITY_EXECUTION_NATURES:
             raise RegistryError(f"{ability_id}: invalid execution_nature")
         contract_ref = ability.get("contract_ref")
         if not isinstance(contract_ref, dict):
@@ -235,7 +236,7 @@ def validate_structure(registry: dict[str, Any], root: Path = ROOT) -> None:
         oracle = evidence_item.get("oracle_class")
         if oracle not in ORACLE_RANK:
             raise RegistryError(f"{evidence_id}: invalid oracle_class")
-        if evidence_item.get("execution_nature") not in VALID_EXECUTION_NATURES:
+        if evidence_item.get("execution_nature") not in VALID_EVIDENCE_EXECUTION_NATURES:
             raise RegistryError(f"{evidence_id}: invalid execution_nature")
         if evidence_item.get("source_type") not in VALID_SOURCE_TYPES:
             raise RegistryError(f"{evidence_id}: invalid source_type")
