@@ -208,9 +208,9 @@ Core target-state evaluation
 
 Against a Core model:
 
-- provider exists and is unblocked -> SATISFIED;
+- at least one provider exists and is unblocked -> SATISFIED; blocked sibling providers inside the same Authority are alternatives and do not block the CapabilityId;
 - provider missing, production prerequisites satisfied, no capability Question -> CREATE at the declared producer Authority;
-- provider or missing capability blocked by unresolved Question -> WAIT;
+- every existing provider is blocked, or a missing capability is blocked by an unresolved Question -> WAIT;
 - production prerequisites not yet satisfied -> PENDING;
 - every derived expectation satisfied -> COMPLETE.
 

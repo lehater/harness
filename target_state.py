@@ -9,7 +9,13 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError, blocked, capability_blockers, validate_model
+from harness import (
+    CoreError,
+    blocked,
+    capability_blockers,
+    unblocked_capability_providers,
+    validate_model,
+)
 
 
 def _by_id(items: list[dict[str, Any]], kind: str) -> dict[str, dict[str, Any]]:
@@ -188,12 +194,20 @@ def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dic
                     f"but capability {capability} is owned by {provider_authority}"
                 )
 
-            blockers = sorted(
-                {
-                    question
-                    for provider in providers
-                    for question in blocked(model, provider)
-                }
+            available_providers = unblocked_capability_providers(
+                model,
+                capability,
+            )
+            blockers = (
+                []
+                if available_providers
+                else sorted(
+                    {
+                        question
+                        for provider in providers
+                        for question in blocked(model, provider)
+                    }
+                )
             )
             if blockers:
                 wait.append(

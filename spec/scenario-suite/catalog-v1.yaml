@@ -390,6 +390,12 @@ requirements:
     description: Authority execution context exposes only admitted upstream and same-Authority canonical inputs.
     min_scenarios: 1
 
+  - id: multi-provider-structural-availability
+    category: authority
+    enforcement: required
+    description: A blocked historical provider does not block a CapabilityId when another same-Authority provider is structurally usable; only usable alternatives enter Authority input context.
+    min_scenarios: 1
+
   - id: project-authority-migration
     category: authority
     enforcement: required

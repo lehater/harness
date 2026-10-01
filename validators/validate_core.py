@@ -27,8 +27,45 @@ from harness import (  # noqa: E402
 )
 
 
+def test_multiple_provider_alternative() -> None:
+    model = {
+        "authorities": [{"id": "SOURCE"}],
+        "artifacts": [
+            {
+                "id": "SOURCE-CURRENT",
+                "authority": "SOURCE",
+                "path": "docs/source-current.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+            {
+                "id": "SOURCE-OLD",
+                "authority": "SOURCE",
+                "path": "docs/source-old.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+        ],
+        "questions": [
+            {
+                "id": "Q-OLD",
+                "authority": "SOURCE",
+                "text": "Historical provider remains unresolved.",
+                "blocks": ["SOURCE-OLD"],
+            }
+        ],
+    }
+    action = next_action(model, "application.source")
+    assert action["action"] == "DESIGN", action
+    assert action["providers"] == ["SOURCE-CURRENT", "SOURCE-OLD"], action
+
+
 def main() -> int:
     errors: list[str] = []
+    try:
+        test_multiple_provider_alternative()
+    except Exception as exc:
+        errors.append(f"multiple provider alternative: {exc}")
     required = [ROOT / "harness.py", ROOT / "docs/design/core-v0.md"]
     for path in required:
         if not path.is_file():

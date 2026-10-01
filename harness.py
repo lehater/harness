@@ -233,6 +233,19 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
     return sorted(result)
 
 
+def unblocked_capability_providers(
+    model: dict[str, Any],
+    capability_id: str,
+) -> list[str]:
+    """Return structurally usable providers for one CapabilityId."""
+    providers = capability_resolve(model, capability_id)
+    return [
+        provider
+        for provider in providers
+        if not blocked(model, provider)
+    ]
+
+
 def question_frontier(model: dict[str, Any], question_ids: list[str]) -> list[dict[str, Any]]:
     """Route unresolved blockers to their addressed authorities without guessing external escalation."""
     validate_model(model)
@@ -304,7 +317,18 @@ def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     validate_model(model)
     providers = capability_resolve(model, capability_id)
     owner = capability_owner(model, capability_id)
-    blockers = sorted({q for artifact_id in providers for q in blocked(model, artifact_id)})
+    available = unblocked_capability_providers(model, capability_id)
+    blockers = (
+        []
+        if available
+        else sorted(
+            {
+                question
+                for artifact_id in providers
+                for question in blocked(model, artifact_id)
+            }
+        )
+    )
     if blockers:
         return {
             "action": "WAIT",

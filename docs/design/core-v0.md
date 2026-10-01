@@ -9,6 +9,13 @@ Harness Core manages boundaries of engineering knowledge and decision ownership.
 - **CapabilityId** — a value identifier for knowledge/capability provided by canonical artifacts. Multiple providers are allowed only inside one Authority.
 - **Question** — a material unresolved semantic gap addressed to the Authority allowed to decide it.
 
+Multiple providers of one CapabilityId are structural alternatives inside the same
+Authority, not a conjunction. The CapabilityId is structurally usable when at
+least one provider is unblocked. A Question that blocks one provider does not
+block sibling providers unless it blocks the CapabilityId itself or its impact
+closure reaches every provider. Assurance/lifecycle may select one accepted
+provider for semantic currentness without changing this Core availability rule.
+
 A Question contains no final semantic answer. Resolution means the addressed Authority changed canonical truth and the Question now references the canonical artifact containing that decision plus the new opaque semantic `acceptance_id` and the identity it supersedes. Core does not interpret the identity; project integration must supply it from accepted semantic/project-native evidence. `ABSENT` is reserved for `supersedes_acceptance_id` when no prior accepted semantic identity existed.
 
 ## Relations
