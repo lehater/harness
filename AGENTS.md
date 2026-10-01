@@ -18,8 +18,9 @@ Ordinary work in this repository uses the Maintainer Skill Surface declared by
 `skills/maintainer-operation-registry-v0.yaml`.
 
 Target repositories using Harness enter through the Consumer Skill Surface
-declared by `skills/consumer-operation-registry-v0.yaml` plus deterministic
-artifact routing in `skills/artifact-skill-registry-v0.yaml`. Consumer
+declared by `skills/consumer-operation-registry-v0.yaml` and
+`skills/consumer-method-registry-v0.yaml`, plus deterministic artifact routing
+in `skills/artifact-skill-registry-v0.yaml`. Consumer
 procedures may be exercised here for fixtures/dogfooding, but they are not the
 default maintainer workflow.
 
