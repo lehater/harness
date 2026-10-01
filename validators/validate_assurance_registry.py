@@ -310,7 +310,18 @@ def _validate_provider_run_binding(
         raise RegistryError(f"{evidence_id}: invalid provider run revision")
 
     cases = _mapping_list(run_record.get("cases"), f"{evidence_id} provider cases")
-    cases_by_id = _index(cases, f"{evidence_id} provider case")
+    cases_by_id: dict[str, dict[str, Any]] = {}
+    for case in cases:
+        case_id = case.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            raise RegistryError(
+                f"{evidence_id}: provider case record has no stable case_id"
+            )
+        if case_id in cases_by_id:
+            raise RegistryError(
+                f"{evidence_id}: duplicate provider case_id {case_id}"
+            )
+        cases_by_id[case_id] = case
     selected = evidence_item.get("case_ids")
     if not isinstance(selected, list) or not selected or not all(
         isinstance(item, str) and item for item in selected
