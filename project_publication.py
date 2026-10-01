@@ -16,7 +16,7 @@ import yaml
 from capability_lifecycle import lifecycle_index, validate_projection
 from decision_pipeline import decision_failure_index
 from engineering_graph import validate_realization
-from harness import CoreError, blocked, capability_blockers, capability_resolve
+from harness import CoreError, artifact_blockers, capability_blockers, capability_resolve
 
 PUBLICATION_KIND = "harness-project-publication"
 PUBLICATION_VERSION = 1
@@ -230,14 +230,31 @@ def build_project_publication(
 def _blockers_for_capability(
     realized: dict[str, Any],
     capability: str,
+    *,
+    selected_artifact: str | None = None,
 ) -> list[str]:
     blockers = set(capability_blockers(realized, capability))
+    if selected_artifact is not None:
+        blockers.update(artifact_blockers(realized, selected_artifact))
+        return sorted(blockers)
+
     try:
         providers = capability_resolve(realized, capability)
     except CoreError:
         providers = []
+    if blockers:
+        return sorted(blockers)
+
+    usable = [
+        artifact_id
+        for artifact_id in providers
+        if not artifact_blockers(realized, artifact_id)
+    ]
+    if usable:
+        return []
+
     for artifact_id in providers:
-        blockers.update(blocked(realized, artifact_id))
+        blockers.update(artifact_blockers(realized, artifact_id))
     return sorted(blockers)
 
 
@@ -259,7 +276,17 @@ def _validate_terminal_outcome(
     evaluations = checked["evaluations"]
 
     if outcome == "BLOCKED":
-        if not _blockers_for_capability(realized, capability):
+        lifecycle_item = lifecycle.get(capability)
+        selected_artifact = (
+            lifecycle_item.get("artifact")
+            if isinstance(lifecycle_item, dict)
+            else None
+        )
+        if not _blockers_for_capability(
+            realized,
+            capability,
+            selected_artifact=selected_artifact,
+        ):
             raise CoreError(
                 f"BLOCKED publication for {capability} requires an unresolved Core blocker"
             )
@@ -291,7 +318,11 @@ def _validate_terminal_outcome(
         raise CoreError(
             f"CURRENT publication lifecycle provider for {capability} is not a Core provider"
         )
-    blockers = _blockers_for_capability(realized, capability)
+    blockers = _blockers_for_capability(
+        realized,
+        capability,
+        selected_artifact=lifecycle_item["artifact"],
+    )
     if blockers:
         raise CoreError(
             f"CURRENT publication for {capability} remains blocked by {blockers}"

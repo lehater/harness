@@ -128,7 +128,137 @@ def expect_core_error(fn, fragment: str) -> None:
         raise AssertionError(f"expected CoreError containing {fragment!r}")
 
 
+def test_capability_blocker_granularity() -> None:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "PUBLICATION-BLOCKER-GRANULARITY",
+        "authorities": [
+            {
+                "id": "PRODUCT",
+                "responsibility": "Own product requirements.",
+                "boundary": {
+                    "semantic_cohesion": "Product semantics.",
+                    "independent_change": "Product requirements change independently.",
+                    "public_contract": "Accepted product requirements.",
+                },
+                "produces": [
+                    {
+                        "capability": "product.intent",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                    {
+                        "capability": "product.acceptance",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "TARGET",
+                "purpose": "Consume both product capabilities.",
+                "requires": ["product.intent", "product.acceptance"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    initial = build_project_publication(
+        graph=graph,
+        core_model={"artifacts": [], "questions": []},
+        semantic_evaluations=EMPTY_EVALUATIONS,
+        lifecycle=EMPTY_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+    core = {
+        "artifacts": [
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT",
+                "path": "docs/requirements.md",
+                "provides": ["product.intent", "product.acceptance"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [
+            {
+                "id": "Q-ACCEPTANCE",
+                "authority": "PRODUCT",
+                "text": "Which acceptance behavior is required?",
+                "blocks_capabilities": ["product.acceptance"],
+            }
+        ],
+    }
+    intent_evaluations = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "version": 1,
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "REQUIREMENTS",
+                "capability": "product.intent",
+                "status": "ACCEPTED",
+                "obligations": {
+                    "expected": [],
+                    "satisfied": [],
+                    "dispositions": [],
+                },
+                "findings": [],
+                "semantic_claims": {"accepted": []},
+                "admission": {
+                    "status": "ACCEPTED",
+                    "acceptance_id": "INTENT-1",
+                },
+            }
+        ],
+    }
+    intent_lifecycle = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": "REQUIREMENTS",
+                "capability": "product.intent",
+                "acceptance_id": "INTENT-1",
+                "accepted_prerequisites": {},
+            }
+        ],
+    }
+
+    expect_core_error(
+        lambda: prepare_capability_transition(
+            graph=graph,
+            current_publication=initial,
+            expected_revision=initial["revision"],
+            capability="product.intent",
+            outcome="BLOCKED",
+            core_model=core,
+            semantic_evaluations=EMPTY_EVALUATIONS,
+            lifecycle=EMPTY_LIFECYCLE,
+            decision_failures=EMPTY_FAILURES,
+        ),
+        "requires an unresolved Core blocker",
+    )
+
+    current = prepare_capability_transition(
+        graph=graph,
+        current_publication=initial,
+        expected_revision=initial["revision"],
+        capability="product.intent",
+        outcome="CURRENT",
+        core_model=core,
+        semantic_evaluations=intent_evaluations,
+        lifecycle=intent_lifecycle,
+        decision_failures=EMPTY_FAILURES,
+    )
+    assert current["state"]["lifecycle"]["providers"][0]["capability"] == "product.intent"
+
+
 def main() -> int:
+    test_capability_blocker_granularity()
     initial = build_project_publication(
         graph=GRAPH,
         core_model=EMPTY_CORE,
