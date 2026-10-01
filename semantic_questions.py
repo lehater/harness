@@ -9,6 +9,7 @@ from typing import Any
 from engineering_graph import producer_index
 from harness import CoreError
 from semantic_acceptance import evaluation_index
+from semantic_derivation import derivation_evaluation_index
 
 GAP_FINDING_CODES = {
     "MISSING_OBLIGATION",
@@ -175,12 +176,8 @@ def proposals_from_evaluation_set(
     documents: list[dict[str, Any]] = list(
         evaluation_index([evaluations]).values()
     )
-    if evaluations.get("kind") == "harness-semantic-derivation-evaluation":
-        documents.append(evaluations)
     documents.extend(
-        item
-        for item in (evaluations.get("derivation_evaluations", []) or [])
-        if isinstance(item, dict)
+        derivation_evaluation_index([evaluations]).values()
     )
     for evaluation in documents:
         for proposal in evaluation.get("question_proposals", []) or []:

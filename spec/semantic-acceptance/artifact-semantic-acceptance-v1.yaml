@@ -110,10 +110,11 @@ integration:
   current_snapshot_rule: >-
     A harness-semantic-evaluation-set is the current semantic-evidence snapshot,
     not an append-only history. It may contain at most one artifact semantic
-    evaluation for each (artifact, capability) identity. Superseded evaluations
-    may be retained by project-native history, but they must not be replayed into
-    the current set. Duplicate current identities fail closed rather than being
-    selected by list order.
+    evaluation for each (artifact, capability) identity and at most one semantic
+    derivation evaluation for each (source_capability, target_capability) edge.
+    Superseded evaluations may be retained by project-native history, but they
+    must not be replayed into the current set. Duplicate current identities fail
+    closed rather than being selected by list order.
   invalidation_rule: >-
     A semantically invalid capability invalidates dependent produced capabilities
     through Engineering Graph prerequisites until revalidation succeeds.

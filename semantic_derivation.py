@@ -234,6 +234,43 @@ def _evaluate_judgement(
     }
 
 
+def derivation_evaluation_index(
+    documents: list[dict[str, Any]],
+) -> dict[tuple[str, str], dict[str, Any]]:
+    """Index one current derivation evaluation per direct capability edge."""
+    result: dict[tuple[str, str], dict[str, Any]] = {}
+
+    def add(evaluation: dict[str, Any]) -> None:
+        source = evaluation.get("source_capability")
+        target = evaluation.get("target_capability")
+        if not isinstance(source, str) or not source:
+            raise CoreError(
+                "semantic derivation evaluation source_capability is required"
+            )
+        if not isinstance(target, str) or not target:
+            raise CoreError(
+                "semantic derivation evaluation target_capability is required"
+            )
+        key = (source, target)
+        if key in result:
+            raise CoreError(
+                "duplicate current semantic derivation evaluation: "
+                f"source={source!r}, target={target!r}"
+            )
+        result[key] = evaluation
+
+    for document in documents:
+        if document.get("kind") == "harness-semantic-derivation-evaluation":
+            add(document)
+        for item in document.get("derivation_evaluations", []) or []:
+            if not isinstance(item, dict):
+                continue
+            if item.get("kind") != "harness-semantic-derivation-evaluation":
+                continue
+            add(item)
+    return result
+
+
 def evaluate_derivation(
     *,
     graph: dict[str, Any],

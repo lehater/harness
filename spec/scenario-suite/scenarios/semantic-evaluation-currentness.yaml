@@ -84,6 +84,28 @@ fixtures:
               authority: DISCOVERY
               text: Stale rejected evaluation must not reopen this Question.
               blocks_capabilities: [demo.evidence]
+  derivation-evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations: []
+      derivation_evaluations:
+        - version: 1
+          kind: harness-semantic-derivation-evaluation
+          source_capability: demo.evidence
+          target_capability: demo.evidence
+          status: ACCEPTED
+          question_proposals: []
+        - version: 1
+          kind: harness-semantic-derivation-evaluation
+          source_capability: demo.evidence
+          target_capability: demo.evidence
+          status: REJECTED
+          question_proposals:
+            - id: Q-STALE-DERIVATION
+              authority: DISCOVERY
+              text: Stale derivation evidence must not reopen this Question.
+              blocks_capabilities: [demo.evidence]
 
 steps:
   - id: duplicate-current-records
@@ -98,3 +120,16 @@ steps:
     expect_error:
       type: CoreError
       contains: duplicate current semantic evaluation
+
+  - id: duplicate-current-derivation-records
+    driver: semantic.closure
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      skill_registry: {ref: fixture.registry}
+      semantic_evaluations: {ref: fixture.derivation-evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+    expect_error:
+      type: CoreError
+      contains: duplicate current semantic derivation evaluation

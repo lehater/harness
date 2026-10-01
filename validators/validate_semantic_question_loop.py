@@ -9,14 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engineering_graph import evaluate_engineering_target, realize_core_model
-from harness import resolve_question, unresolved_questions
+from harness import CoreError, resolve_question, unresolved_questions
 from semantic_admission import (
     admit_artifact,
     derive_acceptance_policy_fingerprints,
     load_yaml,
 )
 from semantic_closure import evaluate_semantic_closure
-from semantic_questions import append_question_proposals
+from semantic_questions import append_question_proposals, proposals_from_evaluation_set
 
 
 GRAPH = {
@@ -150,7 +150,45 @@ def task_candidate(
     return candidate
 
 
+def test_current_derivation_snapshot_uniqueness() -> None:
+    first = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evaluation",
+        "source_capability": "demo.source",
+        "target_capability": "demo.target",
+        "status": "ACCEPTED",
+        "question_proposals": [],
+    }
+    stale = {
+        **first,
+        "status": "REJECTED",
+        "question_proposals": [
+            {
+                "id": "Q-STALE-DERIVATION",
+                "authority": "TARGET",
+                "text": "Stale derivation evidence must not reopen this Question.",
+                "blocks_capabilities": ["demo.target"],
+            }
+        ],
+    }
+    bundle = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [],
+        "derivation_evaluations": [first, stale],
+    }
+    try:
+        proposals_from_evaluation_set(bundle)
+    except CoreError as exc:
+        assert "duplicate current semantic derivation evaluation" in str(exc), exc
+    else:
+        raise AssertionError(
+            "current derivation evaluation snapshot must reject duplicate edge identity"
+        )
+
+
 def main() -> int:
+    test_current_derivation_snapshot_uniqueness()
     registry = load_yaml(ROOT / "skills/artifact-skill-registry-v0.yaml")
     base_contracts = load_yaml(
         ROOT / "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"

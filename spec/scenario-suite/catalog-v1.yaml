@@ -291,7 +291,7 @@ requirements:
   - id: semantic-evaluation-current-snapshot
     category: semantic
     enforcement: required
-    description: A current semantic evaluation set rejects duplicate records for one semantic identity instead of selecting by list order or replaying stale Question proposals.
+    description: A current semantic evaluation set rejects duplicate artifact or derivation records for one semantic identity instead of selecting by list order or replaying stale Question proposals.
     min_scenarios: 1
 
   - id: acceptance-policy-currentness
