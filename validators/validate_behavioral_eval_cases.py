@@ -26,7 +26,12 @@ from adapters.copilot_behavioral_eval_agent import (
 )
 
 ADAPTER = ROOT / "adapters" / "copilot_behavioral_eval_agent.py"
+WORKFLOW = ROOT / ".github" / "workflows" / "behavioral-eval-copilot.yml"
 assert ADAPTER.is_file()
+workflow_text = WORKFLOW.read_text(encoding="utf-8")
+assert "${{ inputs.model }}" not in workflow_text
+assert 'MODEL="gpt-6-luna"' in workflow_text
+assert 'MODEL_SELECTION="explicit"' in workflow_text
 
 sample_jsonl = "\n".join([
     json.dumps({
