@@ -49,7 +49,7 @@ Coverage states: **COVERED**, **PARTIAL**, **UNASSESSED**.
 | AP-18 | Performance / cost / context efficiency | Does Harness avoid unnecessary context, validation, CI and evaluator work? | PARTIAL | AUD-015 |
 | AP-19 | Recovery / crash consistency | Can interrupted multi-step application work resume without contradictory published state? | COVERED | AUD-014 / HARN-012 |
 | AP-20 | Versioning / compatibility | Can Harness/contracts/Consumer Pack evolve without silently invalidating projects? | COVERED | AUD-016 |
-| AP-21 | Provenance / reproducibility | Can state be traced to the exact policy/evidence/version that produced it? | PARTIAL | AUD-002 |
+| AP-21 | Provenance / reproducibility | Can state be traced to the exact policy/evidence/version that produced it? | COVERED | AUD-017 |
 | AP-22 | Scale / stress / pathological graphs | Does behavior remain correct at large graph/question/artifact counts and deep dependency chains? | UNASSESSED | — |
 | AP-23 | Human control / explainability | Are human decision points, uncertainty and consequences explicit enough for safe intervention? | UNASSESSED | — |
 
@@ -81,6 +81,7 @@ Do not rerun every perspective after every change.
 | AUD-014 | 2026-10-01 | AP-19 recovery / crash consistency | Reused and strengthened HARN-012. Capability completion is still persisted as several separately owned artifacts/projections with no canonical atomic apply/commit boundary; interruption can expose mixed state and recomputation from a partial result. No distinct second root cause found. |
 | AUD-015 | 2026-10-01 | AP-18 performance / cost / context efficiency | CI cost/selectivity remains covered by AUD-008/009. Agent-context review found progressive disclosure now canonical in `agent-instruction-architecture-v0.md`; reused/adopted EVO-005. No measured real-agent context/token baseline exists yet, so AP-18 remains PARTIAL. |
 | AUD-016 | 2026-10-01 | AP-20 versioning / compatibility | Consumer Pack transport is pinned to immutable revision + `consumer_api` and fails closed on incompatible API. Contract-policy currentness is covered by fixed HARN-011. Remaining semantic graph rename/split/merge migration is HARN-014; published skill identity/rename compatibility is the non-defect EVO-018, now VALIDATED. No new root cause found. |
+| AUD-017 | 2026-10-01 | AP-21 provenance / reproducibility | Policy/evaluator/source/run identities are generally fingerprinted or immutably pinned, and lifecycle binds accepted prerequisite identities. Remaining provenance gaps map to existing HARN-013 (hidden same-Authority semantic dependency can escape lifecycle baseline) and EVO-030 (no durable operation-decision trace). No new root cause found. |
 
 ## Finding handoff contract
 
