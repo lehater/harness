@@ -17,6 +17,7 @@ from behavioral_eval import build_execution_request, load_case
 from adapters.copilot_behavioral_eval_agent import (
     _model_payload,
     _parse_model_response,
+    _prompt,
 )
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
@@ -29,6 +30,13 @@ EXPECTED = {
 assert MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
 entries = MANIFEST["cases"]
 assert {item["design"] for item in entries} == EXPECTED
+budget = MANIFEST["provider_prompt_budget"]
+assert budget["metric"] == "utf8_bytes"
+max_per_case = budget["max_per_case"]
+max_suite = budget["max_suite"]
+assert isinstance(max_per_case, int) and max_per_case > 0
+assert isinstance(max_suite, int) and max_suite >= max_per_case
+provider_prompt_bytes: dict[str, int] = {}
 
 descriptor = {
     "version": 1,
@@ -73,9 +81,15 @@ for entry in entries:
         payload = _model_payload(request)
         serialized = json.dumps(payload, sort_keys=True)
         assert entry["design"] not in serialized
+        prompt_bytes = len(_prompt(request).encode("utf-8"))
+        provider_prompt_bytes[entry["design"]] = prompt_bytes
+        assert prompt_bytes <= max_per_case, (
+            entry["design"], prompt_bytes, max_per_case
+        )
         trusted_paths = {
             item["path"] for item in payload["trusted_instructions"]
         }
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
         assert all("harness-test-design-catalog" not in path for path in trusted_paths)
         assert all("spec/behavioral-evals" not in path for path in trusted_paths)
         assert "id" not in payload["repository_fixture"]
@@ -119,4 +133,21 @@ for entry in entries:
             )
             assert parsed["selected_operation"] == expected
 
-print(f"first-wave behavioral eval cases: PASS ({len(entries)} cases)")
+contaminated = dict(request)
+contaminated["trusted_instruction_entrypoint"] = [
+    "docs/design/harness-ability-to-evidence-v0.md"
+]
+try:
+    _model_payload(contaminated)
+except ValueError as exc:
+    assert "evaluation/test artifact cannot be a trusted instruction" in str(exc)
+else:
+    raise AssertionError("assurance blueprint must be rejected as provider instruction")
+
+total_prompt_bytes = sum(provider_prompt_bytes.values())
+assert total_prompt_bytes <= max_suite, (total_prompt_bytes, max_suite)
+print(
+    f"first-wave behavioral eval cases: PASS ({len(entries)} cases); "
+    f"provider_prompt_utf8_bytes total={total_prompt_bytes} "
+    f"max_case={max(provider_prompt_bytes.values())}"
+)

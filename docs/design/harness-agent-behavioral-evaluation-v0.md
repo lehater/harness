@@ -111,6 +111,21 @@ consumer would receive:
 The evaluation must not preload the expected operation, expected Capability
 set, expected Authority partition, or oracle rationale.
 
+Provider-visible trusted instructions must come from the production instruction
+surface required by the tested responsibility. Assurance blueprints, test-design
+catalogs, behavioral-evaluation protocol text, assurance registries, oracle
+artifacts, and other evaluator-control material are never agent instructions.
+Loading them into the provider context is both an oracle-contamination risk and
+unnecessary context growth.
+
+Provider context is therefore budgeted separately from behavioral correctness.
+For a frozen evaluation suite, the deterministic budget metric is the UTF-8 byte
+length of the exact provider prompt produced by the adapter. The suite declares
+a per-case ceiling and an aggregate ceiling, and deterministic validation fails
+when either is exceeded. This metric is tokenizer-neutral: live provider token
+usage may be recorded separately when the provider exposes it, but tokenization
+must not be guessed or made a correctness oracle.
+
 ### Allowed tools
 
 Tool permissions are fixed before the run.

@@ -19,7 +19,10 @@ CLI_ENV = "HARNESS_COPILOT_EXECUTABLE"
 DEFAULT_CLI = "copilot"
 _VERSION_RE = re.compile(r"(?<!\\d)(\\d+\\.\\d+\\.\\d+(?:[-+][0-9A-Za-z.-]+)?)(?!\\d)")
 FORBIDDEN_INSTRUCTION_PATH_PARTS = (
+    "harness-assurance-policy",
+    "harness-ability-to-evidence",
     "harness-test-design-catalog",
+    "harness-agent-behavioral-evaluation",
     "harness-assurance-registry",
     "behavioral-eval-integration",
     "spec/behavioral-evals",
@@ -290,6 +293,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
 
     executable = os.environ.get(CLI_ENV, DEFAULT_CLI)
     session_id = str(uuid.uuid4())
+    provider_prompt = _prompt(request)
     with tempfile.TemporaryDirectory(prefix="harness-copilot-behavioral-") as temp:
         root = Path(temp)
         home = root / "home"
@@ -304,7 +308,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
             )
         command = [
             executable,
-            "-p", _prompt(request),
+            "-p", provider_prompt,
             f"--model={model}",
             "--output-format=json",
             f"--session-id={session_id}",
@@ -342,6 +346,7 @@ def _invoke(request: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         "resolved_model": resolved_model,
         "observed_cli_version": observed_cli,
         "client_session_id": session_id,
+        "provider_prompt_utf8_bytes": len(provider_prompt.encode("utf-8")),
         "execution": {
             "fresh_provider_home": True,
             "isolated_provider_working_directory": True,
