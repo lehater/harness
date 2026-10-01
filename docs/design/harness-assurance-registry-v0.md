@@ -340,6 +340,28 @@ it satisfying another broader requirement.
 
 Expected: no automatic broadening.
 
+### AR-M09 — unchanged execution binding
+
+A provider-run execution binding names a bound file whose Git blob identity
+matches the current repository content.
+
+Expected: binding remains admissible.
+
+### AR-M10 — bound execution mutation
+
+A provider-visible instruction/runtime file named by the provider-run binding is
+mutated while the recorded Git blob identity remains unchanged.
+
+Expected: binding is stale and active judgement evidence is rejected.
+
+### AR-M11 — unrelated repository mutation
+
+A repository file outside the provider-run execution binding is mutated while
+all bound file identities remain unchanged.
+
+Expected: binding remains admissible; unrelated repository churn does not stale
+the judgement evidence.
+
 ## Report shape
 
 A future validator/report should expose, at minimum:

@@ -7,6 +7,7 @@ import copy
 import hashlib
 import json
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -685,27 +686,52 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     assert "A19-R03" in limited_report["abilities"]["HA-A19"]["missing_requirements"]
     passed.append("AR-M08")
 
-    stale_binding = {
-        "execution_bindings": {
-            "files": [
-                {
-                    "path": "AGENTS.md",
-                    "git_blob_sha": "0" * 40,
-                }
-            ]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        binding_root = Path(tmpdir)
+        bound_path = binding_root / "trusted-instruction.md"
+        unrelated_path = binding_root / "unrelated.txt"
+        original_bound = b"trusted instruction\n"
+        bound_path.write_bytes(original_bound)
+        unrelated_path.write_text("initial\n", encoding="utf-8")
+        binding = {
+            "execution_bindings": {
+                "files": [
+                    {
+                        "path": "trusted-instruction.md",
+                        "git_blob_sha": _git_blob_sha(original_bound),
+                    }
+                ]
+            }
         }
-    }
-    try:
+
         _validate_execution_bindings(
-            stale_binding,
-            root=ROOT,
-            evidence_id="META-STALE-PROVIDER-BINDING",
+            binding,
+            root=binding_root,
+            evidence_id="META-CURRENT-PROVIDER-BINDING",
         )
-    except RegistryError as exc:
-        assert "execution binding is stale" in str(exc)
-    else:
-        raise AssertionError("AR-M09 stale provider execution binding was accepted")
-    passed.append("AR-M09")
+        passed.append("AR-M09")
+
+        bound_path.write_text("changed instruction\n", encoding="utf-8")
+        try:
+            _validate_execution_bindings(
+                binding,
+                root=binding_root,
+                evidence_id="META-STALE-PROVIDER-BINDING",
+            )
+        except RegistryError as exc:
+            assert "execution binding is stale" in str(exc)
+        else:
+            raise AssertionError("AR-M10 stale provider execution binding was accepted")
+        passed.append("AR-M10")
+
+        bound_path.write_bytes(original_bound)
+        unrelated_path.write_text("changed but unrelated\n", encoding="utf-8")
+        _validate_execution_bindings(
+            binding,
+            root=binding_root,
+            evidence_id="META-UNRELATED-PROVIDER-MUTATION",
+        )
+        passed.append("AR-M11")
 
     return passed
 
