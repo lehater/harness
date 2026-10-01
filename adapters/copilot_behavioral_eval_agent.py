@@ -17,7 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CLI_ENV = "HARNESS_COPILOT_EXECUTABLE"
 DEFAULT_CLI = "copilot"
-_VERSION_RE = re.compile(r"(?<!\\d)(\\d+\\.\\d+\\.\\d+(?:[-+][0-9A-Za-z.-]+)?)(?!\\d)")
+_VERSION_RE = re.compile(r"(?<!\d)(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)(?!\d)")
 FORBIDDEN_INSTRUCTION_PATH_PARTS = (
     "harness-assurance-policy",
     "harness-ability-to-evidence",
