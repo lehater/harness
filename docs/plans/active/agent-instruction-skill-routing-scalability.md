@@ -38,10 +38,12 @@ AUD-005 found:
 - Keep always-on repository invariants available before skill selection.
 - Skills execute procedures; canonical specs/policies own semantics.
 
-## Phase 1 — Active agent-skill registry
+## Phase 1 — Active skill type and surface registry
 
-1. Split active registry membership into Maintainer and Consumer surfaces; classify every current `skills/agent/**` skill into exactly one exported/default surface (or an explicitly shared support class).
-2. Record trigger class, exclusions and explicit composition/precedence.
+Before routing logic, represent every executable procedure with explicit `surface + route_class + lifecycle` metadata. Directory location is not sufficient type information.
+
+1. Classify every executable skill with explicit `surface` (`maintainer` / `consumer`), `route_class` (`operation` / `method` / `artifact-production`) and lifecycle (`active` / deprecated / archived).
+2. Record trigger class, exclusions and explicit composition/precedence for non-capability routes; preserve `knowledge_kind` for artifact-production routes.
 3. Extend `validate_agent_layer.py` to require registry coverage.
 4. Add positive, negative and overlap routing fixtures.
 
