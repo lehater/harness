@@ -113,11 +113,11 @@ assert ADAPTER.stat().st_mode & stat.S_IXUSR, "Copilot behavioral adapter must b
 with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:
     fake_cli = Path(temp) / "copilot"
     fake_cli.write_text(
-        "#!/bin/sh\nprintf '%s\\n' 'GitHub Copilot CLI 1.0.86.'\n",
+        "#!/bin/sh\nprintf '%s\\n' 'GitHub Copilot CLI 1.0.91.'\n",
         encoding="utf-8",
     )
     fake_cli.chmod(fake_cli.stat().st_mode | stat.S_IXUSR)
-    assert _observed_cli_version(str(fake_cli), {}) == "1.0.86"
+    assert _observed_cli_version(str(fake_cli), {}) == "1.0.91"
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
 MANIFEST = yaml.safe_load((BASE / "manifest-v0.yaml").read_text(encoding="utf-8"))
@@ -147,7 +147,7 @@ descriptor = {
     "configuration": {
         "requested_model": "gpt-6-luna",
         "model_selection": "explicit",
-        "copilot_cli_version": "1.0.86",
+        "copilot_cli_version": "1.0.91",
         "provider_timeout_seconds": 150,
     },
 }

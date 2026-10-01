@@ -34,7 +34,7 @@ jobs:
 
       - name: Install pinned Copilot CLI
         run: |
-          npm install -g @github/copilot@1.0.86
+          npm install -g @github/copilot@1.0.91
           copilot --version
 
       - name: Materialize agent descriptor
