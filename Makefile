@@ -1,6 +1,7 @@
 .PHONY: harness-check
 
 harness-check:
+	python validators/validate_context_boundaries.py
 	python validators/validate_core.py
 	python validators/validate_adapters.py
 	python validators/validate_target_state.py
