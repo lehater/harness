@@ -538,7 +538,7 @@ evidence:
     providers:
       - evals/behavioral_eval.py
       - evals/adapters/copilot_behavioral_eval_agent.py
-      - target_state.py
+      - src/harness/project_model/target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
@@ -749,7 +749,7 @@ evidence:
     providers:
       - evals/behavioral_eval.py
       - evals/adapters/copilot_behavioral_eval_agent.py
-      - target_state.py
+      - src/harness/project_model/target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
@@ -776,7 +776,7 @@ evidence:
     providers:
       - evals/behavioral_eval.py
       - evals/adapters/copilot_behavioral_eval_agent.py
-      - target_state.py
+      - src/harness/project_model/target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl
@@ -807,7 +807,7 @@ evidence:
     providers:
       - evals/behavioral_eval.py
       - evals/adapters/copilot_behavioral_eval_agent.py
-      - target_state.py
+      - src/harness/project_model/target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
@@ -835,7 +835,7 @@ evidence:
     providers:
       - evals/behavioral_eval.py
       - evals/adapters/copilot_behavioral_eval_agent.py
-      - target_state.py
+      - src/harness/project_model/target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
@@ -928,7 +928,7 @@ evidence:
       - tests/test_agent_router.py
     source_refs:
       - path: tests/test_agent_router.py
-      - path: agent_router.py
+      - path: src/harness/application/agent_router.py
     satisfies: [A16-R04]
     test_level: TL2
     methods: [EM-07]
