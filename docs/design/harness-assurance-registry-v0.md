@@ -54,7 +54,7 @@ HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Cove
 HA-A07 Project Authority migration, HA-A08 Design target selection,
 HA-A09 existing-project
 bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A11 Source acquisition/completeness,
-HA-A16 routing, HA-A18 Consumer distribution/compatibility,
+HA-A12 Semantic derivation/admission, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
@@ -115,7 +115,9 @@ and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A11
 satisfies A11-R01 through deterministic source-set/boundary/statement
 completeness; A11-R02 source relevance/noise selection and A11-R03 repeated
 trust-boundary execution remain missing because their current provider records
-are stale or their designs are not yet implemented. HA-A16 satisfies A16-R01..R06; and HA-A18
+are stale or their designs are not yet implemented. HA-A12 satisfies A12-R01 through deterministic
+semantic derivation/admission evidence; A12-R02 remains missing because the
+current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
@@ -367,6 +369,16 @@ missing: source relevance/noise selection is judgement-dependent, the relevant
 TD-BOOT-E05/E06 provider records are stale after bound runtime changes, and
 TD-ROUTE-007 trust-boundary execution is not yet implemented at the required
 level.
+
+HA-A12 is partially satisfied. A12-R01 reuses deterministic derivation,
+admission, contradiction, semantic-loss, and real-project atom evidence; the
+remaining TD-SEM-005 metamorphic gap is now covered by an irrelevant-source
+invariance regression. A12-R02 remains missing. Current-surface live calibration
+run `37071325425` used provider-auto: its first scorable run resolved to
+`mai-code-1.1-flash` and produced one false negative on
+`semantic-enforcement-gap` (13/14 correct), while the second provider response
+violated the versioned JSON envelope and was rejected as INCOMPLETE. This is
+evidence against an A12-F06 PASS, not a reason to weaken the oracle.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks

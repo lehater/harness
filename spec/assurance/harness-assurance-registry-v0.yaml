@@ -211,6 +211,23 @@ abilities:
       - A11-R02
       - A11-R03
 
+  - id: HA-A12
+    title: Semantic derivation and admission
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A12-F01
+      - A12-F02
+      - A12-F03
+      - A12-F04
+      - A12-F05
+      - A12-F06
+    requirements:
+      - A12-R01
+      - A12-R02
+
   - id: HA-A16
     title: Agent/method/artifact routing
     contract_ref:
@@ -725,6 +742,34 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A12-R01
+    ability: HA-A12
+    failure_modes: [A12-F01, A12-F02, A12-F03, A12-F04, A12-F05]
+    purpose: Deterministic derivation/admission preserves every required semantic atom, rejects invented or undeclared provenance and contradictions, and is invariant to irrelevant allowed source noise.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-02, EM-03, EM-05, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A12-R02
+    ability: HA-A12
+    failure_modes: [A12-F06]
+    purpose: Delegated semantic judgement meets the blinded expert-labelled calibration protocol under repeated current evaluator execution.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-12]
+      oracle_minimum: O4
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A16-R01
     ability: HA-A16
     failure_modes: [A16-F01]
@@ -852,6 +897,31 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A12-DERIVATION-ADMISSION
+    providers:
+      - tests/test_semantic_admission.py
+      - tests/test_semantic_acceptance.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_semantic_admission.py
+      - path: tests/test_semantic_acceptance.py
+      - path: spec/scenario-suite/scenarios/semantic-contradiction.yaml
+      - path: spec/scenario-suite/scenarios/frontend-task-semantic-loss.yaml
+      - path: spec/scenario-suite/scenarios/real-project-semantic-atom-coverage.yaml
+      - path: src/harness/assurance/semantic_derivation.py
+      - path: src/harness/application/semantic_admission.py
+    satisfies: [A12-R01]
+    test_level: TL2
+    methods: [EM-02, EM-03, EM-05, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: known-project
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Covers required-atom preservation and omission mutation, undeclared prerequisite/Authority rejection, contradiction rejection, admission/lifecycle composition, real-project semantic-loss localization, and exact invariance under an irrelevant source-statement addition.
+      - "Does not satisfy A12-R02: current provider-backed calibration must independently meet the O4 protocol."
+
   - id: EVID-A11-SOURCE-COMPLETENESS
     providers:
       - tests/test_source_coverage.py

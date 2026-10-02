@@ -137,3 +137,39 @@ survives an ambiguity audit is meaningful evidence about evaluator behavior.
 
 The temporary branch-only push trigger used to obtain this evidence was removed
 before integration; the live provider workflow remains operator-triggered.
+
+
+## Current-surface refresh — run 37071325425
+
+A refresh was executed from current Harness runtime code after the physical
+package migration, using the unchanged v3 corpus and v2 protocol through the
+current module-based process driver.
+
+The operator path first exposed a separate workflow defect: explicit
+`gpt-6-luna` selection is unavailable on the current GitHub Copilot CLI path.
+The retry therefore used the supported `provider-auto` mode.
+
+GitHub Actions run: `37071325425`.
+
+Artifact: `live-calibration-evidence`, id `11254508514`, digest
+`sha256:4b58b1014602dddff22e65a8cd2276a59d7cf0c3cfaf969f5de56bd3439dffa5`.
+
+Run 1:
+
+- resolved model: `mai-code-1.1-flash`;
+- scored cases: 14 / 14;
+- TP=6, TN=7, FN=1, FP=0;
+- accuracy=`0.9285714285714286`;
+- detection recall=`0.8571428571428571`;
+- false-positive rate=`0.0`;
+- missed case: `semantic-enforcement-gap`, expected REJECTED but returned ACCEPTED.
+
+Run 2:
+
+- provider response violated the required versioned JSON envelope;
+- evaluation status: `INCOMPLETE`;
+- no partial score was accepted.
+
+This refresh therefore does **not** support an A12-F06/HA-A20 calibration PASS.
+The frozen expert oracle is retained unchanged. Repeating executions until a
+convenient PASS would be cherry-picking rather than assurance evidence.

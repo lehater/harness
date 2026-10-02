@@ -1569,7 +1569,9 @@ accepted downstream claim.
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_semantic_admission.py::test_irrelevant_source_invariance`.
 
 Mutation:
 
