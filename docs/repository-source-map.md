@@ -129,3 +129,13 @@ Runtime physical migration is closed: `src/harness/**` owns production runtime,
 runner/process driver. Root Scenario modules remain Consumer v0 tooling; other
 root runtime surfaces are compatibility facades. See the closure ADR in
 `docs/design/repository-layout-v0.md`.
+
+
+## Consumer API v1 distribution
+
+- `docs/design/harness-consumer-pack-v1.md` — versioned distribution decision
+  and wrapper v1 protocol;
+- `spec/distribution/consumer-pack-v1.yaml` — explicit canonical runtime inventory;
+- `spec/distribution/target-agents-fragment-v1.md` — canonical module router bootstrap.
+
+Consumer v0 definitions and source compatibility facades remain supported.

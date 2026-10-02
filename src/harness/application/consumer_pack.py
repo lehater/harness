@@ -42,7 +42,11 @@ __all__ = ['Any',
 
 REVISION_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 PACK_MANIFEST = "harness-consumer-pack.yaml"
-DEFAULT_DEFINITION = "spec/distribution/consumer-pack-v0.yaml"
+CONSUMER_PACK_DEFINITIONS = {
+    "v0": "spec/distribution/consumer-pack-v0.yaml",
+    "v1": "spec/distribution/consumer-pack-v1.yaml",
+}
+DEFAULT_DEFINITION = CONSUMER_PACK_DEFINITIONS["v0"]
 DEFAULT_SURFACE_REGISTRY = "skills/skill-surface-registry-v0.yaml"
 
 
@@ -77,13 +81,18 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _definition_path(consumer_api: str) -> str:
+    if not isinstance(consumer_api, str) or consumer_api not in CONSUMER_PACK_DEFINITIONS:
+        raise ConsumerPackError("unsupported consumer_api; expected v0 or v1")
+    return CONSUMER_PACK_DEFINITIONS[consumer_api]
+
+
 def validate_binding(binding: dict[str, Any]) -> None:
     if binding.get("version") != 1:
         raise ConsumerPackError("consumer binding version must be 1")
     if binding.get("kind") != "harness-consumer-binding":
         raise ConsumerPackError("unexpected consumer binding kind")
-    if binding.get("consumer_api") != "v0":
-        raise ConsumerPackError("unsupported consumer_api; expected v0")
+    _definition_path(binding.get("consumer_api"))
     source = binding.get("source")
     if not isinstance(source, dict):
         raise ConsumerPackError("consumer binding source must be a mapping")
@@ -106,8 +115,7 @@ def validate_definition(definition: dict[str, Any], source_root: Path) -> None:
         raise ConsumerPackError("consumer pack definition version must be 1")
     if definition.get("kind") != "harness-consumer-pack-definition":
         raise ConsumerPackError("unexpected consumer pack definition kind")
-    if definition.get("consumer_api") != "v0":
-        raise ConsumerPackError("consumer pack definition consumer_api must be v0")
+    _definition_path(definition.get("consumer_api"))
 
     entry = definition.get("entry")
     if not isinstance(entry, dict):
@@ -168,6 +176,9 @@ def _validate_runtime_import_closure(
         for relative in definition["root_files"]
         if relative.endswith(".py")
     }
+
+    if "harness/__init__.py" in definition["exact_files"]:
+        included_root_modules.add("harness")  # package bridge, not root harness.py
 
     for relative in definition["root_files"]:
         if not relative.endswith(".py"):
@@ -302,6 +313,7 @@ def validate_pack(
     expected_revision: str | None = None,
     expected_api: str = "v0",
 ) -> dict[str, Any]:
+    _definition_path(expected_api)
     pack_root = Path(pack_root)
     manifest = load_yaml(pack_root / PACK_MANIFEST)
     if manifest.get("version") != 1:
@@ -419,15 +431,18 @@ def materialize_pack(
     *,
     binding_revision: str,
     effective_revision: str | None = None,
+    consumer_api: str = "v0",
 ) -> dict[str, Any]:
     source_root = Path(source_root).resolve()
     output_root = Path(output_root).resolve()
     if not REVISION_RE.fullmatch(binding_revision):
         raise ConsumerPackError("binding_revision must be a 40-hex commit")
 
-    definition_path = source_root / DEFAULT_DEFINITION
+    definition_path = source_root / _definition_path(consumer_api)
     definition = load_yaml(definition_path)
     validate_definition(definition, source_root)
+    if definition["consumer_api"] != consumer_api:
+        raise ConsumerPackError("selected definition consumer_api mismatch")
     selected = _selected_source_files(source_root, definition)
 
     if output_root.exists():
@@ -517,6 +532,7 @@ def sync_binding(
             output,
             binding_revision=revision,
             effective_revision=effective,
+            consumer_api=consumer_api,
         )
         return output
 
@@ -569,6 +585,7 @@ def sync_binding(
             output,
             binding_revision=revision,
             effective_revision=actual,
+            consumer_api=consumer_api,
         )
     return output
 
@@ -597,11 +614,14 @@ def main() -> int:
     sync.add_argument("cache_root")
     sync.add_argument("--dev-source")
 
+    for command in (validate_def, materialize, validate):
+        command.add_argument("--consumer-api", choices=CONSUMER_PACK_DEFINITIONS, default="v0")
+
     args = parser.parse_args()
 
     if args.command == "validate-definition":
         source_root = Path(args.source_root).resolve()
-        definition = load_yaml(source_root / DEFAULT_DEFINITION)
+        definition = load_yaml(source_root / _definition_path(args.consumer_api))
         validate_definition(definition, source_root)
         print(json.dumps({"status": "VALID", "consumer_api": definition["consumer_api"]}))
         return 0
@@ -610,6 +630,7 @@ def main() -> int:
             args.source_root,
             args.output_root,
             binding_revision=args.revision,
+            consumer_api=args.consumer_api,
         )
         print(yaml.safe_dump(manifest, sort_keys=False), end="")
         return 0
@@ -617,6 +638,7 @@ def main() -> int:
         manifest = validate_pack(
             args.pack_root,
             expected_revision=args.revision,
+            expected_api=args.consumer_api,
         )
         print(json.dumps({"status": "VALID", "consumer_api": manifest["consumer_api"]}))
         return 0
