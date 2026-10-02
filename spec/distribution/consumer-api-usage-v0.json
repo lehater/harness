@@ -3,8 +3,8 @@
   "method": "AST absolute imports; bounded textual facade paths/dotted identities outside runtime",
   "registry_driven_validators": [
     "checks/validate_consumer_api_eol_readiness.py",
-    "tests/test_consumer_pack.py",
-    "checks/validate_context_boundaries.py"
+    "checks/validate_context_boundaries.py",
+    "tests/test_consumer_pack.py"
   ],
   "surfaces": {
     "import_aliases:harness": {
@@ -442,8 +442,8 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "tests/test_consumer_pack.py",
-          "checks/validate_context_boundaries.py"
+          "checks/validate_context_boundaries.py",
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -849,11 +849,11 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
+          "checks/validate_instruction_ownership.py",
           "spec/behavioral-eval-integration/case.yaml",
           "tests/test_consumer_pack.py",
           "tests/test_consumer_wrapper.py",
           "tests/test_fresh_context_routing.py",
-          "checks/validate_instruction_ownership.py",
           "tests/test_skill_router.py"
         ]
       }
@@ -947,8 +947,8 @@
         ],
         "validators_tests": [
           "checks/validate_consumer_api_eol_readiness.py",
-          "tests/test_consumer_pack.py",
           "checks/validate_context_boundaries.py",
+          "tests/test_consumer_pack.py",
           "tests/test_live_calibration_process_driver.py",
           "tests/test_scenario_suite.py"
         ]
@@ -973,8 +973,8 @@
         ],
         "validators_tests": [
           "checks/validate_consumer_api_eol_readiness.py",
-          "tests/test_consumer_pack.py",
           "checks/validate_context_boundaries.py",
+          "tests/test_consumer_pack.py",
           "tests/test_scenario_suite.py"
         ]
       }
@@ -1004,10 +1004,10 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
+          "checks/validate_context_boundaries.py",
           "spec/assurance/harness-assurance-registry-v0.yaml",
           "tests/test_behavioral_eval_cases.py",
-          "tests/test_consumer_pack.py",
-          "checks/validate_context_boundaries.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     }
