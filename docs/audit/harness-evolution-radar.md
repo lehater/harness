@@ -577,6 +577,15 @@ changing. First remove or explicitly decide the logical boundary violations.
 A package move now would mostly relocate the same coupling and create migration
 noise.
 
+**Foundation status**
+
+The migration target and root-module ratchet are now canonicalized in
+`docs/design/repository-layout-v0.md` and
+`spec/architecture/repository-layout-v0.yaml`. This foundation does not by
+itself unpark the physical move: cross-context published-contract work tracked
+by EVO-011 remains an independent precondition where representation coupling is
+still material.
+
 **Related**
 
 - HARN-016

@@ -1,0 +1,14 @@
+# Repository tooling identity; this is not a published Harness release version.
+[project]
+name = "harness-core"
+version = "0.0.0"
+description = "Repository-independent Core for engineering-knowledge ownership."
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML==6.0.3",
+]
+
+[tool.uv]
+# Runtime modules still live in the repository root during the layout migration.
+# Switch to package mode only when src/harness becomes the executable source tree.
+package = false

@@ -9,6 +9,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / "spec" / "architecture" / "harness-context-map-v0.yaml"
+LAYOUT = ROOT / "spec" / "architecture" / "repository-layout-v0.yaml"
 
 
 def load_map() -> dict:
@@ -16,6 +17,101 @@ def load_map() -> dict:
     if not isinstance(value, dict) or value.get("kind") != "harness-bounded-context-map":
         raise SystemExit("invalid Harness bounded-context map")
     return value
+
+
+def load_layout() -> dict:
+    value = yaml.safe_load(LAYOUT.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or value.get("kind") != "harness-repository-layout":
+        raise SystemExit("invalid Harness repository-layout contract")
+    return value
+
+
+def _root_python_modules() -> set[str]:
+    return {path.stem for path in ROOT.glob("*.py") if path.is_file()}
+
+
+def _validate_physical_layout(
+    layout: dict,
+    contexts: dict,
+    owner: dict[str, str],
+    ignored: set[str],
+) -> None:
+    design = layout.get("design")
+    if not isinstance(design, str) or not design or not (ROOT / design).is_file():
+        raise SystemExit("repository layout must reference an existing design contract")
+
+    context_map = layout.get("context_map")
+    if context_map != MAP.relative_to(ROOT).as_posix():
+        raise SystemExit("repository layout must reference the canonical context map")
+
+    target = layout.get("runtime_target")
+    if not isinstance(target, dict) or target.get("root") != "src/harness":
+        raise SystemExit("runtime_target.root must be src/harness")
+
+    packages = target.get("packages")
+    if not isinstance(packages, dict) or set(packages) != set(contexts):
+        raise SystemExit(
+            "runtime_target.packages must map every bounded context/application layer"
+        )
+    for context_name, package in packages.items():
+        if not isinstance(package, str) or not package.isidentifier():
+            raise SystemExit(
+                f"invalid target package for {context_name}: {package!r}"
+            )
+
+    root_python = layout.get("root_python")
+    if not isinstance(root_python, dict):
+        raise SystemExit("root_python migration policy is required")
+    if root_python.get("policy") != "migration-ratchet":
+        raise SystemExit("root_python.policy must be migration-ratchet")
+
+    baseline_values = root_python.get("migration_baseline_modules")
+    exceptions_values = root_python.get("permanent_bootstrap_exceptions", [])
+    for label, values in (
+        ("migration_baseline_modules", baseline_values),
+        ("permanent_bootstrap_exceptions", exceptions_values),
+    ):
+        if not isinstance(values, list) or any(
+            not isinstance(value, str) or not value for value in values
+        ):
+            raise SystemExit(f"root_python.{label} must be a string list")
+        if len(values) != len(set(values)):
+            raise SystemExit(f"root_python.{label} contains duplicates")
+
+    baseline = set(baseline_values)
+    exceptions = set(exceptions_values)
+    overlap = sorted(baseline & exceptions)
+    if overlap:
+        raise SystemExit(
+            f"root Python modules cannot be both migration baseline and exception: {overlap}"
+        )
+
+    classified = set(owner) | ignored
+    unclassified = sorted((baseline | exceptions) - classified)
+    if unclassified:
+        raise SystemExit(
+            f"repository-layout root modules lack context/test classification: {unclassified}"
+        )
+
+    actual = _root_python_modules()
+    unexpected = sorted(actual - baseline - exceptions)
+    stale = sorted(baseline - actual)
+    stale_exceptions = sorted(exceptions - actual)
+    if unexpected:
+        raise SystemExit(
+            "new root Python modules are forbidden during package migration: "
+            f"{unexpected}"
+        )
+    if stale:
+        raise SystemExit(
+            "remove migrated/deleted modules from root migration baseline: "
+            f"{stale}"
+        )
+    if stale_exceptions:
+        raise SystemExit(
+            "remove missing permanent root bootstrap exceptions: "
+            f"{stale_exceptions}"
+        )
 
 
 def _module_path(module: str) -> Path:
@@ -61,6 +157,7 @@ def main() -> int:
                 )
 
     ignored = set(spec.get("ignored_modules", []) or [])
+    _validate_physical_layout(load_layout(), contexts, owner, ignored)
     runtime_modules = _runtime_modules(spec)
     missing = sorted(runtime_modules - set(owner) - ignored)
     stale = sorted((set(owner) | ignored) - runtime_modules)
@@ -154,7 +251,7 @@ def main() -> int:
         return 1
 
     print(
-        "Harness bounded-context boundaries: PASS "
+        "Harness bounded-context/repository-layout boundaries: PASS "
         f"({len(actual_violations)} known violation(s) ratcheted)"
     )
     return 0
