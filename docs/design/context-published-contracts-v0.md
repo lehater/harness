@@ -60,14 +60,22 @@ Project Model contracts, so introducing another DTO would duplicate truth.
 Integration may therefore use only these published Project Model operations:
 
 ```text
-harness.CoreError
-harness.validate_model
+harness.project_model.core.CoreError
+harness.project_model.core.validate_model
 
-engineering_graph.validate_engineering_graph
-engineering_graph.derive_profile
-engineering_graph.producer_index
-engineering_graph.production_index
+harness.project_model.engineering_graph.validate_engineering_graph
+harness.project_model.engineering_graph.derive_profile
+harness.project_model.engineering_graph.producer_index
+harness.project_model.engineering_graph.production_index
 ```
+
+During migration, `from harness import CoreError, validate_model` remains
+supported through the temporary `harness/__init__.py` import bridge. The
+validator normalizes that exact alias to `harness.project_model.core` before
+checking published symbols. Legacy `from engineering_graph import ...` is
+supported only through the temporary root `engineering_graph.py` import/CLI
+facade and normalizes to `harness.project_model.engineering_graph` under the
+same published-symbol checks. `harness.py` is a CLI facade, not the import bridge.
 
 Integration must not import other Project Model implementation symbols merely
 because they are physically reachable.

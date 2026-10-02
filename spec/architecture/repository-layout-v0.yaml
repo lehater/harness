@@ -47,11 +47,9 @@ root_python:
     - decision_pipeline
     - derivation_test_coverage
     - engineering_coverage
-    - engineering_graph
     - frontend_interface_knowledge
     - frontend_screen_contracts
     - graph_doctor
-    - harness
     - human_projection
     - integration_alignment
     - lifecycle_experiment
@@ -78,5 +76,19 @@ root_python:
     - source_boundary
     - source_coverage
     - source_set
-    - target_state
     - workspace
+
+# Finite migration state: these surfaces delegate, never own context semantics.
+compatibility:
+  import_aliases:
+    harness:
+      target: harness.project_model.core
+      bridge: harness/__init__.py
+  cli_facades:
+    harness.py:
+      target: harness.project_model.core
+  module_facades:
+    target_state:
+      target: harness.project_model.target_state
+    engineering_graph:
+      target: harness.project_model.engineering_graph
