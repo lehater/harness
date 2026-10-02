@@ -1211,7 +1211,7 @@ Adding unrelated directories must not enlarge the realization.
 **Oracle:** O1  
 **Status:** READY
 
-**Execution design:** one TL3 `bootstrap_realization` case supplies accepted evidence that identifies the deciding Authority but leaves the required fact unresolved. Question identity/text are not golden values; normalization compares Authority, blocked capability/source semantics, and resulting blocked frontier.
+**Execution design:** one TL3 `bootstrap_realization` case supplies an explicit project fact that the required decision is unresolved and identifies the deciding Authority, while exposing only an implementation default as a noncanonical decoy. No accepted canonical source candidate for the missing capability is present, so the fixture isolates A09-F04 without permitting a blocked-provider representation. Question identity/text are not golden values; normalization compares Authority, blocked capability/source semantics, and resulting blocked frontier.
 
 Fixture:
 

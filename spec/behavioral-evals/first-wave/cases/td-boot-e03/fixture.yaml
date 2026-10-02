@@ -1,6 +1,6 @@
 version: 1
 kind: harness-agent-behavioral-eval-fixture
-id: TD-BOOT-E03-FIXTURE-V1
+id: TD-BOOT-E03-FIXTURE-V2
 reviewed_design_profile:
   version: 1
   kind: harness-design-profile
@@ -13,11 +13,11 @@ reviewed_design_profile:
 existing_project:
   harness_realization: absent
   project_owned_graph: absent
-  accepted_evidence:
-    - path: docs/refund-overview.md
-      accepted: true
+  established_project_facts:
+    - fact: "The maximum refund window has not been accepted yet."
       authority: REFUND-DESIGN
-      summary: "Refund eligibility is accepted, but the maximum refund window remains undecided and must be decided by REFUND-DESIGN."
+      capability: refund.window-policy
+      provider_exists: false
   noncanonical_material:
     - path: src/refund.py
       role: implementation
