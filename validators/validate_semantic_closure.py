@@ -9,8 +9,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from semantic_admission import derive_acceptance_policy_fingerprints
-from semantic_closure import evaluate_semantic_closure
+from harness.application.semantic_admission import derive_acceptance_policy_fingerprints
+from harness.application.semantic_closure import evaluate_semantic_closure
 
 
 GRAPH = {

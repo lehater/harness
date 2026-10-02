@@ -1,6 +1,6 @@
 import unittest
-from harness import CoreError
-from capability_lifecycle import evaluate_lifecycle_target, obsolete_lifecycle_rows, validate_projection
+from harness.project_model.core import CoreError
+from harness.assurance.capability_lifecycle import evaluate_lifecycle_target, obsolete_lifecycle_rows, validate_projection
 
 GRAPH={"version":1,"kind":"harness-engineering-graph","id":"X","authorities":[
 {"id":"SOURCE","responsibility":"Source facts.","boundary":{"semantic_cohesion":"Source facts.","independent_change":"Source facts change independently.","public_contract":"Accepted source facts."},"produces":[{"capability":"source.identity","requires":[]},{"capability":"source.structure","requires":[]}]},

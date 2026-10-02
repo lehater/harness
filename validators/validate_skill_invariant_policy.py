@@ -7,7 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from skill_invariant_policy import evaluate_skill_invariant_policy  # noqa: E402
+from harness.application.skill_invariant_policy import evaluate_skill_invariant_policy  # noqa: E402
 
 
 def main() -> int:

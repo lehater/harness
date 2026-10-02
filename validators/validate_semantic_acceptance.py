@@ -5,15 +5,15 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from semantic_acceptance import (
+from harness.assurance.semantic_acceptance import (
     coverage_assurance_view,
     coverage_invalidation_closure,
     evaluate_artifact,
     evaluation_index,
 )
-from harness import CoreError
-from coverage_planner import capability_realization
-from engineering_coverage import evaluate_with_repository_policy, load
+from harness.project_model.core import CoreError
+from harness.coverage.coverage_planner import capability_realization
+from harness.coverage.engineering_coverage import evaluate_with_repository_policy, load
 
 
 def codes(result):
@@ -300,7 +300,7 @@ def test_coverage_gating_and_invalidation():
 
     # Claim-level gating: ACCEPTED capability evidence does not authorize claims
     # omitted from the semantic evaluation.
-    from coverage_planner import capability_claim_index
+    from harness.coverage.coverage_planner import capability_claim_index
     bindings={"bindings":[{"capability":"project.http","semantic_claims":[
         "engineering.interface.machine.contract",
         "engineering.interface.machine.errors",

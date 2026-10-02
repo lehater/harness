@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any
 import yaml
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
-from engineering_graph import validate_engineering_graph
-from reference_materializer import load_yaml,materialize,validate_reference_model
+from harness.project_model.engineering_graph import validate_engineering_graph
+from harness.reference_model.reference_materializer import load_yaml,materialize,validate_reference_model
 MODEL=ROOT/"spec/research/reference-engineering-model-v0.yaml"; AUTHORITIES=ROOT/"catalogs/software-authorities-v0.yaml"; PROOF=ROOT/"spec/engineering-coverage/semantic-proof-contract-v1.yaml"
 HOLDOUTS=ROOT/"spec/research/reference-materializer-fixtures/holdouts-v0.yaml"; HOLDOUTS_V1=ROOT/"spec/research/reference-materializer-fixtures/holdouts-v1.yaml"; REGRESSIONS=ROOT/"spec/research/reference-materializer-fixtures/regressions-v0.yaml"
 def load(path):

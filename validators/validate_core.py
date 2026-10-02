@@ -14,7 +14,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import (  # noqa: E402
+from harness.project_model.core import (  # noqa: E402
     CoreError,
     affected,
     artifact_blockers,

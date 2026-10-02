@@ -9,7 +9,7 @@ import yaml
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from reference_materializer import load_yaml, materialize
+from harness.reference_model.reference_materializer import load_yaml, materialize
 
 CATALOG=ROOT/"spec/engineering-coverage/concern-catalog-v1.yaml"
 PROOF=ROOT/"spec/engineering-coverage/semantic-proof-contract-v1.yaml"

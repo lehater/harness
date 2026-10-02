@@ -9,12 +9,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from authority_context import build_authority_context
-from decision_explorer_request import build_decision_explorer_request
-from decision_execution_assurance import evaluate_execution_assurance
-from decision_governance import axis_policies, decision_contract_index
-from semantic_acceptance import evaluate_artifact
-from semantic_admission import admit_artifact
+from harness.application.authority_context import build_authority_context
+from harness.application.decision_explorer_request import build_decision_explorer_request
+from harness.decision.decision_execution_assurance import evaluate_execution_assurance
+from harness.decision.decision_governance import axis_policies, decision_contract_index
+from harness.assurance.semantic_acceptance import evaluate_artifact
+from harness.application.semantic_admission import admit_artifact
 
 
 GRAPH = {

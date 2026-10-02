@@ -4,7 +4,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from concern_activation import derive_activation, load
+from harness.coverage.concern_activation import derive_activation, load
 
 def run(consumer):
     return derive_activation(

@@ -10,12 +10,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engineering_graph import (  # noqa: E402
+from harness.project_model.engineering_graph import (  # noqa: E402
     derive_profile,
     evaluate_engineering_target,
     validate_engineering_graph,
 )
-from harness import CoreError  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
 
 
 def _capabilities(items):

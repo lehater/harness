@@ -83,6 +83,12 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: consumer_api_eol_readiness
+  command: python validators/validate_consumer_api_eol_readiness.py
+  stage: deferred
+  cost_class: medium
+  disposition: full_gate
+  rationale: Repository-wide AST, usage inventory and readiness mutations measured about 3 seconds; defer until focused checks pass.
 - id: context_boundaries
   command: python validators/validate_context_boundaries.py
   stage: focused

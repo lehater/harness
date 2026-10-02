@@ -68,6 +68,7 @@ harness-check:
 	python validators/validate_semantic_closure.py
 	python validators/validate_harness.py
 	python -m unittest tests/test_lifecycle_experiment.py
+	python validators/validate_consumer_api_eol_readiness.py
 	python validators/validate_consumer_pack.py
 	python validators/validate_consumer_wrapper.py
 	python validators/validate_scenario_suite.py

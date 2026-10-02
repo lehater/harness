@@ -9,13 +9,13 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError
-from semantic_admission import (
+from harness.project_model.core import CoreError
+from harness.application.semantic_admission import (
     admit_artifact,
     derive_acceptance_policy_fingerprints,
     knowledge_contract_index,
 )
-from semantic_derivation import evaluate_derivation
+from harness.assurance.semantic_derivation import evaluate_derivation
 
 
 GRAPH = {

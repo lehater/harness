@@ -11,14 +11,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from authority_context import (  # noqa: E402
+from harness.application.authority_context import (  # noqa: E402
     build_authority_context,
     validate_extracted_references,
     validate_write_set,
 )
-from engineering_graph import validate_engineering_graph  # noqa: E402
-from harness import CoreError  # noqa: E402
-from integration_alignment import validate_project_alignment  # noqa: E402
+from harness.project_model.engineering_graph import validate_engineering_graph  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.integration.integration_alignment import validate_project_alignment  # noqa: E402
 
 
 def expect_error(fn, contains: str) -> None:

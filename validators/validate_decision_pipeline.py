@@ -8,8 +8,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from decision_pipeline import derive_decision_roadmap
-from harness import CoreError
+from harness.application.decision_pipeline import derive_decision_roadmap
+from harness.project_model.core import CoreError
 
 
 GRAPH = {

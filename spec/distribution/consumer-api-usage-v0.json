@@ -1,48 +1,46 @@
 {
+  "version": 1,
   "method": "AST absolute imports; bounded textual facade paths/dotted identities outside runtime",
   "registry_driven_validators": [
+    "validators/validate_consumer_api_eol_readiness.py",
     "validators/validate_consumer_pack.py",
     "validators/validate_context_boundaries.py"
   ],
   "surfaces": {
-    "adapters/copilot_behavioral_eval_agent.py": {
-      "canonical_target": "adapters.copilot_behavioral_eval_agent",
-      "path": "adapters/copilot_behavioral_eval_agent.py",
+    "import_aliases:harness": {
+      "path": "harness/__init__.py",
+      "canonical_target": "harness.project_model.core",
       "users": {
         "distribution_tooling": [
-          ".github/workflows/ci-policy.yml",
-          "spec/architecture/harness-context-map-v0.yaml"
+          ".github/workflows/greenfield-engineering-graph.yml",
+          "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml",
+          "spec/distribution/consumer-pack-v1.yaml"
         ],
         "documentation_examples": [
-          "docs/design/harness-agent-behavioral-evaluation-v0.md",
+          "docs/design/context-published-contracts-v0.md",
+          "docs/design/core-v0.md",
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/harness-consumer-pack-v1.md",
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md"
         ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml",
-          "spec/assurance/evidence/first-wave-provider-run-36928079710.yaml",
-          "spec/assurance/evidence/first-wave-provider-run-36942421201.yaml",
-          "spec/assurance/evidence/first-wave-provider-run-36947887869.yaml",
-          "spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml",
-          "spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml",
-          "spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml"
-        ],
         "validators_tests": [
-          "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_behavioral_eval_cases.py",
+          "validators/validate_consumer_api_eol_readiness.py",
           "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py"
+          "validators/validate_core.py"
         ]
       }
     },
     "cli_facades:harness.py": {
-      "canonical_target": "harness.project_model.core",
       "path": "harness.py",
+      "canonical_target": "harness.project_model.core",
       "users": {
         "distribution_tooling": [
           ".github/workflows/greenfield-engineering-graph.yml",
           "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
@@ -61,942 +59,15 @@
         ],
         "validators_tests": [
           "spec/assurance/harness-assurance-registry-v0.yaml",
-          "tests/test_lifecycle_experiment.py",
-          "validators/validate_adapters.py",
-          "validators/validate_agent_layer.py",
-          "validators/validate_agent_router.py",
-          "validators/validate_capability_lifecycle.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py",
-          "validators/validate_decision_pipeline.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_engineering_graph.py",
-          "validators/validate_fresh_context_routing.py",
-          "validators/validate_method_router.py",
-          "validators/validate_project_frontier.py",
-          "validators/validate_project_publication.py",
-          "validators/validate_semantic_acceptance.py",
-          "validators/validate_semantic_admission.py",
-          "validators/validate_semantic_question_loop.py",
-          "validators/validate_skill_router.py",
-          "validators/validate_target_state.py",
-          "validators/validate_unified_model.py"
-        ]
-      }
-    },
-    "harness/__init__.py#core-exports": {
-      "canonical_target": "harness.project_model.core",
-      "path": "harness/__init__.py",
-      "users": {
-        "distribution_tooling": [
-          ".github/workflows/greenfield-engineering-graph.yml",
-          "spec/architecture/repository-layout-v0.yaml",
-          "spec/distribution/consumer-pack-v0.yaml",
-          "spec/distribution/consumer-pack-v1.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/context-published-contracts-v0.md",
-          "docs/design/core-v0.md",
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/harness-consumer-pack-v1.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
           "validators/validate_consumer_pack.py",
           "validators/validate_core.py"
-        ]
-      }
-    },
-    "harness/__init__.py#execution-bridge": {
-      "canonical_target": "src/harness",
-      "path": "harness/__init__.py",
-      "users": {
-        "distribution_tooling": [
-          ".github/workflows/greenfield-engineering-graph.yml",
-          "spec/architecture/repository-layout-v0.yaml",
-          "spec/distribution/consumer-pack-v0.yaml",
-          "spec/distribution/consumer-pack-v1.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/context-published-contracts-v0.md",
-          "docs/design/core-v0.md",
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/harness-consumer-pack-v1.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py"
-        ]
-      }
-    },
-    "import_aliases:harness": {
-      "canonical_target": "harness.project_model.core",
-      "path": "harness/__init__.py",
-      "users": {
-        "distribution_tooling": [
-          ".github/workflows/greenfield-engineering-graph.yml",
-          "spec/architecture/repository-layout-v0.yaml",
-          "spec/distribution/consumer-pack-v0.yaml",
-          "spec/distribution/consumer-pack-v1.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/context-published-contracts-v0.md",
-          "docs/design/core-v0.md",
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/harness-consumer-pack-v1.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "tests/test_lifecycle_experiment.py",
-          "validators/validate_adapters.py",
-          "validators/validate_agent_layer.py",
-          "validators/validate_agent_router.py",
-          "validators/validate_capability_lifecycle.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py",
-          "validators/validate_decision_pipeline.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_engineering_graph.py",
-          "validators/validate_fresh_context_routing.py",
-          "validators/validate_method_router.py",
-          "validators/validate_project_frontier.py",
-          "validators/validate_project_publication.py",
-          "validators/validate_semantic_acceptance.py",
-          "validators/validate_semantic_admission.py",
-          "validators/validate_semantic_question_loop.py",
-          "validators/validate_skill_router.py",
-          "validators/validate_target_state.py",
-          "validators/validate_unified_model.py"
-        ]
-      }
-    },
-    "module_facades:acceptance_policy": {
-      "canonical_target": "harness.assurance.acceptance_policy",
-      "path": "acceptance_policy.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ]
-      }
-    },
-    "module_facades:adapters.canonical_graph": {
-      "canonical_target": "harness.integration.adapters.canonical_graph",
-      "path": "adapters/canonical_graph.py",
-      "users": {
-        "distribution_tooling": [
-          "README.md",
-          "spec/architecture/repository-layout-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/harness-consumer-pack-v1.md",
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md"
-        ],
-        "validators_tests": [
-          "validators/validate_adapters.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py",
-          "validators/validate_deep_dependency_graphs.py"
-        ]
-      }
-    },
-    "module_facades:adapters.copilot_live_calibration_evaluator": {
-      "canonical_target": "harness.assurance.adapters.copilot_live_calibration_evaluator",
-      "path": "adapters/copilot_live_calibration_evaluator.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/architecture/repository-layout-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_copilot_live_calibration_evaluator.py"
-        ]
-      }
-    },
-    "module_facades:agent_router": {
-      "canonical_target": "harness.application.agent_router",
-      "path": "agent_router.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/engineering-graph-v0-pilot-results.md",
-          "docs/design/engineering-graph-v0.md",
-          "docs/design/integration-contract-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ddd-context-map.md",
-          "docs/audit/harness-evolution-radar.md",
-          "docs/audit/harness-skill-surface-gap-audit.md"
-        ],
-        "validators_tests": [
-          "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_agent_router.py",
-          "validators/validate_user_facing_application.py"
-        ]
-      }
-    },
-    "module_facades:architecture_driver_closure": {
-      "canonical_target": "harness.coverage.architecture_driver_closure",
-      "path": "architecture_driver_closure.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "validators_tests": [
-          "validators/validate_architecture_driver_closure.py"
-        ]
-      }
-    },
-    "module_facades:authority_context": {
-      "canonical_target": "harness.application.authority_context",
-      "path": "authority_context.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md",
-          "docs/audit/harness-evolution-radar.md"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py",
-          "validators/validate_unified_model.py"
-        ]
-      }
-    },
-    "module_facades:capability_lifecycle": {
-      "canonical_target": "harness.assurance.capability_lifecycle",
-      "path": "capability_lifecycle.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md"
-        ],
-        "validators_tests": [
-          "tests/test_lifecycle_experiment.py",
-          "validators/validate_capability_lifecycle.py",
-          "validators/validate_deep_dependency_graphs.py"
-        ]
-      }
-    },
-    "module_facades:concern_activation": {
-      "canonical_target": "harness.coverage.concern_activation",
-      "path": "concern_activation.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_scoped_activation.py"
-        ]
-      }
-    },
-    "module_facades:consumer_pack": {
-      "canonical_target": "harness.application.consumer_pack",
-      "path": "consumer_pack.py",
-      "users": {
-        "distribution_tooling": [
-          "distribution/harnessw.py",
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/harness-consumer-pack-v1.md",
-          "docs/design/harness-consumer-wrapper-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_consumer_wrapper.py",
-          "validators/validate_fresh_context_routing.py",
-          "validators/validate_skill_router.py"
-        ]
-      }
-    },
-    "module_facades:coverage_application": {
-      "canonical_target": "harness.application.coverage_application",
-      "path": "coverage_application.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/context-published-contracts-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_coverage_production_contract_overlay.py"
-        ]
-      }
-    },
-    "module_facades:coverage_obligations": {
-      "canonical_target": "harness.coverage.coverage_obligations",
-      "path": "coverage_obligations.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "validators_tests": [
-          "validators/validate_subject_obligations.py"
-        ]
-      }
-    },
-    "module_facades:coverage_planner": {
-      "canonical_target": "harness.coverage.coverage_planner",
-      "path": "coverage_planner.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "validators_tests": [
-          "validators/validate_engineering_coverage.py",
-          "validators/validate_frontend_screen_contracts.py",
-          "validators/validate_semantic_acceptance.py"
-        ]
-      }
-    },
-    "module_facades:decision_execution_assurance": {
-      "canonical_target": "harness.decision.decision_execution_assurance",
-      "path": "decision_execution_assurance.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py"
-        ]
-      }
-    },
-    "module_facades:decision_exploration": {
-      "canonical_target": "harness.decision.decision_exploration",
-      "path": "decision_exploration.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ]
-      }
-    },
-    "module_facades:decision_explorer_contract": {
-      "canonical_target": "harness.decision.decision_explorer_contract",
-      "path": "decision_explorer_contract.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ddd-context-map.md"
-        ]
-      }
-    },
-    "module_facades:decision_explorer_request": {
-      "canonical_target": "harness.application.decision_explorer_request",
-      "path": "decision_explorer_request.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py"
-        ]
-      }
-    },
-    "module_facades:decision_governance": {
-      "canonical_target": "harness.decision.decision_governance",
-      "path": "decision_governance.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py"
-        ]
-      }
-    },
-    "module_facades:decision_pipeline": {
-      "canonical_target": "harness.application.decision_pipeline",
-      "path": "decision_pipeline.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ci-audit.md",
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_pipeline.py"
-        ]
-      }
-    },
-    "module_facades:derivation_test_coverage": {
-      "canonical_target": "harness.assurance.derivation_test_coverage",
-      "path": "derivation_test_coverage.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/capability-derivation-testing-v0.md"
-        ]
-      }
-    },
-    "module_facades:engineering_coverage": {
-      "canonical_target": "harness.coverage.engineering_coverage",
-      "path": "engineering_coverage.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md",
-          "docs/research/engineering-coverage-evaluator.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_coverage_blocker_transition.py",
-          "validators/validate_coverage_production_contract_overlay.py",
-          "validators/validate_engineering_coverage.py",
-          "validators/validate_semantic_acceptance.py",
-          "validators/validate_subject_obligations.py"
-        ]
-      }
-    },
-    "module_facades:engineering_graph": {
-      "canonical_target": "harness.project_model.engineering_graph",
-      "path": "engineering_graph.py",
-      "users": {
-        "distribution_tooling": [
-          ".github/workflows/greenfield-engineering-graph.yml",
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/context-published-contracts-v0.md",
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_engineering_graph.py",
-          "validators/validate_engineering_graph_semantic_claims_experiment.py",
-          "validators/validate_reference_engineering_model.py",
-          "validators/validate_semantic_question_loop.py",
-          "validators/validate_unified_model.py",
-          "validators/validate_user_facing_application.py"
-        ]
-      }
-    },
-    "module_facades:frontend_interface_knowledge": {
-      "canonical_target": "harness.workspace.frontend_interface_knowledge",
-      "path": "frontend_interface_knowledge.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "validators_tests": [
-          "validators/validate_frontend_ux_closure.py"
-        ]
-      }
-    },
-    "module_facades:frontend_screen_contracts": {
-      "canonical_target": "harness.workspace.frontend_screen_contracts",
-      "path": "frontend_screen_contracts.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md"
-        ],
-        "validators_tests": [
-          "validators/validate_frontend_screen_contracts.py",
-          "validators/validate_frontend_ux_closure.py"
-        ]
-      }
-    },
-    "module_facades:graph_doctor": {
-      "canonical_target": "harness.application.graph_doctor",
-      "path": "graph_doctor.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/graph-doctor-v1.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ]
-      }
-    },
-    "module_facades:human_projection": {
-      "canonical_target": "harness.workspace.human_projection",
-      "path": "human_projection.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py"
-        ]
-      }
-    },
-    "module_facades:integration_alignment": {
-      "canonical_target": "harness.integration.integration_alignment",
-      "path": "integration_alignment.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_unified_model.py"
-        ]
-      }
-    },
-    "module_facades:live_calibration": {
-      "canonical_target": "harness.assurance.live_calibration",
-      "path": "live_calibration.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "validators_tests": [
-          "validators/validate_copilot_live_calibration_evaluator.py"
-        ]
-      }
-    },
-    "module_facades:method_router": {
-      "canonical_target": "harness.application.method_router",
-      "path": "method_router.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/audit-framework.md",
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_method_router.py"
-        ]
-      }
-    },
-    "module_facades:project_frontier": {
-      "canonical_target": "harness.application.project_frontier",
-      "path": "project_frontier.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/decision-pipeline-v0.md",
-          "docs/design/project-frontier-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md"
-        ],
-        "validators_tests": [
-          "validators/validate_project_frontier.py"
-        ]
-      }
-    },
-    "module_facades:project_publication": {
-      "canonical_target": "harness.application.project_publication",
-      "path": "project_publication.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md"
-        ],
-        "validators_tests": [
-          "validators/validate_project_publication.py"
-        ]
-      }
-    },
-    "module_facades:project_status": {
-      "canonical_target": "harness.reference_model.project_status",
-      "path": "project_status.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_project_status_e2e.py"
-        ]
-      }
-    },
-    "module_facades:reference_materializer": {
-      "canonical_target": "harness.reference_model.reference_materializer",
-      "path": "reference_materializer.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_reference_engineering_model.py",
-          "validators/validate_reference_model_evolution.py",
-          "validators/validate_specialization_proof_semantics.py"
-        ]
-      }
-    },
-    "module_facades:reference_model_evolution": {
-      "canonical_target": "harness.reference_model.reference_model_evolution",
-      "path": "reference_model_evolution.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_reference_model_evolution.py"
-        ]
-      }
-    },
-    "module_facades:repository_realization": {
-      "canonical_target": "harness.integration.repository_realization",
-      "path": "repository_realization.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_repository_realization_design.py"
-        ]
-      }
-    },
-    "module_facades:semantic_acceptance": {
-      "canonical_target": "harness.assurance.semantic_acceptance",
-      "path": "semantic_acceptance.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/research/semantic-surface-extraction-admission-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py",
-          "validators/validate_semantic_acceptance.py"
-        ]
-      }
-    },
-    "module_facades:semantic_admission": {
-      "canonical_target": "harness.application.semantic_admission",
-      "path": "semantic_admission.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/capability-lifecycle-projection-v1.md",
-          "docs/design/decision-governance-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_decision_governance.py",
-          "validators/validate_semantic_admission.py",
-          "validators/validate_semantic_closure.py",
-          "validators/validate_semantic_question_loop.py"
-        ]
-      }
-    },
-    "module_facades:semantic_closure": {
-      "canonical_target": "harness.application.semantic_closure",
-      "path": "semantic_closure.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/capability-lifecycle-projection-v1.md",
-          "docs/design/integration-contract-v0.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_semantic_closure.py",
-          "validators/validate_semantic_question_loop.py"
-        ]
-      }
-    },
-    "module_facades:semantic_derivation": {
-      "canonical_target": "harness.assurance.semantic_derivation",
-      "path": "semantic_derivation.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/capability-derivation-testing-v0.md",
-          "docs/research/real-project-semantic-atom-coverage-proof-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md"
-        ],
-        "validators_tests": [
-          "validators/validate_semantic_admission.py"
-        ]
-      }
-    },
-    "module_facades:semantic_fingerprint": {
-      "canonical_target": "harness.assurance.semantic_fingerprint",
-      "path": "semantic_fingerprint.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ]
-      }
-    },
-    "module_facades:semantic_judgement_calibration": {
-      "canonical_target": "harness.assurance.semantic_judgement_calibration",
-      "path": "semantic_judgement_calibration.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/live-calibration-validator-v0.md",
-          "docs/research/live-calibration-validator-v0.md",
-          "docs/research/semantic-judgement-calibration-v0.md"
-        ]
-      }
-    },
-    "module_facades:semantic_questions": {
-      "canonical_target": "harness.application.semantic_questions",
-      "path": "semantic_questions.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_semantic_question_loop.py"
-        ]
-      }
-    },
-    "module_facades:skill_invariant_policy": {
-      "canonical_target": "harness.application.skill_invariant_policy",
-      "path": "skill_invariant_policy.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "historical": [
-          "docs/audit/harness-ddd-context-map.md",
-          "docs/audit/harness-evolution-radar.md",
-          "docs/audit/harness-skill-surface-gap-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_skill_invariant_policy.py"
-        ]
-      }
-    },
-    "module_facades:skill_router": {
-      "canonical_target": "harness.application.skill_router",
-      "path": "skill_router.py",
-      "users": {
-        "distribution_tooling": [
-          "AGENTS.md",
-          "spec/distribution/consumer-pack-v0.yaml",
-          "spec/distribution/target-agents-fragment-v0.md"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-instruction-architecture-v0.md",
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/operation-orchestration-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md"
-        ],
-        "historical": [
-          "docs/audit/harness-audit-backlog.md",
-          "docs/audit/harness-ci-audit.md",
-          "docs/audit/harness-evolution-radar.md",
-          "docs/audit/harness-skill-surface-post-migration-audit.md",
-          "spec/assurance/evidence/first-wave-provider-run-36942421201.yaml",
-          "spec/assurance/evidence/first-wave-provider-run-36947887869.yaml",
-          "spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml",
-          "spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml"
-        ],
-        "validators_tests": [
-          "spec/behavioral-eval-integration/case.yaml",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_consumer_wrapper.py",
-          "validators/validate_coverage_production_contract_overlay.py",
-          "validators/validate_fresh_context_routing.py",
-          "validators/validate_instruction_ownership.py",
-          "validators/validate_skill_router.py"
-        ]
-      }
-    },
-    "module_facades:source_boundary": {
-      "canonical_target": "harness.evidence.source_boundary",
-      "path": "source_boundary.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md",
-          "docs/research/source-boundary-statement-enumeration-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py"
-        ]
-      }
-    },
-    "module_facades:source_coverage": {
-      "canonical_target": "harness.evidence.source_coverage",
-      "path": "source_coverage.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md",
-          "docs/research/semantic-surface-extraction-admission-v0.md",
-          "docs/research/source-boundary-statement-enumeration-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md"
-        ],
-        "historical": [
-          "docs/audit/harness-ci-audit.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py"
-        ]
-      }
-    },
-    "module_facades:source_set": {
-      "canonical_target": "harness.evidence.source_set",
-      "path": "source_set.py",
-      "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
-        "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md",
-          "docs/research/source-set-evidence-boundary-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md"
-        ],
-        "validators_tests": [
-          "validators/validate_consumer_pack.py"
         ]
       }
     },
     "module_facades:target_state": {
-      "canonical_target": "harness.project_model.target_state",
       "path": "target_state.py",
+      "canonical_target": "harness.project_model.target_state",
       "users": {
-        "distribution_tooling": [
-          "spec/distribution/consumer-pack-v0.yaml"
-        ],
         "documentation_examples": [
           "docs/design/harness-consumer-pack-v0.md",
           "docs/design/integration-contract-v0.md",
@@ -1012,24 +83,29 @@
         ],
         "validators_tests": [
           "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_agent_layer.py",
-          "validators/validate_behavioral_eval.py",
-          "validators/validate_behavioral_eval_cases.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_target_state.py"
+          "validators/validate_consumer_pack.py"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
         ]
       }
     },
-    "module_facades:workspace": {
-      "canonical_target": "harness.workspace.workspace",
-      "path": "workspace.py",
+    "module_facades:engineering_graph": {
+      "path": "engineering_graph.py",
+      "canonical_target": "harness.project_model.engineering_graph",
       "users": {
         "distribution_tooling": [
+          ".github/workflows/greenfield-engineering-graph.yml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
         "documentation_examples": [
-          "docs/design/integration-contract-v0.md",
+          "docs/design/context-published-contracts-v0.md",
+          "docs/design/harness-consumer-pack-v0.md",
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md"
         ],
@@ -1038,35 +114,828 @@
         ]
       }
     },
-    "scenario_drivers.py": {
-      "canonical_target": "scenario_drivers",
-      "path": "scenario_drivers.py",
+    "module_facades:project_status": {
+      "path": "project_status.py",
+      "canonical_target": "harness.reference_model.project_status",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:reference_materializer": {
+      "path": "reference_materializer.py",
+      "canonical_target": "harness.reference_model.reference_materializer",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:reference_model_evolution": {
+      "path": "reference_model_evolution.py",
+      "canonical_target": "harness.reference_model.reference_model_evolution",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:source_boundary": {
+      "path": "source_boundary.py",
+      "canonical_target": "harness.evidence.source_boundary",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md",
+          "docs/research/source-boundary-statement-enumeration-v0.md",
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:source_coverage": {
+      "path": "source_coverage.py",
+      "canonical_target": "harness.evidence.source_coverage",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md",
+          "docs/research/semantic-surface-extraction-admission-v0.md",
+          "docs/research/source-boundary-statement-enumeration-v0.md",
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:source_set": {
+      "path": "source_set.py",
+      "canonical_target": "harness.evidence.source_set",
+      "users": {
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md",
+          "docs/research/source-set-evidence-boundary-v0.md",
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:decision_execution_assurance": {
+      "path": "decision_execution_assurance.py",
+      "canonical_target": "harness.decision.decision_execution_assurance",
       "users": {
         "distribution_tooling": [
-          "evals/live_calibration_process_driver.py",
-          "scenario_suite.py",
-          "spec/distribution/consumer-pack-v0.yaml",
-          "spec/distribution/consumer-pack-v1.yaml"
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:decision_exploration": {
+      "path": "decision_exploration.py",
+      "canonical_target": "harness.decision.decision_exploration",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:decision_explorer_contract": {
+      "path": "decision_explorer_contract.py",
+      "canonical_target": "harness.decision.decision_explorer_contract",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:decision_governance": {
+      "path": "decision_governance.py",
+      "canonical_target": "harness.decision.decision_governance",
+      "users": {
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:architecture_driver_closure": {
+      "path": "architecture_driver_closure.py",
+      "canonical_target": "harness.coverage.architecture_driver_closure",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:concern_activation": {
+      "path": "concern_activation.py",
+      "canonical_target": "harness.coverage.concern_activation",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md"
+        ],
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:coverage_obligations": {
+      "path": "coverage_obligations.py",
+      "canonical_target": "harness.coverage.coverage_obligations",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:coverage_planner": {
+      "path": "coverage_planner.py",
+      "canonical_target": "harness.coverage.coverage_planner",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:engineering_coverage": {
+      "path": "engineering_coverage.py",
+      "canonical_target": "harness.coverage.engineering_coverage",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md",
+          "docs/research/engineering-coverage-evaluator.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:frontend_interface_knowledge": {
+      "path": "frontend_interface_knowledge.py",
+      "canonical_target": "harness.workspace.frontend_interface_knowledge",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:frontend_screen_contracts": {
+      "path": "frontend_screen_contracts.py",
+      "canonical_target": "harness.workspace.frontend_screen_contracts",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:human_projection": {
+      "path": "human_projection.py",
+      "canonical_target": "harness.workspace.human_projection",
+      "users": {
+        "documentation_examples": [
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:workspace": {
+      "path": "workspace.py",
+      "canonical_target": "harness.workspace.workspace",
+      "users": {
+        "documentation_examples": [
+          "docs/design/integration-contract-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:integration_alignment": {
+      "path": "integration_alignment.py",
+      "canonical_target": "harness.integration.integration_alignment",
+      "users": {
+        "documentation_examples": [
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:adapters.canonical_graph": {
+      "path": "adapters/canonical_graph.py",
+      "canonical_target": "harness.integration.adapters.canonical_graph",
+      "users": {
+        "distribution_tooling": [
+          "README.md",
+          "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml"
+        ],
+        "historical": [
+          "docs/audit/harness-audit-backlog.md"
         ],
         "documentation_examples": [
           "docs/design/harness-consumer-pack-v1.md",
-          "docs/design/repository-layout-v0.md",
-          "docs/design/scenario-suite-v0.md",
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
           "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py",
-          "validators/validate_scenario_suite.py"
+          "validators/validate_context_boundaries.py"
+        ]
+      }
+    },
+    "module_facades:repository_realization": {
+      "path": "repository_realization.py",
+      "canonical_target": "harness.integration.repository_realization",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:acceptance_policy": {
+      "path": "acceptance_policy.py",
+      "canonical_target": "harness.assurance.acceptance_policy",
+      "users": {
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:capability_lifecycle": {
+      "path": "capability_lifecycle.py",
+      "canonical_target": "harness.assurance.capability_lifecycle",
+      "users": {
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:derivation_test_coverage": {
+      "path": "derivation_test_coverage.py",
+      "canonical_target": "harness.assurance.derivation_test_coverage",
+      "users": {
+        "documentation_examples": [
+          "docs/design/capability-derivation-testing-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:live_calibration": {
+      "path": "live_calibration.py",
+      "canonical_target": "harness.assurance.live_calibration",
+      "users": {
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:adapters.copilot_live_calibration_evaluator": {
+      "path": "adapters/copilot_live_calibration_evaluator.py",
+      "canonical_target": "harness.assurance.adapters.copilot_live_calibration_evaluator",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md"
+        ],
+        "documentation_examples": [
+          "docs/repository-source-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py"
+        ]
+      }
+    },
+    "module_facades:semantic_acceptance": {
+      "path": "semantic_acceptance.py",
+      "canonical_target": "harness.assurance.semantic_acceptance",
+      "users": {
+        "documentation_examples": [
+          "docs/research/semantic-surface-extraction-admission-v0.md",
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_derivation": {
+      "path": "semantic_derivation.py",
+      "canonical_target": "harness.assurance.semantic_derivation",
+      "users": {
+        "documentation_examples": [
+          "docs/design/capability-derivation-testing-v0.md",
+          "docs/research/real-project-semantic-atom-coverage-proof-v0.md",
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_fingerprint": {
+      "path": "semantic_fingerprint.py",
+      "canonical_target": "harness.assurance.semantic_fingerprint",
+      "users": {
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_judgement_calibration": {
+      "path": "semantic_judgement_calibration.py",
+      "canonical_target": "harness.assurance.semantic_judgement_calibration",
+      "users": {
+        "documentation_examples": [
+          "docs/design/live-calibration-validator-v0.md",
+          "docs/research/live-calibration-validator-v0.md",
+          "docs/research/semantic-judgement-calibration-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:agent_router": {
+      "path": "agent_router.py",
+      "canonical_target": "harness.application.agent_router",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ddd-context-map.md",
+          "docs/audit/harness-evolution-radar.md",
+          "docs/audit/harness-skill-surface-gap-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/design/engineering-graph-v0-pilot-results.md",
+          "docs/design/engineering-graph-v0.md",
+          "docs/design/integration-contract-v0.md"
+        ],
+        "validators_tests": [
+          "spec/assurance/harness-assurance-registry-v0.yaml"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:authority_context": {
+      "path": "authority_context.py",
+      "canonical_target": "harness.application.authority_context",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md",
+          "docs/audit/harness-evolution-radar.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:consumer_pack": {
+      "path": "consumer_pack.py",
+      "canonical_target": "harness.application.consumer_pack",
+      "users": {
+        "distribution_tooling": [
+          "distribution/harnessw.py",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "historical": [
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "documentation_examples": [
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/harness-consumer-pack-v1.md",
+          "docs/design/harness-consumer-wrapper-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py",
+          "validators/validate_consumer_wrapper.py"
+        ]
+      }
+    },
+    "module_facades:coverage_application": {
+      "path": "coverage_application.py",
+      "canonical_target": "harness.application.coverage_application",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "documentation_examples": [
+          "docs/design/context-published-contracts-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:decision_explorer_request": {
+      "path": "decision_explorer_request.py",
+      "canonical_target": "harness.application.decision_explorer_request",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:decision_pipeline": {
+      "path": "decision_pipeline.py",
+      "canonical_target": "harness.application.decision_pipeline",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ci-audit.md",
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:graph_doctor": {
+      "path": "graph_doctor.py",
+      "canonical_target": "harness.application.graph_doctor",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "documentation_examples": [
+          "docs/design/graph-doctor-v1.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:method_router": {
+      "path": "method_router.py",
+      "canonical_target": "harness.application.method_router",
+      "users": {
+        "historical": [
+          "docs/audit/audit-framework.md",
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ci-audit.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_pack.py",
+          "validators/validate_method_router.py"
+        ]
+      }
+    },
+    "module_facades:project_frontier": {
+      "path": "project_frontier.py",
+      "canonical_target": "harness.application.project_frontier",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/decision-pipeline-v0.md",
+          "docs/design/project-frontier-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:project_publication": {
+      "path": "project_publication.py",
+      "canonical_target": "harness.application.project_publication",
+      "users": {
+        "historical": [
+          "docs/audit/harness-audit-backlog.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_admission": {
+      "path": "semantic_admission.py",
+      "canonical_target": "harness.application.semantic_admission",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/capability-lifecycle-projection-v1.md",
+          "docs/design/decision-governance-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_closure": {
+      "path": "semantic_closure.py",
+      "canonical_target": "harness.application.semantic_closure",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-artifact-workbench-v0.md",
+          "docs/design/capability-lifecycle-projection-v1.md",
+          "docs/design/integration-contract-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:semantic_questions": {
+      "path": "semantic_questions.py",
+      "canonical_target": "harness.application.semantic_questions",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:skill_invariant_policy": {
+      "path": "skill_invariant_policy.py",
+      "canonical_target": "harness.application.skill_invariant_policy",
+      "users": {
+        "historical": [
+          "docs/audit/harness-ddd-context-map.md",
+          "docs/audit/harness-evolution-radar.md",
+          "docs/audit/harness-skill-surface-gap-audit.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml"
+        ]
+      }
+    },
+    "module_facades:skill_router": {
+      "path": "skill_router.py",
+      "canonical_target": "harness.application.skill_router",
+      "users": {
+        "distribution_tooling": [
+          "AGENTS.md",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml",
+          "spec/distribution/target-agents-fragment-v0.md"
+        ],
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "docs/audit/harness-ci-audit.md",
+          "docs/audit/harness-evolution-radar.md",
+          "docs/audit/harness-skill-surface-post-migration-audit.md",
+          "spec/assurance/evidence/first-wave-provider-run-36942421201.yaml",
+          "spec/assurance/evidence/first-wave-provider-run-36947887869.yaml",
+          "spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml",
+          "spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml"
+        ],
+        "documentation_examples": [
+          "docs/design/agent-instruction-architecture-v0.md",
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/operation-orchestration-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "validators_tests": [
+          "spec/behavioral-eval-integration/case.yaml",
+          "validators/validate_consumer_pack.py",
+          "validators/validate_consumer_wrapper.py",
+          "validators/validate_fresh_context_routing.py",
+          "validators/validate_instruction_ownership.py",
+          "validators/validate_skill_router.py"
+        ]
+      }
+    },
+    "harness/__init__.py#execution-bridge": {
+      "path": "harness/__init__.py",
+      "canonical_target": "src/harness",
+      "users": {
+        "distribution_tooling": [
+          ".github/workflows/greenfield-engineering-graph.yml",
+          "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml",
+          "spec/distribution/consumer-pack-v1.yaml"
+        ],
+        "documentation_examples": [
+          "docs/design/context-published-contracts-v0.md",
+          "docs/design/core-v0.md",
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/harness-consumer-pack-v1.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_api_eol_readiness.py",
+          "validators/validate_consumer_pack.py",
+          "validators/validate_core.py"
+        ]
+      }
+    },
+    "harness/__init__.py#core-exports": {
+      "path": "harness/__init__.py",
+      "canonical_target": "harness.project_model.core",
+      "users": {
+        "distribution_tooling": [
+          ".github/workflows/greenfield-engineering-graph.yml",
+          "spec/architecture/repository-layout-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml",
+          "spec/distribution/consumer-pack-v1.yaml"
+        ],
+        "documentation_examples": [
+          "docs/design/context-published-contracts-v0.md",
+          "docs/design/core-v0.md",
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/harness-consumer-pack-v1.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_api_eol_readiness.py",
+          "validators/validate_consumer_pack.py",
+          "validators/validate_core.py"
+        ]
+      }
+    },
+    "src/harness/__init__.py#core-exports": {
+      "path": "src/harness/__init__.py",
+      "canonical_target": "harness.project_model.core",
+      "users": {
+        "documentation_examples": [
+          "docs/design/harness-consumer-pack-v0.md",
+          "docs/design/repository-layout-v0.md"
+        ],
+        "distribution_tooling": [
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
+          "spec/distribution/consumer-pack-v0.yaml",
+          "spec/distribution/consumer-pack-v1.yaml"
+        ],
+        "validators_tests": [
+          "validators/validate_consumer_api_eol_readiness.py",
+          "validators/validate_context_boundaries.py"
         ]
       }
     },
     "scenario_suite.py": {
-      "canonical_target": "scenario_suite",
       "path": "scenario_suite.py",
+      "canonical_target": "scenario_suite",
       "users": {
         "distribution_tooling": [
           ".github/workflows/live-calibration-copilot.yml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
           "spec/distribution/consumer-pack-v0.yaml",
           "spec/distribution/consumer-pack-v1.yaml"
         ],
@@ -1077,6 +946,7 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
+          "validators/validate_consumer_api_eol_readiness.py",
           "validators/validate_consumer_pack.py",
           "validators/validate_context_boundaries.py",
           "validators/validate_live_calibration_process_driver.py",
@@ -1084,23 +954,62 @@
         ]
       }
     },
-    "src/harness/__init__.py#core-exports": {
-      "canonical_target": "harness.project_model.core",
-      "path": "src/harness/__init__.py",
+    "scenario_drivers.py": {
+      "path": "scenario_drivers.py",
+      "canonical_target": "scenario_drivers",
       "users": {
+        "documentation_examples": [
+          "docs/design/harness-consumer-pack-v1.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/design/scenario-suite-v0.md",
+          "docs/repository-source-map.md"
+        ],
         "distribution_tooling": [
+          "evals/live_calibration_process_driver.py",
+          "scenario_suite.py",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
           "spec/distribution/consumer-pack-v0.yaml",
           "spec/distribution/consumer-pack-v1.yaml"
         ],
+        "validators_tests": [
+          "validators/validate_consumer_api_eol_readiness.py",
+          "validators/validate_consumer_pack.py",
+          "validators/validate_context_boundaries.py",
+          "validators/validate_scenario_suite.py"
+        ]
+      }
+    },
+    "adapters/copilot_behavioral_eval_agent.py": {
+      "path": "adapters/copilot_behavioral_eval_agent.py",
+      "canonical_target": "adapters.copilot_behavioral_eval_agent",
+      "users": {
+        "distribution_tooling": [
+          ".github/workflows/ci-policy.yml",
+          "spec/architecture/harness-context-map-v0.yaml",
+          "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml"
+        ],
+        "historical": [
+          "docs/audit/harness-audit-backlog.md",
+          "spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml",
+          "spec/assurance/evidence/first-wave-provider-run-36928079710.yaml",
+          "spec/assurance/evidence/first-wave-provider-run-36942421201.yaml",
+          "spec/assurance/evidence/first-wave-provider-run-36947887869.yaml",
+          "spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml",
+          "spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml",
+          "spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml"
+        ],
         "documentation_examples": [
-          "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/repository-layout-v0.md"
+          "docs/design/harness-agent-behavioral-evaluation-v0.md",
+          "docs/design/repository-layout-v0.md",
+          "docs/repository-source-map.md"
         ],
         "validators_tests": [
+          "spec/assurance/harness-assurance-registry-v0.yaml",
+          "validators/validate_behavioral_eval_cases.py",
+          "validators/validate_consumer_pack.py",
           "validators/validate_context_boundaries.py"
         ]
       }
     }
-  },
-  "version": 1
+  }
 }

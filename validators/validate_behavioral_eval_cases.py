@@ -379,7 +379,7 @@ with tempfile.TemporaryDirectory(prefix="behavioral-comp-case-") as temp:
         }],
         "questions": [],
     }
-    from target_state import evaluate_target_state
+    from harness.project_model.target_state import evaluate_target_state
     comp_target = evaluate_target_state(
         comp_binding.fixture["reviewed_design_profile"],
         comp_model,
@@ -474,7 +474,7 @@ with tempfile.TemporaryDirectory(prefix="behavioral-e03-case-") as temp:
             "answer_from": [],
         }],
     }
-    from target_state import evaluate_target_state
+    from harness.project_model.target_state import evaluate_target_state
     e03_target = evaluate_target_state(
         e03_binding.fixture["reviewed_design_profile"],
         e03_model,

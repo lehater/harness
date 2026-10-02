@@ -11,8 +11,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError  # noqa: E402
-from target_state import validate_profile  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.project_model.target_state import validate_profile  # noqa: E402
 
 SURFACE_REGISTRY = ROOT / "skills/skill-surface-registry-v0.yaml"
 ARTIFACT_REGISTRY = ROOT / "skills/artifact-skill-registry-v0.yaml"
