@@ -294,7 +294,7 @@ For source-loss-sensitive work:
 - treat a remaining classification/provenance QUESTION as source coverage INCOMPLETE;
 - make a project-specific source-coverage capability a prerequisite of Product Requirements or the terminal consumer when the experiment requires blind/reconstruction assurance.
 
-Use `skills/artifacts/source-coverage-audit/SKILL.md`, `source_set.py`, `source_boundary.py` and `source_coverage.py` for the reusable procedure/validators. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
+Use `skills/artifacts/source-coverage-audit/SKILL.md`, `harness.evidence.source_set`, `harness.evidence.source_boundary` and `harness.evidence.source_coverage` for the reusable procedure/validators. Root `source_set.py`, `source_boundary.py` and `source_coverage.py` remain supported import/CLI facades. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
 
 ## Implementation feedback
 

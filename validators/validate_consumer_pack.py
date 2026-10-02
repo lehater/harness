@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import os
 import subprocess
@@ -82,6 +83,14 @@ import reference_materializer
 assert not hasattr(reference_model_evolution, 'main')
 assert reference_materializer.CoreError is core.CoreError
 assert reference_materializer.validate_engineering_graph is canonical_graph.validate_engineering_graph
+for module in ('source_boundary', 'source_coverage', 'source_set'):
+    legacy = importlib.import_module(module)
+    canonical = importlib.import_module('harness.evidence.' + module)
+    assert legacy.__all__ is canonical.__all__
+    for name in canonical.__all__:
+        assert getattr(legacy, name) is getattr(canonical, name), (module, name)
+    assert canonical.CoreError is core.CoreError
+    assert Path(canonical.__file__).resolve() == Path('src/harness/evidence/' + module + '.py').resolve()
 """
     result = subprocess.run(
         [sys.executable, "-c", probe], cwd=pack, env=env,
@@ -174,6 +183,50 @@ assert reference_materializer.validate_engineering_graph is canonical_graph.vali
     required = {row["template"] for row in materialized["template_status"] if row["status"] == "REQUIRED"}
     assert set(holdout["expect"]["required_templates"]) <= required
     assert not set(holdout["expect"]["forbidden_templates"]) & required
+
+    source_path = temp_root / "raw-source.txt"
+    source_path.write_text("A source statement.\n", encoding="utf-8")
+    boundary_path = temp_root / "source-boundary.yaml"
+    boundary_path.write_text(yaml.safe_dump({
+        "version": 1, "kind": "harness-source-boundary", "id": "BOUNDARY",
+        "source_baseline": "fixture@v1",
+        "source_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        "segments": [{"id": "S1", "start_line": 1, "end_line": 1}],
+    }), encoding="utf-8")
+    coverage_path = temp_root / "source-coverage.yaml"
+    coverage_path.write_text(yaml.safe_dump({
+        "version": 1, "kind": "harness-source-coverage", "id": "COVERAGE",
+        "source_baseline": "fixture@v1", "coverage_status": "COMPLETE",
+        "statements": [{"id": "S1", "source_ref": "raw-source.txt#1", "text": "A source statement."}],
+        "dispositions": [{"statement_id": "S1", "classification": "ADMITTED",
+                          "admitted_ref": "knowledge.yaml#S1", "sanitized_statement": "A source statement."}],
+    }), encoding="utf-8")
+    contract_path = temp_root / "source-set-contract.yaml"
+    contract_path.write_text(yaml.safe_dump({
+        "version": 1, "kind": "harness-source-set-contract", "id": "CONTRACT",
+        "scope": "fixture", "requirements": [{"id": "requirements", "min_items": 1}],
+    }), encoding="utf-8")
+    inventory_path = temp_root / "source-set.yaml"
+    inventory_path.write_text(yaml.safe_dump({
+        "version": 1, "kind": "harness-source-set", "id": "INVENTORY", "contract_id": "CONTRACT",
+        "channels": [{"id": "requirements", "state": "COMPLETE", "items": [{"source_ref": "raw-source.txt"}]}],
+    }), encoding="utf-8")
+    for script, arguments, expected in (
+        ("source_boundary.py", [str(source_path), str(boundary_path)],
+         {"status": "ACCEPTED", "covered_line_count": 1, "findings": []}),
+        ("source_coverage.py", ["validate", str(coverage_path)],
+         {"valid": True, "coverage_status": "COMPLETE", "statement_count": 1, "questions": []}),
+        ("source_coverage.py", ["report", str(coverage_path)],
+         {"valid": True, "coverage_status": "COMPLETE", "statement_count": 1, "questions": []}),
+        ("source_set.py", [str(contract_path), str(inventory_path)],
+         {"status": "ACCEPTED", "required_channel_count": 1, "reviewed_channel_count": 1, "findings": []}),
+    ):
+        result = subprocess.run(
+            [sys.executable, script, *arguments], cwd=pack, env=env,
+            check=True, capture_output=True, text=True,
+        )
+        actual = json.loads(result.stdout)
+        assert all(actual[key] == value for key, value in expected.items()), (script, actual)
 
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")

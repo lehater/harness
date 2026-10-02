@@ -84,9 +84,9 @@ contexts:
     subdomain: supporting
     responsibility: Own acquisition/source-set completeness, lossless source boundaries and statement coverage.
     modules:
-      - source_boundary
-      - source_coverage
-      - source_set
+      - harness.evidence.source_boundary
+      - harness.evidence.source_coverage
+      - harness.evidence.source_set
     may_depend_on: []
 
   integration:

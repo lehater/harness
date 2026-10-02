@@ -76,8 +76,12 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
 - `workspace.py` — managed knowledge validation and rendering.
-- `source_boundary.py` — assurance-only lossless line-range coverage for a selected immutable raw source before semantic statement enumeration.
-- `source_coverage.py` — statement-level admitted/excluded/question coverage after the raw source boundary has been established.
+- `src/harness/evidence/source_boundary.py` — canonical assurance-only lossless line-range coverage;
+  `source_boundary.py` is its temporary import/CLI facade.
+- `src/harness/evidence/source_coverage.py` — canonical statement-level admitted/excluded/question coverage;
+  `source_coverage.py` is its temporary import/CLI facade.
+- `src/harness/evidence/source_set.py` — canonical acquisition-contract source-set completeness;
+  `source_set.py` is its temporary import/CLI facade.
 - `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/decision-governance/**` — experimental decision-governance evidence and knowledge-kind decision contracts.

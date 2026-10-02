@@ -70,9 +70,6 @@ root_python:
     - semantic_questions
     - skill_invariant_policy
     - skill_router
-    - source_boundary
-    - source_coverage
-    - source_set
     - workspace
 
 # Finite migration state: these surfaces delegate, never own context semantics.
@@ -100,3 +97,12 @@ compatibility:
     reference_model_evolution:
       target: harness.reference_model.reference_model_evolution
       mode: import-only
+    source_boundary:
+      target: harness.evidence.source_boundary
+      mode: import-and-cli
+    source_coverage:
+      target: harness.evidence.source_coverage
+      mode: import-and-cli
+    source_set:
+      target: harness.evidence.source_set
+      mode: import-and-cli
