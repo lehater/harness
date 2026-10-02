@@ -1,0 +1,25 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-008-FIXTURE-V1
+repository_shape:
+  selected_paths:
+    - "docs/maintenance/handoff-contract.md"
+    - "docs/maintenance/receiver-rules.md"
+    - "deploy/README.md"
+    - "observability/examples.md"
+  reference_pressure:
+    - "The repository repeatedly uses deployment, release, observability, and pipeline terminology in folder names and examples."
+    - "Those labels are descriptive unless an accepted atom below creates an engineering obligation."
+atoms:
+  - id: N1
+    statement: "Every signed maintenance bundle must carry a monotonically increasing handoff sequence scoped to the target appliance."
+    source_path: "docs/maintenance/handoff-contract.md"
+  - id: N2
+    statement: "A receiver must reject a signed maintenance bundle when its handoff sequence is not greater than the last accepted sequence for that appliance."
+    source_path: "docs/maintenance/receiver-rules.md"
+  - id: D1
+    statement: "The deployment README uses the phrase release pipeline when illustrating how an operator copies a bundle."
+    source_path: "deploy/README.md"
+  - id: D2
+    statement: "The observability examples mention dashboards and metrics but make no acceptance, retention, alerting, or availability requirement for this scope."
+    source_path: "observability/examples.md"

@@ -1,0 +1,8 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+id: TD-AUTH-003-ORACLE-V1
+dimensions:
+  authority_partition:
+    groups:
+      - [P1, P2]
+      - [W1, W2]

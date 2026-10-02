@@ -1,0 +1,25 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-007-FIXTURE-V1
+atoms:
+  - id: P1
+    statement: "Order creation accepts a client idempotency key."
+    source_path: "docs/mixed/platform-notes.md"
+  - id: P2
+    statement: "A repeated order-create request with the same key returns the prior accepted result rather than creating another order."
+    source_path: "src/examples/order_retry.txt"
+  - id: A1
+    statement: "Security audit events are retained for seven years."
+    source_path: "docs/mixed/platform-notes.md"
+  - id: A2
+    statement: "The seven-year audit-retention obligation is revalidated independently from order retry behavior."
+    source_path: "docs/compliance/retention.md"
+  - id: Q1
+    statement: "A dispatch lease expires after ninety seconds unless renewed."
+    source_path: "docs/mixed/platform-notes.md"
+  - id: Q2
+    statement: "Dispatch-lease expiry can change independently from both order idempotency and audit retention."
+    source_path: "worker/examples/lease.md"
+  - id: D1
+    statement: "A sample deployment manifest contains a metrics port and a retry-named container label, without creating an additional engineering obligation."
+    source_path: "deploy/example.yaml"

@@ -1,0 +1,27 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-AUTH-006
+abilities: [HA-A04]
+failure_modes: [A04-F05]
+test_level: TL1
+fixture_revision: TD-AUTH-006-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Partition accepted decision atoms by their project-specific independent-change boundaries. Repeated reference-like vocabulary, team labels, and file co-location are not ownership rules."
+selected_scope: "governance-labelled-project-decisions"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [authority_partition]
+pass_criteria:
+  require_dimensions: [authority_partition]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

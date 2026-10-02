@@ -350,6 +350,8 @@ Assertions:
 **Oracle:** O1  
 **Status:** READY
 
+**Prepared TL4 execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-007` runs three clean contexts against the same frozen semantic oracle; provider evidence pending.
+
 Base fixture:
 
 Reuse TD-CAP-001/003/004.
@@ -365,6 +367,36 @@ Transformations:
 Expected semantic result:
 
 Same normalized Capability identities and granularity.
+
+## TD-CAP-008 — Project-shaped novel Capability under Reference pressure
+
+**Abilities:** HA-A05  
+**Failure modes:** A05-F06 Reference Model bias, A05-F07 novel Capability missed  
+**Methods:** EM-05, EM-08  
+**Minimum level:** TL3  
+**Oracle:** O1  
+**Status:** READY
+
+**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-008`; provider evidence pending.
+
+Fixture:
+
+A controlled project-shaped repository slice contains one novel independently
+provable maintenance-handoff obligation spread across accepted documents. The
+same slice contains repeated deployment/release/observability vocabulary only in
+descriptive filenames and examples.
+
+Expected semantic result:
+
+The novel obligation is discovered as one Capability surface; descriptive
+Reference-like vocabulary creates no substitute or additional Capability.
+
+Assertions:
+
+- both substantive novel atoms are recalled into one semantic group;
+- descriptive deployment/observability atoms are not admitted as Capabilities;
+- no familiar Reference vocabulary can replace the novel project obligation.
+
 
 # SF-02 — Authority partition
 
@@ -427,6 +459,8 @@ Assertions:
 **Minimum level:** TL1  
 **Oracle:** O1  
 **Status:** READY
+
+**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; provider evidence pending.
 
 Fixture:
 
@@ -525,6 +559,8 @@ was assumed while Authority identity was the unresolved subject.
 **Oracle:** O1  
 **Status:** READY
 
+**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-006`; provider evidence pending.
+
 Fixture:
 
 Reference Model suggests one common Authority grouping, while synthetic project
@@ -543,6 +579,8 @@ contract.
 **Minimum level:** TL1  
 **Oracle:** O1  
 **Status:** READY
+
+**Prepared TL4 execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-007` runs three clean contexts against the same frozen partition oracle; provider evidence pending.
 
 Transformations:
 
@@ -2112,7 +2150,7 @@ Every canonical ability now has at least one designed evidence path.
 | HA-A02 | TD-DEP-001/002/004/005, TD-LIFE-006 |
 | HA-A03 | TD-BOOT-G03 plus existing target-state truth-table/mutation evidence |
 | HA-A04 | TD-AUTH-001..007, TD-COMP-001, TD-BOOT-E06 |
-| HA-A05 | TD-CAP-001..007, TD-COMP-001, TD-BOOT-E06, TD-BOOT-G04/G05 |
+| HA-A05 | TD-CAP-001..008, TD-COMP-001, TD-BOOT-E06, TD-BOOT-G04/G05 |
 | HA-A06 | TD-APP-001..006, TD-COMP-002 |
 | HA-A07 | TD-AUTH-005/006, TD-LIFE-005 |
 | HA-A08 | TD-CAP-005, TD-ROUTE-003, TD-BOOT-G01/G04/G05 |

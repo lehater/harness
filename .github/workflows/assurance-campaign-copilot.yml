@@ -1,0 +1,120 @@
+name: assurance campaign copilot evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: "Behavioral assurance campaign"
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - first-wave
+          - tl4-existing-project
+          - tl5-known-project
+          - release-critical-formation
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  campaign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Harness dependencies
+        run: pip install PyYAML
+
+      - name: Install pinned Copilot CLI
+        run: |
+          npm install -g @github/copilot@1.0.91
+          copilot --version
+
+      - name: Materialize provider-auto agent descriptor
+        shell: bash
+        run: |
+          MODEL="auto"
+          MODEL_SELECTION="provider-auto"
+          sed \
+            -e "s/__MODEL__/${MODEL}/g" \
+            -e "s/__MODEL_SELECTION__/${MODEL_SELECTION}/g" \
+            spec/behavioral-evals/copilot-agent.yaml.tmpl \
+            > /tmp/behavioral-agent.yaml
+
+      - name: Resolve campaign manifests
+        id: manifests
+        shell: bash
+        env:
+          CAMPAIGN: ${{ inputs.campaign }}
+        run: |
+          python - <<'PY' > /tmp/behavioral-templates.txt
+          import os
+          from pathlib import Path
+          import yaml
+
+          manifests = {
+              "first-wave": [Path("spec/behavioral-evals/first-wave/manifest-v0.yaml")],
+              "tl4-existing-project": [Path("spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml")],
+              "tl5-known-project": [Path("spec/behavioral-evals/tl5-known-project/manifest-v0.yaml")],
+              "release-critical-formation": [Path("spec/behavioral-evals/release-critical-formation/manifest-v0.yaml")],
+          }
+          selected = os.environ["CAMPAIGN"]
+          selected_manifests = (
+              [path for paths in manifests.values() for path in paths]
+              if selected == "all"
+              else manifests[selected]
+          )
+          seen = set()
+          for manifest_path in selected_manifests:
+              manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+              for item in manifest["cases"]:
+                  template = (manifest_path.parent / item["template"]).as_posix()
+                  if template not in seen:
+                      seen.add(template)
+                      print(template)
+          PY
+          test -s /tmp/behavioral-templates.txt
+
+      - name: Execute selected behavioral cases
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          mkdir -p behavioral-eval-evidence
+          FAILED=0
+          while IFS= read -r TEMPLATE; do
+            CASE="${TEMPLATE%.tmpl}"
+            DESIGN="$(basename "$(dirname "${TEMPLATE}")")"
+            sed "s/__HARNESS_REVISION__/${GITHUB_SHA}/g" "${TEMPLATE}" > "${CASE}"
+            python behavioral_eval.py "${CASE}" \
+              --agent-descriptor /tmp/behavioral-agent.yaml \
+              --adapter-executable "${GITHUB_WORKSPACE}/adapters/copilot_behavioral_eval_agent.py" \
+              --output-dir "behavioral-eval-evidence/${DESIGN}" \
+              --json-summary "behavioral-eval-evidence/${DESIGN}-summary.json"
+            STATUS=$?
+            rm -f "${CASE}"
+            if [[ ${STATUS} -ne 0 ]]; then
+              FAILED=1
+            fi
+          done < /tmp/behavioral-templates.txt
+          exit ${FAILED}
+
+      - name: Persist behavioral evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: assurance-campaign-${{ inputs.campaign }}
+          path: behavioral-eval-evidence/
+          if-no-files-found: error
+          retention-days: 90

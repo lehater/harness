@@ -133,8 +133,15 @@ with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:
     assert _observed_cli_version(str(fake_cli), {}) == "1.0.91"
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
-MANIFEST = yaml.safe_load(
+DISPATCH_MANIFEST = yaml.safe_load(
     (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+assert DISPATCH_MANIFEST["id"] == "RELEASE-CRITICAL-FORMATION-DISPATCH-BRIDGE-V1"
+assert {item["design"] for item in DISPATCH_MANIFEST["cases"]} == {
+    "TD-AUTH-003", "TD-AUTH-006", "TD-CAP-008", "TD-CAP-007", "TD-AUTH-007"
+}
+MANIFEST = yaml.safe_load(
+    (BASE / "baseline-manifest-v0.yaml").read_text(encoding="utf-8")
 )
 EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
@@ -844,3 +851,112 @@ print(
     f"max_per_call={tl5_max_per_call}"
 )
 
+
+
+FORMATION_BASE = ROOT / "spec" / "behavioral-evals" / "release-critical-formation"
+FORMATION_MANIFEST = yaml.safe_load(
+    (FORMATION_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+FORMATION_EXPECTED = {
+    "TD-AUTH-003": ("TL1", "authority_partition", 1, {"A04-F03"}),
+    "TD-AUTH-006": ("TL1", "authority_partition", 1, {"A04-F05"}),
+    "TD-CAP-008": ("TL3", "capability_partition", 1, {"A05-F06", "A05-F07"}),
+    "TD-CAP-007": ("TL4", "capability_partition", 3, {"A05-F08"}),
+    "TD-AUTH-007": ("TL4", "authority_partition", 3, {"A04-F06"}),
+}
+assert FORMATION_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+formation_entries = FORMATION_MANIFEST["cases"]
+assert {item["design"] for item in formation_entries} == set(FORMATION_EXPECTED)
+formation_budget = FORMATION_MANIFEST["provider_prompt_budget"]
+assert formation_budget["metric"] == "utf8_bytes"
+formation_max_per_call = formation_budget["max_per_call"]
+formation_max_suite = formation_budget["max_suite"]
+assert isinstance(formation_max_per_call, int) and formation_max_per_call > 0
+assert isinstance(formation_max_suite, int) and formation_max_suite >= 9 * formation_max_per_call
+
+formation_prompt_bound = 0
+formation_provider_calls = 0
+for entry in formation_entries:
+    template = FORMATION_BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-formation-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(
+            encoding="utf-8"
+        )
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        expected_level, dimension, runs, failures = FORMATION_EXPECTED[entry["design"]]
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["test_level"] == expected_level
+        assert binding.case["normalization_profile"]["dimensions"] == [dimension]
+        assert binding.case["pass_criteria"]["require_dimensions"] == [dimension]
+        assert binding.case["run_plan"]["runs"] == runs
+        assert binding.case["run_plan"]["all_runs_must_pass"] is True
+        assert set(binding.case["failure_modes"]) == failures
+        assert entry["runs"] == runs
+        assert entry["dimension"] == dimension
+
+        request = build_execution_request(
+            binding,
+            run_id=entry["design"] + "-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        payload = _model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
+        trusted_paths = {item["path"] for item in payload["trusted_instructions"]}
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+
+        prompt_bytes = len(_prompt(request).encode("utf-8"))
+        assert prompt_bytes <= formation_max_per_call, (
+            entry["design"], prompt_bytes, formation_max_per_call
+        )
+        formation_prompt_bound += prompt_bytes * runs
+        formation_provider_calls += runs
+
+        groups = binding.oracle["dimensions"][dimension]["groups"]
+        field = "capabilities" if dimension == "capability_partition" else "authorities"
+        response = {
+            "run_status": "COMPLETED",
+            "output": {
+                field: [{"support_atoms": group} for group in groups],
+            },
+        }
+        normalized = normalize_result(binding, response)
+        scored = score_result(binding, normalized)
+        assert scored["status"] == "PASS"
+        assert scored["dimensions"][dimension]["status"] == "PASS"
+
+assert formation_provider_calls == 9
+assert formation_prompt_bound <= formation_max_suite, (
+    formation_prompt_bound,
+    formation_max_suite,
+)
+print(
+    "Release-critical formation campaign: PASS "
+    f"({len(formation_entries)} cases); provider_calls={formation_provider_calls}; "
+    f"execution_prompt_bound={formation_prompt_bound}; "
+    f"max_per_call={formation_max_per_call}"
+)
+
+CAMPAIGN_WORKFLOW = ROOT / ".github" / "workflows" / "assurance-campaign-copilot.yml"
+campaign_workflow_text = CAMPAIGN_WORKFLOW.read_text(encoding="utf-8")
+assert 'default: all' in campaign_workflow_text
+assert 'release-critical-formation' in campaign_workflow_text
+assert 'tl5-known-project' in campaign_workflow_text
+assert 'tl4-existing-project' in campaign_workflow_text
+assert 'first-wave' in campaign_workflow_text
+assert 'MODEL="auto"' in campaign_workflow_text
+assert 'MODEL_SELECTION="provider-auto"' in campaign_workflow_text
+assert "inputs.model" not in campaign_workflow_text
+print("Assurance campaign workflow structure: PASS")
