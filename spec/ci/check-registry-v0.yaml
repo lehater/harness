@@ -188,13 +188,13 @@ checks:
   stage: deferred
   cost_class: heavy
   disposition: full_gate
-  rationale: Consumer v0/v1 and stripped-source/Pack acceptance measured 29 seconds; retain deferred execution after focused checks.
+  rationale: Canonical Consumer Pack materialization and stripped-source acceptance are heavy; retain deferred execution after focused checks.
 - id: consumer_wrapper
   command: python tests/test_consumer_wrapper.py
   stage: deferred
   cost_class: heavy
   disposition: full_gate
-  rationale: V0/v1 clean-target wrapper plus isolated same-target migration measured 12.8 seconds; retain deferred execution after focused checks.
+  rationale: Canonical clean-target wrapper synchronization is heavy; retain deferred execution after focused checks.
 - id: method_router
   command: python tests/test_method_router.py
   stage: focused
