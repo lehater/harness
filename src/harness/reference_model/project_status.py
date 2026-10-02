@@ -40,11 +40,17 @@ def bootstrap_registry(catalog, existing=None, core=None, authority_migrations=N
     unresolved_authorities = {q.get("authority") for q in (core or {}).get("questions", []) if q.get("resolution") is None}
     result = []
     migrations = authority_migrations or {}
-    retired = {old for old in migrations if old not in catalog_ids(catalog)}
+    current_ids = set(catalog_ids(catalog))
+    retired = set(records) - current_ids
     conflicts = []
-    for old in retired:
-        if old in records and records[old].get("applicability") != "UNASSESSED":
-            conflicts.append({"retired_authority": old, "previous_assessment": records[old], "replacements": migrations[old], "resolution": "MANUAL-DECISION"})
+    for old in sorted(retired):
+        if records[old].get("applicability") != "UNASSESSED":
+            conflicts.append({
+                "retired_authority": old,
+                "previous_assessment": records[old],
+                "replacements": migrations.get(old, []),
+                "resolution": "MANUAL-DECISION",
+            })
     for authority_id in catalog_ids(catalog):
         if authority_id in records:
             result.append(records[authority_id]); continue

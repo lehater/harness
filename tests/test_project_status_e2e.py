@@ -50,3 +50,50 @@ assert m["MACHINE-INTERFACE-DESIGN"]["applicability"]=="UNASSESSED"
 assert m["HUMAN-INTERFACE-DESIGN"]["applicability"]=="UNASSESSED"
 assert migrated["migration_conflicts"][0]["resolution"]=="MANUAL-DECISION"
 print("authority split migration: OK")
+
+
+# Retiring an accepted Authority without a migration map is never silent.
+retired=bootstrap_registry({"authorities":[]},old_reg)
+assert retired["assessments"]==[]
+assert retired["migration_conflicts"]==[{
+    "retired_authority":"INTERFACE-DESIGN",
+    "previous_assessment":old_reg["assessments"][0],
+    "replacements":[],
+    "resolution":"MANUAL-DECISION",
+}]
+
+# Identifier replacement without an explicit migration map is a visible conflict.
+renamed_catalog={"authorities":[{"id":"INTERFACE-EXPERIENCE"}]}
+renamed=bootstrap_registry(renamed_catalog,old_reg)
+assert renamed["assessments"]==[{
+    "authority_id":"INTERFACE-EXPERIENCE",
+    "applicability":"UNASSESSED",
+}]
+assert renamed["migration_conflicts"][0]["retired_authority"]=="INTERFACE-DESIGN"
+assert renamed["migration_conflicts"][0]["replacements"]==[]
+
+# Merge never transfers accepted applicability from either retired Authority.
+merge_old={"assessments":[
+    {**old_reg["assessments"][0],"authority_id":"MACHINE-INTERFACE-DESIGN"},
+    {**old_reg["assessments"][0],"authority_id":"HUMAN-INTERFACE-DESIGN",
+     "applicability":"NOT_APPLICABLE"},
+]}
+merge_catalog={"authorities":[{"id":"INTERFACE-DESIGN"}]}
+merged=bootstrap_registry(
+    merge_catalog,
+    merge_old,
+    authority_migrations={
+        "MACHINE-INTERFACE-DESIGN":["INTERFACE-DESIGN"],
+        "HUMAN-INTERFACE-DESIGN":["INTERFACE-DESIGN"],
+    },
+)
+assert merged["assessments"]==[{
+    "authority_id":"INTERFACE-DESIGN",
+    "applicability":"UNASSESSED",
+}]
+assert {x["retired_authority"] for x in merged["migration_conflicts"]}=={
+    "MACHINE-INTERFACE-DESIGN",
+    "HUMAN-INTERFACE-DESIGN",
+}
+assert all(x["replacements"]==["INTERFACE-DESIGN"] for x in merged["migration_conflicts"])
+print("authority retire/rename/merge migration: OK")

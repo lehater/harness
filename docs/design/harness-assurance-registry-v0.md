@@ -51,7 +51,7 @@ The reviewed minimum implementation is:
 The seed is intentionally incomplete. It includes HA-A01 Core structural truth,
 HA-A02 Engineering Graph topology, HA-A03 Target-state action semantics,
 HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Coverage,
-HA-A09 existing-project
+HA-A07 Project Authority migration, HA-A09 existing-project
 bootstrap/reconcile, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
@@ -101,7 +101,9 @@ provider-removal/blocker, multi-provider, and lifecycle-gap composition evidence
 and A03-R02 through explicit representation-order invariance. A04-R01 and
 A05-R01 are satisfied; HA-A06 satisfies A06-R01 through explicit
 disposition/subject-completeness evidence and A06-R02 through scope-root
-activation isolation. HA-A09 satisfies A09-R01 (TL2),
+activation isolation. HA-A07 satisfies A07-R01 through fail-closed
+retire/split/merge/rename migration evidence and A07-R02 through unchanged
+assessment preservation. HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
@@ -330,6 +332,12 @@ rather than recreated.
 HA-A06 is SATISFIED for its deterministic applicability/completeness proof
 slots. Independent holdout evidence remains relevant only if Harness later makes
 a portability/generalization claim about project fact or template discovery.
+
+HA-A07 is SATISFIED for its deterministic migration-safety proof slots.
+Accepted applicability is never inherited by a replacement Authority without
+evidence; unmapped retirement is now an explicit conflict rather than silent
+loss. The evidence is synthetic O1 and does not claim TL5 real-project
+generalization.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks
