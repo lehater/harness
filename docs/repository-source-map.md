@@ -80,8 +80,10 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
-- `human_projection.py` — deterministic Consumer-scoped human documentation manifest/recipe/IR/package compiler.
-- `workspace.py` — managed knowledge validation and rendering.
+- `src/harness/workspace/` — the four canonical `harness.workspace.*` modules for
+  frontend contracts, managed knowledge and disposable human projections;
+  root frontend modules are import-only facades, while `human_projection.py`
+  and `workspace.py` retain import/CLI compatibility.
 - `src/harness/evidence/source_boundary.py` — canonical assurance-only lossless line-range coverage;
   `source_boundary.py` is its temporary import/CLI facade.
 - `src/harness/evidence/source_coverage.py` — canonical statement-level admitted/excluded/question coverage;

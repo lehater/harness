@@ -388,3 +388,64 @@ contracts and documentation. There is no intersection: AR-M11 introduces no
 additional staleness. Historical hashes, outcomes and currentness classifications
 remain unchanged; no provider judgement run is performed. Deterministic migration
 evidence does not substitute for provider judgement.
+
+## Workspace package migration decision
+
+Architecture decision record: ADR-WORKSPACE-PACKAGE-V0 (accepted).
+
+The complete `workspace` context moves as one coherent slice into
+`src/harness/workspace/`: `frontend_interface_knowledge.py`,
+`frontend_screen_contracts.py`, `human_projection.py` and `workspace.py`.
+Their four `harness.workspace.*` identities alone own implementation semantics.
+The initializer is documentation-only. Root frontend modules use `import-only`;
+Human Projection and Workspace use `import-and-cli`, preserving their existing
+CLIs through the same closed facade grammar used by earlier migrations.
+No new bridge or installed-package execution is introduced; the existing
+source-tree bridge and `tool.uv.package = false` remain unchanged.
+
+Explicit `__all__` preserves the observed pre-move public names, including
+imported names. Legacy/canonical export objects and `__all__` share identity.
+Consumer Pack validation freezes those surfaces and whole-module AST digests
+from reviewed baseline `725f37754b1040c74ed48ead9758e4767ee31f50`.
+Reversing only canonical Project Model import normalization and removing
+`__all__` reproduces those digests, independently proving function/class and
+module equivalence; no path adaptation or semantic redesign is needed.
+Human Projection imports canonical Core and Engineering Graph; Workspace imports
+canonical Core and Target State rather than their compatibility aliases.
+
+Workspace retains exactly `may_depend_on: [project-model, integration]`.
+Integration has not migrated, so Human Projection temporarily imports only
+`validate_project_alignment` from root `integration_alignment`. This is the
+existing ordinary Workspace -> Integration direction, with no new published
+boundary, Integration facade/bridge or copied Integration semantics.
+Ownership/alias assertions and forbidden Application/Coverage/Assurance import
+mutations exercise the existing context validator; isolated-pack identity
+checks bind alignment to the actual Integration implementation.
+
+Consumer Pack retains `consumer_api: v0` and all four root facades. Only the
+Workspace initializer and four canonical modules are added through `exact_files`;
+`include_prefixes` is unchanged. Reused TD-DIST-001/002 evidence checks frozen
+exports, canonical paths, CLI presence/absence, canonical Project Model identity,
+import direction and full-module AST equivalence in a materialized pack without
+checkout `PYTHONPATH` or an installed Harness package. Fresh processes run
+Workspace validate/render against the managed fixture and Human Projection
+compile against the existing unified-model/recipe fixtures. The distributed
+managed-workspace scenario checks composition; frontend scenarios requiring
+`examples/` run in the checkout without expanding the distribution.
+Existing HA-A17 frontend/workspace/human-projection validators and Scenario Suite
+continue to protect behavior; existing facade grammar mutations protect delegation.
+
+Repository-wide search classified Workspace internal consumers (no internal
+module imports), Application/Integration (no direct Workspace imports), Scenario
+Suite (`scenario_drivers`), validators/tests, skills, docs/spec, Consumer Pack and
+assurance bindings. Skills retain their managed-workspace/frontend/projection
+procedures and legacy CLI entrypoints. Neighboring public consumers retain legacy
+imports. Only the deep-dependency validator's private `_task_rows` import moves
+to canonical Workspace, because private names are outside `import *` exports.
+Historical audit/research documents remain unchanged.
+
+All seven provider-run records under `spec/assurance/evidence/**` and every
+`execution_bindings.files` list were compared with the complete PR changed-file
+set. There are no intersections. Under AR-M11 this slice introduces no additional
+staleness; historical hashes, outcomes and currentness classifications remain
+unchanged. No provider judgement run is performed. There is no scope deviation.
