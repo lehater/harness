@@ -123,6 +123,23 @@ exact_files:
   - src/harness/integration/integration_alignment.py
   - src/harness/integration/repository_realization.py
 
+  - src/harness/application/__init__.py
+  - src/harness/application/agent_router.py
+  - src/harness/application/authority_context.py
+  - src/harness/application/consumer_pack.py
+  - src/harness/application/coverage_application.py
+  - src/harness/application/decision_explorer_request.py
+  - src/harness/application/decision_pipeline.py
+  - src/harness/application/graph_doctor.py
+  - src/harness/application/method_router.py
+  - src/harness/application/project_frontier.py
+  - src/harness/application/project_publication.py
+  - src/harness/application/semantic_admission.py
+  - src/harness/application/semantic_closure.py
+  - src/harness/application/semantic_questions.py
+  - src/harness/application/skill_invariant_policy.py
+  - src/harness/application/skill_router.py
+
 generated_files:
   surface_registry: skills/skill-surface-registry-v0.yaml
   pack_manifest: harness-consumer-pack.yaml

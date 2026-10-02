@@ -10,7 +10,8 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `skills/consumer-operation-registry-v0.yaml` — active Harness-consumer operation routes.
 - `skills/consumer-method-registry-v0.yaml` — canonical-concern to non-owning consumer method routes.
 - `skills/skill-surface-registry-v0.yaml` — explicit skill surface/type/lifecycle inventory.
-- `skill_router.py` — typed skill discovery entrypoint over Maintainer/Consumer operation, method and artifact registries.
+- `harness.application.skill_router` — canonical typed skill discovery implementation;
+  root `skill_router.py` retains the Consumer v0 CLI entrypoint over Maintainer/Consumer operation, method and artifact registries.
 - `docs/audit/README.md` — canonical routing policy for defects, evolution ideas and accepted decisions.
 - `docs/audit/audit-framework.md` — reusable Harness audit perspectives, coverage and AUD run history.
 - `docs/audit/harness-audit-backlog.md` — cumulative `HARN-*` defect/design-gap ledger.
@@ -77,9 +78,9 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `src/harness/decision/` — the four canonical `harness.decision.*` modules for
   exploration, Explorer request contracts, governance and execution assurance;
   the four corresponding root files are temporary import-only facades.
-- `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
-- `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
-- `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
+- `src/harness/application/project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
+- `src/harness/application/project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
+- `src/harness/application/graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.
 - `src/harness/workspace/` — the four canonical `harness.workspace.*` modules for
   frontend contracts, managed knowledge and disposable human projections;
   root frontend modules are import-only facades, while `human_projection.py`
@@ -114,3 +115,11 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `validators/validate_agent_layer.py` — agent-layer skill/profile contract validation.
 - `validators/validate_context_boundaries.py` — bounded-context import ratchet plus repository-layout/root-module migration ratchet.
 - `docs/methodology/**` — retained pre-Core material; not part of Core v0 consumer semantics.
+
+- `src/harness/application/` — fifteen canonical Application runtime modules;
+  same-layer imports are relative, and fifteen root facades preserve Consumer v0.
+  Root `consumer_pack.py` remains the wrapper entrypoint; root `skill_router.py`
+  remains the Pack CLI. No Consumer API bump or installed-package requirement.
+- `distribution/harnessw.py` — deliberately standalone stdlib-only bootstrap
+  transport, copied to target `.harness/harnessw.py`; excluded from the Pack and
+  independent of `harness.application.*` imports.

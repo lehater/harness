@@ -118,22 +118,22 @@ contexts:
     subdomain: orchestration
     responsibility: Coordinate bounded contexts, derive next actions and translate results without owning durable domain truth.
     modules:
-      - agent_router
-      - authority_context
-      - consumer_pack
-      - coverage_application
-      - decision_explorer_request
-      - decision_pipeline
+      - harness.application.agent_router
+      - harness.application.authority_context
+      - harness.application.consumer_pack
+      - harness.application.coverage_application
+      - harness.application.decision_explorer_request
+      - harness.application.decision_pipeline
       - distribution.harnessw
-      - graph_doctor
-      - method_router
-      - project_frontier
-      - project_publication
-      - semantic_admission
-      - semantic_closure
-      - semantic_questions
-      - skill_invariant_policy
-      - skill_router
+      - harness.application.graph_doctor
+      - harness.application.method_router
+      - harness.application.project_frontier
+      - harness.application.project_publication
+      - harness.application.semantic_admission
+      - harness.application.semantic_closure
+      - harness.application.semantic_questions
+      - harness.application.skill_invariant_policy
+      - harness.application.skill_router
     may_depend_on:
       - project-model
       - reference-model

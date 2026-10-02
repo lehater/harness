@@ -330,14 +330,20 @@ def _validate_runtime_import(
 
 
 def test_runtime_import_guards() -> None:
-    source = "agent_router"
+    source = "harness.application.agent_router"
     owner = {source: "application"}
     aliases = {
+        "agent_router": "harness.application.agent_router",
+        "skill_router": "harness.application.skill_router",
+        "semantic_admission": "harness.application.semantic_admission",
         "engineering_graph": "harness.project_model.engineering_graph",
         "harness": "harness.project_model.core",
         "adapters.canonical_graph": "harness.integration.adapters.canonical_graph",
     }
     for statement in (
+        "from agent_router import validate_skill_registry",
+        "from skill_router import GLOBAL_INSTRUCTION_CONTRACTS",
+        "from semantic_admission import admit_artifact",
         "from engineering_graph import X",
         "from harness import CoreError",
         "import engineering_graph",
