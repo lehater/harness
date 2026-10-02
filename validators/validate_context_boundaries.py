@@ -18,6 +18,34 @@ def load_map() -> dict:
     return value
 
 
+def _module_path(module: str) -> Path:
+    return ROOT.joinpath(*module.split(".")).with_suffix(".py")
+
+
+def _runtime_modules(spec: dict) -> set[str]:
+    result = {
+        path.stem
+        for path in ROOT.glob("*.py")
+        if path.is_file()
+    }
+    packages = spec.get("runtime_packages", []) or []
+    if not isinstance(packages, list) or any(
+        not isinstance(package, str) or not package for package in packages
+    ):
+        raise SystemExit("runtime_packages must be a string list")
+
+    for package in packages:
+        base = ROOT / package
+        if not base.is_dir():
+            raise SystemExit(f"runtime package missing: {package}")
+        for path in base.rglob("*.py"):
+            if path.name == "__init__.py":
+                continue
+            relative = path.relative_to(ROOT).with_suffix("")
+            result.add(".".join(relative.parts))
+    return result
+
+
 def main() -> int:
     spec = load_map()
     contexts = spec.get("contexts", {}) or {}
@@ -33,17 +61,13 @@ def main() -> int:
                 )
 
     ignored = set(spec.get("ignored_modules", []) or [])
-    root_modules = {
-        path.stem
-        for path in ROOT.glob("*.py")
-        if path.is_file()
-    }
-    missing = sorted(root_modules - set(owner) - ignored)
-    stale = sorted((set(owner) | ignored) - root_modules)
+    runtime_modules = _runtime_modules(spec)
+    missing = sorted(runtime_modules - set(owner) - ignored)
+    stale = sorted((set(owner) | ignored) - runtime_modules)
     if missing:
-        raise SystemExit(f"unclassified root runtime modules: {missing}")
+        raise SystemExit(f"unclassified runtime modules: {missing}")
     if stale:
-        raise SystemExit(f"context map references missing root modules: {stale}")
+        raise SystemExit(f"context map references missing runtime modules: {stale}")
 
     allowed = {
         name: set(context.get("may_depend_on", []) or [])
@@ -60,8 +84,21 @@ def main() -> int:
     }
     actual_violations: set[tuple[str, str]] = set()
 
-    def check_edge(source: str, target: str, imported_names: set[str] | None) -> None:
-        if target not in owner:
+    def resolve_target(module_name: str) -> str | None:
+        parts = module_name.split(".")
+        for length in range(len(parts), 0, -1):
+            candidate = ".".join(parts[:length])
+            if candidate in owner:
+                return candidate
+        return None
+
+    def check_edge(
+        source: str,
+        target_name: str,
+        imported_names: set[str] | None,
+    ) -> None:
+        target = resolve_target(target_name)
+        if target is None:
             return
         if (
             imported_names is not None
@@ -79,17 +116,23 @@ def main() -> int:
         actual_violations.add((source, target))
 
     for source in sorted(owner):
-        path = ROOT / f"{source}.py"
+        path = _module_path(source)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-                target = node.module.split(".", 1)[0]
                 names = {alias.name for alias in node.names}
-                check_edge(source, target, names)
+                if resolve_target(node.module) is not None:
+                    check_edge(source, node.module, names)
+                else:
+                    for alias in node.names:
+                        check_edge(
+                            source,
+                            f"{node.module}.{alias.name}",
+                            None,
+                        )
             elif isinstance(node, ast.Import):
                 for alias in node.names:
-                    target = alias.name.split(".", 1)[0]
-                    check_edge(source, target, None)
+                    check_edge(source, alias.name, None)
 
     declared_edges = set(declared)
     unknown = sorted(actual_violations - declared_edges)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import copy
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -104,6 +105,49 @@ def main():
 
     # The new Coverage-only capability must not become an activation signal.
     assert "fixture.mvp.data-lifecycle-design" not in result["activation_signals"]["capabilities"]
+
+    # HARN-008: a Core row cannot make a Coverage-only production proposal
+    # authoritative. Until Project Model adopts the Capability into the accepted
+    # Engineering Graph, it remains missing work and cannot close Coverage.
+    phantom_core=copy.deepcopy(core)
+    phantom_core.setdefault("artifacts",[]).append({
+        "id":"UNACCEPTED-DATA-LIFECYCLE",
+        "authority":"DATA-DESIGN",
+        "path":"docs/unaccepted-data-lifecycle.yaml",
+        "provides":["fixture.mvp.data-lifecycle-design"],
+        "depends_on":[],
+    })
+    phantom=evaluate_with_repository_policy(
+        graph=graph,
+        realization=phantom_core,
+        consumer="IMPLEMENTATION",
+        scope="mvp",
+        scope_roots=["fixture.mvp.implementation-design"],
+        project_overlay={
+            "activate":[
+                {
+                    "concern":"data.lifecycle",
+                    "rationale":"Fixture requires explicit data lifecycle.",
+                }
+            ],
+            "decisions":[],
+        },
+        production_contract_overlay={
+            "version":1,
+            "kind":"harness-production-contract-overlay",
+            "productions":[{
+                "authority":"DATA-DESIGN",
+                "capability":"fixture.mvp.data-lifecycle-design",
+                "semantic_claims":["engineering.data.lifecycle"],
+                "knowledge_kind":"data-design",
+                "requires":["fixture.mvp.data-design"],
+            }],
+        },
+    )
+    phantom_lifecycle={row["concern"]:row for row in phantom["rows"]}["data.lifecycle"]
+    assert phantom_lifecycle["state"] == "MISSING", phantom_lifecycle
+    assert phantom_lifecycle["action"] == "PRODUCE_CAPABILITY", phantom_lifecycle
+    assert not phantom["completion_ready"], phantom
 
     print("production contract overlay: ok")
     return 0

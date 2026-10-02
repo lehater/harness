@@ -67,4 +67,8 @@ class LifecycleExperimentTest(unittest.TestCase):
         m={"artifacts":[*MODEL["artifacts"],{"id":"USE-OLD","authority":"USE","path":"use-old.md","provides":["use.result"],"depends_on":["SOURCE"]}],"questions":[{"id":"Q-OLD","authority":"USE","text":"Old provider unresolved.","blocks":["USE-OLD"]}]}
         r=evaluate_lifecycle_target(GRAPH,"IMPLEMENTATION",m,projection())
         self.assertEqual("COMPLETE",r["status"]); self.assertEqual([],r["wait"])
+    def test_sibling_capability_question_does_not_block_selected_assertion(self):
+        m={"artifacts":[*MODEL["artifacts"]],"questions":[{"id":"Q-STRUCTURE","authority":"SOURCE","text":"Structure semantics unresolved.","blocks_capabilities":["source.structure"]}]}
+        r=evaluate_lifecycle_target(GRAPH,"IMPLEMENTATION",m,projection())
+        self.assertEqual("COMPLETE",r["status"]); self.assertEqual([],r["wait"])
 if __name__=="__main__": unittest.main()

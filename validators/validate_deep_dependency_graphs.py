@@ -14,6 +14,7 @@ from capability_lifecycle import lifecycle_states  # noqa: E402
 from concern_activation import _capability_closure as activation_closure  # noqa: E402
 from coverage_planner import _capability_closure as planner_closure  # noqa: E402
 from engineering_graph import derive_profile, validate_engineering_graph  # noqa: E402
+from frontend_interface_knowledge import _task_rows  # noqa: E402
 from harness import CoreError, validate_model  # noqa: E402
 from reference_materializer import validate_reference_model  # noqa: E402
 from target_state import validate_profile  # noqa: E402
@@ -108,6 +109,27 @@ def source_graph_fixture() -> dict:
     }
 
 
+def task_model_fixture() -> dict:
+    leaf: dict = {
+        "id": f"TASK-{DEPTH - 1}",
+        "responsibility": "SYSTEM",
+    }
+    for index in range(DEPTH - 2, -1, -1):
+        leaf = {
+            "id": f"TASK-{index}",
+            "responsibility": "SYSTEM",
+            "tasks": [leaf],
+        }
+    return {
+        "goals": [
+            {
+                "id": "GOAL",
+                "tasks": [leaf],
+            }
+        ]
+    }
+
+
 def reference_model_fixture() -> tuple[dict, dict, dict]:
     model = {
         "version": 1,
@@ -150,6 +172,7 @@ def main() -> int:
     assert planner_closure(graph, [f"cap.{DEPTH - 1}"]) == expected
 
     assert len(_source_nodes(source_graph_fixture())) == DEPTH
+    assert len(_task_rows(task_model_fixture())) == DEPTH
 
     reference_model, authorities, proof = reference_model_fixture()
     assert not validate_reference_model(reference_model, authorities, proof)
@@ -167,7 +190,8 @@ def main() -> int:
 
     print(
         "deep dependency graphs: PASS "
-        f"({DEPTH} nodes across Core/Graph/Profile/Lifecycle/Coverage/Adapter/Reference)"
+        f"({DEPTH} nodes across Core/Graph/Profile/Lifecycle/Coverage/"
+        "Adapter/Reference/Frontend)"
     )
     return 0
 

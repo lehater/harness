@@ -257,7 +257,44 @@ def test_capability_blocker_granularity() -> None:
     assert current["state"]["lifecycle"]["providers"][0]["capability"] == "product.intent"
 
 
+def test_semantic_snapshot_currentness() -> None:
+    duplicate_derivation_snapshot = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [],
+        "derivation_evaluations": [
+            {
+                "version": 1,
+                "kind": "harness-semantic-derivation-evaluation",
+                "source_capability": "demo.source",
+                "target_capability": "demo.target",
+                "status": "ACCEPTED",
+                "question_proposals": [],
+            },
+            {
+                "version": 1,
+                "kind": "harness-semantic-derivation-evaluation",
+                "source_capability": "demo.source",
+                "target_capability": "demo.target",
+                "status": "REJECTED",
+                "question_proposals": [],
+            },
+        ],
+    }
+    expect_core_error(
+        lambda: build_project_publication(
+            graph=GRAPH,
+            core_model=EMPTY_CORE,
+            semantic_evaluations=duplicate_derivation_snapshot,
+            lifecycle=EMPTY_LIFECYCLE,
+            decision_failures=EMPTY_FAILURES,
+        ),
+        "duplicate current semantic derivation evaluation",
+    )
+
+
 def main() -> int:
+    test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
     initial = build_project_publication(
         graph=GRAPH,

@@ -60,11 +60,16 @@ def load_scope_source(path: str | Path) -> dict[str, Any]:
 def _apply_production_contract_overlay(
     graph: dict[str, Any],
     overlay: dict[str, Any] | None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], set[str]]:
     if not overlay:
-        return graph
+        return graph, set()
+    if overlay.get("version") != 1:
+        raise ValueError("production contract overlay version must be 1")
+    if overlay.get("kind") != "harness-production-contract-overlay":
+        raise ValueError("unexpected production contract overlay kind")
 
     result = copy.deepcopy(graph)
+    proposed_capabilities: set[str] = set()
     authorities = {
         item.get("id"): item
         for item in result.get("authorities", []) or []
@@ -117,7 +122,25 @@ def _apply_production_contract_overlay(
             production["knowledge_kind"] = knowledge_kind
         authorities[authority_id].setdefault("produces", []).append(production)
         existing.add(capability)
+        proposed_capabilities.add(capability)
 
+    return result, proposed_capabilities
+
+
+def _without_proposed_capability_providers(
+    realization: dict[str, Any],
+    proposed_capabilities: set[str],
+) -> dict[str, Any]:
+    """Keep Coverage proposals from becoming accepted Project Model evidence."""
+    if not proposed_capabilities:
+        return realization
+    result = copy.deepcopy(realization)
+    for artifact in result.get("artifacts", []) or []:
+        artifact["provides"] = [
+            capability
+            for capability in artifact.get("provides", []) or []
+            if capability not in proposed_capabilities
+        ]
     return result
 
 
@@ -358,9 +381,21 @@ def evaluate_coverage(
     subject_obligations: dict[str, Any] | None = None,
     scope_source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    graph = _apply_production_contract_overlay(graph, production_contract_overlay)
+    # Validate accepted Project Model truth before adding any Coverage-only
+    # production proposal. Unknown Core capabilities remain non-authoritative
+    # until the project-owned graph adopts them.
     validate_engineering_graph(graph)
-    realized = validate_realization(graph, realization)
+    accepted_realized = validate_realization(graph, realization)
+    graph, proposed_capabilities = _apply_production_contract_overlay(
+        graph,
+        production_contract_overlay,
+    )
+    validate_engineering_graph(graph)
+    realized = _without_proposed_capability_providers(
+        accepted_realized,
+        proposed_capabilities,
+    )
+    realized = validate_realization(graph, realized)
 
     aliases = authority_aliases or {"bindings": {}}
     overlay = _scope_overlay(

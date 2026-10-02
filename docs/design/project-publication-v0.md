@@ -30,6 +30,7 @@ state:
     version: 1
     kind: harness-semantic-evaluation-set
     semantic_evaluations: [...]
+    derivation_evaluations: [...]
   lifecycle:
     version: 1
     kind: harness-capability-lifecycle
@@ -45,7 +46,11 @@ integration identity for one coherent published snapshot. It does not replace
 Capability acceptance identities.
 
 The component documents retain their existing semantic owners. The publication
-only binds which versions are visible together.
+only binds which versions are visible together. The semantic-evaluation component
+is the current snapshot defined by the semantic-acceptance contract: duplicate
+artifact identities `(artifact, capability)` and duplicate derivation-edge
+identities `(source_capability, target_capability)` fail closed before a
+publication revision is accepted.
 
 ## Invariants
 

@@ -17,6 +17,8 @@ from capability_lifecycle import lifecycle_index, validate_projection
 from decision_pipeline import decision_failure_index
 from engineering_graph import validate_realization
 from harness import CoreError, artifact_blockers, capability_blockers, capability_resolve
+from semantic_acceptance import evaluation_index
+from semantic_derivation import derivation_evaluation_index
 
 PUBLICATION_KIND = "harness-project-publication"
 PUBLICATION_VERSION = 1
@@ -42,16 +44,20 @@ def _empty_failure_set() -> dict[str, Any]:
 def _semantic_evaluation_index(
     document: dict[str, Any],
 ) -> dict[tuple[str, str], dict[str, Any]]:
+    """Validate one current semantic-evidence snapshot for publication."""
     if (
         document.get("version") != 1
         or document.get("kind") != SEMANTIC_SET_KIND
     ):
         raise CoreError("unexpected semantic evaluation set")
+
     evaluations = document.get("semantic_evaluations")
     if not isinstance(evaluations, list):
         raise CoreError("semantic evaluation set semantic_evaluations must be a list")
+    derivations = document.get("derivation_evaluations", [])
+    if not isinstance(derivations, list):
+        raise CoreError("semantic evaluation set derivation_evaluations must be a list")
 
-    result: dict[tuple[str, str], dict[str, Any]] = {}
     for item in evaluations:
         if not isinstance(item, dict):
             raise CoreError("semantic evaluation must be a mapping")
@@ -63,17 +69,26 @@ def _semantic_evaluation_index(
             raise CoreError("semantic evaluation artifact is required")
         if not isinstance(capability, str) or not capability:
             raise CoreError("semantic evaluation capability is required")
-        key = (artifact, capability)
-        if key in result:
-            raise CoreError(
-                f"duplicate semantic evaluation identity: {artifact}/{capability}"
-            )
         if item.get("status") not in {"ACCEPTED", "REJECTED"}:
             raise CoreError(
                 f"semantic evaluation {artifact}/{capability} has invalid status"
             )
-        result[key] = item
-    return result
+
+    for item in derivations:
+        if not isinstance(item, dict):
+            raise CoreError("semantic derivation evaluation must be a mapping")
+        if item.get("kind") != "harness-semantic-derivation-evaluation":
+            raise CoreError("unexpected semantic derivation evaluation kind")
+        if item.get("status") not in {"ACCEPTED", "REJECTED"}:
+            raise CoreError("semantic derivation evaluation has invalid status")
+
+    result = evaluation_index([document])
+    derivation_evaluation_index([document])
+    return {
+        (artifact, capability): item
+        for (artifact, capability), item in result.items()
+        if isinstance(artifact, str) and isinstance(capability, str)
+    }
 
 
 def _state(

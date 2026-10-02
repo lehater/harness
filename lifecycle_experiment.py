@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 import yaml
 from engineering_graph import derive_profile, production_index, validate_realization
-from harness import CoreError, blocked, capability_blockers
+from harness import CoreError, artifact_blockers, capability_blockers
 
 def _load(path: str | Path) -> dict[str, Any]:
     value=yaml.safe_load(Path(path).read_text(encoding="utf-8"))
@@ -85,7 +85,13 @@ def evaluate_lifecycle_target(graph,target,model,projection):
             else:
                 lifecycle_provider=validate_projection(graph,realized,projection).get(capability)
                 selected=[a for a in providers if lifecycle_provider is not None and a["id"]==lifecycle_provider["artifact"]]
-                blockers=sorted({q for a in (selected or providers) for q in blocked(realized,a["id"])})
+                direct_blockers=set(capability_blockers(realized,capability))
+                if selected:
+                    provider_blockers={q for a in selected for q in artifact_blockers(realized,a["id"])}
+                else:
+                    usable=[a for a in providers if not artifact_blockers(realized,a["id"])]
+                    provider_blockers=set() if usable else {q for a in providers for q in artifact_blockers(realized,a["id"])}
+                blockers=sorted(direct_blockers | provider_blockers)
                 if blockers: wait.append({"action":"WAIT","expectation":eid,"capability":capability,"authority":e["authority"],"questions":blockers})
                 elif states[capability]["state"]=="CURRENT": satisfied.append(eid)
                 elif states[capability]["state"]=="STALE": revalidate.append({"action":"REVALIDATE","expectation":eid,"capability":capability,"authority":e["authority"],"lifecycle":states[capability]})

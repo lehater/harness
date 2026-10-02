@@ -48,6 +48,13 @@ because the Project Model or Reference Model omitted it.
 Coverage may expose missing work or obligations, but it does not mutate or
 replace the accepted Engineering Graph.
 
+A `harness-production-contract-overlay` is therefore a planning aid only. It may
+describe a candidate production contract so Coverage can route the missing work,
+but an overlay-only Capability cannot count as an accepted provider or satisfy a
+Coverage proof. Even if the Core realization already contains a matching
+`provides` entry, that entry remains non-authoritative until the project-owned
+Engineering Graph adopts the Capability.
+
 ### Reference Engineering Model
 
 The Reference Engineering Model is a supporting mapping from accepted project

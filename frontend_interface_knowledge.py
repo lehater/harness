@@ -8,20 +8,31 @@ def _finding(findings: list[dict[str, Any]], code: str, message: str, **ctx: Any
 
 def _task_rows(task_model: dict[str, Any]) -> dict[str, dict[str, Any]]:
     rows: dict[str, dict[str, Any]] = {}
-    def walk(items: Any) -> None:
-        if not isinstance(items, list):
-            return
-        for item in items:
-            if not isinstance(item, dict):
+    pending: list[Any] = []
+    goals = task_model.get("goals", []) or []
+    if isinstance(goals, list):
+        for goal in reversed(goals):
+            if not isinstance(goal, dict):
                 continue
-            tid=item.get("id")
-            if isinstance(tid,str) and tid:
-                rows[tid]=item
-            walk(item.get("tasks"))
-            walk(item.get("subtasks"))
-    for goal in task_model.get("goals",[]) or []:
-        if isinstance(goal,dict):
-            walk(goal.get("tasks"))
+            tasks = goal.get("tasks")
+            if isinstance(tasks, list):
+                pending.extend(reversed(tasks))
+
+    while pending:
+        item = pending.pop()
+        if not isinstance(item, dict):
+            continue
+        tid = item.get("id")
+        if isinstance(tid, str) and tid:
+            rows[tid] = item
+
+        # Preserve the previous depth-first order: tasks before subtasks.
+        subtasks = item.get("subtasks")
+        if isinstance(subtasks, list):
+            pending.extend(reversed(subtasks))
+        tasks = item.get("tasks")
+        if isinstance(tasks, list):
+            pending.extend(reversed(tasks))
     return rows
 
 def _indexed(rows: Any, *, kind: str, findings: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:

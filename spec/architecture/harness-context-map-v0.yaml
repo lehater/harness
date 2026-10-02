@@ -3,6 +3,10 @@ kind: harness-bounded-context-map
 id: HARNESS-CONTEXT-MAP-V0
 status: audit-ratchet
 
+runtime_packages:
+  - adapters
+  - distribution
+
 semantics:
   - Bounded contexts own domain meaning; the application layer coordinates them but owns no durable engineering truth.
   - Cross-context dependencies are allowed only through the declared direction or an explicit temporary known violation.
@@ -55,6 +59,7 @@ contexts:
       - capability_lifecycle
       - derivation_test_coverage
       - live_calibration
+      - adapters.copilot_live_calibration_evaluator
       - semantic_acceptance
       - semantic_derivation
       - semantic_fingerprint
@@ -90,6 +95,7 @@ contexts:
     responsibility: Translate project-native repository state into Harness published models and validate alignment.
     modules:
       - integration_alignment
+      - adapters.canonical_graph
       - repository_realization
     may_depend_on:
       - project-model
@@ -118,6 +124,7 @@ contexts:
       - coverage_application
       - decision_explorer_request
       - decision_pipeline
+      - distribution.harnessw
       - graph_doctor
       - method_router
       - project_frontier
@@ -139,6 +146,7 @@ contexts:
 
 ignored_modules:
   - behavioral_eval
+  - adapters.copilot_behavioral_eval_agent
   - authority_role_projection_experiment
   - concern_activation_experiment
   - coverage_control_loop_experiment

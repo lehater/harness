@@ -2,7 +2,10 @@
 """Acceptance checks for deterministic consumer method routing."""
 from __future__ import annotations
 
+import contextlib
 import copy
+import io
+import json
 import sys
 from pathlib import Path
 
@@ -12,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness import CoreError  # noqa: E402
-from method_router import route_methods, validate_method_registry  # noqa: E402
+from method_router import main as method_router_main, route_methods, validate_method_registry  # noqa: E402
 
 
 def load(path: str) -> dict:
@@ -55,6 +58,29 @@ def main() -> int:
     assert explicit["routed"][0]["skill"] == (
         "skills/artifacts/obligation-analysis/SKILL.md"
     )
+
+    previous_argv = sys.argv
+    output = io.StringIO()
+    try:
+        sys.argv = [
+            "method_router.py",
+            "--registry",
+            str(ROOT / "skills/consumer-method-registry-v0.yaml"),
+            "--catalog",
+            str(ROOT / "spec/engineering-coverage/concern-catalog-v1.yaml"),
+            "--method",
+            "obligation-analysis",
+        ]
+        with contextlib.redirect_stdout(output):
+            assert method_router_main() == 0
+    finally:
+        sys.argv = previous_argv
+    cli_route = json.loads(output.getvalue())
+    assert cli_route["surface"] == "consumer", cli_route
+    assert cli_route["route_class"] == "method", cli_route
+    assert cli_route["instruction_contracts"] == [
+        "docs/design/agent-instruction-architecture-v0.md"
+    ], cli_route
 
     duplicate = copy.deepcopy(registry)
     duplicate["routes"][0]["concern_any"].append("reliability.failure-semantics")

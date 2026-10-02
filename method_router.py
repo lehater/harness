@@ -209,6 +209,20 @@ def main() -> int:
         concerns=args.concerns,
         method=args.method,
     )
+
+    # This module remains the pure selector used by skill_router. Its executable
+    # CLI is nevertheless a routing surface, so it must return the same trusted
+    # instruction envelope as the canonical typed entrypoint.
+    from skill_router import _with_instruction_contracts
+
+    result = _with_instruction_contracts(
+        {
+            "surface": "consumer",
+            "route_class": "method",
+            **result,
+        },
+        Path(__file__).resolve().parent,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
