@@ -196,7 +196,18 @@ def main() -> int:
     contract = yaml.safe_load((ROOT / CONTRACT).read_text())
     validate(contract, layout)
     actual = usage_inventory(contract, layout)
-    assert json.loads((ROOT / INVENTORY).read_text()) == actual, 'usage inventory stale'
+    expected = json.loads((ROOT / INVENTORY).read_text())
+    if expected != actual:
+        print('Consumer API usage inventory stale')
+        if expected.get('registry_driven_validators') != actual.get('registry_driven_validators'):
+            print('registry_driven_validators expected=', expected.get('registry_driven_validators'))
+            print('registry_driven_validators actual=', actual.get('registry_driven_validators'))
+        for key in sorted(set(expected.get('surfaces', {})) | set(actual.get('surfaces', {}))):
+            if expected.get('surfaces', {}).get(key) != actual.get('surfaces', {}).get(key):
+                print(f'surface {key}')
+                print('expected=', json.dumps(expected.get('surfaces', {}).get(key), sort_keys=True))
+                print('actual=', json.dumps(actual.get('surfaces', {}).get(key), sort_keys=True))
+        raise AssertionError('usage inventory stale')
     # Contract mutations prove rejection at the smallest surface.
     mutations = []
     bad = copy.deepcopy(contract); bad['compatibility_inventory'].pop(); mutations.append(bad)
