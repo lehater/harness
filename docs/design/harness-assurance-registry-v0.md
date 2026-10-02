@@ -54,7 +54,7 @@ HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Cove
 HA-A07 Project Authority migration, HA-A08 Design target selection,
 HA-A09 existing-project
 bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A11 Source acquisition/completeness,
-HA-A12 Semantic derivation/admission, HA-A13 Questions/blockers, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
+HA-A12 Semantic derivation/admission, HA-A13 Questions/blockers, HA-A14 Lifecycle/currentness, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
@@ -127,7 +127,11 @@ current provider-auto calibration refresh did not meet the frozen O4 protocol. H
 Question routing, blocking, resolution-identity and stale-snapshot evidence, and
 A13-R03 through provider run `37073140125`: TD-QST-001 passed three independent
 clean-context executions, preserving exactly one semantic blocker while a
-related transient repository-scan timeout remained process evidence only. HA-A16 satisfies A16-R01..R06; and HA-A18
+related transient repository-scan timeout remained process evidence only. HA-A14 satisfies A14-R01 through selective
+prerequisite/policy currentness and replay fail-closed evidence, A14-R02 through
+conservative remove/rename/split/merge plus prerequisite-topology evolution, and
+A14-R03 through the explicit depth=1200, fan-out=512 and cardinality=2000
+lifecycle correctness envelope. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the

@@ -20,6 +20,8 @@ from harness.reference_model.reference_materializer import validate_reference_mo
 from harness.project_model.target_state import validate_profile  # noqa: E402
 
 DEPTH = 1200
+BREADTH = 512
+CARDINALITY = 2000
 
 
 def graph_fixture() -> dict:
@@ -152,7 +154,196 @@ def reference_model_fixture() -> tuple[dict, dict, dict]:
     return model, {"authorities": [{"id": "DEPTH"}]}, {"proofs": {}}
 
 
+def breadth_graph_fixture() -> tuple[dict, dict, dict]:
+    productions = [
+        {
+            "capability": "breadth.root",
+            "knowledge_kind": "breadth-regression",
+            "requires": [],
+        }
+    ]
+    productions.extend(
+        {
+            "capability": f"breadth.leaf.{index}",
+            "knowledge_kind": "breadth-regression",
+            "requires": ["breadth.root"],
+        }
+        for index in range(BREADTH)
+    )
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "BREADTH-DEPENDENCY-REGRESSION",
+        "authorities": [
+            {
+                "id": "BREADTH",
+                "responsibility": "Own synthetic breadth-regression knowledge.",
+                "boundary": {
+                    "semantic_cohesion": "Synthetic fan-out knowledge.",
+                    "independent_change": "Synthetic nodes change independently.",
+                    "public_contract": "Breadth-safe lifecycle traversal.",
+                },
+                "produces": productions,
+            }
+        ],
+        "consumers": [
+            {
+                "id": "TARGET",
+                "purpose": "Consume every fan-out leaf.",
+                "requires": [f"breadth.leaf.{index}" for index in range(BREADTH)],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    model = {
+        "artifacts": [
+            {
+                "id": "BREADTH-ROOT",
+                "authority": "BREADTH",
+                "path": "docs/breadth/root.yaml",
+                "provides": ["breadth.root"],
+                "depends_on": [],
+            }
+        ]
+        + [
+            {
+                "id": f"BREADTH-{index}",
+                "authority": "BREADTH",
+                "path": f"docs/breadth/{index}.yaml",
+                "provides": [f"breadth.leaf.{index}"],
+                "depends_on": ["BREADTH-ROOT"],
+            }
+            for index in range(BREADTH)
+        ],
+        "questions": [],
+    }
+    lifecycle = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": "BREADTH-ROOT",
+                "capability": "breadth.root",
+                "acceptance_id": "BREADTH-ROOT-1",
+                "accepted_prerequisites": {},
+            }
+        ]
+        + [
+            {
+                "artifact": f"BREADTH-{index}",
+                "capability": f"breadth.leaf.{index}",
+                "acceptance_id": f"BREADTH-{index}-1",
+                "accepted_prerequisites": {
+                    "breadth.root": "BREADTH-ROOT-1",
+                },
+            }
+            for index in range(BREADTH)
+        ],
+    }
+    return graph, model, lifecycle
+
+
+def cardinality_graph_fixture() -> tuple[dict, dict, dict]:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "CARDINALITY-REGRESSION",
+        "authorities": [
+            {
+                "id": "CARDINALITY",
+                "responsibility": "Own synthetic cardinality-regression knowledge.",
+                "boundary": {
+                    "semantic_cohesion": "Independent synthetic knowledge.",
+                    "independent_change": "Every synthetic capability changes independently.",
+                    "public_contract": "Cardinality-safe lifecycle traversal.",
+                },
+                "produces": [
+                    {
+                        "capability": f"cardinality.{index}",
+                        "knowledge_kind": "cardinality-regression",
+                        "requires": [],
+                    }
+                    for index in range(CARDINALITY)
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "TARGET",
+                "purpose": "Consume one capability while the remainder exercise cardinality only.",
+                "requires": ["cardinality.0"],
+            }
+        ],
+        "terminal_capabilities": [
+            {
+                "capability": f"cardinality.{index}",
+                "authority": "CARDINALITY",
+                "reason": "Synthetic terminal used only for lifecycle scale regression.",
+            }
+            for index in range(1, CARDINALITY)
+        ],
+    }
+    model = {
+        "artifacts": [
+            {
+                "id": f"CARDINALITY-{index}",
+                "authority": "CARDINALITY",
+                "path": f"docs/cardinality/{index}.yaml",
+                "provides": [f"cardinality.{index}"],
+                "depends_on": [],
+            }
+            for index in range(CARDINALITY)
+        ],
+        "questions": [],
+    }
+    lifecycle = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": f"CARDINALITY-{index}",
+                "capability": f"cardinality.{index}",
+                "acceptance_id": f"CARDINALITY-{index}-1",
+                "accepted_prerequisites": {},
+            }
+            for index in range(CARDINALITY)
+        ],
+    }
+    return graph, model, lifecycle
+
+
+def test_lifecycle_scale_shapes() -> None:
+    breadth_graph, breadth_model, breadth_lifecycle = breadth_graph_fixture()
+    validate_engineering_graph(breadth_graph)
+    breadth_states = lifecycle_states(
+        breadth_graph,
+        breadth_model,
+        breadth_lifecycle,
+    )
+    assert len(breadth_states) == BREADTH + 1, len(breadth_states)
+    assert all(
+        item["state"] == "CURRENT"
+        for item in breadth_states.values()
+    ), breadth_states
+
+    cardinality_graph, cardinality_model, cardinality_lifecycle = (
+        cardinality_graph_fixture()
+    )
+    validate_engineering_graph(cardinality_graph)
+    cardinality_states = lifecycle_states(
+        cardinality_graph,
+        cardinality_model,
+        cardinality_lifecycle,
+    )
+    assert len(cardinality_states) == CARDINALITY, len(cardinality_states)
+    assert all(
+        item["state"] == "CURRENT"
+        for item in cardinality_states.values()
+    ), cardinality_states
+
+
 def main() -> int:
+    test_lifecycle_scale_shapes()
     graph = graph_fixture()
     model = core_fixture()
 
@@ -190,8 +381,8 @@ def main() -> int:
 
     print(
         "deep dependency graphs: PASS "
-        f"({DEPTH} nodes across Core/Graph/Profile/Lifecycle/Coverage/"
-        "Adapter/Reference/Frontend)"
+        f"(depth={DEPTH}, breadth={BREADTH}, cardinality={CARDINALITY} "
+        "across Core/Graph/Profile/Lifecycle/Coverage/Adapter/Reference/Frontend)"
     )
     return 0
 

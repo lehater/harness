@@ -1699,7 +1699,10 @@ transfer acceptance to replacement identity.
 **Methods:** EM-03, EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_capability_lifecycle.py`,
+`tests/test_lifecycle_experiment.py`.
 
 Cases:
 
@@ -1720,7 +1723,15 @@ with changed topology become stale as required.
 **Methods:** EM-13  
 **Minimum level:** TL1/TL2 stress tier  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_deep_dependency_graphs.py`.
+
+Current deterministic correctness envelope:
+
+- dependency depth: 1200;
+- breadth/fan-out: 512 direct dependents plus their root;
+- independent lifecycle cardinality: 2000 Capabilities.
 
 Generate depth, breadth/fan-out, and cardinality independently.
 
