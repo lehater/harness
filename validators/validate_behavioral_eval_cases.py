@@ -133,7 +133,13 @@ with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:
     assert _observed_cli_version(str(fake_cli), {}) == "1.0.91"
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
-MANIFEST = yaml.safe_load((BASE / "manifest-v0.yaml").read_text(encoding="utf-8"))
+BASELINE_MANIFEST = yaml.safe_load(
+    (BASE / "baseline-manifest-v0.yaml").read_text(encoding="utf-8")
+)
+DISPATCH_MANIFEST = yaml.safe_load(
+    (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+MANIFEST = BASELINE_MANIFEST
 EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
     "TD-AUTH-001", "TD-AUTH-002", "TD-AUTH-004",
@@ -144,6 +150,18 @@ EXPECTED = {
 assert MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
 entries = MANIFEST["cases"]
 assert {item["design"] for item in entries} == EXPECTED
+assert DISPATCH_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+assert DISPATCH_MANIFEST["id"] == "TL4-EXISTING-PROJECT-DISPATCH-BRIDGE-V1"
+dispatch_entries = DISPATCH_MANIFEST["cases"]
+assert {item["design"] for item in dispatch_entries} == {
+    "TD-COMP-003",
+    "TD-BOOT-E06",
+}
+for item in dispatch_entries:
+    dispatch_template = (BASE / item["template"]).resolve()
+    dispatch_template.relative_to((ROOT / "spec" / "behavioral-evals").resolve())
+    assert dispatch_template.is_file()
+    assert "tl4-existing-project" in str(dispatch_template)
 budget = MANIFEST["provider_prompt_budget"]
 assert budget["metric"] == "utf8_bytes"
 max_per_case = budget["max_per_case"]
