@@ -1,0 +1,97 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: RELEASE-CRITICAL-FORMATION-PROVIDER-RUN-36953091767
+status: accepted
+provider: github-copilot
+workflow_run_id: 36953091767
+workflow_run_url: https://github.com/lehater/harness/actions/runs/36953091767
+workflow_conclusion: failure
+accepted_scope:
+  - TD-CAP-008
+  - TD-CAP-007
+  - TD-AUTH-007
+artifact:
+  id: 11205055778
+  name: first-wave-behavioral-evidence
+  sha256: 29d855fd62ce307f48517945573e2f05549dad1850ad9e294be64f6ff21083d1
+  retention_days: 90
+harness_revision: adb31d8f4a010d3dac612cc1e1c79b0608a77ee0
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 967053ff18096cce7c99c21de54cb5abe2918755}
+    - {path: docs/design/core-v0.md, git_blob_sha: 03cde75282fb20f28705e4d24422efbc14238c85}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: 121a29f1861637d0331ab29ea0603fa459d3d101}
+    - {path: behavioral_eval.py, git_blob_sha: 73ccb8780f9ce0000a1a673a8438934a4b848f67}
+    - {path: adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 80324eaa6a4c2bfa07235ae58e6e5ce7119d479f}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 8edb4d7592db32b1371c4ac90947789115ba08ca}
+currentness:
+  state: current
+  reason: >-
+    All provider-visible instruction/runtime bindings for the accepted cases
+    remain current. The source workflow concluded failure only because
+    TD-AUTH-003 Fixture V1 failed; this record deliberately admits only the
+    independently PASS case records listed in accepted_scope.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 3
+  total_cases: 3
+  provider_calls: 7
+resolved_models:
+  mai-code-1.1-flash: 7
+token_usage:
+  input_tokens: 37989
+  output_tokens: 4181
+  total_tokens: 42170
+provider_prompt_utf8_bytes: 139271
+cases:
+  - case_id: TD-CAP-008
+    template: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/oracle.yaml
+    case_sha256: cdb669dde9076040e6416fa31f82413f51e170bce9edc1acf3b4f1eca3047ff2
+    fixture_sha256: 8ca91d0c31ff1df0b08890e89e70f9f31f10e1cb807b19cf4ea44bc355ddac58
+    oracle_sha256: 1624a4f9db5b8cdf21f2bc74b1664d87c3c5a3b5043773f12818179279e5befc
+    runs:
+      - run_id: TD-CAP-008-R01-e93ff34c0360
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 5854
+        output_tokens: 424
+        provider_prompt_utf8_bytes: 22385
+        record_sha256: 3b3f60f56d814dd9e9ae2a2bcb8dd602b643bdf1debb633202309d9ace910f77
+        started_from_clean_context: true
+  - case_id: TD-CAP-007
+    template: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/oracle.yaml
+    case_sha256: 2fd036d589ade8d16b51a6cbc31955bf69ff5c2b096f878a160af72c4c14d86c
+    fixture_sha256: e3c2247304754797c38d526a098024dea6cc7aaa13dc4db9975fe84267c06f3e
+    oracle_sha256: 9af9d821156930e48df0426968f89b7472b7d2d41591a7ce4b110a994fe31dc9
+    runs:
+      - {run_id: TD-CAP-007-R01-2ede555ac83a, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5843, output_tokens: 805, provider_prompt_utf8_bytes: 22206, record_sha256: c27c3ba28f5494a06c7409969d259dc8fa79a2d07e16c5ed94e8c9c8b06b56a7, started_from_clean_context: true}
+      - {run_id: TD-CAP-007-R02-034376ef648b, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5842, output_tokens: 614, provider_prompt_utf8_bytes: 22206, record_sha256: f6545c8a8c541b3eb272e9307897ffc36c3e7c2311de10392a1f972907a6bcdf, started_from_clean_context: true}
+      - {run_id: TD-CAP-007-R03-fca6602261ad, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5847, output_tokens: 512, provider_prompt_utf8_bytes: 22206, record_sha256: e3dd6295754a5b19a534cdfc9aa0c92b2785386bdbf89ca069d20245ac3c9694, started_from_clean_context: true}
+  - case_id: TD-AUTH-007
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/oracle.yaml
+    case_sha256: ab7e50e7e44ed6d7170123c2bf47f32d2e71439bc9ee517d5a3f35ecaa3c545a
+    fixture_sha256: cf5ecd100ad7ea068c5bb0f8e24a8f12c90b1a9bb85ae1af5ed30c7f2a2b8f42
+    oracle_sha256: 6a86ddc70350b2ad52e12a67cbc89c30d6eebc5e4bf6885d69dbd0f2e2204e46
+    runs:
+      - {run_id: TD-AUTH-007-R01-08e791c5611f, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4868, output_tokens: 626, provider_prompt_utf8_bytes: 16756, record_sha256: 98a2fd9bfafd230f3df292b8787a61f522e9b63e58914e0e75d1cffc8f7705c0, started_from_clean_context: true}
+      - {run_id: TD-AUTH-007-R02-c44b0a543e6e, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4870, output_tokens: 684, provider_prompt_utf8_bytes: 16756, record_sha256: bc9f1d1cdf36d51f28b49163665799177343869d4d4bcc9c6c83eeec756eeb16, started_from_clean_context: true}
+      - {run_id: TD-AUTH-007-R03-a3ac907c5eb6, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4865, output_tokens: 516, provider_prompt_utf8_bytes: 16756, record_sha256: d062b5db744dafb6af329d21c3efad496c1b1468d761fdc7fc4d6d1195717298, started_from_clean_context: true}
+limitations:
+  - This record admits only the three independently PASS case records from workflow run 36953091767; the failed TD-AUTH-003 Fixture V1 record is explicitly excluded.
+  - TD-CAP-007 and TD-AUTH-007 establish three-run convergence only for their frozen synthetic fixtures.
+  - Provider-auto resolved all accepted calls in this record to mai-code-1.1-flash; this is not a cross-model convergence claim.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

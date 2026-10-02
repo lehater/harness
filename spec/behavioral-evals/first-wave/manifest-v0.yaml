@@ -1,11 +1,25 @@
 version: 1
 kind: harness-agent-behavioral-eval-manifest
-id: A04-R02-DISPATCH-BRIDGE-V1
+id: FIRST-WAVE-BEHAVIORAL-EVALS-V1
 provider_prompt_budget:
   metric: utf8_bytes
-  max_per_case: 28000
-  max_suite: 56000
-  max_sequence_extra: 28000
+  max_per_case: 25000
+  max_suite: 390000
+  max_sequence_extra: 35000
 cases:
-  - {design: TD-AUTH-003, template: ../release-critical-formation/cases/td-auth-003/case.yaml.tmpl, dimension: authority_partition}
-  - {design: TD-AUTH-006, template: ../release-critical-formation/cases/td-auth-006/case.yaml.tmpl, dimension: authority_partition}
+  - {design: TD-CAP-001, template: cases/td-cap-001/case.yaml.tmpl, dimension: capability_partition}
+  - {design: TD-CAP-002, template: cases/td-cap-002/case.yaml.tmpl, dimension: capability_partition}
+  - {design: TD-CAP-003, template: cases/td-cap-003/case.yaml.tmpl, dimension: capability_partition}
+  - {design: TD-CAP-004, template: cases/td-cap-004/case.yaml.tmpl, dimension: capability_partition}
+  - {design: TD-AUTH-001, template: cases/td-auth-001/case.yaml.tmpl, dimension: authority_partition}
+  - {design: TD-AUTH-002, template: cases/td-auth-002/case.yaml.tmpl, dimension: authority_partition}
+  - {design: TD-AUTH-004, template: cases/td-auth-004/case.yaml.tmpl, dimension: authority_partition}
+  - {design: TD-ROUTE-001, template: cases/td-route-001/case.yaml.tmpl, dimension: selected_operation}
+  - {design: TD-ROUTE-002, template: cases/td-route-002/case.yaml.tmpl, dimension: selected_operation}
+  - {design: TD-ROUTE-003, template: cases/td-route-003/case.yaml.tmpl, dimension: selected_operation}
+  - {design: TD-COMP-001, template: cases/td-comp-001/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 32000}
+  - {design: TD-BOOT-E01, template: cases/td-boot-e01/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
+  - {design: TD-BOOT-E02, template: cases/td-boot-e02/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
+  - {design: TD-BOOT-E03, template: cases/td-boot-e03/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
+  - {design: TD-BOOT-E04, template: cases/td-boot-e04/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
+  - {design: TD-BOOT-E05, template: cases/td-boot-e05/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}

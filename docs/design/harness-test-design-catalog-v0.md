@@ -348,9 +348,9 @@ Assertions:
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
 
-**Prepared TL4 execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-007` runs three clean contexts against the same frozen semantic oracle; provider evidence pending.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-007`; provider run `36953091767` passed all three clean-context executions.
 
 Base fixture:
 
@@ -375,9 +375,9 @@ Same normalized Capability identities and granularity.
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
 
-**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-008`; provider evidence pending.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-008`; provider run `36953091767` passed the controlled TL3 project-shaped case.
 
 Fixture:
 
@@ -458,9 +458,9 @@ Assertions:
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
 
-**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; provider evidence pending.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; corrected Fixture V2 passed provider run `36953433978`.
 
 Diagnostic provider run `36953091767` exposed an oracle error in Fixture V1:
 the worker-consumption statement was evidence that the payment decision is
@@ -564,9 +564,9 @@ was assumed while Authority identity was the unresolved subject.
 **Methods:** EM-02  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
 
-**Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-006`; provider evidence pending.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-006`; provider runs `36953091767` and `36953433978` both passed.
 
 Fixture:
 
@@ -585,9 +585,9 @@ contract.
 **Methods:** EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
 
-**Prepared TL4 execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-007` runs three clean contexts against the same frozen partition oracle; provider evidence pending.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-007`; provider run `36953091767` passed all three clean-context executions.
 
 Transformations:
 

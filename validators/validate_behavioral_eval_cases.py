@@ -133,15 +133,8 @@ with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:
     assert _observed_cli_version(str(fake_cli), {}) == "1.0.91"
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
-DISPATCH_MANIFEST = yaml.safe_load(
-    (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
-)
-assert DISPATCH_MANIFEST["id"] == "A04-R02-DISPATCH-BRIDGE-V1"
-assert {item["design"] for item in DISPATCH_MANIFEST["cases"]} == {
-    "TD-AUTH-003", "TD-AUTH-006"
-}
 MANIFEST = yaml.safe_load(
-    (BASE / "baseline-manifest-v0.yaml").read_text(encoding="utf-8")
+    (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
 )
 EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",

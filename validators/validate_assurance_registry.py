@@ -721,15 +721,15 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     passed: list[str] = []
 
     report = assurance_report(registry)
-    assert report["summary"]["release_claim_ready"] is False
-    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == ["A04-R01"]
-    assert report["abilities"]["HA-A04"]["missing_requirements"] == [
-        "A04-R02", "A04-R03"
+    assert report["summary"]["release_claim_ready"] is True
+    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == [
+        "A04-R01", "A04-R02", "A04-R03"
     ]
-    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == ["A05-R01"]
-    assert report["abilities"]["HA-A05"]["missing_requirements"] == [
-        "A05-R02", "A05-R03"
+    assert report["abilities"]["HA-A04"]["missing_requirements"] == []
+    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == [
+        "A05-R01", "A05-R02", "A05-R03"
     ]
+    assert report["abilities"]["HA-A05"]["missing_requirements"] == []
     assert report["abilities"]["HA-A09"]["satisfied_requirements"] == [
         "A09-R01", "A09-R02", "A09-R03", "A09-R04"
     ]

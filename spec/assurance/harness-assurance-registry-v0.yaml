@@ -635,6 +635,109 @@ evidence:
       - One successful current provider-backed suite run; this does not establish TL4 prompt/data trust-boundary or routing convergence.
       - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
 
+  - id: EVID-A04-OVERLAP-REFERENCE-TL1-36953433978
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/oracle.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml
+    satisfies: [A04-R02]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml
+    case_ids: [TD-AUTH-003, TD-AUTH-006]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Controlled synthetic overlap and Reference-pressure fixtures only.
+      - TD-AUTH-003 evidence is the corrected Fixture V2; its V1 diagnostic failure is excluded.
+
+  - id: EVID-A04-CONVERGENCE-TL4-36953091767
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    satisfies: [A04-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    case_ids: [TD-AUTH-007]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Three clean-context runs establish convergence only for one frozen Authority-partition fixture.
+      - The parent workflow also contained a failed diagnostic case that is not part of this evidence record.
+
+  - id: EVID-A05-PROJECT-SHAPED-TL3-36953091767
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    satisfies: [A05-R02]
+    test_level: TL3
+    methods: [EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    case_ids: [TD-CAP-008]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - One controlled project-shaped fixture proves novel Capability formation under Reference-like vocabulary pressure.
+      - It is not real-project portability evidence.
+
+  - id: EVID-A05-CONVERGENCE-TL4-36953091767
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    satisfies: [A05-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
+    case_ids: [TD-CAP-007]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Three clean-context runs establish convergence only for one frozen Capability-partition fixture.
+      - Provider-auto resolved all three calls to mai-code-1.1-flash.
+
   - id: EVID-BOOT-COMP-TL2-36947887869
     providers:
       - behavioral_eval.py
