@@ -55,7 +55,144 @@ def coverage(ready: bool = True, **extra):
     }
 
 
+def test_cross_layer_precedence_matrix() -> None:
+    executable = {
+        "capability": "demo.ready",
+        "authority": "DESIGN",
+        "reason": "CREATE_MISSING_PROVIDER",
+        "decision_request_mode": "CREATE",
+        "pipeline": ["PRODUCE_CANDIDATE"],
+    }
+    failure = {
+        "capability": "demo.failed",
+        "state": "FAILED_VALIDATION",
+        "failure_id": "ATTEMPT-1",
+    }
+    blocker = {
+        "capability": "demo.blocked",
+        "authority": "DESIGN",
+        "questions": ["Q-BLOCKED"],
+    }
+    gap = {
+        "capability": "demo.gap",
+        "state": "UNKNOWN",
+    }
+    wait = {
+        "capability": "demo.wait",
+        "state": "WAITING_UPSTREAM",
+    }
+
+    cases = [
+        (
+            "READY",
+            decision(
+                "READY",
+                ready=[executable],
+                failed_validation=[failure],
+                blocked=[blocker],
+                lifecycle_gaps=[gap],
+                waiting_upstream=[wait],
+            ),
+            semantic(
+                status="INCOMPLETE",
+                semantic_gaps=[
+                    {
+                        "capability": "demo.semantic",
+                        "authority": "DESIGN",
+                        "code": "SEMANTIC_ADMISSION_REQUIRED",
+                    }
+                ],
+            ),
+            coverage(False),
+        ),
+        (
+            "FAILED_VALIDATION",
+            decision(
+                "FAILED_VALIDATION",
+                failed_validation=[failure],
+                blocked=[blocker],
+                lifecycle_gaps=[gap],
+                waiting_upstream=[wait],
+            ),
+            semantic(status="INCOMPLETE"),
+            coverage(False),
+        ),
+        (
+            "BLOCKED",
+            decision(
+                "BLOCKED",
+                blocked=[blocker],
+                lifecycle_gaps=[gap],
+                waiting_upstream=[wait],
+            ),
+            semantic(status="INCOMPLETE"),
+            coverage(False),
+        ),
+        (
+            "INCOMPLETE",
+            decision(
+                "INCOMPLETE",
+                lifecycle_gaps=[gap],
+                waiting_upstream=[wait],
+            ),
+            semantic(status="INCOMPLETE"),
+            coverage(False),
+        ),
+        (
+            "WAITING",
+            decision(
+                "WAITING",
+                waiting_upstream=[wait],
+            ),
+            semantic(status="INCOMPLETE"),
+            coverage(False),
+        ),
+        (
+            "COMPLETE",
+            decision("COMPLETE"),
+            semantic(),
+            coverage(),
+        ),
+    ]
+
+    for expected, decision_model, semantic_model, coverage_model in cases:
+        result = compose_project_frontier(
+            target="IMPLEMENTATION",
+            decision_roadmap=decision_model,
+            semantic_closure=semantic_model,
+            engineering_coverage=coverage_model,
+        )
+        assert result["status"] == expected, (expected, result)
+
+    false_complete_cases = [
+        (
+            decision("COMPLETE"),
+            semantic(status="INCOMPLETE"),
+            coverage(),
+        ),
+        (
+            decision("COMPLETE"),
+            semantic(),
+            coverage(False),
+        ),
+        (
+            decision("WAITING", waiting_upstream=[]),
+            semantic(),
+            coverage(),
+        ),
+    ]
+    for decision_model, semantic_model, coverage_model in false_complete_cases:
+        result = compose_project_frontier(
+            target="IMPLEMENTATION",
+            decision_roadmap=decision_model,
+            semantic_closure=semantic_model,
+            engineering_coverage=coverage_model,
+        )
+        assert result["status"] != "COMPLETE", result
+
+
 def main() -> int:
+    test_cross_layer_precedence_matrix()
     complete = compose_project_frontier(
         target="IMPLEMENTATION",
         decision_roadmap=decision("COMPLETE"),
