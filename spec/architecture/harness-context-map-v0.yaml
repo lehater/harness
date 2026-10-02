@@ -73,10 +73,10 @@ contexts:
     subdomain: supporting
     responsibility: Own decision-space evidence, alternatives, governance dispositions and execution assurance.
     modules:
-      - decision_execution_assurance
-      - decision_exploration
-      - decision_explorer_contract
-      - decision_governance
+      - harness.decision.decision_execution_assurance
+      - harness.decision.decision_exploration
+      - harness.decision.decision_explorer_contract
+      - harness.decision.decision_governance
     may_depend_on: []
 
   evidence:

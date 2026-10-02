@@ -85,6 +85,11 @@ exact_files:
   - src/harness/evidence/source_boundary.py
   - src/harness/evidence/source_coverage.py
   - src/harness/evidence/source_set.py
+  - src/harness/decision/__init__.py
+  - src/harness/decision/decision_execution_assurance.py
+  - src/harness/decision/decision_exploration.py
+  - src/harness/decision/decision_explorer_contract.py
+  - src/harness/decision/decision_governance.py
   - skills/consumer-operation-registry-v0.yaml
   - skills/consumer-method-registry-v0.yaml
   - skills/artifact-skill-registry-v0.yaml

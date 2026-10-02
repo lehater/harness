@@ -270,6 +270,50 @@ remain unchanged and no provider run is performed. Existing CI filters cover
 `src/harness/**` and the final gate has no path filter; execution policy and check
 inventory remain unchanged.
 
+## Decision package migration decision
+
+Architecture decision record: ADR-DECISION-PACKAGE-V0 (accepted).
+
+The root implementation namespace obscured the already enforced Decision
+ownership boundary. Following the existing Project Model, Reference Model and
+Evidence mechanism, the complete `decision` context moves in one coherent slice
+into `src/harness/decision/`. Its four canonical modules are:
+
+- `harness.decision.decision_execution_assurance`;
+- `harness.decision.decision_exploration`;
+- `harness.decision.decision_explorer_contract`;
+- `harness.decision.decision_governance`.
+
+All four root files remain temporary `import-only` facades under the existing
+closed grammar; none gains a CLI. Explicit canonical `__all__` lists preserve
+the observed legacy public surface, including imported names. Function/class
+bodies remain unchanged, and every exported legacy object and `__all__` shares
+canonical identity. Exploration imports the Explorer contract directly inside
+the canonical package. Application and Scenario Suite consumers retain their
+legacy imports, normalized by the existing compatibility registry.
+
+Decision retains `may_depend_on: []`. `CoreError` imports use canonical
+`harness.project_model.core` under the existing shared-kernel permission; no
+published boundary, new bridge or installed-package execution is introduced.
+The temporary source-tree bridge and `tool.uv.package = false` remain unchanged.
+
+Consumer Pack `consumer_api: v0` retains the four root facades and adds exactly
+the four canonical modules plus `src/harness/decision/__init__.py` through
+`exact_files`, without expanding prefixes. Existing TD-DIST-001/002 evidence
+extends isolated-pack checks with the frozen pre-move public surfaces, all
+exported-object and `__all__` identities, canonical file locations, shared-kernel
+identity, absence of CLI entrypoints and existing Decision scenarios through
+distributed Application consumers. The subprocess removes checkout `PYTHONPATH`
+and requires no installed Harness package. TL0/TL1 facade grammar/normalization
+checks and existing Decision admission/governance/scenario evidence protect the
+physical migration; no duplicate semantic tests or provider judgement are needed.
+
+All seven provider-run records under `spec/assurance/evidence/**` were checked
+against the four moved files and the complete changed-file set. No changed file
+belongs to an execution binding. Under AR-M11, no additional evidence becomes
+stale; historical hashes, outcomes and existing stale classifications remain
+unchanged. No provider run is performed.
+
 ## Evidence
 
 This migration target is enforced at TL0 by

@@ -71,6 +71,9 @@ Purpose: retain the detailed repository inventory outside the automatically load
   `reference_materializer.py` is its temporary import/CLI facade.
 - `src/harness/reference_model/reference_model_evolution.py` — canonical Reference Model evolution analysis;
   `reference_model_evolution.py` is its temporary import-only facade.
+- `src/harness/decision/` — the four canonical `harness.decision.*` modules for
+  exploration, Explorer request contracts, governance and execution assurance;
+  the four corresponding root files are temporary import-only facades.
 - `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.

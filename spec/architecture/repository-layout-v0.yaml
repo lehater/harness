@@ -39,11 +39,7 @@ root_python:
     - coverage_obligations
     - coverage_planner
     - coverage_planner_experiment
-    - decision_execution_assurance
-    - decision_exploration
-    - decision_explorer_contract
     - decision_explorer_request
-    - decision_governance
     - decision_pipeline
     - derivation_test_coverage
     - engineering_coverage
@@ -106,3 +102,15 @@ compatibility:
     source_set:
       target: harness.evidence.source_set
       mode: import-and-cli
+    decision_execution_assurance:
+      target: harness.decision.decision_execution_assurance
+      mode: import-only
+    decision_exploration:
+      target: harness.decision.decision_exploration
+      mode: import-only
+    decision_explorer_contract:
+      target: harness.decision.decision_explorer_contract
+      mode: import-only
+    decision_governance:
+      target: harness.decision.decision_governance
+      mode: import-only
