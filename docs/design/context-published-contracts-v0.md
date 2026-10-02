@@ -87,7 +87,8 @@ The earlier DDD audit already removed:
 - Coverage -> Application imports by moving repository/skill orchestration into
   `coverage_application.py`;
 - Decision Governance -> Application imports by separating
-  `decision_explorer_contract.py` from the application request builder.
+  `harness.decision.decision_explorer_contract` from the application request
+  builder.
 
 Those directions remain protected by the ordinary context dependency map and do
 not require an additional published-boundary rule.

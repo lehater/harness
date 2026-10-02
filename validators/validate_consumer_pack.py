@@ -91,6 +91,69 @@ for module in ('source_boundary', 'source_coverage', 'source_set'):
         assert getattr(legacy, name) is getattr(canonical, name), (module, name)
     assert canonical.CoreError is core.CoreError
     assert Path(canonical.__file__).resolve() == Path('src/harness/evidence/' + module + '.py').resolve()
+# Public names frozen from the four root modules before the Decision move.
+decision_exports = {
+    "decision_execution_assurance": [
+        "annotations",
+        "Any",
+        "CoreError",
+        "ASSURANCE",
+        "effective_execution_assurance",
+        "evaluate_execution_assurance"
+    ],
+    "decision_exploration": [
+        "annotations",
+        "json",
+        "Any",
+        "validate_explorer_request_binding",
+        "CoreError",
+        "EXPLORATION",
+        "APPLICABILITY",
+        "AUTHORITATIVE_SOURCES",
+        "DECISION_SPACE_REVIEW_CHECKS",
+        "evaluate_decision_exploration"
+    ],
+    "decision_explorer_contract": [
+        "annotations",
+        "hashlib",
+        "json",
+        "Any",
+        "CoreError",
+        "build_decision_explorer_request",
+        "validate_explorer_request_binding"
+    ],
+    "decision_governance": [
+        "annotations",
+        "Any",
+        "CoreError",
+        "EXPLORATION",
+        "AUTONOMY",
+        "ALT_STATES",
+        "DISPOSITIONS",
+        "decision_contract_index",
+        "effective_policy",
+        "axis_policies",
+        "evaluate_decision_governance"
+    ]
+}
+for module, expected in decision_exports.items():
+    legacy = importlib.import_module(module)
+    canonical = importlib.import_module('harness.decision.' + module)
+    assert canonical.__all__ == expected, module
+    assert legacy.__all__ is canonical.__all__, module
+    for name in expected:
+        assert getattr(legacy, name) is getattr(canonical, name), (module, name)
+    assert canonical.CoreError is core.CoreError, module
+    assert Path(canonical.__file__).resolve() == Path('src/harness/decision/' + module + '.py').resolve()
+    assert not hasattr(legacy, 'main'), module
+    assert not hasattr(canonical, 'main'), module
+from harness.decision import decision_exploration, decision_explorer_contract
+assert decision_exploration.validate_explorer_request_binding is decision_explorer_contract.validate_explorer_request_binding
+# Reuse authored Decision scenarios through the distributed Application/drivers.
+from scenario_suite import run_scenario
+for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.yaml')):
+    result = run_scenario(scenario)
+    assert result.status == 'PASSED', result.as_dict()
 """
     result = subprocess.run(
         [sys.executable, "-c", probe], cwd=pack, env=env,
