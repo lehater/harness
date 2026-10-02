@@ -10,10 +10,10 @@ from typing import Any
 import yaml
 
 from agent_router import validate_skill_registry
-from capability_lifecycle import evaluate_lifecycle_target, lifecycle_index, lifecycle_states
+from harness.assurance.capability_lifecycle import evaluate_lifecycle_target, lifecycle_index, lifecycle_states
 from harness.project_model.engineering_graph import derive_profile, evaluate_engineering_target, production_index, validate_realization
 from harness.project_model.core import CoreError, question_frontier
-from semantic_acceptance import evaluation_index
+from harness.assurance.semantic_acceptance import evaluation_index
 from semantic_admission import derive_acceptance_policy_fingerprints
 from semantic_questions import append_question_proposals, proposals_from_evaluation_set
 

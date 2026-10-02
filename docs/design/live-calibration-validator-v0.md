@@ -10,7 +10,8 @@ corpus while preserving three separate responsibilities:
 - expert corpus supplies expected labels;
 - external evaluator supplies only semantic predictions;
 - Harness deterministically validates binding/completeness and delegates scoring
-  to `semantic_judgement_calibration.py`.
+  to `harness.assurance.semantic_judgement_calibration`
+  (legacy Consumer v0 facade: `semantic_judgement_calibration.py`).
 
 The validator is generated evidence above Core. No Core entity is added.
 
@@ -160,7 +161,17 @@ It deliberately does not perform consensus voting or alter scorer metrics.
 
 Harness includes optional Scenario Suite driver `live_calibration_process_driver`, loaded only by operator/CI configuration. It executes one configured program without a shell and sends only the versioned instruction, evaluator descriptor/configuration, and blinded cases with opaque `case_request_id`.
 
-Executable bytes and timeout are fingerprinted into the evaluator adapter descriptor before request construction. Changing either changes evaluator binding. The separate-process boundary does not prove evaluator independence; `independence.status` remains `UNVERIFIED`.
+Canonical invocation sets `HARNESS_LIVE_CALIBRATION_MODULE` to
+`harness.assurance.adapters.copilot_live_calibration_evaluator`. The driver uses
+`[sys.executable, "-m", module_identity]` without a shell. Standard Python
+`importlib.util.find_spec` resolves the module source file; its bytes are hashed,
+not the interpreter. Missing/non-source modules fail closed as unavailable.
+Module mode takes precedence over the compatible executable-path mode configured
+by `HARNESS_LIVE_CALIBRATION_EXECUTABLE`. The existing `executable_sha256` field
+means the hash of the invoked adapter artifact in either mode. Module identity
+is also included in the adapter descriptor. Request/response transport is unchanged.
+
+Adapter artifact bytes and timeout are fingerprinted into the evaluator adapter descriptor before request construction. Changing either changes evaluator binding. The separate-process boundary does not prove evaluator independence; `independence.status` remains `UNVERIFIED`.
 
 
 ## Evidence persistence

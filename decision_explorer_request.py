@@ -10,7 +10,7 @@ from typing import Any
 import yaml
 
 from authority_context import build_authority_context
-from capability_lifecycle import lifecycle_index, lifecycle_states
+from harness.assurance.capability_lifecycle import lifecycle_index, lifecycle_states
 from harness.decision.decision_explorer_contract import build_decision_explorer_request
 from harness.decision.decision_governance import axis_policies, decision_contract_index
 from harness.project_model.engineering_graph import producer_index, production_index, validate_realization

@@ -22,12 +22,10 @@ root_python:
   policy: migration-ratchet
   permanent_bootstrap_exceptions: []
   migration_baseline_modules:
-    - acceptance_policy
     - agent_router
     - authority_context
     - authority_role_projection_experiment
     - behavioral_eval
-    - capability_lifecycle
     - concern_activation_experiment
     - consumer_pack
     - coverage_application
@@ -37,24 +35,16 @@ root_python:
     - coverage_planner_experiment
     - decision_explorer_request
     - decision_pipeline
-    - derivation_test_coverage
     - graph_doctor
-    - integration_alignment
     - lifecycle_experiment
-    - live_calibration
     - live_calibration_process_driver
     - method_router
     - project_frontier
     - project_publication
-    - repository_realization
     - scenario_drivers
     - scenario_suite
-    - semantic_acceptance
     - semantic_admission
     - semantic_closure
-    - semantic_derivation
-    - semantic_fingerprint
-    - semantic_judgement_calibration
     - semantic_questions
     - skill_invariant_policy
     - skill_router
@@ -132,3 +122,39 @@ compatibility:
     workspace:
       target: harness.workspace.workspace
       mode: import-and-cli
+    integration_alignment:
+      target: harness.integration.integration_alignment
+      mode: import-and-cli
+    adapters.canonical_graph:
+      target: harness.integration.adapters.canonical_graph
+      mode: import-and-cli
+    repository_realization:
+      target: harness.integration.repository_realization
+      mode: import-and-cli
+    acceptance_policy:
+      target: harness.assurance.acceptance_policy
+      mode: import-only
+    capability_lifecycle:
+      target: harness.assurance.capability_lifecycle
+      mode: import-and-cli
+    derivation_test_coverage:
+      target: harness.assurance.derivation_test_coverage
+      mode: import-only
+    live_calibration:
+      target: harness.assurance.live_calibration
+      mode: import-only
+    adapters.copilot_live_calibration_evaluator:
+      target: harness.assurance.adapters.copilot_live_calibration_evaluator
+      mode: import-and-cli
+    semantic_acceptance:
+      target: harness.assurance.semantic_acceptance
+      mode: import-and-cli
+    semantic_derivation:
+      target: harness.assurance.semantic_derivation
+      mode: import-and-cli
+    semantic_fingerprint:
+      target: harness.assurance.semantic_fingerprint
+      mode: import-only
+    semantic_judgement_calibration:
+      target: harness.assurance.semantic_judgement_calibration
+      mode: import-only

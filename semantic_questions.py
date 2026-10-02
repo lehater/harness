@@ -8,8 +8,8 @@ from typing import Any
 
 from harness.project_model.engineering_graph import producer_index
 from harness.project_model.core import CoreError
-from semantic_acceptance import evaluation_index
-from semantic_derivation import derivation_evaluation_index
+from harness.assurance.semantic_acceptance import evaluation_index
+from harness.assurance.semantic_derivation import derivation_evaluation_index
 
 GAP_FINDING_CODES = {
     "MISSING_OBLIGATION",

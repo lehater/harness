@@ -32,8 +32,8 @@ Coverage does not own or interpret raw
 The published API is:
 
 ```text
-semantic_acceptance.coverage_assurance_view
-semantic_acceptance.coverage_invalidation_closure
+harness.assurance.semantic_acceptance.coverage_assurance_view
+harness.assurance.semantic_acceptance.coverage_invalidation_closure
 ```
 
 `coverage_assurance_view(project_docs)` returns a read-only projection with:

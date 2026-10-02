@@ -18,7 +18,7 @@ import yaml
 
 from harness.project_model.engineering_graph import derive_profile, evaluate_engineering_target
 from harness.project_model.core import CoreError, capability_resolve, validate_model
-from integration_alignment import validate_project_alignment
+from harness.integration.integration_alignment import validate_project_alignment
 
 
 __all__ = [

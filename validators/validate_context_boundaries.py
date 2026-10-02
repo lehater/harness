@@ -100,7 +100,8 @@ def _validate_physical_layout(
         )
 
     actual = _root_python_modules()
-    unexpected = sorted(actual - baseline - exceptions - facades)
+    root_facades = {module for module in facades if "." not in module}
+    unexpected = sorted(actual - baseline - exceptions - root_facades)
     stale = sorted(baseline - actual)
     stale_exceptions = sorted(exceptions - actual)
     if unexpected:
@@ -222,12 +223,16 @@ def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str],
                 _validate_facade("src/harness/__init__.py", target, "exports")
                 aliases[legacy] = target
             elif kind == "module_facades":
-                if not isinstance(legacy, str) or not legacy.isidentifier() or legacy in owner:
+                if (
+                    not isinstance(legacy, str)
+                    or not all(part.isidentifier() for part in legacy.split("."))
+                    or legacy in owner
+                ):
                     raise SystemExit(f"module facade cannot own semantics: {legacy}")
                 mode = entry["mode"]
                 if mode not in ("import-only", "import-and-cli"):
                     raise SystemExit(f"invalid module facade mode: {legacy}: {mode}")
-                _validate_facade(f"{legacy}.py", target, mode)
+                _validate_facade(legacy.replace(".", "/") + ".py", target, mode)
                 aliases[legacy] = target
                 facades.add(legacy)
             else:
@@ -282,6 +287,8 @@ def _runtime_modules(spec: dict, facades: set[str], aliases: dict[str, str]) -> 
                     )
                 continue
             module = ".".join(path.relative_to(import_root).with_suffix("").parts)
+            if module in facades:
+                continue
             if module in result:
                 raise SystemExit(f"duplicate runtime module identity: {module}")
             result.add(module)
@@ -311,6 +318,7 @@ def _validate_runtime_import(
     modules = []
     if isinstance(node, ast.ImportFrom) and not node.level:
         modules = [node.module]
+        modules.extend(f"{node.module}.{alias.name}" for alias in node.names)
     elif isinstance(node, ast.Import):
         modules = [alias.name for alias in node.names]
     for module in modules:
@@ -327,6 +335,7 @@ def test_runtime_import_guards() -> None:
     aliases = {
         "engineering_graph": "harness.project_model.engineering_graph",
         "harness": "harness.project_model.core",
+        "adapters.canonical_graph": "harness.integration.adapters.canonical_graph",
     }
     for statement in (
         "from engineering_graph import X",
@@ -334,12 +343,15 @@ def test_runtime_import_guards() -> None:
         "import engineering_graph",
         "import harness as legacy",
         "import pathlib, engineering_graph as legacy",
+        "from adapters.canonical_graph import project_model",
+        "import adapters.canonical_graph",
+        "from adapters import canonical_graph",
     ):
         node = ast.parse(statement).body[0]
         try:
             _validate_runtime_import(source, node, owner, aliases)
         except SystemExit as exc:
-            assert "use canonical target harness.project_model." in str(exc)
+            assert "use canonical target harness." in str(exc)
         else:
             raise AssertionError(f"owned runtime accepted {statement}")
         for excluded in ("validators.check", "tests.check", "scenario_suite", "engineering_graph"):

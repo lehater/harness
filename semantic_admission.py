@@ -14,10 +14,10 @@ from typing import Any
 
 import yaml
 
-from acceptance_policy import build_acceptance_policy_baseline
+from harness.assurance.acceptance_policy import build_acceptance_policy_baseline
 from agent_router import validate_skill_registry
 from authority_context import build_authority_context, validate_extracted_references
-from capability_lifecycle import lifecycle_index, lifecycle_states
+from harness.assurance.capability_lifecycle import lifecycle_index, lifecycle_states
 from harness.decision.decision_execution_assurance import (
     effective_execution_assurance,
     evaluate_execution_assurance,
@@ -31,8 +31,8 @@ from harness.decision.decision_governance import (
 )
 from harness.project_model.engineering_graph import producer_index, production_index, validate_realization
 from harness.project_model.core import CoreError
-from semantic_acceptance import evaluate_artifact
-from semantic_fingerprint import semantic_assertion_fingerprints
+from harness.assurance.semantic_acceptance import evaluate_artifact
+from harness.assurance.semantic_fingerprint import semantic_assertion_fingerprints
 from semantic_questions import questions_from_semantic_evaluation
 
 
