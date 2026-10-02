@@ -8,15 +8,15 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engineering_graph import evaluate_engineering_target, realize_core_model
-from harness import CoreError, resolve_question, unresolved_questions
-from semantic_admission import (
+from harness.project_model.engineering_graph import evaluate_engineering_target, realize_core_model
+from harness.project_model.core import CoreError, resolve_question, unresolved_questions
+from harness.application.semantic_admission import (
     admit_artifact,
     derive_acceptance_policy_fingerprints,
     load_yaml,
 )
-from semantic_closure import evaluate_semantic_closure
-from semantic_questions import append_question_proposals, proposals_from_evaluation_set
+from harness.application.semantic_closure import evaluate_semantic_closure
+from harness.application.semantic_questions import append_question_proposals, proposals_from_evaluation_set
 
 
 GRAPH = {

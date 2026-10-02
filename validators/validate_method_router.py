@@ -14,8 +14,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError  # noqa: E402
-from method_router import main as method_router_main, route_methods, validate_method_registry  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.application.method_router import main as method_router_main, route_methods, validate_method_registry  # noqa: E402
 
 
 def load(path: str) -> dict:

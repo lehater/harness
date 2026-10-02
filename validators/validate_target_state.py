@@ -10,8 +10,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError  # noqa: E402
-from target_state import evaluate_target_state, validate_profile  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.project_model.target_state import evaluate_target_state, validate_profile  # noqa: E402
 
 
 def test_multiple_provider_alternative() -> None:

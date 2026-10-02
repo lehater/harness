@@ -97,7 +97,7 @@ class BootstrapSequenceAdapter:
             }],
             "questions": [],
         }
-        from target_state import evaluate_target_state
+        from harness.project_model.target_state import evaluate_target_state
         target = evaluate_target_state(
             request["repository_fixture"]["reviewed_design_profile"],
             model,

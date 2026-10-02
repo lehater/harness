@@ -5,8 +5,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engineering_coverage import evaluate_with_repository_policy, load
-from coverage_planner import capability_realization
+from harness.coverage.engineering_coverage import evaluate_with_repository_policy, load
+from harness.coverage.coverage_planner import capability_realization
 
 
 def scope_eval(root, scope):

@@ -6,9 +6,9 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from coverage_application import evaluate_project_coverage
-from engineering_coverage import evaluate_with_repository_policy, load
-from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
+from harness.application.coverage_application import evaluate_project_coverage
+from harness.coverage.engineering_coverage import evaluate_with_repository_policy, load
+from harness.application.skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 
 def main():

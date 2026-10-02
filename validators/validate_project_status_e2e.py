@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile, yaml
 import sys
 ROOT=Path(__file__).resolve().parents[1]; sys.path.insert(0,str(ROOT))
-from project_status import bootstrap_registry, status, validate_registry
+from harness.reference_model.project_status import bootstrap_registry, status, validate_registry
 
 catalog={"authorities":[{"id":"PRODUCT-REQUIREMENTS"},{"id":"SECURITY-ARCHITECTURE"},{"id":"OPERABILITY-DESIGN"}]}
 core={"authorities":[{"id":"PRODUCT-REQUIREMENTS"},{"id":"SECURITY-ARCHITECTURE"}],

@@ -7,8 +7,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError
-from project_frontier import compose_project_frontier
+from harness.project_model.core import CoreError
+from harness.application.project_frontier import compose_project_frontier
 
 
 def decision(status: str, **extra):

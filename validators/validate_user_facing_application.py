@@ -5,8 +5,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from agent_router import load_yaml, route_create_work
-from engineering_graph import evaluate_engineering_target, validate_engineering_graph
+from harness.application.agent_router import load_yaml, route_create_work
+from harness.project_model.engineering_graph import evaluate_engineering_target, validate_engineering_graph
 
 EXAMPLE = ROOT / "examples" / "user-facing-application"
 GRAPH = load_yaml(EXAMPLE / "engineering-graph.yaml")

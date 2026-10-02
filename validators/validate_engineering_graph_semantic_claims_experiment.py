@@ -5,7 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engineering_graph import validate_engineering_graph, production_index
+from harness.project_model.engineering_graph import validate_engineering_graph, production_index
 
 def main() -> int:
     graph = {

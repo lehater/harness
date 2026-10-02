@@ -8,12 +8,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from capability_lifecycle import (
+from harness.assurance.capability_lifecycle import (
     evaluate_lifecycle_target,
     lifecycle_states,
     obsolete_lifecycle_rows,
 )
-from harness import CoreError
+from harness.project_model.core import CoreError
 
 
 GRAPH = {

@@ -6,7 +6,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from repository_realization import evaluate
+from harness.integration.repository_realization import evaluate
 
 def load(path):
     with open(path, "r", encoding="utf-8") as stream:

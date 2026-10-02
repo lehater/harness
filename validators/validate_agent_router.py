@@ -10,11 +10,11 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from agent_router import (  # noqa: E402
+from harness.application.agent_router import (  # noqa: E402
     route_create_work,
     validate_skill_registry,
 )
-from harness import CoreError  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
 
 
 def boundary(label: str) -> dict[str, str]:

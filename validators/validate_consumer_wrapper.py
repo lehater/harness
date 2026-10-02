@@ -9,6 +9,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import venv
+
+import yaml
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,10 +28,11 @@ def _run_wrapper(
     cache: Path,
     *extra: str,
     check: bool = True,
+    python: str = sys.executable,
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
-            sys.executable,
+            python,
             str(wrapper),
             "sync",
             "--binding",
@@ -242,6 +246,100 @@ def test_matrix(temp_root: Path, source: Path, revision: str, consumer_api: str)
     validate_pack(pack, expected_revision=revision, expected_api=consumer_api)
 
 
+
+def test_v0_to_v1_migration(temp_root: Path, source: Path, revision: str) -> None:
+    """One target/wrapper migrates API and pin without changing project truth."""
+    from validators.validate_consumer_api_lifecycle import facade_paths
+
+    target = temp_root / "target"
+    harness_dir = target / ".harness"
+    harness_dir.mkdir(parents=True)
+    wrapper = harness_dir / "harnessw.py"
+    shutil.copy2(WRAPPER, wrapper)
+    wrapper_bytes = wrapper.read_bytes()
+    # Representative target-owned source and semantic artifacts are immutable.
+    (target / "src").mkdir()
+    (target / "src/product.py").write_text("PRODUCT = 'target-owned'\n")
+    (harness_dir / "knowledge.yaml").write_text("authority: TARGET\nacceptance: reviewed-v1\n")
+    truth = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file()}
+    interpreter = temp_root / "interpreter"
+    venv.EnvBuilder(with_pip=False).create(interpreter)
+    python = str(interpreter / "bin/python")
+    purelib = subprocess.check_output(
+        [python, "-c", "import sysconfig; print(sysconfig.get_path('purelib'))"],
+        cwd=target, env=_clean_env(), text=True,
+    ).strip()
+    shutil.copytree(Path(yaml.__file__).parent, Path(purelib) / "yaml")
+    subprocess.run([python, "-c", "import importlib.util, os; "
+                    "assert 'PYTHONPATH' not in os.environ; "
+                    "assert importlib.util.find_spec('harness') is None"],
+                   cwd=target, env=_clean_env(), check=True)
+    binding = harness_dir / "harness-binding.json"
+    value = {"version": 1, "kind": "harness-consumer-binding", "consumer_api": "v0",
+             "source": {"repository": str(source), "revision": revision}}
+    binding.write_text(json.dumps(value))
+    cache = temp_root / "cache"
+    old_pack = Path(_run_wrapper(wrapper, binding, cache, python=python).stdout.strip())
+    validate_pack(old_pack, expected_revision=revision, expected_api="v0")
+
+    def semantics(pack: Path, api: str) -> dict:
+        routes = {}
+        for name, args, expected in (
+            ("operation", ["operation", "--surface", "consumer", "--operation", "project-engineering-status"],
+             "skills/agent/project-engineering-status/SKILL.md"),
+            ("artifact", ["artifact", "--knowledge-kind", "verification-strategy"],
+             "skills/artifacts/verification-strategy/SKILL.md"),
+        ):
+            command = ([python, str(pack / "skill_router.py")] if api == "v0" else
+                       [python, "-m", "harness.application.skill_router"])
+            result = subprocess.run([*command, *args, "--root", str(pack)], cwd=pack,
+                                    env=_clean_env(), capture_output=True, text=True, check=True)
+            route = json.loads(result.stdout)
+            assert route["skill"] == expected
+            assert route["instruction_contracts"] == ["docs/design/agent-instruction-architecture-v0.md"]
+            routes[name] = route
+        probe = """
+import json
+from pathlib import Path
+from scenario_suite import run_scenario
+results = []
+for name in ('create-work-routing', 'structural-provider-removal', 'semantic-gap-question'):
+    result = run_scenario(Path('spec/scenario-suite/scenarios/' + name + '.yaml')).as_dict()
+    assert result['status'] == 'PASSED', result
+    result.pop('path')
+    results.append(result)
+print(json.dumps(results))
+"""
+        result = subprocess.run([python, "-c", probe], cwd=pack, env=_clean_env(),
+                                capture_output=True, text=True, check=True)
+        return {"routes": routes, "scenarios": json.loads(result.stdout)}
+
+    before = semantics(old_pack, "v0")
+    # A second immutable pin physically lacks every v0 facade. This is test-only
+    # removal, not permission to delete any surface from the repository.
+    stripped = temp_root / "v1-source"
+    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(source), str(stripped)], check=True)
+    layout = yaml.safe_load((stripped / "spec/architecture/repository-layout-v0.yaml").read_text())
+    retired = facade_paths(layout)
+    for relative in retired:
+        (stripped / relative).unlink()
+    v1_revision = _commit_snapshot(stripped)
+    assert revision != v1_revision
+    value["consumer_api"] = "v1"
+    value["source"] = {"repository": str(stripped), "revision": v1_revision}
+    binding.write_text(json.dumps(value))
+    new_pack = Path(_run_wrapper(wrapper, binding, cache, python=python).stdout.strip())
+    validate_pack(new_pack, expected_revision=v1_revision, expected_api="v1")
+    assert new_pack != old_pack
+    assert all(not (new_pack / relative).exists() for relative in retired)
+    assert semantics(new_pack, "v1") == before, "Consumer migration changed semantic observations"
+    assert wrapper.read_bytes() == wrapper_bytes
+    assert {p.relative_to(target): p.read_bytes() for p in target.rglob("*")
+            if p.is_file() and p != binding} == truth
+    print("v0 -> v1 migration PASS: same wrapper; isolated interpreter; immutable pins; "
+          "routes and three authored scenario traces equivalent; v1 facades absent")
+
+
 def main() -> int:
     _assert_stdlib_only()
     with tempfile.TemporaryDirectory(prefix="harness-wrapper-validation-") as temp:
@@ -249,6 +347,7 @@ def main() -> int:
         source = root / "source"
         revision = _source_snapshot(source)
         test_matrix(root / "v0", source, revision, "v0")
+        test_v0_to_v1_migration(root / "migration", source, revision)
         # Regression: every v1 source execution path must work without this facade.
         (source / "consumer_pack.py").unlink()
         revision = _commit_snapshot(source)

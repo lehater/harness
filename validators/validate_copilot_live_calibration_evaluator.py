@@ -12,12 +12,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from adapters.copilot_live_calibration_evaluator import (
+from harness.assurance.adapters.copilot_live_calibration_evaluator import (
     _model_payload,
     _parse_copilot_jsonl,
     _parse_model_response,
 )
-from live_calibration import (
+from harness.assurance.live_calibration import (
     build_live_calibration_request,
     evaluate_live_calibration_run,
 )

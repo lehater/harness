@@ -6,8 +6,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from coverage_planner import capability_realization  # noqa: E402
-from frontend_screen_contracts import (  # noqa: E402
+from harness.coverage.coverage_planner import capability_realization  # noqa: E402
+from harness.workspace.frontend_screen_contracts import (  # noqa: E402
     evaluate_frontend_screen_contracts,
     semantic_evaluation,
 )

@@ -7,12 +7,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from frontend_interface_knowledge import (
+from harness.workspace.frontend_interface_knowledge import (
     evaluate_frontend_ux_closure,
     evaluate_topology_screen_subject_coverage,
     required_screen_ids,
 )
-from frontend_screen_contracts import evaluate_frontend_screen_contracts
+from harness.workspace.frontend_screen_contracts import evaluate_frontend_screen_contracts
 
 EX = ROOT / "examples" / "user-facing-application" / "canonical"
 

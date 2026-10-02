@@ -9,9 +9,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from consumer_pack import materialize_pack  # noqa: E402
-from harness import CoreError  # noqa: E402
-from skill_router import route_artifact, route_method, route_operation  # noqa: E402
+from harness.application.consumer_pack import materialize_pack  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.application.skill_router import route_artifact, route_method, route_operation  # noqa: E402
 
 TRUST_CONTRACT = "docs/design/agent-instruction-architecture-v0.md"
 

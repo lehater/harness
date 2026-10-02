@@ -10,8 +10,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from adapters.canonical_graph import project_model  # noqa: E402
-from harness import (  # noqa: E402
+from harness.integration.adapters.canonical_graph import project_model  # noqa: E402
+from harness.project_model.core import (  # noqa: E402
     CoreError,
     blocked,
     capability_owner,

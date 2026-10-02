@@ -10,8 +10,8 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError
-from project_publication import (
+from harness.project_model.core import CoreError
+from harness.application.project_publication import (
     build_project_publication,
     prepare_capability_transition,
     publish_project_publication,

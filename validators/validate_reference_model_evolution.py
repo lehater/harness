@@ -10,8 +10,8 @@ import yaml
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from reference_materializer import load_yaml, materialize
-from reference_model_evolution import analyze_evolution, fingerprint, materialized_capabilities
+from harness.reference_model.reference_materializer import load_yaml, materialize
+from harness.reference_model.reference_model_evolution import analyze_evolution, fingerprint, materialized_capabilities
 
 MODEL=ROOT/"spec/research/reference-engineering-model-v0.yaml"
 AUTHORITIES=ROOT/"catalogs/software-authorities-v0.yaml"
