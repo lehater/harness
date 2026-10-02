@@ -46,7 +46,7 @@ definitions.
 The reviewed minimum implementation is:
 
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
-- `checks/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M12 meta-self-tests.
+- `checks/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M13 meta-self-tests.
 
 The seed is intentionally incomplete. It includes HA-A04 Authority formation,
 HA-A05 Capability formation, HA-A09 existing-project bootstrap/reconcile,
@@ -104,8 +104,11 @@ provider/runtime bindings. Adding another case to a suite does not by itself
 stale existing case evidence; shared provider/runtime semantics and trusted
 instructions actually used by selected cases do.
 
-Registry validity remains separate from release-claim completeness and
-`release_claim_ready` remains false.
+Registry validity remains separate from release-claim completeness. Because the
+seed does not yet register every canonical HA-A01..HA-A21 ability, the report
+must expose `denominator_complete: false` plus the missing canonical ability
+identities, and `release_claim_ready` must remain false even if every currently
+registered seed requirement becomes satisfied.
 
 ## Core model
 
@@ -239,6 +242,11 @@ Provider/model identifiers are included when the evidence is model-backed.
 
 ## Completeness algorithm
 
+Before evaluating proof slots, compare the registered Ability IDs with the
+canonical Ability IDs owned by `harness-ability-to-evidence-v0.md`. A partial
+registry remains structurally valid as an implementation seed, but its assurance
+denominator is incomplete and cannot authorize a release claim.
+
 For each release-critical ability:
 
 1. enumerate its required requirements;
@@ -251,7 +259,9 @@ For each release-critical ability:
    record remains;
 6. mark the ability SATISFIED only when all release-applicable requirements are
    satisfied;
-7. preserve all missing/insufficient requirement identities in the report.
+7. preserve all missing/insufficient requirement identities in the report;
+8. set `release_claim_ready=true` only when the canonical Ability denominator is
+   complete and every registered release-critical Ability is SATISFIED.
 
 The result is a set/vector of satisfied and missing proof slots.
 
@@ -411,6 +421,15 @@ record plus the injected Core model.
 Expected: the complete linked sequence is admissible; a missing run or broken
 derived-input link is rejected.
 
+### AR-M13 — incomplete canonical Ability denominator
+
+Every requirement in the currently registered seed is satisfied, but at least
+one canonical Ability from the semantic owner is absent from the registry.
+
+Expected: registry structure remains valid for incremental adoption,
+`denominator_complete=false`, the missing Ability identities are reported, and
+`release_claim_ready=false`.
+
 
 ## Report shape
 
@@ -428,6 +447,8 @@ abilities:
 evidence:
   ...
 summary:
+  denominator_complete: false
+  missing_canonical_abilities: [...]
   release_claim_ready: false
 ~~~
 

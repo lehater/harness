@@ -652,7 +652,11 @@ def admissibility_reason(
     return None
 
 
-def assurance_report(registry: dict[str, Any]) -> dict[str, Any]:
+def assurance_report(
+    registry: dict[str, Any],
+    *,
+    canonical_ability_ids: set[str] | None = None,
+) -> dict[str, Any]:
     requirements = {item["id"]: item for item in registry["requirements"]}
     evidence = registry["evidence"]
     ability_report: dict[str, Any] = {}
@@ -694,7 +698,15 @@ def assurance_report(registry: dict[str, Any]) -> dict[str, Any]:
             "insufficient_evidence": insufficient,
         }
 
-    release_claim_ready = all(
+    registered_ability_ids = set(ability_report)
+    missing_canonical_abilities = (
+        sorted(canonical_ability_ids - registered_ability_ids)
+        if canonical_ability_ids is not None
+        else []
+    )
+    denominator_complete = not missing_canonical_abilities
+
+    release_claim_ready = denominator_complete and all(
         report["status"] == "SATISFIED"
         for ability_id, report in ability_report.items()
         if next(
@@ -703,7 +715,17 @@ def assurance_report(registry: dict[str, Any]) -> dict[str, Any]:
     )
     return {
         "abilities": ability_report,
-        "summary": {"release_claim_ready": release_claim_ready},
+        "summary": {
+            "denominator_complete": denominator_complete,
+            "registered_ability_count": len(registered_ability_ids),
+            "canonical_ability_count": (
+                len(canonical_ability_ids)
+                if canonical_ability_ids is not None
+                else len(registered_ability_ids)
+            ),
+            "missing_canonical_abilities": missing_canonical_abilities,
+            "release_claim_ready": release_claim_ready,
+        },
     }
 
 
@@ -986,6 +1008,20 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
         raise AssertionError("AR-M12 broken multi-run sequence binding was accepted")
     passed.append("AR-M12")
 
+    # A partial registry is a valid seed, but it cannot become a release-ready
+    # denominator merely because every currently registered slot is satisfied.
+    second["status"] = "implemented"
+    denominator_report = assurance_report(
+        completeness_fixture,
+        canonical_ability_ids={"META-ABILITY", "META-UNREGISTERED"},
+    )
+    assert denominator_report["summary"]["denominator_complete"] is False
+    assert denominator_report["summary"]["missing_canonical_abilities"] == [
+        "META-UNREGISTERED"
+    ]
+    assert denominator_report["summary"]["release_claim_ready"] is False
+    passed.append("AR-M13")
+
     return passed
 
 
@@ -1003,7 +1039,11 @@ def main() -> int:
         registry = load_yaml(REGISTRY_PATH)
         validate_structure(registry)
         meta_tests = run_meta_self_tests(registry)
-        report = assurance_report(registry)
+        canonical_ability_ids, _, _ = canonical_ids(ROOT)
+        report = assurance_report(
+            registry,
+            canonical_ability_ids=canonical_ability_ids,
+        )
     except (OSError, yaml.YAMLError, RegistryError, AssertionError) as exc:
         print(f"Harness assurance registry validation failed: {exc}")
         return 1
@@ -1018,9 +1058,19 @@ def main() -> int:
             suffix = f" missing={','.join(missing)}" if missing else ""
             print(f"- {ability_id}: {ability['status']}{suffix}")
         print(f"- meta self-tests: {', '.join(meta_tests)}")
+        summary = report["summary"]
+        print(
+            "- denominator_complete: "
+            + str(summary["denominator_complete"]).lower()
+        )
+        if summary["missing_canonical_abilities"]:
+            print(
+                "- missing_canonical_abilities: "
+                + ",".join(summary["missing_canonical_abilities"])
+            )
         print(
             "- release_claim_ready: "
-            + str(report["summary"]["release_claim_ready"]).lower()
+            + str(summary["release_claim_ready"]).lower()
         )
 
     if args.require_release_complete and not report["summary"]["release_claim_ready"]:
