@@ -527,7 +527,7 @@ TL4_BASE = ROOT / "spec" / "behavioral-evals" / "tl4-existing-project"
 TL4_MANIFEST = yaml.safe_load(
     (TL4_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
 )
-TL4_EXPECTED = {"TD-COMP-003", "TD-BOOT-E06"}
+TL4_EXPECTED = {"TD-COMP-003", "TD-BOOT-E06", "TD-QST-001"}
 assert TL4_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
 tl4_entries = TL4_MANIFEST["cases"]
 assert {item["design"] for item in tl4_entries} == TL4_EXPECTED
@@ -614,8 +614,7 @@ for entry in tl4_entries:
                 "selected_operation",
             )
             assert parsed["selected_operation"] == expected
-        else:
-            assert entry["design"] == "TD-BOOT-E06"
+        elif entry["design"] == "TD-BOOT-E06":
             assert entry["dimension"] == "bootstrap_realization"
             assert payload["authorized_operation_chain"] == [
                 {"operation": "project-bootstrap-reconcile", "exposure": "public"},
@@ -678,6 +677,43 @@ for entry in tl4_entries:
                 },
             )
             assert score_result(binding, e06_normalized)["status"] == "PASS"
+        else:
+            assert entry["design"] == "TD-QST-001"
+            assert entry["dimension"] == "bootstrap_realization"
+            fixture = binding.fixture
+            observations = fixture["existing_project"]["execution_observations"]
+            assert len(observations) == 1
+            assert observations[0]["outcome"] == "timeout"
+            assert observations[0]["retryable"] is True
+            qst_model = {
+                "authorities": [{"id": "REFUND-DESIGN"}],
+                "artifacts": [],
+                "questions": [
+                    {
+                        "id": "ARBITRARY-QUESTION-ID",
+                        "authority": "REFUND-DESIGN",
+                        "text": "Refund-window policy remains unresolved.",
+                        "blocks": [],
+                        "blocks_capabilities": ["refund.window-policy"],
+                        "answer_from": [],
+                    }
+                ],
+            }
+            qst_target = evaluate_target_state(
+                fixture["reviewed_design_profile"],
+                qst_model,
+            )
+            qst_normalized = normalize_result(
+                binding,
+                {
+                    "run_status": "COMPLETED",
+                    "output": {
+                        "core_model": qst_model,
+                        "target_state": qst_target,
+                    },
+                },
+            )
+            assert score_result(binding, qst_normalized)["status"] == "PASS"
 
 assert tl4_execution_prompt_bytes <= tl4_max_suite, (
     tl4_execution_prompt_bytes,
@@ -685,7 +721,7 @@ assert tl4_execution_prompt_bytes <= tl4_max_suite, (
 )
 print(
     f"TL4 existing-project behavioral eval cases: PASS ({len(tl4_entries)} cases); "
-    "provider_calls=6; "
+    f"provider_calls={len(tl4_entries) * 3}; "
     f"execution_prompt_bound={tl4_execution_prompt_bytes}; "
     f"max_per_call={tl4_max_per_call}"
 )

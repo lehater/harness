@@ -1,0 +1,94 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: HA-A13-QUESTION-CLASSIFICATION-PROVIDER-RUN-37073140125
+status: accepted
+provider: github-copilot
+workflow_run_id: 37073140125
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37073140125
+workflow_conclusion: success
+artifact:
+  id: 11255936759
+  name: tl4-existing-project-behavioral-evidence
+  sha256: eb8d292ae665c0ec6a1498c2a2df9f65f70d43a27d6ebd26ef4f01aa52ea3f1e
+  retention_days: 90
+harness_revision: f4ae92cd61db9475dfdb83e92eff5eb621838d6a
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: f634ac50f326c6dad8c24674337ebfec6f7e4412}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: c05eade2b2d37a750e9de357c732178f14087486}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+currentness:
+  state: current
+  reason: >-
+    The accepted case, fixture, oracle, trusted instructions, behavioral runner,
+    provider adapter, router, Core and target-state execution surfaces match the
+    current integration branch; the temporary workflow push trigger is not part
+    of the provider-visible or scoring surface and is intentionally not bound.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 1
+  total_cases: 1
+  provider_calls: 3
+resolved_models:
+  mai-code-1.1-flash: 3
+token_usage:
+  input_tokens: 23154
+  output_tokens: 2226
+  total_tokens: 25380
+provider_prompt_utf8_bytes: 94323
+cases:
+  - case_id: TD-QST-001
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/oracle.yaml
+    case_sha256: 08a7a2b6eb33f77d2b3a866223842f462741d575aaabd5dd73b18f098c9b3815
+    fixture_sha256: ec3d5876a7e093d469cb07378257079a09fa265dbe60a26865441ea337282d36
+    oracle_sha256: e4bbb219c0228e767d872bac2689198499560d636ba293c3887189483b909a7a
+    runs:
+      - run_id: TD-QST-001-R01-b19dff29fed7
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 7722
+        output_tokens: 758
+        provider_prompt_utf8_bytes: 31441
+        record_sha256: 46c65cbb4e4764a838d6d543a04fd3b0865685e7eda3b075899dad428398e279
+        started_from_clean_context: true
+      - run_id: TD-QST-001-R02-fe4dd8f05355
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 7718
+        output_tokens: 594
+        provider_prompt_utf8_bytes: 31441
+        record_sha256: e3840c707f0a7727cdebebcbc351d25e04ad49a700608a686b0c8cafa3d21e6c
+        started_from_clean_context: true
+      - run_id: TD-QST-001-R03-898a0cda6a05
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 7714
+        output_tokens: 874
+        provider_prompt_utf8_bytes: 31441
+        record_sha256: 8b3b044d6cc025b9f0aaca027ca75ac04008ca9767fb54bbe395a32e8eb07bfb
+        started_from_clean_context: true
+limitations:
+  - Three clean-context provider-auto runs establish classification stability only for the frozen synthetic refund-window fixture.
+  - The fixture proves that a transient repository/tool timeout does not become a second semantic Question when the semantic unknown and owning Authority are independently explicit.
+  - This does not generalize to every operational failure vocabulary or independent holdout project.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

@@ -1,0 +1,32 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-QST-001-FIXTURE-V1
+reviewed_design_profile:
+  version: 1
+  kind: harness-design-profile
+  id: REFUND-WINDOW-DESIGN
+  expectations:
+    - id: EXP-REFUND-WINDOW
+      subject: REFUND
+      capability: refund.window-policy
+      authority: REFUND-DESIGN
+existing_project:
+  harness_realization: absent
+  project_owned_graph: absent
+  established_project_facts:
+    - fact: "The maximum refund window has not been accepted yet."
+      authority: REFUND-DESIGN
+      capability: refund.window-policy
+      provider_exists: false
+  execution_observations:
+    - operation: repository-reference-scan
+      outcome: timeout
+      detail: "A scan for refund-related references timed out while reading a generated cache after canonical refund documentation had already been inspected."
+      retryable: true
+  noncanonical_material:
+    - path: src/refund.py
+      role: implementation
+      summary: "Current code uses 30 days as an implementation default; the project does not designate that number as canonical policy."
+    - path: build/cache/refund-index.json
+      role: generated-cache
+      summary: "Generated search cache from the failed scan; not canonical engineering truth."

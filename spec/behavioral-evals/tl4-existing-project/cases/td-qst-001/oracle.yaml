@@ -1,0 +1,24 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+dimensions:
+  bootstrap_realization:
+    core_model:
+      authorities: [REFUND-DESIGN]
+      artifacts: []
+      question_count: 1
+      questions:
+        - authority: REFUND-DESIGN
+          blocks_capabilities: [refund.window-policy]
+          blocks_paths: []
+          answer_from_paths: []
+    target_state:
+      status: BLOCKED
+      satisfied: []
+      create: []
+      wait:
+        - expectation: EXP-REFUND-WINDOW
+          subject: REFUND
+          capability: refund.window-policy
+          authority: REFUND-DESIGN
+          question_count: 1
+      pending: []

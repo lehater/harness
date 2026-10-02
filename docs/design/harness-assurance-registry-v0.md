@@ -54,7 +54,7 @@ HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Cove
 HA-A07 Project Authority migration, HA-A08 Design target selection,
 HA-A09 existing-project
 bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A11 Source acquisition/completeness,
-HA-A12 Semantic derivation/admission, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
+HA-A12 Semantic derivation/admission, HA-A13 Questions/blockers, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
@@ -92,6 +92,12 @@ calls passed their frozen semantic oracles. TD-COMP-003 selected
 instruction-like project data; TD-BOOT-E06 converged on the same normalized Core
 realization and BLOCKED Target State in all three runs.
 
+Provider-backed TL4 run `37073140125` added TD-QST-001 to the same campaign.
+All three clean-context TD-QST-001 calls passed. Provider-auto resolved all three
+to `mai-code-1.1-flash`; each normalized result contained exactly one
+REFUND-DESIGN Question blocking only `refund.window-policy`, while the related
+retryable repository-scan timeout created no semantic Question.
+
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
 A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
 through deterministic structural interpretation, and A01-R03 through explicit
@@ -117,7 +123,11 @@ completeness; A11-R02 source relevance/noise selection and A11-R03 repeated
 trust-boundary execution remain missing because their current provider records
 are stale or their designs are not yet implemented. HA-A12 satisfies A12-R01 through deterministic
 semantic derivation/admission evidence; A12-R02 remains missing because the
-current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A16 satisfies A16-R01..R06; and HA-A18
+current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A13 satisfies A13-R01/A13-R02 through deterministic
+Question routing, blocking, resolution-identity and stale-snapshot evidence, and
+A13-R03 through provider run `37073140125`: TD-QST-001 passed three independent
+clean-context executions, preserving exactly one semantic blocker while a
+related transient repository-scan timeout remained process evidence only. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
