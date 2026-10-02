@@ -193,6 +193,24 @@ abilities:
       - A10-R02
       - A10-R03
 
+  - id: HA-A11
+    title: Source acquisition and completeness
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A11-F01
+      - A11-F02
+      - A11-F03
+      - A11-F04
+      - A11-F05
+      - A11-F06
+    requirements:
+      - A11-R01
+      - A11-R02
+      - A11-R03
+
   - id: HA-A16
     title: Agent/method/artifact routing
     contract_ref:
@@ -665,6 +683,48 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A11-R01
+    ability: HA-A11
+    failure_modes: [A11-F03, A11-F04]
+    purpose: Once a source set is selected, every required source channel/range and every enumerated statement is covered or explicitly dispositioned before completeness can be claimed.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-03, EM-05]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A11-R02
+    ability: HA-A11
+    failure_modes: [A11-F01, A11-F02, A11-F05]
+    purpose: Project-shaped source selection includes relevant canonical sources, excludes irrelevant/untrusted material, and remains stable under unrelated repository noise.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-05, EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A11-R03
+    ability: HA-A11
+    failure_modes: [A11-F05, A11-F06]
+    purpose: Repeated clean-context source selection and routing preserve materially compatible boundaries while instruction-like project content remains evidence rather than instruction authority.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-05, EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A16-R01
     ability: HA-A16
     failure_modes: [A16-F01]
@@ -792,6 +852,30 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A11-SOURCE-COMPLETENESS
+    providers:
+      - tests/test_source_coverage.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_source_coverage.py
+      - path: spec/scenario-suite/scenarios/source-set-evidence-boundary.yaml
+      - path: spec/scenario-suite/scenarios/source-boundary-completeness.yaml
+      - path: spec/scenario-suite/scenarios/source-coverage.yaml
+      - path: src/harness/evidence/source_set.py
+      - path: src/harness/evidence/source_boundary.py
+      - path: src/harness/evidence/source_coverage.py
+    satisfies: [A11-R01]
+    test_level: TL1
+    methods: [EM-02, EM-03, EM-05]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves selected source-set channel completeness, lossless line/range boundary coverage, and complete statement disposition with explicit QUESTION/incomplete handling.
+      - Does not prove that the initially selected source set was the semantically correct project source boundary.
+
   - id: EVID-A07-CONSERVATIVE-MIGRATION
     providers:
       - tests/test_project_status_e2e.py
