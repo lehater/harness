@@ -9,6 +9,6 @@ dependencies = [
 ]
 
 [tool.uv]
-# Runtime modules still live in the repository root during the layout migration.
-# Switch to package mode only when src/harness becomes the executable source tree.
+# Runtime implementations live under src/harness and execute through the explicit
+# source-tree bridge. Installed-package execution is a separate policy decision.
 package = false

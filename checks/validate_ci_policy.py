@@ -182,6 +182,12 @@ def main() -> int:
         for pattern in ("checks/validate_*.py", "tests/test_*.py")
         for path in ROOT.glob(pattern)
     }
+    legacy_validation_paths = {
+        str(path.relative_to(ROOT))
+        for path in ROOT.glob("validators/validate_*.py")
+    }
+    for path in sorted(legacy_validation_paths):
+        errors.append(f"CI-P04 legacy validation path is forbidden: {path}")
     for path in sorted(discovered_paths - registered_paths):
         errors.append(f"CI-P04 validation code is unregistered: {path}")
     for path in sorted(registered_paths - discovered_paths):
