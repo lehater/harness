@@ -16,7 +16,7 @@ Target repositories remain the source of product/domain/architecture truth. Harn
 
 Start with `docs/design/core-v0.md`. For project integration, use `docs/design/integration-contract-v0.md`.
 
-There is no required repository-to-repository runtime binding. A target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts.
+Harness Core does not require repository-to-repository ownership binding: a target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts. Agent-enabled consumers use a pinned, locally materialized Harness Consumer Pack for tooling/procedures; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md` and `docs/design/harness-consumer-pack-v0.md`.
 
 ## Engineering Graph v0
 
@@ -85,7 +85,7 @@ Harness is currently designed to be operated by an engineering agent rather than
 The reusable agent loop is documented in `docs/design/agent-artifact-workbench-v0.md`. It uses:
 
 - `skills/agent/design-profile/SKILL.md` to define/review the target knowledge;
-- `skills/agent/bootstrap-existing-project/SKILL.md` to reuse existing canonical project truth;
+- `skills/agent/project-bootstrap-reconcile/SKILL.md` as the public project startup/reconciliation entry; it internally reuses `bootstrap-existing-project` only when no directly usable project realization exists;
 - artifact-specific skills under `skills/artifacts/**` for actionable `CREATE` expectations; skills may produce typed `.harness/knowledge` or project-native canonical artifacts when that is the natural target format;
 - starter profiles under `profiles/**` as adaptable checklists, not universal completeness proofs.
 
@@ -139,7 +139,7 @@ If the target repository later gains its own canonical graph, prefer projecting 
 
 Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approval, Readiness, Handoff, maturity/scoring, task capsules and a universal semantic DSL are outside Core v0. They require a demonstrated consumer failure and an acceptance test before any Core extension.
 
-`skills/agent/**` and `skills/artifacts/**` are the active v0 agent operating layer above Core. Existing `skills/core/**`, `skills/ddd/**`, `skills/software-product/**` and `docs/methodology/**` are retained pre-Core material unless a future consumer-driven migration explicitly promotes them. Active agent skills do not extend Core entities.
+`skills/agent/**`, `skills/maintainer/**` and active `skills/artifacts/**` are the executable agent surfaces above Core. Historical pre-Core procedures are quarantined as non-executable documentation under `docs/legacy/skills/**`; `docs/methodology/**` is also retained pre-Core material unless a future consumer-driven migration explicitly promotes it. Active skills do not extend Core entities.
 
 
 ## Graph Doctor
@@ -190,3 +190,8 @@ validates project/capability alignment for the selected Consumer before compilin
 
 See `docs/design/human-documentation-projection-v1.md` and
 `skills/agent/human-documentation-projection/SKILL.md`.
+
+
+## Consumer bootstrap
+
+A target repository does not copy Harness skills. For clone-and-run use it keeps only `.harness/harnessw.py` plus `.harness/harness-binding.json`; the wrapper materializes the pinned Consumer Pack into local cache and returns its path. See `docs/design/harness-consumer-wrapper-v0.md`.

@@ -323,21 +323,32 @@ def validate_engineering_graph(graph: dict[str, Any]) -> None:
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(capability: str) -> None:
-        if capability in visited:
-            return
-        if capability in visiting:
-            raise CoreError(
-                f"engineering capability production cycle at: {capability}"
-            )
-        visiting.add(capability)
-        for dependency in dependencies[capability]:
-            visit(dependency)
-        visiting.remove(capability)
-        visited.add(capability)
-
     for capability in dependencies:
-        visit(capability)
+        if capability in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(capability, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(
+                    f"engineering capability production cycle at: {current}"
+                )
+            visiting.add(current)
+            stack.append((current, True))
+            for dependency in reversed(sorted(dependencies[current])):
+                if dependency in visiting:
+                    raise CoreError(
+                        f"engineering capability production cycle at: {dependency}"
+                    )
+                if dependency not in visited:
+                    stack.append((dependency, False))
 
 
 def producer_index(graph: dict[str, Any]) -> dict[str, str]:
@@ -377,7 +388,9 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
     required: dict[str, dict[str, str]] = {}
     prerequisites: dict[str, set[str]] = {}
 
-    def include(requirement: dict[str, str]) -> None:
+    pending = list(reversed(_consumer_requirements(consumers[target_consumer])))
+    while pending:
+        requirement = pending.pop()
         capability = requirement["capability"]
         subject = requirement.get("subject", default_subject)
         current = required.get(capability)
@@ -391,14 +404,13 @@ def derive_profile(graph: dict[str, Any], target_consumer: str) -> dict[str, Any
 
         upstream = productions[capability]["requires"]
         dependencies = prerequisites.setdefault(capability, set())
+        to_visit: list[dict[str, str]] = []
         for upstream_requirement in upstream:
             upstream_capability = upstream_requirement["capability"]
             dependencies.add(upstream_capability)
             if upstream_capability not in required:
-                include(upstream_requirement)
-
-    for requirement in _consumer_requirements(consumers[target_consumer]):
-        include(requirement)
+                to_visit.append(upstream_requirement)
+        pending.extend(reversed(to_visit))
 
     expectation_ids = {
         capability: _expectation_id(item["capability"], item["subject"])

@@ -1,0 +1,22 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-AUTH-007-FIXTURE-V1
+atoms:
+  - id: P1
+    statement: "The order API public contract owns idempotency-key acceptance."
+    source_path: "teams/platform/shared.md"
+  - id: P2
+    statement: "Duplicate-create response semantics are versioned and revalidated with the order API contract."
+    source_path: "teams/compliance/shared.md"
+  - id: A1
+    statement: "Audit-retention duration is owned by the records policy."
+    source_path: "teams/platform/shared.md"
+  - id: A2
+    statement: "The records policy can change or revalidate without changing the order API contract."
+    source_path: "teams/platform/shared.md"
+  - id: D1
+    statement: "Dispatch-lease duration is owned by the dispatcher coordination contract."
+    source_path: "teams/compliance/shared.md"
+  - id: D2
+    statement: "Dispatcher lease duration can change or revalidate independently from both order API and records policy decisions."
+    source_path: "teams/platform/shared.md"

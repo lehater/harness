@@ -1,0 +1,45 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-BOOT-E01-FIXTURE-V1
+reviewed_design_profile:
+  version: 1
+  kind: harness-design-profile
+  id: ORDER-DISPATCH-DESIGN
+  expectations:
+    - id: EXP-ORDER-LIFECYCLE
+      subject: ORDER
+      capability: orders.lifecycle-contract
+      authority: ORDER-DESIGN
+    - id: EXP-DISPATCH-CONTRACT
+      subject: ORDER
+      capability: orders.dispatch-contract
+      authority: ORDER-DESIGN
+      depends_on: [EXP-ORDER-LIFECYCLE]
+    - id: EXP-DISPATCH-FAILURE
+      subject: ORDER
+      capability: orders.dispatch-failure-policy
+      authority: ORDER-DESIGN
+      depends_on: [EXP-DISPATCH-CONTRACT]
+existing_project:
+  harness_realization: absent
+  project_owned_graph:
+    accepted: true
+    path: config/project-graph.yaml
+    nodes:
+      - node_id: ORDER-CONTRACT-NODE
+        canonical_source: docs/order-contract.md
+        authority: ORDER-DESIGN
+        capabilities: [orders.lifecycle-contract]
+        depends_on: []
+      - node_id: DISPATCH-CONTRACT-NODE
+        canonical_source: docs/dispatch-contract.md
+        authority: ORDER-DESIGN
+        capabilities: [orders.dispatch-contract]
+        depends_on: [ORDER-CONTRACT-NODE]
+  partial_harness_metadata:
+    known_authorities: [ORDER-DESIGN]
+  other_material:
+    - path: docs/warehouse-notes.md
+      accepted: true
+      scope: warehouse
+      summary: "Accepted warehouse notes outside the selected order/dispatch scope."

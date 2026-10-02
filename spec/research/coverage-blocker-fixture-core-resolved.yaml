@@ -19,4 +19,7 @@ questions:
     authority: SECURITY-ANALYSIS
     text: What trust-boundary threat decision is required?
     blocks_capabilities: [fixture.security.threat-analysis]
-    resolution: THREAT-DECISION
+    resolution:
+      artifact: THREAT-DECISION
+      acceptance_id: THREAT-DECISION-1
+      supersedes_acceptance_id: ABSENT

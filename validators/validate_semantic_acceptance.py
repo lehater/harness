@@ -5,7 +5,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from semantic_acceptance import evaluate_artifact
+from semantic_acceptance import evaluate_artifact, evaluation_index
+from harness import CoreError
 from coverage_planner import capability_realization
 from engineering_coverage import evaluate_with_repository_policy, load
 
@@ -330,6 +331,32 @@ def test_coverage_gating_and_invalidation():
 
 
 
+
+def test_current_evaluation_snapshot_uniqueness():
+    accepted = {
+        "version": 1,
+        "kind": "harness-artifact-semantic-evaluation",
+        "artifact": "EVIDENCE",
+        "capability": "demo.evidence",
+        "status": "ACCEPTED",
+    }
+    stale = dict(accepted)
+    stale["status"] = "REJECTED"
+    bundle = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [accepted, stale],
+    }
+    try:
+        evaluation_index([bundle])
+    except CoreError as exc:
+        assert "duplicate current semantic evaluation" in str(exc), exc
+    else:
+        raise AssertionError(
+            "current semantic evaluation snapshot must reject duplicate identity"
+        )
+
+
 def test_engineering_coverage_evidence_input():
     graph = load(ROOT / "spec/research/subject-coverage-fixture-graph.yaml")
     realization = load(ROOT / "spec/research/subject-coverage-fixture-core-complete.yaml")
@@ -375,6 +402,7 @@ def main():
     test_real_defect_regressions()
     test_authority_direction_regressions()
     test_coverage_gating_and_invalidation()
+    test_current_evaluation_snapshot_uniqueness()
     test_engineering_coverage_evidence_input()
     print(
         "semantic acceptance: PASS "

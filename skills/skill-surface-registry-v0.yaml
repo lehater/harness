@@ -1,0 +1,398 @@
+version: 1
+kind: harness-skill-surface-registry
+id: SKILL-SURFACES-V0
+status: audit-ratchet
+
+# Physical location is not skill type. Every executable-looking SKILL.md must be
+# represented here so discovery, validation and future distribution can reason
+# from explicit semantics rather than directory names.
+skills:
+  - id: bootstrap-existing-project
+    path: skills/agent/bootstrap-existing-project/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: decision-pipeline
+    path: skills/agent/decision-pipeline/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: design-profile
+    path: skills/agent/design-profile/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: human-documentation-projection
+    path: skills/agent/human-documentation-projection/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: project-bootstrap-reconcile
+    path: skills/agent/project-bootstrap-reconcile/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: project-engineering-status
+    path: skills/agent/project-engineering-status/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: acceptance-scenarios
+    path: skills/artifacts/acceptance-scenarios/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: acceptance-scenarios
+  - id: application-design
+    path: skills/artifacts/application-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: application-design
+  - id: change-transition-design
+    path: skills/artifacts/change-transition-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: unrouted
+    route_note: "Conditional producer; production route is pending an accepted knowledge-kind contract."
+  - id: component-design
+    path: skills/artifacts/component-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: component-design
+  - id: conceptual-interface-model
+    path: skills/artifacts/conceptual-interface-model/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: conceptual-interface-model
+  - id: concurrency-consistency-analysis
+    path: skills/artifacts/concurrency-consistency-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: concurrency-consistency-design
+    path: skills/artifacts/concurrency-consistency-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: concurrency-consistency-design
+  - id: data-design
+    path: skills/artifacts/data-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: data-design
+  - id: data-evidence-analysis
+    path: skills/artifacts/data-evidence-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: data-governance-lifecycle-analysis
+    path: skills/artifacts/data-governance-lifecycle-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: domain-model
+    path: skills/artifacts/domain-model/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: domain-model
+  - id: domain-strategy
+    path: skills/artifacts/domain-strategy/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: domain-strategy
+  - id: domain-use-case
+    path: skills/artifacts/domain-use-case/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: domain-use-case
+  - id: engineering-policy
+    path: skills/artifacts/engineering-policy/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: engineering-policy
+  - id: external-dependency-analysis
+    path: skills/artifacts/external-dependency-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: human-interface-design
+    path: skills/artifacts/human-interface-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: human-interface-design
+  - id: human-interface-quality-analysis
+    path: skills/artifacts/human-interface-quality-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: implementation-design
+    path: skills/artifacts/implementation-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: implementation-design
+  - id: information-architecture-design
+    path: skills/artifacts/information-architecture-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: information-architecture-design
+  - id: interaction-design
+    path: skills/artifacts/interaction-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: interaction-design
+  - id: interface-contract
+    path: skills/artifacts/interface-contract/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: interface-contract
+  - id: interface-topology-design
+    path: skills/artifacts/interface-topology-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: interface-topology-design
+  - id: internationalization-localization-analysis
+    path: skills/artifacts/internationalization-localization-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: model-context-strategy
+    path: skills/artifacts/model-context-strategy/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: model-context-strategy
+  - id: obligation-analysis
+    path: skills/artifacts/obligation-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: operability-design
+    path: skills/artifacts/operability-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: operability-design
+  - id: performance-capacity-analysis
+    path: skills/artifacts/performance-capacity-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: pinned-source-entity-set
+    path: skills/artifacts/pinned-source-entity-set/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: pinned-source-entity-set
+  - id: presentation-system-design
+    path: skills/artifacts/presentation-system-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: presentation-system-design
+  - id: problem-evidence
+    path: skills/artifacts/problem-evidence/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: problem-evidence
+  - id: product-requirements
+    path: skills/artifacts/product-requirements/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: product-requirements
+  - id: quality-design
+    path: skills/artifacts/quality-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: quality-design
+  - id: recovery-continuity-analysis
+    path: skills/artifacts/recovery-continuity-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: reliability-analysis
+    path: skills/artifacts/reliability-analysis/SKILL.md
+    surface: consumer
+    route_class: method
+    lifecycle: active
+    route_status: routed
+  - id: screen-view-design
+    path: skills/artifacts/screen-view-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: screen-view-design
+  - id: security-analysis
+    path: skills/artifacts/security-analysis/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: security-analysis
+  - id: security-architecture
+    path: skills/artifacts/security-architecture/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: security-architecture
+  - id: source-classification-registry
+    path: skills/artifacts/source-classification-registry/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: source-classification-registry
+  - id: source-coverage-audit
+    path: skills/artifacts/source-coverage-audit/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: source-coverage-audit
+  - id: system-architecture
+    path: skills/artifacts/system-architecture/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: system-architecture
+  - id: task-model
+    path: skills/artifacts/task-model/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: task-model
+  - id: test-design
+    path: skills/artifacts/test-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: test-design
+  - id: user-journey-design
+    path: skills/artifacts/user-journey-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: user-journey-design
+  - id: user-needs
+    path: skills/artifacts/user-needs/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: user-needs
+  - id: verification-strategy
+    path: skills/artifacts/verification-strategy/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: verification-strategy
+  - id: audit-harness
+    path: skills/maintainer/audit-harness/SKILL.md
+    surface: maintainer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: capture-harness-observation
+    path: skills/maintainer/capture-harness-observation/SKILL.md
+    surface: maintainer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: change-harness
+    path: skills/maintainer/change-harness/SKILL.md
+    surface: maintainer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
+  - id: agent-harness-design
+    path: docs/legacy/skills/agent-harness-design.md
+    surface: maintainer
+    route_class: method
+    lifecycle: archived
+    route_status: not-applicable
+  - id: record-project-knowledge
+    path: docs/legacy/skills/record-project-knowledge.md
+    surface: consumer
+    route_class: operation
+    lifecycle: archived
+    route_status: not-applicable
+  - id: resolve-decision
+    path: docs/legacy/skills/resolve-decision.md
+    surface: consumer
+    route_class: method
+    lifecycle: archived
+    route_status: not-applicable
+  - id: domain-model-change
+    path: docs/legacy/skills/domain-model-change.md
+    surface: consumer
+    route_class: method
+    lifecycle: archived
+    route_status: not-applicable
+  - id: architecture-review
+    path: docs/legacy/skills/architecture-review.md
+    surface: consumer
+    route_class: method
+    lifecycle: archived
+    route_status: not-applicable

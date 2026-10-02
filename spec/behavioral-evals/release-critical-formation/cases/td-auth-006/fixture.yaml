@@ -1,0 +1,20 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-AUTH-006-FIXTURE-V1
+repository_shape:
+  shared_reference_label: "governance-policy"
+  co_located_source: "docs/governance/security-and-compliance.md"
+  note: "The shared label is organizational vocabulary only; the accepted statements below define change boundaries."
+atoms:
+  - id: S1
+    statement: "Session tokens expire after fifteen minutes of inactivity."
+    source_path: "docs/governance/security-and-compliance.md"
+  - id: S2
+    statement: "Session-token expiry is versioned and revalidated with the authentication public contract."
+    source_path: "docs/governance/security-and-compliance.md"
+  - id: R1
+    statement: "Audit records are retained for seven years."
+    source_path: "docs/governance/security-and-compliance.md"
+  - id: R2
+    statement: "Audit-retention duration has its own public contract and can change or revalidate independently from authentication."
+    source_path: "docs/governance/security-and-compliance.md"

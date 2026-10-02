@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engineering_coverage import evaluate_with_repository_policy, load
+from coverage_planner import capability_realization
 
 
 def scope_eval(root, scope):
@@ -71,7 +72,86 @@ def frontend_presentation_eval(semantic_evaluations=None):
         semantic_evaluations=semantic_evaluations,
     )
 
+def test_capability_question_granularity() -> None:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "COVERAGE-CAPABILITY-BLOCKERS",
+        "authorities": [
+            {
+                "id": "PRODUCT",
+                "responsibility": "Own product knowledge.",
+                "boundary": {
+                    "semantic_cohesion": "Product semantics.",
+                    "independent_change": "Product semantics change independently.",
+                    "public_contract": "Accepted product knowledge.",
+                },
+                "produces": [
+                    {"capability": "demo.intent", "requires": []},
+                    {"capability": "demo.acceptance", "requires": []},
+                ],
+            },
+            {
+                "id": "APPLICATION",
+                "responsibility": "Own application knowledge.",
+                "boundary": {
+                    "semantic_cohesion": "Application semantics.",
+                    "independent_change": "Application semantics change independently.",
+                    "public_contract": "Accepted application knowledge.",
+                },
+                "produces": [
+                    {
+                        "capability": "demo.application",
+                        "requires": ["demo.acceptance"],
+                    }
+                ],
+            },
+        ],
+        "consumers": [
+            {
+                "id": "IMPLEMENTATION",
+                "purpose": "Consume application knowledge.",
+                "requires": ["demo.application"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    realization = {
+        "artifacts": [
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT",
+                "path": "docs/requirements.md",
+                "provides": ["demo.intent", "demo.acceptance"],
+                "depends_on": [],
+            },
+            {
+                "id": "APPLICATION",
+                "authority": "APPLICATION",
+                "path": "docs/application.md",
+                "provides": ["demo.application"],
+                "depends_on": ["REQUIREMENTS"],
+            },
+        ],
+        "questions": [
+            {
+                "id": "Q-ACCEPTANCE",
+                "authority": "PRODUCT",
+                "text": "Acceptance semantics are unresolved.",
+                "blocks_capabilities": ["demo.acceptance"],
+            }
+        ],
+    }
+    result = capability_realization([graph, realization])
+    assert "demo.intent" in result["usable"], result
+    assert "demo.acceptance" not in result["usable"], result
+    assert result["blocked"]["demo.acceptance"] == ["Q-ACCEPTANCE"], result
+    assert "demo.application" not in result["usable"], result
+    assert result["blocked"]["demo.application"] == ["Q-ACCEPTANCE"], result
+
+
 def main() -> int:
+    test_capability_question_granularity()
     mvp = scope_eval("fixture.mvp.implementation-design", "mvp")
     later = scope_eval("fixture.later.implementation-design", "later")
 
@@ -102,6 +182,45 @@ def main() -> int:
     assert mvp["remaining_work_count"] == len(mvp["remaining_work"])
     assert mvp["work_item_count"] == len(mvp["work_items"])
     assert not mvp["completion_ready"]
+
+    # HARN-001: manual activation classes are omission-resistant. Silence must
+    # surface them as active coverage obligations instead of allowing them to
+    # disappear from the coverage state.
+    for concern in (
+        "governance.external-obligations",
+        "governance.privacy",
+        "specialized.safety",
+        "specialized.ai",
+        "specialized.regulated",
+    ):
+        assert concern in mvp_rows, concern
+        assert any(
+            item.get("source") == "MANUAL_ACTIVATION_CLASS"
+            for item in mvp_rows[concern]["activation_provenance"]
+        ), mvp_rows[concern]
+
+    privacy_na = evaluate_with_repository_policy(
+        graph=load(ROOT / "spec/research/scope-activation-fixture-graph.yaml"),
+        realization=load(ROOT / "spec/research/scope-activation-fixture-core.yaml"),
+        consumer="IMPLEMENTATION",
+        scope="mvp",
+        scope_roots=["fixture.mvp.implementation-design"],
+        project_overlay={
+            "decisions": [
+                {
+                    "concern": "governance.privacy",
+                    "state": "NOT_APPLICABLE",
+                    "rationale": "Fixture contains no personal or sensitive data.",
+                    "evidence": ["fixture:no-personal-data"],
+                }
+            ]
+        },
+    )
+    privacy_row = {
+        row["concern"]: row for row in privacy_na["rows"]
+    }["governance.privacy"]
+    assert privacy_row["state"] == "NOT_APPLICABLE"
+    assert privacy_row["action"] == "NONE"
 
     partial = subject_eval("subject-coverage-fixture-core-partial.yaml")
     complete = subject_eval("subject-coverage-fixture-core-complete.yaml")

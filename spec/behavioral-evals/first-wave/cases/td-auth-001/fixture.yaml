@@ -1,0 +1,13 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-AUTH-001-FIXTURE-V1
+atoms:
+  - id: D1
+    statement: "The public payment creation contract defines idempotency-key acceptance."
+    source_path: "api/create.md"
+  - id: D2
+    statement: "The same public contract defines duplicate-retry response semantics."
+    source_path: "reliability/retry.md"
+  - id: D3
+    statement: "These clauses are versioned and revalidated together as one public contract."
+    source_path: "governance/payment-contract.md"

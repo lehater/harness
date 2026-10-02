@@ -1,0 +1,90 @@
+version: 1
+kind: harness-scenario
+id: multi-provider-alternative-remains-available
+title: Blocked historical provider does not block an available sibling
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - multi-provider-structural-availability
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: MULTI-PROVIDER-AVAILABILITY
+      authorities:
+        - id: SOURCE
+          responsibility: Own source knowledge.
+          boundary:
+            semantic_cohesion: Source semantics.
+            independent_change: Source changes independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.source
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: APPLICATION
+          responsibility: Own application design.
+          boundary:
+            semantic_cohesion: Application semantics.
+            independent_change: Application changes independently.
+            public_contract: Accepted application design.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: [demo.source]
+      consumers:
+        - id: SOURCE-CONSUMER
+          purpose: Consume source knowledge directly.
+          requires: [demo.source]
+        - id: IMPLEMENTATION
+          purpose: Consume application design.
+          requires: [demo.application]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: SOURCE-CURRENT
+          authority: SOURCE
+          path: docs/source-current.md
+          provides: [demo.source]
+          depends_on: []
+        - id: SOURCE-OLD
+          authority: SOURCE
+          path: docs/source-old.md
+          provides: [demo.source]
+          depends_on: []
+      questions:
+        - id: Q-OLD
+          authority: SOURCE
+          text: Historical provider remains unresolved.
+          blocks: [SOURCE-OLD]
+
+steps:
+  - id: structural-target
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: SOURCE-CONSUMER
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /wait, op: length, value: 0}
+
+  - id: authority-inputs
+    driver: authority.context
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      authority_id: APPLICATION
+      capability_ids: [demo.application]
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /requirements/0/status, op: equals, value: SATISFIED}
+      - {path: /requirements/0/providers, op: equals, value: [SOURCE-CURRENT]}
+      - {path: /input_artifacts, op: contains_match, value: {id: SOURCE-CURRENT}}
+      - {path: /access/read, op: set_equals, value: [docs/source-current.md]}

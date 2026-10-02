@@ -7,6 +7,7 @@ on:
       - ".github/workflows/greenfield-engineering-graph.yml"
       - "engineering_graph.py"
   push:
+    branches: [main]
     paths:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"
@@ -17,6 +18,7 @@ permissions:
 
 jobs:
   evaluate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

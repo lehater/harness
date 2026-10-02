@@ -1,6 +1,11 @@
 .PHONY: harness-check
 
 harness-check:
+	python validators/validate_ci_policy.py
+	python validators/validate_assurance_registry.py
+	python validators/validate_behavioral_eval.py
+	python validators/validate_behavioral_eval_cases.py
+	python validators/validate_context_boundaries.py
 	python validators/validate_core.py
 	python validators/validate_adapters.py
 	python validators/validate_target_state.py
@@ -18,6 +23,10 @@ harness-check:
 	python validators/validate_agent_router.py
 	python validators/validate_workspace.py
 	python validators/validate_agent_layer.py
+	python validators/validate_instruction_ownership.py
+	python validators/validate_skill_router.py
+	python validators/validate_fresh_context_routing.py
+	python validators/validate_method_router.py
 	python validators/validate_source_coverage.py
 	python validators/validate_user_facing_application.py
 	python validators/validate_frontend_screen_contracts.py
@@ -48,11 +57,18 @@ harness-check:
 	python validators/validate_semantic_acceptance.py
 	python validators/validate_skill_invariant_policy.py
 	python validators/validate_capability_lifecycle.py
+	python validators/validate_deep_dependency_graphs.py
 	python validators/validate_decision_governance.py
 	python validators/validate_decision_pipeline.py
+	python validators/validate_project_frontier.py
+	python validators/validate_project_publication.py
 	python validators/validate_semantic_admission.py
 	python validators/validate_semantic_question_loop.py
 	python validators/validate_semantic_closure.py
+	python validators/validate_harness.py
+	python -m unittest tests/test_lifecycle_experiment.py
+	python validators/validate_consumer_pack.py
+	python validators/validate_consumer_wrapper.py
 	python validators/validate_scenario_suite.py
 	python validators/validate_live_calibration_process_driver.py
 	python validators/validate_copilot_live_calibration_evaluator.py

@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 from harness import (  # noqa: E402
     CoreError,
     affected,
+    artifact_blockers,
     blocked,
     capability_owner,
     next_action,
@@ -27,8 +28,90 @@ from harness import (  # noqa: E402
 )
 
 
+def test_multiple_provider_alternative() -> None:
+    model = {
+        "authorities": [{"id": "SOURCE"}],
+        "artifacts": [
+            {
+                "id": "SOURCE-CURRENT",
+                "authority": "SOURCE",
+                "path": "docs/source-current.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+            {
+                "id": "SOURCE-OLD",
+                "authority": "SOURCE",
+                "path": "docs/source-old.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+        ],
+        "questions": [
+            {
+                "id": "Q-OLD",
+                "authority": "SOURCE",
+                "text": "Historical provider remains unresolved.",
+                "blocks": ["SOURCE-OLD"],
+            }
+        ],
+    }
+    action = next_action(model, "application.source")
+    assert action["action"] == "DESIGN", action
+    assert action["providers"] == ["SOURCE-CURRENT", "SOURCE-OLD"], action
+
+
+def test_capability_question_granularity() -> None:
+    model = {
+        "authorities": [{"id": "PRODUCT"}],
+        "artifacts": [
+            {
+                "id": "REQUIREMENTS",
+                "authority": "PRODUCT",
+                "path": "docs/requirements.md",
+                "provides": ["product.intent", "product.acceptance"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [
+            {
+                "id": "Q-ACCEPTANCE",
+                "authority": "PRODUCT",
+                "text": "Which acceptance behavior is required?",
+                "blocks_capabilities": ["product.acceptance"],
+            }
+        ],
+    }
+
+    acceptance = next_action(model, "product.acceptance")
+    intent = next_action(model, "product.intent")
+    assert acceptance["action"] == "WAIT", acceptance
+    assert acceptance["questions"] == ["Q-ACCEPTANCE"], acceptance
+    assert intent["action"] == "DESIGN", intent
+    assert artifact_blockers(model, "REQUIREMENTS") == []
+    assert blocked(model, "REQUIREMENTS") == ["Q-ACCEPTANCE"]
+
+    whole_artifact = copy.deepcopy(model)
+    whole_artifact["questions"].append(
+        {
+            "id": "Q-ARTIFACT",
+            "authority": "PRODUCT",
+            "text": "The requirements artifact as a whole is unusable.",
+            "blocks": ["REQUIREMENTS"],
+        }
+    )
+    intent = next_action(whole_artifact, "product.intent")
+    assert intent["action"] == "WAIT", intent
+    assert intent["questions"] == ["Q-ARTIFACT"], intent
+
+
 def main() -> int:
     errors: list[str] = []
+    try:
+        test_multiple_provider_alternative()
+        test_capability_question_granularity()
+    except Exception as exc:
+        errors.append(f"Core focused regression: {exc}")
     required = [ROOT / "harness.py", ROOT / "docs/design/core-v0.md"]
     for path in required:
         if not path.is_file():
@@ -116,7 +199,28 @@ def main() -> int:
                 raise CoreError("blocked mismatch")
 
             resolution = expect["resolution"]
-            resolved = resolve_question(copy.deepcopy(model), resolution["question"], resolution["artifact"])
+            try:
+                resolve_question(
+                    copy.deepcopy(model),
+                    resolution["question"],
+                    resolution["artifact"],
+                    resolution["acceptance_id"],
+                    resolution["acceptance_id"],
+                )
+            except CoreError:
+                pass
+            else:
+                raise CoreError(
+                    "resolve-question accepted an unchanged semantic acceptance identity"
+                )
+
+            resolved = resolve_question(
+                copy.deepcopy(model),
+                resolution["question"],
+                resolution["artifact"],
+                resolution["acceptance_id"],
+                resolution["supersedes_acceptance_id"],
+            )
             after_action = resolution.get("next_action")
             if after_action:
                 actual_after = next_action(resolved, after_action["capability"])
@@ -138,6 +242,8 @@ def main() -> int:
                     copy.deepcopy(model),
                     external_resolution["question"],
                     external_resolution["artifact"],
+                    external_resolution["acceptance_id"],
+                    external_resolution["supersedes_acceptance_id"],
                 )
                 if unresolved_questions(externally_resolved) != sorted(
                     external_resolution["unresolved_after"]

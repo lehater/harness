@@ -45,7 +45,10 @@ fixtures:
           authority: APPLICATION-DESIGN
           text: Resolve semantic completeness gap.
           blocks_capabilities: [demo.task-model]
-          resolution: TASK-MODEL
+          resolution:
+            artifact: TASK-MODEL
+            acceptance_id: TASK-MODEL-2
+            supersedes_acceptance_id: TASK-MODEL-1
   proposal:
     value:
       - id: Q-SEMANTIC-DEMO-TASK-MODEL-RECOVERY-PER-TASK

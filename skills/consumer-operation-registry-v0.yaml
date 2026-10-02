@@ -1,0 +1,38 @@
+version: 1
+kind: harness-consumer-operation-registry
+id: CONSUMER-OPERATIONS-V0
+status: audit-ratchet
+
+# Public routes are the operation entry points exposed to a Harness consumer.
+# Internal routes are composable procedures and must not compete for entry.
+routes:
+  - operation: project-bootstrap-reconcile
+    skill: skills/agent/project-bootstrap-reconcile/SKILL.md
+    exposure: public
+    trigger: project-start-or-reconcile
+
+  - operation: project-engineering-status
+    skill: skills/agent/project-engineering-status/SKILL.md
+    exposure: public
+    trigger: project-engineering-status-requested
+
+  - operation: design-profile
+    skill: skills/agent/design-profile/SKILL.md
+    exposure: public
+    trigger: design-profile-needed
+
+  - operation: decision-pipeline
+    skill: skills/agent/decision-pipeline/SKILL.md
+    exposure: public
+    trigger: decision-roadmap-ready
+
+  - operation: human-documentation-projection
+    skill: skills/agent/human-documentation-projection/SKILL.md
+    exposure: public
+    trigger: human-projection-plan-ready
+
+  - operation: bootstrap-existing-project
+    skill: skills/agent/bootstrap-existing-project/SKILL.md
+    exposure: internal
+    invoked_by:
+      - project-bootstrap-reconcile

@@ -1,0 +1,90 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: TL5-KNOWN-PROJECT-PROVIDER-RUN-36952038645
+status: accepted
+provider: github-copilot
+workflow_run_id: 36952038645
+workflow_run_url: https://github.com/lehater/harness/actions/runs/36952038645
+artifact:
+  id: 11204413345
+  name: first-wave-behavioral-evidence
+  sha256: bd45b1c5657d792d1975431f4c687e4e69ebbcde12242fe1b0f2cfaaa28f58e8
+  retention_days: 90
+harness_revision: 67d16728e29a637c88ca2e38ba1dbfbaa2c98f3a
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 967053ff18096cce7c99c21de54cb5abe2918755}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: 00fa1e91ed0d4a64186c6f4e4e467c142f59dfe8}
+    - {path: docs/design/core-v0.md, git_blob_sha: 03cde75282fb20f28705e4d24422efbc14238c85}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: c05eade2b2d37a750e9de357c732178f14087486}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: behavioral_eval.py, git_blob_sha: 73ccb8780f9ce0000a1a673a8438934a4b848f67}
+    - {path: adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 80324eaa6a4c2bfa07235ae58e6e5ce7119d479f}
+    - {path: skill_router.py, git_blob_sha: 9e1fa1bdf93e9273e4579268df38d5597dee953c}
+    - {path: harness.py, git_blob_sha: a84c561c322c54a7876ce35d63eaa386423da3d5}
+    - {path: target_state.py, git_blob_sha: 794cb0c1968578e9ad822aa43102a1cc79425d24}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 8edb4d7592db32b1371c4ac90947789115ba08ca}
+currentness:
+  state: current
+  reason: >-
+    All provider-visible instruction and behavior-relevant execution bindings
+    match the accepted run revision. The temporary first-wave manifest was only
+    a workflow-dispatch transport; the selected TL5 case is independently bound
+    by exact rendered-case, fixture, oracle, sequence, and run-record hashes.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 1
+  total_cases: 1
+  provider_calls: 2
+resolved_models:
+  gpt-6-luna: 2
+token_usage:
+  input_tokens: 19485
+  output_tokens: 820
+  total_tokens: 20305
+provider_prompt_utf8_bytes: 66771
+cases:
+  - case_id: TD-BOOT-E07
+    template: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+    oracle: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+    case_sha256: d60e018fdfa49f6b3971890030e7036462d086e6b123d837c1b5851192c379bc
+    fixture_sha256: c55e0ceae5913faeafaed45300454670ba3b5e39a33e6bff2b1934d2393d1d03
+    oracle_sha256: bf2f8137f29339ddc3c326d058c688a7bbf5a19566a8ffee3dd1233a440124aa
+    runs:
+      - run_id: TD-BOOT-E07-R01-789d7b15d01b
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9953
+        output_tokens: 415
+        provider_prompt_utf8_bytes: 34606
+        record_sha256: c0dafdc6c864ca784a8de57e863bc74040b3f2b0c27c2c373ba6d667cf8f2ff2
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 1, phase: bootstrap}
+      - run_id: TD-BOOT-E07-R02-f462fa121cb5
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9532
+        output_tokens: 405
+        provider_prompt_utf8_bytes: 32165
+        record_sha256: 87c4e8b1e1390c4ee099b9b14c694d59518cbedca82af1db55917676bab9469a
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 2, phase: reconcile-existing}
+        derived_input_binding:
+          prior_run_record_sha256: c0dafdc6c864ca784a8de57e863bc74040b3f2b0c27c2c373ba6d667cf8f2ff2
+          core_model_sha256: 61e0baec227a32ed76054a964f54adda5b6d6d966d61da82f0c307d73a238630
+limitations:
+  - This is one bounded regression slice from one known project that participated in Harness design; it is not an independent TL6 holdout.
+  - The accepted O2 baseline covers reuse and unchanged reconcile of the selected NAPMS first-MVP HCD artifacts only.
+  - Provider-auto resolved both calls to gpt-6-luna; this does not establish cross-model convergence.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

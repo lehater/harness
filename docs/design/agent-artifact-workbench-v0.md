@@ -29,7 +29,9 @@ typed schema or project validator
         ↓
 semantic acceptance by the agent
         ↓
-register CanonicalArtifact + provides + dependencies
+prepare coherent Core + semantic + lifecycle result
+        ↓
+atomically publish one Project Publication revision
         ↓
 render human documentation
         ↓
@@ -63,29 +65,19 @@ Use:
 ```text
 target Consumer
         ↓
-Engineering Graph recursive closure
+Engineering Graph / Core / lifecycle / semantic / coverage read models
         ↓
-derived Design Profile
+Project Frontier
         ↓
-target state
+READY action / FAILED_VALIDATION / BLOCKED / INCOMPLETE / WAITING / COMPLETE
         ↓
-CREATE / WAIT / PENDING / COMPLETE
-        ↓
-agent_router for actionable CREATE
-        ↓
-grouped artifact work by Authority + subject + knowledge_kind
-        ↓
-registered artifact skill when available
-        ↓
-Explorer Request → pre-choice exploration when required
+Capability action → Decision Pipeline + artifact skill
+Coverage action   → owning coverage/reconciliation procedure
+Question blocker  → owning Authority
         ↓
 candidate → governance → validation → semantic acceptance → Core provider
         ↓
-reevaluate target Consumer
-        ↓
-when structurally COMPLETE, evaluate Engineering Coverage + applicable project validators
-        ↓
-claim implementation-documentation closure only when the derived conjunction passes
+recompute source read models + Project Frontier
 ```
 
 If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent still has a valid CREATE frontier. It performs the work manually under the production contract or develops a reusable skill only when repeated consumer evidence justifies one.
@@ -96,7 +88,7 @@ If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent st
 
 The handoff must fail closed when any applicable concern/subject remains non-terminal, a registered semantic claim lacks its deterministic validator evidence, an accepted requirement lacks verification disposition, a required TEST disposition lacks executable Test Design, a conditional architecture/repository precondition fails, or a blocking Question remains.
 
-Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results.
+Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results through `project_frontier.py`. Agents consume that projection rather than manually assigning precedence between Target State, Decision Roadmap, Semantic Closure and Engineering Coverage.
 ## Responsibilities
 
 ### Core and target state
@@ -190,7 +182,11 @@ Before registering `provides`, the agent must establish all of the following:
 9. **Structural validity** — the candidate passes its Harness schema validator or project-native deterministic validator.
 10. **Scope discipline** — the artifact does not broaden the selected Design Profile scope merely to look complete.
 
-Registration in the Core graph is the acceptance boundary. No separate workflow-state entity is introduced.
+Registration in the Core graph remains the semantic ownership boundary. When
+one agent action also changes semantic evaluation, lifecycle, Questions or
+failure evidence, those coordinated facts become visible through the atomic
+Project Publication boundary defined by `project-publication-v0.md`. No
+separate workflow-state entity is introduced.
 
 ## Semantic completeness and automatic Questions
 
@@ -236,8 +232,8 @@ When a skill cannot produce the requested knowledge without choosing an unresolv
 
 - identify the Authority that may decide it;
 - create a Core `Question` addressed to that Authority;
-- when an affected provider already exists, block that artifact with `blocks`;
-- when the required provider does not yet exist, block the missing `CapabilityId` with `blocks_capabilities`;
+- when the unresolved semantics concern one CapabilityId, use `blocks_capabilities` whether or not a provider artifact already exists;
+- use artifact `blocks` only when the whole CanonicalArtifact is unusable and every capability materialized by that artifact should inherit the block;
 - do not fabricate an answer inside the candidate.
 
 The final semantic answer belongs in an Authority-owned canonical artifact, not in the Question itself. Resolving a capability-blocking Question does not itself provide the capability: after resolution, target state normally returns `CREATE` so the artifact skill can form the requested knowledge from the accepted decision.
@@ -380,8 +376,10 @@ currentness. In REDO/REVISION, the current accepted provider is an allowed
 baseline input to option formation; only the future candidate/preselected
 solution remains forbidden.
 
-After one Capability reaches CURRENT, BLOCKED or FAILED_VALIDATION, recompute
-the frontier. See `docs/design/decision-pipeline-v0.md` and
+After one Capability reaches CURRENT, BLOCKED or FAILED_VALIDATION, atomically
+publish the complete terminal result and only then recompute the frontier. See
+`docs/design/decision-pipeline-v0.md`,
+`docs/design/project-publication-v0.md` and
 `skills/agent/decision-pipeline/SKILL.md`.
 
 ## Mandatory strict admission for routed artifact skills

@@ -7,7 +7,10 @@ whole. It tests how Harness reacts to project states and transitions rather than
 testing individual Python functions in isolation.
 
 It is deliberately a test-orchestration protocol, not a universal engineering
-semantic model and not new Harness Core state.
+semantic model and not new Harness Core state. Its role in the broader evidence
+hierarchy is governed by `docs/design/harness-assurance-policy-v0.md`; Scenario
+Suite coverage is an evidence provider, not the independent denominator of
+Harness correctness.
 
 ## Model
 

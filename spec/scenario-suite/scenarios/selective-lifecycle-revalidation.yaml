@@ -1,7 +1,7 @@
 version: 1
 kind: harness-scenario
 id: selective-lifecycle-revalidation
-title: Downstream revalidation reacts only to consumed upstream semantic atoms
+title: Downstream revalidation tracks consumed atoms and the exhaustive upstream surface
 dimensions:
   project_archetype: synthetic
   stage: revalidation
@@ -93,7 +93,7 @@ fixtures:
           accepted_prerequisites: {}
           semantic_atom_fingerprints:
             ATOM-A: HASH-A-1
-            NOISE-G: HASH-G-2
+            NOISE-G: HASH-G-1
         - artifact: DOWNSTREAM
           capability: demo.downstream
           acceptance_id: DOWNSTREAM-1
@@ -104,6 +104,9 @@ fixtures:
               exhaustive: true
               semantic_atoms:
                 ATOM-A: HASH-A-1
+              source_surface_fingerprints:
+                ATOM-A: HASH-A-1
+                NOISE-G: HASH-G-1
 
 steps:
   - id: reject-incomplete-lifecycle-surface
@@ -144,11 +147,11 @@ steps:
       - {path: /lifecycle_dependency/semantic_atoms, op: contains, value: ATOM-A}
       - {path: /lifecycle_dependency/semantic_atoms, op: length, value: 1}
 
-  - id: irrelevant-upstream-change
+  - id: unchanged-exhaustive-surface
     driver: lifecycle.states
     benchmark:
       metrics: [selective_revalidation, false_positive_control]
-      mutation_class: irrelevant-upstream-change
+      mutation_class: unchanged-exhaustive-surface
     with:
       graph: {ref: fixture.graph}
       model: {ref: fixture.model}
@@ -156,6 +159,27 @@ steps:
     expect:
       - {path: /demo.upstream/state, op: equals, value: CURRENT}
       - {path: /demo.downstream/state, op: equals, value: CURRENT}
+
+  - id: change-dispositioned-atom
+    driver: data.patch
+    with:
+      value: {ref: fixture.lifecycle}
+      operations:
+        - {op: replace, path: /providers/0/semantic_atom_fingerprints/NOISE-G, value: HASH-G-2}
+
+  - id: dispositioned-atom-change-revalidates
+    driver: lifecycle.states
+    benchmark:
+      metrics: [selective_revalidation, mutation_detection]
+      mutation_class: dispositioned-atom-change
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: step.change-dispositioned-atom}
+    expect:
+      - {path: /demo.downstream/state, op: equals, value: STALE}
+      - {path: /demo.downstream/mismatches/0/mode, op: equals, value: SEMANTIC_SURFACE}
+      - {path: /demo.downstream/mismatches/0/changed_atoms/0/id, op: equals, value: NOISE-G}
 
   - id: change-consumed-atom
     driver: data.patch
@@ -186,14 +210,15 @@ steps:
       operations:
         - {op: add, path: /providers/0/semantic_atom_fingerprints/NEW-X, value: HASH-X-1}
 
-  - id: new-irrelevant-atom-stable
+  - id: new-upstream-atom-revalidates
     driver: lifecycle.states
     benchmark:
-      metrics: [selective_revalidation, false_positive_control]
-      mutation_class: irrelevant-upstream-addition
+      metrics: [selective_revalidation, mutation_detection]
+      mutation_class: exhaustive-surface-addition
     with:
       graph: {ref: fixture.graph}
       model: {ref: fixture.model}
       projection: {ref: step.add-new-irrelevant-atom}
     expect:
-      - {path: /demo.downstream/state, op: equals, value: CURRENT}
+      - {path: /demo.downstream/state, op: equals, value: STALE}
+      - {path: /demo.downstream/mismatches/0/mode, op: equals, value: SEMANTIC_SURFACE}

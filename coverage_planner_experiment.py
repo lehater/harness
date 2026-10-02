@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 import yaml
 
+from semantic_acceptance import semantic_invalidation_closure
+
 
 def load(path: str) -> dict[str, Any]:
     value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
@@ -74,13 +76,10 @@ def _artifact_blocker_index(doc: dict[str, Any]) -> tuple[dict[str, set[str]], d
         if isinstance(item, dict) and item.get("id")
     }
     reverse: dict[str, set[str]] = {artifact_id: set() for artifact_id in artifacts}
-    providers: dict[str, set[str]] = {}
     for artifact_id, artifact in artifacts.items():
         for dependency in artifact.get("depends_on", []) or []:
             if dependency in reverse:
                 reverse[dependency].add(artifact_id)
-        for capability in artifact.get("provides", []) or []:
-            providers.setdefault(capability, set()).add(artifact_id)
 
     artifact_blockers: dict[str, set[str]] = {
         artifact_id: set() for artifact_id in artifacts
@@ -108,7 +107,6 @@ def _artifact_blocker_index(doc: dict[str, Any]) -> tuple[dict[str, set[str]], d
         seeds = set(question.get("blocks", []) or [])
         for capability in question.get("blocks_capabilities", []) or []:
             capability_blockers.setdefault(capability, set()).add(question_id)
-            seeds.update(providers.get(capability, set()))
 
         for seed in seeds:
             for artifact_id in affected(seed):
@@ -172,9 +170,30 @@ def capability_realization(
                     providers_by_capability.setdefault(capability, []).append(artifact_id)
 
     provided = set(providers_by_capability)
+    capability_question_blockers: dict[str, set[str]] = {
+        capability: set(questions)
+        for capability, questions in direct_capability_blockers.items()
+    }
+    for doc in project_docs:
+        if doc.get("kind") != "harness-engineering-graph":
+            continue
+        closure = semantic_invalidation_closure(
+            doc,
+            set(direct_capability_blockers),
+        )
+        for capability, causes in closure.items():
+            for cause in causes:
+                capability_question_blockers.setdefault(capability, set()).update(
+                    direct_capability_blockers.get(cause, set())
+                )
+
     usable: set[str] = set()
     blocked_capabilities: dict[str, list[str]] = {}
     for capability, providers in providers_by_capability.items():
+        question_blockers = capability_question_blockers.get(capability, set())
+        if question_blockers:
+            blocked_capabilities[capability] = sorted(question_blockers)
+            continue
         provider_blockers = {
             provider: sorted(blockers_by_artifact.get(provider, set()))
             for provider in providers
@@ -188,7 +207,6 @@ def capability_realization(
                     for values in provider_blockers.values()
                     for question in values
                 }
-                | direct_capability_blockers.get(capability, set())
             )
             if questions:
                 blocked_capabilities[capability] = questions

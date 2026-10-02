@@ -23,14 +23,20 @@ from decision_exploration import evaluate_decision_exploration
 from derivation_test_coverage import evaluate_derivation_test_coverage
 from decision_governance import evaluate_decision_governance
 from decision_pipeline import derive_decision_roadmap
-from engineering_coverage import evaluate_with_repository_policy
+from coverage_application import evaluate_project_coverage
 from engineering_graph import evaluate_engineering_target
 from frontend_interface_knowledge import evaluate_frontend_ux_closure
 from frontend_screen_contracts import evaluate_frontend_screen_contracts
 from graph_doctor import diagnose_project
 from human_projection import compile_manifest
 from integration_alignment import validate_project_alignment
-from harness import validate_model
+from harness import resolve_question, validate_model
+from project_frontier import compose_project_frontier
+from project_publication import (
+    build_project_publication,
+    prepare_capability_transition,
+    validate_project_publication,
+)
 from project_status import bootstrap_registry, status as project_status
 from repository_realization import evaluate as evaluate_repository_realization
 from decision_execution_assurance import evaluate_execution_assurance
@@ -38,7 +44,9 @@ from source_boundary import evaluate_source_boundary
 from source_set import evaluate_source_set
 from source_coverage import validate_source_coverage
 from skill_invariant_policy import evaluate_skill_invariant_policy
+from skill_router import route_operation
 from semantic_acceptance import evaluate_artifact
+from semantic_admission import admit_artifact
 from semantic_closure import evaluate_semantic_closure
 from semantic_derivation import evaluate_derivation
 from workspace import load_workspace, render_workspace
@@ -143,6 +151,24 @@ def core_validate(*, model: dict[str, Any]) -> dict[str, Any]:
     return {"status": "VALID"}
 
 
+@scenario_driver("core.resolve_question")
+def core_resolve_question(
+    *,
+    model: dict[str, Any],
+    question_id: str,
+    artifact_id: str,
+    acceptance_id: str,
+    supersedes_acceptance_id: str,
+) -> dict[str, Any]:
+    return resolve_question(
+        model,
+        question_id,
+        artifact_id,
+        acceptance_id,
+        supersedes_acceptance_id,
+    )
+
+
 @scenario_driver("engineering.target")
 def engineering_target(
     *,
@@ -161,6 +187,11 @@ def semantic_acceptance(
     candidate: dict[str, Any],
 ) -> dict[str, Any]:
     return evaluate_artifact(contract, sources, candidate)
+
+
+@scenario_driver("semantic.admission")
+def semantic_admission(**kwargs: Any) -> dict[str, Any]:
+    return admit_artifact(**kwargs)
 
 
 @scenario_driver("semantic.derivation")
@@ -264,7 +295,7 @@ def decision_roadmap(**kwargs: Any) -> dict[str, Any]:
 
 @scenario_driver("engineering.coverage")
 def engineering_coverage(**kwargs: Any) -> dict[str, Any]:
-    return evaluate_with_repository_policy(**kwargs)
+    return evaluate_project_coverage(**kwargs)
 
 
 @scenario_driver("graph.doctor")
@@ -286,6 +317,31 @@ def project_authority_bootstrap(
         core=core,
         authority_migrations=authority_migrations,
     )
+
+
+@scenario_driver("project.frontier")
+def project_frontier_driver(**kwargs: Any) -> dict[str, Any]:
+    return compose_project_frontier(**kwargs)
+
+
+@scenario_driver("publication.build")
+def publication_build_driver(**kwargs: Any) -> dict[str, Any]:
+    return build_project_publication(**kwargs)
+
+
+@scenario_driver("publication.transition")
+def publication_transition_driver(**kwargs: Any) -> dict[str, Any]:
+    return prepare_capability_transition(**kwargs)
+
+
+@scenario_driver("publication.validate")
+def publication_validate_driver(
+    *,
+    graph: dict[str, Any],
+    publication: dict[str, Any],
+) -> dict[str, Any]:
+    validate_project_publication(graph, publication)
+    return {"status": "VALID", "revision": publication["revision"]}
 
 
 @scenario_driver("project.status")
@@ -456,6 +512,21 @@ def frontend_screen_contracts_driver(
         screen_design,
         interface_contract,
         screen_ids=set(screen_ids) if screen_ids is not None else None,
+    )
+
+
+@scenario_driver("skill.operation")
+def skill_operation_driver(
+    *,
+    surface: str,
+    operation: str,
+    invoked_by: str | None = None,
+) -> dict[str, Any]:
+    return route_operation(
+        surface=surface,
+        operation=operation,
+        invoked_by=invoked_by,
+        root=Path(__file__).resolve().parent,
     )
 
 

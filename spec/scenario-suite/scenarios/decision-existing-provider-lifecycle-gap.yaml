@@ -1,0 +1,90 @@
+version: 1
+kind: harness-scenario
+id: decision-existing-provider-is-lifecycle-gap
+title: Existing Core provider without lifecycle evidence is not CREATE work
+dimensions:
+  project_archetype: backend-service
+  stage: bootstrap
+  behavior_class: decision
+  execution_type: deterministic
+covers:
+  - decision-existing-provider-lifecycle-gap
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: EXISTING-PROVIDER
+      authorities:
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own architecture.
+          boundary:
+            semantic_cohesion: Architecture decisions.
+            independent_change: Architecture changes independently.
+            public_contract: Accepted architecture.
+          produces:
+            - capability: demo.architecture
+              knowledge_kind: system-architecture
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Build accepted architecture.
+          requires: [demo.architecture]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: EXISTING-ARCH
+          authority: SYSTEM-ARCHITECTURE
+          path: docs/architecture.md
+          provides: [demo.architecture]
+          depends_on: []
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers: []
+  contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-decision-contracts
+      policy_defaults: {exploration: EXPLORE, autonomy: CONSERVATIVE}
+      contracts:
+        - knowledge_kind: system-architecture
+          required: true
+          axes:
+            - id: runtime-shape
+              material_dimensions: [failure-isolation]
+              challenge_strategies: [alternative-shape, failure-probe]
+              minimum_probes: 2
+              delegation_requires: BROAD
+  policy:
+    value:
+      version: 1
+      kind: harness-decision-policy
+      defaults:
+        exploration: EXPLORE
+        autonomy: CONSERVATIVE
+        execution_assurance: REQUEST_BOUND
+
+steps:
+  - id: roadmap
+    driver: decision.roadmap
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      lifecycle: {ref: fixture.lifecycle}
+      decision_contracts: {ref: fixture.contracts}
+      decision_policy: {ref: fixture.policy}
+    expect:
+      - {path: /ready, op: length, value: 0}
+      - path: /lifecycle_gaps
+        op: contains_match
+        value:
+          capability: demo.architecture
+          state: UNKNOWN
+          reason: LIFECYCLE_ASSERTION_MISSING
+          providers: [EXISTING-ARCH]

@@ -1,0 +1,28 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-ROUTE-003
+abilities: [HA-A16, HA-A08]
+failure_modes: [A16-F01]
+test_level: TL1
+fixture_revision: TD-ROUTE-003-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Define and review what engineering knowledge this selected implementation scope must contain before it is design-complete."
+selected_scope: "selected-scope-target-definition"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/agent-instruction-architecture-v0.md
+  - skills/consumer-operation-registry-v0.yaml
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [selected_operation]
+pass_criteria:
+  require_dimensions: [selected_operation]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

@@ -1,0 +1,70 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A04-R02-PROVIDER-RUN-36953433978
+status: accepted
+provider: github-copilot
+workflow_run_id: 36953433978
+workflow_run_url: https://github.com/lehater/harness/actions/runs/36953433978
+workflow_conclusion: success
+artifact:
+  id: 11203949875
+  name: first-wave-behavioral-evidence
+  sha256: 84f69bd7b4acfff893ae52d08e6239f25e0e7b2b6b4c6a832dbbc6a1f71f88c4
+  retention_days: 90
+harness_revision: 55f21a04656c1f0d2c3deb839251f6c517c31405
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 967053ff18096cce7c99c21de54cb5abe2918755}
+    - {path: docs/design/core-v0.md, git_blob_sha: 03cde75282fb20f28705e4d24422efbc14238c85}
+    - {path: behavioral_eval.py, git_blob_sha: 73ccb8780f9ce0000a1a673a8438934a4b848f67}
+    - {path: adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 80324eaa6a4c2bfa07235ae58e6e5ce7119d479f}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 8edb4d7592db32b1371c4ac90947789115ba08ca}
+currentness:
+  state: current
+  reason: >-
+    Provider-visible instruction/runtime bindings and the corrected
+    TD-AUTH-003 Fixture V2 plus TD-AUTH-006 case bindings remain current.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 2
+  total_cases: 2
+  provider_calls: 2
+resolved_models:
+  mai-code-1.1-flash: 1
+  gpt-6-luna: 1
+token_usage:
+  input_tokens: 11054
+  output_tokens: 574
+  total_tokens: 11628
+provider_prompt_utf8_bytes: 33379
+cases:
+  - case_id: TD-AUTH-003
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/oracle.yaml
+    case_sha256: 7424ce854bf2a4a55e98a27f2c7e070aee79d8e9a48b88c15f418696c62de646
+    fixture_sha256: 1ab717e02812339a016ee5e635c6c989aa36600e7fd7a6adadc41e1af57a9549
+    oracle_sha256: abd7bdb6846c187bbb48f08846721f86cf89361ce83e98afccd30ed319c89735
+    runs:
+      - {run_id: TD-AUTH-003-R01-14a8029aac06, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4839, output_tokens: 475, provider_prompt_utf8_bytes: 16611, record_sha256: 1e015d6cc50d7834db217bde1f01f387928897f844dd33779bbd11ab9ef39aa3, started_from_clean_context: true}
+  - case_id: TD-AUTH-006
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/oracle.yaml
+    case_sha256: c48d41f186a587e6f7c80b660ef8ee766534abeb1d8fe787fb8f60fa901c4c04
+    fixture_sha256: 39c30368e7623af3e65ff8d03bb762fffee3dfd2042c34044f9f0aad2cc08393
+    oracle_sha256: 54bf3d5a84e45a2c960f069820cac6c90ad161f2046e22a0593450ec6bf0070f
+    runs:
+      - {run_id: TD-AUTH-006-R01-a99e36606ba0, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 6215, output_tokens: 99, provider_prompt_utf8_bytes: 16768, record_sha256: f837f838ad5efb5e20342a95dccd2e8243ffc7e5b35a53f7a6aa9746fbd048e4, started_from_clean_context: true}
+limitations:
+  - TD-AUTH-003 uses corrected Fixture V2; the failed V1 diagnostic run is not admitted.
+  - This is controlled synthetic TL1 evidence for overlap/joint-ownership and Reference-vocabulary bias only.
+  - Provider-auto resolved the two calls to different concrete models; this is not a single-model baseline.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

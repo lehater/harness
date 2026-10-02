@@ -1,0 +1,165 @@
+version: 1
+kind: harness-bounded-context-map
+id: HARNESS-CONTEXT-MAP-V0
+status: audit-ratchet
+
+runtime_packages:
+  - adapters
+  - distribution
+
+semantics:
+  - Bounded contexts own domain meaning; the application layer coordinates them but owns no durable engineering truth.
+  - Cross-context dependencies are allowed only through the declared direction or an explicit temporary known violation.
+  - Research/test modules are outside the runtime context map and may depend on production contexts, never the reverse.
+  - CoreError is temporarily treated as a shared-kernel symbol until error contracts are extracted from harness.py.
+  - Project Model owns the accepted project Engineering Graph; Coverage alone owns selected-scope completeness/applicability; Reference Model may propose reusable materializations but never proves completeness or mutates project truth.
+
+contexts:
+  project-model:
+    kind: bounded_context
+    subdomain: core
+    responsibility: Own project-specific engineering knowledge topology and structural state.
+    modules:
+      - harness
+      - engineering_graph
+      - target_state
+    may_depend_on: []
+
+  reference-model:
+    kind: bounded_context
+    subdomain: supporting
+    responsibility: Own reusable Authority types, Capability templates, applicability predicates and reference-model evolution.
+    modules:
+      - project_status
+      - reference_materializer
+      - reference_model_evolution
+    may_depend_on:
+      - project-model
+
+  coverage:
+    kind: bounded_context
+    subdomain: core
+    responsibility: Own engineering Concern applicability, subject obligations, proof requirements and completeness evaluation.
+    modules:
+      - architecture_driver_closure
+      - concern_activation
+      - coverage_obligations
+      - coverage_planner
+      - engineering_coverage
+    may_depend_on:
+      - project-model
+      - assurance
+
+  assurance:
+    kind: bounded_context
+    subdomain: core
+    responsibility: Own semantic evaluation, derivation proof, acceptance identity and capability currentness.
+    modules:
+      - acceptance_policy
+      - capability_lifecycle
+      - derivation_test_coverage
+      - live_calibration
+      - adapters.copilot_live_calibration_evaluator
+      - semantic_acceptance
+      - semantic_derivation
+      - semantic_fingerprint
+      - semantic_judgement_calibration
+    may_depend_on:
+      - project-model
+      - evidence
+
+  decision:
+    kind: bounded_context
+    subdomain: supporting
+    responsibility: Own decision-space evidence, alternatives, governance dispositions and execution assurance.
+    modules:
+      - decision_execution_assurance
+      - decision_exploration
+      - decision_explorer_contract
+      - decision_governance
+    may_depend_on: []
+
+  evidence:
+    kind: bounded_context
+    subdomain: supporting
+    responsibility: Own acquisition/source-set completeness, lossless source boundaries and statement coverage.
+    modules:
+      - source_boundary
+      - source_coverage
+      - source_set
+    may_depend_on: []
+
+  integration:
+    kind: bounded_context
+    subdomain: supporting
+    responsibility: Translate project-native repository state into Harness published models and validate alignment.
+    modules:
+      - integration_alignment
+      - adapters.canonical_graph
+      - repository_realization
+    may_depend_on:
+      - project-model
+
+  workspace:
+    kind: bounded_context
+    subdomain: generic
+    responsibility: Validate/materialize optional managed knowledge and disposable human projections.
+    modules:
+      - frontend_interface_knowledge
+      - frontend_screen_contracts
+      - human_projection
+      - workspace
+    may_depend_on:
+      - project-model
+      - integration
+
+  application:
+    kind: application_layer
+    subdomain: orchestration
+    responsibility: Coordinate bounded contexts, derive next actions and translate results without owning durable domain truth.
+    modules:
+      - agent_router
+      - authority_context
+      - consumer_pack
+      - coverage_application
+      - decision_explorer_request
+      - decision_pipeline
+      - distribution.harnessw
+      - graph_doctor
+      - method_router
+      - project_frontier
+      - project_publication
+      - semantic_admission
+      - semantic_closure
+      - semantic_questions
+      - skill_invariant_policy
+      - skill_router
+    may_depend_on:
+      - project-model
+      - reference-model
+      - coverage
+      - assurance
+      - decision
+      - evidence
+      - integration
+      - workspace
+
+ignored_modules:
+  - behavioral_eval
+  - adapters.copilot_behavioral_eval_agent
+  - authority_role_projection_experiment
+  - concern_activation_experiment
+  - coverage_control_loop_experiment
+  - coverage_derivation_experiment
+  - coverage_map_experiment
+  - coverage_planner_experiment
+  - lifecycle_experiment
+  - live_calibration_process_driver
+  - scenario_drivers
+  - scenario_suite
+
+shared_kernel_imports:
+  harness:
+    - CoreError
+
+known_violations: []

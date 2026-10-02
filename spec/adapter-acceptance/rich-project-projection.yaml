@@ -39,7 +39,10 @@ projection:
     - id: Q-RESOLVED-QUALITY
       authority: PRODUCT-REQUIREMENTS
       text: Are numeric quality targets required?
-      resolution: QUALITY-TARGETS
+      resolution:
+        artifact: QUALITY-TARGETS
+        acceptance_id: QUALITY-TARGETS-2
+        supersedes_acceptance_id: QUALITY-TARGETS-1
     - id: Q-OPEN-ARCHITECTURE
       authority: SYSTEM-ARCHITECTURE
       text: Which architecture decision is authoritative?

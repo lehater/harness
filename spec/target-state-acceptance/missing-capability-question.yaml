@@ -36,7 +36,10 @@ partial_model:
       authority: DOMAIN
       text: Which domain boundary is accepted?
       blocks_capabilities: [application.domain-semantics]
-      resolution: DOMAIN-DECISION
+      resolution:
+        artifact: DOMAIN-DECISION
+        acceptance_id: DOMAIN-DECISION-2
+        supersedes_acceptance_id: ABSENT
 
 complete_model:
   authorities:
@@ -57,7 +60,10 @@ complete_model:
       authority: DOMAIN
       text: Which domain boundary is accepted?
       blocks_capabilities: [application.domain-semantics]
-      resolution: DOMAIN-DECISION
+      resolution:
+        artifact: DOMAIN-DECISION
+        acceptance_id: DOMAIN-DECISION-2
+        supersedes_acceptance_id: ABSENT
 
 expect:
   empty:

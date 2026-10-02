@@ -1,0 +1,89 @@
+version: 1
+kind: harness-scenario
+id: create-work-respects-prerequisite-boundary
+title: CREATE grouping preserves capability admission boundaries
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - create-work-prerequisite-boundary
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: CREATE-PREREQUISITE-BOUNDARY
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted source knowledge.
+          boundary:
+            semantic_cohesion: Source semantics.
+            independent_change: Sources change independently.
+            public_contract: Accepted source knowledge.
+          produces:
+            - capability: demo.source-a
+              knowledge_kind: problem-evidence
+              requires: []
+            - capability: demo.source-b
+              knowledge_kind: problem-evidence
+              requires: []
+        - id: PRODUCT
+          responsibility: Own product requirements.
+          boundary:
+            semantic_cohesion: Product semantics.
+            independent_change: Product requirements change independently.
+            public_contract: Accepted product requirements.
+          produces:
+            - capability: demo.product-a
+              knowledge_kind: product-requirements
+              requires: [demo.source-a]
+            - capability: demo.product-b
+              knowledge_kind: product-requirements
+              requires: [demo.source-b]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume both product capabilities.
+          requires: [demo.product-a, demo.product-b]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: SOURCE-A
+          authority: DISCOVERY
+          path: docs/source-a.md
+          provides: [demo.source-a]
+          depends_on: []
+        - id: SOURCE-B
+          authority: DISCOVERY
+          path: docs/source-b.md
+          provides: [demo.source-b]
+          depends_on: []
+      questions: []
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: CREATE-PREREQUISITE-BOUNDARY-REGISTRY
+      routes:
+        - knowledge_kind: problem-evidence
+          skill: skills/artifacts/problem-evidence/SKILL.md
+        - knowledge_kind: product-requirements
+          skill: skills/artifacts/product-requirements/SKILL.md
+
+steps:
+  - id: route-create
+    driver: agent.route
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.model}
+      registry: {ref: fixture.registry}
+    expect:
+      - {path: /target_status, op: equals, value: READY}
+      - {path: /routed, op: length, value: 2}
+      - {path: /routed, op: contains_match, value: {knowledge_kind: product-requirements, capabilities: [demo.product-a]}}
+      - {path: /routed, op: contains_match, value: {knowledge_kind: product-requirements, capabilities: [demo.product-b]}}
+      - {path: /unrouted, op: length, value: 0}

@@ -1,0 +1,27 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+dimensions:
+  bootstrap_realization:
+    core_model:
+      authorities: [ORDER-DESIGN]
+      artifacts:
+        - path: docs/order-contract.md
+          authority: ORDER-DESIGN
+          provides: [orders.lifecycle-contract]
+          depends_on_paths: []
+        - path: docs/dispatch-contract.md
+          authority: ORDER-DESIGN
+          provides: [orders.dispatch-contract]
+          depends_on_paths: [docs/order-contract.md]
+      question_count: 0
+      questions: []
+    target_state:
+      status: READY
+      satisfied: [EXP-DISPATCH-CONTRACT, EXP-ORDER-LIFECYCLE]
+      create:
+        - expectation: EXP-DISPATCH-FAILURE
+          subject: ORDER
+          capability: orders.dispatch-failure-policy
+          authority: ORDER-DESIGN
+      wait: []
+      pending: []

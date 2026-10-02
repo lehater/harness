@@ -14,8 +14,59 @@ from harness import CoreError  # noqa: E402
 from target_state import evaluate_target_state, validate_profile  # noqa: E402
 
 
+def test_multiple_provider_alternative() -> None:
+    profile = {
+        "version": 1,
+        "kind": "harness-design-profile",
+        "id": "MULTI-PROVIDER",
+        "expectations": [
+            {
+                "id": "SOURCE",
+                "subject": "APPLICATION",
+                "capability": "application.source",
+                "authority": "SOURCE",
+            }
+        ],
+    }
+    model = {
+        "authorities": [{"id": "SOURCE"}],
+        "artifacts": [
+            {
+                "id": "SOURCE-CURRENT",
+                "authority": "SOURCE",
+                "path": "docs/source-current.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+            {
+                "id": "SOURCE-OLD",
+                "authority": "SOURCE",
+                "path": "docs/source-old.md",
+                "provides": ["application.source"],
+                "depends_on": [],
+            },
+        ],
+        "questions": [
+            {
+                "id": "Q-OLD",
+                "authority": "SOURCE",
+                "text": "Historical provider remains unresolved.",
+                "blocks": ["SOURCE-OLD"],
+            }
+        ],
+    }
+    result = evaluate_target_state(profile, model)
+    assert result["status"] == "COMPLETE", result
+    assert result["satisfied"] == ["SOURCE"], result
+    assert result["wait"] == [], result
+
+
 def main() -> int:
     errors: list[str] = []
+    try:
+        test_multiple_provider_alternative()
+    except Exception as exc:
+        errors.append(f"multiple provider alternative: {exc}")
     fixtures = sorted((ROOT / "spec/target-state-acceptance").glob("*.yaml"))
     if not fixtures:
         errors.append("no target-state acceptance fixtures found")

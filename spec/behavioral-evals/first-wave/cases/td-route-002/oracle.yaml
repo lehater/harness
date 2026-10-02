@@ -1,0 +1,5 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+id: TD-ROUTE-002-ORACLE-V1
+dimensions:
+  selected_operation: project-engineering-status

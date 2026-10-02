@@ -182,6 +182,117 @@ def main() -> int:
     assert baseline[0]["purpose"] == "CURRENT_ACCEPTED_BASELINE", redo_a
     assert "future_candidate" in redo_a["decision_request"]["forbidden_inputs"], redo_a
 
+    failure_set = {
+        "version": 1,
+        "kind": "harness-decision-failure-set",
+        "failures": [
+            {
+                "capability": "arch.b",
+                "failure_id": "ARCH-B-ATTEMPT-1",
+                "stage": "REVIEW_OPTIONS",
+                "finding": "Decision space remained materially incomplete.",
+            }
+        ],
+    }
+    failed = derive_decision_roadmap(
+        graph=GRAPH,
+        model=MODEL,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+        decision_failures=failure_set,
+    )
+    assert failed["frontier_status"] == "FAILED_VALIDATION", failed
+    assert "arch.b" not in caps(failed["ready"]), failed
+    assert next(
+        item
+        for item in failed["failed_validation"]
+        if item["capability"] == "arch.b"
+    )["retry_required"] is True, failed
+
+    retried_create = derive_decision_roadmap(
+        graph=GRAPH,
+        model=MODEL,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+        decision_failures=failure_set,
+        redo_capabilities=["arch.b"],
+    )
+    retried_b = next(
+        item
+        for item in retried_create["ready"]
+        if item["capability"] == "arch.b"
+    )
+    assert retried_b["reason"] == "EXPLICIT_RETRY_FAILED_VALIDATION", retried_b
+    assert retried_b["decision_request_mode"] == "CREATE", retried_b
+
+    # HARN-004: an existing Core provider without lifecycle evidence is an
+    # integration/currentness gap, not missing canonical knowledge. It must
+    # never be sent through CREATE and must preserve artifact-level blockers.
+    legacy_model = {
+        "artifacts": [
+            *MODEL["artifacts"],
+            {
+                "id": "ARCH-B",
+                "authority": "ARCH",
+                "path": "b.md",
+                "provides": ["arch.b"],
+                "depends_on": ["SOURCE"],
+            },
+        ],
+        "questions": [],
+    }
+    legacy = derive_decision_roadmap(
+        graph=GRAPH,
+        model=legacy_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert "arch.b" not in caps(legacy["ready"]), legacy
+    assert legacy["frontier_status"] == "INCOMPLETE", legacy
+    assert next(
+        item
+        for item in legacy["lifecycle_gaps"]
+        if item["capability"] == "arch.b"
+    ) == {
+        "capability": "arch.b",
+        "authority": "ARCH",
+        "state": "UNKNOWN",
+        "reason": "LIFECYCLE_ASSERTION_MISSING",
+        "providers": ["ARCH-B"],
+    }, legacy
+
+    legacy_blocked_model = {
+        **legacy_model,
+        "questions": [
+            {
+                "id": "Q-B",
+                "authority": "ARCH",
+                "text": "Which existing architecture semantics apply?",
+                "blocks": ["ARCH-B"],
+            }
+        ],
+    }
+    legacy_blocked = derive_decision_roadmap(
+        graph=GRAPH,
+        model=legacy_blocked_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert next(
+        item
+        for item in legacy_blocked["blocked"]
+        if item["capability"] == "arch.b"
+    )["questions"] == ["Q-B"], legacy_blocked
+    assert "arch.b" not in caps(legacy_blocked["lifecycle_gaps"]), legacy_blocked
+
     # Explicit redo never bypasses a Core Question.
     blocked_model = {
         **MODEL,
@@ -204,9 +315,38 @@ def main() -> int:
         redo_capabilities=["arch.a"],
     )
     assert "arch.a" not in caps(blocked["ready"]), blocked
+    assert blocked["frontier_status"] == "READY", blocked
     assert next(
         item for item in blocked["blocked"] if item["capability"] == "arch.a"
     )["questions"] == ["Q-A"], blocked
+
+    fully_blocked_model = {
+        **MODEL,
+        "questions": [
+            {
+                "id": "Q-A",
+                "authority": "ARCH",
+                "text": "Which accepted architecture semantics apply?",
+                "blocks_capabilities": ["arch.a"],
+            },
+            {
+                "id": "Q-B",
+                "authority": "ARCH",
+                "text": "Which architecture B semantics apply?",
+                "blocks_capabilities": ["arch.b"],
+            },
+        ],
+    }
+    fully_blocked = derive_decision_roadmap(
+        graph=GRAPH,
+        model=fully_blocked_model,
+        target="TARGET",
+        lifecycle=LIFECYCLE,
+        decision_contracts=contracts,
+        decision_policy=POLICY,
+    )
+    assert fully_blocked["ready"] == [], fully_blocked
+    assert fully_blocked["frontier_status"] == "BLOCKED", fully_blocked
 
     # Complete the selected target: a repeated ordinary invocation becomes a no-op.
     complete_model = {
@@ -256,7 +396,7 @@ def main() -> int:
         decision_contracts=contracts,
         decision_policy=POLICY,
     )
-    assert empty["frontier_status"] == "EMPTY", empty
+    assert empty["frontier_status"] == "COMPLETE", empty
     assert empty["ready"] == [], empty
 
     try:
@@ -276,7 +416,7 @@ def main() -> int:
 
     print(
         "decision pipeline: PASS "
-        "(single frontier + sequential stages + current-baseline redo + idempotence)"
+        "(single frontier + persisted failure + explicit retry + idempotence)"
     )
     return 0
 

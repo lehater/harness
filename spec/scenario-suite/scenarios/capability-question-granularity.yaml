@@ -1,0 +1,144 @@
+version: 1
+kind: harness-scenario
+id: capability-question-does-not-poison-sibling
+title: Capability-scoped Question preserves sibling capability availability
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - capability-question-granularity
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: CAPABILITY-QUESTION-GRANULARITY
+      authorities:
+        - id: PRODUCT
+          responsibility: Own product requirements.
+          boundary:
+            semantic_cohesion: Product semantics.
+            independent_change: Product requirements change independently.
+            public_contract: Accepted product requirements.
+          produces:
+            - capability: demo.intent
+              knowledge_kind: product-requirements
+              requires: []
+            - capability: demo.acceptance
+              knowledge_kind: product-requirements
+              requires: []
+        - id: APPLICATION
+          responsibility: Own application design.
+          boundary:
+            semantic_cohesion: Application semantics.
+            independent_change: Application design changes independently.
+            public_contract: Accepted application design.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              requires: [demo.intent]
+      consumers:
+        - id: INTENT-CONSUMER
+          purpose: Consume product intent.
+          requires: [demo.intent]
+        - id: ACCEPTANCE-CONSUMER
+          purpose: Consume acceptance semantics.
+          requires: [demo.acceptance]
+        - id: IMPLEMENTATION
+          purpose: Consume application design.
+          requires: [demo.application]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: REQUIREMENTS
+          authority: PRODUCT
+          path: docs/requirements.md
+          provides: [demo.intent, demo.acceptance]
+          depends_on: []
+      questions:
+        - id: Q-ACCEPTANCE
+          authority: PRODUCT
+          text: Which acceptance behavior is required?
+          blocks_capabilities: [demo.acceptance]
+  empty-core:
+    value: {artifacts: [], questions: []}
+  empty-evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations: []
+  empty-lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers: []
+  empty-failures:
+    value:
+      version: 1
+      kind: harness-decision-failure-set
+      failures: []
+
+steps:
+  - id: intent-remains-available
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: INTENT-CONSUMER
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /wait, op: length, value: 0}
+
+  - id: acceptance-is-blocked
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: ACCEPTANCE-CONSUMER
+      model: {ref: fixture.model}
+    expect:
+      - {path: /status, op: equals, value: BLOCKED}
+      - {path: /wait, op: contains_match, value: {capability: demo.acceptance, questions: [Q-ACCEPTANCE]}}
+
+  - id: sibling-remains-admissible-input
+    driver: authority.context
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      authority_id: APPLICATION
+      capability_ids: [demo.application]
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /requirements/0/status, op: equals, value: SATISFIED}
+      - {path: /requirements/0/providers, op: equals, value: [REQUIREMENTS]}
+      - {path: /input_artifacts, op: contains_match, value: {id: REQUIREMENTS}}
+
+  - id: initial-publication
+    driver: publication.build
+    with:
+      graph: {ref: fixture.graph}
+      core_model: {ref: fixture.empty-core}
+      semantic_evaluations: {ref: fixture.empty-evaluations}
+      lifecycle: {ref: fixture.empty-lifecycle}
+      decision_failures: {ref: fixture.empty-failures}
+    expect:
+      - {path: /kind, op: equals, value: harness-project-publication}
+
+  - id: reject-false-sibling-block-publication
+    driver: publication.transition
+    with:
+      graph: {ref: fixture.graph}
+      current_publication: {ref: step.initial-publication}
+      expected_revision: {ref: step.initial-publication#/revision}
+      capability: demo.intent
+      outcome: BLOCKED
+      core_model: {ref: fixture.model}
+      semantic_evaluations: {ref: fixture.empty-evaluations}
+      lifecycle: {ref: fixture.empty-lifecycle}
+      decision_failures: {ref: fixture.empty-failures}
+    expect_error:
+      type: CoreError
+      contains: requires an unresolved Core blocker

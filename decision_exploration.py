@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from decision_explorer_request import validate_explorer_request_binding
+from decision_explorer_contract import validate_explorer_request_binding
 from harness import CoreError
 
 EXPLORATION = {"LOCAL": 0, "EXPLORE": 1, "RESEARCH": 2, "DEEP_RESEARCH": 3}

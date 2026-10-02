@@ -1,0 +1,50 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+oracle_class: O2
+oracle_basis:
+  repository: lehater/napms
+  commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  canonical_graph_git_blob_sha: a1c8c5d98c2b4cb927e9b424f3ea70fc0f89d2de
+  harness_projection_git_blob_sha: 3e4d074e8ac4e67d259c4d0c721da62c0dff3b91
+dimensions:
+  bootstrap_realization:
+    core_model:
+      authorities: [DISCOVERY, PRODUCT-REQUIREMENTS]
+      artifacts:
+        - path: docs/discovery/first-mvp-hcd-problem-evidence.yaml
+          authority: DISCOVERY
+          provides: [engineering.hcd.first-mvp.problem-evidence]
+          depends_on_paths: []
+        - path: docs/discovery/first-mvp-hcd-user-needs.yaml
+          authority: DISCOVERY
+          provides:
+            - engineering.hcd.access-request.user-needs
+            - engineering.hcd.application-components.user-needs
+            - engineering.hcd.policy-export.user-needs
+          depends_on_paths: [docs/discovery/first-mvp-hcd-problem-evidence.yaml]
+        - path: docs/requirements/first-mvp-product-requirements.yaml
+          authority: PRODUCT-REQUIREMENTS
+          provides:
+            - engineering.hcd.access-request.requirements
+            - engineering.hcd.application-components.requirements
+            - engineering.hcd.policy-export.requirements
+            - engineering.requirements.acceptance
+            - engineering.requirements.product-intent
+          depends_on_paths: [docs/discovery/first-mvp-hcd-user-needs.yaml]
+      question_count: 0
+      questions: []
+    target_state:
+      status: COMPLETE
+      satisfied:
+        - EXP-ACCEPTANCE
+        - EXP-ACCESS-REQUEST-REQUIREMENTS
+        - EXP-ACCESS-REQUEST-USER-NEEDS
+        - EXP-APPLICATION-COMPONENTS-REQUIREMENTS
+        - EXP-APPLICATION-COMPONENTS-USER-NEEDS
+        - EXP-POLICY-EXPORT-REQUIREMENTS
+        - EXP-POLICY-EXPORT-USER-NEEDS
+        - EXP-PROBLEM-EVIDENCE
+        - EXP-PRODUCT-INTENT
+      create: []
+      wait: []
+      pending: []

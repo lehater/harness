@@ -9,10 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engineering_graph import evaluate_engineering_target, realize_core_model
-from harness import resolve_question, unresolved_questions
-from semantic_admission import admit_artifact, load_yaml
+from harness import CoreError, resolve_question, unresolved_questions
+from semantic_admission import (
+    admit_artifact,
+    derive_acceptance_policy_fingerprints,
+    load_yaml,
+)
 from semantic_closure import evaluate_semantic_closure
-from semantic_questions import append_question_proposals
+from semantic_questions import append_question_proposals, proposals_from_evaluation_set
 
 
 GRAPH = {
@@ -146,10 +150,57 @@ def task_candidate(
     return candidate
 
 
+def test_current_derivation_snapshot_uniqueness() -> None:
+    first = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evaluation",
+        "source_capability": "demo.source",
+        "target_capability": "demo.target",
+        "status": "ACCEPTED",
+        "question_proposals": [],
+    }
+    stale = {
+        **first,
+        "status": "REJECTED",
+        "question_proposals": [
+            {
+                "id": "Q-STALE-DERIVATION",
+                "authority": "TARGET",
+                "text": "Stale derivation evidence must not reopen this Question.",
+                "blocks_capabilities": ["demo.target"],
+            }
+        ],
+    }
+    bundle = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [],
+        "derivation_evaluations": [first, stale],
+    }
+    try:
+        proposals_from_evaluation_set(bundle)
+    except CoreError as exc:
+        assert "duplicate current semantic derivation evaluation" in str(exc), exc
+    else:
+        raise AssertionError(
+            "current derivation evaluation snapshot must reject duplicate edge identity"
+        )
+
+
 def main() -> int:
+    test_current_derivation_snapshot_uniqueness()
     registry = load_yaml(ROOT / "skills/artifact-skill-registry-v0.yaml")
     base_contracts = load_yaml(
         ROOT / "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
+    )
+    decision_contracts = load_yaml(
+        ROOT / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml"
+    )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=GRAPH,
+        knowledge_contracts=base_contracts,
+        decision_contracts=decision_contracts,
+        decision_policy=None,
     )
 
     rejected = admit_artifact(
@@ -318,6 +369,14 @@ def main() -> int:
             "acceptance_id": "INTERACTION-1",
         },
     }
+    for provider in lifecycle["providers"]:
+        provider["acceptance_policy_fingerprint"] = (
+            current_policy_fingerprints[provider["capability"]]
+        )
+    interaction_eval["admission"]["acceptance_policy_fingerprint"] = (
+        current_policy_fingerprints["example.interaction"]
+    )
+
     bundle = {
         "version": 1,
         "kind": "harness-semantic-evaluation-set",
@@ -353,17 +412,20 @@ def main() -> int:
         GRAPH,
         append_question_proposals(complete_model, [question]),
     )
-    resolved = resolve_question(realized, question["id"], "TASK-MODEL")
-    assert unresolved_questions(resolved) == [], resolved
-
-    reopened = append_question_proposals(resolved, [question])
-    assert unresolved_questions(reopened) == [question["id"]], reopened
-    reopened_target = evaluate_engineering_target(
-        GRAPH,
-        "IMPLEMENTATION",
-        reopened,
-    )
-    assert reopened_target["status"] == "BLOCKED", reopened_target
+    try:
+        resolve_question(
+            realized,
+            question["id"],
+            "TASK-MODEL",
+            "TASK-INCOMPLETE",
+            "TASK-INCOMPLETE",
+        )
+    except Exception as exc:
+        assert "must differ" in str(exc), exc
+    else:
+        raise AssertionError(
+            "Question resolution must reject unchanged semantic identity"
+        )
 
     accepted = admit_artifact(
         graph=GRAPH,
@@ -376,6 +438,24 @@ def main() -> int:
         acceptance_id="TASK-COMPLETE",
     )
     assert accepted["status"] == "ACCEPTED", accepted
+
+    resolved = resolve_question(
+        realized,
+        question["id"],
+        "TASK-MODEL",
+        accepted["admission"]["acceptance_id"],
+        "TASK-INCOMPLETE",
+    )
+    assert unresolved_questions(resolved) == [], resolved
+    reopened = append_question_proposals(resolved, [question])
+    assert unresolved_questions(reopened) == [question["id"]], reopened
+    reopened_target = evaluate_engineering_target(
+        GRAPH,
+        "IMPLEMENTATION",
+        reopened,
+    )
+    assert reopened_target["status"] == "BLOCKED", reopened_target
+
     updated_lifecycle = copy.deepcopy(lifecycle)
     updated_lifecycle["providers"][0] = accepted["lifecycle_assertion"]
     fixed_bundle = {

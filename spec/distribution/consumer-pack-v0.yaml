@@ -1,0 +1,92 @@
+version: 1
+kind: harness-consumer-pack-definition
+id: HARNESS-CONSUMER-PACK-V0
+consumer_api: v0
+
+entry:
+  surface_registry: skills/skill-surface-registry-v0.yaml
+  operation_registry: skills/consumer-operation-registry-v0.yaml
+  method_registry: skills/consumer-method-registry-v0.yaml
+  artifact_registry: skills/artifact-skill-registry-v0.yaml
+
+# Runtime modules are explicit so adding a new Harness mechanism cannot
+# accidentally enlarge the public Consumer distribution.
+root_files:
+  - consumer_pack.py
+  - acceptance_policy.py
+  - agent_router.py
+  - architecture_driver_closure.py
+  - authority_context.py
+  - capability_lifecycle.py
+  - concern_activation.py
+  - coverage_obligations.py
+  - coverage_planner.py
+  - coverage_application.py
+  - decision_execution_assurance.py
+  - decision_exploration.py
+  - decision_explorer_contract.py
+  - decision_explorer_request.py
+  - decision_governance.py
+  - decision_pipeline.py
+  - derivation_test_coverage.py
+  - engineering_coverage.py
+  - engineering_graph.py
+  - frontend_interface_knowledge.py
+  - frontend_screen_contracts.py
+  - graph_doctor.py
+  - harness.py
+  - human_projection.py
+  - integration_alignment.py
+  - live_calibration.py
+  - method_router.py
+  - project_frontier.py
+  - project_publication.py
+  - project_status.py
+  - reference_materializer.py
+  - reference_model_evolution.py
+  - repository_realization.py
+  - scenario_drivers.py
+  - scenario_suite.py
+  - semantic_acceptance.py
+  - semantic_admission.py
+  - semantic_closure.py
+  - semantic_derivation.py
+  - semantic_fingerprint.py
+  - semantic_judgement_calibration.py
+  - semantic_questions.py
+  - skill_invariant_policy.py
+  - skill_router.py
+  - source_boundary.py
+  - source_coverage.py
+  - source_set.py
+  - target_state.py
+  - workspace.py
+
+include_prefixes:
+  - adapters/
+  - catalogs/
+  - profiles/
+  - spec/
+  - docs/design/
+  - docs/research/
+
+exact_files:
+  - skills/consumer-operation-registry-v0.yaml
+  - skills/consumer-method-registry-v0.yaml
+  - skills/artifact-skill-registry-v0.yaml
+  - spec/distribution/consumer-pack-v0.yaml
+
+generated_files:
+  surface_registry: skills/skill-surface-registry-v0.yaml
+  pack_manifest: harness-consumer-pack.yaml
+
+forbidden_prefixes:
+  - .github/
+  - docs/audit/
+  - docs/plans/
+  - docs/legacy/
+  - skills/maintainer/
+  - skills/core/
+  - skills/ddd/
+  - skills/software-product/
+  - tests/

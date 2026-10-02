@@ -56,7 +56,7 @@ python engineering_graph.py evaluate <engineering-graph> <consumer> <core-realiz
 
 For agent execution, actionable CREATE results may additionally be routed with `agent_router.py`.
 
-CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch.
+CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch. Agent-facing consumer skill distribution follows the same separation: the pinned Harness Consumer Pack is tooling, not project semantic truth; see `agent-skill-surfaces-and-consumer-distribution-v0.md`.
 
 ## Derived Design Profiles
 
@@ -87,9 +87,30 @@ Harness may derive an ephemeral bounded execution context for one Authority from
 
 The context contains accepted upstream provider artifacts, same-Authority supporting closure, owned artifacts, public outputs, downstream consumers, blockers and allowed canonical read/write paths.
 
+Same-Authority supporting closure grants read access only. It does not authorize those artifacts as semantic provenance for strict admission. A supporting artifact that materially contributes accepted semantics must provide a CapabilityId declared in the selected production's Engineering Graph prerequisites so lifecycle currentness can baseline it.
+
 It is routing data, not a CanonicalArtifact, task, approval, stage or workflow state.
 
 Projects may provide format-specific reference extractors, but Harness owns validation against the derived allowed-read boundary. Write-set validation must reject changes to canonical artifacts outside the selected Authority and must reject production while required inputs are blocked.
+
+## Atomic project publication
+
+A terminal Capability result can update Core realization, semantic evaluation,
+lifecycle evidence, Questions and Decision Pipeline failure evidence together.
+Those coordinated facts must be exposed to strict agent-loop readers as one
+logical project revision.
+
+The canonical publication contract is `docs/design/project-publication-v0.md`.
+Direct declaration may persist one atomic publication document. Project-native
+adapters may use their own database transaction, immutable repository commit,
+snapshot pointer or equivalent mechanism, but must expose the same atomic
+visibility and compare-and-swap semantics.
+
+The publication envelope owns no engineering semantics. Its component documents
+remain owned by Project Model, Knowledge Assurance and Decision contracts.
+Legacy/static integrations may continue to supply separate inputs for inspection
+and migration, but sequentially writing those inputs is not sufficient evidence
+of crash-consistent Capability completion.
 
 ## CI boundary
 
@@ -115,6 +136,13 @@ A project may claim its design/documentation closure complete only when all appl
 - project-native deterministic validators that justify registered semantic claims pass.
 
 The aggregate check is disposable derived evidence. It must not become another source of product/domain/architecture truth.
+
+Completeness ownership is defined by `docs/design/model-completeness-ownership-v0.md`.
+The Project Model owns the accepted concrete graph; Engineering Coverage owns the
+selected-scope completeness/applicability verdict. Reference Engineering Model
+materialization, when used, is only a proposal source behind the project-owned
+integration boundary and cannot substitute for Coverage or make its proposed
+graph canonical by itself.
 
 A project should expose one normal local/CI command that fails if any of the applicable assertions above fail. Separate workflows may retain redundant checks, but a green structural target alone must never be presented as full implementation-documentation closure.
 ## Portability invariant
@@ -194,6 +222,13 @@ to an active artifact skill:
   explicitly accepted;
 - the provider must have a CURRENT capability lifecycle assertion whose
   acceptance identity matches the semantic admission;
+- semantic admission and lifecycle evidence must carry the same
+  `acceptance_policy_fingerprint`, derived from the effective knowledge-kind
+  semantic contract (including overlays), decision contract, effective decision
+  policy and versioned semantic-admission evaluator contract;
+- strict closure recomputes that fingerprint from the current rules; a missing
+  or changed fingerprint makes the accepted provider STALE and requires
+  revalidation;
 - its recorded prerequisite acceptance identities must match the currently
   selected prerequisite identities.
 
@@ -205,3 +240,9 @@ owning Authorities revalidate.
 The canonical strict check is `semantic_closure.py`. Projects may wrap it in
 their own CI entrypoint, but a green structural target alone must not be
 presented as full engineering closure.
+
+Acceptance-policy fingerprints identify effective rules, not files. Changes that
+alter semantic obligations, overlays, decision axes/policy or evaluator contract
+must change the fingerprint. The evaluator contract identifier is intentionally
+versioned and must be bumped whenever semantic-admission behavior changes in a
+way that can alter acceptance.

@@ -1,8 +1,8 @@
 # Active Harness work
 
-Current: none.
+Current: `agent-instruction-skill-routing-scalability.md`.
 
-State: stable; Reference Engineering Model promotion-evidence cycle closed.
+State: audit branch contains an active instruction/skill-routing scalability plan; Reference Engineering Model promotion remains deferred.
 
 ## Current baseline
 
@@ -28,3 +28,11 @@ See `docs/research/reference-engineering-model-promotion-decision-v0.md`.
 ## Next candidate work
 
 The smallest engineering follow-up is materialization provenance binding. Do not reopen canonical-promotion evaluation until its evidence is available.
+
+
+## Active audit-branch plan
+
+See `docs/plans/active/agent-instruction-skill-routing-scalability.md`.
+
+This plan addresses HARN-017/HARN-018 and EVO-021..026. It is an audit-branch
+plan, not yet a canonical mainline architecture decision.

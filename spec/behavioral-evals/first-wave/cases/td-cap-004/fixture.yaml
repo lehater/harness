@@ -1,0 +1,13 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-004-FIXTURE-V1
+atoms:
+  - id: R1
+    statement: "Retries of create-payment requests must be idempotent."
+    source_path: "docs/api.md"
+  - id: R2
+    statement: "Reusing the same idempotency key must return the original payment rather than create a duplicate."
+    source_path: "docs/reliability.md"
+  - id: R3
+    statement: "Example: after a network timeout, repeating the same keyed payment request resolves to the existing payment."
+    source_path: "examples/retry.md"

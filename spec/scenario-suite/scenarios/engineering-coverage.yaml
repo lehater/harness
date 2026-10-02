@@ -9,6 +9,7 @@ dimensions:
   execution_type: deterministic
 covers:
   - engineering-coverage-gap
+  - instruction-data-trust-boundary
 
 fixtures:
   graph:
@@ -46,3 +47,8 @@ steps:
           action: PRODUCE_CAPABILITY
           capability: fixture.domain.model.bc-b
           authority: TACTICAL-DOMAIN-DESIGN
+          execution_route:
+            status: ROUTED
+            knowledge_kind: domain-model
+            skill: skills/artifacts/domain-model/SKILL.md
+            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]

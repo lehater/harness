@@ -1,0 +1,35 @@
+version: 1
+kind: harness-scenario
+id: routed-instruction-trust-boundary
+title: Routed procedures expose the canonical content trust contract
+dimensions:
+  project_archetype: synthetic
+  stage: bootstrap
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - instruction-data-trust-boundary
+
+steps:
+  - id: consumer-operation
+    driver: skill.operation
+    with:
+      surface: consumer
+      operation: project-engineering-status
+    expect:
+      - path: /instruction_contracts
+        op: equals
+        value: [docs/design/agent-instruction-architecture-v0.md]
+      - {path: /exposure, op: equals, value: public}
+
+  - id: authorized-internal-operation
+    driver: skill.operation
+    with:
+      surface: consumer
+      operation: bootstrap-existing-project
+      invoked_by: project-bootstrap-reconcile
+    expect:
+      - path: /instruction_contracts
+        op: equals
+        value: [docs/design/agent-instruction-architecture-v0.md]
+      - {path: /invoked_by, op: equals, value: project-bootstrap-reconcile}

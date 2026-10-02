@@ -61,19 +61,29 @@ def validate_model(model: dict[str, Any]) -> None:
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(artifact_id: str) -> None:
-        if artifact_id in visiting:
-            raise CoreError(f"artifact dependency cycle at: {artifact_id}")
-        if artifact_id in visited:
-            return
-        visiting.add(artifact_id)
-        for dep in artifacts[artifact_id].get("depends_on", []) or []:
-            visit(dep)
-        visiting.remove(artifact_id)
-        visited.add(artifact_id)
-
     for artifact_id in artifacts:
-        visit(artifact_id)
+        if artifact_id in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(artifact_id, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(f"artifact dependency cycle at: {current}")
+            visiting.add(current)
+            stack.append((current, True))
+            dependencies = artifacts[current].get("depends_on", []) or []
+            for dep in reversed(dependencies):
+                if dep in visiting:
+                    raise CoreError(f"artifact dependency cycle at: {dep}")
+                if dep not in visited:
+                    stack.append((dep, False))
 
     for question_id, question in questions.items():
         authority = question.get("authority")
@@ -103,11 +113,38 @@ def validate_model(model: dict[str, Any]) -> None:
                 )
         resolution = question.get("resolution")
         if resolution is not None:
-            if resolution not in artifacts:
-                raise CoreError(f"question {question_id} resolves to unknown artifact: {resolution}")
-            if artifacts[resolution]["authority"] != authority:
+            if not isinstance(resolution, dict):
+                raise CoreError(
+                    f"question {question_id} resolution must bind artifact and semantic acceptance identities"
+                )
+            artifact_id = resolution.get("artifact")
+            acceptance_id = resolution.get("acceptance_id")
+            supersedes = resolution.get("supersedes_acceptance_id")
+            if not isinstance(artifact_id, str) or not artifact_id:
+                raise CoreError(f"question {question_id} resolution artifact is required")
+            if artifact_id not in artifacts:
+                raise CoreError(
+                    f"question {question_id} resolves to unknown artifact: {artifact_id}"
+                )
+            if artifacts[artifact_id]["authority"] != authority:
                 raise CoreError(
                     f"question {question_id} resolution artifact must belong to addressed authority {authority}"
+                )
+            if not isinstance(acceptance_id, str) or not acceptance_id:
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id is required"
+                )
+            if acceptance_id == "ABSENT":
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id cannot be ABSENT"
+                )
+            if not isinstance(supersedes, str) or not supersedes:
+                raise CoreError(
+                    f"question {question_id} resolution supersedes_acceptance_id is required"
+                )
+            if acceptance_id == supersedes:
+                raise CoreError(
+                    f"question {question_id} resolution acceptance_id must differ from supersedes_acceptance_id"
                 )
 
 
@@ -172,7 +209,8 @@ def capability_blockers(model: dict[str, Any], capability_id: str) -> list[str]:
     )
 
 
-def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
+def artifact_blockers(model: dict[str, Any], artifact_id: str) -> list[str]:
+    """Return unresolved Questions whose scope is the artifact as a whole."""
     validate_model(model)
     artifacts = _by_id(model.get("artifacts", []), "artifact")
     if artifact_id not in artifacts:
@@ -184,6 +222,19 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
         for seed in question.get("blocks", []) or []:
             if artifact_id == seed or artifact_id in affected(model, seed):
                 result.add(question["id"])
+    return sorted(result)
+
+
+def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
+    """Legacy conservative artifact projection including capability blockers."""
+    validate_model(model)
+    artifacts = _by_id(model.get("artifacts", []), "artifact")
+    if artifact_id not in artifacts:
+        raise CoreError(f"unknown artifact: {artifact_id}")
+    result: set[str] = set(artifact_blockers(model, artifact_id))
+    for question in model.get("questions", []):
+        if question.get("resolution") is not None:
+            continue
         for capability in question.get("blocks_capabilities", []) or []:
             providers = [
                 artifact["id"]
@@ -194,6 +245,21 @@ def blocked(model: dict[str, Any], artifact_id: str) -> list[str]:
                 if artifact_id == provider or artifact_id in affected(model, provider):
                     result.add(question["id"])
     return sorted(result)
+
+
+def unblocked_capability_providers(
+    model: dict[str, Any],
+    capability_id: str,
+) -> list[str]:
+    """Return structurally usable providers for one CapabilityId."""
+    providers = capability_resolve(model, capability_id)
+    if capability_blockers(model, capability_id):
+        return []
+    return [
+        provider
+        for provider in providers
+        if not artifact_blockers(model, provider)
+    ]
 
 
 def question_frontier(model: dict[str, Any], question_ids: list[str]) -> list[dict[str, Any]]:
@@ -267,7 +333,19 @@ def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     validate_model(model)
     providers = capability_resolve(model, capability_id)
     owner = capability_owner(model, capability_id)
-    blockers = sorted({q for artifact_id in providers for q in blocked(model, artifact_id)})
+    available = unblocked_capability_providers(model, capability_id)
+    blockers = (
+        []
+        if available
+        else sorted(
+            set(capability_blockers(model, capability_id))
+            | {
+                question
+                for artifact_id in providers
+                for question in artifact_blockers(model, artifact_id)
+            }
+        )
+    )
     if blockers:
         return {
             "action": "WAIT",
@@ -284,7 +362,20 @@ def next_action(model: dict[str, Any], capability_id: str) -> dict[str, Any]:
     }
 
 
-def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) -> dict[str, Any]:
+def resolve_question(
+    model: dict[str, Any],
+    question_id: str,
+    artifact_id: str,
+    acceptance_id: str,
+    supersedes_acceptance_id: str,
+) -> dict[str, Any]:
+    """Resolve a Question only across an explicit semantic acceptance transition.
+
+    Acceptance identities are opaque to Core. The caller/integration owns their
+    semantic validity, while Core enforces that resolution cannot claim the same
+    accepted identity it supersedes. Use the reserved value ABSENT only to state
+    that no prior accepted semantic identity existed.
+    """
     validate_model(model)
     result = copy.deepcopy(model)
     artifacts = _by_id(result.get("artifacts", []), "artifact")
@@ -298,7 +389,21 @@ def resolve_question(model: dict[str, Any], question_id: str, artifact_id: str) 
         raise CoreError(
             f"resolution artifact {artifact_id} is not owned by addressed authority {question['authority']}"
         )
-    question["resolution"] = artifact_id
+    if not isinstance(acceptance_id, str) or not acceptance_id:
+        raise CoreError("resolution acceptance_id is required")
+    if acceptance_id == "ABSENT":
+        raise CoreError("resolution acceptance_id cannot be ABSENT")
+    if not isinstance(supersedes_acceptance_id, str) or not supersedes_acceptance_id:
+        raise CoreError("resolution supersedes_acceptance_id is required")
+    if acceptance_id == supersedes_acceptance_id:
+        raise CoreError(
+            "resolution acceptance_id must differ from supersedes_acceptance_id"
+        )
+    question["resolution"] = {
+        "artifact": artifact_id,
+        "acceptance_id": acceptance_id,
+        "supersedes_acceptance_id": supersedes_acceptance_id,
+    }
     validate_model(result)
     return result
 
@@ -331,6 +436,8 @@ def main() -> int:
         elif name == "resolve-question":
             command.add_argument("question")
             command.add_argument("artifact")
+            command.add_argument("acceptance_id")
+            command.add_argument("supersedes_acceptance_id")
             command.add_argument("--write", action="store_true")
 
     args = parser.parse_args()
@@ -350,7 +457,13 @@ def main() -> int:
     elif args.command == "next-action":
         _emit(next_action(model, args.capability))
     elif args.command == "resolve-question":
-        resolved = resolve_question(model, args.question, args.artifact)
+        resolved = resolve_question(
+            model,
+            args.question,
+            args.artifact,
+            args.acceptance_id,
+            args.supersedes_acceptance_id,
+        )
         if args.write:
             Path(args.model).write_text(yaml.safe_dump(resolved, sort_keys=False), encoding="utf-8")
         else:

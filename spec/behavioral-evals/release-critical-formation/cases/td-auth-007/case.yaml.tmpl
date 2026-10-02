@@ -1,0 +1,27 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-AUTH-007
+abilities: [HA-A04]
+failure_modes: [A04-F06]
+test_level: TL4
+fixture_revision: TD-AUTH-007-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Partition accepted decision atoms into independently changeable Authorities. Decide from semantic ownership and revalidation boundaries, not team names, filenames, or co-location."
+selected_scope: "order-platform-authority-boundaries"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [authority_partition]
+pass_criteria:
+  require_dimensions: [authority_partition]
+run_plan:
+  runs: 3
+  all_runs_must_pass: true

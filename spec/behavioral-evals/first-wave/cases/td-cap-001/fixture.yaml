@@ -1,0 +1,7 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-001-FIXTURE-V1
+atoms:
+  - id: E1
+    statement: "Payment creation must accept an idempotency key."
+    source_path: "docs/api-contract.md"

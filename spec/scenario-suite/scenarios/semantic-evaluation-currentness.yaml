@@ -1,0 +1,135 @@
+version: 1
+kind: harness-scenario
+id: semantic-evaluation-set-rejects-duplicate-current-records
+title: Current semantic evaluation snapshot rejects stale duplicate records
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-evaluation-current-snapshot
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: SEMANTIC-EVALUATION-CURRENTNESS
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own evidence.
+          boundary:
+            semantic_cohesion: Evidence semantics.
+            independent_change: Evidence changes independently.
+            public_contract: Accepted evidence.
+          produces:
+            - capability: demo.evidence
+              knowledge_kind: problem-evidence
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume evidence.
+          requires: [demo.evidence]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: EVIDENCE
+          authority: DISCOVERY
+          path: docs/evidence.md
+          provides: [demo.evidence]
+          depends_on: []
+      questions: []
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: CURRENT-EVALUATION-REGISTRY
+      routes:
+        - knowledge_kind: problem-evidence
+          skill: skills/artifacts/problem-evidence/SKILL.md
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: EVIDENCE
+          capability: demo.evidence
+          acceptance_id: EVIDENCE-2
+          accepted_prerequisites: {}
+  evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: EVIDENCE
+          capability: demo.evidence
+          status: ACCEPTED
+          findings: []
+          semantic_claims: {accepted: []}
+          question_proposals: []
+          admission: {status: ACCEPTED, acceptance_id: EVIDENCE-2}
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: EVIDENCE
+          capability: demo.evidence
+          status: REJECTED
+          findings: [{code: MISSING_OBLIGATION, obligation: stale-obligation}]
+          semantic_claims: {accepted: []}
+          question_proposals:
+            - id: Q-STALE
+              authority: DISCOVERY
+              text: Stale rejected evaluation must not reopen this Question.
+              blocks_capabilities: [demo.evidence]
+  derivation-evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations: []
+      derivation_evaluations:
+        - version: 1
+          kind: harness-semantic-derivation-evaluation
+          source_capability: demo.evidence
+          target_capability: demo.evidence
+          status: ACCEPTED
+          question_proposals: []
+        - version: 1
+          kind: harness-semantic-derivation-evaluation
+          source_capability: demo.evidence
+          target_capability: demo.evidence
+          status: REJECTED
+          question_proposals:
+            - id: Q-STALE-DERIVATION
+              authority: DISCOVERY
+              text: Stale derivation evidence must not reopen this Question.
+              blocks_capabilities: [demo.evidence]
+
+steps:
+  - id: duplicate-current-records
+    driver: semantic.closure
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      skill_registry: {ref: fixture.registry}
+      semantic_evaluations: {ref: fixture.evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+    expect_error:
+      type: CoreError
+      contains: duplicate current semantic evaluation
+
+  - id: duplicate-current-derivation-records
+    driver: semantic.closure
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      skill_registry: {ref: fixture.registry}
+      semantic_evaluations: {ref: fixture.derivation-evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+    expect_error:
+      type: CoreError
+      contains: duplicate current semantic derivation evaluation

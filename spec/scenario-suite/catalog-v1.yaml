@@ -76,6 +76,7 @@ required_drivers:
   - authority.context
   - source.coverage
   - core.validate
+  - core.resolve_question
   - data.patch
   - engineering.target
   - semantic.acceptance
@@ -97,6 +98,10 @@ required_drivers:
   - engineering.coverage
   - graph.doctor
   - project.authority_bootstrap
+  - project.frontier
+  - publication.build
+  - publication.transition
+  - publication.validate
   - project.status
   - canonical.project
   - canonical.alignment
@@ -106,6 +111,7 @@ required_drivers:
   - human.compile_manifest
   - frontend.ux_closure
   - frontend.screen_contracts
+  - skill.operation
   - skill.invariant_policy
 
 requirements:
@@ -125,6 +131,12 @@ requirements:
     description: A recurring semantic gap reopens a previously resolved deterministic Question.
     min_scenarios: 1
 
+  - id: question-resolution-acceptance-transition
+    category: semantic
+    enforcement: required
+    description: A Question resolves only when the addressed Authority binds it to a distinct accepted semantic identity transition.
+    min_scenarios: 1
+
   - id: lifecycle-currentness
     description: Changed upstream acceptance makes dependent accepted knowledge stale when no finer semantic dependency baseline is available.
     min_scenarios: 1
@@ -137,6 +149,12 @@ requirements:
 
   - id: create-work-skill-routing
     description: Actionable CREATE work is routed to the registered knowledge-kind skill.
+    min_scenarios: 1
+
+  - id: create-work-prerequisite-boundary
+    category: routing
+    enforcement: required
+    description: CREATE capabilities with different effective direct prerequisite contracts remain separate artifact-work items even when Authority, subject and knowledge kind match.
     min_scenarios: 1
 
   - id: blocked-work-not-routed
@@ -210,6 +228,12 @@ requirements:
     description: Semantic admission rejects assertions whose source or decision Authority provenance violates the read boundary.
     min_scenarios: 1
 
+  - id: semantic-dependency-topology
+    category: semantic
+    enforcement: required
+    description: Strict semantic admission rejects readable canonical source artifacts that are not represented by the target production's declared prerequisite capabilities.
+    min_scenarios: 1
+
   - id: semantic-derivation-coverage
     category: semantic
     enforcement: required
@@ -256,6 +280,24 @@ requirements:
     category: semantic
     enforcement: required
     description: Full semantic closure requires accepted admission plus CURRENT lifecycle evidence for every selected capability.
+    min_scenarios: 1
+
+  - id: lifecycle-graph-evolution-reconciliation
+    category: lifecycle
+    enforcement: required
+    description: Removed CapabilityIds become inert lifecycle history while changed prerequisite topology makes retained capabilities stale without transferring acceptance to new identities.
+    min_scenarios: 1
+
+  - id: semantic-evaluation-current-snapshot
+    category: semantic
+    enforcement: required
+    description: A current semantic evaluation set rejects duplicate artifact or derivation records for one semantic identity instead of selecting by list order or replaying stale Question proposals.
+    min_scenarios: 1
+
+  - id: acceptance-policy-currentness
+    category: lifecycle
+    enforcement: required
+    description: Accepted capability knowledge becomes stale when the effective acceptance policy changes after admission.
     min_scenarios: 1
 
   - id: subject-inventory-disposition
@@ -312,6 +354,30 @@ requirements:
     description: CURRENT work is omitted by default while explicit REDO remains bounded and repeatable.
     min_scenarios: 1
 
+  - id: decision-existing-provider-lifecycle-gap
+    category: decision
+    enforcement: required
+    description: An existing Core provider without lifecycle evidence is surfaced as an UNKNOWN lifecycle gap and never as CREATE work.
+    min_scenarios: 1
+
+  - id: decision-failed-validation-retry
+    category: decision
+    enforcement: required
+    description: FAILED_VALIDATION remains visible and non-READY until an explicit retry, including failed CREATE with no current provider.
+    min_scenarios: 1
+
+  - id: project-next-action-frontier
+    category: routing
+    enforcement: required
+    description: Application orchestration composes decision, semantic and coverage read models into one unambiguous next-action frontier and distinguishes COMPLETE/BLOCKED/WAITING/INCOMPLETE.
+    min_scenarios: 1
+
+  - id: capability-publication-atomicity
+    category: integration
+    enforcement: required
+    description: A terminal Capability result becomes visible only as one coherent revision; partial component mutation and stale-writer publication fail closed.
+    min_scenarios: 1
+
   - id: decision-execution-assurance
     category: decision
     enforcement: required
@@ -322,6 +388,18 @@ requirements:
     category: authority
     enforcement: required
     description: Authority execution context exposes only admitted upstream and same-Authority canonical inputs.
+    min_scenarios: 1
+
+  - id: multi-provider-structural-availability
+    category: authority
+    enforcement: required
+    description: A blocked historical provider does not block a CapabilityId when another same-Authority provider is structurally usable; only usable alternatives enter Authority input context.
+    min_scenarios: 1
+
+  - id: capability-question-granularity
+    category: lifecycle
+    enforcement: required
+    description: A capability-scoped Question blocks only that CapabilityId when one CanonicalArtifact materializes several capabilities; artifact-scoped blocks remain whole-artifact.
     min_scenarios: 1
 
   - id: project-authority-migration
@@ -346,6 +424,18 @@ requirements:
     category: frontend
     enforcement: required
     description: Frontend screen and UX closure rejects missing query/action/state/provider or presentation semantics.
+    min_scenarios: 1
+
+  - id: internal-operation-parent-authorization
+    category: routing
+    enforcement: required
+    description: Internal operations resolve only when the runtime caller supplies a registered public parent authorized by the target route's invoked_by contract.
+    min_scenarios: 1
+
+  - id: instruction-data-trust-boundary
+    category: agent
+    enforcement: required
+    description: Every routed agent procedure exposes the canonical instruction trust contract so project/tool payloads cannot become instruction authority merely through their content.
     min_scenarios: 1
 
   - id: skill-invariant-policy

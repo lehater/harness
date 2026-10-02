@@ -8,6 +8,7 @@ semantics:
   - Activation does not imply the concern is missing; coverage is evaluated separately.
   - Rules may use structural machine-readable signals, never prose interpretation.
   - Explicit project applicability decisions may override an activation only with accepted rationale/evidence.
+  - Manual activation classes are conservative applicability obligations: silence keeps the concern activated until explicit project knowledge closes it.
 
 baseline:
   # Minimal implementation-readiness questions for a software product.

@@ -1,0 +1,126 @@
+version: 1
+kind: harness-scenario
+id: acceptance-policy-change-requires-revalidation
+title: Acceptance policy changes invalidate previously accepted capability knowledge
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: lifecycle
+  execution_type: deterministic
+covers:
+  - acceptance-policy-currentness
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: ACCEPTANCE-POLICY-CURRENTNESS
+      authorities:
+        - id: DISCOVERY
+          responsibility: Own accepted source evidence.
+          boundary:
+            semantic_cohesion: Source evidence.
+            independent_change: Evidence changes independently.
+            public_contract: Accepted evidence.
+          produces:
+            - capability: demo.evidence
+              knowledge_kind: problem-evidence
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume accepted evidence.
+          requires: [demo.evidence]
+      terminal_capabilities: []
+  model:
+    value:
+      artifacts:
+        - id: EVIDENCE
+          authority: DISCOVERY
+          path: docs/evidence.md
+          provides: [demo.evidence]
+          depends_on: []
+      questions: []
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: ACCEPTANCE-POLICY-REGISTRY
+      routes:
+        - knowledge_kind: problem-evidence
+          skill: skills/artifacts/problem-evidence/SKILL.md
+  evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: EVIDENCE
+          capability: demo.evidence
+          status: ACCEPTED
+          findings: []
+          semantic_claims: {accepted: []}
+          question_proposals: []
+          admission:
+            status: ACCEPTED
+            acceptance_id: EVIDENCE-1
+            acceptance_policy_fingerprint: sha256:obsolete-policy
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: EVIDENCE
+          capability: demo.evidence
+          acceptance_id: EVIDENCE-1
+          acceptance_policy_fingerprint: sha256:obsolete-policy
+          accepted_prerequisites: {}
+  knowledge_contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-semantic-contracts
+      id: changed-semantic-contracts/v1
+      defaults:
+        requires_assertion_authority: true
+        requires_source_authority: true
+        requires_semantic_review: true
+        required_review_checks: [source-discipline, authority-boundary, no-invention]
+      contracts:
+        - knowledge_kind: problem-evidence
+          required_review_checks: [evidence-not-solution, evidence-currentness-reviewed]
+  decision_contracts:
+    value:
+      version: 1
+      kind: harness-knowledge-kind-decision-contracts
+      id: empty-decision-contracts/v1
+      policy_defaults: {exploration: EXPLORE, autonomy: CONSERVATIVE}
+      contracts: []
+
+steps:
+  - id: closure
+    driver: semantic.closure
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      target: IMPLEMENTATION
+      skill_registry: {ref: fixture.registry}
+      semantic_evaluations: {ref: fixture.evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+      knowledge_contracts: {ref: fixture.knowledge_contracts}
+      decision_contracts: {ref: fixture.decision_contracts}
+    expect:
+      - {path: /status, op: equals, value: INCOMPLETE}
+      - path: /currentness_gaps
+        op: contains_match
+        value:
+          capability: demo.evidence
+          state: STALE
+      - path: /revalidate
+        op: contains_match
+        value:
+          capability: demo.evidence
+      - path: /currentness_gaps/0/details/mismatches
+        op: contains_match
+        value:
+          mode: ACCEPTANCE_POLICY

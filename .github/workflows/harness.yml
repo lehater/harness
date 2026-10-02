@@ -5,51 +5,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    paths:
-      - "AGENTS.md"
-      - "README.md"
-      - "docs/design/**"
-      - "profiles/**"
-      - "skills/**"
-      - "adapters/**"
-      - "spec/**"
-      - "validators/**"
-      - "harness.py"
-      - "engineering_graph.py"
-      - "reference_materializer.py"
-      - "reference_model_evolution.py"
-      - "engineering_coverage.py"
-      - "coverage_planner.py"
-      - "coverage_obligations.py"
-      - "concern_activation.py"
-      - "integration_alignment.py"
-      - "authority_context.py"
-      - "graph_doctor.py"
-      - "human_projection.py"
-      - "agent_router.py"
-      - "semantic_acceptance.py"
-      - "semantic_admission.py"
-      - "semantic_questions.py"
-      - "semantic_closure.py"
-      - "semantic_derivation.py"
-      - "semantic_fingerprint.py"
-      - "semantic_judgement_calibration.py"
-      - "live_calibration.py"
-      - "live_calibration_process_driver.py"
-      - "derivation_test_coverage.py"
-      - "scenario_suite.py"
-      - "scenario_drivers.py"
-      - "capability_lifecycle.py"
-      - "target_state.py"
-      - "workspace.py"
-      - "Makefile"
-      - "examples/greenfield-csv-deduplicator/**"
-      - "examples/user-facing-application/**"
-      - "examples/frontend-legacy-compatibility/**"
-      - ".github/workflows/harness.yml"
+    types: [opened, ready_for_review, synchronize, reopened]
 
 jobs:
   validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

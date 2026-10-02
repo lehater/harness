@@ -26,20 +26,21 @@ def _capability_closure(doc: dict[str, Any], roots: list[str]) -> set[str]:
                 productions[production["capability"]] = production
 
     closure: set[str] = set()
-    def include(capability: str) -> None:
+    pending = list(reversed(roots))
+    while pending:
+        capability = pending.pop()
         if capability in closure:
-            return
+            continue
         closure.add(capability)
         production = productions.get(capability)
         if not production:
-            return
+            continue
+        upstream_capabilities: list[str] = []
         for requirement in production.get("requires", []) or []:
             upstream = requirement if isinstance(requirement, str) else requirement.get("capability")
-            if upstream:
-                include(upstream)
-
-    for capability in roots:
-        include(capability)
+            if upstream and upstream not in closure:
+                upstream_capabilities.append(upstream)
+        pending.extend(reversed(upstream_capabilities))
     return closure
 
 
@@ -225,6 +226,23 @@ def derive_activation(
                 "rule": rule["id"],
                 "signals": evidence,
             })
+
+    for item in policy.get("manual_activation_classes", []) or []:
+        if isinstance(item, str):
+            concern = item
+            reason = None
+        elif isinstance(item, dict) and item.get("concern"):
+            concern = item["concern"]
+            reason = item.get("reason")
+        else:
+            raise ValueError("manual activation class must be a concern id or mapping")
+        entry = {
+            "source": "MANUAL_ACTIVATION_CLASS",
+            "policy": policy.get("id"),
+        }
+        if reason:
+            entry["reason"] = reason
+        provenance.setdefault(concern, []).append(entry)
 
     selected_scope = overlay.get("scope")
 

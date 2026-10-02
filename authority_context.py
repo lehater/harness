@@ -17,9 +17,10 @@ from engineering_graph import (
 )
 from harness import (
     CoreError,
-    blocked,
+    artifact_blockers,
     capability_blockers,
     capability_resolve,
+    unblocked_capability_providers,
     validate_model,
 )
 
@@ -142,6 +143,7 @@ def build_authority_context(
         except CoreError:
             providers = []
 
+        available_providers: list[str] = []
         if providers:
             for provider in providers:
                 if artifacts[provider]["authority"] != expected_authority:
@@ -149,18 +151,28 @@ def build_authority_context(
                         f"capability {capability} provider {provider} belongs to "
                         f"{artifacts[provider]['authority']}, expected {expected_authority}"
                     )
+
+            available_providers = unblocked_capability_providers(
+                realized,
+                capability,
+            )
+            for provider in available_providers:
                 input_artifact_ids.add(provider)
                 support_artifact_ids.update(
                     _same_authority_closure(provider, artifacts)
                 )
-                provider_blockers.update(blocked(realized, provider))
+            if not available_providers:
+                for provider in providers:
+                    provider_blockers.update(
+                        artifact_blockers(realized, provider)
+                    )
 
         all_blockers = sorted(
             set(direct_capability_blockers) | provider_blockers
         )
-        if all_blockers:
+        if direct_capability_blockers or (providers and not available_providers):
             status = "WAIT"
-        elif providers:
+        elif available_providers:
             status = "SATISFIED"
         else:
             status = "DESIGN_GAP"
@@ -169,7 +181,9 @@ def build_authority_context(
             "capability": capability,
             "authority": expected_authority,
             "status": status,
-            "providers": sorted(providers),
+            "providers": sorted(
+                available_providers if available_providers else providers
+            ),
             "blocked_by": all_blockers,
         }
         requirements.append(row)

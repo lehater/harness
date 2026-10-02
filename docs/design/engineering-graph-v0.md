@@ -63,6 +63,8 @@ Example:
 
 This allows one Authority to own several related outputs without forcing every output to wait for the union of all Authority inputs.
 
+A production's `requires` list is also the complete lifecycle boundary for material semantic dependencies outside the target artifact itself. If accepted semantics for one capability are derived from another canonical artifact, that source knowledge must be exposed through a CapabilityId listed in the target production's `requires`, even when both artifacts belong to the same Authority. Same-Authority `depends_on` support may remain readable execution context, but it does not create a semantic prerequisite or a lifecycle baseline.
+
 If two outputs are semantically unrelated, that remains evidence that the Authority should be split. Different prerequisite sets alone do not force a split.
 
 ## Capability
@@ -170,7 +172,7 @@ Engineering Graph validation and structural target-state evaluation do not gener
 
 `agent_router.py` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
 
-When several simultaneously actionable capabilities share the same Authority, subject and knowledge kind, the router groups them into one artifact-work item. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities. Grouping is an agent execution projection, not a Core task entity.
+When several simultaneously actionable capabilities share the same Authority, subject, knowledge kind and effective direct prerequisite contract, the router groups them into one artifact-work item. The prerequisite contract compares each required CapabilityId together with its effective subject, so list ordering does not matter and an omitted subject is equivalent to the graph default subject. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities from the same accepted input boundary. Capabilities with different prerequisite contracts remain separate work items even when one Authority and skill could eventually co-materialize them; strict semantic admission and lifecycle baselines remain capability-specific. Grouping is an agent execution projection, not a Core task entity.
 
 ## Derived target
 
@@ -206,9 +208,9 @@ Core target-state evaluation
 
 Against a Core model:
 
-- provider exists and is unblocked -> SATISFIED;
+- at least one provider exists and is unblocked -> SATISFIED; blocked sibling providers inside the same Authority are alternatives and do not block the CapabilityId;
 - provider missing, production prerequisites satisfied, no capability Question -> CREATE at the declared producer Authority;
-- provider or missing capability blocked by unresolved Question -> WAIT;
+- every existing provider is blocked, or a missing capability is blocked by an unresolved Question -> WAIT;
 - production prerequisites not yet satisfied -> PENDING;
 - every derived expectation satisfied -> COMPLETE.
 
@@ -250,7 +252,7 @@ A consumer contract answers **which classes of engineering knowledge are needed*
 
 A project completeness policy may additionally answer **for which subjects those capabilities must exist**.
 
-Both may contribute production/consumer requirements to the projected Engineering Graph.
+Both may contribute production/consumer requirements to the projected Engineering Graph. The accepted Engineering Graph owns the concrete project topology, but not the claim that this topology is exhaustive. Selected-scope completeness and applicability are owned by Engineering Coverage. An optional Reference Engineering Model may propose reusable graph materialization, but neither a successful materialization nor absence of a reference template proves completeness or non-applicability. The canonical ownership boundary is defined in `docs/design/model-completeness-ownership-v0.md`.
 
 In v0, independent subject coverage is represented by distinct CapabilityIds, for example:
 

@@ -1,0 +1,13 @@
+version: 1
+kind: harness-agent-behavioral-eval-manifest
+id: RELEASE-CRITICAL-FORMATION-V1
+provider_prompt_budget:
+  metric: utf8_bytes
+  max_per_call: 28000
+  max_suite: 252000
+cases:
+  - {design: TD-AUTH-003, template: cases/td-auth-003/case.yaml.tmpl, dimension: authority_partition, runs: 1}
+  - {design: TD-AUTH-006, template: cases/td-auth-006/case.yaml.tmpl, dimension: authority_partition, runs: 1}
+  - {design: TD-CAP-008, template: cases/td-cap-008/case.yaml.tmpl, dimension: capability_partition, runs: 1}
+  - {design: TD-CAP-007, template: cases/td-cap-007/case.yaml.tmpl, dimension: capability_partition, runs: 3}
+  - {design: TD-AUTH-007, template: cases/td-auth-007/case.yaml.tmpl, dimension: authority_partition, runs: 3}

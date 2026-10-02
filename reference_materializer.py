@@ -123,13 +123,23 @@ def validate_reference_model(model,authority_catalog,proof_contract):
             if isinstance(r,dict) and isinstance(r.get("template"),str) and r["template"] not in by_id: errors.append(diag("MISSING_TEMPLATE",f"{tid}: missing template {r['template']}",template=tid,dependency=r["template"]))
     deps={tid:{r["template"] for r in t.get("requires",[]) or [] if isinstance(r,dict) and r.get("template") in by_id} for tid,t in by_id.items()}
     visiting=set(); visited=set()
-    def visit(tid):
-        if tid in visited:return
-        if tid in visiting: errors.append(diag("CAPABILITY_CYCLE",f"Reference Capability dependency cycle at {tid}",template=tid)); return
-        visiting.add(tid)
-        for target in sorted(deps.get(tid,())): visit(target)
-        visiting.remove(tid); visited.add(tid)
-    for tid in sorted(by_id): visit(tid)
+    for tid in sorted(by_id):
+        if tid in visited: continue
+        stack=[(tid,False)]
+        while stack:
+            current,expanded=stack.pop()
+            if expanded:
+                if current in visiting: visiting.remove(current)
+                visited.add(current); continue
+            if current in visited: continue
+            if current in visiting:
+                errors.append(diag("CAPABILITY_CYCLE",f"Reference Capability dependency cycle at {current}",template=current)); continue
+            visiting.add(current); stack.append((current,True))
+            for target in reversed(sorted(deps.get(current,()))):
+                if target in visiting:
+                    errors.append(diag("CAPABILITY_CYCLE",f"Reference Capability dependency cycle at {target}",template=target))
+                elif target not in visited:
+                    stack.append((target,False))
     return errors
 
 def value_matches(value,d):

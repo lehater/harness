@@ -1,0 +1,28 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-CAP-007
+abilities: [HA-A05]
+failure_modes: [A05-F08]
+test_level: TL4
+fixture_revision: TD-CAP-007-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Identify the independently provable Capability partition from the accepted evidence. Ignore file layout, repeated examples, and descriptive terminology; return only the stable semantic groups."
+selected_scope: "order-platform-semantic-surfaces"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+  - skills/agent/design-profile/SKILL.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [capability_partition]
+pass_criteria:
+  require_dimensions: [capability_partition]
+run_plan:
+  runs: 3
+  all_runs_must_pass: true

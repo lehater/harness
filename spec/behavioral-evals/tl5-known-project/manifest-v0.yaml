@@ -1,0 +1,9 @@
+version: 1
+kind: harness-agent-behavioral-eval-manifest
+id: TL5-KNOWN-PROJECT-BEHAVIORAL-EVALS-V1
+provider_prompt_budget:
+  metric: utf8_bytes
+  max_per_call: 42000
+  max_suite: 84000
+cases:
+  - {design: TD-BOOT-E07, template: cases/td-boot-e07/case.yaml.tmpl, dimension: bootstrap_realization}

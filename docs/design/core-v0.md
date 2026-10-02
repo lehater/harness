@@ -9,7 +9,14 @@ Harness Core manages boundaries of engineering knowledge and decision ownership.
 - **CapabilityId** — a value identifier for knowledge/capability provided by canonical artifacts. Multiple providers are allowed only inside one Authority.
 - **Question** — a material unresolved semantic gap addressed to the Authority allowed to decide it.
 
-A Question contains no final semantic answer. Resolution means the addressed Authority changed canonical truth and the Question now references the canonical artifact containing that decision.
+Multiple providers of one CapabilityId are structural alternatives inside the same
+Authority, not a conjunction. The CapabilityId is structurally usable when at
+least one provider is unblocked. A Question that blocks one provider does not
+block sibling providers unless it blocks the CapabilityId itself or its impact
+closure reaches every provider. Assurance/lifecycle may select one accepted
+provider for semantic currentness without changing this Core availability rule.
+
+A Question contains no final semantic answer. Resolution means the addressed Authority changed canonical truth and the Question now references the canonical artifact containing that decision plus the new opaque semantic `acceptance_id` and the identity it supersedes. Core does not interpret the identity; project integration must supply it from accepted semantic/project-native evidence. `ABSENT` is reserved for `supersedes_acceptance_id` when no prior accepted semantic identity existed.
 
 ## Relations
 
@@ -17,9 +24,9 @@ A Question contains no final semantic answer. Resolution means the addressed Aut
 - CanonicalArtifact provides CapabilityId.
 - CanonicalArtifact may `depends_on` other CanonicalArtifact IDs.
 - Question is addressed to one Authority.
-- An unresolved Question may `blocks` existing downstream artifacts.
-- An unresolved Question may `blocks_capabilities` when the semantic gap prevents a required capability from being formed before any provider artifact exists.
-- A resolved Question has `resolution: <artifact-id>` and that artifact must belong to the addressed Authority.
+- An unresolved Question may `blocks` a CanonicalArtifact when the unresolved semantics make the artifact as a whole unusable; the artifact dependency impact remains artifact-wide.
+- An unresolved Question may `blocks_capabilities` when the unresolved semantics concern a specific CapabilityId, whether or not a provider artifact already exists. Other capabilities co-materialized by the same artifact remain independently usable unless separately blocked.
+- A resolved Question has `resolution: {artifact, acceptance_id, supersedes_acceptance_id}`; the artifact must belong to the addressed Authority and the two identities must differ.
 
 ## Project model
 
@@ -54,7 +61,7 @@ questions:
 - `resolve MODEL CAPABILITY_ID`
 - `owner MODEL CAPABILITY_ID`
 - `blocked MODEL ARTIFACT`
-- `resolve-question MODEL QUESTION ARTIFACT [--write]`
+- `resolve-question MODEL QUESTION ARTIFACT ACCEPTANCE_ID SUPERSEDES_ACCEPTANCE_ID [--write]`
 
 Core validates declared ownership, references, dependencies and capability ownership. It does not interpret arbitrary artifact semantics.
 
@@ -106,7 +113,7 @@ The BLS slice justifies one small Core extension: unresolved Questions may block
 Observed usage guidance:
 
 - `Question` is exceptional, not a mandatory work item.
-- use `blocks_capabilities` only when the unresolved semantic decision prevents creation of a provider that does not yet exist; use artifact `blocks` when a provider already exists.
+- choose blocker scope by semantic granularity, not provider existence: use `blocks_capabilities` for a capability-specific gap even when its provider artifact already exists; use artifact `blocks` only when the whole CanonicalArtifact is unusable.
 - `affected` is a dependency-impact closure, not a mandatory file-change list.
 - target repositories remain authoritative for semantic and dependency truth; a Core model should project existing project truth rather than create a second canonical graph.
 - Git branch synchronization, CI configuration and other delivery mechanics remain outside Core.

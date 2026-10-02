@@ -9,6 +9,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from semantic_admission import derive_acceptance_policy_fingerprints
 from semantic_closure import evaluate_semantic_closure
 
 
@@ -166,6 +167,31 @@ def load_registry():
 
 
 def main() -> int:
+    contracts = yaml.safe_load(
+        (ROOT / "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    decision_contracts = yaml.safe_load(
+        (ROOT / "spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    current_policy_fingerprints = derive_acceptance_policy_fingerprints(
+        graph=GRAPH,
+        knowledge_contracts=contracts,
+        decision_contracts=decision_contracts,
+        decision_policy=None,
+    )
+    for provider in LIFECYCLE["providers"]:
+        provider["acceptance_policy_fingerprint"] = (
+            current_policy_fingerprints[provider["capability"]]
+        )
+    for evaluation_item in EVALUATIONS["semantic_evaluations"]:
+        evaluation_item["admission"]["acceptance_policy_fingerprint"] = (
+            current_policy_fingerprints[evaluation_item["capability"]]
+        )
+
     result = evaluate_semantic_closure(
         graph=GRAPH,
         model=MODEL,
@@ -173,8 +199,45 @@ def main() -> int:
         skill_registry=load_registry(),
         semantic_evaluations=EVALUATIONS,
         lifecycle=LIFECYCLE,
+        knowledge_contracts=contracts,
+        decision_contracts=decision_contracts,
     )
     assert result["status"] == "COMPLETE", result
+
+    changed_contracts = copy.deepcopy(contracts)
+    changed_requirements = next(
+        item
+        for item in changed_contracts["contracts"]
+        if item["knowledge_kind"] == "product-requirements"
+    )
+    changed_requirements.setdefault("required_review_checks", []).append(
+        "policy-change-probe"
+    )
+    changed_policy = evaluate_semantic_closure(
+        graph=GRAPH,
+        model=MODEL,
+        target="IMPLEMENTATION",
+        skill_registry=load_registry(),
+        semantic_evaluations=EVALUATIONS,
+        lifecycle=LIFECYCLE,
+        knowledge_contracts=changed_contracts,
+        decision_contracts=decision_contracts,
+    )
+    assert changed_policy["status"] == "INCOMPLETE", changed_policy
+    requirements_gap = next(
+        item
+        for item in changed_policy["currentness_gaps"]
+        if item["capability"] == "requirements"
+    )
+    assert requirements_gap["state"] == "STALE", requirements_gap
+    assert any(
+        mismatch.get("mode") == "ACCEPTANCE_POLICY"
+        for mismatch in requirements_gap["details"].get("mismatches", [])
+    ), requirements_gap
+    assert any(
+        item.get("capability") == "requirements"
+        for item in changed_policy["revalidate"]
+    ), changed_policy
 
     missing = copy.deepcopy(EVALUATIONS)
     missing["semantic_evaluations"] = [

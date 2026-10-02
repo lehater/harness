@@ -23,6 +23,9 @@ fixtures:
           when:
             knowledge_kinds_any: [data-design]
           activate: [data.lifecycle]
+      manual_activation_classes:
+        - concern: specialized.ai
+          reason: AI applicability requires explicit project classification.
   roles:
     value:
       version: 1
@@ -73,8 +76,9 @@ steps:
         - {ref: fixture.graph}
       target_consumer: IMPLEMENTATION
     expect:
-      - {path: /activated_count, op: equals, value: 3}
+      - {path: /activated_count, op: equals, value: 4}
       - {path: /rows, op: contains_match, value: {concern: intent.behavior}}
       - {path: /rows, op: contains_match, value: {concern: data.lifecycle}}
       - {path: /rows, op: contains_match, value: {concern: governance.privacy}}
+      - {path: /rows, op: contains_match, value: {concern: specialized.ai}}
       - {path: /rows, op: not_contains_match, value: {concern: interface.human.accessibility}}

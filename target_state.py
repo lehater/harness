@@ -9,7 +9,13 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError, blocked, capability_blockers, validate_model
+from harness import (
+    CoreError,
+    artifact_blockers,
+    capability_blockers,
+    unblocked_capability_providers,
+    validate_model,
+)
 
 
 def _by_id(items: list[dict[str, Any]], kind: str) -> dict[str, dict[str, Any]]:
@@ -86,19 +92,33 @@ def validate_profile(profile: dict[str, Any], model: dict[str, Any] | None = Non
     visiting: set[str] = set()
     visited: set[str] = set()
 
-    def visit(expectation_id: str) -> None:
-        if expectation_id in visited:
-            return
-        if expectation_id in visiting:
-            raise CoreError(f"design profile expectation dependency cycle at: {expectation_id}")
-        visiting.add(expectation_id)
-        for dependency in indexed[expectation_id].get("depends_on", []):
-            visit(dependency)
-        visiting.remove(expectation_id)
-        visited.add(expectation_id)
-
     for expectation_id in indexed:
-        visit(expectation_id)
+        if expectation_id in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(expectation_id, False)]
+        while stack:
+            current, expanded = stack.pop()
+            if expanded:
+                if current in visiting:
+                    visiting.remove(current)
+                visited.add(current)
+                continue
+            if current in visited:
+                continue
+            if current in visiting:
+                raise CoreError(
+                    f"design profile expectation dependency cycle at: {current}"
+                )
+            visiting.add(current)
+            stack.append((current, True))
+            dependencies = indexed[current].get("depends_on", [])
+            for dependency in reversed(dependencies):
+                if dependency in visiting:
+                    raise CoreError(
+                        f"design profile expectation dependency cycle at: {dependency}"
+                    )
+                if dependency not in visited:
+                    stack.append((dependency, False))
 
 
 def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:
@@ -174,12 +194,21 @@ def evaluate_target_state(profile: dict[str, Any], model: dict[str, Any]) -> dic
                     f"but capability {capability} is owned by {provider_authority}"
                 )
 
-            blockers = sorted(
-                {
-                    question
-                    for provider in providers
-                    for question in blocked(model, provider)
-                }
+            available_providers = unblocked_capability_providers(
+                model,
+                capability,
+            )
+            blockers = (
+                []
+                if available_providers
+                else sorted(
+                    set(capability_blockers(model, capability))
+                    | {
+                        question
+                        for provider in providers
+                        for question in artifact_blockers(model, provider)
+                    }
+                )
             )
             if blockers:
                 wait.append(

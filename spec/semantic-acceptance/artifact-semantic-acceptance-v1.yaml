@@ -107,6 +107,14 @@ integration:
   opt_in_rule: >-
     Once evaluation evidence exists for an artifact/capability, REJECTED evidence
     prevents that provider from realizing the capability.
+  current_snapshot_rule: >-
+    A harness-semantic-evaluation-set is the current semantic-evidence snapshot,
+    not an append-only history. It may contain at most one artifact semantic
+    evaluation for each (artifact, capability) identity and at most one semantic
+    derivation evaluation for each (source_capability, target_capability) edge.
+    Superseded evaluations may be retained by project-native history, but they
+    must not be replayed into the current set. Duplicate current identities fail
+    closed rather than being selected by list order.
   invalidation_rule: >-
     A semantically invalid capability invalidates dependent produced capabilities
     through Engineering Graph prerequisites until revalidation succeeds.
@@ -120,7 +128,11 @@ integration:
     Routed artifact production must use the strict semantic-admission path when
     full engineering closure is claimed. That path derives admissible source
     Authorities from Engineering Graph prerequisites, validates canonical
-    read/write provenance, requires the knowledge-kind semantic review contract,
+    read/write provenance, and accepts canonical semantic source assertions only
+    from the lifecycle-selected provider artifacts of declared prerequisite
+    capabilities. Read access, including same-Authority supporting closure, does
+    not by itself authorize semantic provenance. The path requires the
+    knowledge-kind semantic review contract,
     composes the Harness-generated candidate-free Decision Explorer Request,
     request-bound pre-choice Decision Exploration and Decision Governance for
     participating knowledge kinds, and records a capability acceptance identity
