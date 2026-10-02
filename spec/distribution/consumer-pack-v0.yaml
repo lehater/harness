@@ -85,6 +85,12 @@ exact_files:
   - src/harness/evidence/source_boundary.py
   - src/harness/evidence/source_coverage.py
   - src/harness/evidence/source_set.py
+  - src/harness/coverage/__init__.py
+  - src/harness/coverage/architecture_driver_closure.py
+  - src/harness/coverage/concern_activation.py
+  - src/harness/coverage/coverage_obligations.py
+  - src/harness/coverage/coverage_planner.py
+  - src/harness/coverage/engineering_coverage.py
   - src/harness/decision/__init__.py
   - src/harness/decision/decision_execution_assurance.py
   - src/harness/decision/decision_exploration.py

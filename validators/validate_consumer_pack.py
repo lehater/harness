@@ -38,6 +38,66 @@ def _git_head() -> str:
     return result.stdout.strip()
 
 
+def test_coverage_published_boundary(temp_root: Path) -> None:
+    """Mutate canonical Coverage imports against the actual architecture validator."""
+    import shutil
+    from validators import validate_context_boundaries as boundaries
+
+    spec = boundaries.load_map()
+    owner = {
+        module: context
+        for context, contract in spec["contexts"].items()
+        for module in contract["modules"]
+    }
+    aliases, _ = boundaries._compatibility(boundaries.load_layout(), owner)
+    assert spec["contexts"]["coverage"]["may_depend_on"] == ["project-model", "assurance"]
+    for module in (
+        "architecture_driver_closure", "concern_activation", "coverage_obligations",
+        "coverage_planner", "engineering_coverage",
+    ):
+        canonical = "harness.coverage." + module
+        assert owner[canonical] == "coverage"
+        assert boundaries._resolve_target(module, owner, aliases) == canonical
+        assert boundaries._resolve_target(canonical, owner, aliases) == canonical
+
+    checkout = temp_root / "boundary-checkout"
+    checkout.mkdir()
+    for path in ROOT.glob("*.py"):
+        shutil.copy2(path, checkout / path.name)
+    for directory in ("src", "harness", "adapters", "distribution"):
+        shutil.copytree(ROOT / directory, checkout / directory)
+    for relative in (
+        "spec/architecture/harness-context-map-v0.yaml",
+        "spec/architecture/repository-layout-v0.yaml",
+        "docs/design/repository-layout-v0.md",
+    ):
+        target = checkout / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, target)
+    command = [sys.executable, "-c", (
+        "import sys; from pathlib import Path; "
+        "import validators.validate_context_boundaries as v; "
+        "v.ROOT=Path(sys.argv[1]); "
+        "v.MAP=v.ROOT/'spec/architecture/harness-context-map-v0.yaml'; "
+        "v.LAYOUT=v.ROOT/'spec/architecture/repository-layout-v0.yaml'; "
+        "raise SystemExit(v.main())"
+    ), str(checkout)]
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    target = checkout / "src/harness/coverage/coverage_planner.py"
+    original = target.read_text()
+    for statement, diagnostic in (
+        ("import semantic_acceptance", "without an explicit symbol boundary"),
+        ("from semantic_acceptance import validate_semantic_evaluation", "non-published symbols"),
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0, statement
+        assert "harness.coverage.coverage_planner (coverage)" in result.stderr, result.stderr
+        assert diagnostic in result.stderr, result.stderr
+    target.write_text(original)
+
+
 def test_pack_execution(pack: Path, temp_root: Path) -> None:
     """Exercise the distributed files, without inheriting checkout import paths."""
     env = dict(os.environ)
@@ -91,6 +151,124 @@ for module in ('source_boundary', 'source_coverage', 'source_set'):
         assert getattr(legacy, name) is getattr(canonical, name), (module, name)
     assert canonical.CoreError is core.CoreError
     assert Path(canonical.__file__).resolve() == Path('src/harness/evidence/' + module + '.py').resolve()
+# Frozen from the root Coverage modules before physical migration.
+coverage_exports = {
+    "architecture_driver_closure": [
+        "annotations",
+        "Any",
+        "BASELINE_CONCERNS",
+        "TERMINAL_STATES",
+        "evaluate"
+    ],
+    "concern_activation": [
+        "annotations",
+        "argparse",
+        "Path",
+        "Any",
+        "yaml",
+        "load",
+        "project_signals",
+        "rule_matches",
+        "derive_activation",
+        "main"
+    ],
+    "coverage_obligations": [
+        "annotations",
+        "Any",
+        "re",
+        "capability_claim_index",
+        "capability_realization",
+        "concern_proofs",
+        "declared_capability_claim_index",
+        "semantic_evaluation_required_claims",
+        "coverage_assurance_view",
+        "TERMINAL_STATES",
+        "derive_subject_inventory_disposition",
+        "validate_subject_obligations",
+        "derive_subject_obligation_rows"
+    ],
+    "coverage_planner": [
+        "annotations",
+        "argparse",
+        "Path",
+        "Any",
+        "yaml",
+        "coverage_assurance_view",
+        "coverage_invalidation_closure",
+        "load",
+        "capability_realization",
+        "realized_capabilities",
+        "declared_capability_claim_index",
+        "capability_claim_index",
+        "concern_proofs",
+        "semantic_evaluation_required_claims",
+        "role_claims",
+        "authorities_for_claim",
+        "derive_plan",
+        "main"
+    ],
+    "engineering_coverage": [
+        "annotations",
+        "argparse",
+        "copy",
+        "json",
+        "Path",
+        "Any",
+        "yaml",
+        "derive_activation",
+        "derive_plan",
+        "derive_subject_inventory_disposition",
+        "derive_subject_obligation_rows",
+        "validate_engineering_graph",
+        "validate_realization",
+        "question_frontier",
+        "ROOT",
+        "load",
+        "load_scope_source",
+        "evaluate_coverage",
+        "evaluate_with_repository_policy",
+        "main"
+    ]
+}
+import ast
+import sys
+# Import canonical Coverage with fail-fast sentinels for every root facade.
+# Transitive unmigrated consumers were already loaded by the earlier probes.
+for module in coverage_exports:
+    assert 'harness.coverage.' + module not in sys.modules, module
+    sys.modules[module] = None
+for module, expected in coverage_exports.items():
+    canonical = importlib.import_module('harness.coverage.' + module)
+    assert canonical.__all__ == expected, module
+    assert Path(canonical.__file__).resolve() == Path('src/harness/coverage/' + module + '.py').resolve()
+    assert hasattr(canonical, 'main') == (module in ('concern_activation', 'coverage_planner', 'engineering_coverage'))
+    tree = ast.parse(Path(canonical.__file__).read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert node.module not in coverage_exports or node.level == 1, (module, node.module)
+            assert node.module not in ('harness', 'engineering_graph'), (module, node.module)
+            if node.module == 'semantic_acceptance':
+                assert {alias.name for alias in node.names} <= {'coverage_assurance_view', 'coverage_invalidation_closure'}
+        if isinstance(node, ast.Import):
+            assert all(alias.name != 'semantic_acceptance' and alias.name not in coverage_exports for alias in node.names)
+for module, expected in coverage_exports.items():
+    del sys.modules[module]
+    legacy = importlib.import_module(module)
+    canonical = importlib.import_module('harness.coverage.' + module)
+    assert legacy.__all__ is canonical.__all__, module
+    for name in expected:
+        assert getattr(legacy, name) is getattr(canonical, name), (module, name)
+    assert hasattr(legacy, 'main') == hasattr(canonical, 'main'), module
+from harness.coverage import engineering_coverage, coverage_obligations, coverage_planner, concern_activation
+assert engineering_coverage.ROOT == Path.cwd()
+assert engineering_coverage.question_frontier is core.question_frontier
+assert engineering_coverage.validate_engineering_graph is canonical_graph.validate_engineering_graph
+assert engineering_coverage.validate_realization is canonical_graph.validate_realization
+assert engineering_coverage.derive_activation is concern_activation.derive_activation
+assert engineering_coverage.derive_plan is coverage_planner.derive_plan
+assert engineering_coverage.derive_subject_obligation_rows is coverage_obligations.derive_subject_obligation_rows
+assert coverage_obligations.capability_realization is coverage_planner.capability_realization
+
 # Public names frozen from the four root modules before the Decision move.
 decision_exports = {
     "decision_execution_assurance": [
@@ -160,6 +338,30 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+    # Representative Coverage CLIs reuse distributed fixtures and authored function oracles.
+    overlay = temp_root / "coverage-overlay.yaml"
+    overlay.write_text(yaml.safe_dump({"activate": [], "decisions": []}), encoding="utf-8")
+    policy = "spec/engineering-coverage/"
+    research = "spec/research/"
+    coverage_commands = (
+        ("concern_activation", [policy + "activation-policy-v1.yaml", research + "consumer-activation-fixture-roles.yaml", str(overlay), research + "consumer-activation-fixture-graph.yaml", "--consumer", "BACKEND"],
+         "m.derive_activation(m.load(a[0]), m.load(a[1]), m.load(a[2]), [m.load(a[3])], 'BACKEND')"),
+        ("coverage_planner", [policy + "semantic-proof-contract-v1.yaml", policy + "authority-role-contract-v1.yaml", research + "coverage-planner-fixture-authorities.yaml", research + "coverage-planner-fixture-claims.yaml", research + "coverage-derivation-fixture-overlay.yaml", research + "coverage-derivation-fixture-knowledge.yaml"],
+         "m.derive_plan(*[m.load(x) for x in a[:5]], [m.load(a[5])])"),
+        ("engineering_coverage", [research + "scope-activation-fixture-graph.yaml", research + "scope-activation-fixture-core.yaml", "IMPLEMENTATION"],
+         "m.evaluate_with_repository_policy(graph=m.load(a[0]), realization=m.load(a[1]), consumer=a[2], scope='default')"),
+    )
+    for module, arguments, expression in coverage_commands:
+        oracle = subprocess.run(
+            [sys.executable, "-c", "import importlib, json, sys; m=importlib.import_module('harness.coverage.'+sys.argv[1]); a=sys.argv[2:]; print(json.dumps(" + expression + "))", module, *arguments],
+            cwd=pack, env=env, check=True, capture_output=True, text=True,
+        )
+        result = subprocess.run(
+            [sys.executable, module + ".py", *arguments], cwd=pack, env=env,
+            check=True, capture_output=True, text=True,
+        )
+        assert yaml.safe_load(result.stdout) == json.loads(oracle.stdout), module
+
     fixture = load_yaml(pack / "spec/acceptance/core-v0-cross-authority-change.yaml")
     model_path = temp_root / "core-model.yaml"
     model_path.write_text(yaml.safe_dump(fixture["model"]), encoding="utf-8")
@@ -308,6 +510,7 @@ def main() -> int:
         assert manifest["consumer_api"] == "v0"
         assert manifest["binding_revision"] == revision
         test_pack_execution(pack, temp_root)
+        test_coverage_published_boundary(temp_root)
 
         surface = load_yaml(pack / "skills/skill-surface-registry-v0.yaml")
         entries = surface["skills"]

@@ -41,11 +41,11 @@ contexts:
     subdomain: core
     responsibility: Own engineering Concern applicability, subject obligations, proof requirements and completeness evaluation.
     modules:
-      - architecture_driver_closure
-      - concern_activation
-      - coverage_obligations
-      - coverage_planner
-      - engineering_coverage
+      - harness.coverage.architecture_driver_closure
+      - harness.coverage.concern_activation
+      - harness.coverage.coverage_obligations
+      - harness.coverage.coverage_planner
+      - harness.coverage.engineering_coverage
     may_depend_on:
       - project-model
       - assurance

@@ -333,3 +333,58 @@ This contract does not:
 - convert all validators to a new test framework;
 - change Consumer Pack API/version semantics;
 - define a published Python package/release version.
+
+## Coverage package migration decision
+
+The complete `coverage` context migrates in one coherent slice to
+`src/harness/coverage/`: `architecture_driver_closure.py`,
+`concern_activation.py`, `coverage_obligations.py`, `coverage_planner.py` and
+`engineering_coverage.py`. Only their `harness.coverage.*` identities own
+semantics. Root Architecture Driver Closure and Coverage Obligations use
+`import-only`; Concern Activation, Coverage Planner and Engineering Coverage
+use `import-and-cli`. These reuse the existing closed facade grammar and
+source-tree bridge; no new packaging or execution mechanism is introduced.
+
+Explicit `__all__` freezes each pre-move public surface, including imported
+names. Production function/class ASTs are independently equivalent to the
+reviewed baseline. Engineering Coverage's module-level `ROOT` is adjusted to
+preserve repository-relative policy lookup after relocation. Internal Coverage
+imports are relative; Project Model imports use canonical Core and Engineering
+Graph identities. Coverage retains only the `project-model` and `assurance`
+dependency directions.
+
+The existing Coverage -> Assurance published boundary remains exactly
+`semantic_acceptance.coverage_assurance_view` and
+`semantic_acceptance.coverage_invalidation_closure`. Assurance has not physically
+migrated, so canonical Coverage temporarily imports root `semantic_acceptance`
+with explicit published symbols. No Assurance implementation is copied and no
+new DTO/API is introduced.
+
+Consumer Pack v0 retains all five root facades and adds exactly the Coverage
+initializer plus the five implementation files through `exact_files`.
+TD-DIST-001/002 isolated-pack evidence checks frozen exports, object identity,
+canonical locations, CLI presence/absence, canonical Project Model identity,
+relative internal imports and policy lookup without checkout `PYTHONPATH` or an
+installed Harness package. Fresh CLI processes exercise all three existing CLIs
+with distributed research fixtures. Published-boundary mutation checks reject
+broad Assurance access and non-published symbols from canonical Coverage;
+existing facade grammar mutations and alias normalization remain enforced.
+Existing HA-A06 validators and Scenario Suite cases retain legacy imports and
+protect the same semantic behavior.
+
+Repository-wide consumer discovery classified internal Coverage imports,
+Application (`coverage_application`, `project_frontier`), Scenario Suite
+(`scenario_drivers`), validators/tests, experiments/research, docs/spec and
+Consumer Pack declarations. Only internal dependencies and ownership/distribution
+contracts change; neighboring consumers retain compatibility imports. Two validators that directly
+exercise private helpers import those helpers from canonical Coverage while
+public semantic checks retain the compatibility surface. Historical
+audit/research prose is preserved. Assurance execution bindings contain no
+Coverage consumer match and no changed-file intersection.
+
+All seven provider evidence records and their 76 `execution_bindings.files`
+entries were compared with the complete changed-file set, including validators,
+contracts and documentation. There is no intersection: AR-M11 introduces no
+additional staleness. Historical hashes, outcomes and currentness classifications
+remain unchanged; no provider judgement run is performed. Deterministic migration
+evidence does not substitute for provider judgement.

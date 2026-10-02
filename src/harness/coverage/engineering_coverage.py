@@ -1,0 +1,667 @@
+#!/usr/bin/env python3
+"""Canonical Engineering Coverage evaluator.
+
+Public interface:
+    evaluate_coverage(
+        graph,
+        realization,
+        consumer,
+        scope,
+        scope_roots,
+        project_overlay,
+        authority_aliases,
+        semantic_claim_bindings,
+    )
+
+Reusable Harness policy is loaded from spec/engineering-coverage. Callers do not
+manually assemble activation -> proof -> routing stages.
+"""
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from .concern_activation import derive_activation
+from .coverage_planner import derive_plan
+from .coverage_obligations import derive_subject_inventory_disposition, derive_subject_obligation_rows
+from harness.project_model.engineering_graph import validate_engineering_graph, validate_realization
+from harness.project_model.core import question_frontier
+
+
+__all__ = [
+    "annotations",
+    "argparse",
+    "copy",
+    "json",
+    "Path",
+    "Any",
+    "yaml",
+    "derive_activation",
+    "derive_plan",
+    "derive_subject_inventory_disposition",
+    "derive_subject_obligation_rows",
+    "validate_engineering_graph",
+    "validate_realization",
+    "question_frontier",
+    "ROOT",
+    "load",
+    "load_scope_source",
+    "evaluate_coverage",
+    "evaluate_with_repository_policy",
+    "main"
+]
+
+
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def load(path: str | Path) -> dict[str, Any]:
+    value = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a mapping")
+    return value
+
+def load_scope_source(path: str | Path) -> dict[str, Any]:
+    raw = Path(path).read_text(encoding="utf-8")
+    try:
+        value = yaml.safe_load(raw)
+    except yaml.YAMLError:
+        value = None
+    if isinstance(value, dict):
+        return value
+    return {
+        "kind": "harness-markdown-scope-source",
+        "path": str(path),
+        "text": raw,
+    }
+
+
+def _apply_production_contract_overlay(
+    graph: dict[str, Any],
+    overlay: dict[str, Any] | None,
+) -> tuple[dict[str, Any], set[str]]:
+    if not overlay:
+        return graph, set()
+    if overlay.get("version") != 1:
+        raise ValueError("production contract overlay version must be 1")
+    if overlay.get("kind") != "harness-production-contract-overlay":
+        raise ValueError("unexpected production contract overlay kind")
+
+    result = copy.deepcopy(graph)
+    proposed_capabilities: set[str] = set()
+    authorities = {
+        item.get("id"): item
+        for item in result.get("authorities", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+    existing = {
+        production.get("capability")
+        for authority in authorities.values()
+        for production in authority.get("produces", []) or []
+        if isinstance(production, dict) and production.get("capability")
+    }
+
+    for item in overlay.get("productions", []) or []:
+        if not isinstance(item, dict):
+            raise ValueError("production contract overlay item must be a mapping")
+        authority_id = item.get("authority")
+        capability = item.get("capability")
+        semantic_claims = item.get("semantic_claims", []) or []
+        knowledge_kind = item.get("knowledge_kind")
+        requires = item.get("requires", []) or []
+
+        if authority_id not in authorities:
+            raise ValueError(
+                f"production contract overlay references unknown Authority: {authority_id}"
+            )
+        if not isinstance(capability, str) or not capability:
+            raise ValueError("production contract overlay capability is required")
+        if capability in existing:
+            raise ValueError(
+                f"production contract overlay duplicates CapabilityId: {capability}"
+            )
+        if not semantic_claims:
+            raise ValueError(
+                f"production contract overlay {capability} must declare semantic_claims"
+            )
+
+        production = {
+            "capability": capability,
+            "semantic_claims": semantic_claims,
+            "requires": [
+                value if isinstance(value, dict) else {"capability": value}
+                for value in requires
+            ],
+        }
+        if knowledge_kind is not None:
+            if not isinstance(knowledge_kind, str) or not knowledge_kind:
+                raise ValueError(
+                    f"production contract overlay {capability} knowledge_kind must be non-empty"
+                )
+            production["knowledge_kind"] = knowledge_kind
+        authorities[authority_id].setdefault("produces", []).append(production)
+        existing.add(capability)
+        proposed_capabilities.add(capability)
+
+    return result, proposed_capabilities
+
+
+def _without_proposed_capability_providers(
+    realization: dict[str, Any],
+    proposed_capabilities: set[str],
+) -> dict[str, Any]:
+    """Keep Coverage proposals from becoming accepted Project Model evidence."""
+    if not proposed_capabilities:
+        return realization
+    result = copy.deepcopy(realization)
+    for artifact in result.get("artifacts", []) or []:
+        artifact["provides"] = [
+            capability
+            for capability in artifact.get("provides", []) or []
+            if capability not in proposed_capabilities
+        ]
+    return result
+
+
+def _merge_authority_roles(
+    standard: dict[str, Any],
+    aliases: dict[str, Any],
+    graph: dict[str, Any],
+) -> dict[str, Any]:
+    standard_bindings = standard.get("bindings", {}) or {}
+    alias_bindings = aliases.get("bindings", {}) or {}
+    authorities = {
+        item["id"]
+        for item in graph.get("authorities", []) or []
+        if isinstance(item, dict) and item.get("id")
+    }
+
+    bindings: dict[str, list[str]] = {}
+    provenance: dict[str, list[str]] = {}
+    for authority in sorted(authorities):
+        roles: set[str] = set()
+        if authority in standard_bindings:
+            roles.update(standard_bindings[authority] or [])
+            provenance.setdefault(authority, []).append("STANDARD_ID")
+        if authority in alias_bindings:
+            roles.update(alias_bindings[authority] or [])
+            provenance.setdefault(authority, []).append("PROJECT_ALIAS")
+        if roles:
+            bindings[authority] = sorted(roles)
+
+    return {
+        "version": 1,
+        "kind": "harness-derived-authority-role-bindings",
+        "project": aliases.get("project", graph.get("id")),
+        "bindings": bindings,
+        "provenance": provenance,
+        "unresolved_authorities": sorted(authorities - set(bindings)),
+    }
+
+
+def _scope_overlay(
+    project_overlay: dict[str, Any],
+    *,
+    project: str,
+    consumer: str,
+    scope: str,
+    scope_roots: list[str],
+) -> dict[str, Any]:
+    result = dict(project_overlay)
+    result["project"] = project
+    result["consumer"] = consumer
+    result["scope"] = scope
+    result["scope_roots"] = list(scope_roots)
+    result.setdefault("activate", [])
+    result.setdefault("decisions", [])
+    return result
+
+
+def _derive_work_items(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_capability: dict[str, dict[str, Any]] = {}
+    others: list[dict[str, Any]] = []
+
+    for row in rows:
+        action = row.get("action")
+        concern = row.get("concern")
+
+        if action == "PRODUCE_CAPABILITY":
+            for candidate in row.get("ready_production_candidates", []) or []:
+                capability = candidate["capability"]
+                item = by_capability.setdefault(
+                    capability,
+                    {
+                        "action": "PRODUCE_CAPABILITY",
+                        "capability": capability,
+                        "authority": candidate.get("authority"),
+                        "knowledge_kind": candidate.get("knowledge_kind"),
+                        "concerns": [],
+                        "semantic_claims": [],
+                    },
+                )
+                if concern not in item["concerns"]:
+                    item["concerns"].append(concern)
+                claim_entry = {"claim": candidate["claim"]}
+                if candidate.get("subject") is not None:
+                    claim_entry["subject"] = candidate["subject"]
+                if claim_entry not in item["semantic_claims"]:
+                    item["semantic_claims"].append(claim_entry)
+            continue
+
+        if action == "WAIT_FOR_PREREQUISITES":
+            blocked = []
+            for candidate in row.get("production_candidates", []) or []:
+                blocked.append(
+                    {
+                        "capability": candidate["capability"],
+                        "authority": candidate.get("authority"),
+                        "missing_prerequisites": candidate.get(
+                            "missing_prerequisites", []
+                        ),
+                    }
+                )
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "blocked_productions": blocked,
+                }
+            )
+            continue
+
+        if action == "MODEL_PRODUCTION_CONTRACT":
+            candidate_authorities = sorted(
+                {
+                    authority
+                    for values in (row.get("routes", {}) or {}).values()
+                    for authority in values
+                }
+            )
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
+                    "candidate_authorities": candidate_authorities,
+                    "accepted_semantic_claims": row.get(
+                        "accepted_semantic_claims", []
+                    ),
+                }
+            )
+            continue
+
+        if action == "CLASSIFY_ACCEPTED_SCOPE":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "subject": row.get("subject"),
+                    "requirement_refs": sorted(row.get("requirement_refs", []) or []),
+                }
+            )
+            continue
+
+        if action in {"DECLARE_SUBJECT_INVENTORY", "DEFINE_SUBJECT_OBLIGATIONS"}:
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    "subject": row.get("subject"),
+                    "reason": row.get("reason"),
+                }
+            )
+            continue
+
+        if action == "RESOLVE_QUESTIONS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
+                    "questions": sorted(row.get("questions", []) or []),
+                }
+            )
+            continue
+
+        if action == "VALIDATE_SEMANTICS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
+                    "capabilities": sorted(row.get("capabilities", []) or []),
+                    "accepted_semantic_claims": row.get(
+                        "accepted_semantic_claims", []
+                    ),
+                    "reason": row.get("reason"),
+                }
+            )
+            continue
+
+        if action == "REVALIDATE_SEMANTICS":
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **({"subject": row["subject"]} if row.get("subject") is not None else {}),
+                    "capabilities": sorted(row.get("capabilities", []) or []),
+                    "causes": row.get("causes", {}),
+                    **({"reason": row["reason"]} if row.get("reason") else {}),
+                }
+            )
+            continue
+
+        if action in {"ASSIGN_AUTHORITY", "MODEL_PROOF_CONTRACT"}:
+            others.append(
+                {
+                    "action": action,
+                    "concern": concern,
+                    **(
+                        {
+                            "accepted_semantic_claims": row.get(
+                                "accepted_semantic_claims", []
+                            )
+                        }
+                        if row.get("accepted_semantic_claims") is not None
+                        else {}
+                    ),
+                }
+            )
+
+    capability_items = sorted(
+        by_capability.values(),
+        key=lambda item: (item.get("authority") or "", item["capability"]),
+    )
+    for item in capability_items:
+        item["concerns"].sort()
+        item["semantic_claims"] = sorted(
+            item["semantic_claims"],
+            key=lambda value: (value["claim"], value.get("subject", "")),
+        )
+    return capability_items + others
+
+
+def evaluate_coverage(
+    *,
+    graph: dict[str, Any],
+    realization: dict[str, Any],
+    consumer: str,
+    scope: str,
+    scope_roots: list[str] | None,
+    activation_policy: dict[str, Any],
+    proof_contract: dict[str, Any],
+    authority_role_contract: dict[str, Any],
+    standard_authority_roles: dict[str, Any],
+    authority_aliases: dict[str, Any] | None = None,
+    project_overlay: dict[str, Any] | None = None,
+    semantic_claim_bindings: dict[str, Any] | None = None,
+    production_contract_overlay: dict[str, Any] | None = None,
+    semantic_evaluations: dict[str, Any] | None = None,
+    subject_obligations: dict[str, Any] | None = None,
+    scope_source: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    # Validate accepted Project Model truth before adding any Coverage-only
+    # production proposal. Unknown Core capabilities remain non-authoritative
+    # until the project-owned graph adopts them.
+    validate_engineering_graph(graph)
+    accepted_realized = validate_realization(graph, realization)
+    graph, proposed_capabilities = _apply_production_contract_overlay(
+        graph,
+        production_contract_overlay,
+    )
+    validate_engineering_graph(graph)
+    realized = _without_proposed_capability_providers(
+        accepted_realized,
+        proposed_capabilities,
+    )
+    realized = validate_realization(graph, realized)
+
+    aliases = authority_aliases or {"bindings": {}}
+    overlay = _scope_overlay(
+        project_overlay or {},
+        project=graph.get("id", "PROJECT"),
+        consumer=consumer,
+        scope=scope,
+        scope_roots=list(scope_roots or []),
+    )
+    claim_bindings = semantic_claim_bindings or {
+        "version": 1,
+        "kind": "harness-semantic-claim-bindings",
+        "bindings": [],
+    }
+
+    roles = _merge_authority_roles(standard_authority_roles, aliases, graph)
+    project_docs = [graph, realized]
+    if semantic_evaluations is not None:
+        project_docs.append(semantic_evaluations)
+
+    activation = derive_activation(
+        activation_policy,
+        roles,
+        overlay,
+        project_docs,
+        consumer,
+    )
+
+    applicable_decisions = []
+    for item in overlay.get("decisions", []) or []:
+        consumers = item.get("consumers", []) or []
+        scopes = item.get("scopes", []) or []
+        if consumers and consumer not in consumers:
+            continue
+        if scopes and scope not in scopes:
+            continue
+        applicable_decisions.append(item)
+
+    planner_overlay = {
+        "project": overlay["project"],
+        "scope": scope,
+        "scope_roots": activation.get("scope_roots", []),
+        "coverage_extension_capabilities": [
+            item["capability"]
+            for item in (production_contract_overlay or {}).get("productions", []) or []
+            if isinstance(item, dict) and item.get("capability")
+        ],
+        "required": [row["concern"] for row in activation["rows"]],
+        "decisions": applicable_decisions,
+    }
+
+    plan = derive_plan(
+        proof_contract,
+        authority_role_contract,
+        roles,
+        claim_bindings,
+        planner_overlay,
+        project_docs,
+        consumer,
+    )
+
+    subject_inventory = overlay.get("subject_inventory")
+    if subject_obligations is not None:
+        if scope_source is None:
+            raise ValueError("scope_source is required with subject_obligations")
+        if subject_inventory is not None:
+            if not isinstance(subject_inventory, dict):
+                raise ValueError("subject_inventory disposition must be a mapping")
+            if subject_inventory.get("state") != "REQUIRED":
+                raise ValueError(
+                    "subject-obligation contract conflicts with non-REQUIRED subject_inventory disposition"
+                )
+        subject_evaluation = derive_subject_obligation_rows(
+            obligations=subject_obligations,
+            source=scope_source,
+            graph=graph,
+            project_docs=project_docs,
+            proof_contract=proof_contract,
+            capability_bindings=claim_bindings,
+            consumer=consumer,
+            scope=scope,
+            scope_roots=activation.get("scope_roots", []),
+            extension_capabilities=set(
+                planner_overlay.get("coverage_extension_capabilities", []) or []
+            ),
+        )
+    else:
+        subject_evaluation = derive_subject_inventory_disposition(
+            subject_inventory,
+            consumer=consumer,
+            scope=scope,
+        )
+
+    activation_by_concern = {
+        row["concern"]: row.get("provenance", [])
+        for row in activation["rows"]
+    }
+    rows = []
+    for row in plan["rows"]:
+        item = dict(row)
+        item["activation_provenance"] = activation_by_concern.get(
+            row["concern"], []
+        )
+        rows.append(item)
+
+    remaining_work = [
+        row for row in rows
+        if row["state"] not in {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
+    ]
+    subject_rows = (
+        list(subject_evaluation.get("rows", []))
+        if subject_evaluation is not None
+        else []
+    )
+    subject_remaining = (
+        list(subject_evaluation.get("remaining_work", []))
+        if subject_evaluation is not None
+        else []
+    )
+    remaining_work = remaining_work + subject_remaining
+    work_items = _derive_work_items(remaining_work)
+    question_ids = sorted(
+        {
+            question
+            for row in remaining_work
+            for question in row.get("questions", []) or []
+        }
+    )
+    questions = question_frontier(realized, question_ids)
+
+    return {
+        "version": 1,
+        "kind": "harness-engineering-coverage-evaluation",
+        "status": "canonical",
+        "project": overlay["project"],
+        "consumer": consumer,
+        "scope": scope,
+        "scope_roots": activation.get("scope_roots", []),
+        "completion_ready": not remaining_work,
+        "activated_count": activation["activated_count"],
+        "remaining_work_count": len(remaining_work),
+        "work_item_count": len(work_items),
+        "question_frontier_count": len(questions),
+        "summary": plan["summary"],
+        "authority_roles": roles,
+        "activation_signals": activation["signals"],
+        "rows": rows,
+        "subject_obligation_rows": subject_rows,
+        "subject_obligation_evaluation": subject_evaluation,
+        "remaining_work": remaining_work,
+        "work_items": work_items,
+        "question_frontier": questions,
+    }
+
+
+def evaluate_with_repository_policy(
+    *,
+    graph: dict[str, Any],
+    realization: dict[str, Any],
+    consumer: str,
+    scope: str,
+    scope_roots: list[str] | None = None,
+    authority_aliases: dict[str, Any] | None = None,
+    project_overlay: dict[str, Any] | None = None,
+    semantic_claim_bindings: dict[str, Any] | None = None,
+    production_contract_overlay: dict[str, Any] | None = None,
+    semantic_evaluations: dict[str, Any] | None = None,
+    subject_obligations: dict[str, Any] | None = None,
+    scope_source: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return evaluate_coverage(
+        graph=graph,
+        realization=realization,
+        consumer=consumer,
+        scope=scope,
+        scope_roots=scope_roots,
+        activation_policy=load(ROOT / "spec/engineering-coverage/activation-policy-v1.yaml"),
+        proof_contract=load(ROOT / "spec/engineering-coverage/semantic-proof-contract-v1.yaml"),
+        authority_role_contract=load(ROOT / "spec/engineering-coverage/authority-role-contract-v1.yaml"),
+        standard_authority_roles=load(ROOT / "spec/engineering-coverage/standard-authority-role-bindings-v1.yaml"),
+        authority_aliases=authority_aliases,
+        project_overlay=project_overlay,
+        semantic_claim_bindings=semantic_claim_bindings,
+        production_contract_overlay=production_contract_overlay,
+        semantic_evaluations=semantic_evaluations,
+        subject_obligations=subject_obligations,
+        scope_source=scope_source,
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Engineering Coverage evaluator")
+    parser.add_argument("graph")
+    parser.add_argument("realization")
+    parser.add_argument("consumer")
+    parser.add_argument("--scope", default="default")
+    parser.add_argument("--scope-root", action="append", default=[])
+    parser.add_argument("--authority-aliases")
+    parser.add_argument("--overlay")
+    parser.add_argument("--semantic-claim-bindings")
+    parser.add_argument("--production-contract-overlay")
+    parser.add_argument("--subject-obligations")
+    parser.add_argument("--scope-source")
+    parser.add_argument(
+        "--semantic-evaluations",
+        help="Generated semantic acceptance evidence document; may contain one evaluation or semantic_evaluations list.",
+    )
+    args = parser.parse_args()
+
+    result = evaluate_with_repository_policy(
+        graph=load(args.graph),
+        realization=load(args.realization),
+        consumer=args.consumer,
+        scope=args.scope,
+        scope_roots=args.scope_root,
+        authority_aliases=load(args.authority_aliases) if args.authority_aliases else None,
+        project_overlay=load(args.overlay) if args.overlay else None,
+        semantic_claim_bindings=(
+            load(args.semantic_claim_bindings)
+            if args.semantic_claim_bindings
+            else None
+        ),
+        production_contract_overlay=(
+            load(args.production_contract_overlay)
+            if args.production_contract_overlay
+            else None
+        ),
+        semantic_evaluations=(
+            load(args.semantic_evaluations)
+            if args.semantic_evaluations
+            else None
+        ),
+        subject_obligations=(
+            load(args.subject_obligations)
+            if args.subject_obligations
+            else None
+        ),
+        scope_source=(load_scope_source(args.scope_source) if args.scope_source else None),
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

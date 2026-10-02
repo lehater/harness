@@ -6,7 +6,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
 from coverage_obligations import derive_subject_obligation_rows
-from engineering_coverage import _derive_work_items, evaluate_coverage, load
+from engineering_coverage import evaluate_coverage, load
+from harness.coverage.engineering_coverage import _derive_work_items
 
 
 PROOF={
