@@ -107,6 +107,23 @@ abilities:
       - A05-R02
       - A05-R03
 
+  - id: HA-A06
+    title: Applicability and Engineering Coverage
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A06-F01
+      - A06-F02
+      - A06-F03
+      - A06-F04
+      - A06-F05
+      - A06-F06
+    requirements:
+      - A06-R01
+      - A06-R02
+
   - id: HA-A09
     title: Existing-project bootstrap/reconcile
     contract_ref:
@@ -402,6 +419,34 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A06-R01
+    ability: HA-A06
+    failure_modes: [A06-F01, A06-F02, A06-F03, A06-F05]
+    purpose: Coverage dispositions are explicit and evidence-backed; silence, missing subject instances, or unresolved required territory cannot contribute to completion.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-02, EM-03, EM-04, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A06-R02
+    ability: HA-A06
+    failure_modes: [A06-F04, A06-F06]
+    purpose: Consumer/scope activation is selective; narrowing or broadening one scope changes only obligations reachable from that scope and does not activate unrelated concerns.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-03, EM-05, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A09-R01
     ability: HA-A09
     failure_modes: [A09-F01, A09-F04, A09-F06]
@@ -585,6 +630,50 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A06-DISPOSITION-COMPLETENESS
+    providers:
+      - tests/test_engineering_coverage.py
+      - tests/test_subject_scoped_coverage.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_engineering_coverage.py
+      - path: tests/test_subject_scoped_coverage.py
+      - path: spec/scenario-suite/scenarios/engineering-coverage.yaml
+      - path: spec/scenario-suite/scenarios/coverage-question-frontier.yaml
+      - path: src/harness/coverage/engineering_coverage.py
+    satisfies: [A06-R01]
+    test_level: TL2
+    methods: [EM-02, EM-03, EM-04, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves explicit NOT_APPLICABLE rationale, omission-resistant manual activation classes, subject-specific MISSING rows, question-frontier blocking, and completion_ready=false while required coverage remains unresolved.
+      - Does not claim independent holdout generalization of project fact/template discovery.
+
+  - id: EVID-A06-SCOPE-ISOLATION
+    providers:
+      - tests/test_engineering_coverage.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_engineering_coverage.py
+      - path: spec/scenario-suite/scenarios/scope-root-activation.yaml
+      - path: spec/scenario-suite/scenarios/production-contract-overlay.yaml
+      - path: src/harness/coverage/engineering_coverage.py
+    satisfies: [A06-R02]
+    test_level: TL2
+    methods: [EM-03, EM-05, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves scope-root sensitivity and that project production overlays add routed work without becoming new activation signals.
+      - Does not claim portability to arbitrary external project vocabularies.
+
   - id: EVID-A03-TARGET-STATE-REACTIONS
     providers:
       - tests/test_target_state.py
