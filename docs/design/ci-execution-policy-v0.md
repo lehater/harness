@@ -79,6 +79,10 @@ an explicit entry in `spec/ci/check-registry-v0.yaml`. Every
 `workflow_roles` entry declaring role, cost class, and draft behavior so a new
 workflow cannot appear outside policy.
 
+Exact workflow `paths` / `paths-ignore` entries must reference existing
+repository paths. Glob patterns remain allowed for dynamic subtrees. Retired
+exact paths are policy violations rather than inert CI configuration.
+
 Every registered check declares an explicit disposition. A `full_gate` check
 must appear in `make harness-check`; a `standalone` check must state why it is
 outside the full gate; `unresolved` is intentionally invalid and blocks policy
@@ -149,6 +153,7 @@ workflow-role declaration.
 - full-gate path independence and draft guarding;
 - no branch push/PR duplicate ownership for targeted workflows;
 - complete validator/test registration;
+- exact workflow path filters do not reference retired repository paths;
 - explicit disposition of every validator/test and presence of every
   `full_gate` check in `make harness-check`;
 - non-decreasing stage order;
