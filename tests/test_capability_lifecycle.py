@@ -206,8 +206,122 @@ def test_capability_question_granularity() -> None:
     assert acceptance["wait"][0]["questions"] == ["Q-ACCEPTANCE"], acceptance
 
 
+def test_split_merge_do_not_transfer_acceptance() -> None:
+    split_graph = copy.deepcopy(GRAPH)
+    split_graph["authorities"][0]["produces"] = [
+        {
+            "capability": "source.identity.primary",
+            "knowledge_kind": "problem-evidence",
+            "requires": [],
+        },
+        {
+            "capability": "source.identity.metadata",
+            "knowledge_kind": "problem-evidence",
+            "requires": [],
+        },
+    ]
+    split_graph["authorities"][1]["produces"][0]["requires"] = [
+        "source.identity.primary",
+        "source.identity.metadata",
+    ]
+    split_model = copy.deepcopy(MODEL)
+    split_model["artifacts"][0]["provides"] = [
+        "source.identity.primary",
+        "source.identity.metadata",
+    ]
+    split_states = lifecycle_states(split_graph, split_model, projection())
+    assert split_states["source.identity.primary"]["state"] == "UNKNOWN", split_states
+    assert split_states["source.identity.metadata"]["state"] == "UNKNOWN", split_states
+    assert split_states["use.result"]["state"] == "STALE", split_states
+    assert any(
+        item.get("mode") == "PREREQUISITE_TOPOLOGY"
+        and item.get("accepted_prerequisites") == ["source.identity"]
+        and item.get("current_prerequisites")
+        == ["source.identity.metadata", "source.identity.primary"]
+        for item in split_states["use.result"]["mismatches"]
+    ), split_states
+    assert obsolete_lifecycle_rows(split_graph, projection()) == [
+        {
+            "capability": "source.identity",
+            "artifact": "SOURCE",
+            "acceptance_id": "ID1",
+            "reason": "CAPABILITY_NOT_IN_ENGINEERING_GRAPH",
+        }
+    ]
+
+    merged_graph = copy.deepcopy(GRAPH)
+    merged_graph["authorities"][0]["produces"] = [
+        {
+            "capability": "source.combined",
+            "knowledge_kind": "problem-evidence",
+            "requires": [],
+        }
+    ]
+    merged_graph["authorities"][1]["produces"][0]["requires"] = [
+        "source.combined"
+    ]
+    merged_model = copy.deepcopy(MODEL)
+    merged_model["artifacts"][0]["provides"] = ["source.combined"]
+    merged_projection = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": "SOURCE",
+                "capability": "source.identity",
+                "acceptance_id": "ID1",
+                "accepted_prerequisites": {},
+            },
+            {
+                "artifact": "SOURCE",
+                "capability": "source.structure",
+                "acceptance_id": "S1",
+                "accepted_prerequisites": {},
+            },
+            {
+                "artifact": "USE",
+                "capability": "use.result",
+                "acceptance_id": "U1",
+                "accepted_prerequisites": {
+                    "source.identity": "ID1",
+                    "source.structure": "S1",
+                },
+            },
+        ],
+    }
+    merged_states = lifecycle_states(
+        merged_graph,
+        merged_model,
+        merged_projection,
+    )
+    assert merged_states["source.combined"]["state"] == "UNKNOWN", merged_states
+    assert merged_states["use.result"]["state"] == "STALE", merged_states
+    assert any(
+        item.get("mode") == "PREREQUISITE_TOPOLOGY"
+        and item.get("accepted_prerequisites")
+        == ["source.identity", "source.structure"]
+        and item.get("current_prerequisites") == ["source.combined"]
+        for item in merged_states["use.result"]["mismatches"]
+    ), merged_states
+    assert obsolete_lifecycle_rows(merged_graph, merged_projection) == [
+        {
+            "capability": "source.identity",
+            "artifact": "SOURCE",
+            "acceptance_id": "ID1",
+            "reason": "CAPABILITY_NOT_IN_ENGINEERING_GRAPH",
+        },
+        {
+            "capability": "source.structure",
+            "artifact": "SOURCE",
+            "acceptance_id": "S1",
+            "reason": "CAPABILITY_NOT_IN_ENGINEERING_GRAPH",
+        },
+    ]
+
+
 def main() -> int:
     test_capability_question_granularity()
+    test_split_merge_do_not_transfer_acceptance()
     result = evaluate_lifecycle_target(
         GRAPH, "IMPLEMENTATION", MODEL, projection()
     )
