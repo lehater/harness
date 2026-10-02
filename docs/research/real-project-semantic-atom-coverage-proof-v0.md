@@ -19,7 +19,7 @@ to the same observed model.
 
 No new semantic-atom framework was required.
 
-`semantic_derivation.py` already treats accepted upstream
+`harness.assurance.semantic_derivation` already treats accepted upstream
 `semantic_assertions` as individually addressable semantic atoms and requires
 each applicable source assertion to be either:
 

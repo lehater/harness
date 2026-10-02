@@ -18,7 +18,7 @@ raw source contains material statement
 statement ledger
 ```
 
-`source_coverage.py` cannot detect this because it correctly validates only
+`harness.evidence.source_coverage` cannot detect this because it correctly validates only
 the statements present in its input ledger.
 
 The question is therefore:
@@ -66,7 +66,7 @@ RAW SOURCE ENUMERATION COMPLETE
 
 A small assurance-only validator was added:
 
-`source_boundary.py`.
+`harness.evidence.source_boundary`.
 
 Scenario driver:
 

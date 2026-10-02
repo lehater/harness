@@ -2,7 +2,7 @@
 
 Status: research.
 
-`engineering_coverage.py` is the single public research entrypoint for completeness evaluation.
+`harness.coverage.engineering_coverage` is the single public research entrypoint for completeness evaluation.
 
 ## Inputs
 

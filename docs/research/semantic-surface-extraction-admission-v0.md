@@ -25,7 +25,7 @@ Two existing mechanisms already cover different parts of the problem.
 
 ### Statement-level source coverage
 
-`source_coverage.py` proves that every enumerated source statement has exactly
+`harness.evidence.source_coverage` proves that every enumerated source statement has exactly
 one disposition:
 
 - ADMITTED;
@@ -40,7 +40,7 @@ ADMITTED `sanitized_statement`.
 
 ### Semantic acceptance
 
-`semantic_acceptance.py` can deterministically enforce a machine-addressable
+`harness.assurance.semantic_acceptance` can deterministically enforce a machine-addressable
 semantic surface once the required source atoms are already known.
 
 Relevant existing findings include:
@@ -77,7 +77,7 @@ coverage_status = COMPLETE
 statement_count = 1
 ```
 
-This is correct behavior for `source_coverage.py`: it proves disposition
+This is correct behavior for `harness.evidence.source_coverage`: it proves disposition
 coverage, not natural-language semantic fidelity.
 
 The same scenario then starts from an expert-reviewed source atom baseline:
@@ -239,7 +239,7 @@ statement ledger
 exact-one disposition
 ```
 
-Oracle: deterministic `source_coverage.py`.
+Oracle: deterministic `harness.evidence.source_coverage`.
 
 Guarantee: no enumerated source statement disappears silently.
 

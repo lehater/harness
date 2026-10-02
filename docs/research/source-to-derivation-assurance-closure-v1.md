@@ -93,7 +93,7 @@ has been discovered.
 
 Validator:
 
-`source_set.py`.
+`harness.evidence.source_set`.
 
 Proves, relative to the accepted acquisition contract:
 
@@ -119,7 +119,7 @@ ALL_RELEVANT_EVIDENCE_IN_THE_WORLD_COMPLETE
 
 Validator:
 
-`source_boundary.py`.
+`harness.evidence.source_boundary`.
 
 Proves that no line/item disappears inside one selected immutable source before
 semantic review.
@@ -144,7 +144,7 @@ Therefore the evaluator is evidence, not the oracle.
 
 Validator:
 
-`source_coverage.py`.
+`harness.evidence.source_coverage`.
 
 Proves that every enumerated source statement has exactly one explicit
 disposition.
@@ -159,7 +159,7 @@ Those questions are handled by the adjacent boundaries.
 One canonical statement is compared with the candidate semantic atoms extracted
 from it.
 
-Existing `semantic_acceptance.py` then deterministically rejects:
+Existing `harness.assurance.semantic_acceptance` then deterministically rejects:
 
 - missing required atoms;
 - weakened machine-addressable values;
@@ -172,7 +172,7 @@ That is repeat evidence, not a universal model-quality claim.
 
 ### 7. Consumed-atom accounting
 
-Existing `semantic_derivation.py` proves that every applicable accepted source
+Existing `harness.assurance.semantic_derivation` proves that every applicable accepted source
 atom is either:
 
 - linked to downstream semantics; or
@@ -348,9 +348,9 @@ The research does **not** justify:
 
 The reusable assurance mechanisms are sufficient:
 
-- `source_set.py`;
-- `source_boundary.py`;
-- `source_coverage.py`;
+- `harness.evidence.source_set`;
+- `harness.evidence.source_boundary`;
+- `harness.evidence.source_coverage`;
 - semantic acceptance;
 - semantic derivation;
 - request-bound semantic judgement;

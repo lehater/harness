@@ -179,12 +179,19 @@ def main() -> int:
 
     discovered_paths = {
         str(path.relative_to(ROOT))
-        for pattern in ("checks/validate_*.py", "tests/test_*.py")
-        for path in ROOT.glob(pattern)
+        for directory, pattern in (
+            (ROOT / "checks", "validate_*.py"),
+            (ROOT / "tests", "test_*.py"),
+        )
+        if directory.is_dir()
+        for path in directory.rglob(pattern)
     }
+    legacy_root = ROOT / "validators"
     legacy_validation_paths = {
         str(path.relative_to(ROOT))
-        for path in ROOT.glob("validators/validate_*.py")
+        for path in (
+            legacy_root.rglob("validate_*.py") if legacy_root.is_dir() else []
+        )
     }
     for path in sorted(legacy_validation_paths):
         errors.append(f"CI-P04 legacy validation path is forbidden: {path}")

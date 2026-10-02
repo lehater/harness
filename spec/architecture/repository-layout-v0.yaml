@@ -5,6 +5,24 @@ status: canonical
 design: docs/design/repository-layout-v0.md
 context_map: spec/architecture/harness-context-map-v0.yaml
 
+repository_surfaces:
+  policy: closed
+  directories:
+    .github: repository-automation
+    catalogs: reference-catalogs
+    checks: repository-policy-checks
+    distribution: bootstrap-transport
+    docs: documentation
+    evals: evaluation-infrastructure
+    examples: acceptance-examples
+    experiments: research-implementations
+    harness: source-tree-package-bridge
+    profiles: starter-profiles
+    skills: agent-procedures
+    spec: machine-readable-contracts
+    src: production-source
+    tests: executable-tests
+
 runtime_target:
   root: src/harness
   packages:

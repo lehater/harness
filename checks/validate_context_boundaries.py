@@ -12,6 +12,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / "spec" / "architecture" / "harness-context-map-v0.yaml"
 LAYOUT = ROOT / "spec" / "architecture" / "repository-layout-v0.yaml"
+EPHEMERAL_TOP_LEVEL_DIRECTORIES = {
+    ".git",
+    ".venv",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "__pycache__",
+}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -48,6 +56,39 @@ def _without_docstring(body: list[ast.stmt]) -> list[ast.stmt]:
 
 def _root_python_modules() -> set[str]:
     return {path.stem for path in ROOT.glob("*.py") if path.is_file()}
+
+
+def _validate_repository_surfaces(layout: dict[str, Any]) -> None:
+    surfaces = layout.get("repository_surfaces")
+    if not isinstance(surfaces, dict) or surfaces.get("policy") != "closed":
+        raise SystemExit("repository_surfaces.policy must be closed")
+
+    directories = surfaces.get("directories")
+    if not isinstance(directories, dict) or not directories:
+        raise SystemExit("repository_surfaces.directories must be a non-empty mapping")
+    for name, role in directories.items():
+        if (
+            not isinstance(name, str)
+            or not name
+            or "/" in name
+            or name in {".", ".."}
+        ):
+            raise SystemExit(f"invalid repository surface directory: {name!r}")
+        if not isinstance(role, str) or not role.strip():
+            raise SystemExit(f"repository surface {name!r} requires a role")
+
+    declared = set(directories)
+    actual = {
+        path.name
+        for path in ROOT.iterdir()
+        if path.is_dir() and path.name not in EPHEMERAL_TOP_LEVEL_DIRECTORIES
+    }
+    missing = sorted(declared - actual)
+    undeclared = sorted(actual - declared)
+    if missing:
+        raise SystemExit(f"declared repository surfaces are missing: {missing}")
+    if undeclared:
+        raise SystemExit(f"undeclared top-level repository surfaces: {undeclared}")
 
 
 def _module_path(module: str) -> Path:
@@ -90,6 +131,8 @@ def _validate_layout(layout: dict[str, Any], contexts: dict[str, Any]) -> None:
         raise SystemExit("repository layout must reference an existing design contract")
     if layout.get("context_map") != MAP.relative_to(ROOT).as_posix():
         raise SystemExit("repository layout must reference the canonical context map")
+
+    _validate_repository_surfaces(layout)
 
     target = layout.get("runtime_target")
     if not isinstance(target, dict) or target.get("root") != "src/harness":

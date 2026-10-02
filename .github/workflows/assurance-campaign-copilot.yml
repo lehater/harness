@@ -33,7 +33,7 @@ jobs:
           node-version: "22"
 
       - name: Install Harness dependencies
-        run: pip install PyYAML
+        run: pip install PyYAML==6.0.3
 
       - name: Install pinned Copilot CLI
         run: |
