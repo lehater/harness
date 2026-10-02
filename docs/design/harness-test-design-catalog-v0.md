@@ -1348,7 +1348,7 @@ Expected result:
 - ignore unrelated repository territory;
 - introduce no Questions or invented providers when the selected accepted
   project slice is complete;
-- return the same normalized Core realization and READY Target State on the
+- return the same normalized Core realization and COMPLETE Target State on the
   unchanged reconcile run.
 
 This is regression evidence for one known project that participated in Harness

@@ -34,7 +34,7 @@ dimensions:
       question_count: 0
       questions: []
     target_state:
-      status: READY
+      status: COMPLETE
       satisfied: [EXP-PROBLEM-EVIDENCE, EXP-PRODUCT-REQUIREMENTS, EXP-USER-NEEDS]
       create: []
       wait: []
