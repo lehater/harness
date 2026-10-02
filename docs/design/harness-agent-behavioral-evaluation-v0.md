@@ -451,7 +451,7 @@ The first reviewed judgement cases are materialized under
 TD-AUTH-001/002/004, and TD-ROUTE-001..003.
 
 Execution uses the provider-neutral runner plus
-`adapters/copilot_behavioral_eval_agent.py`. The provider receives the frozen
+`evals/adapters/copilot_behavioral_eval_agent.py`. The provider receives the frozen
 task, blinded fixture data, and explicitly declared normal Harness instruction
 surfaces; it does not receive the oracle, pass criteria, prior run conclusions,
 or evaluation fixture metadata.
@@ -526,4 +526,4 @@ the assurance denominator.
 
 Canonical source-repository runner invocation: `python -m evals.behavioral_eval`.
 The existing `--adapter-executable` contract and provider adapter location
-`adapters/copilot_behavioral_eval_agent.py` remain unchanged.
+`evals/adapters/copilot_behavioral_eval_agent.py` remain unchanged.

@@ -95,8 +95,7 @@ Schema validation does not itself accept semantics. The agent registers `provide
 
 When a target repository already owns artifact paths and dependency routing in a canonical graph, do not copy that graph into Harness metadata.
 
-`src/harness/integration/adapters/canonical_graph.py` is the canonical implementation;
-`adapters/canonical_graph.py` remains its legacy Consumer v0 entrypoint. It can project a selected part of such a graph into Core v0. The consumer projection declares only Harness-specific metadata:
+`src/harness/integration/adapters/canonical_graph.py` is the canonical implementation. It can project a selected part of such a graph into Core v0. The consumer projection declares only Harness-specific metadata:
 
 ```yaml
 version: 1
@@ -125,8 +124,6 @@ Example invocation:
 ```sh
 python -m harness.integration.adapters.canonical_graph /path/to/project/docs/harness-core.yaml
 ```
-Consumer v0 compatibility entrypoint: `python -m adapters.canonical_graph`.
-
 
 The emitted YAML is an ordinary Core v0 model and can be passed to `python -m harness.project_model.core`. Projection metadata is integration metadata, not a second source of product/domain/architecture truth.
 
@@ -197,11 +194,9 @@ See `docs/design/human-documentation-projection-v1.md` and
 
 ## Consumer bootstrap
 
-A target repository does not copy Harness skills. For clone-and-run use it keeps only `.harness/harnessw.py` plus `.harness/harness-binding.json`; the wrapper materializes the pinned Consumer Pack into local cache and returns its path. See `docs/design/harness-consumer-wrapper-v0.md`.
+A target repository does not copy Harness skills. For clone-and-run use it keeps only `.harness/harnessw.py` plus `.harness/harness-binding.json`; the wrapper materializes the pinned Consumer Pack into local cache and returns its path. See `docs/design/harness-consumer-wrapper-v1.md`.
 
-New Consumer integrations MUST use `consumer_api: v1` (SUPPORTED). Consumer API
-v0 is DEPRECATED and remains fully functional; existing consumers should migrate
-to v1. Deprecation has no calendar EOL date.
+Consumer distribution uses a single canonical API: `consumer_api: v1`.
 
 Copy `distribution/harnessw.py` to `.harness/harnessw.py` and use
 `spec/distribution/consumer-binding-example-v1.json` as
@@ -217,5 +212,4 @@ python -m harness.application.skill_router operation --surface consumer --operat
 
 Load the returned instruction contracts, then the selected skill. Use
 `spec/distribution/target-agents-fragment-v1.md` for target AGENTS instructions.
-The implicit Consumer Pack CLI default remains v0 for compatibility; new
-integrations select v1 explicitly.
+Consumer Pack CLI and bindings use v1 by default and reject retired API identities.
