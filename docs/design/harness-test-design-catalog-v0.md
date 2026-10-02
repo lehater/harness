@@ -1109,7 +1109,9 @@ The exact unresolved obligation stays visible and prevents completion.
 **Methods:** EM-07, later EM-09  
 **Minimum level:** TL2 deterministic after operation; TL4 for full intent path  
 **Oracle:** O1/O4  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36949909315` executed three independent clean-context runs for this frozen TL4 case; all three returned PASS. This establishes only the declared TL4 synthetic obligation and does not substitute for TL5 real-project evidence.
 
 
 **TL4 execution design:** `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`
@@ -1286,7 +1288,9 @@ Selected scope/model is unchanged.
 **Methods:** EM-09  
 **Minimum level:** TL4  
 **Oracle:** O1 for synthetic model + semantic normalization  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36949909315` executed three independent clean-context runs for this frozen TL4 case; all three returned PASS. This establishes only the declared TL4 synthetic obligation and does not substitute for TL5 real-project evidence.
 
 Prerequisite:
 

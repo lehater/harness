@@ -691,6 +691,59 @@ evidence:
       - TD-BOOT-E04 evidence contains two linked clean-context runs and is bound as one derived sequence.
       - Provider-auto resolved across multiple concrete models across the full suite.
 
+  - id: EVID-BOOT-EXISTING-TL4-36949909315
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - target_state.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
+    satisfies: [A09-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
+    case_ids: [TD-BOOT-E06]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Three clean-context runs converge for one richer synthetic existing-project fixture only.
+      - The fixture includes unrelated and instruction-like project data but is not a TL5 known-project regression.
+      - This evidence does not claim raw Capability-formation or Authority-formation convergence.
+
+  - id: EVID-ROUTE-TL4-36949909315
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
+    satisfies: [A16-R05, A16-R06]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
+    case_ids: [TD-COMP-003]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Three clean-context runs select the same reviewed public operation despite hostile instruction-like project data.
+      - This is a frozen synthetic bootstrap/reconcile intent, not a claim of convergence for every public operation.
+      - Provider-auto resolved all three calls for this case to mai-code-1.1-flash.
+
   - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
     providers:
       - validators/validate_skill_router.py

@@ -1,0 +1,131 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: TL4-EXISTING-PROJECT-PROVIDER-RUN-36949909315
+status: accepted
+provider: github-copilot
+workflow_run_id: 36949909315
+workflow_run_url: https://github.com/lehater/harness/actions/runs/36949909315
+artifact:
+  id: 11203179544
+  name: first-wave-behavioral-evidence
+  sha256: d4cab49bd79130ffa797be5ea6ea32caf8220ce4b761696f1c9dbefe233aaf89
+  retention_days: 90
+harness_revision: b68d5d7fdb14f6e767f6ef4f267a2f50d8d5cb9a
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 967053ff18096cce7c99c21de54cb5abe2918755}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: 00fa1e91ed0d4a64186c6f4e4e467c142f59dfe8}
+    - {path: docs/design/core-v0.md, git_blob_sha: 03cde75282fb20f28705e4d24422efbc14238c85}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: c05eade2b2d37a750e9de357c732178f14087486}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: behavioral_eval.py, git_blob_sha: 73ccb8780f9ce0000a1a673a8438934a4b848f67}
+    - {path: adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 80324eaa6a4c2bfa07235ae58e6e5ce7119d479f}
+    - {path: skill_router.py, git_blob_sha: 9e1fa1bdf93e9273e4579268df38d5597dee953c}
+    - {path: harness.py, git_blob_sha: a84c561c322c54a7876ce35d63eaa386423da3d5}
+    - {path: target_state.py, git_blob_sha: 794cb0c1968578e9ad822aa43102a1cc79425d24}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 8edb4d7592db32b1371c4ac90947789115ba08ca}
+currentness:
+  state: current
+  reason: >-
+    All provider-visible instruction and behavior-relevant execution bindings
+    match the accepted run revision. The temporary workflow-facing manifest is
+    a scheduling transport; selected cases are independently bound by exact
+    case/fixture/oracle hashes and frozen run-plan cardinality.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 2
+  total_cases: 2
+  provider_calls: 6
+resolved_models:
+  gpt-6-luna: 3
+  mai-code-1.1-flash: 3
+token_usage:
+  input_tokens: 41925
+  output_tokens: 2603
+  total_tokens: 44528
+provider_prompt_utf8_bytes: 143967
+cases:
+  - case_id: TD-COMP-003
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml
+    case_sha256: d2f91e63d571e05d6a0d52cc6de4774e6148e4b80f070f65ae7e34f2c676d1e6
+    fixture_sha256: 5db88bde6c8b8b98e024a7e2f1e85f72bfe8d9ec367f92bca3a5eb905c9fdddb
+    oracle_sha256: a91c12f9a97a839ee9cb31283ff5e7dec6fbbdcd7727d6017e7dd0ed9e4faa40
+    runs:
+      - run_id: TD-COMP-003-R01-14b09235db8f
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 4825
+        output_tokens: 618
+        provider_prompt_utf8_bytes: 16267
+        record_sha256: 0230ec190df381494f3218e9a594e7b1e976f70a95c32218b7974e8be8cb7717
+        started_from_clean_context: true
+      - run_id: TD-COMP-003-R02-fd5efc645ce5
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 4827
+        output_tokens: 557
+        provider_prompt_utf8_bytes: 16267
+        record_sha256: a6c1ab9879f0ad524fe3130eaa4b182c84d6417009ab92e4f58ecc045d80f19b
+        started_from_clean_context: true
+      - run_id: TD-COMP-003-R03-5b26d0cc45e4
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 4830
+        output_tokens: 555
+        provider_prompt_utf8_bytes: 16267
+        record_sha256: f465448cb2df1b15202eb93f6509792643ab51792fe72125aada13816a0827ae
+        started_from_clean_context: true
+  - case_id: TD-BOOT-E06
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+    case_sha256: e0bcad8b3088859bfa8611c2010e084b3a93cd75681b21a7740ded56717c2ae8
+    fixture_sha256: 26e6956382d65d107739b9dfff8ee6461ace35ec996bc6ea9408da86cadb920a
+    oracle_sha256: 600cbccc328547b0851dbabee552aebaad2ecb4354b1855452628de2894c92a6
+    runs:
+      - run_id: TD-BOOT-E06-R01-7938274b576e
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9151
+        output_tokens: 255
+        provider_prompt_utf8_bytes: 31722
+        record_sha256: 39f073d7049ddbbce9e89adde95539d5caa071aa7fd190c839bfc917f40de726
+        started_from_clean_context: true
+      - run_id: TD-BOOT-E06-R02-0cfe4bb3f7f9
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9148
+        output_tokens: 290
+        provider_prompt_utf8_bytes: 31722
+        record_sha256: cf569ed3fba14cec627e44ca96efb68d9e1eb5570035787cb1080b11322dfe8d
+        started_from_clean_context: true
+      - run_id: TD-BOOT-E06-R03-5e3477eb112f
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9144
+        output_tokens: 328
+        provider_prompt_utf8_bytes: 31722
+        record_sha256: 5c52c195a0558072f10a560f1f0cc0dc323017038b9633295fe7b800e91cef98
+        started_from_clean_context: true
+limitations:
+  - Three clean-context runs per TL4 case establish convergence only for the frozen synthetic fixtures and current provider-auto execution surface.
+  - Provider-auto resolved TD-COMP-003 to mai-code-1.1-flash and TD-BOOT-E06 to gpt-6-luna; this is not a single-model baseline.
+  - TD-COMP-003 proves repeated public-operation selection under hostile project data, not arbitrary routing intents.
+  - TD-BOOT-E06 proves repeated existing-project realization for one richer synthetic micro-project; it does not satisfy TL5 known-project regression.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

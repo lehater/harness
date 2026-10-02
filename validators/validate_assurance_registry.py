@@ -731,17 +731,16 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
         "A05-R02", "A05-R03"
     ]
     assert report["abilities"]["HA-A09"]["satisfied_requirements"] == [
-        "A09-R01", "A09-R02"
+        "A09-R01", "A09-R02", "A09-R03"
     ]
     assert report["abilities"]["HA-A09"]["missing_requirements"] == [
-        "A09-R03", "A09-R04"
+        "A09-R04"
     ]
     assert set(report["abilities"]["HA-A16"]["satisfied_requirements"]) == {
-        "A16-R01", "A16-R02", "A16-R03", "A16-R04"
+        "A16-R01", "A16-R02", "A16-R03",
+        "A16-R04", "A16-R05", "A16-R06"
     }
-    assert report["abilities"]["HA-A16"]["missing_requirements"] == [
-        "A16-R05", "A16-R06"
-    ]
+    assert report["abilities"]["HA-A16"]["missing_requirements"] == []
     passed.append("AR-M01")
 
     def candidate(

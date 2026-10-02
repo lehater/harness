@@ -80,12 +80,22 @@ run 2 of TD-BOOT-E04 is cryptographically linked to run 1 and to the injected
 Core realization. Provider-auto resolved 10 calls to `gpt-6-luna` and 7 to
 `mai-code-1.1-flash`; the run consumed 117860 input and 4429 output tokens.
 
-The current admitted proof state is deliberately partial: A04-R01 and A05-R01
-are satisfied; HA-A09 now satisfies A09-R01 (TL2) and A09-R02 (TL3); and
-A16-R01..R04 are satisfied. A04-R02/R03, A05-R02/R03, A09-R03/R04, and
-A16-R05/R06 remain missing. The previous TD-CAP-003 disagreement in run
-`36947239747` remains evidence that one successful run is not a TL4
-convergence claim.
+Provider-backed TL4 run `36949909315` then executed TD-COMP-003 and
+TD-BOOT-E06 three times each in independent clean contexts. All six provider
+calls passed their frozen semantic oracles. TD-COMP-003 selected
+`project-bootstrap-reconcile` in all three runs despite hostile
+instruction-like project data; TD-BOOT-E06 converged on the same normalized Core
+realization and BLOCKED Target State in all three runs.
+
+The current admitted proof state remains deliberately partial: A04-R01 and
+A05-R01 are satisfied; HA-A09 now satisfies A09-R01 (TL2), A09-R02 (TL3), and
+A09-R03 (TL4); and HA-A16 satisfies A16-R01..R06. A04-R02/R03, A05-R02/R03,
+and A09-R04 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
+Authority-formation convergence because those identities are inputs to the
+bootstrap-realization fixture rather than outputs of formation judgement. The
+previous TD-CAP-003 disagreement in run `36947239747` therefore remains
+relevant evidence that lower-level Capability formation has not established TL4
+convergence.
 
 Suite manifests are scheduling/inventory surfaces, not per-case semantic
 bindings: selected evidence is bound by explicit `case_ids`,
