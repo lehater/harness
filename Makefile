@@ -5,6 +5,7 @@ harness-check:
 	python validators/validate_assurance_registry.py
 	python validators/validate_behavioral_eval.py
 	python validators/validate_behavioral_eval_cases.py
+	python validators/validate_consumer_api_lifecycle.py
 	python validators/validate_context_boundaries.py
 	python validators/validate_core.py
 	python validators/validate_adapters.py

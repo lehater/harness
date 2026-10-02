@@ -78,6 +78,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: consumer_api_lifecycle
+  command: python validators/validate_consumer_api_lifecycle.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: context_boundaries
   command: python validators/validate_context_boundaries.py
   stage: focused
@@ -186,9 +191,9 @@ checks:
 - id: consumer_pack
   command: python validators/validate_consumer_pack.py
   stage: deferred
-  cost_class: medium
+  cost_class: heavy
   disposition: full_gate
-  rationale: AUD-008 measured this distribution check at about three seconds; defer until focused checks pass.
+  rationale: Consumer v0/v1 and stripped-source/Pack acceptance measured 29 seconds; retain deferred execution after focused checks.
 - id: consumer_wrapper
   command: python validators/validate_consumer_wrapper.py
   stage: deferred

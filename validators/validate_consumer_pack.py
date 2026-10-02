@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import venv
 from pathlib import Path
 
 import yaml
@@ -220,8 +221,11 @@ def test_context_dependencies(temp_root: Path) -> None:
     target.write_text(original)
 
 
-def test_pack_execution(pack: Path, temp_root: Path, consumer_api: str = "v0") -> None:
+def test_pack_execution(
+    pack: Path, temp_root: Path, consumer_api: str = "v0", python: str | None = None,
+) -> None:
     """Exercise the distributed files, without inheriting checkout import paths."""
+    python = python or sys.executable
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
     env["PYTHONNOUSERSITE"] = "1"
@@ -1200,13 +1204,13 @@ assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
 
     def cli(filename: str) -> list[str]:
         if consumer_api == "v0":
-            return [sys.executable, filename]
+            return [python, filename]
         identity = ("harness.project_model.core" if filename == "harness.py"
                     else layout["compatibility"]["module_facades"][filename[:-3]]["target"])
-        return [sys.executable, "-m", identity]
+        return [python, "-m", identity]
 
     result = subprocess.run(
-        [sys.executable, "-c", probe], cwd=pack, env=env,
+        [python, "-c", probe], cwd=pack, env=env,
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
@@ -1243,7 +1247,7 @@ assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
         for identity in ((entry["target"], legacy) if consumer_api == "v0" else (entry["target"],)):
             is_copilot = identity.endswith("copilot_live_calibration_evaluator")
             result = subprocess.run(
-                [sys.executable, "-m", identity, *([] if is_copilot else [str(nested_graph)])],
+                [python, "-m", identity, *([] if is_copilot else [str(nested_graph)])],
                 input="", cwd=pack, env=env, capture_output=True, text=True,
             )
             if is_copilot:
@@ -1297,7 +1301,7 @@ assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
     )
     for module, arguments, expression in coverage_commands:
         oracle = subprocess.run(
-            [sys.executable, "-c", "import importlib, json, sys; m=importlib.import_module('harness.coverage.'+sys.argv[1]); a=sys.argv[2:]; print(json.dumps(" + expression + "))", module, *arguments],
+            [python, "-c", "import importlib, json, sys; m=importlib.import_module('harness.coverage.'+sys.argv[1]); a=sys.argv[2:]; print(json.dumps(" + expression + "))", module, *arguments],
             cwd=pack, env=env, check=True, capture_output=True, text=True,
         )
         result = subprocess.run(
@@ -1460,11 +1464,88 @@ assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
                          for identity in sorted(set(requirements))],
     }))
     result = subprocess.run(
-        [sys.executable, "scenario_suite.py", str(scenarios), "--catalog", str(catalog)],
+        [python, "scenario_suite.py", str(scenarios), "--catalog", str(catalog)],
         cwd=pack, env=env, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(result.stdout)["scenario_count"] == 6
+
+
+def test_v1_stripped_source(temp_root: Path) -> None:
+    """Materialize/execute v1 where no legacy physical fallback is available."""
+    from validators.validate_consumer_api_lifecycle import facade_paths
+
+    source = temp_root / "stripped-source"
+    shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
+        ".git", "__pycache__", ".venv", "node_modules", ".pytest_cache"))
+    layout = load_yaml(source / "spec/architecture/repository-layout-v0.yaml")
+    retired = facade_paths(layout)
+    for relative in retired:
+        (source / relative).unlink()
+    shutil.rmtree(source / "adapters")
+    assert (source / "harness/__init__.py").is_file()
+    assert all(not (source / relative).exists() for relative in retired)
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env["PYTHONNOUSERSITE"] = "1"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    # A fresh interpreter has only PyYAML copied as a third-party dependency.
+    # No Harness installation, global site packages or parent checkout imports.
+    interpreter = temp_root / "ratchet-interpreter"
+    venv.EnvBuilder(with_pip=False).create(interpreter)
+    python = str(interpreter / "bin/python")
+    purelib = subprocess.check_output(
+        [python, "-c", "import sysconfig; print(sysconfig.get_path('purelib'))"],
+        cwd=temp_root, env=env, text=True,
+    ).strip()
+    shutil.copytree(Path(yaml.__file__).parent, Path(purelib) / "yaml")
+    result = subprocess.run(
+        [python, "-c", "import importlib.util, os; "
+         "assert 'PYTHONPATH' not in os.environ; "
+         "assert importlib.util.find_spec('harness') is None"],
+        cwd=temp_root, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    # Fail-fast legacy import guard supplements physical absence.
+    probe = """
+import importlib.abc
+import importlib
+import sys
+from pathlib import Path
+import yaml
+layout = yaml.safe_load(Path('spec/architecture/repository-layout-v0.yaml').read_text())
+legacy = set(layout['compatibility']['module_facades']) | {'adapters'}
+class RejectLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname in legacy or fullname.startswith('adapters.'):
+            raise ImportError('retired facade dependency: ' + fullname)
+sys.meta_path.insert(0, RejectLegacy())
+for entry in layout['compatibility']['module_facades'].values():
+    module = importlib.import_module(entry['target'])
+    assert Path(module.__file__).resolve().is_relative_to(Path.cwd() / 'src/harness')
+from harness.application.consumer_pack import materialize_pack
+manifest = materialize_pack(Path.cwd(), Path(sys.argv[1]), binding_revision='a'*40, consumer_api='v1')
+assert manifest['consumer_api'] == 'v1'
+"""
+    pack = temp_root / "stripped-v1-pack"
+    result = subprocess.run([python, "-c", probe, str(pack)],
+                            cwd=source, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert validate_pack(pack, expected_api="v1")["consumer_api"] == "v1"
+    # Source and Pack execute the existing CLI/import/Scenario acceptance path.
+    for directory, name in ((source, "source"), (pack, "pack")):
+        execution = temp_root / ("stripped-" + name + "-execution")
+        execution.mkdir()
+        test_pack_execution(directory, execution, "v1", python)
+    # Negative control: the ratchet must detect a newly introduced legacy import.
+    module = source / "src/harness/application/consumer_pack.py"
+    original = module.read_text()
+    module.write_text(original + "\nimport consumer_pack\n")
+    result = subprocess.run([python, "-c", probe, str(temp_root / "forbidden-pack")],
+                            cwd=source, env=env, capture_output=True, text=True)
+    assert result.returncode != 0 and 'retired facade dependency: consumer_pack' in result.stderr
+    module.write_text(original)
+    print("v1 stripped-facade source/Pack ratchet PASS (negative control PASS)")
 
 
 def test_v1_pack(temp_root: Path) -> None:
@@ -1699,6 +1780,7 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="consumer-v1-validation-") as temp:
         test_v1_pack(Path(temp))
+        test_v1_stripped_source(Path(temp))
     print("Harness Consumer v0 compatibility and v1 canonical distribution validation passed")
     return 0
 
