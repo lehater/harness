@@ -128,7 +128,7 @@ Each implementation step is a separate branch/PR from the current integrated
 
 `pyproject.toml` is the repository-level dependency/tooling declaration.
 Harness remains a non-packaged uv project (`tool.uv.package = false`) during
-the Core bootstrap slice. The explicit source-tree bridge supplies packaged
+the completed Project Model bootstrap. The explicit source-tree bridge supplies packaged
 imports without installation. Installation and removal of the bridge require
 a separate packaging/execution-policy change.
 
@@ -138,7 +138,7 @@ switch to frozen uv-based CI execution are a separate execution-policy change
 and must be validated independently rather than bundled into the layout
 foundation.
 
-## Core bootstrap migration decision
+## Project Model bootstrap migration decision
 
 The first slice moves only Core into `src/harness/project_model/core.py`.
 The second slice moves Target State into
@@ -190,12 +190,15 @@ extra execution and path manipulation outside that grammar are rejected.
 Packaged initializers carry only declared re-exports or documentation; they
 are not independent semantic modules. Relative module imports are checked too.
 
-Consumer Pack v0 includes the four package/bridge files explicitly alongside
-the legacy CLI. Its acceptance validator runs imports and the CLI in a
-materialized pack without checkout `PYTHONPATH`; root import-closure analysis
-alone is insufficient evidence for this slice. Existing Core acceptance and
-legacy Target State/Engineering Graph checks protect HA-A01/HA-A03; isolated
-pack execution protects HA-A18 (TD-DIST-001/002).
+Consumer Pack v0 explicitly includes the three canonical Project Model modules
+(`core.py`, `target_state.py`, `engineering_graph.py`), their package initializers
+and the temporary source-tree import bridge. The root `harness.py` CLI facade
+and `target_state.py` / `engineering_graph.py` import/CLI facades remain in the
+pack. Its acceptance validator runs canonical and legacy imports, identity checks
+and CLI execution in a materialized pack without checkout `PYTHONPATH`; root
+import-closure analysis alone does not prove packaged dependency closure.
+Existing Core, Target State and Engineering Graph acceptance checks protect
+HA-A01/HA-A03; isolated pack execution protects HA-A18 (TD-DIST-001/002).
 
 Accepted provider-run bindings include the old Core document and, for several
 runs, the root implementation. This move makes 12 previously active evidence

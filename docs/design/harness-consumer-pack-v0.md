@@ -104,19 +104,23 @@ checks Python imports between root Harness modules: if an exported module import
 another Harness root module that is not exported, pack creation fails.
 
 This checks root-module closure; it does not prove packaged dependency closure.
-For the Core bootstrap slice, `exact_files` also includes:
+For the completed Project Model bootstrap, `exact_files` includes:
 
 ```text
 harness/__init__.py
 src/harness/__init__.py
 src/harness/project_model/__init__.py
 src/harness/project_model/core.py
+src/harness/project_model/target_state.py
+src/harness/project_model/engineering_graph.py
 ```
 
-The canonical implementation is the packaged Core. `harness/__init__.py` is
-its temporary import bridge and `harness.py` remains only the legacy CLI.
-The pack acceptance validator executes imports, checks canonical/legacy object
-identity and runs the legacy CLI against an existing fixture from inside an
+The canonical Project Model implementations are the three packaged modules.
+`harness/__init__.py` is the temporary Core import bridge; root `harness.py` is
+only the legacy Core CLI. Root `target_state.py` and `engineering_graph.py` are
+temporary import/CLI facades delegating to their canonical packaged modules.
+The pack acceptance validator executes canonical and legacy imports, checks
+object identity and runs the legacy CLIs against existing fixtures from inside an
 isolated materialized pack, without inheriting source-checkout import paths.
 No whole `src/` prefix, Harness install step, API change or wrapper protocol
 change is introduced.
