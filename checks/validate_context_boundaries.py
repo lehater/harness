@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Ratchet validator for the Harness DDD bounded-context map."""
+"""Validate canonical repository layout and bounded-context dependency direction."""
 from __future__ import annotations
 
 import ast
 from pathlib import Path
 import sys
+from typing import Any
+
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,156 +14,25 @@ MAP = ROOT / "spec" / "architecture" / "harness-context-map-v0.yaml"
 LAYOUT = ROOT / "spec" / "architecture" / "repository-layout-v0.yaml"
 
 
-def load_map() -> dict:
-    value = yaml.safe_load(MAP.read_text(encoding="utf-8"))
-    if not isinstance(value, dict) or value.get("kind") != "harness-bounded-context-map":
+def load_yaml(path: Path) -> dict[str, Any]:
+    value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise SystemExit(f"{path.relative_to(ROOT)} must contain a mapping")
+    return value
+
+
+def load_map() -> dict[str, Any]:
+    value = load_yaml(MAP)
+    if value.get("kind") != "harness-bounded-context-map":
         raise SystemExit("invalid Harness bounded-context map")
     return value
 
 
-def load_layout() -> dict:
-    value = yaml.safe_load(LAYOUT.read_text(encoding="utf-8"))
-    if not isinstance(value, dict) or value.get("kind") != "harness-repository-layout":
+def load_layout() -> dict[str, Any]:
+    value = load_yaml(LAYOUT)
+    if value.get("kind") != "harness-repository-layout":
         raise SystemExit("invalid Harness repository-layout contract")
     return value
-
-
-def _root_python_modules() -> set[str]:
-    return {path.stem for path in ROOT.glob("*.py") if path.is_file()}
-
-
-def _validate_physical_layout(
-    layout: dict,
-    contexts: dict,
-    owner: dict[str, str],
-    ignored: set[str],
-    facades: set[str],
-) -> None:
-    design = layout.get("design")
-    if not isinstance(design, str) or not design or not (ROOT / design).is_file():
-        raise SystemExit("repository layout must reference an existing design contract")
-
-    context_map = layout.get("context_map")
-    if context_map != MAP.relative_to(ROOT).as_posix():
-        raise SystemExit("repository layout must reference the canonical context map")
-
-    target = layout.get("runtime_target")
-    if not isinstance(target, dict) or target.get("root") != "src/harness":
-        raise SystemExit("runtime_target.root must be src/harness")
-
-    packages = target.get("packages")
-    if not isinstance(packages, dict) or set(packages) != set(contexts):
-        raise SystemExit(
-            "runtime_target.packages must map every bounded context/application layer"
-        )
-    for context_name, package in packages.items():
-        if not isinstance(package, str) or not package.isidentifier():
-            raise SystemExit(
-                f"invalid target package for {context_name}: {package!r}"
-            )
-
-    root_python = layout.get("root_python")
-    if not isinstance(root_python, dict):
-        raise SystemExit("root_python migration policy is required")
-    if root_python.get("policy") != "closed":
-        raise SystemExit("root_python.policy must be closed")
-
-    baseline_values = root_python.get("migration_baseline_modules")
-    exceptions_values = root_python.get("permanent_bootstrap_exceptions", [])
-    tooling_values = root_python.get("permanent_consumer_tooling_modules")
-    for label, values in (
-        ("migration_baseline_modules", baseline_values),
-        ("permanent_bootstrap_exceptions", exceptions_values),
-        ("permanent_consumer_tooling_modules", tooling_values),
-    ):
-        if not isinstance(values, list) or any(
-            not isinstance(value, str) or not value for value in values
-        ):
-            raise SystemExit(f"root_python.{label} must be a string list")
-        if len(values) != len(set(values)):
-            raise SystemExit(f"root_python.{label} contains duplicates")
-
-    if baseline_values != []:
-        raise SystemExit("runtime migration is closed: migration_baseline_modules must be empty")
-    if any(not module.startswith("harness.") and module != "distribution.harnessw" for module in owner):
-        raise SystemExit("context/application owners must be canonical harness.* or distribution.harnessw")
-
-    tooling = set(tooling_values)
-    if tooling:
-        raise SystemExit("root Python consumer tooling is forbidden after migration closure")
-    baseline = set(baseline_values)
-    exceptions = set(exceptions_values)
-    overlap = sorted(baseline & exceptions)
-    if overlap:
-        raise SystemExit(
-            f"root Python modules cannot be both migration baseline and exception: {overlap}"
-        )
-
-    if facades & (baseline | exceptions):
-        raise SystemExit(
-            "compatibility surfaces must be tracked separately from implementation baseline"
-        )
-
-    classified = set(owner) | ignored
-    unclassified = sorted((baseline | exceptions) - classified)
-    if unclassified:
-        raise SystemExit(
-            f"repository-layout root modules lack context/test classification: {unclassified}"
-        )
-
-    actual = _root_python_modules()
-    root_facades = {module for module in facades if "." not in module}
-    missing_tooling = sorted(tooling - actual)
-    if missing_tooling:
-        raise SystemExit(f"missing declared consumer tooling modules: {missing_tooling}")
-    unexpected = sorted(actual - baseline - exceptions - tooling - root_facades)
-    stale = sorted(baseline - actual)
-    stale_exceptions = sorted(exceptions - actual)
-    if unexpected:
-        raise SystemExit(
-            "new root Python modules are forbidden after migration closure: "
-            f"{unexpected}"
-        )
-    if stale:
-        raise SystemExit(
-            "remove migrated/deleted modules from root migration baseline: "
-            f"{stale}"
-        )
-    if stale_exceptions:
-        raise SystemExit(
-            "remove missing permanent root bootstrap exceptions: "
-            f"{stale_exceptions}"
-        )
-
-
-def _module_path(module: str) -> Path:
-    base = ROOT / "src" if module.startswith("harness.") else ROOT
-    return base.joinpath(*module.split(".")).with_suffix(".py")
-
-
-def _facade_body(target: str, kind: str) -> str:
-    """Closed grammar for migration surfaces, not a semantic implementation."""
-    exports = f"from {target} import *\nfrom {target} import __all__\n"
-    if kind == "exports":
-        return exports
-    if kind == "bridge":
-        return (
-            'from pathlib import Path as _Path\n'
-            '__path__ = [str(_Path(__file__).resolve().parents[1] / "src" / "harness")]\n'
-            + exports
-        )
-    if kind == "import-only":
-        return exports
-    if kind == "import-and-cli":
-        return exports + _facade_body(target, "cli")
-    if kind == "cli":
-        return (
-            f"from {target} import main\n"
-            'if __name__ == "__main__":\n'
-            '    raise SystemExit(main())\n'
-        )
-    raise SystemExit(f"unknown compatibility surface kind: {kind}")
-
 
 
 def _without_docstring(body: list[ast.stmt]) -> list[ast.stmt]:
@@ -175,143 +46,120 @@ def _without_docstring(body: list[ast.stmt]) -> list[ast.stmt]:
     return body
 
 
-def _validate_facade_tree(tree: ast.Module, target: str, kind: str) -> None:
-    body = list(tree.body)
-    body = _without_docstring(body)
-    actual = ast.dump(ast.Module(body=body, type_ignores=[]))
-    expected = ast.dump(ast.parse(_facade_body(target, kind)))
-    if actual != expected:
-        raise SystemExit(f"{kind} must only delegate to {target}; implementation is forbidden")
+def _root_python_modules() -> set[str]:
+    return {path.stem for path in ROOT.glob("*.py") if path.is_file()}
 
 
-def _validate_facade(relative: str, target: str, kind: str) -> None:
-    path = ROOT / relative
+def _module_path(module: str) -> Path:
+    base = ROOT / "src" if module.startswith("harness.") else ROOT
+    return base.joinpath(*module.split(".")).with_suffix(".py")
+
+
+def _validate_bridge(layout: dict[str, Any]) -> None:
+    bridge = layout.get("source_tree_bridge")
+    expected = {
+        "package": "harness",
+        "path": "harness/__init__.py",
+        "target_root": "src/harness",
+    }
+    if bridge != expected:
+        raise SystemExit(f"source_tree_bridge must be {expected!r}")
+
+    path = ROOT / bridge["path"]
     if not path.is_file():
-        raise SystemExit(f"compatibility surface missing: {relative}")
-    try:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=relative)
-        _validate_facade_tree(tree, target, kind)
-    except (SyntaxError, SystemExit) as exc:
-        raise SystemExit(f"invalid compatibility surface {relative}: {exc}") from exc
+        raise SystemExit("source-tree bridge is missing")
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    actual = ast.dump(ast.Module(body=_without_docstring(tree.body), type_ignores=[]))
+    expected_tree = ast.parse(
+        'from pathlib import Path as _Path\n'
+        '__path__ = [str(_Path(__file__).resolve().parents[1] / "src" / "harness")]\n'
+    )
+    expected_ast = ast.dump(expected_tree)
+    if actual != expected_ast:
+        raise SystemExit("source-tree bridge may only bind harness.__path__ to src/harness")
+
+    canonical_init = ROOT / "src/harness/__init__.py"
+    tree = ast.parse(canonical_init.read_text(encoding="utf-8"), filename=str(canonical_init))
+    if _without_docstring(tree.body):
+        raise SystemExit("src/harness/__init__.py must not own exports or implementation")
 
 
-def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str], set[str]]:
-    compatibility = layout.get("compatibility", {})
-    if not isinstance(compatibility, dict) or set(compatibility) - {
-        "import_aliases", "cli_facades", "module_facades"
-    }:
-        raise SystemExit("invalid compatibility metadata")
-    aliases: dict[str, str] = {}
-    facades: set[str] = set()
-    for kind in ("import_aliases", "cli_facades", "module_facades"):
-        entries = compatibility.get(kind, {})
-        if not isinstance(entries, dict):
-            raise SystemExit(f"compatibility.{kind} must be a mapping")
-        for legacy, entry in entries.items():
-            fields = (
-                {"target", "bridge"} if kind == "import_aliases"
-                else {"target", "mode"} if kind == "module_facades"
-                else {"target"}
-            )
-            if not isinstance(entry, dict) or set(entry) != fields:
-                raise SystemExit(f"invalid compatibility entry: {legacy}")
-            target = entry["target"]
-            if (
-                not isinstance(target, str)
-                or target not in owner
-                or not _module_path(target).is_file()
-            ):
-                raise SystemExit(f"compatibility target must be an existing canonical module: {target}")
-            if not target.startswith("harness."):
-                raise SystemExit(f"compatibility target must live under src/harness: {target}")
-            if kind == "import_aliases":
-                if not isinstance(legacy, str) or not legacy.isidentifier() or legacy in owner:
-                    raise SystemExit(f"import alias cannot own semantics: {legacy}")
-                bridge = f"{legacy}/__init__.py"
-                if entry["bridge"] != bridge:
-                    raise SystemExit(f"import bridge must match alias package: {legacy}")
-                if legacy != "harness":
-                    raise SystemExit("source package bridge currently supports only harness")
-                _validate_facade(bridge, target, "bridge")
-                _validate_facade("src/harness/__init__.py", target, "exports")
-                aliases[legacy] = target
-            elif kind == "module_facades":
-                if (
-                    not isinstance(legacy, str)
-                    or not all(part.isidentifier() for part in legacy.split("."))
-                    or legacy in owner
-                ):
-                    raise SystemExit(f"module facade cannot own semantics: {legacy}")
-                mode = entry["mode"]
-                if mode not in ("import-only", "import-and-cli"):
-                    raise SystemExit(f"invalid module facade mode: {legacy}: {mode}")
-                _validate_facade(legacy.replace(".", "/") + ".py", target, mode)
-                aliases[legacy] = target
-                facades.add(legacy)
-            else:
-                if (
-                    not isinstance(legacy, str)
-                    or Path(legacy).name != legacy
-                    or not legacy.endswith(".py")
-                ):
-                    raise SystemExit(f"CLI facade must be a root Python file: {legacy}")
-                if Path(legacy).stem in owner:
-                    raise SystemExit(f"CLI facade cannot own semantics: {legacy}")
-                _validate_facade(legacy, target, "cli")
-                facades.add(Path(legacy).stem)
-    return aliases, facades
+def _validate_layout(layout: dict[str, Any], contexts: dict[str, Any]) -> None:
+    design = layout.get("design")
+    if not isinstance(design, str) or not design or not (ROOT / design).is_file():
+        raise SystemExit("repository layout must reference an existing design contract")
+    if layout.get("context_map") != MAP.relative_to(ROOT).as_posix():
+        raise SystemExit("repository layout must reference the canonical context map")
+
+    target = layout.get("runtime_target")
+    if not isinstance(target, dict) or target.get("root") != "src/harness":
+        raise SystemExit("runtime_target.root must be src/harness")
+    packages = target.get("packages")
+    if not isinstance(packages, dict) or set(packages) != set(contexts):
+        raise SystemExit("runtime_target.packages must map every context/application layer")
+    if any(not isinstance(value, str) or not value.isidentifier() for value in packages.values()):
+        raise SystemExit("runtime_target package names must be identifiers")
+
+    root_python = layout.get("root_python")
+    if root_python != {"policy": "closed"}:
+        raise SystemExit("root_python must be the closed canonical policy")
+    if _root_python_modules():
+        raise SystemExit(f"root Python modules are forbidden: {sorted(_root_python_modules())}")
+    if (ROOT / "adapters").exists():
+        raise SystemExit("top-level adapters/ is retired; use canonical package/evals paths")
+
+    if "compatibility" in layout:
+        raise SystemExit("legacy compatibility registry is forbidden after migration closure")
+    _validate_bridge(layout)
 
 
-def _runtime_modules(spec: dict, facades: set[str], aliases: dict[str, str]) -> set[str]:
-    result = _root_python_modules() - facades
+def _validate_initializer(path: Path) -> None:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    if _without_docstring(tree.body):
+        raise SystemExit(
+            f"package initializer cannot own implementation: {path.relative_to(ROOT)}"
+        )
+
+
+def _runtime_modules(spec: dict[str, Any]) -> set[str]:
+    result: set[str] = set()
+
+    src = ROOT / "src/harness"
+    if not src.is_dir():
+        raise SystemExit("canonical runtime root src/harness is missing")
+    for path in src.rglob("*.py"):
+        if path.name == "__init__.py":
+            _validate_initializer(path)
+            continue
+        module = ".".join(path.relative_to(ROOT / "src").with_suffix("").parts)
+        if module in result:
+            raise SystemExit(f"duplicate runtime module identity: {module}")
+        result.add(module)
+
     packages = spec.get("runtime_packages", []) or []
     if not isinstance(packages, list) or any(
         not isinstance(package, str) or not package for package in packages
     ):
         raise SystemExit("runtime_packages must be a string list")
+    if len(packages) != len(set(packages)):
+        raise SystemExit("runtime_packages contains duplicates")
 
-    # src modules use import identities, never the physical src prefix.
-    bases = [(ROOT / package, ROOT) for package in packages]
-    if (ROOT / "src/harness").exists():
-        bases.append((ROOT / "src/harness", ROOT / "src"))
-    if (ROOT / "harness").exists():
-        bases.append((ROOT / "harness", ROOT))
-    for base, import_root in bases:
+    for package in packages:
+        base = ROOT / package
         if not base.is_dir():
-            raise SystemExit(f"runtime package missing: {base.relative_to(ROOT)}")
+            raise SystemExit(f"runtime package missing: {package}")
         for path in base.rglob("*.py"):
             if path.name == "__init__.py":
-                # Initializers carry package wiring only, never domain meaning.
-                registered_exports = (
-                    path == ROOT / "src/harness/__init__.py" and "harness" in aliases
-                )
-                if import_root == ROOT / "src" and not registered_exports:
-                    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-                    if _without_docstring(tree.body):
-                        raise SystemExit(
-                            "packaged initializer cannot own implementation: "
-                            f"{path.relative_to(ROOT)}"
-                        )
-                if base == ROOT / "harness" and (
-                    path != base / "__init__.py" or "harness" not in aliases
-                ):
-                    raise SystemExit(
-                        f"undeclared compatibility initializer: {path.relative_to(ROOT)}"
-                    )
+                _validate_initializer(path)
                 continue
-            module = ".".join(path.relative_to(import_root).with_suffix("").parts)
-            if module in facades:
-                continue
+            module = ".".join(path.relative_to(ROOT).with_suffix("").parts)
             if module in result:
                 raise SystemExit(f"duplicate runtime module identity: {module}")
             result.add(module)
     return result
 
 
-def _resolve_target(module_name: str, owner: dict[str, str], aliases: dict[str, str]) -> str | None:
-    # Aliases match exactly; harness.project_model.other must not become Core.
-    if module_name in aliases:
-        return aliases[module_name]
+def _resolve_target(module_name: str, owner: dict[str, str]) -> str | None:
     parts = module_name.split(".")
     for length in range(len(parts), 0, -1):
         candidate = ".".join(parts[:length])
@@ -320,159 +168,69 @@ def _resolve_target(module_name: str, owner: dict[str, str], aliases: dict[str, 
     return None
 
 
-def _validate_runtime_import(
-    source: str,
-    node: ast.AST,
-    owner: dict[str, str],
-    aliases: dict[str, str],
-) -> None:
-    if source not in owner:
-        return
-    modules = []
-    if isinstance(node, ast.ImportFrom) and not node.level:
-        modules = [node.module]
-        modules.extend(f"{node.module}.{alias.name}" for alias in node.names)
-    elif isinstance(node, ast.Import):
-        modules = [alias.name for alias in node.names]
-    for module in modules:
-        if module in aliases:
-            raise SystemExit(
-                f"{source}:{node.lineno} imports compatibility alias {module}; "
-                f"use canonical target {_resolve_target(module, owner, aliases)} instead"
-            )
+def _reject_retired_imports(path: Path, legacy_leafs: set[str]) -> None:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in ast.walk(tree):
+        names: list[str] = []
+        if isinstance(node, ast.Import):
+            names = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.level == 0:
+            module = node.module or ""
+            if module == "harness":
+                raise SystemExit(
+                    f"{path.relative_to(ROOT)}:{node.lineno} uses retired package-root Core exports"
+                )
+            names = [module]
+        for name in names:
+            if name == "adapters" or name.startswith("adapters."):
+                raise SystemExit(
+                    f"{path.relative_to(ROOT)}:{node.lineno} imports retired top-level adapters"
+                )
+            if "." not in name and name in legacy_leafs:
+                raise SystemExit(
+                    f"{path.relative_to(ROOT)}:{node.lineno} imports retired root module {name}"
+                )
 
 
-def test_runtime_import_guards() -> None:
-    source = "harness.application.agent_router"
-    owner = {source: "application"}
-    aliases = {
-        "agent_router": "harness.application.agent_router",
-        "skill_router": "harness.application.skill_router",
-        "semantic_admission": "harness.application.semantic_admission",
-        "engineering_graph": "harness.project_model.engineering_graph",
-        "harness": "harness.project_model.core",
-        "adapters.canonical_graph": "harness.integration.adapters.canonical_graph",
-    }
-    for statement in (
-        "from agent_router import validate_skill_registry",
-        "from skill_router import GLOBAL_INSTRUCTION_CONTRACTS",
-        "from semantic_admission import admit_artifact",
-        "from engineering_graph import X",
-        "from harness import CoreError",
-        "import engineering_graph",
-        "import harness as legacy",
-        "import pathlib, engineering_graph as legacy",
-        "from adapters.canonical_graph import project_model",
-        "import adapters.canonical_graph",
-        "from adapters import canonical_graph",
-    ):
-        node = ast.parse(statement).body[0]
-        try:
-            _validate_runtime_import(source, node, owner, aliases)
-        except SystemExit as exc:
-            assert "use canonical target harness." in str(exc)
-        else:
-            raise AssertionError(f"owned runtime accepted {statement}")
-        for excluded in ("validators.check", "tests.check", "engineering_graph"):
-            _validate_runtime_import(excluded, node, owner, aliases)
-    for statement in (
-        "from harness.project_model.core import CoreError",
-        "from harness.project_model.engineering_graph import derive_profile",
-        "from harness.decision.decision_governance import axis_policies",
-        "from harness.coverage.engineering_coverage import evaluate_with_repository_policy",
-        "from harness.workspace.workspace import validate_workspace",
-        "import harness.project_model.core",
-        "from semantic_acceptance import coverage_assurance_view",
-        "from integration_alignment import validate_project_alignment",
-        "from .engineering_graph import derive_profile",
-    ):
-        _validate_runtime_import(source, ast.parse(statement).body[0], owner, aliases)
-
-
-def test_compatibility_guards() -> None:
-    target = "harness.project_model.core"
-    for kind in ("bridge", "exports", "cli", "import-only", "import-and-cli"):
-        valid = _facade_body(target, kind)
-        _validate_facade_tree(ast.parse(valid), target, kind)
-        for mutation in (
-            "\nclass ShadowCore: pass\n",
-            "\ndef validate_model(model): return model\n",
-            "\nreplacement = lambda model: model\n",
-            "\nexec('pass')\n",
-            "\nimport sys\nsys.path.insert(0, 'src')\n",
-        ):
-            try:
-                _validate_facade_tree(ast.parse(valid + mutation), target, kind)
-            except SystemExit:
-                pass
-            else:
-                raise AssertionError(f"{kind} accepted semantic/path mutation")
-    for actual_kind, declared_kind in (
-        ("import-only", "import-and-cli"),
-        ("import-and-cli", "import-only"),
-    ):
-        try:
-            _validate_facade_tree(ast.parse(_facade_body(target, actual_kind)), target, declared_kind)
-        except SystemExit:
-            pass
-        else:
-            raise AssertionError(f"{declared_kind} accepted {actual_kind} grammar")
-    module_target = "harness.project_model.target_state"
-    owner = {target: "project-model", module_target: "project-model"}
-    aliases = {"harness": target, "target_state": module_target}
-    assert _resolve_target("target_state", owner, aliases) == module_target
-    assert _resolve_target("harness", owner, aliases) == target
-    assert _resolve_target(target, owner, aliases) == target
-    assert _resolve_target("harness.project_model.other", owner, aliases) is None
-
-
-def test_closed_root_guards(layout, contexts, owner, ignored, facades) -> None:
-    from copy import deepcopy
-    from unittest.mock import patch
-
-    actual = _root_python_modules()
-    _validate_physical_layout(layout, contexts, owner, ignored, facades)
-    mutations = [(layout, owner, actual | {"random_root_implementation"})]
-    for field, values in (
-        ("permanent_consumer_tooling_modules", ["random_root_implementation"]),
-        ("permanent_bootstrap_exceptions", ["random_root_implementation"]),
-        ("migration_baseline_modules", ["random_root_implementation"]),
-    ):
-        changed = deepcopy(layout)
-        changed["root_python"][field] = values
-        mutations.append((changed, owner, actual))
-    for changed, changed_owner, inventory in mutations:
-        with patch(__name__ + "._root_python_modules", return_value=inventory):
-            try:
-                _validate_physical_layout(changed, contexts, changed_owner, ignored, facades)
-            except SystemExit:
-                pass
-            else:
-                raise AssertionError("closed root ratchet accepted mutation")
+def _scan_retired_imports(owner: dict[str, str]) -> None:
+    legacy_leafs = {module.rsplit(".", 1)[-1] for module in owner if module.startswith("harness.")}
+    roots = ("src/harness", "checks", "tests", "evals", "experiments", "distribution")
+    for relative in roots:
+        base = ROOT / relative
+        if not base.exists():
+            continue
+        for path in base.rglob("*.py"):
+            if path.name == "__init__.py":
+                continue
+            _reject_retired_imports(path, legacy_leafs)
 
 
 def main() -> int:
-    test_compatibility_guards()
-    test_runtime_import_guards()
     spec = load_map()
     contexts = spec.get("contexts", {}) or {}
+    if not isinstance(contexts, dict) or not contexts:
+        raise SystemExit("context map must declare contexts")
 
     owner: dict[str, str] = {}
     for context_name, context in contexts.items():
-        for module in context.get("modules", []) or []:
+        modules = context.get("modules", []) or []
+        for module in modules:
             previous = owner.setdefault(module, context_name)
             if previous != context_name:
                 raise SystemExit(
-                    f"module {module} belongs to multiple contexts: "
-                    f"{previous}, {context_name}"
+                    f"module {module} belongs to multiple contexts: {previous}, {context_name}"
                 )
 
-    ignored = set(spec.get("ignored_modules", []) or [])
+    ignored_values = spec.get("ignored_modules", []) or []
+    if not isinstance(ignored_values, list) or len(ignored_values) != len(set(ignored_values)):
+        raise SystemExit("ignored_modules must be a unique list")
+    ignored = set(ignored_values)
+
     layout = load_layout()
-    aliases, facades = _compatibility(layout, owner)
-    _validate_physical_layout(layout, contexts, owner, ignored, facades)
-    test_closed_root_guards(layout, contexts, owner, ignored, facades)
-    runtime_modules = _runtime_modules(spec, facades, aliases)
+    _validate_layout(layout, contexts)
+    _scan_retired_imports(owner)
+
+    runtime_modules = _runtime_modules(spec)
     missing = sorted(runtime_modules - set(owner) - ignored)
     stale = sorted((set(owner) | ignored) - runtime_modules)
     if missing:
@@ -482,77 +240,60 @@ def main() -> int:
 
     packages = layout["runtime_target"]["packages"]
     for module, context in owner.items():
-        if module.startswith("harness.") and not module.startswith(
-            f"harness.{packages[context]}."
-        ):
+        if module == "distribution.harnessw":
+            if context != "application":
+                raise SystemExit("distribution.harnessw must belong to application")
+            continue
+        if not module.startswith("harness."):
+            raise SystemExit(f"owned runtime module is not canonical: {module}")
+        if not module.startswith(f"harness.{packages[context]}."):
             raise SystemExit(f"canonical module {module} is outside {context}'s package")
 
     allowed = {
         name: set(context.get("may_depend_on", []) or [])
         for name, context in contexts.items()
     }
-    published_boundaries: dict[tuple[str, str], dict[str, set[str]]] = {}
+
+    published: dict[tuple[str, str], dict[str, set[str]]] = {}
     for index, item in enumerate(spec.get("published_boundaries", []) or []):
         if not isinstance(item, dict):
             raise SystemExit(f"published boundary #{index + 1} must be a mapping")
         source_context = item.get("from_context")
         target_context = item.get("to_context")
         if source_context not in contexts or target_context not in contexts:
-            raise SystemExit(
-                f"published boundary #{index + 1} references unknown context"
-            )
+            raise SystemExit(f"published boundary #{index + 1} references unknown context")
         if target_context not in allowed.get(source_context, set()):
             raise SystemExit(
-                f"published boundary {source_context}->{target_context} is not "
-                "an allowed context dependency"
+                f"published boundary {source_context}->{target_context} is not an allowed dependency"
             )
         key = (source_context, target_context)
-        if key in published_boundaries:
-            raise SystemExit(
-                f"duplicate published boundary: {source_context}->{target_context}"
-            )
+        if key in published:
+            raise SystemExit(f"duplicate published boundary: {source_context}->{target_context}")
         modules = item.get("modules")
         if not isinstance(modules, dict) or not modules:
-            raise SystemExit(
-                f"published boundary {source_context}->{target_context} requires modules"
-            )
+            raise SystemExit(f"published boundary {source_context}->{target_context} requires modules")
         normalized: dict[str, set[str]] = {}
         for module, symbols in modules.items():
             if owner.get(module) != target_context:
-                raise SystemExit(
-                    f"published boundary module {module} is not owned by {target_context}"
-                )
-            if not isinstance(symbols, list) or not symbols or any(
-                not isinstance(symbol, str) or not symbol for symbol in symbols
-            ):
-                raise SystemExit(
-                    f"published boundary {module} symbols must be a non-empty string list"
-                )
-            if len(symbols) != len(set(symbols)):
-                raise SystemExit(f"published boundary {module} has duplicate symbols")
+                raise SystemExit(f"published boundary module {module} is not owned by {target_context}")
+            if not isinstance(symbols, list) or not symbols or len(symbols) != len(set(symbols)):
+                raise SystemExit(f"published boundary {module} symbols must be unique/non-empty")
             normalized[module] = set(symbols)
-        published_boundaries[key] = normalized
+        published[key] = normalized
+
     shared = {
         module: set(names or [])
         for module, names in (spec.get("shared_kernel_imports", {}) or {}).items()
     }
-
     declared = {
         (item["from_module"], item["to_module"]): item
         for item in spec.get("known_violations", []) or []
     }
     actual_violations: set[tuple[str, str]] = set()
-    published_boundary_violations: list[str] = []
+    published_violations: list[str] = []
 
-    def resolve_target(module_name: str) -> str | None:
-        return _resolve_target(module_name, owner, aliases)
-
-    def check_edge(
-        source: str,
-        target_name: str,
-        imported_names: set[str] | None,
-    ) -> None:
-        target = resolve_target(target_name)
+    def check_edge(source: str, target_name: str, imported_names: set[str] | None) -> None:
+        target = _resolve_target(target_name, owner)
         if target is None:
             return
         if (
@@ -567,28 +308,24 @@ def main() -> int:
         if source_context == target_context:
             return
 
-        boundary = published_boundaries.get((source_context, target_context))
+        boundary = published.get((source_context, target_context))
         if boundary is not None:
             allowed_symbols = boundary.get(target)
             if allowed_symbols is None:
-                published_boundary_violations.append(
-                    f"{source} ({source_context}) imports non-published module "
-                    f"{target} ({target_context})"
+                published_violations.append(
+                    f"{source} ({source_context}) imports non-published module {target} ({target_context})"
                 )
                 return
             if imported_names is None:
-                published_boundary_violations.append(
-                    f"{source} ({source_context}) imports published module {target} "
-                    "without an explicit symbol boundary"
+                published_violations.append(
+                    f"{source} ({source_context}) imports published module {target} without explicit symbols"
                 )
                 return
             disallowed = sorted(imported_names - allowed_symbols)
             if disallowed:
-                published_boundary_violations.append(
-                    f"{source} ({source_context}) imports non-published symbols "
-                    f"from {target}: {disallowed}"
+                published_violations.append(
+                    f"{source} ({source_context}) imports non-published symbols from {target}: {disallowed}"
                 )
-                return
             return
 
         if target_context in allowed.get(source_context, set()):
@@ -599,25 +336,20 @@ def main() -> int:
         path = _module_path(source)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            _validate_runtime_import(source, node, owner, aliases)
             if isinstance(node, ast.ImportFrom):
                 module_name = node.module or ""
                 if node.level:
                     package_parts = source.split(".")[:-1]
                     if node.level > len(package_parts):
                         raise SystemExit(f"invalid relative runtime import in {source}")
-                    prefix = package_parts[:len(package_parts) - node.level + 1]
+                    prefix = package_parts[: len(package_parts) - node.level + 1]
                     module_name = ".".join(prefix + ([module_name] if module_name else []))
                 names = {alias.name for alias in node.names}
-                if resolve_target(module_name) is not None:
+                if _resolve_target(module_name, owner) is not None:
                     check_edge(source, module_name, names)
                 else:
                     for alias in node.names:
-                        check_edge(
-                            source,
-                            f"{module_name}.{alias.name}",
-                            None,
-                        )
+                        check_edge(source, f"{module_name}.{alias.name}", None)
             elif isinstance(node, ast.Import):
                 for alias in node.names:
                     check_edge(source, alias.name, None)
@@ -626,31 +358,25 @@ def main() -> int:
     unknown = sorted(actual_violations - declared_edges)
     stale_exceptions = sorted(declared_edges - actual_violations)
 
-    if published_boundary_violations:
+    if published_violations:
         print("published cross-context contract violations:", file=sys.stderr)
-        for violation in sorted(published_boundary_violations):
+        for violation in sorted(published_violations):
             print(f"- {violation}", file=sys.stderr)
         return 1
-
     if unknown:
         print("undeclared bounded-context violations:", file=sys.stderr)
         for source, target in unknown:
-            print(
-                f"- {source} ({owner[source]}) -> {target} ({owner[target]})",
-                file=sys.stderr,
-            )
+            print(f"- {source} ({owner[source]}) -> {target} ({owner[target]})", file=sys.stderr)
         return 1
-
     if stale_exceptions:
         print("remove resolved known_violations from context map:", file=sys.stderr)
         for source, target in stale_exceptions:
             print(f"- {source} -> {target}", file=sys.stderr)
         return 1
 
-
     print(
         "Harness bounded-context/repository-layout boundaries: PASS "
-        f"({len(actual_violations)} known violation(s) ratcheted)"
+        f"({len(actual_violations)} known violation(s) ratcheted; root closed)"
     )
     return 0
 

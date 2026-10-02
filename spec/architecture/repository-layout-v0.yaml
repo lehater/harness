@@ -20,15 +20,8 @@ runtime_target:
 
 root_python:
   policy: closed
-  permanent_bootstrap_exceptions: []
-  migration_baseline_modules: []
-  permanent_consumer_tooling_modules: []
 
-# Source-tree bridge required while repository execution is non-installed.
-compatibility:
-  import_aliases:
-    harness:
-      target: harness.project_model.core
-      bridge: harness/__init__.py
-  cli_facades: {}
-  module_facades: {}
+source_tree_bridge:
+  package: harness
+  path: harness/__init__.py
+  target_root: src/harness
