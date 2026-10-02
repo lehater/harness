@@ -95,7 +95,7 @@ not require an additional published-boundary rule.
 
 ## Enforcement
 
-`validators/validate_context_boundaries.py` validates both levels:
+`checks/validate_context_boundaries.py` validates both levels:
 
 1. the context dependency itself must be allowed by the bounded-context map;
 2. when a `published_boundaries` rule exists, imports must use only the listed

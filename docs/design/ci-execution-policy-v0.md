@@ -142,7 +142,7 @@ edit alone is not sufficient authority to weaken this policy.
 `spec/ci/check-registry-v0.yaml` is the machine-readable check inventory and
 workflow-role declaration.
 
-`validators/validate_ci_policy.py` verifies:
+`checks/validate_ci_policy.py` verifies:
 
 - workflow trigger invariants for `exhaustive`, `focused`, and `external`
   workflow roles;

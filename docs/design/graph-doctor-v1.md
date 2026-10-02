@@ -131,7 +131,7 @@ A dedicated acceptance suite proves:
 - missing artifact dependency;
 - incomplete Consumer target reported as INFO.
 
-Acceptance is executed by `validators/validate_graph_doctor.py` through `make harness-check`.
+Acceptance is executed by `tests/test_graph_doctor.py` through `make harness-check`.
 
 ## NAPMS pilot
 
