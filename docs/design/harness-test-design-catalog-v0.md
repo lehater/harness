@@ -1749,7 +1749,11 @@ are recorded separately from correctness.
 **Methods:** EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_project_frontier.py::test_cross_layer_precedence_matrix`
+plus the existing project-frontier composition regression and Scenario Suite
+case.
 
 Fixture matrix:
 
