@@ -841,6 +841,40 @@ does not establish a universal mechanism that invents a new Core Question from
 every missing applicability fact. Any future Question-creation test must name
 the operation/owner responsible for creating it.
 
+## TD-QST-001 — Semantic unknown versus process failure
+
+**Abilities:** HA-A13  
+**Failure modes:** A13-F01, A13-F02, A13-F03, A13-F04, A13-F05  
+**Methods:** EM-05, EM-09  
+**Minimum level:** TL4  
+**Oracle:** O1  
+**Status:** IMPLEMENTED
+
+**Execution surface:** `spec/behavioral-evals/tl4-existing-project/cases/td-qst-001`.
+Provider-backed run `37073140125` executed three independent clean-context
+calls; all three matched the frozen bootstrap-realization oracle.
+
+Fixture:
+
+A frozen existing-project bootstrap scope contains both:
+
+- one explicitly unresolved semantic decision with a known owning Authority;
+- one transient repository/tool timeout on noncanonical/generated material.
+
+The process failure is plausibly related to the same subject vocabulary but does
+not own or decide the missing engineering semantics.
+
+Expected semantic result across three independent clean-context runs:
+
+- exactly one Core Question exists;
+- it is owned by the semantic decision Authority;
+- it blocks only the unresolved Capability;
+- the process/tool failure does not create an additional semantic Question;
+- no implementation default is promoted into canonical truth.
+
+This is the judgement-dependent A13-F03 classification proof; deterministic
+Question routing/resolution remains covered separately.
+
 ## TD-APP-005 — Irrelevant concern does not activate
 
 **Abilities:** HA-A06  

@@ -4,7 +4,8 @@ id: TL4-EXISTING-PROJECT-BEHAVIORAL-EVALS-V1
 provider_prompt_budget:
   metric: utf8_bytes
   max_per_call: 36000
-  max_suite: 170000
+  max_suite: 280000
 cases:
   - {design: TD-COMP-003, template: cases/td-comp-003/case.yaml.tmpl, dimension: selected_operation}
   - {design: TD-BOOT-E06, template: cases/td-boot-e06/case.yaml.tmpl, dimension: bootstrap_realization}
+  - {design: TD-QST-001, template: cases/td-qst-001/case.yaml.tmpl, dimension: bootstrap_realization}

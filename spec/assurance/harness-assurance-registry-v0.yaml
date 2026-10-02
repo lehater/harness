@@ -228,6 +228,25 @@ abilities:
       - A12-R01
       - A12-R02
 
+  - id: HA-A13
+    title: Questions and blockers
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A13-F01
+      - A13-F02
+      - A13-F03
+      - A13-F04
+      - A13-F05
+      - A13-F06
+      - A13-F07
+    requirements:
+      - A13-R01
+      - A13-R02
+      - A13-R03
+
   - id: HA-A16
     title: Agent/method/artifact routing
     contract_ref:
@@ -770,6 +789,48 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A13-R01
+    ability: HA-A13
+    failure_modes: [A13-F01, A13-F02, A13-F03, A13-F04, A13-F05]
+    purpose: Semantic gaps create Questions at the owning Authority, process-only failures do not, and blockers remain capability-scoped rather than poisoning unrelated work.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-03]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A13-R02
+    ability: HA-A13
+    failure_modes: [A13-F06, A13-F07]
+    purpose: Question resolution requires a new semantic acceptance identity and current-snapshot semantics prevent stale evaluations from reopening resolved Questions.
+    required:
+      test_levels: [TL2]
+      methods_any: [EM-03, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A13-R03
+    ability: HA-A13
+    failure_modes: [A13-F03]
+    purpose: Under ambiguous but related repository/process evidence, repeated clean-context agent execution distinguishes a genuine semantic unknown from a transient process/tool failure.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-05, EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A16-R01
     ability: HA-A16
     failure_modes: [A16-F01]
@@ -897,6 +958,74 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A13-QUESTION-ROUTING
+    providers:
+      - tests/test_semantic_question_loop.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_semantic_question_loop.py
+      - path: spec/scenario-suite/scenarios/semantic-process-error.yaml
+      - path: spec/scenario-suite/scenarios/capability-question-granularity.yaml
+      - path: src/harness/application/semantic_questions.py
+      - path: src/harness/project_model/core.py
+    satisfies: [A13-R01]
+    test_level: TL1
+    methods: [EM-02, EM-03]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves semantic-gap Question creation/owner routing, process-error exclusion, direct blocking and capability-level sibling isolation.
+      - Ambiguous agent classification is owned separately by A13-R03.
+
+  - id: EVID-A13-QUESTION-RESOLUTION
+    providers:
+      - tests/test_semantic_question_loop.py
+      - tests/test_semantic_closure.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_semantic_question_loop.py
+      - path: tests/test_semantic_closure.py
+      - path: spec/scenario-suite/scenarios/coverage-question-frontier.yaml
+      - path: src/harness/application/semantic_closure.py
+      - path: src/harness/project_model/core.py
+    satisfies: [A13-R02]
+    test_level: TL2
+    methods: [EM-03, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves unchanged semantic acceptance cannot resolve a Question and duplicate current semantic/derivation identities fail closed instead of replaying stale Question proposals.
+      - Lifecycle revalidation after a valid new acceptance remains owned jointly with HA-A14.
+
+  - id: EVID-A13-QUESTION-CLASSIFICATION-TL4
+    providers:
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+    source_refs:
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/fixture.yaml
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/oracle.yaml
+      - path: spec/assurance/evidence/ha-a13-question-classification-provider-run-37073140125.yaml
+    satisfies: [A13-R03]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    status: verified
+    verified_at_revision: f4ae92cd61db9475dfdb83e92eff5eb621838d6a
+    provider_run_ref: spec/assurance/evidence/ha-a13-question-classification-provider-run-37073140125.yaml
+    case_ids: [TD-QST-001]
+    limitations:
+      - Three provider-auto clean-context runs all preserved exactly one semantic Question while excluding the related transient repository-scan timeout from Core Question state.
+      - This is a frozen synthetic classification proof, not an independent holdout guarantee for arbitrary operational-failure wording.
+
   - id: EVID-A12-DERIVATION-ADMISSION
     providers:
       - tests/test_semantic_admission.py
