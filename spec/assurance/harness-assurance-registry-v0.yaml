@@ -41,6 +41,22 @@ abilities:
       - A02-R02
       - A02-R03
 
+  - id: HA-A03
+    title: Target-state action semantics
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A03-F01
+      - A03-F02
+      - A03-F03
+      - A03-F04
+      - A03-F05
+    requirements:
+      - A03-R01
+      - A03-R02
+
   - id: HA-A19
     title: CI and validation execution policy
     contract_ref:
@@ -229,6 +245,34 @@ requirements:
     required:
       test_levels: [TL1, TL2]
       methods_any: [EM-13]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A03-R01
+    ability: HA-A03
+    failure_modes: [A03-F01, A03-F02, A03-F03, A03-F04]
+    purpose: Target-state and composed decision semantics map provider/prerequisite/blocker/lifecycle state to COMPLETE, CREATE, WAIT, PENDING, or explicit revalidation gaps without bypass.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-02, EM-03, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A03-R02
+    ability: HA-A03
+    failure_modes: [A03-F05]
+    purpose: Meaning-equivalent declaration ordering preserves the exact normalized target-state action result.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-04]
       oracle_minimum: O1
       judgement_execution: false
     substitution:
@@ -541,6 +585,49 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A03-TARGET-STATE-REACTIONS
+    providers:
+      - tests/test_target_state.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_target_state.py
+      - path: spec/target-state-acceptance/design-profile-v0.yaml
+      - path: spec/target-state-acceptance/missing-capability-question.yaml
+      - path: spec/scenario-suite/scenarios/structural-provider-removal.yaml
+      - path: spec/scenario-suite/scenarios/multi-provider-availability.yaml
+      - path: spec/scenario-suite/scenarios/decision-existing-provider-lifecycle-gap.yaml
+      - path: src/harness/project_model/target_state.py
+    satisfies: [A03-R01]
+    test_level: TL2
+    methods: [EM-02, EM-03, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Covers CREATE/WAIT/PENDING/COMPLETE truth-table transitions, provider removal, blocker propagation, usable multi-provider alternatives, and the composed lifecycle-gap rule that an existing provider is never recreated merely because lifecycle evidence is missing.
+      - Lifecycle currentness itself is owned by HA-A14; this evidence proves only the target/action consequence.
+
+  - id: EVID-A03-REPRESENTATION-INVARIANCE
+    providers:
+      - tests/test_target_state.py
+    source_refs:
+      - path: tests/test_target_state.py
+      - path: spec/target-state-acceptance/design-profile-v0.yaml
+      - path: src/harness/project_model/target_state.py
+    satisfies: [A03-R02]
+    test_level: TL1
+    methods: [EM-04]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves exact result invariance when the controlled partial-state fixture reorders expectations, Authorities, artifacts, and Questions.
+      - Does not claim equivalence across semantic changes to the state itself.
+
   - id: EVID-A02-TOPOLOGY-VALIDATION
     providers:
       - tests/test_engineering_graph.py
