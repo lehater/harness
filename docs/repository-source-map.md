@@ -26,7 +26,7 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
 - `spec/distribution/consumer-pack-v0.yaml` — machine-readable Consumer Pack export definition.
 - `spec/assurance/llm-execution-policy-v1.yaml` — conditional provider-backed assurance execution policy.
-- `behavioral_eval.py` — provider-neutral clean-context behavioral-evaluation runner, semantic normalizer and scorer.
+- `evals/behavioral_eval.py` — provider-neutral clean-context behavioral-evaluation runner, semantic normalizer and scorer.
 - `spec/behavioral-evals/first-wave/manifest-v0.yaml` — reviewed first-wave Capability/Authority/task-intent behavioural case inventory.
 - `adapters/copilot_behavioral_eval_agent.py` — provider adapter for clean-context judgement runs; oracle/pass criteria are not provider inputs.
 - `validators/validate_behavioral_eval_cases.py` — deterministic first-wave case/adapter boundary validation; not judgement evidence.
@@ -123,3 +123,9 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `distribution/harnessw.py` — deliberately standalone stdlib-only bootstrap
   transport, copied to target `.harness/harnessw.py`; excluded from the Pack and
   independent of `harness.application.*` imports.
+
+Runtime physical migration is closed: `src/harness/**` owns production runtime,
+`experiments/**` contains research, and `evals/**` contains the moved evaluation
+runner/process driver. Root Scenario modules remain Consumer v0 tooling; other
+root runtime surfaces are compatibility facades. See the closure ADR in
+`docs/design/repository-layout-v0.md`.

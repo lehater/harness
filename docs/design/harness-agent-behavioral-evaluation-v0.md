@@ -429,7 +429,7 @@ Behavioural failures should be classified before changing prompts/skills:
 
 ## Implemented minimal substrate
 
-The first reusable substrate is implemented in `behavioral_eval.py` with
+The first reusable substrate is implemented in `evals/behavioral_eval.py` with
 deterministic contract coverage in `validators/validate_behavioral_eval.py`.
 
 The initial adapter boundary is provider-neutral JSON-over-process. Each run gets
@@ -523,3 +523,7 @@ requires them.
 
 The runner executes accepted evidence designs; it is not itself the source of
 the assurance denominator.
+
+Canonical source-repository runner invocation: `python -m evals.behavioral_eval`.
+The existing `--adapter-executable` contract and provider adapter location
+`adapters/copilot_behavioral_eval_agent.py` remain unchanged.

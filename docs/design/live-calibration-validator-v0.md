@@ -159,7 +159,7 @@ It deliberately does not perform consensus voting or alter scorer metrics.
 
 ## Reference external-process adapter
 
-Harness includes optional Scenario Suite driver `live_calibration_process_driver`, loaded only by operator/CI configuration. It executes one configured program without a shell and sends only the versioned instruction, evaluator descriptor/configuration, and blinded cases with opaque `case_request_id`.
+Harness includes optional Scenario Suite driver `evals.live_calibration_process_driver`, loaded only by operator/CI configuration. It executes one configured program without a shell and sends only the versioned instruction, evaluator descriptor/configuration, and blinded cases with opaque `case_request_id`.
 
 Canonical invocation sets `HARNESS_LIVE_CALIBRATION_MODULE` to
 `harness.assurance.adapters.copilot_live_calibration_evaluator`. The driver uses

@@ -12,6 +12,14 @@ hierarchy is governed by `docs/design/harness-assurance-policy-v0.md`; Scenario
 Suite coverage is an evidence provider, not the independent denominator of
 Harness correctness.
 
+## Consumer v0 tooling identity
+
+`scenario_suite.py` and `scenario_drivers.py` remain explicit root Consumer v0
+test-orchestration tooling, distributed by the Consumer Pack. They are not
+Application bounded-context owners. Their production dependencies use canonical
+`harness.*` identities; only the runner-to-drivers dependency uses root tooling.
+The optional process driver is `evals.live_calibration_process_driver`.
+
 ## Model
 
 ```text

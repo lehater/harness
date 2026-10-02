@@ -15,7 +15,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from behavioral_eval import (
+from evals.behavioral_eval import (
     build_execution_request,
     load_case,
     normalize_result,

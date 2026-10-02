@@ -16,7 +16,7 @@ from typing import Any, Protocol
 
 import yaml
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 
 CASE_REQUIRED_FIELDS = {
     "case_id",
@@ -432,7 +432,7 @@ def _canonical_bootstrap_model(model: Any) -> dict[str, Any]:
     if not isinstance(model, dict):
         raise BehavioralEvalError("bootstrap core_model must be a mapping")
     try:
-        from harness import validate_model
+        from harness.project_model.core import validate_model
         validate_model(model)
     except Exception as exc:
         raise BehavioralEvalError(f"bootstrap core_model is invalid: {exc}") from exc

@@ -82,7 +82,7 @@ def _bootstrap_route_context(
     phase: str = "bootstrap",
 ) -> dict[str, dict[str, Any]]:
     sys.path.insert(0, str(ROOT))
-    from skill_router import route_operation
+    from harness.application.skill_router import route_operation
 
     entry = route_operation(
         surface="consumer",
@@ -714,7 +714,7 @@ def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
         selected = parsed["selected_operation"]
         try:
             sys.path.insert(0, str(ROOT))
-            from skill_router import route_operation
+            from harness.application.skill_router import route_operation
             route = route_operation(surface="consumer", operation=selected, root=ROOT)
         except Exception as exc:
             response["validator_results"].append({
@@ -742,8 +742,8 @@ def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
                 "status": "PASS",
             })
             sys.path.insert(0, str(ROOT))
-            from harness import validate_model
-            from target_state import evaluate_target_state
+            from harness.project_model.core import validate_model
+            from harness.project_model.target_state import evaluate_target_state
 
             core_model = parsed["output"]["core_model"]
             validate_model(core_model)

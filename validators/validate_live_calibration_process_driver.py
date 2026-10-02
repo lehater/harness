@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 from scenario_suite import load_driver_modules, run_scenario
 
 INTEGRATION = ROOT / "spec" / "live-calibration-integration"
-load_driver_modules(["live_calibration_process_driver"])
+load_driver_modules(["evals.live_calibration_process_driver"])
 
 
 def run(name: str, executable: Path, timeout: str = "5"):
@@ -47,7 +47,7 @@ run("process-failed.yaml", INTEGRATION / "process-failed.py")
 run("process-malformed.yaml", INTEGRATION / "process-malformed.py")
 
 # Exercise real module subprocess transport using deterministic existing fixtures.
-import live_calibration_process_driver as driver
+import evals.live_calibration_process_driver as driver
 real_run = driver.subprocess.run
 with tempfile.TemporaryDirectory() as directory:
     root = Path(directory)

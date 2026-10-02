@@ -97,7 +97,7 @@ jobs:
             CASE="${TEMPLATE%.tmpl}"
             DESIGN="$(basename "$(dirname "${TEMPLATE}")")"
             sed "s/__HARNESS_REVISION__/${GITHUB_SHA}/g" "${TEMPLATE}" > "${CASE}"
-            python behavioral_eval.py "${CASE}" \
+            python -m evals.behavioral_eval "${CASE}" \
               --agent-descriptor /tmp/behavioral-agent.yaml \
               --adapter-executable "${GITHUB_WORKSPACE}/adapters/copilot_behavioral_eval_agent.py" \
               --output-dir "behavioral-eval-evidence/${DESIGN}" \

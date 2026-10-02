@@ -4,7 +4,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from coverage_planner_experiment import derive_plan, load
+from experiments.coverage_planner_experiment import derive_plan, load
 
 def run(consumer):
     return derive_plan(

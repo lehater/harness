@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from coverage_derivation_experiment import derive, load, remaining_work
+from experiments.coverage_derivation_experiment import derive, load, remaining_work
 
 def main() -> int:
     catalog = load(str(ROOT / "spec/research/engineering-concerns-v1.yaml"))

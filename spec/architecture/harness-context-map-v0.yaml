@@ -4,6 +4,8 @@ id: HARNESS-CONTEXT-MAP-V0
 status: audit-ratchet
 
 runtime_packages:
+  - experiments
+  - evals
   - adapters
   - distribution
 
@@ -145,16 +147,16 @@ contexts:
       - workspace
 
 ignored_modules:
-  - behavioral_eval
+  - evals.behavioral_eval
   - adapters.copilot_behavioral_eval_agent
-  - authority_role_projection_experiment
-  - concern_activation_experiment
-  - coverage_control_loop_experiment
-  - coverage_derivation_experiment
-  - coverage_map_experiment
-  - coverage_planner_experiment
-  - lifecycle_experiment
-  - live_calibration_process_driver
+  - experiments.authority_role_projection_experiment
+  - experiments.concern_activation_experiment
+  - experiments.coverage_control_loop_experiment
+  - experiments.coverage_derivation_experiment
+  - experiments.coverage_map_experiment
+  - experiments.coverage_planner_experiment
+  - experiments.lifecycle_experiment
+  - evals.live_calibration_process_driver
   - scenario_drivers
   - scenario_suite
 
