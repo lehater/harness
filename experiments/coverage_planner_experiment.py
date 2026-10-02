@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 import yaml
 
-from semantic_acceptance import coverage_invalidation_closure
+from harness.assurance.semantic_acceptance import coverage_invalidation_closure
 
 
 def load(path: str) -> dict[str, Any]:

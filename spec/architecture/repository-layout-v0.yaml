@@ -21,16 +21,8 @@ runtime_target:
 root_python:
   policy: migration-ratchet
   permanent_bootstrap_exceptions: []
-  migration_baseline_modules:
-    - authority_role_projection_experiment
-    - behavioral_eval
-    - concern_activation_experiment
-    - coverage_control_loop_experiment
-    - coverage_derivation_experiment
-    - coverage_map_experiment
-    - coverage_planner_experiment
-    - lifecycle_experiment
-    - live_calibration_process_driver
+  migration_baseline_modules: []
+  permanent_consumer_tooling_modules:
     - scenario_drivers
     - scenario_suite
 

@@ -4,8 +4,8 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from concern_activation_experiment import derive_activation, load
-from coverage_planner_experiment import derive_plan
+from experiments.concern_activation_experiment import derive_activation, load
+from experiments.coverage_planner_experiment import derive_plan
 
 GRAPH=ROOT/"spec/research/scope-activation-fixture-graph.yaml"
 ROLES=ROOT/"spec/research/scope-activation-fixture-roles.yaml"

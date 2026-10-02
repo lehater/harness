@@ -7,7 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from coverage_map_experiment import aggregate, derive_tree, load, validate
+from experiments.coverage_map_experiment import aggregate, derive_tree, load, validate
 
 CATALOG = ROOT / "spec/research/engineering-concerns-v1.yaml"
 ETL = ROOT / "spec/research/engineering-coverage-map-etl-v1.yaml"

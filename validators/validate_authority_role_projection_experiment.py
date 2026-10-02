@@ -4,7 +4,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from authority_role_projection_experiment import resolve, load
+from experiments.authority_role_projection_experiment import resolve, load
 
 def main() -> int:
     standard=load(str(ROOT/"spec/research/standard-authority-role-bindings-v1.yaml"))

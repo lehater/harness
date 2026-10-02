@@ -4,7 +4,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from coverage_control_loop_experiment import evaluate, load
+from experiments.coverage_control_loop_experiment import evaluate, load
 
 def main() -> int:
     result=evaluate(

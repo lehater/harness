@@ -4,7 +4,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from concern_activation_experiment import derive_activation, load
+from experiments.concern_activation_experiment import derive_activation, load
 
 def run(example):
     return derive_activation(

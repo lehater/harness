@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any
 import yaml
 
-from concern_activation_experiment import derive_activation
-from coverage_planner_experiment import derive_plan
+from .concern_activation_experiment import derive_activation
+from .coverage_planner_experiment import derive_plan
 
 
 def load(path: str) -> dict[str, Any]:

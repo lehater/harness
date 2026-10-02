@@ -1,6 +1,6 @@
 # Repository Layout v0
 
-Status: canonical migration target.
+Status: canonical; runtime physical migration closed.
 
 ## Purpose
 
@@ -72,22 +72,19 @@ directory before it has content.
 
 ## Root Python migration ratchet
 
-During migration the current root Python modules are an explicit finite
-baseline. The architecture validator enforces:
+The runtime implementation baseline is closed: `migration_baseline_modules: []`.
+The architecture validator enforces:
 
-1. a new root `*.py` module cannot appear outside the baseline, declared migration compatibility facades, or an explicit
-   permanent bootstrap exception;
-2. when a root implementation moves or is deleted, its baseline entry must be removed;
-   a retained import/CLI facade is tracked separately by compatibility metadata;
-3. every baseline/exception module remains classified by the canonical context
-   map or as research/test infrastructure;
+1. root Python modules must be declared compatibility facades, the constrained
+   Consumer v0 Scenario tooling pair, or explicit bootstrap exceptions;
+2. declared tooling must exist, be ignored by context ownership, and be neither
+   a context owner nor a compatibility facade; duplicates are invalid;
+3. all context/Application owners are canonical `harness.*` implementations or
+   the explicit standalone `distribution.harnessw` transport;
 4. the target package mapping covers every bounded context/application layer.
 
-The baseline is migration state only. It is not permission to keep the flat
-layout indefinitely.
-
-A permanent root Python exception requires a concrete bootstrap/compatibility
-reason. Convenience or import-shortening is not sufficient.
+Bootstrap exceptions remain empty and separate from Consumer tooling.
+Experiments and evaluation implementations cannot return to the root.
 
 ## Migration rules
 
@@ -638,3 +635,48 @@ remain invalid. Wrapper and facade grammar stay unchanged. This is the only
 production-body exception to whole-module baseline equivalence and is reversed
 explicitly by the AST proof. A fresh isolated Consumer Pack CLI uses default bytecode
 behavior; focused mutations protect the remaining exact-file-set contract.
+
+## Runtime physical migration closure
+
+Architecture decision record: ADR-RUNTIME-PHYSICAL-MIGRATION-CLOSURE-V0.
+Status: accepted.
+
+All bounded-context/Application implementations are under `src/harness/**`;
+`distribution/harnessw.py` remains the explicit standalone bootstrap transport.
+`root_python.migration_baseline_modules` is empty and must remain empty.
+Seven research implementations live under `experiments/**`, invoked with
+`python -m experiments.<module>`. Evaluation infrastructure moved in this tranche
+lives under `evals/**`, with canonical runner `python -m evals.behavioral_eval`
+and optional driver `evals.live_calibration_process_driver`. Neither package
+owns production semantics or belongs to the Consumer Pack.
+
+`scenario_suite.py` and `scenario_drivers.py` remain explicit Consumer v0 root
+test-orchestration tooling. The single `permanent_consumer_tooling_modules`
+classification is constrained to these two ignored, non-owned, non-facade root
+modules. Missing declarations/files, duplicates, owner overlap and undeclared
+root modules fail validation. Bootstrap exceptions remain separately empty.
+Scenario production imports are canonical and mechanically guarded.
+
+Compatibility facades remain solely for Consumer v0 compatibility. Their
+retirement requires an explicit Consumer API compatibility decision. Consumer
+API v0, Pack membership and wrapper transport are preserved. Test/check physical
+migration and distribution cleanup remain separate work.
+
+Evidence: HA-A17 ownership TL0/TL1 root/classification mutations; HA-A18 existing
+TD-DIST-001/002 Consumer Pack and wrapper checks. Whole-module AST fingerprints
+against reviewed base `7e0b04d6448ca5b6c3043045bc15ac0b2fa1b8cf` reverse only
+canonical/package import normalization and the moved evaluation runner's root
+lookup. They cover all nine moved modules, both Scenario modules and the
+behavioral provider adapter. No implementation redesign is permitted.
+
+Closing audit: the behavioral provider adapter remains distributed by the
+`adapters/` prefix, although it is evaluation infrastructure; distribution
+cleanup is deferred to explicit Consumer Pack compatibility review. Its physical
+relocation and executable-path transport decision are deferred. Existing adapter
+path wiring is preserved; no new path bootstrap is introduced.
+
+All seven historical execution-bound provider records intersect this tranche at
+`behavioral_eval.py` and `adapters/copilot_behavioral_eval_agent.py`. All were
+already stale on the base; no new current-to-stale transition occurs. Historical
+paths, hashes and outcomes remain immutable. Current assurance bindings point
+to the relocated runner for future runs. No provider runs are executed.

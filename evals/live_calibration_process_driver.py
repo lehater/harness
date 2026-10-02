@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from live_calibration import (
+from harness.assurance.live_calibration import (
     build_live_calibration_request,
     evaluate_live_calibration_run,
 )

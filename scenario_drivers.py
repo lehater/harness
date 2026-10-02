@@ -10,53 +10,53 @@ import copy
 from pathlib import Path
 from typing import Any, Callable
 
-from adapters.canonical_graph import project_model
-from agent_router import route_create_work
-from authority_context import build_authority_context
-from capability_lifecycle import lifecycle_states
-from concern_activation import derive_activation
-from coverage_obligations import (
+from harness.integration.adapters.canonical_graph import project_model
+from harness.application.agent_router import route_create_work
+from harness.application.authority_context import build_authority_context
+from harness.assurance.capability_lifecycle import lifecycle_states
+from harness.coverage.concern_activation import derive_activation
+from harness.coverage.coverage_obligations import (
     derive_subject_inventory_disposition,
     validate_subject_obligations,
 )
-from decision_exploration import evaluate_decision_exploration
-from derivation_test_coverage import evaluate_derivation_test_coverage
-from decision_governance import evaluate_decision_governance
-from decision_pipeline import derive_decision_roadmap
-from coverage_application import evaluate_project_coverage
-from engineering_graph import evaluate_engineering_target
-from frontend_interface_knowledge import evaluate_frontend_ux_closure
-from frontend_screen_contracts import evaluate_frontend_screen_contracts
-from graph_doctor import diagnose_project
-from human_projection import compile_manifest
-from integration_alignment import validate_project_alignment
-from harness import resolve_question, validate_model
-from project_frontier import compose_project_frontier
-from project_publication import (
+from harness.decision.decision_exploration import evaluate_decision_exploration
+from harness.assurance.derivation_test_coverage import evaluate_derivation_test_coverage
+from harness.decision.decision_governance import evaluate_decision_governance
+from harness.application.decision_pipeline import derive_decision_roadmap
+from harness.application.coverage_application import evaluate_project_coverage
+from harness.project_model.engineering_graph import evaluate_engineering_target
+from harness.workspace.frontend_interface_knowledge import evaluate_frontend_ux_closure
+from harness.workspace.frontend_screen_contracts import evaluate_frontend_screen_contracts
+from harness.application.graph_doctor import diagnose_project
+from harness.workspace.human_projection import compile_manifest
+from harness.integration.integration_alignment import validate_project_alignment
+from harness.project_model.core import resolve_question, validate_model
+from harness.application.project_frontier import compose_project_frontier
+from harness.application.project_publication import (
     build_project_publication,
     prepare_capability_transition,
     validate_project_publication,
 )
-from project_status import bootstrap_registry, status as project_status
-from repository_realization import evaluate as evaluate_repository_realization
-from decision_execution_assurance import evaluate_execution_assurance
-from source_boundary import evaluate_source_boundary
-from source_set import evaluate_source_set
-from source_coverage import validate_source_coverage
-from skill_invariant_policy import evaluate_skill_invariant_policy
-from skill_router import route_operation
-from semantic_acceptance import evaluate_artifact
-from semantic_admission import admit_artifact
-from semantic_closure import evaluate_semantic_closure
-from semantic_derivation import evaluate_derivation
-from workspace import load_workspace, render_workspace
-from semantic_judgement_calibration import evaluate_judgement_calibration
-from live_calibration import (
+from harness.reference_model.project_status import bootstrap_registry, status as project_status
+from harness.integration.repository_realization import evaluate as evaluate_repository_realization
+from harness.decision.decision_execution_assurance import evaluate_execution_assurance
+from harness.evidence.source_boundary import evaluate_source_boundary
+from harness.evidence.source_set import evaluate_source_set
+from harness.evidence.source_coverage import validate_source_coverage
+from harness.application.skill_invariant_policy import evaluate_skill_invariant_policy
+from harness.application.skill_router import route_operation
+from harness.assurance.semantic_acceptance import evaluate_artifact
+from harness.application.semantic_admission import admit_artifact
+from harness.application.semantic_closure import evaluate_semantic_closure
+from harness.assurance.semantic_derivation import evaluate_derivation
+from harness.workspace.workspace import load_workspace, render_workspace
+from harness.assurance.semantic_judgement_calibration import evaluate_judgement_calibration
+from harness.assurance.live_calibration import (
     build_live_calibration_request,
     evaluate_live_calibration_run,
     evaluate_live_calibration_stability,
 )
-from semantic_questions import (
+from harness.application.semantic_questions import (
     append_question_proposals,
     questions_from_evaluation,
 )

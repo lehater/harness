@@ -383,7 +383,7 @@ evidence:
 
   - id: EVID-CAP-FIRST-WAVE-TL1
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -410,7 +410,7 @@ evidence:
 
   - id: EVID-AUTH-FIRST-WAVE-TL1
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -435,7 +435,7 @@ evidence:
 
   - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -460,7 +460,7 @@ evidence:
 
   - id: EVID-CAP-FIRST-WAVE-TL1-36942421201
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -486,7 +486,7 @@ evidence:
 
   - id: EVID-AUTH-FIRST-WAVE-TL1-36942421201
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -511,7 +511,7 @@ evidence:
 
   - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1-36942421201
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -536,7 +536,7 @@ evidence:
 
   - id: EVID-BOOT-COMP-TL2-36942421201
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
@@ -564,7 +564,7 @@ evidence:
 
   - id: EVID-CAP-FIRST-WAVE-TL1-36947887869
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -590,7 +590,7 @@ evidence:
 
   - id: EVID-AUTH-FIRST-WAVE-TL1-36947887869
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -615,7 +615,7 @@ evidence:
 
   - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1-36947887869
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -640,7 +640,7 @@ evidence:
 
   - id: EVID-A04-OVERLAP-REFERENCE-TL1-36953433978
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -669,7 +669,7 @@ evidence:
 
   - id: EVID-A04-CONVERGENCE-TL4-36953091767
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -695,7 +695,7 @@ evidence:
 
   - id: EVID-A05-PROJECT-SHAPED-TL3-36953091767
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -721,7 +721,7 @@ evidence:
 
   - id: EVID-A05-CONVERGENCE-TL4-36953091767
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
@@ -747,7 +747,7 @@ evidence:
 
   - id: EVID-BOOT-COMP-TL2-36947887869
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
@@ -774,7 +774,7 @@ evidence:
 
   - id: EVID-BOOT-EXISTING-TL3-36947887869
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
@@ -805,7 +805,7 @@ evidence:
 
   - id: EVID-BOOT-EXISTING-TL4-36949909315
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
@@ -833,7 +833,7 @@ evidence:
 
   - id: EVID-BOOT-EXISTING-TL5-36952038645
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - target_state.py
       - .github/workflows/behavioral-eval-copilot.yml
@@ -861,7 +861,7 @@ evidence:
 
   - id: EVID-ROUTE-TL4-36949909315
     providers:
-      - behavioral_eval.py
+      - evals/behavioral_eval.py
       - adapters/copilot_behavioral_eval_agent.py
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:

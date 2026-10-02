@@ -64,7 +64,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     checkout.mkdir()
     for path in ROOT.glob("*.py"):
         shutil.copy2(path, checkout / path.name)
-    for directory in ("src", "harness", "adapters", "distribution"):
+    for directory in ("src", "harness", "adapters", "distribution", "experiments", "evals"):
         shutil.copytree(ROOT / directory, checkout / directory)
     for relative in (
         "spec/architecture/harness-context-map-v0.yaml",
@@ -1465,6 +1465,13 @@ def main() -> int:
         assert "product-requirements" in ids
         assert "reliability-analysis" in ids
         assert "project-bootstrap-reconcile" in ids
+
+        assert not (pack / "experiments").exists()
+        assert not (pack / "evals").exists()
+        assert (pack / "scenario_suite.py").is_file()
+        assert (pack / "scenario_drivers.py").is_file()
+        assert (pack / "adapters/copilot_behavioral_eval_agent.py").is_file()
+        assert manifest["consumer_api"] == "v0"
 
         assert not (pack / "skills/maintainer").exists()
         assert not (pack / "docs/audit").exists()
