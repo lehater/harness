@@ -1,0 +1,82 @@
+version: 1
+kind: harness-repository-layout
+id: HARNESS-REPOSITORY-LAYOUT-V0
+status: migration-ratchet
+design: docs/design/repository-layout-v0.md
+context_map: spec/architecture/harness-context-map-v0.yaml
+
+runtime_target:
+  root: src/harness
+  packages:
+    project-model: project_model
+    reference-model: reference_model
+    coverage: coverage
+    assurance: assurance
+    decision: decision
+    evidence: evidence
+    integration: integration
+    workspace: workspace
+    application: application
+
+root_python:
+  policy: migration-ratchet
+  permanent_bootstrap_exceptions: []
+  migration_baseline_modules:
+    - acceptance_policy
+    - agent_router
+    - architecture_driver_closure
+    - authority_context
+    - authority_role_projection_experiment
+    - behavioral_eval
+    - capability_lifecycle
+    - concern_activation
+    - concern_activation_experiment
+    - consumer_pack
+    - coverage_application
+    - coverage_control_loop_experiment
+    - coverage_derivation_experiment
+    - coverage_map_experiment
+    - coverage_obligations
+    - coverage_planner
+    - coverage_planner_experiment
+    - decision_execution_assurance
+    - decision_exploration
+    - decision_explorer_contract
+    - decision_explorer_request
+    - decision_governance
+    - decision_pipeline
+    - derivation_test_coverage
+    - engineering_coverage
+    - engineering_graph
+    - frontend_interface_knowledge
+    - frontend_screen_contracts
+    - graph_doctor
+    - harness
+    - human_projection
+    - integration_alignment
+    - lifecycle_experiment
+    - live_calibration
+    - live_calibration_process_driver
+    - method_router
+    - project_frontier
+    - project_publication
+    - project_status
+    - reference_materializer
+    - reference_model_evolution
+    - repository_realization
+    - scenario_drivers
+    - scenario_suite
+    - semantic_acceptance
+    - semantic_admission
+    - semantic_closure
+    - semantic_derivation
+    - semantic_fingerprint
+    - semantic_judgement_calibration
+    - semantic_questions
+    - skill_invariant_policy
+    - skill_router
+    - source_boundary
+    - source_coverage
+    - source_set
+    - target_state
+    - workspace

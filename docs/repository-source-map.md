@@ -17,6 +17,8 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
 - `docs/design/agent-instruction-architecture-v0.md` — canonical instruction ownership/scoping contract.
 - `docs/design/operation-orchestration-v0.md` — canonical coordinator/router/operation composition contract.
+- `docs/design/repository-layout-v0.md` — canonical physical-layout migration target and responsibility boundaries.
+- `spec/architecture/repository-layout-v0.yaml` — machine-readable root-module migration ratchet and context-to-package target mapping.
 - `docs/design/core-v0.md` — current Core boundary and model.
 - `docs/design/harness-consumer-pack-v0.md` — pinned Consumer Pack binding, materialization and validation contract.
 - `docs/design/harness-consumer-wrapper-v0.md` — clean-target wrapper/bootstrap contract.
@@ -79,4 +81,5 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `validators/validate_human_projection.py` — Human Documentation Projection v1 acceptance runner.
 - `validators/validate_workspace.py` — managed-workspace acceptance runner.
 - `validators/validate_agent_layer.py` — agent-layer skill/profile contract validation.
+- `validators/validate_context_boundaries.py` — bounded-context import ratchet plus repository-layout/root-module migration ratchet.
 - `docs/methodology/**` — retained pre-Core material; not part of Core v0 consumer semantics.
