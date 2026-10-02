@@ -1,0 +1,31 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-BOOT-E04-FIXTURE-V1
+reviewed_design_profile:
+  version: 1
+  kind: harness-design-profile
+  id: CHECKOUT-PAYMENT-DESIGN
+  expectations:
+    - id: EXP-IDEMPOTENCY
+      subject: CHECKOUT
+      capability: payment.idempotency-contract
+      authority: PAYMENT-DESIGN
+    - id: EXP-RETRY
+      subject: CHECKOUT
+      capability: payment.retry-policy
+      authority: PAYMENT-DESIGN
+      depends_on: [EXP-IDEMPOTENCY]
+    - id: EXP-RECONCILIATION
+      subject: CHECKOUT
+      capability: payment.reconciliation-observability
+      authority: PAYMENT-DESIGN
+      depends_on: [EXP-RETRY]
+existing_project:
+  harness_realization: absent
+  project_owned_graph: absent
+  accepted_source_of_truth:
+    - path: docs/payment-api.md
+      authority: PAYMENT-DESIGN
+      accepted: true
+      capabilities: [payment.idempotency-contract]
+      summary: "Payment creation has a stable idempotency contract."

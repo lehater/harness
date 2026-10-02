@@ -1,0 +1,30 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-BOOT-E03
+abilities: [HA-A09, HA-A13]
+failure_modes: [A09-F04, A13-F01]
+test_level: TL3
+fixture_revision: TD-BOOT-E03-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Bootstrap the selected refund design scope without inventing the unresolved refund-window decision."
+selected_scope: "refund-window-design"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/agent-instruction-architecture-v0.md
+  - docs/design/core-v0.md
+  - skills/agent/project-bootstrap-reconcile/SKILL.md
+  - skills/agent/bootstrap-existing-project/SKILL.md
+allowed_tools: []
+write_policy: captured-output
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [bootstrap_realization]
+pass_criteria:
+  require_dimensions: [bootstrap_realization]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

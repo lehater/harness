@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -153,6 +154,15 @@ def load_case(path: str | Path) -> FrozenBinding:
     runs = case["run_plan"].get("runs")
     if not isinstance(runs, int) or runs < 1:
         raise BehavioralEvalError("run_plan.runs must be a positive integer")
+    sequence = case["run_plan"].get("sequence")
+    if sequence is not None:
+        if sequence != "bootstrap-idempotence":
+            raise BehavioralEvalError(f"unsupported run_plan.sequence: {sequence}")
+        dimensions = case["normalization_profile"]["dimensions"]
+        if dimensions != ["bootstrap_realization"] or runs != 2:
+            raise BehavioralEvalError(
+                "bootstrap-idempotence requires bootstrap_realization and exactly two runs"
+            )
 
     fixture_path = _resolve_case_ref(case_path, case["repository_fixture"], "repository_fixture")
     oracle_path = _resolve_case_ref(case_path, case["oracle_ref"], "oracle_ref")
@@ -387,13 +397,20 @@ def _canonical_target_state(value: Any, label: str) -> dict[str, Any]:
                     )
                 )
             if "questions" in item:
-                normalized["questions"] = sorted(
+                normalized["question_count"] = len(
                     _require_string_list(
                         item["questions"],
                         f"{label}.{name}[{index}].questions",
                         nonempty=False,
                     )
                 )
+            if "question_count" in item:
+                question_count = item["question_count"]
+                if not isinstance(question_count, int) or question_count < 0:
+                    raise BehavioralEvalError(
+                        f"{label}.{name}[{index}].question_count must be non-negative"
+                    )
+                normalized["question_count"] = question_count
             items.append(normalized)
         return sorted(items, key=lambda item: json.dumps(item, sort_keys=True))
 
@@ -438,6 +455,25 @@ def _canonical_bootstrap_model(model: Any) -> dict[str, Any]:
         }
         for item in artifacts
     ]
+    normalized_questions: list[dict[str, Any]] = []
+    for item in questions:
+        if not isinstance(item, dict):
+            raise BehavioralEvalError("bootstrap core_model.questions entries must be mappings")
+        normalized_questions.append({
+            "authority": item.get("authority"),
+            "blocks_capabilities": sorted(item.get("blocks_capabilities", []) or []),
+            "blocks_paths": sorted(
+                id_to_path[artifact_id]
+                for artifact_id in (item.get("blocks", []) or [])
+            ),
+            "answer_from_paths": sorted(
+                id_to_path[artifact_id]
+                for artifact_id in (item.get("answer_from", []) or [])
+            ),
+        })
+    normalized_questions.sort(
+        key=lambda item: json.dumps(item, sort_keys=True)
+    )
     return {
         "authorities": sorted(item["id"] for item in authorities),
         "artifacts": sorted(
@@ -445,6 +481,7 @@ def _canonical_bootstrap_model(model: Any) -> dict[str, Any]:
             key=lambda item: json.dumps(item, sort_keys=True),
         ),
         "question_count": len(questions),
+        "questions": normalized_questions,
     }
 
 
@@ -467,6 +504,27 @@ def _canonical_bootstrap_oracle(value: Any) -> dict[str, Any]:
             "provides": sorted(item.get("provides", []) or []),
             "depends_on_paths": sorted(item.get("depends_on_paths", []) or []),
         })
+    raw_questions = core.get("questions", []) or []
+    if not isinstance(raw_questions, list):
+        raise BehavioralEvalError(
+            "oracle bootstrap_realization.core_model.questions must be a list"
+        )
+    normalized_questions: list[dict[str, Any]] = []
+    for item in raw_questions:
+        if not isinstance(item, dict):
+            raise BehavioralEvalError("oracle bootstrap question must be a mapping")
+        normalized_questions.append({
+            "authority": item.get("authority"),
+            "blocks_capabilities": sorted(item.get("blocks_capabilities", []) or []),
+            "blocks_paths": sorted(item.get("blocks_paths", []) or []),
+            "answer_from_paths": sorted(item.get("answer_from_paths", []) or []),
+        })
+    normalized_questions.sort(key=lambda item: json.dumps(item, sort_keys=True))
+    question_count = core.get("question_count", len(normalized_questions))
+    if not isinstance(question_count, int) or question_count < 0:
+        raise BehavioralEvalError(
+            "oracle bootstrap_realization.core_model.question_count must be non-negative"
+        )
     return {
         "core_model": {
             "authorities": sorted(core.get("authorities", []) or []),
@@ -474,7 +532,8 @@ def _canonical_bootstrap_oracle(value: Any) -> dict[str, Any]:
                 normalized_artifacts,
                 key=lambda item: json.dumps(item, sort_keys=True),
             ),
-            "question_count": core.get("question_count"),
+            "question_count": question_count,
+            "questions": normalized_questions,
         },
         "target_state": _canonical_target_state(
             value.get("target_state"),
@@ -569,6 +628,7 @@ def build_run_record(
     agent_descriptor: dict[str, Any],
     agent_descriptor_sha256: str,
     response: dict[str, Any],
+    request: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     run_status = response["run_status"]
     normalized: dict[str, Any] | None = None
@@ -608,6 +668,11 @@ def build_run_record(
         "correctness": correctness,
         "provenance": response.get("provenance", {}),
     }
+    if request is not None:
+        if request.get("execution_context") is not None:
+            record["execution_context"] = request["execution_context"]
+        if request.get("derived_input_binding") is not None:
+            record["derived_input_binding"] = request["derived_input_binding"]
     canonical = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     record["record_sha256"] = _sha256(canonical.encode("utf-8"))
     return record
@@ -630,13 +695,76 @@ def execute_case(
     output_dir: str | Path,
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
+    previous_response: dict[str, Any] | None = None
+    previous_record: dict[str, Any] | None = None
+    sequence = binding.case["run_plan"].get("sequence")
     for index in range(1, binding.case["run_plan"]["runs"] + 1):
         run_id = f"{binding.case['case_id']}-R{index:02d}-{uuid.uuid4().hex[:12]}"
-        request = build_execution_request(binding, run_id=run_id, agent_descriptor=agent_descriptor, agent_descriptor_sha256=agent_descriptor_sha256)
+        request = build_execution_request(
+            binding,
+            run_id=run_id,
+            agent_descriptor=agent_descriptor,
+            agent_descriptor_sha256=agent_descriptor_sha256,
+        )
+        if sequence == "bootstrap-idempotence":
+            phase = "bootstrap" if index == 1 else "reconcile-existing"
+            request["execution_context"] = {
+                "sequence": sequence,
+                "step": index,
+                "phase": phase,
+            }
+            if index == 2:
+                if previous_response is None or previous_record is None:
+                    raise BehavioralEvalError(
+                        "bootstrap-idempotence second run requires a completed first run"
+                    )
+                if previous_record.get("run_status") != "COMPLETED":
+                    raise BehavioralEvalError(
+                        "bootstrap-idempotence cannot derive from incomplete first run"
+                    )
+                output = previous_response.get("output")
+                if not isinstance(output, dict) or not isinstance(output.get("core_model"), dict):
+                    raise BehavioralEvalError(
+                        "bootstrap-idempotence first run lacks core_model output"
+                    )
+                core_model = copy.deepcopy(output["core_model"])
+                fixture = copy.deepcopy(binding.fixture)
+                if not isinstance(fixture, dict):
+                    raise BehavioralEvalError(
+                        "bootstrap-idempotence requires a mapping repository fixture"
+                    )
+                existing = fixture.setdefault("existing_project", {})
+                if not isinstance(existing, dict):
+                    raise BehavioralEvalError(
+                        "bootstrap-idempotence existing_project must be a mapping"
+                    )
+                existing["harness_realization"] = "current-and-usable"
+                existing["current_harness_realization"] = core_model
+                request["repository_fixture"] = fixture
+                canonical_input = json.dumps(
+                    core_model,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                ).encode("utf-8")
+                request["derived_input_binding"] = {
+                    "prior_run_record_sha256": previous_record["record_sha256"],
+                    "core_model_sha256": _sha256(canonical_input),
+                }
+
         response = adapter.execute(request, agent_descriptor=agent_descriptor)
-        record = build_run_record(binding, run_id=run_id, agent_descriptor=agent_descriptor, agent_descriptor_sha256=agent_descriptor_sha256, response=response)
+        record = build_run_record(
+            binding,
+            run_id=run_id,
+            agent_descriptor=agent_descriptor,
+            agent_descriptor_sha256=agent_descriptor_sha256,
+            response=response,
+            request=request,
+        )
         write_run_record(Path(output_dir) / f"{run_id}.json", record)
         records.append(record)
+        previous_response = response
+        previous_record = record
     return records
 
 

@@ -1158,6 +1158,8 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution design:** one TL3 `bootstrap_realization` case supplies a reviewed profile plus a project-owned accepted graph. The provider must project the graph's canonical sources/dependency edge into Core; target-state evaluation is deterministic.
+
 Fixture:
 
 A tiny existing repository exposes canonical machine-readable dependency/routing
@@ -1184,6 +1186,8 @@ Assertions:
 **Oracle:** O1  
 **Status:** READY
 
+**Execution design:** one TL3 `bootstrap_realization` case supplies accepted canonical artifacts but no graph. The oracle contains only the minimal selected-scope Core realization and frontier.
+
 Fixture:
 
 A tiny repository has accepted canonical engineering artifacts but no
@@ -1207,6 +1211,8 @@ Adding unrelated directories must not enlarge the realization.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution design:** one TL3 `bootstrap_realization` case supplies accepted evidence that identifies the deciding Authority but leaves the required fact unresolved. Question identity/text are not golden values; normalization compares Authority, blocked capability/source semantics, and resulting blocked frontier.
+
 Fixture:
 
 One required semantic fact cannot be established from accepted sources.
@@ -1225,6 +1231,8 @@ not guess a value merely to complete the model.
 **Oracle:** O1  
 **Status:** READY
 
+**Execution design:** the provider-neutral runner performs exactly two calls. Run 1 bootstraps from the frozen fixture. Run 2 receives Run 1's exact Core model as an explicitly hashed current realization and executes only the public reconcile responsibility. Both runs must match the same semantic oracle; the second record binds the prior record hash and derived Core-model hash.
+
 Procedure:
 
 Run bootstrap/reconcile twice against unchanged fixture state.
@@ -1242,6 +1250,8 @@ run; no duplicate artifacts/Capabilities are introduced.
 **Minimum level:** TL3  
 **Oracle:** O1  
 **Status:** READY
+
+**Execution design:** this is a metamorphic pair with TD-BOOT-E02. E05 adds a sizeable unrelated subtree, lexical traps, and instruction-like project data while reusing the same semantic oracle. Any expanded selected model fails.
 
 Mutation:
 

@@ -61,20 +61,28 @@ in `spec/assurance/evidence/first-wave-provider-run-36928079710.yaml`; it
 remains stale for the current Harness because root `AGENTS.md` changed after
 that run.
 
-Provider-backed run `36942421201` is the current accepted execution record in
+Provider-backed run `36942421201` executed the refreshed ten first-wave
+cases plus TD-COMP-001 against Harness revision
+`c1a45a1a618fe11e2b2b28a5d3184d177beb5d71` and remains preserved in
 `spec/assurance/evidence/first-wave-provider-run-36942421201.yaml`. It
-executed the refreshed ten first-wave cases plus TD-COMP-001 against Harness
-revision `c1a45a1a618fe11e2b2b28a5d3184d177beb5d71`. Active judgement
-evidence is bound to case/fixture/oracle content plus the provider-visible
-instruction and behavior-relevant execution surface by immutable Git blob
-identities. Registry validation compares those bindings with the current
-repository before a proof slot can remain admissible.
+established A04-R01, A05-R01, A09-R01, and A16-R01 for that bound execution
+surface.
 
-The current admitted proof state is deliberately partial: A04-R01 and A05-R01
-are satisfied; A16-R01..R04 are satisfied; and the new HA-A09 TL2 handoff slot
-A09-R01 is satisfied by TD-COMP-001. A04-R02/R03, A05-R02/R03,
-A09-R02/R03/R04, and A16-R05/R06 remain missing. Registry validity therefore
-remains separate from release-claim completeness and
+The shared behavioral runner/adapter was subsequently extended for the TL3
+existing-project suite TD-BOOT-E01..E05. Because those files are behavior-
+relevant execution bindings, run `36942421201` is now intentionally stale for
+the current branch until the expanded suite is executed again. Deterministic
+A16-R02..R04 evidence remains current; judgement slots A04-R01, A05-R01,
+A09-R01 and A16-R01 temporarily return to missing. This is the expected
+currentness behavior rather than a regression in the historical run.
+
+Suite manifests are scheduling/inventory surfaces, not per-case semantic
+bindings: selected evidence is already bound by explicit `case_ids` plus
+case/fixture/oracle hashes. Adding another case to a suite therefore does not by
+itself stale existing case evidence; shared provider/runtime semantics and the
+trusted instructions actually used by selected cases do.
+
+Registry validity remains separate from release-claim completeness and
 `release_claim_ready` remains false.
 
 ## Core model

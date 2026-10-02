@@ -1,0 +1,24 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-BOOT-E03-FIXTURE-V1
+reviewed_design_profile:
+  version: 1
+  kind: harness-design-profile
+  id: REFUND-WINDOW-DESIGN
+  expectations:
+    - id: EXP-REFUND-WINDOW
+      subject: REFUND
+      capability: refund.window-policy
+      authority: REFUND-DESIGN
+existing_project:
+  harness_realization: absent
+  project_owned_graph: absent
+  accepted_evidence:
+    - path: docs/refund-overview.md
+      accepted: true
+      authority: REFUND-DESIGN
+      summary: "Refund eligibility is accepted, but the maximum refund window remains undecided and must be decided by REFUND-DESIGN."
+  noncanonical_material:
+    - path: src/refund.py
+      role: implementation
+      summary: "Current code uses 30 days as an implementation default; the project does not designate that number as canonical policy."

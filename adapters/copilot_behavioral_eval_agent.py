@@ -78,7 +78,9 @@ def _public_operations() -> list[str]:
     )
 
 
-def _bootstrap_route_context() -> dict[str, dict[str, Any]]:
+def _bootstrap_route_context(
+    phase: str = "bootstrap",
+) -> dict[str, dict[str, Any]]:
     sys.path.insert(0, str(ROOT))
     from skill_router import route_operation
 
@@ -87,19 +89,26 @@ def _bootstrap_route_context() -> dict[str, dict[str, Any]]:
         operation="project-bootstrap-reconcile",
         root=ROOT,
     )
+    if entry.get("exposure") != "public":
+        raise ValueError("project-bootstrap-reconcile must remain public")
+    result = {"entry": entry}
+    if phase == "reconcile-existing":
+        return result
+    if phase != "bootstrap":
+        raise ValueError(f"unsupported bootstrap execution phase: {phase}")
+
     internal = route_operation(
         surface="consumer",
         operation="bootstrap-existing-project",
         root=ROOT,
         invoked_by="project-bootstrap-reconcile",
     )
-    if entry.get("exposure") != "public":
-        raise ValueError("project-bootstrap-reconcile must remain public")
     if internal.get("exposure") != "internal":
         raise ValueError("bootstrap-existing-project must remain internal")
     if internal.get("invoked_by") != "project-bootstrap-reconcile":
         raise ValueError("bootstrap-existing-project authorization is invalid")
-    return {"entry": entry, "internal": internal}
+    result["internal"] = internal
+    return result
 
 
 def _response_contract(dimension: str) -> dict[str, Any]:
@@ -147,6 +156,7 @@ def _response_contract(dimension: str) -> dict[str, Any]:
                 "Reuse existing canonical source paths and do not create a second source of truth.",
                 "Preserve stable CapabilityIds and Authority ownership from the reviewed target/project truth.",
                 "Do not invent providers for missing capabilities or promote draft/implementation material to canonical truth.",
+                "When accepted evidence establishes an unresolved semantic gap and its deciding Authority is known, preserve it as a Core Question rather than inventing a provider.",
                 "Return Core model data only; deterministic Core validation and Target State evaluation happen afterward.",
             ],
         }
@@ -207,7 +217,16 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(selected_scope, str) or not selected_scope:
         raise ValueError("selected_scope must be a non-empty string")
 
+    execution_context = request.get("execution_context") or {}
+    if not isinstance(execution_context, dict):
+        raise ValueError("execution_context must be a mapping")
+    phase = execution_context.get("phase", "bootstrap")
     trusted_instructions = _trusted_instruction_bundle(request)
+    if dimension == "bootstrap_realization" and phase == "reconcile-existing":
+        trusted_instructions = [
+            item for item in trusted_instructions
+            if item["path"] != "skills/agent/bootstrap-existing-project/SKILL.md"
+        ]
     payload = {
         "instruction": (
             "Execute the user task using only the trusted Harness instructions below. "
@@ -225,15 +244,18 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
         "semantic_dimension": dimension,
         "response_contract": _response_contract(dimension),
     }
+    if execution_context:
+        payload["execution_context"] = execution_context
     if dimension == "bootstrap_realization":
-        routes = _bootstrap_route_context()
+        routes = _bootstrap_route_context(phase)
         trusted_paths = {item["path"] for item in trusted_instructions}
         required_paths = {
             routes["entry"]["skill"],
-            routes["internal"]["skill"],
             *routes["entry"].get("instruction_contracts", []),
-            *routes["internal"].get("instruction_contracts", []),
         }
+        if "internal" in routes:
+            required_paths.add(routes["internal"]["skill"])
+            required_paths.update(routes["internal"].get("instruction_contracts", []))
         missing = sorted(required_paths - trusted_paths)
         if missing:
             raise ValueError(
@@ -244,13 +266,19 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
             {
                 "operation": routes["entry"]["route_key"],
                 "exposure": routes["entry"]["exposure"],
-            },
-            {
+            }
+        ]
+        if "internal" in routes:
+            payload["authorized_operation_chain"].append({
                 "operation": routes["internal"]["route_key"],
                 "exposure": routes["internal"]["exposure"],
                 "invoked_by": routes["internal"]["invoked_by"],
-            },
-        ]
+            })
+        else:
+            payload["response_contract"]["realization_rules"].insert(
+                0,
+                "A directly usable current Harness realization is supplied; reconcile it in place and do not invoke the internal bootstrap operation.",
+            )
     return payload
 
 
@@ -703,8 +731,12 @@ def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
 
     if _dimension(request) == "bootstrap_realization":
         try:
-            routes = _bootstrap_route_context()
-            response["resolved_routes"] = [routes["entry"], routes["internal"]]
+            execution_context = request.get("execution_context") or {}
+            phase = execution_context.get("phase", "bootstrap")
+            routes = _bootstrap_route_context(phase)
+            response["resolved_routes"] = [routes["entry"]]
+            if "internal" in routes:
+                response["resolved_routes"].append(routes["internal"])
             response["validator_results"].append({
                 "validator": "bootstrap-operation-authorization",
                 "status": "PASS",

@@ -1,0 +1,30 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-BOOT-E01
+abilities: [HA-A09, HA-A17]
+failure_modes: [A09-F01, A09-F02, A09-F06]
+test_level: TL3
+fixture_revision: TD-BOOT-E01-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Bootstrap Harness for the selected order/dispatch design scope while preserving the project's existing canonical graph truth."
+selected_scope: "order-dispatch-design"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/agent-instruction-architecture-v0.md
+  - docs/design/core-v0.md
+  - skills/agent/project-bootstrap-reconcile/SKILL.md
+  - skills/agent/bootstrap-existing-project/SKILL.md
+allowed_tools: []
+write_policy: captured-output
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [bootstrap_realization]
+pass_criteria:
+  require_dimensions: [bootstrap_realization]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

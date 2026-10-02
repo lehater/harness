@@ -168,6 +168,14 @@ Every repeated run receives the same:
 - allowed tools;
 - provider execution descriptor. When the provider only supports auto-routing, the requested execution mode remains fixed as `provider-auto`; the resolved model may vary and must be recorded per run. Such evidence is not a single-model baseline unless every relevant run resolves to the same model.
 
+A deliberately state-derived sequence is a separate contract from clean-context
+repetition. For bootstrap idempotence, Run 2 may receive Run 1's produced Core
+model as the explicit current realization. The runner must bind that derived
+input to the prior immutable run-record hash and a deterministic hash of the
+injected Core model. No hidden conversation state or unrecorded workspace state
+may carry between the runs.
+
+
 ## Observable execution trace
 
 Do not record or require private chain-of-thought.
@@ -236,7 +244,7 @@ Supported semantic IR dimensions:
 - Capability semantic identities;
 - prerequisite/dependency edges;
 - applicability dispositions;
-- Questions and owners;
+- Questions normalized by semantic owner/blocking/source relations rather than generated Question ids or prose;
 - selected Consumer closure;
 - omitted oracle obligations;
 - invented obligations;

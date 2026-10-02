@@ -2,6 +2,7 @@
 """Validate first-wave behavioral cases and Copilot adapter boundary without a live call."""
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import stat
@@ -138,6 +139,7 @@ EXPECTED = {
     "TD-AUTH-001", "TD-AUTH-002", "TD-AUTH-004",
     "TD-ROUTE-001", "TD-ROUTE-002", "TD-ROUTE-003",
     "TD-COMP-001",
+    "TD-BOOT-E01", "TD-BOOT-E02", "TD-BOOT-E03", "TD-BOOT-E04", "TD-BOOT-E05",
 }
 assert MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
 entries = MANIFEST["cases"]
@@ -231,10 +233,40 @@ for entry in entries:
             parsed = _parse_model_response(json.dumps(sample), entry["dimension"])
             assert parsed["output"][field] == sample["output"][field]
         elif entry["dimension"] == "bootstrap_realization":
-            assert entry["design"] == "TD-COMP-001"
+            assert entry["design"] in {
+                "TD-COMP-001",
+                "TD-BOOT-E01", "TD-BOOT-E02", "TD-BOOT-E03",
+                "TD-BOOT-E04", "TD-BOOT-E05",
+            }
             contract = _response_contract("bootstrap_realization")
             assert "core_model" in contract["schema"]["output"]
-            assert entry["max_prompt_bytes"] == 32000
+            assert entry["max_prompt_bytes"] in {32000, 35000}
+            if entry["design"] == "TD-BOOT-E04":
+                assert binding.case["run_plan"] == {
+                    "runs": 2,
+                    "sequence": "bootstrap-idempotence",
+                    "all_runs_must_pass": True,
+                }
+                reconcile_request = copy.deepcopy(request)
+                reconcile_request["execution_context"] = {
+                    "sequence": "bootstrap-idempotence",
+                    "step": 2,
+                    "phase": "reconcile-existing",
+                }
+                reconcile_payload = _model_payload(reconcile_request)
+                assert reconcile_payload["authorized_operation_chain"] == [
+                    {
+                        "operation": "project-bootstrap-reconcile",
+                        "exposure": "public",
+                    }
+                ]
+                reconcile_trusted = {
+                    item["path"] for item in reconcile_payload["trusted_instructions"]
+                }
+                assert (
+                    "skills/agent/bootstrap-existing-project/SKILL.md"
+                    not in reconcile_trusted
+                )
         else:
             contract = _response_contract("selected_operation")
             assert contract["schema"]["selected_operation"] == (
@@ -366,6 +398,65 @@ with tempfile.TemporaryDirectory(prefix="behavioral-comp-case-") as temp:
     }]
     comp_prompt_bytes = len(_prompt(comp_request).encode("utf-8"))
     assert comp_prompt_bytes > 0
+
+e02_oracle = yaml.safe_load(
+    (BASE / "cases/td-boot-e02/oracle.yaml").read_text(encoding="utf-8")
+)
+e05_oracle = yaml.safe_load(
+    (BASE / "cases/td-boot-e05/oracle.yaml").read_text(encoding="utf-8")
+)
+assert e02_oracle["dimensions"]["bootstrap_realization"] == (
+    e05_oracle["dimensions"]["bootstrap_realization"]
+)
+e05_fixture = yaml.safe_load(
+    (BASE / "cases/td-boot-e05/fixture.yaml").read_text(encoding="utf-8")
+)
+assert len(e05_fixture["existing_project"]["unrelated_subtree"]) >= 8
+assert any(
+    "instruction authority" in item["summary"]
+    for item in e05_fixture["existing_project"]["unrelated_subtree"]
+)
+
+E03_TEMPLATE = BASE / "cases/td-boot-e03/case.yaml.tmpl"
+with tempfile.TemporaryDirectory(prefix="behavioral-e03-case-") as temp:
+    temp_root = Path(temp)
+    shutil.copytree(E03_TEMPLATE.parent, temp_root / "case")
+    runtime = temp_root / "case" / "case.yaml"
+    runtime.write_text(
+        (temp_root / "case" / "case.yaml.tmpl")
+        .read_text(encoding="utf-8")
+        .replace("__HARNESS_REVISION__", "a" * 40),
+        encoding="utf-8",
+    )
+    e03_binding = load_case(runtime)
+    e03_model = {
+        "authorities": [{"id": "REFUND-DESIGN"}],
+        "artifacts": [],
+        "questions": [{
+            "id": "ARBITRARY-QUESTION-ID",
+            "authority": "REFUND-DESIGN",
+            "text": "The maximum refund window remains unresolved.",
+            "blocks": [],
+            "blocks_capabilities": ["refund.window-policy"],
+            "answer_from": [],
+        }],
+    }
+    from target_state import evaluate_target_state
+    e03_target = evaluate_target_state(
+        e03_binding.fixture["reviewed_design_profile"],
+        e03_model,
+    )
+    e03_normalized = normalize_result(
+        e03_binding,
+        {
+            "run_status": "COMPLETED",
+            "output": {
+                "core_model": e03_model,
+                "target_state": e03_target,
+            },
+        },
+    )
+    assert score_result(e03_binding, e03_normalized)["status"] == "PASS"
 
 contaminated = dict(request)
 contaminated["trusted_instruction_entrypoint"] = [

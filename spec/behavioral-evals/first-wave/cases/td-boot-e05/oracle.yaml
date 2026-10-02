@@ -1,0 +1,28 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+dimensions:
+  bootstrap_realization:
+    core_model:
+      authorities: [PAYMENT-DESIGN]
+      artifacts:
+        - path: docs/payment-api.md
+          authority: PAYMENT-DESIGN
+          provides: [payment.idempotency-contract]
+          depends_on_paths: []
+      question_count: 0
+      questions: []
+    target_state:
+      status: READY
+      satisfied: [EXP-IDEMPOTENCY]
+      create:
+        - expectation: EXP-RETRY
+          subject: CHECKOUT
+          capability: payment.retry-policy
+          authority: PAYMENT-DESIGN
+      wait: []
+      pending:
+        - expectation: EXP-RECONCILIATION
+          subject: CHECKOUT
+          capability: payment.reconciliation-observability
+          authority: PAYMENT-DESIGN
+          depends_on: [EXP-RETRY]
