@@ -78,7 +78,7 @@ def test_context_dependencies(temp_root: Path) -> None:
         shutil.copy2(ROOT / relative, target)
     command = [sys.executable, "-c", (
         "import sys; from pathlib import Path; "
-        "import validators.validate_context_boundaries as v; "
+        "import checks.validate_context_boundaries as v; "
         "v.ROOT=Path(sys.argv[1]); "
         "v.MAP=v.ROOT/'spec/architecture/harness-context-map-v0.yaml'; "
         "v.LAYOUT=v.ROOT/'spec/architecture/repository-layout-v0.yaml'; "
