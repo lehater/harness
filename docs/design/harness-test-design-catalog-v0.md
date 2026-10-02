@@ -462,6 +462,13 @@ Assertions:
 
 **Prepared execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; provider evidence pending.
 
+Diagnostic provider run `36953091767` exposed an oracle error in Fixture V1:
+the worker-consumption statement was evidence that the payment decision is
+relevant to the worker, but it was not itself a worker-owned canonical decision.
+Fixture V2 classifies that statement as consumption evidence and excludes it
+from the Authority partition while retaining the worker's independent backoff
+decision. The failed V1 result is not admissible evidence.
+
 Fixture:
 
 One canonical decision atom is intentionally presented as relevant to two

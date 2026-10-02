@@ -136,9 +136,9 @@ BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
 DISPATCH_MANIFEST = yaml.safe_load(
     (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
 )
-assert DISPATCH_MANIFEST["id"] == "RELEASE-CRITICAL-FORMATION-DISPATCH-BRIDGE-V1"
+assert DISPATCH_MANIFEST["id"] == "A04-R02-DISPATCH-BRIDGE-V1"
 assert {item["design"] for item in DISPATCH_MANIFEST["cases"]} == {
-    "TD-AUTH-003", "TD-AUTH-006", "TD-CAP-008", "TD-CAP-007", "TD-AUTH-007"
+    "TD-AUTH-003", "TD-AUTH-006"
 }
 MANIFEST = yaml.safe_load(
     (BASE / "baseline-manifest-v0.yaml").read_text(encoding="utf-8")
@@ -899,6 +899,17 @@ for entry in formation_entries:
         assert binding.case["run_plan"]["runs"] == runs
         assert binding.case["run_plan"]["all_runs_must_pass"] is True
         assert set(binding.case["failure_modes"]) == failures
+        if entry["design"] == "TD-AUTH-003":
+            assert binding.case["fixture_revision"] == "TD-AUTH-003-FIXTURE-V2"
+            assert binding.oracle["dimensions"]["authority_partition"]["groups"] == [
+                ["P1", "P2"], ["W2"]
+            ]
+            assert any(
+                item["id"] == "C1"
+                and "consumes" in item["statement"]
+                and "does not define or version" in item["statement"]
+                for item in binding.fixture["atoms"]
+            )
         assert entry["runs"] == runs
         assert entry["dimension"] == dimension
 

@@ -1,6 +1,6 @@
 version: 1
 kind: harness-agent-behavioral-eval-fixture
-id: TD-AUTH-003-FIXTURE-V1
+id: TD-AUTH-003-FIXTURE-V2
 atoms:
   - id: P1
     statement: "The payment API public contract decides whether create requests require an idempotency key."
@@ -8,7 +8,7 @@ atoms:
   - id: P2
     statement: "The payment API public contract owns duplicate-request response semantics and versions them together with idempotency-key acceptance."
     source_path: "docs/payment/retry-contract.md"
-  - id: W1
+  - id: C1
     statement: "The retry worker consumes the payment API idempotency decision but does not define or version that public rule."
     source_path: "worker/payment-retry.md"
   - id: W2

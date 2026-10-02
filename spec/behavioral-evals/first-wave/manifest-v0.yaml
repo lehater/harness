@@ -1,14 +1,11 @@
 version: 1
 kind: harness-agent-behavioral-eval-manifest
-id: RELEASE-CRITICAL-FORMATION-DISPATCH-BRIDGE-V1
+id: A04-R02-DISPATCH-BRIDGE-V1
 provider_prompt_budget:
   metric: utf8_bytes
   max_per_case: 28000
-  max_suite: 252000
+  max_suite: 56000
   max_sequence_extra: 28000
 cases:
   - {design: TD-AUTH-003, template: ../release-critical-formation/cases/td-auth-003/case.yaml.tmpl, dimension: authority_partition}
   - {design: TD-AUTH-006, template: ../release-critical-formation/cases/td-auth-006/case.yaml.tmpl, dimension: authority_partition}
-  - {design: TD-CAP-008, template: ../release-critical-formation/cases/td-cap-008/case.yaml.tmpl, dimension: capability_partition}
-  - {design: TD-CAP-007, template: ../release-critical-formation/cases/td-cap-007/case.yaml.tmpl, dimension: capability_partition}
-  - {design: TD-AUTH-007, template: ../release-critical-formation/cases/td-auth-007/case.yaml.tmpl, dimension: authority_partition}
