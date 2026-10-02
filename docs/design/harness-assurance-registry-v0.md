@@ -89,10 +89,9 @@ instruction-like project data; TD-BOOT-E06 converged on the same normalized Core
 realization and BLOCKED Target State in all three runs.
 
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
-A01-R02 (deterministic structural interpretation) and A01-R03 (Question
-acceptance transition) while A01-R01 remains missing because current negative
-Core validation evidence is not systematic across ownership and dangling-reference
-mutations. A04-R01 and A05-R01 are satisfied; HA-A09 satisfies A09-R01 (TL2),
+A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
+through deterministic structural interpretation, and A01-R03 through explicit
+Question acceptance-transition evidence. A04-R01 and A05-R01 are satisfied; HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
@@ -305,9 +304,10 @@ Examples likely to map directly after review:
 - CI policy validator -> HA-A19;
 - calibration scorer/live binding protocol -> portions of HA-A20.
 
-HA-A01 deliberately remains INCOMPLETE: the current Core tests establish
-representative valid-state semantics and Question resolution, but do not yet
-form a comprehensive TL1 mutation set for invalid ownership/reference shapes.
+HA-A01 is now SATISFIED for its current three proof slots. The A01-R01 mutation
+matrix exercises representative invalid ownership/provider/dependency/Question
+reference shapes. This is bounded O1 evidence; it does not claim exhaustive
+property generation across every representable Core document shape.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks

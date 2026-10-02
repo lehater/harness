@@ -481,6 +481,25 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A01-STRUCTURAL-VALIDATION-MUTATIONS
+    providers:
+      - tests/test_core.py
+    source_refs:
+      - path: tests/test_core.py
+      - path: src/harness/project_model/core.py
+      - path: spec/scenario-suite/scenarios/core-invalid.yaml
+    satisfies: [A01-R01]
+    test_level: TL1
+    methods: [EM-02, EM-03, EM-06]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Covers representative ownership, provider, dependency, cycle, canonical-path, and Question reference mutations with hand-authored failure oracles.
+      - Does not claim exhaustive property generation over every representable Core document shape.
+
   - id: EVID-A01-DETERMINISTIC-STRUCTURAL-SEMANTICS
     providers:
       - tests/test_core.py

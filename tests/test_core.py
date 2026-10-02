@@ -106,6 +106,104 @@ def test_capability_question_granularity() -> None:
     assert intent["questions"] == ["Q-ARTIFACT"], intent
 
 
+def test_structural_validation_mutations() -> None:
+    base = {
+        "authorities": [{"id": "A"}, {"id": "B"}],
+        "artifacts": [
+            {
+                "id": "A-DOC",
+                "authority": "A",
+                "path": "docs/a.yaml",
+                "provides": ["demo.a"],
+                "depends_on": [],
+            },
+            {
+                "id": "B-DOC",
+                "authority": "B",
+                "path": "docs/b.yaml",
+                "provides": ["demo.b"],
+                "depends_on": ["A-DOC"],
+            },
+        ],
+        "questions": [
+            {
+                "id": "Q-B",
+                "authority": "B",
+                "text": "Which B semantics are accepted?",
+                "blocks_capabilities": ["demo.b"],
+                "answer_from": ["B-DOC"],
+            }
+        ],
+    }
+    validate_model(base)
+
+    cases: list[tuple[str, dict, str]] = []
+
+    model = copy.deepcopy(base)
+    model["artifacts"][0]["authority"] = "MISSING"
+    cases.append(("artifact unknown authority", model, "references unknown authority"))
+
+    model = copy.deepcopy(base)
+    model["artifacts"][1]["provides"] = ["demo.a"]
+    cases.append(("cross-authority provider", model, "providers in multiple authorities"))
+
+    model = copy.deepcopy(base)
+    model["artifacts"][1]["depends_on"] = ["MISSING"]
+    cases.append(("dangling dependency", model, "depends on unknown artifact"))
+
+    model = copy.deepcopy(base)
+    model["artifacts"][1]["depends_on"] = ["B-DOC"]
+    cases.append(("self dependency", model, "cannot depend on itself"))
+
+    model = copy.deepcopy(base)
+    model["artifacts"][0]["depends_on"] = ["B-DOC"]
+    cases.append(("dependency cycle", model, "artifact dependency cycle"))
+
+    model = copy.deepcopy(base)
+    model["artifacts"][1]["path"] = "docs/a.yaml"
+    cases.append(("duplicate canonical path", model, "duplicate canonical artifact path"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["authority"] = "MISSING"
+    cases.append(("question unknown authority", model, "references unknown authority"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["blocks"] = ["MISSING"]
+    cases.append(("question dangling block", model, "blocks unknown artifact"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["answer_from"] = ["MISSING"]
+    cases.append(("question dangling answer source", model, "answers from unknown artifact"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["answer_from"] = ["A-DOC"]
+    cases.append(("question wrong-authority answer source", model, "answer source must belong"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["resolution"] = {
+        "artifact": "MISSING",
+        "acceptance_id": "B-2",
+        "supersedes_acceptance_id": "B-1",
+    }
+    cases.append(("question dangling resolution", model, "resolves to unknown artifact"))
+
+    model = copy.deepcopy(base)
+    model["questions"][0]["resolution"] = {
+        "artifact": "A-DOC",
+        "acceptance_id": "B-2",
+        "supersedes_acceptance_id": "B-1",
+    }
+    cases.append(("question wrong-authority resolution", model, "must belong to addressed authority"))
+
+    for label, model, fragment in cases:
+        try:
+            validate_model(model)
+        except CoreError as exc:
+            assert fragment in str(exc), (label, fragment, str(exc))
+        else:
+            raise AssertionError(f"{label}: invalid Core model was accepted")
+
+
 def test_package_execution() -> None:
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
@@ -144,6 +242,7 @@ def main() -> int:
         test_package_execution()
         test_multiple_provider_alternative()
         test_capability_question_granularity()
+        test_structural_validation_mutations()
     except Exception as exc:
         errors.append(f"Core focused regression: {exc}")
     required = [
