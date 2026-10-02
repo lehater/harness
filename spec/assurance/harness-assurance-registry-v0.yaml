@@ -345,6 +345,25 @@ abilities:
       - A18-R02
       - A18-R03
 
+  - id: HA-A20
+    title: External semantic assurance
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A20-F01
+      - A20-F02
+      - A20-F03
+      - A20-F04
+      - A20-F05
+      - A20-F06
+      - A20-F07
+    requirements:
+      - A20-R01
+      - A20-R02
+      - A20-R03
+
 requirements:
   - id: A01-R01
     ability: HA-A01
@@ -1140,7 +1159,102 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A20-R01
+    ability: HA-A20
+    failure_modes: [A20-F01, A20-F02, A20-F06]
+    purpose: External evaluator output fails closed unless complete and exactly bound to corpus, protocol, evaluator configuration, run identity, adapter bytes, and any observed resolved provider/model runtime identity.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-03]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A20-R02
+    ability: HA-A20
+    failure_modes: [A20-F03, A20-F04]
+    purpose: The current deployed evaluator configuration has expert-labelled FP/FN measurements and at least two scorable clean-context runs with explicit stability results.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09, EM-12]
+      oracle_minimum: O4
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A20-R03
+    ability: HA-A20
+    failure_modes: [A20-F05, A20-F07]
+    purpose: Calibration claims are explicitly limited to the labelled corpus population and evaluator independence is never claimed beyond externally established evidence.
+    required:
+      test_levels: [TL0]
+      methods_any: [EM-14]
+      oracle_minimum: O4
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
 evidence:
+  - id: EVID-A20-LIVE-BOUNDARY
+    providers:
+      - tests/test_copilot_live_calibration_evaluator.py
+      - tests/test_live_calibration_process_driver.py
+    source_refs:
+      - path: tests/test_copilot_live_calibration_evaluator.py
+      - path: tests/test_live_calibration_process_driver.py
+      - path: src/harness/assurance/live_calibration.py
+      - path: evals/live_calibration_process_driver.py
+      - path: src/harness/assurance/adapters/copilot_live_calibration_evaluator.py
+      - path: spec/semantic-derivation/live-calibration-protocol-v2.yaml
+      - path: spec/semantic-derivation/calibration-corpus-v3.yaml
+    satisfies: [A20-R01]
+    test_level: TL1
+    methods: [EM-03]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: external
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Malformed, incomplete, duplicate, unknown-case and invalid-verdict responses fail closed before semantic acceptance.
+      - Corpus/protocol/evaluator/run identity, process adapter bytes and timeout are fingerprinted into the request boundary.
+      - Repeated-run stability now rejects a changed observed provider/resolved-model/CLI runtime binding even when requested model policy remains provider-auto.
+      - This evidence validates the assurance boundary; it does not establish semantic accuracy for the current provider configuration.
+
+  - id: EVID-A20-CLAIM-SCOPE
+    providers:
+      - docs/design/live-calibration-validator-v0.md
+      - docs/research/semantic-judgement-calibration-v0.md
+      - docs/research/live-calibration-provider-run-v0.md
+      - docs/research/live-calibration-v3-evidence.md
+    source_refs:
+      - path: docs/design/live-calibration-validator-v0.md
+      - path: docs/research/semantic-judgement-calibration-v0.md
+      - path: docs/research/live-calibration-provider-run-v0.md
+      - path: docs/research/live-calibration-v3-evidence.md
+      - path: spec/semantic-derivation/live-calibration-protocol-v2.yaml
+      - path: spec/semantic-derivation/calibration-corpus-v3.yaml
+      - path: src/harness/assurance/live_calibration.py
+    satisfies: [A20-R03]
+    test_level: TL0
+    methods: [EM-14]
+    oracle_class: O4
+    execution_nature: deterministic
+    source_type: inspection
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - The v3 corpus is explicitly a small bootstrap population; measured error rates are corpus-specific and cannot support universal semantic-correctness claims.
+      - Harness establishes label withholding and exact request binding but reports evaluator independence as UNVERIFIED without trusted external attestation.
+      - Historical gpt-6-luna calibration cannot be inherited by a provider-auto execution that resolves to a different model.
+
   - id: EVID-A17-PROJECTION-PROVENANCE
     providers:
       - tests/test_human_projection.py

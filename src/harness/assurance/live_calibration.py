@@ -421,6 +421,22 @@ def evaluate_live_calibration_run(
     }
 
 
+def _runtime_binding(evaluation: dict[str, Any]) -> tuple[Any, ...] | None:
+    execution = evaluation.get("execution")
+    if not isinstance(execution, dict):
+        return None
+    provenance = execution.get("provider_provenance")
+    if not isinstance(provenance, dict):
+        return None
+    return (
+        provenance.get("provider"),
+        provenance.get("requested_model"),
+        provenance.get("resolved_model"),
+        provenance.get("resolved_model_source"),
+        provenance.get("observed_cli_version"),
+    )
+
+
 def evaluate_live_calibration_stability(
     *,
     evaluations: list[dict[str, Any]],
@@ -437,6 +453,7 @@ def evaluate_live_calibration_stability(
         first.get("protocol", {}).get("fingerprint"),
         first.get("evaluator", {}).get("fingerprint"),
     )
+    required_runtime_binding = _runtime_binding(first)
     run_ids: set[str] = set()
     verdicts: dict[str, set[str]] = {}
 
@@ -464,6 +481,22 @@ def evaluate_live_calibration_stability(
                 "status": "INVALID",
                 "findings": [
                     {"code": "LIVE_CALIBRATION_SERIES_BINDING_MISMATCH"}
+                ],
+                "unstable_cases": [],
+            }
+
+        current_runtime_binding = _runtime_binding(evaluation)
+        if current_runtime_binding != required_runtime_binding:
+            return {
+                "version": 1,
+                "kind": "harness-live-semantic-calibration-stability",
+                "status": "INVALID",
+                "findings": [
+                    {
+                        "code": "LIVE_CALIBRATION_SERIES_RUNTIME_BINDING_MISMATCH",
+                        "expected": required_runtime_binding,
+                        "actual": current_runtime_binding,
+                    }
                 ],
                 "unstable_cases": [],
             }

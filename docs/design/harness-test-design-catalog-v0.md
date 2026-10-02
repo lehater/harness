@@ -2071,7 +2071,14 @@ reported rather than overwritten.
 **Methods:** EM-12, EM-14  
 **Minimum level:** TL4 operational-assurance track  
 **Oracle:** O4  
-**Status:** READY
+**Status:** PARTIAL
+
+**Implemented boundary evidence:** `src/harness/assurance/live_calibration.py`
+and `tests/test_copilot_live_calibration_evaluator.py` reject stability
+comparison when the observed provider/resolved-model/CLI runtime binding changes,
+even if the requested policy remains `model: auto`. Corpus-specific scope and
+non-independence claims are documented explicitly. A current passing repeated
+provider calibration is still required before this design is fully VERIFIED.
 
 Calibration evidence is valid only for its explicitly bound evaluation
 population.

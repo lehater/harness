@@ -20,6 +20,7 @@ from harness.assurance.adapters.copilot_live_calibration_evaluator import (
 from harness.assurance.live_calibration import (
     build_live_calibration_request,
     evaluate_live_calibration_run,
+    evaluate_live_calibration_stability,
 )
 
 CORPUS = yaml.safe_load(
@@ -161,5 +162,34 @@ invalid_status_results[0]["status"] = "MAYBE"
 invalid_status = evaluate(invalid_status_results)
 assert invalid_status["status"] == "INVALID"
 assert invalid_status["findings"][0]["code"] == "LIVE_CALIBRATION_VERDICT_INVALID"
+
+first_eval = evaluate(valid_results)
+second_eval = copy.deepcopy(first_eval)
+second_eval["run_id"] = "ADAPTER-BOUNDARY-2"
+runtime_binding = {
+    "provider": "github-copilot",
+    "requested_model": "auto",
+    "resolved_model": "provider-model-a",
+    "resolved_model_source": "copilot-cli-session-events",
+    "observed_cli_version": "1.0.86",
+}
+first_eval["execution"] = {"provider_provenance": copy.deepcopy(runtime_binding)}
+second_eval["execution"] = {"provider_provenance": copy.deepcopy(runtime_binding)}
+stable = evaluate_live_calibration_stability(
+    evaluations=[first_eval, second_eval]
+)
+assert stable["status"] == "STABLE", stable
+
+changed_runtime = copy.deepcopy(second_eval)
+changed_runtime["execution"]["provider_provenance"]["resolved_model"] = (
+    "provider-model-b"
+)
+invalid_runtime = evaluate_live_calibration_stability(
+    evaluations=[first_eval, changed_runtime]
+)
+assert invalid_runtime["status"] == "INVALID", invalid_runtime
+assert invalid_runtime["findings"][0]["code"] == (
+    "LIVE_CALIBRATION_SERIES_RUNTIME_BINDING_MISMATCH"
+), invalid_runtime
 
 print("GitHub Copilot live calibration adapter boundary: PASS")
