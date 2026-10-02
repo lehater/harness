@@ -51,6 +51,26 @@ def normalize_list(value: Any) -> list[str]:
     return [str(value)]
 
 
+def validate_workflow_path_filters(
+    relative: str,
+    events: dict[str, Any],
+    errors: list[str],
+) -> None:
+    for event_name, config in events.items():
+        if not isinstance(config, dict):
+            continue
+        for key in ("paths", "paths-ignore"):
+            for value in normalize_list(config.get(key)):
+                candidate = value[1:] if value.startswith("!") else value
+                if not candidate or any(char in candidate for char in "*?["):
+                    continue
+                if not (ROOT / candidate).exists():
+                    errors.append(
+                        f"CI-P04 workflow {relative} {event_name}.{key} "
+                        f"references missing path: {value}"
+                    )
+
+
 def pull_request_may_run_on_draft(config: Any) -> bool:
     if config is None:
         return True
@@ -289,6 +309,7 @@ def main() -> int:
             continue
         workflow = load_yaml(path)
         events = workflow_events(workflow)
+        validate_workflow_path_filters(relative, events, errors)
 
         if role == "exhaustive":
             if draft_behavior != "skip":
