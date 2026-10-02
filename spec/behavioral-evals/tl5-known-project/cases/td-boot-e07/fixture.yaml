@@ -1,6 +1,6 @@
 version: 1
 kind: harness-agent-behavioral-eval-fixture
-id: TD-BOOT-E07-FIXTURE-V1
+id: TD-BOOT-E07-FIXTURE-V2
 
 known_project:
   repository: lehater/napms
@@ -24,16 +24,48 @@ reviewed_design_profile:
       subject: NAPMS-FIRST-MVP
       capability: engineering.hcd.first-mvp.problem-evidence
       authority: DISCOVERY
-    - id: EXP-USER-NEEDS
+
+    - id: EXP-APPLICATION-COMPONENTS-USER-NEEDS
       subject: NAPMS-FIRST-MVP
       capability: engineering.hcd.application-components.user-needs
       authority: DISCOVERY
       depends_on: [EXP-PROBLEM-EVIDENCE]
-    - id: EXP-PRODUCT-REQUIREMENTS
+    - id: EXP-ACCESS-REQUEST-USER-NEEDS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.access-request.user-needs
+      authority: DISCOVERY
+      depends_on: [EXP-PROBLEM-EVIDENCE]
+    - id: EXP-POLICY-EXPORT-USER-NEEDS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.policy-export.user-needs
+      authority: DISCOVERY
+      depends_on: [EXP-PROBLEM-EVIDENCE]
+
+    - id: EXP-PRODUCT-INTENT
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.requirements.product-intent
+      authority: PRODUCT-REQUIREMENTS
+      depends_on: [EXP-APPLICATION-COMPONENTS-USER-NEEDS, EXP-ACCESS-REQUEST-USER-NEEDS, EXP-POLICY-EXPORT-USER-NEEDS]
+    - id: EXP-ACCEPTANCE
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.requirements.acceptance
+      authority: PRODUCT-REQUIREMENTS
+      depends_on: [EXP-APPLICATION-COMPONENTS-USER-NEEDS, EXP-ACCESS-REQUEST-USER-NEEDS, EXP-POLICY-EXPORT-USER-NEEDS]
+    - id: EXP-APPLICATION-COMPONENTS-REQUIREMENTS
       subject: NAPMS-FIRST-MVP
       capability: engineering.hcd.application-components.requirements
       authority: PRODUCT-REQUIREMENTS
-      depends_on: [EXP-USER-NEEDS]
+      depends_on: [EXP-APPLICATION-COMPONENTS-USER-NEEDS]
+    - id: EXP-ACCESS-REQUEST-REQUIREMENTS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.access-request.requirements
+      authority: PRODUCT-REQUIREMENTS
+      depends_on: [EXP-ACCESS-REQUEST-USER-NEEDS]
+    - id: EXP-POLICY-EXPORT-REQUIREMENTS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.policy-export.requirements
+      authority: PRODUCT-REQUIREMENTS
+      depends_on: [EXP-POLICY-EXPORT-USER-NEEDS]
 
 existing_project:
   harness_realization: absent

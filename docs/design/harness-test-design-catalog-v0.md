@@ -1355,6 +1355,15 @@ This is regression evidence for one known project that participated in Harness
 design. It may satisfy A09-R04 only after an accepted provider run is captured;
 it is not an independent TL6 portability holdout.
 
+Diagnostic provider run `36951760690` completed both bootstrap/idempotence calls
+but failed the V1 oracle because the selected task required only one Capability
+from two multi-Capability project bindings, leaving scope-minimization versus
+binding-preservation ambiguous. That run is not admissible evidence. Fixture V2
+removes the ambiguity before re-execution: every accepted Capability binding on
+the selected three NAPMS artifacts is now an explicit Design Profile expectation,
+so dropping any binding is a direct A09-F06 failure rather than an oracle-policy
+choice.
+
 # SF-07 — Greenfield bootstrap micro-project
 
 ## TD-BOOT-G01 — Minimal initial model

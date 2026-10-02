@@ -754,6 +754,17 @@ for entry in tl5_entries:
         assert known["source_artifacts"]["harness_projection"]["git_blob_sha"] == (
             "3e4d074e8ac4e67d259c4d0c721da62c0dff3b91"
         )
+        assert binding.case["fixture_revision"] == "TD-BOOT-E07-FIXTURE-V2"
+        expected_capabilities = {
+            item["capability"]
+            for item in fixture["reviewed_design_profile"]["expectations"]
+        }
+        projected_capabilities = {
+            capability
+            for item in fixture["existing_project"]["harness_projection"]["bindings"]
+            for capability in item["provides"]
+        }
+        assert expected_capabilities == projected_capabilities
 
         request = build_execution_request(
             binding,

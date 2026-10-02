@@ -35,7 +35,16 @@ dimensions:
       questions: []
     target_state:
       status: COMPLETE
-      satisfied: [EXP-PROBLEM-EVIDENCE, EXP-PRODUCT-REQUIREMENTS, EXP-USER-NEEDS]
+      satisfied:
+        - EXP-ACCEPTANCE
+        - EXP-ACCESS-REQUEST-REQUIREMENTS
+        - EXP-ACCESS-REQUEST-USER-NEEDS
+        - EXP-APPLICATION-COMPONENTS-REQUIREMENTS
+        - EXP-APPLICATION-COMPONENTS-USER-NEEDS
+        - EXP-POLICY-EXPORT-REQUIREMENTS
+        - EXP-POLICY-EXPORT-USER-NEEDS
+        - EXP-PROBLEM-EVIDENCE
+        - EXP-PRODUCT-INTENT
       create: []
       wait: []
       pending: []
