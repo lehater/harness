@@ -177,7 +177,60 @@ def expect_core_error(fn, fragment: str):
         raise AssertionError(f"expected CoreError containing {fragment!r}")
 
 
+def test_irrelevant_source_invariance() -> None:
+    contract = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-contract",
+        "source_capability": "example.user-needs",
+        "target_capability": "example.requirements",
+        "obligations": [{"id": "needs", "source_kind": "user-need"}],
+    }
+    evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.user-needs",
+        "target_capability": "example.requirements",
+        "links": [
+            {
+                "sources": ["NEED-AUTHORIZED-SOURCE"],
+                "relation": "REALIZES",
+                "targets": ["REQ-AUTHORIZED-SOURCE"],
+            }
+        ],
+        "dispositions": [],
+    }
+    baseline_sources = sources()
+    baseline = evaluate_derivation(
+        graph=GRAPH,
+        contract=contract,
+        source=baseline_sources,
+        candidate=candidate(),
+        evidence=evidence,
+    )
+
+    noisy_sources = copy.deepcopy(baseline_sources)
+    noisy_sources["semantic_assertions"].append(
+        {
+            "id": "IRRELEVANT-IMPLEMENTATION-NOTE",
+            "kind": "implementation-note",
+            "subject": "unrelated-runtime-detail",
+            "semantic_value": "This statement is outside the declared derivation obligations.",
+            "decision_authority": "DISCOVERY",
+            "source_artifact": "NEEDS",
+        }
+    )
+    noisy = evaluate_derivation(
+        graph=GRAPH,
+        contract=contract,
+        source=noisy_sources,
+        candidate=candidate(),
+        evidence=evidence,
+    )
+    assert noisy == baseline, (noisy, baseline)
+
+
 def main() -> int:
+    test_irrelevant_source_invariance()
     registry = load("skills/artifact-skill-registry-v0.yaml")
     contracts = load(
         "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
