@@ -125,6 +125,17 @@ isolated materialized pack, without inheriting source-checkout import paths.
 No whole `src/` prefix, Harness install step, API change or wrapper protocol
 change is introduced.
 
+Integration and Assurance implementations live exclusively under
+`src/harness/integration/` and `src/harness/assurance/`. Their sixteen package
+files are included through `exact_files`; the ten root legacy files and two
+nested adapter facades remain Consumer v0 surfaces. `include_prefixes` and
+`consumer_api` are unchanged. Dotted legacy identities use the existing
+`compatibility.module_facades` registry, with mechanical identity-to-path
+mapping and explicit import-only/import-and-cli modes. Pack acceptance freezes
+all twelve export surfaces and verifies shared export/object identity,
+canonical locations, implementation AST equivalence, runtime canonical imports
+and unchanged published boundaries.
+
 ## Clean-target bootstrap
 
 A target repository that needs clone-and-run operation commits the small

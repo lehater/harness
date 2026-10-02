@@ -55,15 +55,15 @@ contexts:
     subdomain: core
     responsibility: Own semantic evaluation, derivation proof, acceptance identity and capability currentness.
     modules:
-      - acceptance_policy
-      - capability_lifecycle
-      - derivation_test_coverage
-      - live_calibration
-      - adapters.copilot_live_calibration_evaluator
-      - semantic_acceptance
-      - semantic_derivation
-      - semantic_fingerprint
-      - semantic_judgement_calibration
+      - harness.assurance.acceptance_policy
+      - harness.assurance.capability_lifecycle
+      - harness.assurance.derivation_test_coverage
+      - harness.assurance.live_calibration
+      - harness.assurance.adapters.copilot_live_calibration_evaluator
+      - harness.assurance.semantic_acceptance
+      - harness.assurance.semantic_derivation
+      - harness.assurance.semantic_fingerprint
+      - harness.assurance.semantic_judgement_calibration
     may_depend_on:
       - project-model
       - evidence
@@ -94,9 +94,9 @@ contexts:
     subdomain: supporting
     responsibility: Translate project-native repository state into Harness published models and validate alignment.
     modules:
-      - integration_alignment
-      - adapters.canonical_graph
-      - repository_realization
+      - harness.integration.integration_alignment
+      - harness.integration.adapters.canonical_graph
+      - harness.integration.repository_realization
     may_depend_on:
       - project-model
 
@@ -162,7 +162,7 @@ published_boundaries:
   - from_context: coverage
     to_context: assurance
     modules:
-      semantic_acceptance:
+      harness.assurance.semantic_acceptance:
         - coverage_assurance_view
         - coverage_invalidation_closure
 

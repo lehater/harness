@@ -90,7 +90,14 @@ Purpose: retain the detailed repository inventory outside the automatically load
   `source_coverage.py` is its temporary import/CLI facade.
 - `src/harness/evidence/source_set.py` — canonical acquisition-contract source-set completeness;
   `source_set.py` is its temporary import/CLI facade.
-- `adapters/canonical_graph.py` — optional projection of existing canonical graph routing into Core without copying paths/dependencies.
+- `src/harness/integration/` — canonical alignment, repository realization and
+  canonical-graph adapter implementations; root `integration_alignment.py`,
+  `repository_realization.py` and `adapters/canonical_graph.py` retain legacy
+  Consumer v0 import/CLI entrypoints.
+- `src/harness/assurance/` — canonical semantic acceptance/derivation/fingerprint,
+  acceptance policy, lifecycle, derivation coverage and calibration implementations;
+  the eight corresponding root files and
+  `adapters/copilot_live_calibration_evaluator.py` retain legacy Consumer v0 facades.
 - `spec/acceptance/**` — executable Core acceptance cases.
 - `spec/decision-governance/**` — experimental decision-governance evidence and knowledge-kind decision contracts.
 - `spec/adapter-acceptance/**` — executable adapter integration cases.

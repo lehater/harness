@@ -5,6 +5,8 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import importlib.util
+import sys
 import os
 import subprocess
 from pathlib import Path
@@ -17,6 +19,7 @@ from live_calibration import (
 from scenario_drivers import scenario_driver
 
 EXECUTABLE_ENV = "HARNESS_LIVE_CALIBRATION_EXECUTABLE"
+MODULE_ENV = "HARNESS_LIVE_CALIBRATION_MODULE"
 TIMEOUT_ENV = "HARNESS_LIVE_CALIBRATION_TIMEOUT_SECONDS"
 
 
@@ -96,11 +99,28 @@ def execute_live_calibration_process(
         if isinstance(raw_executable, str) and raw_executable
         else None
     )
+    module_identity = os.environ.get(MODULE_ENV)
+    if module_identity:
+        try:
+            spec = importlib.util.find_spec(module_identity)
+        except (ImportError, AttributeError, ValueError):
+            spec = None
+        executable = (
+            Path(spec.origin).resolve()
+            if spec is not None and spec.origin and spec.origin.endswith(".py")
+            else None
+        )
+        argv = [sys.executable, "-m", module_identity]
+    else:
+        argv = [str(executable)]
     effective = _effective_evaluator(
         evaluator,
         executable=executable,
         timeout_seconds=timeout,
     )
+
+    if module_identity:
+        effective["adapter"]["module_identity"] = module_identity
 
     request = build_live_calibration_request(
         corpus=corpus,
@@ -130,7 +150,7 @@ def execute_live_calibration_process(
         }
         try:
             completed = subprocess.run(
-                [str(executable)],
+                argv,
                 input=json.dumps(payload, ensure_ascii=False),
                 text=True,
                 capture_output=True,

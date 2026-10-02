@@ -426,7 +426,8 @@ An unclassified active skill is a Harness validation failure.
 
 Accepted knowledge is not permanently current.
 
-`capability_lifecycle.py` records one acceptance identity per selected
+`harness.assurance.capability_lifecycle` (legacy Consumer v0 entrypoint:
+`capability_lifecycle.py`) records one acceptance identity per selected
 Capability and the exact prerequisite acceptance identities against which it was
 accepted. If an upstream identity changes, the direct consumer becomes
 `STALE` and is exposed as `REVALIDATE`; further downstream work remains

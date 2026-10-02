@@ -107,7 +107,7 @@ serve different purposes.
 ## Integration
 
 `semantic.derivation` is a Scenario Suite driver backed by
-`semantic_derivation.py`. No second test runner or CapabilityTestSuite is
+`harness.assurance.semantic_derivation` (legacy Consumer v0 facade: `semantic_derivation.py`). No second test runner or CapabilityTestSuite is
 introduced.
 
 A higher-level capability-test-pack DSL should be added only if repeated
@@ -190,7 +190,8 @@ when the dependency surface is proven complete.
 
 ## Derivation test coverage
 
-`derivation_test_coverage.py` evaluates direct Engineering Graph production
+`harness.assurance.derivation_test_coverage` (legacy Consumer v0 facade:
+`derivation_test_coverage.py`) evaluates direct Engineering Graph production
 dependencies against two reusable proof forms:
 
 - a tested knowledge-kind edge, which allows one generic scenario to cover the

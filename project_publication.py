@@ -13,12 +13,12 @@ from typing import Any
 
 import yaml
 
-from capability_lifecycle import lifecycle_index, validate_projection
+from harness.assurance.capability_lifecycle import lifecycle_index, validate_projection
 from decision_pipeline import decision_failure_index
 from harness.project_model.engineering_graph import validate_realization
 from harness.project_model.core import CoreError, artifact_blockers, capability_blockers, capability_resolve
-from semantic_acceptance import evaluation_index
-from semantic_derivation import derivation_evaluation_index
+from harness.assurance.semantic_acceptance import evaluation_index
+from harness.assurance.semantic_derivation import derivation_evaluation_index
 
 PUBLICATION_KIND = "harness-project-publication"
 PUBLICATION_VERSION = 1

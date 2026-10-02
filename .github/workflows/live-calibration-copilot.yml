@@ -55,7 +55,7 @@ jobs:
       - name: Execute real live calibration
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          HARNESS_LIVE_CALIBRATION_EXECUTABLE: ${{ github.workspace }}/adapters/copilot_live_calibration_evaluator.py
+          HARNESS_LIVE_CALIBRATION_MODULE: harness.assurance.adapters.copilot_live_calibration_evaluator
           HARNESS_LIVE_CALIBRATION_TIMEOUT_SECONDS: "180"
         run: |
           python scenario_suite.py             spec/live-calibration-provider             --catalog spec/live-calibration-provider/catalog-v1.yml             --driver-module live_calibration_process_driver             --json-report live-calibration-evidence.json

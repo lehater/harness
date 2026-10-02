@@ -177,11 +177,17 @@ adopt installed-package execution.
 CLI file to its canonical `target`. These are migration state, never context
 owners or permanent bootstrap exceptions. The first supported import-bridge
 shape is the root `harness` package. `compatibility.module_facades` maps a legacy
-module name to its canonical `target` and explicit `mode`, separately from package
+dotted Python module identity to its canonical `target` and explicit `mode`, separately from package
 bridges. The shared closed grammar supports `import-only` (canonical symbols and
 `__all__` re-exports) and `import-and-cli` (the same exports plus canonical `main`
 and execution under the `__main__` guard). Unknown modes, extra fields and any
-implementation are rejected. These files are tracked separately from the
+implementation are rejected. Every dotted component must be a Python identifier;
+the physical file is mechanically derived by replacing dots with slashes and
+appending `.py` (for example, `foo.bar.baz` maps to `foo/bar/baz.py`).
+Nested facades are excluded from runtime semantic ownership; the root migration
+ratchet considers only root files. Exact dotted aliases normalize to their
+canonical targets, and owned runtime imports may not use them, including
+`from foo import bar` when `foo.bar` is an alias. These files are tracked separately from the
 implementation migration baseline.
 
 The architecture validator discovers non-initializer modules under `src/harness`,
@@ -354,11 +360,11 @@ Graph identities. Coverage retains only the `project-model` and `assurance`
 dependency directions.
 
 The existing Coverage -> Assurance published boundary remains exactly
-`semantic_acceptance.coverage_assurance_view` and
-`semantic_acceptance.coverage_invalidation_closure`. Assurance has not physically
-migrated, so canonical Coverage temporarily imports root `semantic_acceptance`
-with explicit published symbols. No Assurance implementation is copied and no
-new DTO/API is introduced.
+`harness.assurance.semantic_acceptance.coverage_assurance_view` and
+`harness.assurance.semantic_acceptance.coverage_invalidation_closure`. Canonical
+Coverage imports the migrated Assurance implementation with exactly those
+published symbols. No Assurance implementation is copied and no new DTO/API is
+introduced.
 
 Consumer Pack v0 retains all five root facades and adds exactly the Coverage
 initializer plus the five implementation files through `exact_files`.
@@ -414,10 +420,10 @@ Human Projection imports canonical Core and Engineering Graph; Workspace imports
 canonical Core and Target State rather than their compatibility aliases.
 
 Workspace retains exactly `may_depend_on: [project-model, integration]`.
-Integration has not migrated, so Human Projection temporarily imports only
-`validate_project_alignment` from root `integration_alignment`. This is the
-existing ordinary Workspace -> Integration direction, with no new published
-boundary, Integration facade/bridge or copied Integration semantics.
+Human Projection imports only `validate_project_alignment` from canonical
+`harness.integration.integration_alignment`. This is the existing ordinary
+Workspace -> Integration direction, with no new published boundary or copied
+Integration semantics.
 Ownership/alias assertions and forbidden Application/Coverage/Assurance import
 mutations exercise the existing context validator; isolated-pack identity
 checks bind alignment to the actual Integration implementation.
@@ -487,3 +493,72 @@ intersection exists, but there is no new current -> stale transition. Historical
 hashes, outcomes and currentness classifications remain unchanged. This
 mechanical import normalization requires deterministic assurance only; no
 provider judgement run or refreshed judgement claim is introduced.
+
+
+## Integration and Assurance package migration decision
+
+Architecture decision record: ADR-INTEGRATION-ASSURANCE-PACKAGE-V0.
+Status: accepted.
+
+Nested compatibility modules preserve import identity and module CLI identity,
+not direct filesystem-script execution. `import adapters.foo` and
+`python -m adapters.foo` remain compatibility surfaces. `python adapters/foo.py`
+depends on filesystem layout and is intentionally unsupported after migration.
+Facades retain the existing closed grammar without path bootstrapping.
+Canonical nested CLIs use `python -m harness.integration.adapters.canonical_graph`
+and `python -m harness.assurance.adapters.copilot_live_calibration_evaluator`.
+Consumer v0 retains the corresponding legacy dotted module entrypoints.
+The distribution manifest promises included files and import identities, not
+direct nested file execution; no Consumer API bump is required.
+
+The existing context map owns the Integration and Assurance boundaries, but
+physical implementations still occupied root and adapter namespaces. One
+coherent migration moves all three Integration and nine Assurance modules into
+`src/harness/integration/` and `src/harness/assurance/`, including their respective
+`adapters/` packages. Initializers contain documentation only. Context ownership
+uses canonical identities exclusively, with unchanged dependency directions and
+an empty known-violation ratchet.
+
+The existing `compatibility.module_facades` mechanism generalizes to dotted
+identities. Both legacy adapter paths are mechanically located and checked
+against the same delegation grammar as root facades. There is no second facade
+registry or filename-specific ownership rule. Nested aliases are excluded from
+the semantic inventory; root implementation baseline entries are removed only
+for the ten migrated root files.
+
+All owned runtime consumers use canonical imports. Integration retains its
+published Project Model symbol boundary. Coverage uses only the two existing
+published Assurance symbols under their canonical module identity; neither
+boundary widens. Assurance internally uses canonical identities, with no new
+dependency. Application remains physically unchanged.
+
+Explicit `__all__` freezes the pre-move public surfaces from `d28f4cc`, including
+imported public names and the private adapter helpers already imported by
+acceptance validators. Every legacy export and export list shares canonical
+object identity. Whole-module AST fingerprints reverse only approved imports
+and remove the explicit export assignment, proving unchanged module logic,
+function/class bodies and CLI guards. No repository-relative adaptation is
+needed by these twelve implementations.
+
+Consumer API remains v0. Root files and the `adapters/` include prefix stay in
+the Pack; sixteen canonical files are added through `exact_files`. Reused
+TD-DIST-001/002 evidence checks canonical locations, frozen surfaces, identity,
+owned import discipline, published boundaries and nested facade mutations in
+an isolated Pack without checkout `PYTHONPATH` or package installation.
+
+Evidence scope: HA-A17 ownership/projection, HA-A18 distribution compatibility,
+and unchanged HA-A12/A14/A20 deterministic semantic/currentness/calibration
+behavior. Existing subsystem fixtures and the full Scenario Suite are reused;
+new TL1 mutations target only facade metadata, closed grammar and import rules.
+The entire changed-file set is compared with all provider execution bindings;
+intersection is empty for all seven execution-bound provider records:
+`first-wave-provider-run-36928079710`, `first-wave-provider-run-36942421201`,
+`first-wave-provider-run-36947887869`, `tl4-existing-project-provider-run-36949909315`,
+`tl5-known-project-provider-run-36952038645`,
+`release-critical-formation-provider-run-36953091767`, and
+`a04-r02-provider-run-36953433978`. This includes the changed
+`.github/workflows/live-calibration-copilot.yml`, which none of those bindings
+contains. All seven were already stale; there is no new currentness transition.
+Historical results, hashes and existing stale states remain
+unchanged. This physical migration makes no new provider-judgement claim and
+requires no provider run.

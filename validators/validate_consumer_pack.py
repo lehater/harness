@@ -106,11 +106,82 @@ def test_context_dependencies(temp_root: Path) -> None:
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         assert result.returncode == 0, (statement, result.stderr)
     target.write_text(original)
+    # Dotted aliases are compatibility files, excluded from semantic ownership.
+    layout = boundaries.load_layout()
+    for legacy in ("adapters.canonical_graph", "adapters.copilot_live_calibration_evaluator"):
+        canonical = layout["compatibility"]["module_facades"][legacy]["target"]
+        assert boundaries._resolve_target(legacy, owner, aliases) == canonical
+        assert legacy not in boundaries._runtime_modules(spec, set(layout["compatibility"]["module_facades"]) | {"harness"}, aliases)
+        assert legacy not in owner
+        facade = checkout / (legacy.replace(".", "/") + ".py")
+        body = facade.read_text()
+        for mutation in ("\nclass Hidden: pass\n", "\nimport sys; sys.path.insert(0, 'src')\n"):
+            facade.write_text(body + mutation)
+            result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+            assert result.returncode != 0 and "implementation is forbidden" in result.stderr, result.stderr
+        facade.write_text(body)
+    target = checkout / "agent_router.py"
+    original = target.read_text()
+    for statement in (
+        "from adapters.canonical_graph import project_model",
+        "import adapters.canonical_graph as legacy",
+        "from adapters import canonical_graph",
+        "from adapters.copilot_live_calibration_evaluator import main",
+        "from semantic_acceptance import coverage_assurance_view",
+        "from integration_alignment import validate_project_alignment",
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0 and "imports compatibility alias" in result.stderr, result.stderr
+    target.write_text(original)
+    # Metadata rejects malformed identities, and discovers arbitrary nesting
+    # through the same mechanical mapping, without filename exceptions.
+    layout_path = checkout / "spec/architecture/repository-layout-v0.yaml"
+    original_layout = layout_path.read_text()
+    for legacy in ("foo..bar", "foo/bar", "foo.3bar", "foo-bar", ".foo"):
+        mutated = yaml.safe_load(original_layout)
+        mutated["compatibility"]["module_facades"][legacy] = {
+            "target": "harness.integration.adapters.canonical_graph", "mode": "import-and-cli",
+        }
+        layout_path.write_text(yaml.safe_dump(mutated))
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0 and "module facade cannot own semantics" in result.stderr, result.stderr
+    mutated = yaml.safe_load(original_layout)
+    nested = checkout / "adapters/deep/legacy.py"
+    nested.parent.mkdir()
+    nested.write_text(boundaries._facade_body("harness.integration.adapters.canonical_graph", "import-and-cli"))
+    mutated["compatibility"]["module_facades"]["adapters.deep.legacy"] = {
+        "target": "harness.integration.adapters.canonical_graph", "mode": "import-and-cli",
+    }
+    layout_path.write_text(yaml.safe_dump(mutated))
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    unregistered_root = checkout / "unexpected_root.py"
+    unregistered_root.write_text('"""Unregistered root module."""\n')
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode != 0 and "new root Python modules are forbidden" in result.stderr, result.stderr
+    unregistered_root.unlink()
+    # A facade cannot become a second semantic owner.
+    map_path = checkout / "spec/architecture/harness-context-map-v0.yaml"
+    original_map = map_path.read_text()
+    modified_map = yaml.safe_load(original_map)
+    modified_map["contexts"]["integration"]["modules"].append("adapters.deep.legacy")
+    map_path.write_text(yaml.safe_dump(modified_map))
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode != 0 and "module facade cannot own semantics" in result.stderr, result.stderr
+    map_path.write_text(original_map)
+    nested.unlink()
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode != 0 and "compatibility surface missing" in result.stderr, result.stderr
+    layout_path.write_text(original_layout)
+
     target = checkout / "src/harness/coverage/coverage_planner.py"
     original = target.read_text()
     for statement, diagnostic in (
-        ("import semantic_acceptance", "without an explicit symbol boundary"),
-        ("from semantic_acceptance import validate_semantic_evaluation", "non-published symbols"),
+        ("import harness.assurance.semantic_acceptance", "without an explicit symbol boundary"),
+        ("from harness.assurance.semantic_acceptance import validate_semantic_evaluation", "non-published symbols"),
+        ("from harness.assurance.semantic_derivation import validate_contract", "non-published module"),
+        ("from harness.assurance import semantic_acceptance", "without an explicit symbol boundary"),
     ):
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
@@ -127,7 +198,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     target = checkout / "src/harness/workspace/human_projection.py"
     original = target.read_text()
     for statement in (
-        "import project_frontier", "import harness.coverage.engineering_coverage", "import semantic_acceptance",
+        "import project_frontier", "import harness.coverage.engineering_coverage", "import harness.assurance.semantic_acceptance",
     ):
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
@@ -285,7 +356,7 @@ for module, expected in coverage_exports.items():
         if isinstance(node, ast.ImportFrom):
             assert node.module not in coverage_exports or node.level == 1, (module, node.module)
             assert node.module not in ('harness', 'engineering_graph'), (module, node.module)
-            if node.module == 'semantic_acceptance':
+            if node.module == 'harness.assurance.semantic_acceptance':
                 assert {alias.name for alias in node.names} <= {'coverage_assurance_view', 'coverage_invalidation_closure'}
         if isinstance(node, ast.Import):
             assert all(alias.name != 'semantic_acceptance' and alias.name not in coverage_exports for alias in node.names)
@@ -467,7 +538,7 @@ for module, expected in workspace_exports.items():
         if isinstance(node, ast.ImportFrom):
             assert node.module not in workspace_exports, (module, node.module)
             assert node.module not in ('harness', 'engineering_graph', 'target_state'), (module, node.module)
-            if node.module == 'integration_alignment':
+            if node.module == 'harness.integration.integration_alignment':
                 assert module == 'human_projection'
                 assert [alias.name for alias in node.names] == ['validate_project_alignment']
         elif isinstance(node, ast.Import):
@@ -477,7 +548,7 @@ for module, expected in workspace_exports.items():
     tree.body = [node for node in tree.body if not (isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == '__all__' for target in node.targets))]
     for node in tree.body:
         if isinstance(node, ast.ImportFrom):
-            node.module = {'harness.project_model.core': 'harness', 'harness.project_model.engineering_graph': 'engineering_graph', 'harness.project_model.target_state': 'target_state'}.get(node.module, node.module)
+            node.module = {'harness.project_model.core': 'harness', 'harness.project_model.engineering_graph': 'engineering_graph', 'harness.project_model.target_state': 'target_state', 'harness.integration.integration_alignment': 'integration_alignment'}.get(node.module, node.module)
     assert hashlib.sha256(ast.dump(tree).encode()).hexdigest() == workspace_baseline_ast[module], module
 from harness.workspace import human_projection, workspace
 import integration_alignment
@@ -496,6 +567,228 @@ for name in ('workspace-managed',):
     result = run_scenario(Path('spec/scenario-suite/scenarios/' + name + '.yaml'))
     assert result.status == 'PASSED', result.as_dict()
 
+
+# Frozen pre-migration surfaces and complete implementation ASTs (d28f4cc).
+migration_baseline = {'integration_alignment': {'canonical': 'harness.integration.integration_alignment',
+                           'exports': ['Any',
+                                       'CoreError',
+                                       'Path',
+                                       'annotations',
+                                       'argparse',
+                                       'defaultdict',
+                                       'derive_profile',
+                                       'json',
+                                       'load_yaml',
+                                       'main',
+                                       'producer_index',
+                                       'production_index',
+                                       'project_model',
+                                       'validate_engineering_graph',
+                                       'validate_model',
+                                       'validate_project_alignment',
+                                       'yaml'],
+                           'ast_sha256': '124beca5fc7a10dc7678f9656477e26f239b1ee14a064197c02e73a2cb1b2c5a',
+                           'mode': 'import-and-cli'},
+ 'adapters.canonical_graph': {'canonical': 'harness.integration.adapters.canonical_graph',
+                              'exports': ['Any',
+                                          'CoreError',
+                                          'Path',
+                                          '_source_nodes',
+                                          'annotations',
+                                          'argparse',
+                                          'copy',
+                                          'load_projection',
+                                          'main',
+                                          'project_model',
+                                          'validate_model',
+                                          'yaml'],
+                              'ast_sha256': 'a4b3f0aa5423df696261efeab4415bae4d921ade60e9d6273a9dcdfee77d18f9',
+                              'mode': 'import-and-cli'},
+ 'repository_realization': {'canonical': 'harness.integration.repository_realization',
+                            'exports': ['APPLICABILITY',
+                                        'Any',
+                                        'Path',
+                                        'annotations',
+                                        'argparse',
+                                        'evaluate',
+                                        'json',
+                                        'load_yaml',
+                                        'main',
+                                        'yaml'],
+                            'ast_sha256': '403edd4af5dfce045e13503e4fadad9816bb8ecff4aea786dc7c3447e0e21e9e',
+                            'mode': 'import-and-cli'},
+ 'acceptance_policy': {'canonical': 'harness.assurance.acceptance_policy',
+                       'exports': ['Any',
+                                   'EVALUATOR_CONTRACT',
+                                   'annotations',
+                                   'build_acceptance_policy_baseline',
+                                   'hashlib',
+                                   'json'],
+                       'ast_sha256': '515e911534a9f8998eacff33b87aac9707a4313aa9fe2acab83efc8cf25703a2',
+                       'mode': 'import-only'},
+ 'capability_lifecycle': {'canonical': 'harness.assurance.capability_lifecycle',
+                          'exports': ['Any',
+                                      'CoreError',
+                                      'Path',
+                                      'annotations',
+                                      'argparse',
+                                      'artifact_blockers',
+                                      'capability_blockers',
+                                      'derive_profile',
+                                      'evaluate_lifecycle_target',
+                                      'json',
+                                      'lifecycle_index',
+                                      'lifecycle_states',
+                                      'main',
+                                      'obsolete_lifecycle_rows',
+                                      'production_index',
+                                      'validate_projection',
+                                      'validate_realization',
+                                      'yaml'],
+                          'ast_sha256': 'cc7c2a222b48907f421feac80274129a409cf3e59c388334681ec17a30add4cb',
+                          'mode': 'import-and-cli'},
+ 'derivation_test_coverage': {'canonical': 'harness.assurance.derivation_test_coverage',
+                              'exports': ['Any',
+                                          'CoreError',
+                                          'DISPOSITIONS',
+                                          'Path',
+                                          'annotations',
+                                          'evaluate_derivation_test_coverage',
+                                          'production_index',
+                                          'yaml'],
+                              'ast_sha256': 'ae82f3bb1bb476a47e1dc3c6f8f3e0d45119cabb922b309869762bee9ff7023e',
+                              'mode': 'import-only'},
+ 'live_calibration': {'canonical': 'harness.assurance.live_calibration',
+                      'exports': ['Any',
+                                  'CoreError',
+                                  'RUN_STATES',
+                                  'VERDICTS',
+                                  'annotations',
+                                  'build_live_calibration_request',
+                                  'copy',
+                                  'evaluate_judgement_calibration',
+                                  'evaluate_live_calibration_run',
+                                  'evaluate_live_calibration_stability',
+                                  'hashlib',
+                                  'json'],
+                      'ast_sha256': 'bc270ad40bdbc3078daa28a8fe4f8cb5a86b517ec862984a455279ed03d95bc0',
+                      'mode': 'import-only'},
+ 'adapters.copilot_live_calibration_evaluator': {'canonical': 'harness.assurance.adapters.copilot_live_calibration_evaluator',
+                                                 'exports': ['Any',
+                                                             'CLI_ENV',
+                                                             'DEFAULT_CLI',
+                                                             'Path',
+                                                             '_model_payload',
+                                                             '_parse_copilot_jsonl',
+                                                             '_parse_model_response',
+                                                             'annotations',
+                                                             'datetime',
+                                                             'evaluate_request',
+                                                             'json',
+                                                             'main',
+                                                             'os',
+                                                             're',
+                                                             'subprocess',
+                                                             'sys',
+                                                             'tempfile',
+                                                             'timezone',
+                                                             'uuid'],
+                                                 'ast_sha256': '7fc6be95ea6a8442671517a8779a0bb60c45fd5e540a8915e8076dee0740f4ac',
+                                                 'mode': 'import-and-cli'},
+ 'semantic_acceptance': {'canonical': 'harness.assurance.semantic_acceptance',
+                         'exports': ['Any',
+                                     'CoreError',
+                                     'CoverageAssuranceView',
+                                     'Path',
+                                     'accepted_claims_for',
+                                     'annotations',
+                                     'argparse',
+                                     'coverage_assurance_view',
+                                     'coverage_invalidation_closure',
+                                     'coverage_proof_available',
+                                     'defaultdict',
+                                     'deque',
+                                     'evaluate_artifact',
+                                     'evaluation_index',
+                                     'json',
+                                     'load',
+                                     'main',
+                                     'rejected_semantic_providers',
+                                     'semantic_invalidation_closure',
+                                     'semantic_key',
+                                     'yaml'],
+                         'ast_sha256': 'f80b33276fc4be1d9ddea145cc45cc049d15262cff3e756eca6d8d92bdb62050',
+                         'mode': 'import-and-cli'},
+ 'semantic_derivation': {'canonical': 'harness.assurance.semantic_derivation',
+                         'exports': ['Any',
+                                     'CoreError',
+                                     'DISPOSITIONS',
+                                     'JUDGEMENT_REVIEWERS',
+                                     'JUDGEMENT_STATUSES',
+                                     'Path',
+                                     'RELATIONS',
+                                     'annotations',
+                                     'argparse',
+                                     'derivation_evaluation_index',
+                                     'evaluate_derivation',
+                                     'hashlib',
+                                     'json',
+                                     'main',
+                                     'producer_index',
+                                     'production_index',
+                                     'semantic_assertion_fingerprint',
+                                     'yaml'],
+                         'ast_sha256': '5579f1a6d0e21b73ca024621ddaa7ed481e168325abc290ae51b2d6c6d9f8c0c',
+                         'mode': 'import-and-cli'},
+ 'semantic_fingerprint': {'canonical': 'harness.assurance.semantic_fingerprint',
+                          'exports': ['Any',
+                                      'CoreError',
+                                      'annotations',
+                                      'hashlib',
+                                      'json',
+                                      'semantic_assertion_fingerprint',
+                                      'semantic_assertion_fingerprints'],
+                          'ast_sha256': '5194661089cb1cb08a3e5aef8b365b0df223a31bdb9a1d07863dc46c72317c0e',
+                          'mode': 'import-only'},
+ 'semantic_judgement_calibration': {'canonical': 'harness.assurance.semantic_judgement_calibration',
+                                    'exports': ['Any',
+                                                'CoreError',
+                                                'STATUSES',
+                                                'annotations',
+                                                'evaluate_judgement_calibration'],
+                                    'ast_sha256': '15fc074504d9d061e544589f76a2b89369c760e812565782abdf2d943906dd87',
+                                    'mode': 'import-only'}}
+reverse_imports = {row['canonical']: legacy for legacy, row in migration_baseline.items()}
+for legacy_name, row in migration_baseline.items():
+    canonical = importlib.import_module(row['canonical'])
+    legacy = importlib.import_module(legacy_name)
+    assert canonical.__all__ == row['exports'], legacy_name
+    assert legacy.__all__ is canonical.__all__, legacy_name
+    for name in row['exports']:
+        assert getattr(legacy, name) is getattr(canonical, name), (legacy_name, name)
+    assert Path(canonical.__file__).resolve() == Path('src', *row['canonical'].split('.')).with_suffix('.py').resolve()
+    assert hasattr(canonical, 'main') == (row['mode'] == 'import-and-cli'), legacy_name
+    tree = ast.parse(Path(canonical.__file__).read_text())
+    tree.body = [node for node in tree.body if not (isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == '__all__' for target in node.targets))]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            node.module = reverse_imports.get(node.module, node.module)
+    assert hashlib.sha256(ast.dump(tree).encode()).hexdigest() == row['ast_sha256'], legacy_name
+# Every owned runtime import remains canonical even in the materialized pack.
+import yaml
+context_map = yaml.safe_load(Path('spec/architecture/harness-context-map-v0.yaml').read_text())
+for context in context_map['contexts'].values():
+    for identity in context['modules']:
+        path = Path('src', *identity.split('.')).with_suffix('.py') if identity.startswith('harness.') else Path(*identity.split('.')).with_suffix('.py')
+        if identity == 'distribution.harnessw':
+            continue  # Wrapper transport is outside the materialized runtime pack.
+        for node in ast.walk(ast.parse(path.read_text())):
+            if isinstance(node, ast.ImportFrom) and not node.level:
+                assert node.module not in migration_baseline, (identity, node.module)
+                assert all((node.module + '.' + alias.name) not in migration_baseline for alias in node.names)
+            elif isinstance(node, ast.Import):
+                assert all(alias.name not in migration_baseline for alias in node.names), identity
+
 # Reuse authored Decision scenarios through the distributed Application/drivers.
 from scenario_suite import run_scenario
 for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.yaml')):
@@ -507,6 +800,29 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+    # Canonical and Consumer v0 nested module CLIs require no path bootstrap.
+    fixture = load_yaml(pack / "spec/adapter-acceptance/rich-project-projection.yaml")
+    source = temp_root / "nested-source.yaml"
+    source.write_text(yaml.safe_dump(fixture["source_graph"]))
+    nested_graph = temp_root / "nested-projection.yaml"
+    nested_graph.write_text(yaml.safe_dump({**fixture["projection"], "source_graph": source.name}))
+    for legacy, entry in load_yaml(pack / "spec/architecture/repository-layout-v0.yaml")["compatibility"]["module_facades"].items():
+        if ".adapters." not in entry["target"] or entry["mode"] != "import-and-cli":
+            continue
+        outputs = []
+        for identity in (entry["target"], legacy):
+            is_copilot = identity.endswith("copilot_live_calibration_evaluator")
+            result = subprocess.run(
+                [sys.executable, "-m", identity, *([] if is_copilot else [str(nested_graph)])],
+                input="", cwd=pack, env=env, capture_output=True, text=True,
+            )
+            if is_copilot:
+                assert result.returncode == 2 and "JSONDecodeError" in result.stderr, result.stderr
+            else:
+                assert result.returncode == 0, result.stderr
+                outputs.append(yaml.safe_load(result.stdout))
+        if outputs:
+            assert outputs[0] == outputs[1]
     # Fresh isolated-pack processes exercise both preserved Workspace CLIs.
     fixture = "spec/workspace-acceptance/minimal-domain"
     for command in ("validate", "render"):

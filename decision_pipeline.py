@@ -10,7 +10,7 @@ from typing import Any, Iterable
 import yaml
 
 from authority_context import build_authority_context
-from capability_lifecycle import lifecycle_index, lifecycle_states
+from harness.assurance.capability_lifecycle import lifecycle_index, lifecycle_states
 from decision_explorer_request import derive_decision_explorer_request
 from harness.project_model.engineering_graph import (
     derive_profile,

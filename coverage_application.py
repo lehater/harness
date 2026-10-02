@@ -9,7 +9,7 @@ from typing import Any
 
 from agent_router import validate_skill_registry
 from harness.coverage.engineering_coverage import evaluate_with_repository_policy, load, load_scope_source
-from integration_alignment import validate_project_alignment
+from harness.integration.integration_alignment import validate_project_alignment
 from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 ROOT = Path(__file__).resolve().parent

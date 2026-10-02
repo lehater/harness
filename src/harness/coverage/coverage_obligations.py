@@ -12,7 +12,7 @@ from .coverage_planner import (
     declared_capability_claim_index,
     semantic_evaluation_required_claims,
 )
-from semantic_acceptance import coverage_assurance_view
+from harness.assurance.semantic_acceptance import coverage_assurance_view
 
 
 __all__ = [

@@ -95,7 +95,8 @@ Schema validation does not itself accept semantics. The agent registers `provide
 
 When a target repository already owns artifact paths and dependency routing in a canonical graph, do not copy that graph into Harness metadata.
 
-`adapters/canonical_graph.py` can project a selected part of such a graph into Core v0. The consumer projection declares only Harness-specific metadata:
+`src/harness/integration/adapters/canonical_graph.py` is the canonical implementation;
+`adapters/canonical_graph.py` remains its legacy Consumer v0 entrypoint. It can project a selected part of such a graph into Core v0. The consumer projection declares only Harness-specific metadata:
 
 ```yaml
 version: 1
@@ -122,8 +123,10 @@ questions: []
 Example invocation:
 
 ```sh
-python adapters/canonical_graph.py /path/to/project/docs/harness-core.yaml
+python -m harness.integration.adapters.canonical_graph /path/to/project/docs/harness-core.yaml
 ```
+Consumer v0 compatibility entrypoint: `python -m adapters.canonical_graph`.
+
 
 The emitted YAML is an ordinary Core v0 model and can be passed to `harness.py`. Projection metadata is integration metadata, not a second source of product/domain/architecture truth.
 

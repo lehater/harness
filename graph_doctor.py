@@ -9,14 +9,14 @@ from typing import Any
 
 import yaml
 
-from adapters.canonical_graph import project_model
+from harness.integration.adapters.canonical_graph import project_model
 from harness.project_model.engineering_graph import (
     derive_profile,
     evaluate_engineering_target,
     validate_engineering_graph,
 )
 from harness.project_model.core import CoreError, validate_model
-from integration_alignment import validate_project_alignment
+from harness.integration.integration_alignment import validate_project_alignment
 
 
 SEVERITY_ORDER = {"ERROR": 0, "WARN": 1, "INFO": 2}
