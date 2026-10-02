@@ -38,8 +38,8 @@ def load_binding(path: Path) -> dict[str, Any]:
         raise WrapperError("Harness binding version must be 1")
     if value.get("kind") != "harness-consumer-binding":
         raise WrapperError("unexpected Harness binding kind")
-    if value.get("consumer_api") not in ("v0", "v1"):
-        raise WrapperError("unsupported Harness consumer_api; expected v0 or v1")
+    if value.get("consumer_api") != "v1":
+        raise WrapperError("unsupported Harness consumer_api; expected v1")
 
     source = value.get("source")
     if not isinstance(source, dict) or set(source) != {"repository", "revision"}:
@@ -148,23 +148,22 @@ def _git_head(path: Path) -> str:
 
 
 def _pack_command(python: Path, root: Path, consumer_api: str) -> list[str]:
-    if consumer_api == "v1":
-        return [str(python), "-m", "harness.application.consumer_pack"]
-    tool = root / "consumer_pack.py"
-    if not tool.is_file():
-        raise WrapperError(f"Harness source/Pack has no consumer_pack.py: {root}")
-    return [str(python), str(tool)]
+    if consumer_api != "v1":
+        raise WrapperError("unsupported Harness consumer_api; expected v1")
+    return [str(python), "-m", "harness.application.consumer_pack"]
 
 
 def _api_selector(consumer_api: str) -> list[str]:
-    return ["--consumer-api", "v1"] if consumer_api == "v1" else []
+    if consumer_api != "v1":
+        raise WrapperError("unsupported Harness consumer_api; expected v1")
+    return ["--consumer-api", "v1"]
 
 
 def _validate_existing_pack(
     python: Path,
     pack: Path,
     revision: str,
-    consumer_api: str = "v0",
+    consumer_api: str = "v1",
 ) -> bool:
     try:
         subprocess.run(

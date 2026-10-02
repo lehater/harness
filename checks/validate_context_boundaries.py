@@ -63,8 +63,8 @@ def _validate_physical_layout(
     root_python = layout.get("root_python")
     if not isinstance(root_python, dict):
         raise SystemExit("root_python migration policy is required")
-    if root_python.get("policy") != "migration-ratchet":
-        raise SystemExit("root_python.policy must be migration-ratchet")
+    if root_python.get("policy") != "closed":
+        raise SystemExit("root_python.policy must be closed")
 
     baseline_values = root_python.get("migration_baseline_modules")
     exceptions_values = root_python.get("permanent_bootstrap_exceptions", [])
@@ -87,12 +87,8 @@ def _validate_physical_layout(
         raise SystemExit("context/application owners must be canonical harness.* or distribution.harnessw")
 
     tooling = set(tooling_values)
-    if tooling != {"scenario_suite", "scenario_drivers"}:
-        raise SystemExit("permanent consumer tooling is constrained to Consumer v0 Scenario Suite")
-    if tooling - ignored or tooling & set(owner) or tooling & facades:
-        raise SystemExit("consumer tooling must be ignored, non-owned and non-facade")
-    if any(not module.isidentifier() for module in tooling):
-        raise SystemExit("consumer tooling must be root Python modules")
+    if tooling:
+        raise SystemExit("root Python consumer tooling is forbidden after migration closure")
     baseline = set(baseline_values)
     exceptions = set(exceptions_values)
     overlap = sorted(baseline & exceptions)
@@ -123,7 +119,7 @@ def _validate_physical_layout(
     stale_exceptions = sorted(exceptions - actual)
     if unexpected:
         raise SystemExit(
-            "new root Python modules are forbidden during package migration: "
+            "new root Python modules are forbidden after migration closure: "
             f"{unexpected}"
         )
     if stale:
@@ -330,7 +326,7 @@ def _validate_runtime_import(
     owner: dict[str, str],
     aliases: dict[str, str],
 ) -> None:
-    if source not in owner and source not in {"scenario_suite", "scenario_drivers"}:
+    if source not in owner:
         return
     modules = []
     if isinstance(node, ast.ImportFrom) and not node.level:
@@ -436,13 +432,10 @@ def test_closed_root_guards(layout, contexts, owner, ignored, facades) -> None:
 
     actual = _root_python_modules()
     _validate_physical_layout(layout, contexts, owner, ignored, facades)
-    mutations = []
-    mutations.append((layout, owner, actual | {"random_root_implementation"}))
-    mutations.append((layout, {**owner, "scenario_suite": "application"}, actual))
-    mutations.append((layout, owner, actual - {"scenario_suite"}))
+    mutations = [(layout, owner, actual | {"random_root_implementation"})]
     for field, values in (
-        ("permanent_consumer_tooling_modules", ["scenario_suite", "scenario_suite", "scenario_drivers"]),
-        ("permanent_consumer_tooling_modules", ["scenario_suite", "scenario_drivers", "random_root_implementation"]),
+        ("permanent_consumer_tooling_modules", ["random_root_implementation"]),
+        ("permanent_bootstrap_exceptions", ["random_root_implementation"]),
         ("migration_baseline_modules", ["random_root_implementation"]),
     ):
         changed = deepcopy(layout)
@@ -456,42 +449,6 @@ def test_closed_root_guards(layout, contexts, owner, ignored, facades) -> None:
                 pass
             else:
                 raise AssertionError("closed root ratchet accepted mutation")
-
-
-def test_migration_equivalence(layout) -> None:
-    """Whole-module AST proof against reviewed 7e0b04d; reverse only allowed moves."""
-    import hashlib
-
-    expected = {
-        'experiments/authority_role_projection_experiment.py': '770cbb74e6b9dcfbec8bd036625dbb97bc107e730c4241177388ebfbc7b9bcff',
-        'experiments/concern_activation_experiment.py': 'b4cc7f6eeeb7c773d0eac2b857a3ccbe37ceadec531bdd7cdceef9e55308062e',
-        'experiments/coverage_control_loop_experiment.py': 'ab0e438109644ee246a449259c62ce95b757193921dafde2a7a7ec0c50babe85',
-        'experiments/coverage_derivation_experiment.py': '3e601ede7422bc1aa8ced47fed50d0fc14391e862c147cab5b953a0463d300f4',
-        'experiments/coverage_map_experiment.py': 'dc45992a408d82800b4396fedb0a962a6e4d53d9696b169dedc822298ea63fe8',
-        'experiments/coverage_planner_experiment.py': '9d2ea470a0c647ccb992679212b1e67889d94e112f477b2ba9312729f5c09900',
-        'experiments/lifecycle_experiment.py': '29a9f746c1d0fc7dbf6bd680b1194ea2b9d7bed7ffd5aa9682e95d487fd0e066',
-        'evals/behavioral_eval.py': '7a9fdc3e465991035bea1ec5eb062dac49e11ab89a550af5ba56149e61d48b0c',
-        'evals/live_calibration_process_driver.py': '8109a687d867ea66422de85d5d1d0354c819e327ec7472ee6362ce62fc1929e1',
-        'scenario_suite.py': '5794eeefd283fa45e75347bf829d978471580cf0cbb256ac3eb8019008d013a2',
-        'scenario_drivers.py': '0752e47c820f577709b8e6d6f63e5ec78b3ace1c5005db3eeceddaca029f0afd',
-        'adapters/copilot_behavioral_eval_agent.py': 'd4387c598ac3f22e1bf3894d43ee61bd96ff4c58ea8dc46098411e99b2e2d804',
-    }
-    reverse = {}
-    for legacy, entry in layout["compatibility"]["module_facades"].items():
-        reverse.setdefault(entry["target"], legacy)
-    reverse["harness.project_model.core"] = "harness"
-    for relative, digest in expected.items():
-        source = (ROOT / relative).read_text(encoding="utf-8")
-        if relative == "evals/behavioral_eval.py":
-            source = source.replace("Path(__file__).resolve().parents[1]", "Path(__file__).resolve().parent")
-        tree = ast.parse(source)
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom):
-                node.module = reverse.get(node.module, node.module)
-                if relative.startswith("experiments/") and node.level == 1:
-                    node.level = 0
-        actual = hashlib.sha256(ast.dump(tree).encode()).hexdigest()
-        assert actual == digest, f"migration changed implementation AST: {relative}"
 
 
 def main() -> int:
@@ -638,10 +595,6 @@ def main() -> int:
             return
         actual_violations.add((source, target))
 
-    for source in ("scenario_suite", "scenario_drivers"):
-        for node in ast.walk(ast.parse(_module_path(source).read_text(encoding="utf-8"))):
-            _validate_runtime_import(source, node, owner, aliases)
-
     for source in sorted(owner):
         path = _module_path(source)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -694,7 +647,6 @@ def main() -> int:
             print(f"- {source} -> {target}", file=sys.stderr)
         return 1
 
-    test_migration_equivalence(layout)
 
     print(
         "Harness bounded-context/repository-layout boundaries: PASS "

@@ -9,10 +9,8 @@ entry:
   method_registry: skills/consumer-method-registry-v0.yaml
   artifact_registry: skills/artifact-skill-registry-v0.yaml
 
-# Permanent Consumer test-orchestration tooling, not module facades.
-root_files:
-  - scenario_drivers.py
-  - scenario_suite.py
+# Consumer runtime is canonical package code only.
+root_files: []
 
 include_prefixes:
   - catalogs/
@@ -86,6 +84,8 @@ exact_files:
   - src/harness/application/method_router.py
   - src/harness/application/project_frontier.py
   - src/harness/application/project_publication.py
+  - src/harness/application/scenario_drivers.py
+  - src/harness/application/scenario_suite.py
   - src/harness/application/semantic_admission.py
   - src/harness/application/semantic_closure.py
   - src/harness/application/semantic_questions.py
