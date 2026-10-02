@@ -15,7 +15,7 @@ from typing import Any
 import yaml
 
 from harness.project_model.core import CoreError
-from scenario_drivers import get_driver
+from harness.application.scenario_drivers import get_driver
 
 
 class ScenarioError(CoreError):

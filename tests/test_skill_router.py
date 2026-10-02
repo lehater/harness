@@ -134,7 +134,7 @@ def main() -> int:
             effective_revision="validation-source",
         )
         exercise(pack, has_maintainer=False)
-        assert (pack / "skill_router.py").is_file()
+        assert (pack / "src/harness/application/skill_router.py").is_file()
 
     print("Typed Harness skill router validation passed")
     return 0

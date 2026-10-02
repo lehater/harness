@@ -43,10 +43,9 @@ __all__ = ['Any',
 REVISION_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 PACK_MANIFEST = "harness-consumer-pack.yaml"
 CONSUMER_PACK_DEFINITIONS = {
-    "v0": "spec/distribution/consumer-pack-v0.yaml",
     "v1": "spec/distribution/consumer-pack-v1.yaml",
 }
-DEFAULT_DEFINITION = CONSUMER_PACK_DEFINITIONS["v0"]
+DEFAULT_DEFINITION = CONSUMER_PACK_DEFINITIONS["v1"]
 DEFAULT_SURFACE_REGISTRY = "skills/skill-surface-registry-v0.yaml"
 
 
@@ -83,7 +82,7 @@ def _sha256(path: Path) -> str:
 
 def _definition_path(consumer_api: str) -> str:
     if not isinstance(consumer_api, str) or consumer_api not in CONSUMER_PACK_DEFINITIONS:
-        raise ConsumerPackError("unsupported consumer_api; expected v0 or v1")
+        raise ConsumerPackError("unsupported consumer_api; expected v1")
     return CONSUMER_PACK_DEFINITIONS[consumer_api]
 
 
@@ -311,7 +310,7 @@ def validate_pack(
     pack_root: str | Path,
     *,
     expected_revision: str | None = None,
-    expected_api: str = "v0",
+    expected_api: str = "v1",
 ) -> dict[str, Any]:
     _definition_path(expected_api)
     pack_root = Path(pack_root)
@@ -431,7 +430,7 @@ def materialize_pack(
     *,
     binding_revision: str,
     effective_revision: str | None = None,
-    consumer_api: str = "v0",
+    consumer_api: str = "v1",
 ) -> dict[str, Any]:
     source_root = Path(source_root).resolve()
     output_root = Path(output_root).resolve()
@@ -615,7 +614,7 @@ def main() -> int:
     sync.add_argument("--dev-source")
 
     for command in (validate_def, materialize, validate):
-        command.add_argument("--consumer-api", choices=CONSUMER_PACK_DEFINITIONS, default="v0")
+        command.add_argument("--consumer-api", choices=CONSUMER_PACK_DEFINITIONS, default="v1")
 
     args = parser.parse_args()
 

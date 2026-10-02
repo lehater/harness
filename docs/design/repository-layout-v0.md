@@ -1,682 +1,82 @@
 # Repository Layout v0
 
-Status: canonical; runtime and validation-code physical migrations closed.
+Status: canonical; physical migration closed.
 
 ## Purpose
 
-Define the physical repository structure that Harness converges toward after the
-logical bounded-context boundaries have been established.
+Harness runtime implementations live under `src/harness/**`. Repository-level
+validation, tests, evaluation infrastructure and research are physically separated
+from production runtime. Legacy root/dotted Python facades are removed.
 
-The repository already has a canonical semantic ownership map in
-`spec/architecture/harness-context-map-v0.yaml`. This contract makes physical
-Python packaging converge on that ownership instead of allowing the repository
-root to remain the implementation namespace.
+The machine-readable contract is
+`spec/architecture/repository-layout-v0.yaml`; bounded-context ownership is
+`spec/architecture/harness-context-map-v0.yaml`.
 
-## Problem
-
-Before the package migration, Harness kept runtime modules directly in the repository root.
-That makes the root simultaneously act as:
-
-- the repository control surface;
-- the Python import namespace;
-- the application/orchestration layer;
-- several bounded contexts;
-- experiment/evaluation infrastructure.
-
-Logical context ownership is already enforced, so the flat physical layout no
-longer communicates the architecture that the dependency ratchet protects.
-
-## Target runtime layout
-
-The target runtime package is:
+## Canonical layout
 
 ```text
-src/harness/
-  project_model/
-  reference_model/
-  coverage/
-  assurance/
-  decision/
-  evidence/
-  integration/
-  workspace/
-  application/
+src/harness/       production runtime and application orchestration
+checks/            repository, architecture and CI policy checks
+tests/             behavioral, regression, integration and acceptance tests
+evals/             evaluation runners and provider adapters
+experiments/       research implementations
+distribution/      standalone bootstrap transport
+spec/              machine-readable contracts
+docs/              design/research/audit documentation
+skills/            agent procedures and routing registries
 ```
 
-Package names are a physical projection of the existing bounded contexts. They
-do not create new domain ownership and must not become a second context map.
+Root Python modules are forbidden. `root_python.migration_baseline_modules`,
+`permanent_bootstrap_exceptions` and `permanent_consumer_tooling_modules`
+must remain empty.
 
-The machine-readable mapping is
-`spec/architecture/repository-layout-v0.yaml`.
+## Source-tree package bridge
 
-## Repository surfaces
+The repository is intentionally executable without installing Harness as a
+package. `harness/__init__.py` supplies the package search path into
+`src/harness`; `src/harness/**` remains the only runtime implementation owner.
+The bridge is package wiring, not a second runtime implementation.
 
-The intended top-level responsibilities are:
+## Runtime ownership
 
-```text
-src/harness/**     production/runtime Python
-tests/**           behavior verification
-checks/**          repository/architecture/CI policy checks
-evals/**           provider/agent evaluation infrastructure
-experiments/**     non-production research code
-spec/**            machine-readable contracts and fixtures
-skills/**          routed agent procedures and registries
-docs/**            human-readable canonical/design/research material
-examples/**        controlled example projects/fixtures
-distribution/**    bootstrap/distribution transport
-.github/**         repository automation
-```
+Each owned runtime module belongs to exactly one bounded context or the
+Application layer. Cross-context dependencies follow
+`spec/architecture/harness-context-map-v0.yaml`; selected published symbol
+boundaries are documented in
+`docs/design/context-published-contracts-v0.md`.
 
-These are responsibility boundaries, not a requirement to create every
-directory before it has content.
+`checks/validate_context_boundaries.py` enforces:
 
-## Root Python migration ratchet
+- complete context ownership;
+- canonical package placement;
+- dependency direction and published boundaries;
+- a closed root Python namespace;
+- absence of undeclared runtime packages.
 
-The runtime implementation baseline is closed: `migration_baseline_modules: []`.
-The architecture validator enforces:
+## Distribution
 
-1. root Python modules must be declared compatibility facades, the constrained
-   Consumer v0 Scenario tooling pair, or explicit bootstrap exceptions;
-2. declared tooling must exist, be ignored by context ownership, and be neither
-   a context owner nor a compatibility facade; duplicates are invalid;
-3. all context/Application owners are canonical `harness.*` implementations or
-   the explicit standalone `distribution.harnessw` transport;
-4. the target package mapping covers every bounded context/application layer.
+Consumer distribution is canonical-only:
 
-Bootstrap exceptions remain empty and separate from Consumer tooling.
-Experiments and evaluation implementations cannot return to the root.
+- `consumer_api: v1`;
+- `spec/distribution/consumer-pack-v1.yaml`;
+- `spec/distribution/consumer-binding-example-v1.json`;
+- `spec/distribution/target-agents-fragment-v1.md`;
+- `distribution/harnessw.py`.
 
-## Migration rules
+The Consumer Pack contains canonical `harness.*` modules. It does not contain
+root module facades or a top-level `adapters/` tree.
 
-Physical moves must preserve these invariants:
+Scenario execution is owned by
+`harness.application.scenario_suite` and
+`harness.application.scenario_drivers`.
 
-- no Harness domain semantics change merely because a module moves;
-- the canonical context map remains the owner of semantic boundaries and
-  dependency direction;
-- each move uses the destination package assigned to that context;
-- import-boundary validation remains green after every migration step;
-- Consumer Pack/bootstrap compatibility is preserved explicitly rather than by
-  keeping arbitrary implementation modules in the root;
-- experiments/evaluations are separated from production runtime only after
-  their actual consumer/runtime role is established.
+Provider-backed behavioral evaluation is infrastructure under
+`evals/adapters/copilot_behavioral_eval_agent.py` and is not part of the
+Consumer Pack.
 
-Cross-context published contracts are canonicalized in
-`docs/design/context-published-contracts-v0.md` and machine-enforced by the
-bounded-context validator. Package moves must preserve those contracts rather
-than reintroducing representation coupling through new import paths.
+## Closure invariant
 
-## Migration order
-
-Use dependency direction to minimize temporary compatibility surfaces:
-
-1. package/project metadata and the root-module ratchet;
-2. leaf contexts: Project Model, Evidence, Decision;
-3. Reference Model, Assurance, Integration;
-4. Coverage and Workspace;
-5. Application Layer;
-6. experiment/evaluation separation;
-7. test/check physical classification;
-8. Consumer Pack path-decoupling and compatibility cleanup.
-
-Each implementation step is a separate branch/PR from the current integrated
-`main`, with the full deterministic gate run before integration.
-
-## Python project metadata
-
-`pyproject.toml` is the repository-level dependency/tooling declaration.
-Harness remains a non-packaged uv project (`tool.uv.package = false`) during
-the completed Project Model bootstrap. The explicit source-tree bridge supplies packaged
-imports without installation. Installation and removal of the bridge require
-a separate packaging/execution-policy change.
-
-PyYAML is pinned to the same 6.0.3 version already required by the clean-target
-wrapper. CI execution remains unchanged in this step. Lockfile adoption and a
-switch to frozen uv-based CI execution are a separate execution-policy change
-and must be validated independently rather than bundled into the layout
-foundation.
-
-## Project Model bootstrap migration decision
-
-The first slice moves only Core into `src/harness/project_model/core.py`.
-The second slice moves Target State into
-`src/harness/project_model/target_state.py`, importing Core directly with `.core`;
-root `target_state.py` delegates imports and CLI execution to that canonical owner.
-The third slice moves Engineering Graph into
-`src/harness/project_model/engineering_graph.py`, importing `.core` and `.target_state`
-directly. Root `engineering_graph.py` uses the same module/CLI facade grammar.
-The published Integration boundary names `harness.project_model.engineering_graph`;
-legacy imports are normalized to that canonical identity before symbol checks.
-
-The migration surfaces are distinct:
-
-- `src/harness/project_model/core.py` is the only canonical Core implementation,
-  owned as `harness.project_model.core` by Project Model;
-- `harness/__init__.py` is a temporary source-tree import bridge: it sets only
-  the package `__path__` to repository-relative `src/harness` and re-exports Core;
-- `harness.py` is only the legacy CLI facade, delegating to canonical `main`.
-
-Python resolves `import harness` to the adjacent package, not to the CLI file.
-Both package initializers re-export the same canonical Core `__all__`; there
-are no independent export lists or duplicate classes/functions. Canonical
-`src/harness/__init__.py` has no required initialization that the bridge skips.
-No global `sys.path`, `PYTHONPATH`, dynamic file loader or implementation copy
-is involved.
-
-Decision: retain this finite bridge while source-tree/Consumer Pack execution
-has no Harness installation prerequisite. Installation alone cannot solve the
-root `harness.py` name collision. A root implementation package would add a
-second physical move. The explicit bridge preserves current execution with one
-canonical implementation and can be removed when consumers and distribution
-adopt installed-package execution.
-
-`compatibility.import_aliases` maps each legacy import name to a canonical
-`target` and its `bridge` path. `compatibility.cli_facades` maps each legacy root
-CLI file to its canonical `target`. These are migration state, never context
-owners or permanent bootstrap exceptions. The first supported import-bridge
-shape is the root `harness` package. `compatibility.module_facades` maps a legacy
-dotted Python module identity to its canonical `target` and explicit `mode`, separately from package
-bridges. The shared closed grammar supports `import-only` (canonical symbols and
-`__all__` re-exports) and `import-and-cli` (the same exports plus canonical `main`
-and execution under the `__main__` guard). Unknown modes, extra fields and any
-implementation are rejected. Every dotted component must be a Python identifier;
-the physical file is mechanically derived by replacing dots with slashes and
-appending `.py` (for example, `foo.bar.baz` maps to `foo/bar/baz.py`).
-Nested facades are excluded from runtime semantic ownership; the root migration
-ratchet considers only root files. Exact dotted aliases normalize to their
-canonical targets, and owned runtime imports may not use them, including
-`from foo import bar` when `foo.bar` is an alias. These files are tracked separately from the
-implementation migration baseline.
-
-The architecture validator discovers non-initializer modules under `src/harness`,
-checks their context package, normalizes exact import aliases before dependency,
-published-symbol and shared-kernel checks, and validates declared migration
-files against a closed delegation grammar. Classes, production functions,
-extra execution and path manipulation outside that grammar are rejected.
-Packaged initializers carry only declared re-exports or documentation; they
-are not independent semantic modules. Relative module imports are checked too.
-
-Consumer Pack v0 explicitly includes the three canonical Project Model modules
-(`core.py`, `target_state.py`, `engineering_graph.py`), their package initializers
-and the temporary source-tree import bridge. The root `harness.py` CLI facade
-and `target_state.py` / `engineering_graph.py` import/CLI facades remain in the
-pack. Its acceptance validator runs canonical and legacy imports, identity checks
-and CLI execution in a materialized pack without checkout `PYTHONPATH`; root
-import-closure analysis alone does not prove packaged dependency closure.
-Existing Core, Target State and Engineering Graph acceptance checks protect
-HA-A01/HA-A03; isolated pack execution protects HA-A18 (TD-DIST-001/002).
-
-Accepted provider-run bindings include the old Core document and, for several
-runs, the root implementation. This move makes 12 previously active evidence
-entries from five runs stale under the existing assurance contract. Their
-original hashes/outcomes remain historical; deterministic migration checks do
-not replace provider judgement evidence or establish a refreshed release claim.
-
-## Reference Model package migration decision
-
-The next coherent slice moves the complete `reference-model` context into
-`src/harness/reference_model/`: `project_status.py`, `reference_materializer.py`
-and `reference_model_evolution.py`. Only their `harness.reference_model.*`
-identities own semantics in the context map. Production function bodies remain
-unchanged; explicit `__all__` lists preserve the previous public import surface,
-including previously re-exported imports, so legacy and canonical objects have
-identical identity.
-
-Root `project_status.py` and `reference_materializer.py` use `import-and-cli`;
-root `reference_model_evolution.py` uses `import-only` and gains no CLI. Existing
-Target State and Engineering Graph facades use `import-and-cli`. All five use
-the same closed grammar, without filename-specific validation rules.
-
-Reference Materializer imports `CoreError` and `validate_engineering_graph` from
-canonical Project Model modules. The existing Reference Model -> Project Model
-direction permits this dependency and has no separate published-symbol boundary;
-no additional DTO or symbol contract is required. Reference Model remains a
-supporting/research surface, with no new project-truth or completeness authority.
-
-Consumer Pack v0 adds only the four exact Reference Model package files and keeps
-all three root compatibility files. TD-DIST-001/002 evidence extends isolated
-pack execution with both import surfaces, all exported-object identities,
-Project Status bootstrap/status, Reference Materializer validate/materialize,
-and the absence of an evolution CLI. Facade mutation checks reject implementation
-and mismatched import-only/import-and-cli grammars at TL1. Existing Reference
-Model validators continue to exercise semantics through legacy imports.
-
-No changed file belongs to an existing provider-run execution binding. Under
-AR-M11, this slice does not invalidate additional judgement evidence; historical
-hashes and existing stale classifications remain unchanged. No provider run is
-performed. Existing CI paths already include `src/harness/**`, and the full gate
-has no path filter, so no execution-policy change is needed.
-
-## Evidence package migration decision
-
-The complete `evidence` context moves to `src/harness/evidence/`:
-`source_boundary.py`, `source_coverage.py` and `source_set.py`. Only their
-`harness.evidence.*` identities own semantics; all three root files become
-`import-and-cli` facades under the existing closed grammar and leave the root
-implementation baseline. No other context moves.
-
-Production function bodies remain unchanged. Explicit `__all__` lists preserve
-all previously available public names, including imported names; canonical and
-legacy symbols have identical object identity. Each module imports `CoreError`
-from `harness.project_model.core` using the existing shared-kernel permission.
-Evidence keeps an empty `may_depend_on` list and gains no published boundary.
-
-Consumer Pack v0 keeps the three root files and adds only the four exact Evidence
-package files. Existing TD-DIST-001/002 isolated execution evidence covers all
-three canonical/legacy imports, every exported-object identity and all three
-legacy CLIs without checkout `PYTHONPATH`. Existing facade mutation checks
-reject implementation. Source Coverage acceptance and Source Boundary/Source Set
-Scenario Suite drivers continue to exercise legacy imports.
-
-No changed file belongs to a provider-run execution binding. AR-M11 therefore
-preserves existing evidence currentness; historical hashes and classifications
-remain unchanged and no provider run is performed. Existing CI filters cover
-`src/harness/**` and the final gate has no path filter; execution policy and check
-inventory remain unchanged.
-
-## Decision package migration decision
-
-Architecture decision record: ADR-DECISION-PACKAGE-V0 (accepted).
-
-The root implementation namespace obscured the already enforced Decision
-ownership boundary. Following the existing Project Model, Reference Model and
-Evidence mechanism, the complete `decision` context moves in one coherent slice
-into `src/harness/decision/`. Its four canonical modules are:
-
-- `harness.decision.decision_execution_assurance`;
-- `harness.decision.decision_exploration`;
-- `harness.decision.decision_explorer_contract`;
-- `harness.decision.decision_governance`.
-
-All four root files remain temporary `import-only` facades under the existing
-closed grammar; none gains a CLI. Explicit canonical `__all__` lists preserve
-the observed legacy public surface, including imported names. Function/class
-bodies remain unchanged, and every exported legacy object and `__all__` shares
-canonical identity. Exploration imports the Explorer contract directly inside
-the canonical package. Application and Scenario Suite consumers retain their
-legacy imports, normalized by the existing compatibility registry.
-
-Decision retains `may_depend_on: []`. `CoreError` imports use canonical
-`harness.project_model.core` under the existing shared-kernel permission; no
-published boundary, new bridge or installed-package execution is introduced.
-The temporary source-tree bridge and `tool.uv.package = false` remain unchanged.
-
-Consumer Pack `consumer_api: v0` retains the four root facades and adds exactly
-the four canonical modules plus `src/harness/decision/__init__.py` through
-`exact_files`, without expanding prefixes. Existing TD-DIST-001/002 evidence
-extends isolated-pack checks with the frozen pre-move public surfaces, all
-exported-object and `__all__` identities, canonical file locations, shared-kernel
-identity, absence of CLI entrypoints and existing Decision scenarios through
-distributed Application consumers. The subprocess removes checkout `PYTHONPATH`
-and requires no installed Harness package. TL0/TL1 facade grammar/normalization
-checks and existing Decision admission/governance/scenario evidence protect the
-physical migration; no duplicate semantic tests or provider judgement are needed.
-
-All seven provider-run records under `spec/assurance/evidence/**` were checked
-against the four moved files and the complete changed-file set. No changed file
-belongs to an execution binding. Under AR-M11, no additional evidence becomes
-stale; historical hashes, outcomes and existing stale classifications remain
-unchanged. No provider run is performed.
-
-## Evidence
-
-This migration target is enforced at TL0 by
-`checks/validate_context_boundaries.py`, which now validates both the
-semantic context map and the physical-layout migration ratchet.
-
-Every coherent migration candidate must also pass the existing full
-`make harness-check` gate before integration.
-
-## Non-goals
-
-This contract does not:
-
-- introduce new Harness bounded contexts;
-- change Core entities or engineering semantics;
-- require a repository-wide module move in one PR;
-- convert all validators to a new test framework;
-- change Consumer Pack API/version semantics;
-- define a published Python package/release version.
-
-## Coverage package migration decision
-
-The complete `coverage` context migrates in one coherent slice to
-`src/harness/coverage/`: `architecture_driver_closure.py`,
-`concern_activation.py`, `coverage_obligations.py`, `coverage_planner.py` and
-`engineering_coverage.py`. Only their `harness.coverage.*` identities own
-semantics. Root Architecture Driver Closure and Coverage Obligations use
-`import-only`; Concern Activation, Coverage Planner and Engineering Coverage
-use `import-and-cli`. These reuse the existing closed facade grammar and
-source-tree bridge; no new packaging or execution mechanism is introduced.
-
-Explicit `__all__` freezes each pre-move public surface, including imported
-names. Production function/class ASTs are independently equivalent to the
-reviewed baseline. Engineering Coverage's module-level `ROOT` is adjusted to
-preserve repository-relative policy lookup after relocation. Internal Coverage
-imports are relative; Project Model imports use canonical Core and Engineering
-Graph identities. Coverage retains only the `project-model` and `assurance`
-dependency directions.
-
-The existing Coverage -> Assurance published boundary remains exactly
-`harness.assurance.semantic_acceptance.coverage_assurance_view` and
-`harness.assurance.semantic_acceptance.coverage_invalidation_closure`. Canonical
-Coverage imports the migrated Assurance implementation with exactly those
-published symbols. No Assurance implementation is copied and no new DTO/API is
-introduced.
-
-Consumer Pack v0 retains all five root facades and adds exactly the Coverage
-initializer plus the five implementation files through `exact_files`.
-TD-DIST-001/002 isolated-pack evidence checks frozen exports, object identity,
-canonical locations, CLI presence/absence, canonical Project Model identity,
-relative internal imports and policy lookup without checkout `PYTHONPATH` or an
-installed Harness package. Fresh CLI processes exercise all three existing CLIs
-with distributed research fixtures. Published-boundary mutation checks reject
-broad Assurance access and non-published symbols from canonical Coverage;
-existing facade grammar mutations and alias normalization remain enforced.
-Existing HA-A06 validators and Scenario Suite cases retain legacy imports and
-protect the same semantic behavior.
-
-Repository-wide consumer discovery classified internal Coverage imports,
-Application (`coverage_application`, `project_frontier`), Scenario Suite
-(`scenario_drivers`), validators/tests, experiments/research, docs/spec and
-Consumer Pack declarations. Only internal dependencies and ownership/distribution
-contracts change; neighboring consumers retain compatibility imports. Two validators that directly
-exercise private helpers import those helpers from canonical Coverage while
-public semantic checks retain the compatibility surface. Historical
-audit/research prose is preserved. Assurance execution bindings contain no
-Coverage consumer match and no changed-file intersection.
-
-All seven provider evidence records and their 76 `execution_bindings.files`
-entries were compared with the complete changed-file set, including validators,
-contracts and documentation. There is no intersection: AR-M11 introduces no
-additional staleness. Historical hashes, outcomes and currentness classifications
-remain unchanged; no provider judgement run is performed. Deterministic migration
-evidence does not substitute for provider judgement.
-
-## Workspace package migration decision
-
-Architecture decision record: ADR-WORKSPACE-PACKAGE-V0 (accepted).
-
-The complete `workspace` context moves as one coherent slice into
-`src/harness/workspace/`: `frontend_interface_knowledge.py`,
-`frontend_screen_contracts.py`, `human_projection.py` and `workspace.py`.
-Their four `harness.workspace.*` identities alone own implementation semantics.
-The initializer is documentation-only. Root frontend modules use `import-only`;
-Human Projection and Workspace use `import-and-cli`, preserving their existing
-CLIs through the same closed facade grammar used by earlier migrations.
-No new bridge or installed-package execution is introduced; the existing
-source-tree bridge and `tool.uv.package = false` remain unchanged.
-
-Explicit `__all__` preserves the observed pre-move public names, including
-imported names. Legacy/canonical export objects and `__all__` share identity.
-Consumer Pack validation freezes those surfaces and whole-module AST digests
-from reviewed baseline `725f37754b1040c74ed48ead9758e4767ee31f50`.
-Reversing only canonical Project Model import normalization and removing
-`__all__` reproduces those digests, independently proving function/class and
-module equivalence; no path adaptation or semantic redesign is needed.
-Human Projection imports canonical Core and Engineering Graph; Workspace imports
-canonical Core and Target State rather than their compatibility aliases.
-
-Workspace retains exactly `may_depend_on: [project-model, integration]`.
-Human Projection imports only `validate_project_alignment` from canonical
-`harness.integration.integration_alignment`. This is the existing ordinary
-Workspace -> Integration direction, with no new published boundary or copied
-Integration semantics.
-Ownership/alias assertions and forbidden Application/Coverage/Assurance import
-mutations exercise the existing context validator; isolated-pack identity
-checks bind alignment to the actual Integration implementation.
-
-Consumer Pack retains `consumer_api: v0` and all four root facades. Only the
-Workspace initializer and four canonical modules are added through `exact_files`;
-`include_prefixes` is unchanged. Reused TD-DIST-001/002 evidence checks frozen
-exports, canonical paths, CLI presence/absence, canonical Project Model identity,
-import direction and full-module AST equivalence in a materialized pack without
-checkout `PYTHONPATH` or an installed Harness package. Fresh processes run
-Workspace validate/render against the managed fixture and Human Projection
-compile against the existing unified-model/recipe fixtures. The distributed
-managed-workspace scenario checks composition; frontend scenarios requiring
-`examples/` run in the checkout without expanding the distribution.
-Existing HA-A17 frontend/workspace/human-projection validators and Scenario Suite
-continue to protect behavior; existing facade grammar mutations protect delegation.
-
-Repository-wide search classified Workspace internal consumers (no internal
-module imports), Application/Integration (no direct Workspace imports), Scenario
-Suite (`scenario_drivers`), validators/tests, skills, docs/spec, Consumer Pack and
-assurance bindings. Skills retain their managed-workspace/frontend/projection
-procedures and legacy CLI entrypoints. Neighboring public consumers retain legacy
-imports. Only the deep-dependency validator's private `_task_rows` import moves
-to canonical Workspace, because private names are outside `import *` exports.
-Historical audit/research documents remain unchanged.
-
-All seven provider-run records under `spec/assurance/evidence/**` and every
-`execution_bindings.files` list were compared with the complete PR changed-file
-set. There are no intersections. Under AR-M11 this slice introduces no additional
-staleness; historical hashes, outcomes and currentness classifications remain
-unchanged. No provider judgement run is performed. There is no scope deviation.
-
-## Runtime canonical-import normalization
-
-Architecture decision (ADR): compatibility facades are no longer an internal
-runtime dependency mechanism. Modules owned by `contexts.*.modules` in the
-canonical context map must import migrated contexts through their canonical
-identities. The architecture validator rejects exact compatibility aliases for
-both `from ... import ...` and `import ...`, before the existing dependency and
-published-symbol checks. Unmigrated root identities remain canonical; context
-ownership, dependency directions and published boundaries are unchanged.
-
-Internal migration compatibility and public Consumer API compatibility have
-different lifetimes. `repository-layout-v0.yaml` owns the transitional alias
-mapping under `compatibility`; `consumer-pack-v0.yaml` owns distribution and
-public exposure through `root_files`, `exact_files` and `consumer_api: v0`.
-No duplicate compatibility registry is introduced. Existing import/CLI facades
-and the source-tree bridge remain unchanged because Consumer Pack v0 exposes
-them. Facade removal is deferred to an explicit Consumer API compatibility
-decision. Validators, tests, ignored research/scenario modules and external
-consumers may continue exercising legacy surfaces.
-
-Evidence uses TL0/TL1 exact-alias mutation/control checks and existing
-TD-DIST-001/002 isolated Consumer Pack import, identity and CLI checks (HA-A18).
-All 85 objects imported by the 40 normalized runtime imports were checked for
-identity against their canonical re-exports. Production bodies, signatures and
-CLI behavior are unchanged. The Workspace forbidden-dependency mutation uses
-the canonical Coverage identity so it continues testing dependency direction
-rather than being intercepted by the new alias guard.
-
-All seven provider-run records under `spec/assurance/evidence/**` and every
-`execution_bindings.files` list were compared with the complete changed-file
-set. Four records intersect at `skill_router.py`: first-wave runs 36942421201
-and 36947887869, TL4 existing-project run 36949909315, and TL5 known-project run
-36952038645. All seven records were already stale on the base revision. Binding
-intersection exists, but there is no new current -> stale transition. Historical
-hashes, outcomes and currentness classifications remain unchanged. This
-mechanical import normalization requires deterministic assurance only; no
-provider judgement run or refreshed judgement claim is introduced.
-
-
-## Integration and Assurance package migration decision
-
-Architecture decision record: ADR-INTEGRATION-ASSURANCE-PACKAGE-V0.
-Status: accepted.
-
-Nested compatibility modules preserve import identity and module CLI identity,
-not direct filesystem-script execution. `import adapters.foo` and
-`python -m adapters.foo` remain compatibility surfaces. `python adapters/foo.py`
-depends on filesystem layout and is intentionally unsupported after migration.
-Facades retain the existing closed grammar without path bootstrapping.
-Canonical nested CLIs use `python -m harness.integration.adapters.canonical_graph`
-and `python -m harness.assurance.adapters.copilot_live_calibration_evaluator`.
-Consumer v0 retains the corresponding legacy dotted module entrypoints.
-The distribution manifest promises included files and import identities, not
-direct nested file execution; no Consumer API bump is required.
-
-The existing context map owns the Integration and Assurance boundaries, but
-physical implementations still occupied root and adapter namespaces. One
-coherent migration moves all three Integration and nine Assurance modules into
-`src/harness/integration/` and `src/harness/assurance/`, including their respective
-`adapters/` packages. Initializers contain documentation only. Context ownership
-uses canonical identities exclusively, with unchanged dependency directions and
-an empty known-violation ratchet.
-
-The existing `compatibility.module_facades` mechanism generalizes to dotted
-identities. Both legacy adapter paths are mechanically located and checked
-against the same delegation grammar as root facades. There is no second facade
-registry or filename-specific ownership rule. Nested aliases are excluded from
-the semantic inventory; root implementation baseline entries are removed only
-for the ten migrated root files.
-
-All owned runtime consumers use canonical imports. Integration retains its
-published Project Model symbol boundary. Coverage uses only the two existing
-published Assurance symbols under their canonical module identity; neither
-boundary widens. Assurance internally uses canonical identities, with no new
-dependency. Application remained physically unchanged in that slice; its subsequent migration is recorded below.
-
-Explicit `__all__` freezes the pre-move public surfaces from `d28f4cc`, including
-imported public names and the private adapter helpers already imported by
-acceptance validators. Every legacy export and export list shares canonical
-object identity. Whole-module AST fingerprints reverse only approved imports
-and remove the explicit export assignment, proving unchanged module logic,
-function/class bodies and CLI guards. No repository-relative adaptation is
-needed by these twelve implementations.
-
-Consumer API remains v0. Root files and the `adapters/` include prefix stay in
-the Pack; sixteen canonical files are added through `exact_files`. Reused
-TD-DIST-001/002 evidence checks canonical locations, frozen surfaces, identity,
-owned import discipline, published boundaries and nested facade mutations in
-an isolated Pack without checkout `PYTHONPATH` or package installation.
-
-Evidence scope: HA-A17 ownership/projection, HA-A18 distribution compatibility,
-and unchanged HA-A12/A14/A20 deterministic semantic/currentness/calibration
-behavior. Existing subsystem fixtures and the full Scenario Suite are reused;
-new TL1 mutations target only facade metadata, closed grammar and import rules.
-The entire changed-file set is compared with all provider execution bindings;
-intersection is empty for all seven execution-bound provider records:
-`first-wave-provider-run-36928079710`, `first-wave-provider-run-36942421201`,
-`first-wave-provider-run-36947887869`, `tl4-existing-project-provider-run-36949909315`,
-`tl5-known-project-provider-run-36952038645`,
-`release-critical-formation-provider-run-36953091767`, and
-`a04-r02-provider-run-36953433978`. This includes the changed
-`.github/workflows/live-calibration-copilot.yml`, which none of those bindings
-contains. All seven were already stale; there is no new currentness transition.
-Historical results, hashes and existing stale states remain
-unchanged. This physical migration makes no new provider-judgement claim and
-requires no provider run.
-
-
-## Application package migration decision
-
-Architecture decision record: ADR-APPLICATION-PACKAGE-V0.
-Status: accepted.
-
-The fifteen ordinary Application runtime modules move together into
-`src/harness/application/`: `agent_router`, `authority_context`, `consumer_pack`,
-`coverage_application`, `decision_explorer_request`, `decision_pipeline`,
-`graph_doctor`, `method_router`, `project_frontier`, `project_publication`,
-`semantic_admission`, `semantic_closure`, `semantic_questions`,
-`skill_invariant_policy` and `skill_router`. Their `harness.application.*`
-identities own implementation; the initializer contains only a docstring.
-Same-layer imports become relative. Existing cross-context dependencies and
-published boundaries stay unchanged. The root migration baseline now contains
-only ignored research, experiments, scenarios and evaluation infrastructure.
-
-All fifteen root files remain Consumer API v0 facades under the existing closed
-grammar. Publication, Questions and Skill Invariant Policy are import-only;
-the other twelve preserve their existing CLIs. In particular `consumer_pack.py`
-remains the wrapper's checkout and Pack entrypoint, and `skill_router.py` remains
-the Pack CLI. There is no Consumer API bump, new bootstrap logic, include-prefix
-expansion or installed-package requirement. Sixteen canonical Application files
-are exported through `exact_files`.
-
-`distribution.harnessw` deliberately remains the standalone stdlib-only bootstrap
-transport, outside the materialized Pack. It imports no Harness implementation.
-The preserved clean-target chain is standalone wrapper -> checkout root
-`consumer_pack.py` facade -> canonical Consumer Pack implementation -> materialized
-Pack -> root `skill_router.py` facade -> canonical Skill Router implementation.
-
-Frozen public namespaces and whole-module AST hashes from
-`1e67fdfadfde23148af72c73f2307ee7cbb7ab90` are checked in the isolated Pack.
-Legacy and canonical `__all__` lists and every exported object share identity.
-Reversing only relative Application imports, explicit exports and
-`Path(__file__).resolve().parents[3]` root adaptations restores each baseline
-AST, except for the explicitly approved cache-validation exception below.
-The five path-sensitive modules continue resolving repository/Pack-local
-skills, registries, spec and docs; production bodies are otherwise unchanged.
-
-Evidence reuses HA-A18 TD-DIST-001/002 (isolated Pack and clean-target wrapper),
-HA-A16 routing validators, HA-A12/13 semantic admission/Questions/closure and
-HA-A15 frontier/publication composition. Existing Scenario Suite evidence and
-the full deterministic gate protect behavior. TL1 mutations from canonical
-Application reject root `agent_router`, `skill_router` and `semantic_admission`
-imports using the existing ownership ratchet; owned runtime alias imports are
-zero. Validators/scenarios retain legacy imports as compatibility evidence.
-
-The complete changed-file set is compared with every provider execution binding
-under `spec/assurance/evidence/**`. Four records intersect at `skill_router.py`:
-first-wave runs 36942421201 and 36947887869, TL4 existing-project run 36949909315
-and TL5 known-project run 36952038645. All seven execution-bound records were
-already stale on the base. Binding intersection: yes; new current -> stale
-transition: no. Historical hashes, outcomes and currentness are preserved.
-This mechanical migration requires deterministic evidence; no provider run or
-new provider judgement claim is introduced.
-
-
-### Approved bytecode-cache compatibility exception
-
-The operator explicitly authorized this exception after committed-head CI
-exposed a cold bootstrap failure: importing the root Consumer Pack facade
-creates `__pycache__/*.pyc` before the Pack validates its own file set. The old
-standalone implementation generated no local bytecode during that validation.
-A pre-commit wrapper run cloned the unmigrated base and could not expose this
-failure; wrapper acceptance must also run against the committed candidate.
-
-`validate_pack()` now excludes only `.pyc` files within `__pycache__` directories
-from the untracked-file comparison. Manifested files still require existence
-and matching hashes, including any explicitly manifested cache file. Ordinary
-extra files, `.pyc` outside cache directories and non-bytecode files inside them
-remain invalid. Wrapper and facade grammar stay unchanged. This is the only
-production-body exception to whole-module baseline equivalence and is reversed
-explicitly by the AST proof. A fresh isolated Consumer Pack CLI uses default bytecode
-behavior; focused mutations protect the remaining exact-file-set contract.
-
-## Runtime physical migration closure
-
-Architecture decision record: ADR-RUNTIME-PHYSICAL-MIGRATION-CLOSURE-V0.
-Status: accepted.
-
-All bounded-context/Application implementations are under `src/harness/**`;
-`distribution/harnessw.py` remains the explicit standalone bootstrap transport.
-`root_python.migration_baseline_modules` is empty and must remain empty.
-Seven research implementations live under `experiments/**`, invoked with
-`python -m experiments.<module>`. Evaluation infrastructure moved in this tranche
-lives under `evals/**`, with canonical runner `python -m evals.behavioral_eval`
-and optional driver `evals.live_calibration_process_driver`. Neither package
-owns production semantics or belongs to the Consumer Pack.
-
-`scenario_suite.py` and `scenario_drivers.py` remain explicit Consumer v0 root
-test-orchestration tooling. The single `permanent_consumer_tooling_modules`
-classification is constrained to these two ignored, non-owned, non-facade root
-modules. Missing declarations/files, duplicates, owner overlap and undeclared
-root modules fail validation. Bootstrap exceptions remain separately empty.
-Scenario production imports are canonical and mechanically guarded.
-
-Compatibility facades remain solely for Consumer v0 compatibility. Their
-retirement requires an explicit Consumer API compatibility decision. Consumer
-API v0, Pack membership and wrapper transport are preserved. Test/check physical
-migration and distribution cleanup remain separate work.
-
-Evidence: HA-A17 ownership TL0/TL1 root/classification mutations; HA-A18 existing
-TD-DIST-001/002 Consumer Pack and wrapper checks. Whole-module AST fingerprints
-against reviewed base `7e0b04d6448ca5b6c3043045bc15ac0b2fa1b8cf` reverse only
-canonical/package import normalization and the moved evaluation runner's root
-lookup. They cover all nine moved modules, both Scenario modules and the
-behavioral provider adapter. No implementation redesign is permitted.
-
-Closing audit: the behavioral provider adapter remains distributed by the
-`adapters/` prefix, although it is evaluation infrastructure; distribution
-cleanup is deferred to explicit Consumer Pack compatibility review. Its physical
-relocation and executable-path transport decision are deferred. Existing adapter
-path wiring is preserved; no new path bootstrap is introduced.
-
-All seven historical execution-bound provider records intersect this tranche at
-`behavioral_eval.py` and `adapters/copilot_behavioral_eval_agent.py`. All were
-already stale on the base; no new current-to-stale transition occurs. Historical
-paths, hashes and outcomes remain immutable. Current assurance bindings point
-to the relocated runner for future runs. No provider runs are executed.
+A repository change that reintroduces a root `*.py` runtime module, an
+undeclared runtime module, a retired Consumer API identity, or a top-level
+legacy adapter implementation is a layout regression rather than a compatibility
+extension.

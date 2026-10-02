@@ -282,12 +282,15 @@ The next concrete work is:
 6. ensure inactive/maintainer skills are not visible through Consumer discovery.
 
 
-## Concrete v0 distribution contract
+## Concrete distribution contract
 
-`docs/design/harness-consumer-pack-v0.md`,
-`docs/design/harness-consumer-wrapper-v0.md` and
-`spec/distribution/consumer-pack-v0.yaml` define the first executable
-realization of this decision. `python -m harness.application.consumer_pack` materializes and validates the pack. The standard-library `distribution/harnessw.py` closes clean-target bootstrap by reading the pinned JSON binding, fetching the exact revision and invoking that revision's pack materializer. Local development override remains explicit.
+`docs/design/harness-consumer-pack-v1.md`,
+`docs/design/harness-consumer-wrapper-v1.md` and
+`spec/distribution/consumer-pack-v1.yaml` define the executable distribution.
+`python -m harness.application.consumer_pack` materializes and validates the pack.
+The standard-library `distribution/harnessw.py` closes clean-target bootstrap by
+reading the pinned JSON binding, fetching the exact revision and invoking the
+canonical pack materializer. Local development override remains explicit.
 
 
 ## Typed discovery entrypoint
@@ -345,14 +348,9 @@ separate behavioral-evaluation problem tracked by the Evolution Radar.
 
 ## Consumer API v1
 
-The separately versioned canonical-only distribution is defined by
-`harness-consumer-pack-v1.md` and `spec/distribution/consumer-pack-v1.yaml`.
-v0 retains legacy module/file compatibility; v1 exposes canonical `harness.*`
-module identities and minimal root test tooling. Both use the existing routed
-Consumer surface. Source facades remain available for v0 materialization.
+Consumer API v1 is the only supported distribution identity. It exposes canonical
+`harness.*` runtime modules and consumer skills/registries. Root module/file
+facades are not distributed and no longer exist in source.
 
-New integrations MUST select v1; v0 is deprecated compatibility only. Bootstrap
-with `python .harness/harnessw.py sync`, then use
-`python -m harness.application.skill_router ...` from the printed Pack directory.
 Use `spec/distribution/consumer-binding-example-v1.json` and
 `spec/distribution/target-agents-fragment-v1.md`.

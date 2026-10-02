@@ -429,7 +429,7 @@ def main() -> int:
         )
         assert read_project_publication(path, graph=GRAPH)["revision"] == initial["revision"]
 
-        with patch("project_publication.os.replace", side_effect=OSError("simulated crash")):
+        with patch("harness.application.project_publication.os.replace", side_effect=OSError("simulated crash")):
             try:
                 publish_project_publication(
                     path,

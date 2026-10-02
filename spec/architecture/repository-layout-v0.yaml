@@ -1,7 +1,7 @@
 version: 1
 kind: harness-repository-layout
 id: HARNESS-REPOSITORY-LAYOUT-V0
-status: migration-ratchet
+status: canonical
 design: docs/design/repository-layout-v0.md
 context_map: spec/architecture/harness-context-map-v0.yaml
 
@@ -19,164 +19,9 @@ runtime_target:
     application: application
 
 root_python:
-  policy: migration-ratchet
-  permanent_bootstrap_exceptions: []
-  migration_baseline_modules: []
-  permanent_consumer_tooling_modules:
-    - scenario_drivers
-    - scenario_suite
+  policy: closed
 
-# Finite migration state: these surfaces delegate, never own context semantics.
-compatibility:
-  import_aliases:
-    harness:
-      target: harness.project_model.core
-      bridge: harness/__init__.py
-  cli_facades:
-    harness.py:
-      target: harness.project_model.core
-  module_facades:
-    target_state:
-      target: harness.project_model.target_state
-      mode: import-and-cli
-    engineering_graph:
-      target: harness.project_model.engineering_graph
-      mode: import-and-cli
-    project_status:
-      target: harness.reference_model.project_status
-      mode: import-and-cli
-    reference_materializer:
-      target: harness.reference_model.reference_materializer
-      mode: import-and-cli
-    reference_model_evolution:
-      target: harness.reference_model.reference_model_evolution
-      mode: import-only
-    source_boundary:
-      target: harness.evidence.source_boundary
-      mode: import-and-cli
-    source_coverage:
-      target: harness.evidence.source_coverage
-      mode: import-and-cli
-    source_set:
-      target: harness.evidence.source_set
-      mode: import-and-cli
-    decision_execution_assurance:
-      target: harness.decision.decision_execution_assurance
-      mode: import-only
-    decision_exploration:
-      target: harness.decision.decision_exploration
-      mode: import-only
-    decision_explorer_contract:
-      target: harness.decision.decision_explorer_contract
-      mode: import-only
-    decision_governance:
-      target: harness.decision.decision_governance
-      mode: import-only
-    architecture_driver_closure:
-      target: harness.coverage.architecture_driver_closure
-      mode: import-only
-    concern_activation:
-      target: harness.coverage.concern_activation
-      mode: import-and-cli
-    coverage_obligations:
-      target: harness.coverage.coverage_obligations
-      mode: import-only
-    coverage_planner:
-      target: harness.coverage.coverage_planner
-      mode: import-and-cli
-    engineering_coverage:
-      target: harness.coverage.engineering_coverage
-      mode: import-and-cli
-    frontend_interface_knowledge:
-      target: harness.workspace.frontend_interface_knowledge
-      mode: import-only
-    frontend_screen_contracts:
-      target: harness.workspace.frontend_screen_contracts
-      mode: import-only
-    human_projection:
-      target: harness.workspace.human_projection
-      mode: import-and-cli
-    workspace:
-      target: harness.workspace.workspace
-      mode: import-and-cli
-    integration_alignment:
-      target: harness.integration.integration_alignment
-      mode: import-and-cli
-    adapters.canonical_graph:
-      target: harness.integration.adapters.canonical_graph
-      mode: import-and-cli
-    repository_realization:
-      target: harness.integration.repository_realization
-      mode: import-and-cli
-    acceptance_policy:
-      target: harness.assurance.acceptance_policy
-      mode: import-only
-    capability_lifecycle:
-      target: harness.assurance.capability_lifecycle
-      mode: import-and-cli
-    derivation_test_coverage:
-      target: harness.assurance.derivation_test_coverage
-      mode: import-only
-    live_calibration:
-      target: harness.assurance.live_calibration
-      mode: import-only
-    adapters.copilot_live_calibration_evaluator:
-      target: harness.assurance.adapters.copilot_live_calibration_evaluator
-      mode: import-and-cli
-    semantic_acceptance:
-      target: harness.assurance.semantic_acceptance
-      mode: import-and-cli
-    semantic_derivation:
-      target: harness.assurance.semantic_derivation
-      mode: import-and-cli
-    semantic_fingerprint:
-      target: harness.assurance.semantic_fingerprint
-      mode: import-only
-    semantic_judgement_calibration:
-      target: harness.assurance.semantic_judgement_calibration
-      mode: import-only
-    agent_router:
-      target: harness.application.agent_router
-      mode: import-and-cli
-    authority_context:
-      target: harness.application.authority_context
-      mode: import-and-cli
-    consumer_pack:
-      target: harness.application.consumer_pack
-      mode: import-and-cli
-    coverage_application:
-      target: harness.application.coverage_application
-      mode: import-and-cli
-    decision_explorer_request:
-      target: harness.application.decision_explorer_request
-      mode: import-and-cli
-    decision_pipeline:
-      target: harness.application.decision_pipeline
-      mode: import-and-cli
-    graph_doctor:
-      target: harness.application.graph_doctor
-      mode: import-and-cli
-    method_router:
-      target: harness.application.method_router
-      mode: import-and-cli
-    project_frontier:
-      target: harness.application.project_frontier
-      mode: import-and-cli
-    project_publication:
-      target: harness.application.project_publication
-      mode: import-only
-    semantic_admission:
-      target: harness.application.semantic_admission
-      mode: import-and-cli
-    semantic_closure:
-      target: harness.application.semantic_closure
-      mode: import-and-cli
-    semantic_questions:
-      target: harness.application.semantic_questions
-      mode: import-only
-    skill_invariant_policy:
-      target: harness.application.skill_invariant_policy
-      mode: import-only
-    skill_router:
-      target: harness.application.skill_router
-      mode: import-and-cli
+source_tree_bridge:
+  package: harness
+  path: harness/__init__.py
+  target_root: src/harness

@@ -16,7 +16,7 @@ router.
 - **Coordinator** — the active agent managing the user-level use case.
 - **Operation** — one semantic responsibility with explicit trigger, inputs,
   procedure and completion/output.
-- **Router** — `skill_router.py`, which resolves an operation identity to its
+- **Router** — `harness.application.skill_router`, which resolves an operation identity to its
   registered skill.
 - **Skill** — the executable procedure implementing one routed responsibility.
 - **Substep** — a technical action inside an operation, such as reading a file,
@@ -25,7 +25,7 @@ router.
 ## Core invariants
 
 1. The coordinator owns sequencing across operations.
-2. Every new operation responsibility is resolved through `skill_router.py`.
+2. Every new operation responsibility is resolved through `harness.application.skill_router`.
 3. A skill may name a semantic next/internal operation, but it must not bind to
    another skill by physical filesystem path as its orchestration mechanism.
 4. Ordinary substeps inside one responsibility do not require rerouting.

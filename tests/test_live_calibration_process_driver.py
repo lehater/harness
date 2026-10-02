@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scenario_suite import load_driver_modules, run_scenario
+from harness.application.scenario_suite import load_driver_modules, run_scenario
 
 INTEGRATION = ROOT / "spec" / "live-calibration-integration"
 load_driver_modules(["evals.live_calibration_process_driver"])

@@ -526,7 +526,7 @@ def skill_operation_driver(
         surface=surface,
         operation=operation,
         invoked_by=invoked_by,
-        root=Path(__file__).resolve().parent,
+        root=Path(__file__).resolve().parents[3],
     )
 
 

@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scenario_suite import load_driver_modules, run_suite  # noqa: E402
-from scenario_drivers import get_driver  # noqa: E402
+from harness.application.scenario_suite import load_driver_modules, run_suite  # noqa: E402
+from harness.application.scenario_drivers import get_driver  # noqa: E402
 
 
 def main() -> int:
@@ -67,7 +67,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as temp_dir:
         module_path = Path(temp_dir) / "scenario_external_probe.py"
         module_path.write_text(
-            "from scenario_drivers import scenario_driver\n"
+            "from harness.application.scenario_drivers import scenario_driver\n"
             "@scenario_driver('external.probe')\n"
             "def probe(*, value):\n"
             "    return {'value': value}\n",

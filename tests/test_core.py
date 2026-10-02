@@ -106,52 +106,42 @@ def test_capability_question_granularity() -> None:
     assert intent["questions"] == ["Q-ARTIFACT"], intent
 
 
-def test_package_compatibility() -> None:
-    # Frozen pre-migration consumer surface: independent from canonical __all__.
-    legacy_exports = {
-        "CoreError", "affected", "artifact_blockers", "blocked",
-        "capability_blockers", "capability_owner", "capability_resolve",
-        "completeness", "design_frontier", "load_model", "next_action",
-        "question_frontier", "resolve_question", "unblocked_capability_providers",
-        "unresolved_questions", "validate_model",
-    }
+def test_package_execution() -> None:
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
     env["PYTHONNOUSERSITE"] = "1"
-    for imports in (
-        "import harness; from harness.project_model import core",
-        "from harness.project_model import core; import harness",
-    ):
-        probe = imports + "\n" + f"required = {sorted(legacy_exports)!r}\n" + """
-assert set(required) <= set(core.__all__)
-assert harness.__all__ is core.__all__
-for name in required:
-    assert getattr(harness, name) is getattr(core, name), name
-assert harness.CoreError is core.CoreError
-assert harness.validate_model is core.validate_model
+    probe = """
+from pathlib import Path
+import harness
+from harness.project_model import core
+assert Path(harness.__file__).resolve() == Path('harness/__init__.py').resolve()
+assert Path(core.__file__).resolve() == Path('src/harness/project_model/core.py').resolve()
+assert not hasattr(harness, 'CoreError')
+assert not hasattr(harness, 'validate_model')
 """
-        result = subprocess.run(
-            [sys.executable, "-c", probe], cwd=ROOT, env=env,
-            capture_output=True, text=True,
-        )
-        assert result.returncode == 0, result.stderr
+    result = subprocess.run(
+        [sys.executable, "-c", probe], cwd=ROOT, env=env,
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
     fixture = yaml.safe_load(
         (ROOT / "spec/research/consumer-activation-fixture-core.yaml").read_text()
     )
     validate_model(fixture)
-    for entry in ("harness.py", "-m"):
-        command = [sys.executable, entry]
-        if entry == "-m":
-            command.append("harness.project_model.core")
-        command += ["validate", "spec/research/consumer-activation-fixture-core.yaml"]
-        result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
-        assert result.returncode == 0, result.stderr
-        assert json.loads(result.stdout) == {"valid": True}, result.stdout
+    command = [
+        sys.executable, "-m", "harness.project_model.core",
+        "validate", "spec/research/consumer-activation-fixture-core.yaml",
+    ]
+    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == {"valid": True}, result.stdout
+
 
 def main() -> int:
     errors: list[str] = []
     try:
-        test_package_compatibility()
+        test_package_execution()
         test_multiple_provider_alternative()
         test_capability_question_granularity()
     except Exception as exc:
@@ -159,7 +149,6 @@ def main() -> int:
     required = [
         ROOT / "src/harness/project_model/core.py",
         ROOT / "harness/__init__.py",
-        ROOT / "harness.py",
         ROOT / "docs/design/core-v0.md",
     ]
     for path in required:

@@ -6,7 +6,6 @@ status: audit-ratchet
 runtime_packages:
   - experiments
   - evals
-  - adapters
   - distribution
 
 semantics:
@@ -131,6 +130,8 @@ contexts:
       - harness.application.method_router
       - harness.application.project_frontier
       - harness.application.project_publication
+      - harness.application.scenario_drivers
+      - harness.application.scenario_suite
       - harness.application.semantic_admission
       - harness.application.semantic_closure
       - harness.application.semantic_questions
@@ -148,7 +149,7 @@ contexts:
 
 ignored_modules:
   - evals.behavioral_eval
-  - adapters.copilot_behavioral_eval_agent
+  - evals.adapters.copilot_behavioral_eval_agent
   - experiments.authority_role_projection_experiment
   - experiments.concern_activation_experiment
   - experiments.coverage_control_loop_experiment
@@ -157,8 +158,6 @@ ignored_modules:
   - experiments.coverage_planner_experiment
   - experiments.lifecycle_experiment
   - evals.live_calibration_process_driver
-  - scenario_drivers
-  - scenario_suite
 
 published_boundaries:
   - from_context: coverage

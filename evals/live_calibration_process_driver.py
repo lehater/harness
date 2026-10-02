@@ -16,7 +16,7 @@ from harness.assurance.live_calibration import (
     build_live_calibration_request,
     evaluate_live_calibration_run,
 )
-from scenario_drivers import scenario_driver
+from harness.application.scenario_drivers import scenario_driver
 
 EXECUTABLE_ENV = "HARNESS_LIVE_CALIBRATION_EXECUTABLE"
 MODULE_ENV = "HARNESS_LIVE_CALIBRATION_MODULE"
