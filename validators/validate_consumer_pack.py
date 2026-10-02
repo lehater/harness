@@ -84,7 +84,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     ), str(checkout)]
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    target = checkout / "agent_router.py"
+    target = checkout / "src/harness/application/agent_router.py"
     original = target.read_text()
     for statement in (
         "from engineering_graph import X", "from harness import CoreError",
@@ -93,7 +93,7 @@ def test_context_dependencies(temp_root: Path) -> None:
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         assert result.returncode != 0, statement
-        assert "agent_router:" in result.stderr, result.stderr
+        assert "harness.application.agent_router:" in result.stderr, result.stderr
         assert "use canonical target harness.project_model." in result.stderr, result.stderr
     for statement in (
         "from harness.project_model.core import CoreError",
@@ -120,7 +120,7 @@ def test_context_dependencies(temp_root: Path) -> None:
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
             assert result.returncode != 0 and "implementation is forbidden" in result.stderr, result.stderr
         facade.write_text(body)
-    target = checkout / "agent_router.py"
+    target = checkout / "src/harness/application/agent_router.py"
     original = target.read_text()
     for statement in (
         "from adapters.canonical_graph import project_model",
@@ -133,6 +133,18 @@ def test_context_dependencies(temp_root: Path) -> None:
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
         assert result.returncode != 0 and "imports compatibility alias" in result.stderr, result.stderr
+    target.write_text(original)
+    target = checkout / "src/harness/application/semantic_closure.py"
+    original = target.read_text()
+    for statement in (
+        "from agent_router import validate_skill_registry",
+        "from skill_router import GLOBAL_INSTRUCTION_CONTRACTS",
+        "from semantic_admission import derive_acceptance_policy_fingerprints",
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0 and "imports compatibility alias" in result.stderr, result.stderr
+        assert "harness.application.semantic_closure:" in result.stderr, result.stderr
     target.write_text(original)
     # Metadata rejects malformed identities, and discovers arbitrary nesting
     # through the same mechanical mapping, without filename exceptions.
@@ -198,7 +210,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     target = checkout / "src/harness/workspace/human_projection.py"
     original = target.read_text()
     for statement in (
-        "import project_frontier", "import harness.coverage.engineering_coverage", "import harness.assurance.semantic_acceptance",
+        "import harness.application.project_frontier", "import harness.coverage.engineering_coverage", "import harness.assurance.semantic_acceptance",
     ):
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
@@ -774,6 +786,377 @@ for legacy_name, row in migration_baseline.items():
         if isinstance(node, ast.ImportFrom):
             node.module = reverse_imports.get(node.module, node.module)
     assert hashlib.sha256(ast.dump(tree).encode()).hexdigest() == row['ast_sha256'], legacy_name
+# Frozen public namespaces and whole-module ASTs from 1e67fdfadfde23148af72c73f2307ee7cbb7ab90.
+application_baseline = {'agent_router': {'ast_sha256': '9359c2058a8a450f79d298522e71fa6585d797f8729052c8d12b6b91618feff3',
+                  'canonical': 'harness.application.agent_router',
+                  'exports': ['Any',
+                              'CoreError',
+                              'GLOBAL_INSTRUCTION_CONTRACTS',
+                              'Path',
+                              'annotations',
+                              'argparse',
+                              'evaluate_engineering_target',
+                              'json',
+                              'load_yaml',
+                              'main',
+                              'production_index',
+                              'route_create_work',
+                              'validate_engineering_graph',
+                              'validate_skill_registry',
+                              'yaml'],
+                  'mode': 'import-and-cli',
+                  'root_paths': 0},
+ 'authority_context': {'ast_sha256': 'cdcf13c2cb01f6e94ed97ccdd6ea8e369b6c4bd7acdeec8b0376dae8c66a4b41',
+                       'canonical': 'harness.application.authority_context',
+                       'exports': ['Any',
+                                   'CoreError',
+                                   'Path',
+                                   'annotations',
+                                   'argparse',
+                                   'artifact_blockers',
+                                   'build_authority_context',
+                                   'capability_blockers',
+                                   'capability_resolve',
+                                   'json',
+                                   'main',
+                                   'producer_index',
+                                   'production_index',
+                                   'realize_core_model',
+                                   'unblocked_capability_providers',
+                                   'validate_engineering_graph',
+                                   'validate_extracted_references',
+                                   'validate_model',
+                                   'validate_write_set',
+                                   'yaml'],
+                       'mode': 'import-and-cli',
+                       'root_paths': 0},
+ 'consumer_pack': {'ast_sha256': 'b375aab5b3ae312c6d50e67ea958e9b9011fb529c0235eca74d198f6a4e87fe4',
+                   'canonical': 'harness.application.consumer_pack',
+                   'exports': ['Any',
+                               'ConsumerPackError',
+                               'DEFAULT_DEFINITION',
+                               'DEFAULT_SURFACE_REGISTRY',
+                               'PACK_MANIFEST',
+                               'Path',
+                               'REVISION_RE',
+                               'annotations',
+                               'argparse',
+                               'ast',
+                               'hashlib',
+                               'json',
+                               'load_yaml',
+                               'main',
+                               'materialize_pack',
+                               're',
+                               'shutil',
+                               'subprocess',
+                               'sync_binding',
+                               'tempfile',
+                               'validate_binding',
+                               'validate_definition',
+                               'validate_pack',
+                               'yaml'],
+                   'mode': 'import-and-cli',
+                   'root_paths': 0},
+ 'coverage_application': {'ast_sha256': '394cc56a5ee16fd661101336135d4d84131364b9939b4235903c4cbf899a27aa',
+                          'canonical': 'harness.application.coverage_application',
+                          'exports': ['Any',
+                                      'GLOBAL_INSTRUCTION_CONTRACTS',
+                                      'Path',
+                                      'ROOT',
+                                      'annotations',
+                                      'argparse',
+                                      'copy',
+                                      'evaluate_project_coverage',
+                                      'evaluate_with_repository_policy',
+                                      'json',
+                                      'load',
+                                      'load_scope_source',
+                                      'main',
+                                      'validate_project_alignment',
+                                      'validate_skill_registry'],
+                          'mode': 'import-and-cli',
+                          'root_paths': 1},
+ 'decision_explorer_request': {'ast_sha256': '87cae11e41500a012e0ee6a2250a4d35a913524fad0e442004aee68327d6f12d',
+                               'canonical': 'harness.application.decision_explorer_request',
+                               'exports': ['Any',
+                                           'CoreError',
+                                           'Path',
+                                           'annotations',
+                                           'argparse',
+                                           'axis_policies',
+                                           'build_authority_context',
+                                           'build_decision_explorer_request',
+                                           'decision_contract_index',
+                                           'derive_decision_explorer_request',
+                                           'json',
+                                           'lifecycle_index',
+                                           'lifecycle_states',
+                                           'main',
+                                           'producer_index',
+                                           'production_index',
+                                           'validate_realization',
+                                           'yaml'],
+                               'mode': 'import-and-cli',
+                               'root_paths': 0},
+ 'decision_pipeline': {'ast_sha256': '1a23bb3ed044ac7602d4c8df4f7d27b309831ffcc21cdfa1bc1f7e49b8cf8c33',
+                       'canonical': 'harness.application.decision_pipeline',
+                       'exports': ['Any',
+                                   'CoreError',
+                                   'Iterable',
+                                   'PIPELINE_STAGES',
+                                   'Path',
+                                   'annotations',
+                                   'argparse',
+                                   'artifact_blockers',
+                                   'build_authority_context',
+                                   'capability_blockers',
+                                   'decision_failure_index',
+                                   'derive_decision_explorer_request',
+                                   'derive_decision_roadmap',
+                                   'derive_profile',
+                                   'json',
+                                   'lifecycle_index',
+                                   'lifecycle_states',
+                                   'main',
+                                   'producer_index',
+                                   'production_index',
+                                   'validate_realization',
+                                   'yaml'],
+                       'mode': 'import-and-cli',
+                       'root_paths': 0},
+ 'graph_doctor': {'ast_sha256': 'fbefec1a803a2361c360d0cd023d3e2f209c29aef58bc319966435652d12b5a4',
+                  'canonical': 'harness.application.graph_doctor',
+                  'exports': ['Any',
+                              'CoreError',
+                              'Path',
+                              'SEVERITY_ORDER',
+                              'annotations',
+                              'argparse',
+                              'derive_profile',
+                              'diagnose_engineering_graph',
+                              'diagnose_model',
+                              'diagnose_project',
+                              'evaluate_engineering_target',
+                              'finding',
+                              'json',
+                              'main',
+                              'project_model',
+                              'validate_engineering_graph',
+                              'validate_model',
+                              'validate_project_alignment',
+                              'yaml'],
+                  'mode': 'import-and-cli',
+                  'root_paths': 0},
+ 'method_router': {'ast_sha256': '387cd641da160d24c7e7a83384ba311838f01e4940d6f429fd89565ac5dee946',
+                   'canonical': 'harness.application.method_router',
+                   'exports': ['Any',
+                               'CoreError',
+                               'Path',
+                               'annotations',
+                               'argparse',
+                               'concern_ids',
+                               'json',
+                               'load_yaml',
+                               'main',
+                               'route_methods',
+                               'validate_method_registry',
+                               'yaml'],
+                   'mode': 'import-and-cli',
+                   'root_paths': 1},
+ 'project_frontier': {'ast_sha256': 'cc00b967d88aeda82dfa53597127599ebaa85e5ccd748fec26224ec4358a5242',
+                      'canonical': 'harness.application.project_frontier',
+                      'exports': ['Any',
+                                  'CoreError',
+                                  'DECISION_STATUSES',
+                                  'Path',
+                                  'annotations',
+                                  'argparse',
+                                  'compose_project_frontier',
+                                  'json',
+                                  'main',
+                                  'yaml'],
+                      'mode': 'import-and-cli',
+                      'root_paths': 0},
+ 'project_publication': {'ast_sha256': '9817c49d04d0b986c170fdac8cf926458eb36be523ff3de3d00016e092e6e67a',
+                         'canonical': 'harness.application.project_publication',
+                         'exports': ['Any',
+                                     'CoreError',
+                                     'FAILURE_SET_KIND',
+                                     'OUTCOMES',
+                                     'PUBLICATION_KIND',
+                                     'PUBLICATION_VERSION',
+                                     'Path',
+                                     'SEMANTIC_SET_KIND',
+                                     'STATE_KEYS',
+                                     'annotations',
+                                     'artifact_blockers',
+                                     'build_project_publication',
+                                     'capability_blockers',
+                                     'capability_resolve',
+                                     'contextmanager',
+                                     'copy',
+                                     'decision_failure_index',
+                                     'derivation_evaluation_index',
+                                     'evaluation_index',
+                                     'hashlib',
+                                     'json',
+                                     'lifecycle_index',
+                                     'os',
+                                     'prepare_capability_transition',
+                                     'publish_project_publication',
+                                     'read_project_publication',
+                                     'tempfile',
+                                     'validate_project_publication',
+                                     'validate_projection',
+                                     'validate_realization',
+                                     'yaml'],
+                         'mode': 'import-only',
+                         'root_paths': 0},
+ 'semantic_admission': {'ast_sha256': '325c4855c3a909939b36666db1022a12a8135f7075e31062c8a147215fdd81c6',
+                        'canonical': 'harness.application.semantic_admission',
+                        'exports': ['Any',
+                                    'CoreError',
+                                    'Path',
+                                    'admit_artifact',
+                                    'annotations',
+                                    'argparse',
+                                    'axis_policies',
+                                    'build_acceptance_policy_baseline',
+                                    'build_authority_context',
+                                    'build_decision_explorer_request',
+                                    'decision_contract_index',
+                                    'derive_acceptance_policy_baseline',
+                                    'derive_acceptance_policy_fingerprints',
+                                    'effective_execution_assurance',
+                                    'effective_knowledge_contract',
+                                    'evaluate_artifact',
+                                    'evaluate_decision_exploration',
+                                    'evaluate_decision_governance',
+                                    'evaluate_execution_assurance',
+                                    'json',
+                                    'knowledge_contract_index',
+                                    'lifecycle_index',
+                                    'lifecycle_states',
+                                    'load_yaml',
+                                    'main',
+                                    'producer_index',
+                                    'production_index',
+                                    'questions_from_semantic_evaluation',
+                                    'semantic_assertion_fingerprints',
+                                    'validate_extracted_references',
+                                    'validate_realization',
+                                    'validate_skill_registry',
+                                    'yaml'],
+                        'mode': 'import-and-cli',
+                        'root_paths': 3},
+ 'semantic_closure': {'ast_sha256': '4d7615d93e9da0219b2915b41d2429930cc8af8d26dd8f12c0436ab46487d48e',
+                      'canonical': 'harness.application.semantic_closure',
+                      'exports': ['Any',
+                                  'CoreError',
+                                  'Path',
+                                  'annotations',
+                                  'append_question_proposals',
+                                  'argparse',
+                                  'derive_acceptance_policy_fingerprints',
+                                  'derive_profile',
+                                  'evaluate_engineering_target',
+                                  'evaluate_lifecycle_target',
+                                  'evaluate_semantic_closure',
+                                  'evaluation_index',
+                                  'json',
+                                  'lifecycle_index',
+                                  'lifecycle_states',
+                                  'load_yaml',
+                                  'main',
+                                  'production_index',
+                                  'proposals_from_evaluation_set',
+                                  'question_frontier',
+                                  'validate_realization',
+                                  'validate_skill_registry',
+                                  'yaml'],
+                      'mode': 'import-and-cli',
+                      'root_paths': 2},
+ 'semantic_questions': {'ast_sha256': '4473f808776c2c4a58d242b1fab8d63d5ff6587c89608c1d0cbf08a7f10d4985',
+                        'canonical': 'harness.application.semantic_questions',
+                        'exports': ['Any',
+                                    'CoreError',
+                                    'DERIVATION_GAP_FINDING_CODES',
+                                    'GAP_FINDING_CODES',
+                                    'annotations',
+                                    'append_question_proposals',
+                                    'copy',
+                                    'derivation_evaluation_index',
+                                    'evaluation_index',
+                                    'producer_index',
+                                    'proposals_from_evaluation_set',
+                                    'questions_from_derivation_evaluation',
+                                    'questions_from_evaluation',
+                                    'questions_from_semantic_evaluation',
+                                    're'],
+                        'mode': 'import-only',
+                        'root_paths': 0},
+ 'skill_invariant_policy': {'ast_sha256': '84ce2661f707475f18b4be61a0c32eda39b04c04c73c83da0074151e0f4e5204',
+                            'canonical': 'harness.application.skill_invariant_policy',
+                            'exports': ['Any',
+                                        'Path',
+                                        'annotations',
+                                        'evaluate_skill_invariant_policy',
+                                        'knowledge_contract_index',
+                                        'validate_skill_registry',
+                                        'yaml'],
+                            'mode': 'import-only',
+                            'root_paths': 0},
+ 'skill_router': {'ast_sha256': 'c715785fea66cf390639c09bf1b417f663a3245a77ed6b43a502b4ffc8ebe72e',
+                  'canonical': 'harness.application.skill_router',
+                  'exports': ['Any',
+                              'CoreError',
+                              'GLOBAL_INSTRUCTION_CONTRACTS',
+                              'Path',
+                              'ROOT',
+                              'annotations',
+                              'argparse',
+                              'json',
+                              'load_method_yaml',
+                              'load_yaml',
+                              'main',
+                              'route_artifact',
+                              'route_method',
+                              'route_methods',
+                              'route_operation',
+                              'yaml'],
+                  'mode': 'import-and-cli',
+                  'root_paths': 1}}
+for legacy_name, row in application_baseline.items():
+    canonical = importlib.import_module(row['canonical'])
+    legacy = importlib.import_module(legacy_name)
+    assert canonical.__all__ == row['exports'], legacy_name
+    assert legacy.__all__ is canonical.__all__, legacy_name
+    for name in row['exports']:
+        assert getattr(legacy, name) is getattr(canonical, name), (legacy_name, name)
+    assert Path(canonical.__file__).resolve() == Path('src', *row['canonical'].split('.')).with_suffix('.py').resolve()
+    assert hasattr(canonical, 'main') == (row['mode'] == 'import-and-cli'), legacy_name
+    source = Path(canonical.__file__).read_text()
+    adapted = 'Path(__file__).resolve().parents[3]'
+    assert source.count(adapted) == row['root_paths'], legacy_name
+    if row['root_paths']:
+        assert Path(canonical.__file__).resolve().parents[3] == Path.cwd()
+    # Explicit user-approved exception: ignore generated bytecode in file-set checks.
+    cache_filter = '        and (path.relative_to(pack_root).as_posix() in expected_files\\n             or not ("__pycache__" in path.relative_to(pack_root).parts and path.suffix == ".pyc"))\\n'
+    if legacy_name == 'consumer_pack':
+        assert source.count(cache_filter) == 1
+        source = source.replace(cache_filter, '')
+    # Reverse only approved cache, physical-root and same-layer adaptations.
+    tree = ast.parse(source.replace(adapted, 'Path(__file__).resolve().parent'))
+    tree.body = [node for node in tree.body if not (isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == '__all__' for target in node.targets))]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.level == 1 and node.module in application_baseline:
+            node.level = 0
+    assert hashlib.sha256(ast.dump(tree).encode()).hexdigest() == row['ast_sha256'], legacy_name
+migration_baseline.update(application_baseline)
+from harness.application import skill_router, coverage_application
+assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
+
 # Every owned runtime import remains canonical even in the materialized pack.
 import yaml
 context_map = yaml.safe_load(Path('spec/architecture/harness-context-map-v0.yaml').read_text())
@@ -800,6 +1183,26 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+    # Every Application CLI still starts through its root Consumer v0 facade.
+    for module in ['agent_router', 'authority_context', 'consumer_pack', 'coverage_application', 'decision_explorer_request', 'decision_pipeline', 'graph_doctor', 'method_router', 'project_frontier', 'semantic_admission', 'semantic_closure', 'skill_router']:
+        result = subprocess.run(
+            [sys.executable, module + ".py", "--help"], cwd=pack, env=env,
+            capture_output=True, text=True,
+        )
+        assert result.returncode == 0, (module, result.stderr)
+    result = subprocess.run(
+        [sys.executable, "consumer_pack.py", "validate-definition", "--source-root", str(pack)],
+        cwd=pack, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    result = subprocess.run(
+        [sys.executable, "skill_router.py", "operation", "--surface", "consumer", "--operation", "project-bootstrap-reconcile"],
+        cwd=pack, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    route = json.loads(result.stdout)
+    assert route["instruction_contracts"] == ["docs/design/agent-instruction-architecture-v0.md"]
+    assert (pack / route["skill"]).is_file()
     # Canonical and Consumer v0 nested module CLIs require no path bootstrap.
     fixture = load_yaml(pack / "spec/adapter-acceptance/rich-project-projection.yaml")
     source = temp_root / "nested-source.yaml"
@@ -1022,6 +1425,30 @@ def main() -> int:
         )
         assert manifest["consumer_api"] == "v0"
         assert manifest["binding_revision"] == revision
+        # Default Python execution generates caches; the immutable manifest stays valid.
+        bytecode_env = dict(os.environ)
+        bytecode_env.pop("PYTHONPATH", None)
+        bytecode_env.pop("PYTHONDONTWRITEBYTECODE", None)
+        result = subprocess.run(
+            [sys.executable, "consumer_pack.py", "validate-pack", str(pack)],
+            cwd=pack, env=bytecode_env, capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        assert list((pack / "src/harness/application/__pycache__").glob("*.pyc"))
+        assert validate_pack(pack, expected_revision=revision) == manifest
+        # Only .pyc files inside __pycache__ are exempt, not arbitrary extra files.
+        for relative in ("unexpected.txt", "unexpected.pyc", "src/harness/application/__pycache__/unexpected.txt"):
+            extra = pack / relative
+            extra.write_text("untracked")
+            try:
+                validate_pack(pack)
+            except ValueError as exc:
+                assert "manifest/file set mismatch" in str(exc) and relative in str(exc), str(exc)
+            else:
+                raise AssertionError(f"untracked Consumer Pack file accepted: {relative}")
+            finally:
+                extra.unlink()
+
         test_pack_execution(pack, temp_root)
         test_context_dependencies(temp_root)
 

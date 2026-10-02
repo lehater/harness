@@ -50,7 +50,8 @@ A branch/tag such as `main` is not a valid pinned revision.
 
 ## Materialization
 
-`consumer_pack.py` owns deterministic pack materialization.
+`harness.application.consumer_pack` owns deterministic pack materialization;
+root `consumer_pack.py` retains its Consumer API v0 import/CLI facade.
 
 ```text
 binding
@@ -190,3 +191,30 @@ target project's semantic graph.
 The canonical wrapper contract is `docs/design/harness-consumer-wrapper-v0.md`.
 
 Only the wrapper and binding are target-repository bootstrap tooling. The Consumer Pack remains cache/materialized tooling and project semantic truth remains in the target repository's normal Harness/project artifacts.
+
+
+## Application runtime packaging
+
+All fifteen ordinary Application implementations live in
+`src/harness/application/` and use canonical same-layer imports. The fifteen
+root files remain Consumer v0 facades: twelve import/CLI surfaces and three
+import-only surfaces (Publication, Questions and Skill Invariant Policy).
+The initializer and implementations are explicit `exact_files`; `root_files`,
+`include_prefixes` and `consumer_api: v0` remain unchanged.
+
+The standalone stdlib-only `distribution/harnessw.py` deliberately remains
+bootstrap transport and is excluded from the Pack. It executes the checkout's
+root `consumer_pack.py` facade, which delegates to
+`harness.application.consumer_pack`. Inside the materialized Pack that same
+facade works through the existing source-tree bridge. Root `skill_router.py`
+continues delegating to `harness.application.skill_router`, with registries,
+skills, spec and docs resolved from the Pack root. Neither an installed Harness
+package nor `PYTHONPATH` is required; wrapper semantics and Consumer API do not
+change.
+
+Python-generated `.pyc` files within `__pycache__` directories are disposable
+runtime caches and do not count as untracked distribution files. All manifested
+files retain existence/hash checks; other extra files remain invalid. This
+explicitly approved compatibility exception lets the root Consumer Pack facade
+validate the Pack after importing its canonical implementation with default
+Python bytecode behavior. Wrapper/bootstrap semantics remain unchanged.

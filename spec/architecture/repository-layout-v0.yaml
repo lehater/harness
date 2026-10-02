@@ -22,32 +22,17 @@ root_python:
   policy: migration-ratchet
   permanent_bootstrap_exceptions: []
   migration_baseline_modules:
-    - agent_router
-    - authority_context
     - authority_role_projection_experiment
     - behavioral_eval
     - concern_activation_experiment
-    - consumer_pack
-    - coverage_application
     - coverage_control_loop_experiment
     - coverage_derivation_experiment
     - coverage_map_experiment
     - coverage_planner_experiment
-    - decision_explorer_request
-    - decision_pipeline
-    - graph_doctor
     - lifecycle_experiment
     - live_calibration_process_driver
-    - method_router
-    - project_frontier
-    - project_publication
     - scenario_drivers
     - scenario_suite
-    - semantic_admission
-    - semantic_closure
-    - semantic_questions
-    - skill_invariant_policy
-    - skill_router
 
 # Finite migration state: these surfaces delegate, never own context semantics.
 compatibility:
@@ -158,3 +143,48 @@ compatibility:
     semantic_judgement_calibration:
       target: harness.assurance.semantic_judgement_calibration
       mode: import-only
+    agent_router:
+      target: harness.application.agent_router
+      mode: import-and-cli
+    authority_context:
+      target: harness.application.authority_context
+      mode: import-and-cli
+    consumer_pack:
+      target: harness.application.consumer_pack
+      mode: import-and-cli
+    coverage_application:
+      target: harness.application.coverage_application
+      mode: import-and-cli
+    decision_explorer_request:
+      target: harness.application.decision_explorer_request
+      mode: import-and-cli
+    decision_pipeline:
+      target: harness.application.decision_pipeline
+      mode: import-and-cli
+    graph_doctor:
+      target: harness.application.graph_doctor
+      mode: import-and-cli
+    method_router:
+      target: harness.application.method_router
+      mode: import-and-cli
+    project_frontier:
+      target: harness.application.project_frontier
+      mode: import-and-cli
+    project_publication:
+      target: harness.application.project_publication
+      mode: import-only
+    semantic_admission:
+      target: harness.application.semantic_admission
+      mode: import-and-cli
+    semantic_closure:
+      target: harness.application.semantic_closure
+      mode: import-and-cli
+    semantic_questions:
+      target: harness.application.semantic_questions
+      mode: import-only
+    skill_invariant_policy:
+      target: harness.application.skill_invariant_policy
+      mode: import-only
+    skill_router:
+      target: harness.application.skill_router
+      mode: import-and-cli

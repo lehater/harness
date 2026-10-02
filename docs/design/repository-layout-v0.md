@@ -14,7 +14,7 @@ root to remain the implementation namespace.
 
 ## Problem
 
-Harness currently keeps most runtime modules directly in the repository root.
+Before the package migration, Harness kept runtime modules directly in the repository root.
 That makes the root simultaneously act as:
 
 - the repository control surface;
@@ -530,7 +530,7 @@ All owned runtime consumers use canonical imports. Integration retains its
 published Project Model symbol boundary. Coverage uses only the two existing
 published Assurance symbols under their canonical module identity; neither
 boundary widens. Assurance internally uses canonical identities, with no new
-dependency. Application remains physically unchanged.
+dependency. Application remained physically unchanged in that slice; its subsequent migration is recorded below.
 
 Explicit `__all__` freezes the pre-move public surfaces from `d28f4cc`, including
 imported public names and the private adapter helpers already imported by
@@ -562,3 +562,79 @@ contains. All seven were already stale; there is no new currentness transition.
 Historical results, hashes and existing stale states remain
 unchanged. This physical migration makes no new provider-judgement claim and
 requires no provider run.
+
+
+## Application package migration decision
+
+Architecture decision record: ADR-APPLICATION-PACKAGE-V0.
+Status: accepted.
+
+The fifteen ordinary Application runtime modules move together into
+`src/harness/application/`: `agent_router`, `authority_context`, `consumer_pack`,
+`coverage_application`, `decision_explorer_request`, `decision_pipeline`,
+`graph_doctor`, `method_router`, `project_frontier`, `project_publication`,
+`semantic_admission`, `semantic_closure`, `semantic_questions`,
+`skill_invariant_policy` and `skill_router`. Their `harness.application.*`
+identities own implementation; the initializer contains only a docstring.
+Same-layer imports become relative. Existing cross-context dependencies and
+published boundaries stay unchanged. The root migration baseline now contains
+only ignored research, experiments, scenarios and evaluation infrastructure.
+
+All fifteen root files remain Consumer API v0 facades under the existing closed
+grammar. Publication, Questions and Skill Invariant Policy are import-only;
+the other twelve preserve their existing CLIs. In particular `consumer_pack.py`
+remains the wrapper's checkout and Pack entrypoint, and `skill_router.py` remains
+the Pack CLI. There is no Consumer API bump, new bootstrap logic, include-prefix
+expansion or installed-package requirement. Sixteen canonical Application files
+are exported through `exact_files`.
+
+`distribution.harnessw` deliberately remains the standalone stdlib-only bootstrap
+transport, outside the materialized Pack. It imports no Harness implementation.
+The preserved clean-target chain is standalone wrapper -> checkout root
+`consumer_pack.py` facade -> canonical Consumer Pack implementation -> materialized
+Pack -> root `skill_router.py` facade -> canonical Skill Router implementation.
+
+Frozen public namespaces and whole-module AST hashes from
+`1e67fdfadfde23148af72c73f2307ee7cbb7ab90` are checked in the isolated Pack.
+Legacy and canonical `__all__` lists and every exported object share identity.
+Reversing only relative Application imports, explicit exports and
+`Path(__file__).resolve().parents[3]` root adaptations restores each baseline
+AST, except for the explicitly approved cache-validation exception below.
+The five path-sensitive modules continue resolving repository/Pack-local
+skills, registries, spec and docs; production bodies are otherwise unchanged.
+
+Evidence reuses HA-A18 TD-DIST-001/002 (isolated Pack and clean-target wrapper),
+HA-A16 routing validators, HA-A12/13 semantic admission/Questions/closure and
+HA-A15 frontier/publication composition. Existing Scenario Suite evidence and
+the full deterministic gate protect behavior. TL1 mutations from canonical
+Application reject root `agent_router`, `skill_router` and `semantic_admission`
+imports using the existing ownership ratchet; owned runtime alias imports are
+zero. Validators/scenarios retain legacy imports as compatibility evidence.
+
+The complete changed-file set is compared with every provider execution binding
+under `spec/assurance/evidence/**`. Four records intersect at `skill_router.py`:
+first-wave runs 36942421201 and 36947887869, TL4 existing-project run 36949909315
+and TL5 known-project run 36952038645. All seven execution-bound records were
+already stale on the base. Binding intersection: yes; new current -> stale
+transition: no. Historical hashes, outcomes and currentness are preserved.
+This mechanical migration requires deterministic evidence; no provider run or
+new provider judgement claim is introduced.
+
+
+### Approved bytecode-cache compatibility exception
+
+The operator explicitly authorized this exception after committed-head CI
+exposed a cold bootstrap failure: importing the root Consumer Pack facade
+creates `__pycache__/*.pyc` before the Pack validates its own file set. The old
+standalone implementation generated no local bytecode during that validation.
+A pre-commit wrapper run cloned the unmigrated base and could not expose this
+failure; wrapper acceptance must also run against the committed candidate.
+
+`validate_pack()` now excludes only `.pyc` files within `__pycache__` directories
+from the untracked-file comparison. Manifested files still require existence
+and matching hashes, including any explicitly manifested cache file. Ordinary
+extra files, `.pyc` outside cache directories and non-bytecode files inside them
+remain invalid. Wrapper and facade grammar stay unchanged. This is the only
+production-body exception to whole-module baseline equivalence and is reversed
+explicitly by the AST proof. A fresh isolated Consumer Pack CLI uses default bytecode
+behavior; focused mutations protect the remaining exact-file-set contract.
