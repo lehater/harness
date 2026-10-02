@@ -5,7 +5,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from semantic_acceptance import evaluate_artifact, evaluation_index
+from semantic_acceptance import (
+    coverage_assurance_view,
+    coverage_invalidation_closure,
+    evaluate_artifact,
+    evaluation_index,
+)
 from harness import CoreError
 from coverage_planner import capability_realization
 from engineering_coverage import evaluate_with_repository_policy, load
@@ -398,12 +403,69 @@ def test_engineering_coverage_evidence_input():
     assert row["capabilities"] == ["fixture.domain.model.bc-b"]
     assert result["completion_ready"] is False
 
+
+def test_published_coverage_assurance_view():
+    coverage_view = coverage_assurance_view(
+        [
+            {
+                "semantic_evaluations": [
+                    {
+                        "kind": "harness-artifact-semantic-evaluation",
+                        "artifact": "ART-A",
+                        "capability": "cap.accepted",
+                        "status": "ACCEPTED",
+                        "semantic_claims": {"accepted": ["claim.accepted"]},
+                    },
+                    {
+                        "kind": "harness-artifact-semantic-evaluation",
+                        "artifact": "ART-B",
+                        "capability": "cap.rejected",
+                        "status": "REJECTED",
+                        "semantic_claims": {"accepted": []},
+                    },
+                    {
+                        "kind": "harness-artifact-semantic-evaluation",
+                        "artifact": "ART-C",
+                        "status": "ACCEPTED",
+                        "semantic_claims": {"accepted": []},
+                    },
+                ]
+            }
+        ]
+    )
+    assert coverage_view.provider_disposition("ART-A", "cap.accepted") == "ACCEPTED"
+    assert coverage_view.provider_disposition("ART-B", "cap.rejected") == "REJECTED"
+    assert coverage_view.provider_disposition("ART-C", "cap.fallback") == "ACCEPTED"
+    assert coverage_view.provider_disposition("ART-X", "cap.none") == "UNEVALUATED"
+    assert coverage_view.capability_evaluated("cap.accepted")
+    assert coverage_view.accepted_claims("cap.accepted") == {"claim.accepted"}
+    assert coverage_view.accepted_claims("cap.rejected") == set()
+
+    invalidation = coverage_invalidation_closure(
+        {
+            "authorities": [
+                {
+                    "produces": [
+                        {"capability": "cap.root", "requires": []},
+                        {"capability": "cap.child", "requires": ["cap.root"]},
+                    ]
+                }
+            ]
+        },
+        {"cap.root"},
+    )
+    assert invalidation == {
+        "cap.child": ["cap.root"],
+        "cap.root": ["cap.root"],
+    }
+
 def main():
     test_real_defect_regressions()
     test_authority_direction_regressions()
     test_coverage_gating_and_invalidation()
     test_current_evaluation_snapshot_uniqueness()
     test_engineering_coverage_evidence_input()
+    test_published_coverage_assurance_view()
     print(
         "semantic acceptance: PASS "
         "(real defect regressions + authority direction + gating/invalidation)"

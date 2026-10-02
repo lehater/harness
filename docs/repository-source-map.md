@@ -17,6 +17,7 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `docs/audit/harness-evolution-radar.md` — cumulative `EVO-*` non-defect recommendation/research/idea ledger.
 - `docs/design/agent-instruction-architecture-v0.md` — canonical instruction ownership/scoping contract.
 - `docs/design/operation-orchestration-v0.md` — canonical coordinator/router/operation composition contract.
+- `docs/design/context-published-contracts-v0.md` — canonical published module/symbol contracts for selected cross-context dependencies.
 - `docs/design/repository-layout-v0.md` — canonical physical-layout migration target and responsibility boundaries.
 - `spec/architecture/repository-layout-v0.yaml` — machine-readable root-module migration ratchet and context-to-package target mapping.
 - `docs/design/core-v0.md` — current Core boundary and model.

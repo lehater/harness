@@ -511,6 +511,78 @@ def evaluation_index(
     return result
 
 
+class CoverageAssuranceView:
+    """Published read-only Assurance projection for Engineering Coverage."""
+
+    def __init__(
+        self,
+        provider_dispositions: dict[tuple[object, object], str],
+        evaluated_capabilities: set[str],
+        accepted_claims_by_capability: dict[str, set[str]],
+    ) -> None:
+        self._provider_dispositions = dict(provider_dispositions)
+        self._evaluated_capabilities = set(evaluated_capabilities)
+        self._accepted_claims_by_capability = {
+            capability: set(claims)
+            for capability, claims in accepted_claims_by_capability.items()
+        }
+
+    def provider_disposition(self, artifact: str, capability: str) -> str:
+        """Return ACCEPTED, REJECTED, or UNEVALUATED for one provider."""
+
+        exact = (artifact, capability)
+        fallback = (artifact, None)
+        if exact in self._provider_dispositions:
+            return self._provider_dispositions[exact]
+        if fallback in self._provider_dispositions:
+            return self._provider_dispositions[fallback]
+        return "UNEVALUATED"
+
+    def capability_evaluated(self, capability: str) -> bool:
+        return capability in self._evaluated_capabilities
+
+    def evaluated_capabilities(self) -> set[str]:
+        return set(self._evaluated_capabilities)
+
+    def accepted_claims(self, capability: str) -> set[str]:
+        return set(self._accepted_claims_by_capability.get(capability, set()))
+
+    def accepted_claims_by_capability(self) -> dict[str, set[str]]:
+        return {
+            capability: set(claims)
+            for capability, claims in self._accepted_claims_by_capability.items()
+        }
+
+
+def coverage_assurance_view(
+    project_docs: list[dict[str, Any]],
+) -> CoverageAssuranceView:
+    """Project current semantic evidence into the published Coverage view."""
+
+    provider_dispositions: dict[tuple[object, object], str] = {}
+    evaluated_capabilities: set[str] = set()
+    accepted_claims: dict[str, set[str]] = {}
+
+    for key, evaluation in evaluation_index(project_docs).items():
+        provider_dispositions[key] = (
+            "ACCEPTED" if evaluation.get("status") == "ACCEPTED" else "REJECTED"
+        )
+        capability = evaluation.get("capability")
+        if not isinstance(capability, str) or not capability:
+            continue
+        evaluated_capabilities.add(capability)
+        if evaluation.get("status") == "ACCEPTED":
+            accepted_claims.setdefault(capability, set()).update(
+                evaluation.get("semantic_claims", {}).get("accepted", []) or []
+            )
+
+    return CoverageAssuranceView(
+        provider_dispositions,
+        evaluated_capabilities,
+        accepted_claims,
+    )
+
+
 def accepted_claims_for(
     evaluations: dict[tuple[str | None, str | None], dict[str, Any]],
     artifact: str,
@@ -599,6 +671,15 @@ def semantic_invalidation_closure(
                 queue.append(dependent)
 
     return {cap: sorted(values) for cap, values in reasons.items()}
+
+
+def coverage_invalidation_closure(
+    engineering_graph: dict[str, Any],
+    invalid_capabilities: set[str],
+) -> dict[str, list[str]]:
+    """Published Assurance invalidation projection for Coverage consumers."""
+
+    return semantic_invalidation_closure(engineering_graph, invalid_capabilities)
 
 
 def coverage_proof_available(

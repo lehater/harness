@@ -483,8 +483,8 @@ coordination, not a mega-aggregate.
 
 ### EVO-011 — Published cross-context read models
 
-**Type:** RESEARCH  
-**Status:** CAPTURED
+**Type:** RECOMMENDATION  
+**Status:** ADOPTED
 
 **Direction**
 
@@ -506,6 +506,18 @@ make later physical restructuring mechanical.
 **Evidence needed**
 
 Extract one boundary and show reduced coupling without duplicating truth.
+
+**Canonical decision**
+
+The stable boundaries are now owned by
+`docs/design/context-published-contracts-v0.md` and enforced through
+`spec/architecture/harness-context-map-v0.yaml`.
+
+Coverage consumes an Assurance read projection instead of raw semantic
+evaluation records. Repository Integration is restricted to the explicit
+Project Model validation/index operations needed for graph alignment. The
+previous Coverage -> Application and Decision -> Application inversions remain
+removed.
 
 **Related**
 
@@ -548,7 +560,7 @@ The Reference Model is intentionally research today.
 ### EVO-013 — Physical packages by bounded context
 
 **Type:** RECOMMENDATION  
-**Status:** PARKED
+**Status:** ADOPTED
 
 **Direction**
 
@@ -572,19 +584,14 @@ src/harness/
 Do not perform this while context ownership and dependency direction are still
 changing. First remove or explicitly decide the logical boundary violations.
 
-**Why parked**
+**Adoption status**
 
-A package move now would mostly relocate the same coupling and create migration
-noise.
-
-**Foundation status**
-
-The migration target and root-module ratchet are now canonicalized in
+The migration target and root-module ratchet are canonicalized in
 `docs/design/repository-layout-v0.md` and
-`spec/architecture/repository-layout-v0.yaml`. This foundation does not by
-itself unpark the physical move: cross-context published-contract work tracked
-by EVO-011 remains an independent precondition where representation coupling is
-still material.
+`spec/architecture/repository-layout-v0.yaml`. HARN-016 has no current
+boundary violations, and EVO-011 now has machine-enforced published
+cross-context contracts. The physical move may therefore proceed incrementally
+without using relocation to discover semantic boundaries.
 
 **Related**
 

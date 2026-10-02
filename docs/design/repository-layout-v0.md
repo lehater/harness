@@ -102,9 +102,10 @@ Physical moves must preserve these invariants:
 - experiments/evaluations are separated from production runtime only after
   their actual consumer/runtime role is established.
 
-Cross-context published contracts from EVO-011 remain an independent design
-concern. A package move must not be used to hide unresolved representation
-coupling.
+Cross-context published contracts are canonicalized in
+`docs/design/context-published-contracts-v0.md` and machine-enforced by the
+bounded-context validator. Package moves must preserve those contracts rather
+than reintroducing representation coupling through new import paths.
 
 ## Migration order
 

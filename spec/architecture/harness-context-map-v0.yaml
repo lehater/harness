@@ -158,6 +158,26 @@ ignored_modules:
   - scenario_drivers
   - scenario_suite
 
+published_boundaries:
+  - from_context: coverage
+    to_context: assurance
+    modules:
+      semantic_acceptance:
+        - coverage_assurance_view
+        - coverage_invalidation_closure
+
+  - from_context: integration
+    to_context: project-model
+    modules:
+      harness:
+        - CoreError
+        - validate_model
+      engineering_graph:
+        - derive_profile
+        - producer_index
+        - production_index
+        - validate_engineering_graph
+
 shared_kernel_imports:
   harness:
     - CoreError
