@@ -203,9 +203,9 @@ checks:
 - id: consumer_wrapper
   command: python validators/validate_consumer_wrapper.py
   stage: deferred
-  cost_class: medium
+  cost_class: heavy
   disposition: full_gate
-  rationale: AUD-008 measured this distribution check at about three seconds; defer until focused checks pass.
+  rationale: V0/v1 clean-target wrapper plus isolated same-target migration measured 12.8 seconds; retain deferred execution after focused checks.
 - id: method_router
   command: python validators/validate_method_router.py
   stage: focused
