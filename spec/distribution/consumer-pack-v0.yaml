@@ -75,6 +75,7 @@ exact_files:
   - src/harness/__init__.py
   - src/harness/project_model/__init__.py
   - src/harness/project_model/core.py
+  - src/harness/project_model/target_state.py
   - skills/consumer-operation-registry-v0.yaml
   - skills/consumer-method-registry-v0.yaml
   - skills/artifact-skill-registry-v0.yaml

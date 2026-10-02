@@ -89,7 +89,7 @@ def _validate_physical_layout(
 
     if facades & (baseline | exceptions):
         raise SystemExit(
-            "CLI compatibility must be tracked separately from implementation baseline"
+            "compatibility surfaces must be tracked separately from implementation baseline"
         )
 
     classified = set(owner) | ignored
@@ -136,6 +136,8 @@ def _facade_body(target: str, kind: str) -> str:
             '__path__ = [str(_Path(__file__).resolve().parents[1] / "src" / "harness")]\n'
             + exports
         )
+    if kind == "module":
+        return exports + _facade_body(target, "cli")
     if kind == "cli":
         return (
             f"from {target} import main\n"
@@ -180,12 +182,12 @@ def _validate_facade(relative: str, target: str, kind: str) -> None:
 def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str], set[str]]:
     compatibility = layout.get("compatibility", {})
     if not isinstance(compatibility, dict) or set(compatibility) - {
-        "import_aliases", "cli_facades"
+        "import_aliases", "cli_facades", "module_facades"
     }:
         raise SystemExit("invalid compatibility metadata")
     aliases: dict[str, str] = {}
     facades: set[str] = set()
-    for kind in ("import_aliases", "cli_facades"):
+    for kind in ("import_aliases", "cli_facades", "module_facades"):
         entries = compatibility.get(kind, {})
         if not isinstance(entries, dict):
             raise SystemExit(f"compatibility.{kind} must be a mapping")
@@ -213,6 +215,12 @@ def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str],
                 _validate_facade(bridge, target, "bridge")
                 _validate_facade("src/harness/__init__.py", target, "exports")
                 aliases[legacy] = target
+            elif kind == "module_facades":
+                if not isinstance(legacy, str) or not legacy.isidentifier() or legacy in owner:
+                    raise SystemExit(f"module facade cannot own semantics: {legacy}")
+                _validate_facade(f"{legacy}.py", target, "module")
+                aliases[legacy] = target
+                facades.add(legacy)
             else:
                 if (
                     not isinstance(legacy, str)
@@ -285,7 +293,7 @@ def _resolve_target(module_name: str, owner: dict[str, str], aliases: dict[str, 
 
 def test_compatibility_guards() -> None:
     target = "harness.project_model.core"
-    for kind in ("bridge", "exports", "cli"):
+    for kind in ("bridge", "exports", "cli", "module"):
         valid = _facade_body(target, kind)
         _validate_facade_tree(ast.parse(valid), target, kind)
         for mutation in (
@@ -301,8 +309,10 @@ def test_compatibility_guards() -> None:
                 pass
             else:
                 raise AssertionError(f"{kind} accepted semantic/path mutation")
-    owner = {target: "project-model"}
-    aliases = {"harness": target}
+    module_target = "harness.project_model.target_state"
+    owner = {target: "project-model", module_target: "project-model"}
+    aliases = {"harness": target, "target_state": module_target}
+    assert _resolve_target("target_state", owner, aliases) == module_target
     assert _resolve_target("harness", owner, aliases) == target
     assert _resolve_target(target, owner, aliases) == target
     assert _resolve_target("harness.project_model.other", owner, aliases) is None

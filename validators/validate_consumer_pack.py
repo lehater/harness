@@ -57,6 +57,11 @@ assert Path(harness.__file__).resolve() == Path('harness/__init__.py').resolve()
 assert Path(core.__file__).resolve() == Path('src/harness/project_model/core.py').resolve()
 import engineering_graph
 import target_state
+from harness.project_model import target_state as canonical
+assert target_state.validate_profile is canonical.validate_profile
+assert target_state.evaluate_target_state is canonical.evaluate_target_state
+assert target_state.__all__ is canonical.__all__
+assert Path(canonical.__file__).resolve() == Path("src/harness/project_model/target_state.py").resolve()
 assert engineering_graph.CoreError is core.CoreError
 assert target_state.CoreError is core.CoreError
 """
@@ -73,6 +78,16 @@ assert target_state.CoreError is core.CoreError
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
     assert json.loads(result.stdout) == {"valid": True}, result.stdout
+
+    target_fixture = load_yaml(next((pack / "spec/target-state-acceptance").glob("*.yaml")))
+    profile_path = temp_root / "target-profile.yaml"
+    profile_path.write_text(yaml.safe_dump(target_fixture["profile"]), encoding="utf-8")
+    model_path.write_text(yaml.safe_dump(target_fixture["complete_model"]), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "target_state.py", str(profile_path), str(model_path)],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    assert json.loads(result.stdout) == target_fixture["expect"]["complete"], result.stdout
 
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")

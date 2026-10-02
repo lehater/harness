@@ -141,8 +141,10 @@ foundation.
 ## Core bootstrap migration decision
 
 The first slice moves only Core into `src/harness/project_model/core.py`.
-`engineering_graph.py` and `target_state.py` remain canonical root implementations
-and exercise the legacy Core import contract.
+`engineering_graph.py` remains a canonical root implementation and exercises
+the legacy Core import contract. The second slice moves Target State into
+`src/harness/project_model/target_state.py`, importing Core directly with `.core`;
+root `target_state.py` delegates imports and CLI execution to that canonical owner.
 
 The migration surfaces are distinct:
 
@@ -170,8 +172,11 @@ adopt installed-package execution.
 `target` and its `bridge` path. `compatibility.cli_facades` maps each legacy root
 CLI file to its canonical `target`. These are migration state, never context
 owners or permanent bootstrap exceptions. The first supported import-bridge
-shape is the root `harness` package; later module facades must explicitly extend
-the allowed shape rather than silently bypass its validation.
+shape is the root `harness` package. `compatibility.module_facades` maps a legacy
+module name to its canonical `target`, separately from package bridges. Its closed
+grammar re-exports canonical symbols and `__all__`, imports canonical `main`, and
+delegates execution under the `__main__` guard. These files are tracked separately
+from the implementation migration baseline.
 
 The architecture validator discovers non-initializer modules under `src/harness`,
 checks their context package, normalizes exact import aliases before dependency,

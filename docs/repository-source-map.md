@@ -61,7 +61,8 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `src/harness/project_model/core.py` — canonical Core v0 structural operations and CLI implementation.
 - `harness/__init__.py` — temporary source-tree Core import bridge.
 - `harness.py` — legacy Core CLI compatibility facade.
-- `target_state.py` — target-state evaluator above Core.
+- `src/harness/project_model/target_state.py` — canonical target-state evaluator above Core;
+  `target_state.py` is its temporary import/CLI facade.
 - `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.

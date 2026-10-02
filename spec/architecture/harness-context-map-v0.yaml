@@ -22,7 +22,7 @@ contexts:
     modules:
       - harness.project_model.core
       - engineering_graph
-      - target_state
+      - harness.project_model.target_state
     may_depend_on: []
 
   reference-model:

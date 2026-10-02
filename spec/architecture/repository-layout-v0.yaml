@@ -77,7 +77,6 @@ root_python:
     - source_boundary
     - source_coverage
     - source_set
-    - target_state
     - workspace
 
 # Finite migration state: these surfaces delegate, never own context semantics.
@@ -89,3 +88,6 @@ compatibility:
   cli_facades:
     harness.py:
       target: harness.project_model.core
+  module_facades:
+    target_state:
+      target: harness.project_model.target_state
