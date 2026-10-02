@@ -24,25 +24,20 @@ root_python:
   migration_baseline_modules:
     - acceptance_policy
     - agent_router
-    - architecture_driver_closure
     - authority_context
     - authority_role_projection_experiment
     - behavioral_eval
     - capability_lifecycle
-    - concern_activation
     - concern_activation_experiment
     - consumer_pack
     - coverage_application
     - coverage_control_loop_experiment
     - coverage_derivation_experiment
     - coverage_map_experiment
-    - coverage_obligations
-    - coverage_planner
     - coverage_planner_experiment
     - decision_explorer_request
     - decision_pipeline
     - derivation_test_coverage
-    - engineering_coverage
     - frontend_interface_knowledge
     - frontend_screen_contracts
     - graph_doctor
@@ -114,3 +109,18 @@ compatibility:
     decision_governance:
       target: harness.decision.decision_governance
       mode: import-only
+    architecture_driver_closure:
+      target: harness.coverage.architecture_driver_closure
+      mode: import-only
+    concern_activation:
+      target: harness.coverage.concern_activation
+      mode: import-and-cli
+    coverage_obligations:
+      target: harness.coverage.coverage_obligations
+      mode: import-only
+    coverage_planner:
+      target: harness.coverage.coverage_planner
+      mode: import-and-cli
+    engineering_coverage:
+      target: harness.coverage.engineering_coverage
+      mode: import-and-cli

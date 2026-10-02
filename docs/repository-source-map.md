@@ -71,6 +71,9 @@ Purpose: retain the detailed repository inventory outside the automatically load
   `reference_materializer.py` is its temporary import/CLI facade.
 - `src/harness/reference_model/reference_model_evolution.py` — canonical Reference Model evolution analysis;
   `reference_model_evolution.py` is its temporary import-only facade.
+- `src/harness/coverage/` — the five canonical `harness.coverage.*` modules for
+  applicability, subject obligations, proof planning and completeness evaluation;
+  the five root Coverage modules are temporary import/CLI compatibility facades.
 - `src/harness/decision/` — the four canonical `harness.decision.*` modules for
   exploration, Explorer request contracts, governance and execution assurance;
   the four corresponding root files are temporary import-only facades.
