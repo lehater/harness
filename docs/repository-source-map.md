@@ -65,6 +65,12 @@ Purpose: retain the detailed repository inventory outside the automatically load
   `target_state.py` is its temporary import/CLI facade.
 - `src/harness/project_model/engineering_graph.py` — canonical Engineering Graph implementation;
   `engineering_graph.py` is its temporary import/CLI facade.
+- `src/harness/reference_model/project_status.py` — canonical Authority applicability/status implementation;
+  `project_status.py` is its temporary import/CLI facade.
+- `src/harness/reference_model/reference_materializer.py` — canonical Reference Engineering Model validator/materializer;
+  `reference_materializer.py` is its temporary import/CLI facade.
+- `src/harness/reference_model/reference_model_evolution.py` — canonical Reference Model evolution analysis;
+  `reference_model_evolution.py` is its temporary import-only facade.
 - `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
 - `graph_doctor.py` — canonical non-destructive aggregate diagnostics over Engineering Graph/Core/project integration.

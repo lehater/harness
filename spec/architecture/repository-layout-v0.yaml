@@ -58,9 +58,6 @@ root_python:
     - method_router
     - project_frontier
     - project_publication
-    - project_status
-    - reference_materializer
-    - reference_model_evolution
     - repository_realization
     - scenario_drivers
     - scenario_suite
@@ -90,5 +87,16 @@ compatibility:
   module_facades:
     target_state:
       target: harness.project_model.target_state
+      mode: import-and-cli
     engineering_graph:
       target: harness.project_model.engineering_graph
+      mode: import-and-cli
+    project_status:
+      target: harness.reference_model.project_status
+      mode: import-and-cli
+    reference_materializer:
+      target: harness.reference_model.reference_materializer
+      mode: import-and-cli
+    reference_model_evolution:
+      target: harness.reference_model.reference_model_evolution
+      mode: import-only

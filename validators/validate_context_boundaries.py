@@ -136,7 +136,9 @@ def _facade_body(target: str, kind: str) -> str:
             '__path__ = [str(_Path(__file__).resolve().parents[1] / "src" / "harness")]\n'
             + exports
         )
-    if kind == "module":
+    if kind == "import-only":
+        return exports
+    if kind == "import-and-cli":
         return exports + _facade_body(target, "cli")
     if kind == "cli":
         return (
@@ -192,7 +194,11 @@ def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str],
         if not isinstance(entries, dict):
             raise SystemExit(f"compatibility.{kind} must be a mapping")
         for legacy, entry in entries.items():
-            fields = {"target", "bridge"} if kind == "import_aliases" else {"target"}
+            fields = (
+                {"target", "bridge"} if kind == "import_aliases"
+                else {"target", "mode"} if kind == "module_facades"
+                else {"target"}
+            )
             if not isinstance(entry, dict) or set(entry) != fields:
                 raise SystemExit(f"invalid compatibility entry: {legacy}")
             target = entry["target"]
@@ -218,7 +224,10 @@ def _compatibility(layout: dict, owner: dict[str, str]) -> tuple[dict[str, str],
             elif kind == "module_facades":
                 if not isinstance(legacy, str) or not legacy.isidentifier() or legacy in owner:
                     raise SystemExit(f"module facade cannot own semantics: {legacy}")
-                _validate_facade(f"{legacy}.py", target, "module")
+                mode = entry["mode"]
+                if mode not in ("import-only", "import-and-cli"):
+                    raise SystemExit(f"invalid module facade mode: {legacy}: {mode}")
+                _validate_facade(f"{legacy}.py", target, mode)
                 aliases[legacy] = target
                 facades.add(legacy)
             else:
@@ -293,7 +302,7 @@ def _resolve_target(module_name: str, owner: dict[str, str], aliases: dict[str, 
 
 def test_compatibility_guards() -> None:
     target = "harness.project_model.core"
-    for kind in ("bridge", "exports", "cli", "module"):
+    for kind in ("bridge", "exports", "cli", "import-only", "import-and-cli"):
         valid = _facade_body(target, kind)
         _validate_facade_tree(ast.parse(valid), target, kind)
         for mutation in (
@@ -309,6 +318,16 @@ def test_compatibility_guards() -> None:
                 pass
             else:
                 raise AssertionError(f"{kind} accepted semantic/path mutation")
+    for actual_kind, declared_kind in (
+        ("import-only", "import-and-cli"),
+        ("import-and-cli", "import-only"),
+    ):
+        try:
+            _validate_facade_tree(ast.parse(_facade_body(target, actual_kind)), target, declared_kind)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError(f"{declared_kind} accepted {actual_kind} grammar")
     module_target = "harness.project_model.target_state"
     owner = {target: "project-model", module_target: "project-model"}
     aliases = {"harness": target, "target_state": module_target}
