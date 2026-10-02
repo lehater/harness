@@ -53,7 +53,7 @@ HA-A02 Engineering Graph topology, HA-A03 Target-state action semantics,
 HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Coverage,
 HA-A07 Project Authority migration, HA-A08 Design target selection,
 HA-A09 existing-project
-bootstrap/reconcile, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
+bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
@@ -108,7 +108,9 @@ assessment preservation. HA-A08 is explicitly INCOMPLETE: A08-R01 requires
 a judgement-backed bounded selection/anti-template-bias case, A08-R02 requires
 the TL3 project-shaped minimal-target proof, and A08-R03 requires repeated
 clean-context convergence. HA-A09 satisfies A09-R01 (TL2),
-A09-R02 (TL3), and A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18
+A09-R02 (TL3), and A09-R03 (TL4); HA-A10 is explicitly INCOMPLETE with
+A10-R01/A10-R02 waiting on the blocked TD-BOOT-G01..G04 TL3 greenfield cases
+and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
@@ -348,6 +350,11 @@ deterministic closure evaluation and historical/stale provider runs do not
 substitute for target-selection judgement. TD-CAP-005 and TD-BOOT-G01/G04/G05
 remain the relevant designed evidence paths; TL4 convergence must use repeated
 clean-context execution.
+
+HA-A10 is present in the denominator and remains INCOMPLETE by design.
+Greenfield bootstrap cannot be proven from pre-authored graph fixtures because
+that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
+minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks

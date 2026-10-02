@@ -176,6 +176,23 @@ abilities:
       - A09-R03
       - A09-R04
 
+  - id: HA-A10
+    title: Greenfield bootstrap
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: judgement-dependent
+    failure_modes:
+      - A10-F01
+      - A10-F02
+      - A10-F03
+      - A10-F04
+      - A10-F05
+    requirements:
+      - A10-R01
+      - A10-R02
+      - A10-R03
+
   - id: HA-A16
     title: Agent/method/artifact routing
     contract_ref:
@@ -600,6 +617,48 @@ requirements:
       test_levels: [TL5]
       methods_any: [EM-10]
       oracle_minimum: O2
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A10-R01
+    ability: HA-A10
+    failure_modes: [A10-F01, A10-F02, A10-F03]
+    purpose: A concise greenfield goal produces the smallest sufficient initial model, preserves foundational obligations, and leaves unsupported architecture/domain choices unresolved rather than invented.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-05, EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A10-R02
+    ability: HA-A10
+    failure_modes: [A10-F04]
+    purpose: The first project frontier exposes only foundational work whose prerequisites are satisfied and cannot falsely become READY or COMPLETE.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-07, EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A10-R03
+    ability: HA-A10
+    failure_modes: [A10-F05]
+    purpose: Repeated clean-context bootstrap from the same frozen goal converges on materially compatible normalized initial models and frontiers.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09]
+      oracle_minimum: O1
       judgement_execution: true
     substitution:
       higher_level_alone_allowed: false
