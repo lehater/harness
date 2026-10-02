@@ -2,6 +2,7 @@
 """Validate Harness design target-state acceptance fixtures."""
 from __future__ import annotations
 
+import copy
 import sys
 from pathlib import Path
 
@@ -61,10 +62,33 @@ def test_multiple_provider_alternative() -> None:
     assert result["wait"] == [], result
 
 
+def test_representation_order_invariance() -> None:
+    doc = yaml.safe_load(
+        (
+            ROOT / "spec/target-state-acceptance/design-profile-v0.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    profile = copy.deepcopy(doc["profile"])
+    model = copy.deepcopy(doc["partial_model"])
+    expected = evaluate_target_state(profile, model)
+
+    reordered_profile = copy.deepcopy(profile)
+    reordered_profile["expectations"] = list(
+        reversed(reordered_profile["expectations"])
+    )
+    reordered_model = copy.deepcopy(model)
+    for key in ("authorities", "artifacts", "questions"):
+        reordered_model[key] = list(reversed(reordered_model.get(key, [])))
+
+    actual = evaluate_target_state(reordered_profile, reordered_model)
+    assert actual == expected, (actual, expected)
+
+
 def main() -> int:
     errors: list[str] = []
     try:
         test_multiple_provider_alternative()
+        test_representation_order_invariance()
     except Exception as exc:
         errors.append(f"multiple provider alternative: {exc}")
     fixtures = sorted((ROOT / "spec/target-state-acceptance").glob("*.yaml"))
