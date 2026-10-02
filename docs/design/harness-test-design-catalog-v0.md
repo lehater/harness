@@ -1846,7 +1846,9 @@ produces one coherent result.
 **Methods:** EM-02, EM-03  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_human_projection.py`, `tests/test_adapters.py`.
 
 Mutation:
 
@@ -1863,7 +1865,12 @@ Canonical truth/currentness does not change because projection text changed.
 **Methods:** EM-03, EM-07  
 **Minimum level:** TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_human_projection.py`, `tests/test_unified_model.py`,
+`tests/test_frontend_screen_contracts.py`, and `tests/test_graph_doctor.py`.
+The NAPMS-shaped workspace fixture supplies the TL3 repository-shaped realization
+surface.
 
 Expected result:
 
@@ -1877,7 +1884,9 @@ required canonical semantics are absent/stale.
 **Methods:** EM-05  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
+
+**Evidence:** `tests/test_human_projection.py::test_projection_reproducibility_and_source_ownership`.
 
 Equivalent canonical truth should yield semantically equivalent projection
 independent of irrelevant ordering.
