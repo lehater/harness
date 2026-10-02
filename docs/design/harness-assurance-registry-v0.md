@@ -55,7 +55,7 @@ HA-A07 Project Authority migration, HA-A08 Design target selection,
 HA-A09 existing-project
 bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A11 Source acquisition/completeness,
 HA-A12 Semantic derivation/admission, HA-A13 Questions/blockers, HA-A14 Lifecycle/currentness, HA-A15 Frontier/publication, HA-A16 routing, HA-A17 Repository realization/projections, HA-A18 Consumer distribution/compatibility,
-and HA-A19 assurance self-test obligations. HA-A05 remains split
+HA-A19 assurance self-test obligations, and HA-A20 External semantic assurance. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
 separate TL2 controlled handoff, TL3 existing-project micro-project, TL4
@@ -139,7 +139,12 @@ evidence at the direct-file publication boundary. HA-A17 satisfies A17-R01 throu
 adapter/projection provenance and stale-source rejection, A17-R02 through the
 NAPMS-shaped repository/workspace fail-closed realization path, and A17-R03
 through exact projection-manifest invariance under irrelevant declaration
-reordering. Independent whole-project portability remains owned by HA-A21. HA-A16 satisfies A16-R01..R06; and HA-A18
+reordering. Independent whole-project portability remains owned by HA-A21. HA-A20 satisfies A20-R01 through fail-closed
+request/response binding plus observed resolved-runtime binding, and A20-R03
+through explicit corpus-population limits and UNVERIFIED independence metadata.
+A20-R02 remains missing: current-surface provider run `37071325425` produced
+one false negative in its first scorable run and an INCOMPLETE malformed-envelope
+second run, so it cannot establish the required current FP/FN+stability proof. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
