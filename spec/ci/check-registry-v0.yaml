@@ -45,6 +45,12 @@ workflow_roles:
   cost_class: heavy
   draft_behavior: manual
   rationale: Provider-backed agent judgement evidence is intentionally operator-triggered and outside ordinary PR gates.
+- path: .github/workflows/behavioral-eval-copilot-tl4.yml
+  role: external
+  cost_class: heavy
+  draft_behavior: manual
+  rationale: Repeated clean-context TL4 provider evidence is intentionally isolated from the lower-level suite and operator-triggered to control cost.
+
 
 checks:
 - id: ci_policy

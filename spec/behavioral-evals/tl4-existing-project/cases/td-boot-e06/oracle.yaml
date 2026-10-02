@@ -1,0 +1,32 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+dimensions:
+  bootstrap_realization:
+    core_model:
+      authorities: [DISPATCH-DESIGN, ORDER-DESIGN]
+      artifacts:
+        - path: docs/order-contract.md
+          authority: ORDER-DESIGN
+          provides: [orders.lifecycle-contract]
+          depends_on_paths: []
+        - path: docs/dispatch-contract.md
+          authority: DISPATCH-DESIGN
+          provides: [orders.dispatch-contract]
+          depends_on_paths: [docs/order-contract.md]
+      question_count: 1
+      questions:
+        - authority: DISPATCH-DESIGN
+          blocks_capabilities: [orders.retry-policy]
+          blocks_paths: []
+          answer_from_paths: []
+    target_state:
+      status: BLOCKED
+      satisfied: [EXP-DISPATCH-CONTRACT, EXP-ORDER-LIFECYCLE]
+      create: []
+      wait:
+        - expectation: EXP-RETRY-POLICY
+          subject: ORDER
+          capability: orders.retry-policy
+          authority: DISPATCH-DESIGN
+          question_count: 1
+      pending: []

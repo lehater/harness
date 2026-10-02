@@ -1,0 +1,85 @@
+name: behavioral eval copilot tl4 evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  tl4-existing-project:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Harness dependencies
+        run: pip install PyYAML
+
+      - name: Install pinned Copilot CLI
+        run: |
+          npm install -g @github/copilot@1.0.91
+          copilot --version
+
+      - name: Materialize provider-auto baseline agent descriptor
+        shell: bash
+        run: |
+          MODEL="auto"
+          MODEL_SELECTION="provider-auto"
+          sed \
+            -e "s/__MODEL__/${MODEL}/g" \
+            -e "s/__MODEL_SELECTION__/${MODEL_SELECTION}/g" \
+            spec/behavioral-evals/copilot-agent.yaml.tmpl \
+            > /tmp/behavioral-agent.yaml
+
+      - name: Execute TL4 existing-project behavioral cases
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          mkdir -p behavioral-eval-evidence
+          FAILED=0
+          mapfile -t TEMPLATES < <(
+            python - <<'PY'
+          import yaml
+          from pathlib import Path
+          manifest = yaml.safe_load(
+              Path("spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml").read_text()
+          )
+          for item in manifest["cases"]:
+              print("spec/behavioral-evals/tl4-existing-project/" + item["template"])
+          PY
+          )
+          for TEMPLATE in "${TEMPLATES[@]}"; do
+            CASE="${TEMPLATE%.tmpl}"
+            DESIGN="$(basename "$(dirname "${TEMPLATE}")")"
+            sed "s/__HARNESS_REVISION__/${GITHUB_SHA}/g" "${TEMPLATE}" > "${CASE}"
+            python behavioral_eval.py "${CASE}" \
+              --agent-descriptor /tmp/behavioral-agent.yaml \
+              --adapter-executable "${GITHUB_WORKSPACE}/adapters/copilot_behavioral_eval_agent.py" \
+              --output-dir "behavioral-eval-evidence/${DESIGN}" \
+              --json-summary "behavioral-eval-evidence/${DESIGN}-summary.json"
+            STATUS=$?
+            rm -f "${CASE}"
+            if [[ ${STATUS} -ne 0 ]]; then
+              FAILED=1
+            fi
+          done
+          exit ${FAILED}
+
+      - name: Persist TL4 behavioral evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tl4-existing-project-behavioral-evidence
+          path: behavioral-eval-evidence/
+          if-no-files-found: warn
+          retention-days: 90

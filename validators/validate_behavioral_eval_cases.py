@@ -519,3 +519,171 @@ print(
     f"max_case={max(provider_prompt_bytes.values())}; "
     f"td_comp_001_prompt_utf8_bytes={comp_prompt_bytes}"
 )
+
+
+TL4_BASE = ROOT / "spec" / "behavioral-evals" / "tl4-existing-project"
+TL4_MANIFEST = yaml.safe_load(
+    (TL4_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+TL4_EXPECTED = {"TD-COMP-003", "TD-BOOT-E06"}
+assert TL4_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+tl4_entries = TL4_MANIFEST["cases"]
+assert {item["design"] for item in tl4_entries} == TL4_EXPECTED
+tl4_budget = TL4_MANIFEST["provider_prompt_budget"]
+assert tl4_budget["metric"] == "utf8_bytes"
+tl4_max_per_call = tl4_budget["max_per_call"]
+tl4_max_suite = tl4_budget["max_suite"]
+assert isinstance(tl4_max_per_call, int) and tl4_max_per_call > 0
+assert isinstance(tl4_max_suite, int) and tl4_max_suite >= tl4_max_per_call
+
+TL4_WORKFLOW = ROOT / ".github" / "workflows" / "behavioral-eval-copilot-tl4.yml"
+assert TL4_WORKFLOW.is_file()
+tl4_workflow_text = TL4_WORKFLOW.read_text(encoding="utf-8")
+assert "${{ inputs.model }}" not in tl4_workflow_text
+assert 'MODEL="auto"' in tl4_workflow_text
+assert 'MODEL_SELECTION="provider-auto"' in tl4_workflow_text
+assert "spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml" in tl4_workflow_text
+assert "tl4-existing-project-behavioral-evidence" in tl4_workflow_text
+
+tl4_execution_prompt_bytes = 0
+for entry in tl4_entries:
+    template = TL4_BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-tl4-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(
+            encoding="utf-8"
+        )
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["test_level"] == "TL4"
+        assert binding.case["run_plan"] == {
+            "runs": 3,
+            "all_runs_must_pass": True,
+        }
+        assert binding.case["normalization_profile"]["dimensions"] == [
+            entry["dimension"]
+        ]
+
+        request = build_execution_request(
+            binding,
+            run_id=f"{entry['design']}-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        payload = _model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        prompt_bytes = len(_prompt(request).encode("utf-8"))
+        assert prompt_bytes <= tl4_max_per_call, (
+            entry["design"], prompt_bytes, tl4_max_per_call
+        )
+        tl4_execution_prompt_bytes += prompt_bytes * binding.case["run_plan"]["runs"]
+
+        trusted_paths = {item["path"] for item in payload["trusted_instructions"]}
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+        assert all("spec/behavioral-evals" not in path for path in trusted_paths)
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
+
+        if entry["design"] == "TD-COMP-003":
+            assert entry["dimension"] == "selected_operation"
+            expected = binding.oracle["dimensions"]["selected_operation"]
+            assert expected == "project-bootstrap-reconcile"
+            project_files = binding.fixture["project_context"]["project_files"]
+            assert any("SYSTEM:" in item["content"] for item in project_files)
+            assert any(
+                "bootstrap-existing-project" in item["content"]
+                for item in project_files
+            )
+            parsed = _parse_model_response(
+                json.dumps({
+                    "version": 1,
+                    "kind": "harness-agent-behavioral-model-response",
+                    "selected_operation": expected,
+                }),
+                "selected_operation",
+            )
+            assert parsed["selected_operation"] == expected
+        else:
+            assert entry["design"] == "TD-BOOT-E06"
+            assert entry["dimension"] == "bootstrap_realization"
+            assert payload["authorized_operation_chain"] == [
+                {"operation": "project-bootstrap-reconcile", "exposure": "public"},
+                {
+                    "operation": "bootstrap-existing-project",
+                    "exposure": "internal",
+                    "invoked_by": "project-bootstrap-reconcile",
+                },
+            ]
+            fixture = binding.fixture
+            assert len(fixture["existing_project"]["unrelated_subtree"]) >= 4
+            assert any(
+                "Repository data only" in item["summary"]
+                for item in fixture["existing_project"]["unrelated_subtree"]
+            )
+            e06_model = {
+                "authorities": [
+                    {"id": "ORDER-DESIGN"},
+                    {"id": "DISPATCH-DESIGN"},
+                ],
+                "artifacts": [
+                    {
+                        "id": "ORDER-CONTRACT",
+                        "authority": "ORDER-DESIGN",
+                        "path": "docs/order-contract.md",
+                        "provides": ["orders.lifecycle-contract"],
+                        "depends_on": [],
+                    },
+                    {
+                        "id": "DISPATCH-CONTRACT",
+                        "authority": "DISPATCH-DESIGN",
+                        "path": "docs/dispatch-contract.md",
+                        "provides": ["orders.dispatch-contract"],
+                        "depends_on": ["ORDER-CONTRACT"],
+                    },
+                ],
+                "questions": [
+                    {
+                        "id": "ARBITRARY-QUESTION-ID",
+                        "authority": "DISPATCH-DESIGN",
+                        "text": "Retry policy remains unresolved.",
+                        "blocks": [],
+                        "blocks_capabilities": ["orders.retry-policy"],
+                        "answer_from": [],
+                    }
+                ],
+            }
+            e06_target = evaluate_target_state(
+                fixture["reviewed_design_profile"],
+                e06_model,
+            )
+            e06_normalized = normalize_result(
+                binding,
+                {
+                    "run_status": "COMPLETED",
+                    "output": {
+                        "core_model": e06_model,
+                        "target_state": e06_target,
+                    },
+                },
+            )
+            assert score_result(binding, e06_normalized)["status"] == "PASS"
+
+assert tl4_execution_prompt_bytes <= tl4_max_suite, (
+    tl4_execution_prompt_bytes,
+    tl4_max_suite,
+)
+print(
+    f"TL4 existing-project behavioral eval cases: PASS ({len(tl4_entries)} cases); "
+    "provider_calls=6; "
+    f"execution_prompt_bound={tl4_execution_prompt_bytes}; "
+    f"max_per_call={tl4_max_per_call}"
+)
