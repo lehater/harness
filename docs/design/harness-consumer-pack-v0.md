@@ -211,3 +211,10 @@ continues delegating to `harness.application.skill_router`, with registries,
 skills, spec and docs resolved from the Pack root. Neither an installed Harness
 package nor `PYTHONPATH` is required; wrapper semantics and Consumer API do not
 change.
+
+Python-generated `.pyc` files within `__pycache__` directories are disposable
+runtime caches and do not count as untracked distribution files. All manifested
+files retain existence/hash checks; other extra files remain invalid. This
+explicitly approved compatibility exception lets the root Consumer Pack facade
+validate the Pack after importing its canonical implementation with default
+Python bytecode behavior. Wrapper/bootstrap semantics remain unchanged.

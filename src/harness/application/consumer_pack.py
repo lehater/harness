@@ -349,6 +349,8 @@ def validate_pack(
         path.relative_to(pack_root).as_posix()
         for path in pack_root.rglob("*")
         if path.is_file() and path.name != PACK_MANIFEST
+        and (path.relative_to(pack_root).as_posix() in expected_files
+             or not ("__pycache__" in path.relative_to(pack_root).parts and path.suffix == ".pyc"))
     }
     if actual_files != expected_files:
         raise ConsumerPackError(

@@ -599,7 +599,8 @@ Frozen public namespaces and whole-module AST hashes from
 Legacy and canonical `__all__` lists and every exported object share identity.
 Reversing only relative Application imports, explicit exports and
 `Path(__file__).resolve().parents[3]` root adaptations restores each baseline
-AST. The five path-sensitive modules continue resolving repository/Pack-local
+AST, except for the explicitly approved cache-validation exception below.
+The five path-sensitive modules continue resolving repository/Pack-local
 skills, registries, spec and docs; production bodies are otherwise unchanged.
 
 Evidence reuses HA-A18 TD-DIST-001/002 (isolated Pack and clean-target wrapper),
@@ -618,3 +619,22 @@ already stale on the base. Binding intersection: yes; new current -> stale
 transition: no. Historical hashes, outcomes and currentness are preserved.
 This mechanical migration requires deterministic evidence; no provider run or
 new provider judgement claim is introduced.
+
+
+### Approved bytecode-cache compatibility exception
+
+The operator explicitly authorized this exception after committed-head CI
+exposed a cold bootstrap failure: importing the root Consumer Pack facade
+creates `__pycache__/*.pyc` before the Pack validates its own file set. The old
+standalone implementation generated no local bytecode during that validation.
+A pre-commit wrapper run cloned the unmigrated base and could not expose this
+failure; wrapper acceptance must also run against the committed candidate.
+
+`validate_pack()` now excludes only `.pyc` files within `__pycache__` directories
+from the untracked-file comparison. Manifested files still require existence
+and matching hashes, including any explicitly manifested cache file. Ordinary
+extra files, `.pyc` outside cache directories and non-bytecode files inside them
+remain invalid. Wrapper and facade grammar stay unchanged. This is the only
+production-body exception to whole-module baseline equivalence and is reversed
+explicitly by the AST proof. A fresh isolated Consumer Pack CLI uses default bytecode
+behavior; focused mutations protect the remaining exact-file-set contract.
