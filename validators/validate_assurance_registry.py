@@ -720,25 +720,40 @@ def _expect_invalid(registry: dict[str, Any], fragment: str) -> None:
 def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     passed: list[str] = []
 
-    report = assurance_report(registry)
-    assert report["summary"]["release_claim_ready"] is True
-    assert report["abilities"]["HA-A04"]["satisfied_requirements"] == [
-        "A04-R01", "A04-R02", "A04-R03"
-    ]
-    assert report["abilities"]["HA-A04"]["missing_requirements"] == []
-    assert report["abilities"]["HA-A05"]["satisfied_requirements"] == [
-        "A05-R01", "A05-R02", "A05-R03"
-    ]
-    assert report["abilities"]["HA-A05"]["missing_requirements"] == []
-    assert report["abilities"]["HA-A09"]["satisfied_requirements"] == [
-        "A09-R01", "A09-R02", "A09-R03", "A09-R04"
-    ]
-    assert report["abilities"]["HA-A09"]["missing_requirements"] == []
-    assert set(report["abilities"]["HA-A16"]["satisfied_requirements"]) == {
-        "A16-R01", "A16-R02", "A16-R03",
-        "A16-R04", "A16-R05", "A16-R06"
+    # Completeness is a mechanism oracle, not an assertion that today's live
+    # provider evidence is current. A stale run must expose a gap, not fail CI.
+    completeness_fixture = {
+        "abilities": [{
+            "id": "META-ABILITY", "release_critical": True,
+            "requirements": ["META-R01", "META-R02"],
+        }],
+        "requirements": [{
+            "id": requirement_id, "release_applicable": True,
+            "required": {
+                "test_levels": ["TL1"], "methods_any": ["EM-02"],
+                "oracle_minimum": "O1", "judgement_execution": False,
+            },
+            "substitution": {"higher_level_alone_allowed": False},
+        } for requirement_id in ("META-R01", "META-R02")],
+        "evidence": [{
+            "id": "META-EVIDENCE-1", "satisfies": ["META-R01"],
+            "status": "implemented", "test_level": "TL1", "methods": ["EM-02"],
+            "oracle_class": "O1", "execution_nature": "deterministic",
+        }],
     }
-    assert report["abilities"]["HA-A16"]["missing_requirements"] == []
+    report = assurance_report(completeness_fixture)
+    assert report["summary"]["release_claim_ready"] is False
+    assert report["abilities"]["META-ABILITY"]["satisfied_requirements"] == ["META-R01"]
+    assert report["abilities"]["META-ABILITY"]["missing_requirements"] == ["META-R02"]
+    second = dict(completeness_fixture["evidence"][0])
+    second.update(id="META-EVIDENCE-2", satisfies=["META-R02"])
+    completeness_fixture["evidence"].append(second)
+    assert assurance_report(completeness_fixture)["summary"]["release_claim_ready"] is True
+    for status in ("stale", "retired"):
+        second["status"] = status
+        report = assurance_report(completeness_fixture)
+        assert report["summary"]["release_claim_ready"] is False
+        assert report["abilities"]["META-ABILITY"]["missing_requirements"] == ["META-R02"]
     passed.append("AR-M01")
 
     def candidate(

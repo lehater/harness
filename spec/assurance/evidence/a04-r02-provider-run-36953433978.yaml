@@ -26,10 +26,12 @@ execution_bindings:
     - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
     - {path: .github/workflows/behavioral-eval-copilot.yml, git_blob_sha: 8edb4d7592db32b1371c4ac90947789115ba08ca}
 currentness:
-  state: current
+  state: stale
   reason: >-
-    Provider-visible instruction/runtime bindings and the corrected
-    TD-AUTH-003 Fixture V2 plus TD-AUTH-006 case bindings remain current.
+    Core package bootstrap changed docs/design/core-v0.md.
+    Original execution bindings and outcomes remain historical; a new provider
+    run is required before this evidence can prove the current execution surface.
+
 outcome:
   run_status: COMPLETED
   correctness: PASS

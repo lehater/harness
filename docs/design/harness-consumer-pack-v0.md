@@ -103,8 +103,23 @@ The pack definition explicitly lists public root runtime modules. Materializatio
 checks Python imports between root Harness modules: if an exported module imports
 another Harness root module that is not exported, pack creation fails.
 
-This prevents a source refactor from silently creating an incomplete
-distribution.
+This checks root-module closure; it does not prove packaged dependency closure.
+For the Core bootstrap slice, `exact_files` also includes:
+
+```text
+harness/__init__.py
+src/harness/__init__.py
+src/harness/project_model/__init__.py
+src/harness/project_model/core.py
+```
+
+The canonical implementation is the packaged Core. `harness/__init__.py` is
+its temporary import bridge and `harness.py` remains only the legacy CLI.
+The pack acceptance validator executes imports, checks canonical/legacy object
+identity and runs the legacy CLI against an existing fixture from inside an
+isolated materialized pack, without inheriting source-checkout import paths.
+No whole `src/` prefix, Harness install step, API change or wrapper protocol
+change is introduced.
 
 ## Clean-target bootstrap
 

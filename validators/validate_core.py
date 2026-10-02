@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import copy
+import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -26,7 +29,6 @@ from harness import (  # noqa: E402
     unresolved_questions,
     validate_model,
 )
-
 
 def test_multiple_provider_alternative() -> None:
     model = {
@@ -59,7 +61,6 @@ def test_multiple_provider_alternative() -> None:
     action = next_action(model, "application.source")
     assert action["action"] == "DESIGN", action
     assert action["providers"] == ["SOURCE-CURRENT", "SOURCE-OLD"], action
-
 
 def test_capability_question_granularity() -> None:
     model = {
@@ -105,14 +106,62 @@ def test_capability_question_granularity() -> None:
     assert intent["questions"] == ["Q-ARTIFACT"], intent
 
 
+def test_package_compatibility() -> None:
+    # Frozen pre-migration consumer surface: independent from canonical __all__.
+    legacy_exports = {
+        "CoreError", "affected", "artifact_blockers", "blocked",
+        "capability_blockers", "capability_owner", "capability_resolve",
+        "completeness", "design_frontier", "load_model", "next_action",
+        "question_frontier", "resolve_question", "unblocked_capability_providers",
+        "unresolved_questions", "validate_model",
+    }
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env["PYTHONNOUSERSITE"] = "1"
+    for imports in (
+        "import harness; from harness.project_model import core",
+        "from harness.project_model import core; import harness",
+    ):
+        probe = imports + "\n" + f"required = {sorted(legacy_exports)!r}\n" + """
+assert set(required) <= set(core.__all__)
+assert harness.__all__ is core.__all__
+for name in required:
+    assert getattr(harness, name) is getattr(core, name), name
+assert harness.CoreError is core.CoreError
+assert harness.validate_model is core.validate_model
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", probe], cwd=ROOT, env=env,
+            capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stderr
+    fixture = yaml.safe_load(
+        (ROOT / "spec/research/consumer-activation-fixture-core.yaml").read_text()
+    )
+    validate_model(fixture)
+    for entry in ("harness.py", "-m"):
+        command = [sys.executable, entry]
+        if entry == "-m":
+            command.append("harness.project_model.core")
+        command += ["validate", "spec/research/consumer-activation-fixture-core.yaml"]
+        result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout) == {"valid": True}, result.stdout
+
 def main() -> int:
     errors: list[str] = []
     try:
+        test_package_compatibility()
         test_multiple_provider_alternative()
         test_capability_question_granularity()
     except Exception as exc:
         errors.append(f"Core focused regression: {exc}")
-    required = [ROOT / "harness.py", ROOT / "docs/design/core-v0.md"]
+    required = [
+        ROOT / "src/harness/project_model/core.py",
+        ROOT / "harness/__init__.py",
+        ROOT / "harness.py",
+        ROOT / "docs/design/core-v0.md",
+    ]
     for path in required:
         if not path.is_file():
             errors.append(f"missing Core v0 file: {path.relative_to(ROOT)}")

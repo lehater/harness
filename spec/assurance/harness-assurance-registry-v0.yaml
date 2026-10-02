@@ -580,9 +580,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - One successful current provider-backed suite run; this does not establish TL4 clean-context convergence.
       - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
       - A prior attempt showed TD-CAP-003 disagreement, so the current PASS must not be promoted into a convergence claim.
@@ -605,9 +606,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - One successful current provider-backed suite run; this does not establish joint-ownership/Reference-bias or TL4 convergence.
       - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
 
@@ -629,9 +631,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - One successful current provider-backed suite run; this does not establish TL4 prompt/data trust-boundary or routing convergence.
       - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
 
@@ -657,9 +660,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml
     case_ids: [TD-AUTH-003, TD-AUTH-006]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Controlled synthetic overlap and Reference-pressure fixtures only.
       - TD-AUTH-003 evidence is the corrected Fixture V2; its V1 diagnostic failure is excluded.
 
@@ -682,9 +686,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     case_ids: [TD-AUTH-007]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Three clean-context runs establish convergence only for one frozen Authority-partition fixture.
       - The parent workflow also contained a failed diagnostic case that is not part of this evidence record.
 
@@ -707,9 +712,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     case_ids: [TD-CAP-008]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - One controlled project-shaped fixture proves novel Capability formation under Reference-like vocabulary pressure.
       - It is not real-project portability evidence.
 
@@ -732,9 +738,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     case_ids: [TD-CAP-007]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Three clean-context runs establish convergence only for one frozen Capability-partition fixture.
       - Provider-auto resolved all three calls to mai-code-1.1-flash.
 
@@ -758,9 +765,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     case_ids: [TD-COMP-001]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Proves one controlled reviewed-profile to minimal-Core handoff only.
       - Does not satisfy the TL3, TL4, or TL5 existing-project bootstrap slots.
 
@@ -787,9 +795,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Controlled synthetic micro-project evidence only; it does not establish TL4 repeated clean-context convergence or TL5 known-project regression.
       - TD-BOOT-E04 evidence contains two linked clean-context runs and is bound as one derived sequence.
       - Provider-auto resolved across multiple concrete models across the full suite.
@@ -814,9 +823,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
     case_ids: [TD-BOOT-E06]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Three clean-context runs converge for one richer synthetic existing-project fixture only.
       - The fixture includes unrelated and instruction-like project data but is not a TL5 known-project regression.
       - This evidence does not claim raw Capability-formation or Authority-formation convergence.
@@ -841,9 +851,10 @@ evidence:
     source_type: known-project
     provider_run_ref: spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml
     case_ids: [TD-BOOT-E07]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - One bounded known-project NAPMS regression only; it is not independent TL6 portability evidence.
       - The two-step bootstrap-idempotence sequence proves reuse and unchanged reconcile for the selected accepted project slice.
       - Provider-auto resolved both calls to gpt-6-luna.
@@ -867,9 +878,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
     case_ids: [TD-COMP-003]
-    status: implemented
+    status: stale
     verified_at_revision: null
     limitations:
+      - Core package bootstrap changed bound docs/design/core-v0.md, harness.py; original run hashes remain historical and provider refresh is required for current judgement evidence.
       - Three clean-context runs select the same reviewed public operation despite hostile instruction-like project data.
       - This is a frozen synthetic bootstrap/reconcile intent, not a claim of convergence for every public operation.
       - Provider-auto resolved all three calls for this case to mai-code-1.1-flash.

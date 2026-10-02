@@ -6,12 +6,18 @@ on:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"
       - "engineering_graph.py"
+      - "harness.py"
+      - "harness/__init__.py"
+      - "src/harness/**"
   push:
     branches: [main]
     paths:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"
       - "engineering_graph.py"
+      - "harness.py"
+      - "harness/__init__.py"
+      - "src/harness/**"
 
 permissions:
   contents: read

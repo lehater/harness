@@ -53,7 +53,11 @@ questions:
 
 ## Derived operations
 
-`harness.py` provides:
+Canonical implementation is `src/harness/project_model/core.py`, imported as
+`harness.project_model.core`. The temporary source-tree import bridge
+`harness/__init__.py` preserves legacy `from harness import ...` using the
+canonical Core `__all__`, including identical `CoreError` and function objects.
+`harness.py` contains only CLI delegation and provides the existing commands:
 
 - `validate MODEL`
 - `affected MODEL ARTIFACT`

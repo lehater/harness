@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import copy
+import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -35,6 +37,43 @@ def _git_head() -> str:
     return result.stdout.strip()
 
 
+def test_pack_execution(pack: Path, temp_root: Path) -> None:
+    """Exercise the distributed files, without inheriting checkout import paths."""
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env["PYTHONNOUSERSITE"] = "1"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    probe = """
+from pathlib import Path
+import harness
+from harness import CoreError, validate_model
+from harness.project_model import core
+assert CoreError is core.CoreError
+assert validate_model is core.validate_model
+assert harness.__all__ is core.__all__
+for name in core.__all__:
+    assert getattr(harness, name) is getattr(core, name), name
+assert Path(harness.__file__).resolve() == Path('harness/__init__.py').resolve()
+assert Path(core.__file__).resolve() == Path('src/harness/project_model/core.py').resolve()
+import engineering_graph
+import target_state
+assert engineering_graph.CoreError is core.CoreError
+assert target_state.CoreError is core.CoreError
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", probe], cwd=pack, env=env,
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    fixture = load_yaml(pack / "spec/acceptance/core-v0-cross-authority-change.yaml")
+    model_path = temp_root / "core-model.yaml"
+    model_path.write_text(yaml.safe_dump(fixture["model"]), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "harness.py", "validate", str(model_path)],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    assert json.loads(result.stdout) == {"valid": True}, result.stdout
+
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")
     validate_definition(definition, ROOT)
@@ -51,6 +90,7 @@ def main() -> int:
         )
         assert manifest["consumer_api"] == "v0"
         assert manifest["binding_revision"] == revision
+        test_pack_execution(pack, temp_root)
 
         surface = load_yaml(pack / "skills/skill-surface-registry-v0.yaml")
         entries = surface["skills"]

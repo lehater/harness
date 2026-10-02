@@ -58,7 +58,9 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `skills/agent/**` — active agent orchestration instructions above Core, including scoped bootstrap and Design Profile construction/review.
 - `skills/artifacts/**` — active artifact-specific engineering procedures.
 - `docs/legacy/skills/**` — quarantined pre-Core procedure text; historical documentation only, never active skill discovery.
-- `harness.py` — Core v0 structural operations.
+- `src/harness/project_model/core.py` — canonical Core v0 structural operations and CLI implementation.
+- `harness/__init__.py` — temporary source-tree Core import bridge.
+- `harness.py` — legacy Core CLI compatibility facade.
 - `target_state.py` — target-state evaluator above Core.
 - `project_frontier.py` — canonical derived cross-layer next-action frontier; it owns precedence only, never project truth.
 - `project_publication.py` — validates/prepares one coherent project-state publication revision and provides crash-safe direct-file publication.
