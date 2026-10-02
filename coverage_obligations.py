@@ -12,7 +12,7 @@ from coverage_planner import (
     declared_capability_claim_index,
     semantic_evaluation_required_claims,
 )
-from semantic_acceptance import evaluation_index
+from semantic_acceptance import coverage_assurance_view
 
 
 TERMINAL_STATES = {"COVERED", "NOT_APPLICABLE", "DEFERRED"}
@@ -221,24 +221,9 @@ def derive_subject_obligation_rows(
         project_docs,
         required_evaluation_claims=strict_claims,
     )
-    evaluations = evaluation_index(project_docs)
-    evaluated_capabilities = {
-        evaluation.get("capability")
-        for evaluation in evaluations.values()
-        if isinstance(evaluation.get("capability"), str)
-        and evaluation.get("capability")
-    }
-    accepted_evaluation_claims: dict[str, set[str]] = {}
-    for evaluation in evaluations.values():
-        capability = evaluation.get("capability")
-        if (
-            isinstance(capability, str)
-            and capability
-            and evaluation.get("status") == "ACCEPTED"
-        ):
-            accepted_evaluation_claims.setdefault(capability, set()).update(
-                evaluation.get("semantic_claims", {}).get("accepted", []) or []
-            )
+    assurance = coverage_assurance_view(project_docs)
+    evaluated_capabilities = assurance.evaluated_capabilities()
+    accepted_evaluation_claims = assurance.accepted_claims_by_capability()
     realization = capability_realization(
         project_docs,
         consumer,

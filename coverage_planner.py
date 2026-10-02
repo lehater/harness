@@ -15,7 +15,10 @@ from pathlib import Path
 from typing import Any
 import yaml
 
-from semantic_acceptance import evaluation_index, semantic_invalidation_closure
+from semantic_acceptance import (
+    coverage_assurance_view,
+    coverage_invalidation_closure,
+)
 
 
 def load(path: str) -> dict[str, Any]:
@@ -145,7 +148,7 @@ def capability_realization(
     providers_by_capability: dict[str, list[str]] = {}
     blockers_by_artifact: dict[str, set[str]] = {}
     direct_capability_blockers: dict[str, set[str]] = {}
-    semantic_evaluations = evaluation_index(project_docs)
+    assurance = coverage_assurance_view(project_docs)
     rejected_providers: dict[str, set[str]] = {}
 
     for doc in project_docs:
@@ -162,10 +165,7 @@ def capability_realization(
                 if allowed is not None and capability not in allowed:
                     continue
                 providers_by_capability.setdefault(capability, []).append(artifact["id"])
-                evaluation = semantic_evaluations.get((artifact["id"], capability))
-                if evaluation is None:
-                    evaluation = semantic_evaluations.get((artifact["id"], None))
-                if evaluation is not None and evaluation.get("status") != "ACCEPTED":
+                if assurance.provider_disposition(artifact["id"], capability) == "REJECTED":
                     rejected_providers.setdefault(capability, set()).add(artifact["id"])
 
         for binding in doc.get("bindings", []) or []:
@@ -177,10 +177,7 @@ def capability_realization(
                     continue
                 if artifact_id:
                     providers_by_capability.setdefault(capability, []).append(artifact_id)
-                    evaluation = semantic_evaluations.get((artifact_id, capability))
-                    if evaluation is None:
-                        evaluation = semantic_evaluations.get((artifact_id, None))
-                    if evaluation is not None and evaluation.get("status") != "ACCEPTED":
+                    if assurance.provider_disposition(artifact_id, capability) == "REJECTED":
                         rejected_providers.setdefault(capability, set()).add(artifact_id)
 
     provided = set(providers_by_capability)
@@ -199,7 +196,7 @@ def capability_realization(
     for doc in project_docs:
         if doc.get("kind") != "harness-engineering-graph":
             continue
-        closure = semantic_invalidation_closure(doc, directly_rejected)
+        closure = coverage_invalidation_closure(doc, directly_rejected)
         for capability, causes in closure.items():
             semantic_invalid.setdefault(capability, [])
             semantic_invalid[capability] = sorted(
@@ -213,7 +210,7 @@ def capability_realization(
     for doc in project_docs:
         if doc.get("kind") != "harness-engineering-graph":
             continue
-        closure = semantic_invalidation_closure(
+        closure = coverage_invalidation_closure(
             doc,
             set(direct_capability_blockers),
         )
@@ -404,29 +401,18 @@ def capability_claim_index(
     accepted claims remain usable.
     """
     declared = declared_capability_claim_index(bindings, project_docs)
-    evaluated_capabilities: set[str] = set()
-    accepted_by_capability: dict[str, set[str]] = {}
-
-    for evaluation in evaluation_index(project_docs).values():
-        capability = evaluation.get("capability")
-        if not isinstance(capability, str) or not capability:
-            continue
-        evaluated_capabilities.add(capability)
-        if evaluation.get("status") == "ACCEPTED":
-            accepted_by_capability.setdefault(capability, set()).update(
-                evaluation.get("semantic_claims", {}).get("accepted", []) or []
-            )
+    assurance = coverage_assurance_view(project_docs)
 
     required = set(required_evaluation_claims or set())
     result: dict[str, list[dict[str, str]]] = {}
     for capability, claims in declared.items():
         for claim in claims:
             claim_name = claim["claim"]
-            if claim_name in required and capability not in evaluated_capabilities:
+            if claim_name in required and not assurance.capability_evaluated(capability):
                 continue
             if (
-                capability in evaluated_capabilities
-                and claim_name not in accepted_by_capability.get(capability, set())
+                assurance.capability_evaluated(capability)
+                and claim_name not in assurance.accepted_claims(capability)
             ):
                 continue
             result.setdefault(capability, []).append(claim)
@@ -489,24 +475,9 @@ def derive_plan(
         project_docs,
         required_evaluation_claims=strict_claims,
     )
-    evaluations = evaluation_index(project_docs)
-    evaluated_capabilities = {
-        evaluation.get("capability")
-        for evaluation in evaluations.values()
-        if isinstance(evaluation.get("capability"), str)
-        and evaluation.get("capability")
-    }
-    accepted_evaluation_claims: dict[str, set[str]] = {}
-    for evaluation in evaluations.values():
-        capability = evaluation.get("capability")
-        if (
-            isinstance(capability, str)
-            and capability
-            and evaluation.get("status") == "ACCEPTED"
-        ):
-            accepted_evaluation_claims.setdefault(capability, set()).update(
-                evaluation.get("semantic_claims", {}).get("accepted", []) or []
-            )
+    assurance = coverage_assurance_view(project_docs)
+    evaluated_capabilities = assurance.evaluated_capabilities()
+    accepted_evaluation_claims = assurance.accepted_claims_by_capability()
     scope_roots = list(overlay.get("scope_roots", []) or [])
     extension_capabilities = set(
         overlay.get("coverage_extension_capabilities", []) or []

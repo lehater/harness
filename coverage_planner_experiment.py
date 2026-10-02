@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 import yaml
 
-from semantic_acceptance import semantic_invalidation_closure
+from semantic_acceptance import coverage_invalidation_closure
 
 
 def load(path: str) -> dict[str, Any]:
@@ -177,7 +177,7 @@ def capability_realization(
     for doc in project_docs:
         if doc.get("kind") != "harness-engineering-graph":
             continue
-        closure = semantic_invalidation_closure(
+        closure = coverage_invalidation_closure(
             doc,
             set(direct_capability_blockers),
         )

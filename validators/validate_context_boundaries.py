@@ -170,6 +170,47 @@ def main() -> int:
         name: set(context.get("may_depend_on", []) or [])
         for name, context in contexts.items()
     }
+    published_boundaries: dict[tuple[str, str], dict[str, set[str]]] = {}
+    for index, item in enumerate(spec.get("published_boundaries", []) or []):
+        if not isinstance(item, dict):
+            raise SystemExit(f"published boundary #{index + 1} must be a mapping")
+        source_context = item.get("from_context")
+        target_context = item.get("to_context")
+        if source_context not in contexts or target_context not in contexts:
+            raise SystemExit(
+                f"published boundary #{index + 1} references unknown context"
+            )
+        if target_context not in allowed.get(source_context, set()):
+            raise SystemExit(
+                f"published boundary {source_context}->{target_context} is not "
+                "an allowed context dependency"
+            )
+        key = (source_context, target_context)
+        if key in published_boundaries:
+            raise SystemExit(
+                f"duplicate published boundary: {source_context}->{target_context}"
+            )
+        modules = item.get("modules")
+        if not isinstance(modules, dict) or not modules:
+            raise SystemExit(
+                f"published boundary {source_context}->{target_context} requires modules"
+            )
+        normalized: dict[str, set[str]] = {}
+        for module, symbols in modules.items():
+            if owner.get(module) != target_context:
+                raise SystemExit(
+                    f"published boundary module {module} is not owned by {target_context}"
+                )
+            if not isinstance(symbols, list) or not symbols or any(
+                not isinstance(symbol, str) or not symbol for symbol in symbols
+            ):
+                raise SystemExit(
+                    f"published boundary {module} symbols must be a non-empty string list"
+                )
+            if len(symbols) != len(set(symbols)):
+                raise SystemExit(f"published boundary {module} has duplicate symbols")
+            normalized[module] = set(symbols)
+        published_boundaries[key] = normalized
     shared = {
         module: set(names or [])
         for module, names in (spec.get("shared_kernel_imports", {}) or {}).items()
@@ -180,6 +221,7 @@ def main() -> int:
         for item in spec.get("known_violations", []) or []
     }
     actual_violations: set[tuple[str, str]] = set()
+    published_boundary_violations: list[str] = []
 
     def resolve_target(module_name: str) -> str | None:
         parts = module_name.split(".")
@@ -208,6 +250,31 @@ def main() -> int:
         target_context = owner[target]
         if source_context == target_context:
             return
+
+        boundary = published_boundaries.get((source_context, target_context))
+        if boundary is not None:
+            allowed_symbols = boundary.get(target)
+            if allowed_symbols is None:
+                published_boundary_violations.append(
+                    f"{source} ({source_context}) imports non-published module "
+                    f"{target} ({target_context})"
+                )
+                return
+            if imported_names is None:
+                published_boundary_violations.append(
+                    f"{source} ({source_context}) imports published module {target} "
+                    "without an explicit symbol boundary"
+                )
+                return
+            disallowed = sorted(imported_names - allowed_symbols)
+            if disallowed:
+                published_boundary_violations.append(
+                    f"{source} ({source_context}) imports non-published symbols "
+                    f"from {target}: {disallowed}"
+                )
+                return
+            return
+
         if target_context in allowed.get(source_context, set()):
             return
         actual_violations.add((source, target))
@@ -234,6 +301,12 @@ def main() -> int:
     declared_edges = set(declared)
     unknown = sorted(actual_violations - declared_edges)
     stale_exceptions = sorted(declared_edges - actual_violations)
+
+    if published_boundary_violations:
+        print("published cross-context contract violations:", file=sys.stderr)
+        for violation in sorted(published_boundary_violations):
+            print(f"- {violation}", file=sys.stderr)
+        return 1
 
     if unknown:
         print("undeclared bounded-context violations:", file=sys.stderr)

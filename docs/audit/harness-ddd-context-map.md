@@ -199,6 +199,10 @@ This is evidence that the defects are not independent accidents; several are man
 
 This prevents architecture debt from growing while allowing incremental correction.
 
+Published cross-context module/symbol contracts are additionally enforced by the
+same validator from `spec/architecture/harness-context-map-v0.yaml`; see
+`docs/design/context-published-contracts-v0.md`.
+
 ## Refactoring order
 
 Do not start with a repository-wide package move.
@@ -206,9 +210,9 @@ Do not start with a repository-wide package move.
 1. Establish context ownership and the import ratchet. **Done on the audit branch.**
 2. Remove BC-01/BC-02 by separating pure Coverage evaluation from integration and skill routing. **Done on the audit branch.**
 3. Remove BC-03 by splitting the Decision request contract from its application builder. **Done on the audit branch.**
-4. Introduce stable published read models at context boundaries, especially Assurance -> Coverage.
+4. Introduce stable published read models at context boundaries, especially Assurance -> Coverage. **Done: `docs/design/context-published-contracts-v0.md` plus machine-enforced `published_boundaries`.**
 5. Resolve `HARN-008` explicitly: Coverage owns completeness; Reference Model owns reusable materialization. **Canonical ownership contract added on the audit branch.**
 6. Fix functional P0 invariants inside their owning contexts.
-7. Only then physically move modules under `src/harness/<context>/...`.
+7. Physically move modules under `src/harness/<context>/...`. **Now unblocked as an incremental migration governed by `docs/design/repository-layout-v0.md`.**
 
 The final package move should be mechanical confirmation of boundaries already enforced semantically, not the mechanism used to discover them.
