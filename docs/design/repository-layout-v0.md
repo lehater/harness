@@ -15,7 +15,9 @@ The machine-readable contract is
 ## Canonical layout
 
 ```text
+.github/           repository automation
 src/harness/       production runtime and application orchestration
+harness/           source-tree package bridge only
 checks/            repository, architecture and CI policy checks
 tests/             behavioral, regression, integration and acceptance tests
 evals/             evaluation runners and provider adapters
@@ -24,11 +26,15 @@ distribution/      standalone bootstrap transport
 spec/              machine-readable contracts
 docs/              design/research/audit documentation
 skills/            agent procedures and routing registries
+catalogs/          reusable reference catalogs
+profiles/          reusable starter profiles
+examples/          acceptance and demonstration fixtures
 ```
 
-Root Python modules are forbidden. `root_python.migration_baseline_modules`,
-`permanent_bootstrap_exceptions` and `permanent_consumer_tooling_modules`
-must remain empty.
+Root Python modules are forbidden. The top-level directory namespace is also
+closed: every repository-owned root directory must be declared under
+`repository_surfaces.directories` in the machine-readable layout contract.
+Known local VCS/cache directories are ignored by the validator.
 
 ## Source-tree package bridge
 
@@ -51,6 +57,7 @@ boundaries are documented in
 - canonical package placement;
 - dependency direction and published boundaries;
 - a closed root Python namespace;
+- a closed top-level repository directory namespace;
 - absence of undeclared runtime packages.
 
 ## Distribution
@@ -76,7 +83,7 @@ Consumer Pack.
 
 ## Closure invariant
 
-A repository change that reintroduces a root `*.py` runtime module, an
-undeclared runtime module, a retired Consumer API identity, or a top-level
-legacy adapter implementation is a layout regression rather than a compatibility
-extension.
+A repository change that reintroduces a root `*.py` runtime module, adds an
+undeclared top-level directory/runtime module, restores a retired Consumer API
+identity, or adds a top-level legacy adapter implementation is a layout
+regression rather than a compatibility extension.

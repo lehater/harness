@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - run: pip install PyYAML
+      - run: pip install PyYAML==6.0.3
       - run: make harness-check
       - name: Evaluate greenfield implementation frontier
         run: |

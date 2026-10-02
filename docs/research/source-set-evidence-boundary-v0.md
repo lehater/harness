@@ -50,7 +50,7 @@ authority and deterministic enforcement of an already accepted contract.
 
 A small assurance-only validator was added:
 
-`source_set.py`.
+`harness.evidence.source_set`.
 
 Scenario driver:
 
