@@ -1316,6 +1316,45 @@ Authorities/providers, dependency structure, Questions, and the resulting
 Consumer/Target-State frontier. Combined with TD-COMP-003, the TL4 composition
 also has a separately falsifiable selected-operation proof.
 
+
+## TD-BOOT-E07 — Known-project bootstrap/reconcile regression
+
+**Abilities:** HA-A09  
+**Failure modes:** A09-F01, A09-F02, A09-F03, A09-F04, A09-F05, A09-F06  
+**Methods:** EM-10  
+**Minimum level:** TL5  
+**Oracle:** O2 accepted real-project truth  
+**Status:** READY
+
+**Known-project baseline:** `lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066`.
+The frozen case uses a bounded first-MVP HCD slice extracted from the project's
+accepted `docs/canonical-graph.yaml` plus `docs/harness-projection.yaml`.
+The source Git blob identities are recorded in the fixture so the case cannot
+silently drift into synthetic data while retaining a real-project label.
+
+**Execution design:** bootstrap the selected problem-evidence -> user-needs ->
+product-requirements slice from the project-owned canonical graph/projection,
+while unrelated repository material remains visible as noise. Then reconcile
+the exact returned Core realization once more through the existing
+`bootstrap-idempotence` sequence.
+
+Expected result:
+
+- reuse the accepted project-owned graph/projection instead of constructing a
+  second source of truth;
+- preserve the accepted Authority and provider bindings, including capabilities
+  on reused artifacts that are richer than the selected Design Profile;
+- preserve the project-owned dependency chain;
+- ignore unrelated repository territory;
+- introduce no Questions or invented providers when the selected accepted
+  project slice is complete;
+- return the same normalized Core realization and READY Target State on the
+  unchanged reconcile run.
+
+This is regression evidence for one known project that participated in Harness
+design. It may satisfy A09-R04 only after an accepted provider run is captured;
+it is not an independent TL6 portability holdout.
+
 # SF-07 — Greenfield bootstrap micro-project
 
 ## TD-BOOT-G01 — Minimal initial model
@@ -2063,7 +2102,7 @@ Every canonical ability now has at least one designed evidence path.
 | HA-A06 | TD-APP-001..006, TD-COMP-002 |
 | HA-A07 | TD-AUTH-005/006, TD-LIFE-005 |
 | HA-A08 | TD-CAP-005, TD-ROUTE-003, TD-BOOT-G01/G04/G05 |
-| HA-A09 | TD-BOOT-E01..006 |
+| HA-A09 | TD-BOOT-E01..007 |
 | HA-A10 | TD-BOOT-G01..005 |
 | HA-A11 | TD-BOOT-E05/E06, TD-ROUTE-007 plus existing source-boundary designs |
 | HA-A12 | TD-DEP-001..005, TD-SEM-001..006 |

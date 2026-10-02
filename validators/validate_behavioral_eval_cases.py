@@ -687,3 +687,147 @@ print(
     f"execution_prompt_bound={tl4_execution_prompt_bytes}; "
     f"max_per_call={tl4_max_per_call}"
 )
+
+TL5_BASE = ROOT / "spec" / "behavioral-evals" / "tl5-known-project"
+TL5_MANIFEST = yaml.safe_load(
+    (TL5_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+TL5_EXPECTED = {"TD-BOOT-E07"}
+assert TL5_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+tl5_entries = TL5_MANIFEST["cases"]
+assert {item["design"] for item in tl5_entries} == TL5_EXPECTED
+tl5_budget = TL5_MANIFEST["provider_prompt_budget"]
+assert tl5_budget["metric"] == "utf8_bytes"
+tl5_max_per_call = tl5_budget["max_per_call"]
+tl5_max_suite = tl5_budget["max_suite"]
+assert isinstance(tl5_max_per_call, int) and tl5_max_per_call > 0
+assert isinstance(tl5_max_suite, int) and tl5_max_suite >= 2 * tl5_max_per_call
+
+tl5_execution_prompt_bytes = 0
+for entry in tl5_entries:
+    template = TL5_BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-tl5-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(
+            encoding="utf-8"
+        )
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["test_level"] == "TL5"
+        assert binding.case["run_plan"] == {
+            "runs": 2,
+            "sequence": "bootstrap-idempotence",
+            "all_runs_must_pass": True,
+        }
+        assert binding.case["normalization_profile"]["dimensions"] == [
+            "bootstrap_realization"
+        ]
+
+        fixture = binding.fixture
+        known = fixture["known_project"]
+        assert known["repository"] == "lehater/napms"
+        assert known["commit"] == "42481577fab7f795cf3a2118b7b6f1c3c075d066"
+        assert known["classification"] == "known-project"
+        assert known["source_artifacts"]["canonical_graph"]["git_blob_sha"] == (
+            "a1c8c5d98c2b4cb927e9b424f3ea70fc0f89d2de"
+        )
+        assert known["source_artifacts"]["harness_projection"]["git_blob_sha"] == (
+            "3e4d074e8ac4e67d259c4d0c721da62c0dff3b91"
+        )
+
+        request = build_execution_request(
+            binding,
+            run_id="TD-BOOT-E07-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        payload = _model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        trusted_paths = {item["path"] for item in payload["trusted_instructions"]}
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+        assert all("spec/behavioral-evals" not in path for path in trusted_paths)
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
+
+        prompt_bytes = len(_prompt(request).encode("utf-8"))
+        assert prompt_bytes <= tl5_max_per_call, (
+            entry["design"], prompt_bytes, tl5_max_per_call
+        )
+        tl5_execution_prompt_bytes += prompt_bytes * 2
+
+        model = {
+            "authorities": [
+                {"id": "DISCOVERY"},
+                {"id": "PRODUCT-REQUIREMENTS"},
+            ],
+            "artifacts": [
+                {
+                    "id": "FIRST-MVP-HCD-PROBLEM-EVIDENCE",
+                    "authority": "DISCOVERY",
+                    "path": "docs/discovery/first-mvp-hcd-problem-evidence.yaml",
+                    "provides": ["engineering.hcd.first-mvp.problem-evidence"],
+                    "depends_on": [],
+                },
+                {
+                    "id": "FIRST-MVP-HCD-USER-NEEDS",
+                    "authority": "DISCOVERY",
+                    "path": "docs/discovery/first-mvp-hcd-user-needs.yaml",
+                    "provides": [
+                        "engineering.hcd.application-components.user-needs",
+                        "engineering.hcd.access-request.user-needs",
+                        "engineering.hcd.policy-export.user-needs",
+                    ],
+                    "depends_on": ["FIRST-MVP-HCD-PROBLEM-EVIDENCE"],
+                },
+                {
+                    "id": "FIRST-MVP-REQUIREMENTS",
+                    "authority": "PRODUCT-REQUIREMENTS",
+                    "path": "docs/requirements/first-mvp-product-requirements.yaml",
+                    "provides": [
+                        "engineering.requirements.product-intent",
+                        "engineering.requirements.acceptance",
+                        "engineering.hcd.application-components.requirements",
+                        "engineering.hcd.access-request.requirements",
+                        "engineering.hcd.policy-export.requirements",
+                    ],
+                    "depends_on": ["FIRST-MVP-HCD-USER-NEEDS"],
+                },
+            ],
+            "questions": [],
+        }
+        target = evaluate_target_state(
+            fixture["reviewed_design_profile"],
+            model,
+        )
+        normalized = normalize_result(
+            binding,
+            {
+                "run_status": "COMPLETED",
+                "output": {
+                    "core_model": model,
+                    "target_state": target,
+                },
+            },
+        )
+        assert score_result(binding, normalized)["status"] == "PASS"
+
+assert tl5_execution_prompt_bytes <= tl5_max_suite, (
+    tl5_execution_prompt_bytes,
+    tl5_max_suite,
+)
+print(
+    f"TL5 known-project behavioral eval cases: PASS ({len(tl5_entries)} cases); "
+    "provider_calls=2; "
+    f"execution_prompt_bound={tl5_execution_prompt_bytes}; "
+    f"max_per_call={tl5_max_per_call}"
+)
+

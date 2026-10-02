@@ -1,0 +1,83 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-BOOT-E07-FIXTURE-V1
+
+known_project:
+  repository: lehater/napms
+  commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  classification: known-project
+  source_artifacts:
+    canonical_graph:
+      path: docs/canonical-graph.yaml
+      git_blob_sha: a1c8c5d98c2b4cb927e9b424f3ea70fc0f89d2de
+    harness_projection:
+      path: docs/harness-projection.yaml
+      git_blob_sha: 3e4d074e8ac4e67d259c4d0c721da62c0dff3b91
+  slice: first-MVP problem evidence -> application-components user needs -> application-components requirements
+
+reviewed_design_profile:
+  version: 1
+  kind: harness-design-profile
+  id: NAPMS-FIRST-MVP-PROBLEM-TO-REQUIREMENTS
+  expectations:
+    - id: EXP-PROBLEM-EVIDENCE
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.first-mvp.problem-evidence
+      authority: DISCOVERY
+    - id: EXP-USER-NEEDS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.application-components.user-needs
+      authority: DISCOVERY
+      depends_on: [EXP-PROBLEM-EVIDENCE]
+    - id: EXP-PRODUCT-REQUIREMENTS
+      subject: NAPMS-FIRST-MVP
+      capability: engineering.hcd.application-components.requirements
+      authority: PRODUCT-REQUIREMENTS
+      depends_on: [EXP-USER-NEEDS]
+
+existing_project:
+  harness_realization: absent
+  project_owned_graph:
+    accepted: true
+    path: docs/canonical-graph.yaml
+    nodes:
+      - id: FIRST-MVP-HCD-PROBLEM-EVIDENCE
+        kind: problem-evidence
+        path: docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        depends_on: []
+      - id: FIRST-MVP-HCD-USER-NEEDS
+        kind: user-needs
+        path: docs/discovery/first-mvp-hcd-user-needs.yaml
+        depends_on: [FIRST-MVP-HCD-PROBLEM-EVIDENCE]
+      - id: FIRST-MVP-REQUIREMENTS
+        kind: product-requirements/v1
+        path: docs/requirements/first-mvp-product-requirements.yaml
+        depends_on: [FIRST-MVP-HCD-USER-NEEDS]
+  harness_projection:
+    accepted: true
+    path: docs/harness-projection.yaml
+    authorities: [DISCOVERY, PRODUCT-REQUIREMENTS]
+    bindings:
+      - artifact: FIRST-MVP-HCD-PROBLEM-EVIDENCE
+        authority: DISCOVERY
+        provides: [engineering.hcd.first-mvp.problem-evidence]
+      - artifact: FIRST-MVP-HCD-USER-NEEDS
+        authority: DISCOVERY
+        provides:
+          - engineering.hcd.application-components.user-needs
+          - engineering.hcd.access-request.user-needs
+          - engineering.hcd.policy-export.user-needs
+      - artifact: FIRST-MVP-REQUIREMENTS
+        authority: PRODUCT-REQUIREMENTS
+        provides:
+          - engineering.requirements.product-intent
+          - engineering.requirements.acceptance
+          - engineering.hcd.application-components.requirements
+          - engineering.hcd.access-request.requirements
+          - engineering.hcd.policy-export.requirements
+    questions: []
+  unrelated_subtree:
+    - {path: backend/src, summary: "Implementation code outside the selected design slice."}
+    - {path: docs-legacy, summary: "Retired frozen migration evidence; not current canonical truth."}
+    - {path: web, summary: "Frontend implementation outside the selected problem-to-requirements scope."}
+    - {path: docs/model/contexts/resource-catalogue, summary: "Accepted tactical domain material outside the selected HCD slice."}
