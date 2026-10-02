@@ -50,6 +50,11 @@ workflow_roles:
   cost_class: heavy
   draft_behavior: manual
   rationale: Repeated clean-context TL4 provider evidence is intentionally isolated from the lower-level suite and operator-triggered to control cost.
+- path: .github/workflows/assurance-campaign-copilot.yml
+  role: external
+  cost_class: heavy
+  draft_behavior: manual
+  rationale: Provider-backed assurance campaigns may execute multiple judgement suites in one operator-triggered run and are isolated from ordinary PR gates.
 
 
 checks:
