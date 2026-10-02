@@ -38,10 +38,7 @@ root_python:
     - decision_explorer_request
     - decision_pipeline
     - derivation_test_coverage
-    - frontend_interface_knowledge
-    - frontend_screen_contracts
     - graph_doctor
-    - human_projection
     - integration_alignment
     - lifecycle_experiment
     - live_calibration
@@ -61,7 +58,6 @@ root_python:
     - semantic_questions
     - skill_invariant_policy
     - skill_router
-    - workspace
 
 # Finite migration state: these surfaces delegate, never own context semantics.
 compatibility:
@@ -123,4 +119,16 @@ compatibility:
       mode: import-and-cli
     engineering_coverage:
       target: harness.coverage.engineering_coverage
+      mode: import-and-cli
+    frontend_interface_knowledge:
+      target: harness.workspace.frontend_interface_knowledge
+      mode: import-only
+    frontend_screen_contracts:
+      target: harness.workspace.frontend_screen_contracts
+      mode: import-only
+    human_projection:
+      target: harness.workspace.human_projection
+      mode: import-and-cli
+    workspace:
+      target: harness.workspace.workspace
       mode: import-and-cli

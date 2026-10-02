@@ -38,8 +38,8 @@ def _git_head() -> str:
     return result.stdout.strip()
 
 
-def test_coverage_published_boundary(temp_root: Path) -> None:
-    """Mutate canonical Coverage imports against the actual architecture validator."""
+def test_context_dependencies(temp_root: Path) -> None:
+    """Check migrated ownership and mutate imports against the architecture validator."""
     import shutil
     from validators import validate_context_boundaries as boundaries
 
@@ -95,6 +95,22 @@ def test_coverage_published_boundary(temp_root: Path) -> None:
         assert result.returncode != 0, statement
         assert "harness.coverage.coverage_planner (coverage)" in result.stderr, result.stderr
         assert diagnostic in result.stderr, result.stderr
+    target.write_text(original)
+
+    assert spec["contexts"]["workspace"]["may_depend_on"] == ["project-model", "integration"]
+    for module in ("frontend_interface_knowledge", "frontend_screen_contracts", "human_projection", "workspace"):
+        canonical = "harness.workspace." + module
+        assert owner[canonical] == "workspace"
+        assert boundaries._resolve_target(module, owner, aliases) == canonical
+    target = checkout / "src/harness/workspace/human_projection.py"
+    original = target.read_text()
+    for statement in (
+        "import project_frontier", "import engineering_coverage", "import semantic_acceptance",
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0, statement
+        assert "harness.workspace.human_projection (workspace)" in result.stderr, result.stderr
     target.write_text(original)
 
 
@@ -327,6 +343,137 @@ for module, expected in decision_exports.items():
     assert not hasattr(canonical, 'main'), module
 from harness.decision import decision_exploration, decision_explorer_contract
 assert decision_exploration.validate_explorer_request_binding is decision_explorer_contract.validate_explorer_request_binding
+
+# Workspace migration: surfaces and AST digests frozen from main 725f377.
+import hashlib
+workspace_exports = {
+    'frontend_interface_knowledge': [
+        'Any',
+        'annotations',
+        'evaluate_frontend_ux_closure',
+        'evaluate_topology_screen_subject_coverage',
+        'required_screen_ids',
+    ],
+    'frontend_screen_contracts': [
+        'Any',
+        'HTTP_METHODS',
+        'Iterable',
+        'annotations',
+        'evaluate_frontend_screen_contracts',
+        'evaluate_presentation_provider_contract',
+        'operation_ids',
+        'operation_query_parameters',
+        'operation_response_codes',
+        're',
+        'semantic_evaluation',
+    ],
+    'human_projection': [
+        'Any',
+        'CoreError',
+        'Path',
+        'annotations',
+        'argparse',
+        'capability_resolve',
+        'compile_manifest',
+        'derive_profile',
+        'evaluate_engineering_target',
+        'hashlib',
+        'json',
+        'main',
+        'materialize_package',
+        'realize_projection_model',
+        'render_projection_documents',
+        'resolve_visual_assets',
+        'shutil',
+        'validate_manifest_sources',
+        'validate_model',
+        'validate_project_alignment',
+        'validate_projection_ir',
+        'validate_recipe',
+        'yaml',
+    ],
+    'workspace': [
+        'Any',
+        'CoreError',
+        'DEFAULT_OUTPUT',
+        'ID_TO_FILE',
+        'MANAGED_PREFIX',
+        'Path',
+        'SCHEMA_RENDERERS',
+        'SCHEMA_VALIDATORS',
+        'annotations',
+        'argparse',
+        'evaluate_target_state',
+        'json',
+        'load_model',
+        'load_workspace',
+        'main',
+        're',
+        'render_workspace',
+        'validate_knowledge_document',
+        'validate_profile',
+        'yaml',
+    ],
+}
+workspace_baseline_ast = {
+    'frontend_interface_knowledge': '0112d7b8629f8fcbe225189feaacd2227bd1ba68cc0648d8dfb1c869d553e052',
+    'frontend_screen_contracts': '8fc2bae00c6e35a0d7be25fb8b0e1dc95a226ed0d6557599819a36978204e1b7',
+    'human_projection': '3684f2555d3b0cbf2042f0891dcdc0d983c6354e71fda7aa4464cf91c9a98c0b',
+    'workspace': 'c2e28b8dc9215e9fb961294dd35a2d27504ba3750f09570e1e4bdff1084babea',
+}
+# Fail immediately if canonical Workspace tries to load any of its root facades.
+for module in workspace_exports:
+    assert 'harness.workspace.' + module not in sys.modules, module
+    sys.modules[module] = None
+for module in workspace_exports:
+    importlib.import_module('harness.workspace.' + module)
+for module in workspace_exports:
+    del sys.modules[module]
+for module, expected in workspace_exports.items():
+    canonical = importlib.import_module('harness.workspace.' + module)
+    legacy = importlib.import_module(module)
+    assert canonical.__all__ == expected, module
+    assert legacy.__all__ is canonical.__all__, module
+    assert sorted(name for name in vars(canonical) if not name.startswith('_')) == expected, module
+    for name in expected:
+        assert getattr(legacy, name) is getattr(canonical, name), (module, name)
+    assert Path(canonical.__file__).resolve() == Path('src/harness/workspace/' + module + '.py').resolve()
+    assert hasattr(canonical, 'main') == (module in ('human_projection', 'workspace'))
+    assert hasattr(legacy, 'main') == hasattr(canonical, 'main')
+    tree = ast.parse(Path(canonical.__file__).read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert node.module not in workspace_exports, (module, node.module)
+            assert node.module not in ('harness', 'engineering_graph', 'target_state'), (module, node.module)
+            if node.module == 'integration_alignment':
+                assert module == 'human_projection'
+                assert [alias.name for alias in node.names] == ['validate_project_alignment']
+        elif isinstance(node, ast.Import):
+            assert all(alias.name not in workspace_exports and alias.name not in ('integration_alignment', 'engineering_graph', 'target_state') for alias in node.names)
+    # Full-module structural equivalence independently of behavioral checks:
+    # remove explicit exports and reverse only the approved Project Model imports.
+    tree.body = [node for node in tree.body if not (isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == '__all__' for target in node.targets))]
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom):
+            node.module = {'harness.project_model.core': 'harness', 'harness.project_model.engineering_graph': 'engineering_graph', 'harness.project_model.target_state': 'target_state'}.get(node.module, node.module)
+    assert hashlib.sha256(ast.dump(tree).encode()).hexdigest() == workspace_baseline_ast[module], module
+from harness.workspace import human_projection, workspace
+import integration_alignment
+assert human_projection.CoreError is workspace.CoreError is core.CoreError
+assert human_projection.capability_resolve is core.capability_resolve
+assert human_projection.validate_model is core.validate_model
+assert human_projection.derive_profile is canonical_graph.derive_profile
+assert human_projection.evaluate_engineering_target is canonical_graph.evaluate_engineering_target
+assert human_projection.validate_project_alignment is integration_alignment.validate_project_alignment
+assert workspace.load_model is core.load_model
+from harness.project_model import target_state as canonical_target
+assert workspace.evaluate_target_state is canonical_target.evaluate_target_state
+assert workspace.validate_profile is canonical_target.validate_profile
+from scenario_suite import run_scenario
+for name in ('workspace-managed',):
+    result = run_scenario(Path('spec/scenario-suite/scenarios/' + name + '.yaml'))
+    assert result.status == 'PASSED', result.as_dict()
+
 # Reuse authored Decision scenarios through the distributed Application/drivers.
 from scenario_suite import run_scenario
 for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.yaml')):
@@ -338,6 +485,34 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+    # Fresh isolated-pack processes exercise both preserved Workspace CLIs.
+    fixture = "spec/workspace-acceptance/minimal-domain"
+    for command in ("validate", "render"):
+        result = subprocess.run(
+            [sys.executable, "workspace.py", command, fixture],
+            cwd=pack, env=env, capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout)["target_state"]["status"] == "COMPLETE"
+    projection = temp_root / "projection-fixture"
+    projection.mkdir()
+    fixture = load_yaml(pack / "spec/unified-model-acceptance/napms-shape.yaml")
+    for name in ("engineering_graph", "source_graph", "projection"):
+        (projection / (name + ".yaml")).write_text(yaml.safe_dump(fixture[name]))
+    manifest = projection / "manifest.yaml"
+    plan = projection / "plan.yaml"
+    result = subprocess.run(
+        [sys.executable, "human_projection.py", "compile", str(projection / "engineering_graph.yaml"),
+         "BACKEND-IMPLEMENTATION", "--source-graph", str(projection / "source_graph.yaml"),
+         "--projection", str(projection / "projection.yaml"),
+         "--recipe", "spec/human-projection-acceptance/backend-review.yaml",
+         "--output-manifest", str(manifest), "--output-plan", str(plan)],
+        cwd=pack, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert load_yaml(manifest)["target"]["status"] == "COMPLETE"
+    assert load_yaml(plan)["documents"]
+
     # Representative Coverage CLIs reuse distributed fixtures and authored function oracles.
     overlay = temp_root / "coverage-overlay.yaml"
     overlay.write_text(yaml.safe_dump({"activate": [], "decisions": []}), encoding="utf-8")
@@ -510,7 +685,7 @@ def main() -> int:
         assert manifest["consumer_api"] == "v0"
         assert manifest["binding_revision"] == revision
         test_pack_execution(pack, temp_root)
-        test_coverage_published_boundary(temp_root)
+        test_context_dependencies(temp_root)
 
         surface = load_yaml(pack / "skills/skill-surface-registry-v0.yaml")
         entries = surface["skills"]

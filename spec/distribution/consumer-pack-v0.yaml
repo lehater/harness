@@ -96,6 +96,11 @@ exact_files:
   - src/harness/decision/decision_exploration.py
   - src/harness/decision/decision_explorer_contract.py
   - src/harness/decision/decision_governance.py
+  - src/harness/workspace/__init__.py
+  - src/harness/workspace/frontend_interface_knowledge.py
+  - src/harness/workspace/frontend_screen_contracts.py
+  - src/harness/workspace/human_projection.py
+  - src/harness/workspace/workspace.py
   - skills/consumer-operation-registry-v0.yaml
   - skills/consumer-method-registry-v0.yaml
   - skills/artifact-skill-registry-v0.yaml

@@ -14,7 +14,7 @@ from capability_lifecycle import lifecycle_states  # noqa: E402
 from harness.coverage.concern_activation import _capability_closure as activation_closure  # noqa: E402
 from harness.coverage.coverage_planner import _capability_closure as planner_closure  # noqa: E402
 from engineering_graph import derive_profile, validate_engineering_graph  # noqa: E402
-from frontend_interface_knowledge import _task_rows  # noqa: E402
+from harness.workspace.frontend_interface_knowledge import _task_rows  # noqa: E402
 from harness import CoreError, validate_model  # noqa: E402
 from reference_materializer import validate_reference_model  # noqa: E402
 from target_state import validate_profile  # noqa: E402
