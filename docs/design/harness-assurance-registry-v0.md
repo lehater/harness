@@ -46,7 +46,7 @@ definitions.
 The reviewed minimum implementation is:
 
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
-- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M11 meta-self-tests.
+- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M12 meta-self-tests.
 
 The seed is intentionally incomplete. It includes HA-A04 Authority formation,
 HA-A05 Capability formation, HA-A09 existing-project bootstrap/reconcile,
@@ -69,18 +69,30 @@ established A04-R01, A05-R01, A09-R01, and A16-R01 for that bound execution
 surface.
 
 The shared behavioral runner/adapter was subsequently extended for the TL3
-existing-project suite TD-BOOT-E01..E05. Because those files are behavior-
-relevant execution bindings, run `36942421201` is now intentionally stale for
-the current branch until the expanded suite is executed again. Deterministic
-A16-R02..R04 evidence remains current; judgement slots A04-R01, A05-R01,
-A09-R01 and A16-R01 temporarily return to missing. This is the expected
-currentness behavior rather than a regression in the historical run.
+existing-project suite TD-BOOT-E01..E05, making run `36942421201` historical
+for the newer execution surface.
+
+Provider-backed run `36947887869` is the current accepted record for Harness
+revision `8641130437862f06319f111a412847ae1e61d934`. It executed all 16
+registered cases successfully, including the two-step TD-BOOT-E04
+bootstrap/reconcile sequence. The evidence record binds all 17 provider calls;
+run 2 of TD-BOOT-E04 is cryptographically linked to run 1 and to the injected
+Core realization. Provider-auto resolved 10 calls to `gpt-6-luna` and 7 to
+`mai-code-1.1-flash`; the run consumed 117860 input and 4429 output tokens.
+
+The current admitted proof state is deliberately partial: A04-R01 and A05-R01
+are satisfied; HA-A09 now satisfies A09-R01 (TL2) and A09-R02 (TL3); and
+A16-R01..R04 are satisfied. A04-R02/R03, A05-R02/R03, A09-R03/R04, and
+A16-R05/R06 remain missing. The previous TD-CAP-003 disagreement in run
+`36947239747` remains evidence that one successful run is not a TL4
+convergence claim.
 
 Suite manifests are scheduling/inventory surfaces, not per-case semantic
-bindings: selected evidence is already bound by explicit `case_ids` plus
-case/fixture/oracle hashes. Adding another case to a suite therefore does not by
-itself stale existing case evidence; shared provider/runtime semantics and the
-trusted instructions actually used by selected cases do.
+bindings: selected evidence is bound by explicit `case_ids`,
+case/fixture/oracle hashes, frozen run-plan cardinality, and immutable
+provider/runtime bindings. Adding another case to a suite does not by itself
+stale existing case evidence; shared provider/runtime semantics and trusted
+instructions actually used by selected cases do.
 
 Registry validity remains separate from release-claim completeness and
 `release_claim_ready` remains false.

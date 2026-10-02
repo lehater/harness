@@ -1156,7 +1156,9 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies a reviewed profile plus a project-owned accepted graph. The provider must project the graph's canonical sources/dependency edge into Core; target-state evaluation is deterministic.
 
@@ -1184,7 +1186,9 @@ Assertions:
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies accepted canonical artifacts but no graph. The oracle contains only the minimal selected-scope Core realization and frontier.
 
@@ -1209,7 +1213,9 @@ Adding unrelated directories must not enlarge the realization.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies an explicit project fact that the required decision is unresolved and identifies the deciding Authority, while exposing only an implementation default as a noncanonical decoy. No accepted canonical source candidate for the missing capability is present, so the fixture isolates A09-F04 without permitting a blocked-provider representation. Question identity/text are not golden values; normalization compares Authority, blocked capability/source semantics, and resulting blocked frontier.
 
@@ -1229,7 +1235,9 @@ not guess a value merely to complete the model.
 **Methods:** EM-03, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
 
 **Execution design:** the provider-neutral runner performs exactly two calls. Run 1 bootstraps from the frozen fixture. Run 2 receives Run 1's exact Core model as an explicitly hashed current realization and executes only the public reconcile responsibility. Both runs must match the same semantic oracle; the second record binds the prior record hash and derived Core-model hash.
 
@@ -1249,7 +1257,9 @@ run; no duplicate artifacts/Capabilities are introduced.
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
 
 **Execution design:** this is a metamorphic pair with TD-BOOT-E02. E05 adds a sizeable unrelated subtree, lexical traps, and instruction-like project data while reusing the same semantic oracle. Any expanded selected model fails.
 

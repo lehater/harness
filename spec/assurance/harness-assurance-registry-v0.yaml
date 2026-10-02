@@ -562,6 +562,135 @@ evidence:
       - Does not establish project-owned graph/projection reuse, repeated clean-context idempotence, unrelated-file invariance, or real-project regression.
       - TD-COMP-001 is TL2 only; it does not satisfy A09-R02, A09-R03, or A09-R04.
 
+  - id: EVID-CAP-FIRST-WAVE-TL1-36947887869
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    satisfies: [A05-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - One successful current provider-backed suite run; this does not establish TL4 clean-context convergence.
+      - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
+      - A prior attempt showed TD-CAP-003 disagreement, so the current PASS must not be promoted into a convergence claim.
+
+  - id: EVID-AUTH-FIRST-WAVE-TL1-36947887869
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    satisfies: [A04-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - One successful current provider-backed suite run; this does not establish joint-ownership/Reference-bias or TL4 convergence.
+      - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
+
+  - id: EVID-ROUTE-INTENT-FIRST-WAVE-TL1-36947887869
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: .github/workflows/behavioral-eval-copilot.yml
+      - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    satisfies: [A16-R01]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - One successful current provider-backed suite run; this does not establish TL4 prompt/data trust-boundary or routing convergence.
+      - Provider-auto resolved across multiple concrete models; this is not a single-model baseline.
+
+  - id: EVID-BOOT-COMP-TL2-36947887869
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - target_state.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    satisfies: [A09-R01]
+    test_level: TL2
+    methods: [EM-07]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    case_ids: [TD-COMP-001]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves one controlled reviewed-profile to minimal-Core handoff only.
+      - Does not satisfy the TL3, TL4, or TL5 existing-project bootstrap slots.
+
+  - id: EVID-BOOT-EXISTING-TL3-36947887869
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - target_state.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl
+      - path: validators/validate_behavioral_eval.py
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    satisfies: [A09-R02]
+    test_level: TL3
+    methods: [EM-03, EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
+    case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Controlled synthetic micro-project evidence only; it does not establish TL4 repeated clean-context convergence or TL5 known-project regression.
+      - TD-BOOT-E04 evidence contains two linked clean-context runs and is bound as one derived sequence.
+      - Provider-auto resolved across multiple concrete models across the full suite.
+
   - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
     providers:
       - validators/validate_skill_router.py
