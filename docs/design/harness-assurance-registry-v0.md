@@ -50,7 +50,8 @@ The reviewed minimum implementation is:
 
 The seed is intentionally incomplete. It includes HA-A04 Authority formation,
 HA-A05 Capability formation, HA-A09 existing-project bootstrap/reconcile,
-HA-A16 routing, and HA-A19 assurance self-test obligations. HA-A05 remains split
+HA-A16 routing, HA-A18 Consumer distribution/compatibility, and HA-A19
+assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
 separate TL2 controlled handoff, TL3 existing-project micro-project, TL4
@@ -89,8 +90,9 @@ realization and BLOCKED Target State in all three runs.
 
 The current admitted proof state remains deliberately partial: A04-R01 and
 A05-R01 are satisfied; HA-A09 now satisfies A09-R01 (TL2), A09-R02 (TL3), and
-A09-R03 (TL4); and HA-A16 satisfies A16-R01..R06. A04-R02/R03, A05-R02/R03,
-and A09-R04 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
+A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18 satisfies A18-R01
+(current public-pack closure) plus A18-R02 (immutable pin/API compatibility).
+A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
 bootstrap-realization fixture rather than outputs of formation judgement. The
 previous TD-CAP-003 disagreement in run `36947239747` therefore remains
@@ -299,6 +301,10 @@ Examples likely to map directly after review:
 - Consumer Pack validators -> HA-A18;
 - CI policy validator -> HA-A19;
 - calibration scorer/live binding protocol -> portions of HA-A20.
+
+HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
+pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks
+a reviewed cross-revision published-identity compatibility proof.
 
 Formation/agent abilities remain unsatisfied until genuine behavioural evidence
 exists.
