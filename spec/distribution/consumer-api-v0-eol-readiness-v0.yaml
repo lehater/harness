@@ -15,48 +15,48 @@ gates:
   status: PASS
   evidence:
   - spec/distribution/consumer-api-lifecycle-v0.yaml
-  - validators/validate_consumer_api_lifecycle.py
+  - checks/validate_consumer_api_lifecycle.py
 - id: G2
   requirement: v0 is DEPRECATED
   status: PASS
   evidence:
   - spec/distribution/consumer-api-lifecycle-v0.yaml
-  - validators/validate_consumer_api_lifecycle.py
+  - checks/validate_consumer_api_lifecycle.py
 - id: G3
   requirement: New-consumer onboarding is v1-only
   status: PASS
   evidence:
   - spec/distribution/consumer-api-lifecycle-v0.yaml
-  - validators/validate_consumer_api_lifecycle.py
+  - checks/validate_consumer_api_lifecycle.py
 - id: G4
   requirement: Canonical runtime has zero v0 facade dependencies
   status: PASS
   evidence:
-  - validators/validate_consumer_api_eol_readiness.py
-  - validators/validate_context_boundaries.py
+  - checks/validate_consumer_api_eol_readiness.py
+  - checks/validate_context_boundaries.py
 - id: G5
   requirement: v1 executes with all v0-only facades physically absent
   status: PASS
   evidence:
-  - validators/validate_consumer_pack.py
+  - tests/test_consumer_pack.py
 - id: G6
   requirement: v0 -> v1 migration procedure exists and is tested
   status: PASS
   evidence:
   - docs/design/harness-consumer-api-v0-eol-readiness.md
-  - validators/validate_consumer_wrapper.py
+  - tests/test_consumer_wrapper.py
 - id: G7
   requirement: Active first-party non-compatibility callers have zero v0 execution dependencies
   status: PASS
   evidence:
-  - validators/validate_consumer_api_eol_readiness.py
+  - checks/validate_consumer_api_eol_readiness.py
   - spec/distribution/consumer-api-usage-v0.json
 - id: G8
   requirement: Intentional v0 compatibility obligations are inventoried
   status: PASS
   evidence:
   - docs/design/harness-consumer-api-v0-eol-readiness.md
-  - validators/validate_consumer_api_eol_readiness.py
+  - checks/validate_consumer_api_eol_readiness.py
 - id: G9
   requirement: External/independent v0 consumers have been assessed
   status: NOT_ESTABLISHED
@@ -102,7 +102,7 @@ first_party_execution:
     reason: Explicit API v0 dispatch transports the pinned v0 materializer; v1 uses canonical dispatch.
     required_action_at_eol: Under the explicit EOL decision, revise current-source v0 dispatch/probes
       while retaining immutable historical compatibility evidence.
-  - path: validators/validate_consumer_api_eol_readiness.py
+  - path: checks/validate_consumer_api_eol_readiness.py
     classification: compatibility-probe
     references:
     - consumer_pack
@@ -112,7 +112,7 @@ first_party_execution:
       not execution dependencies.
     required_action_at_eol: Keep canonical import rejection; revise the bounded readiness snapshot only
       under reviewed EOL evidence/decision.
-  - path: validators/validate_consumer_pack.py
+  - path: tests/test_consumer_pack.py
     classification: compatibility-probe
     references:
     - adapters.canonical_graph
@@ -148,7 +148,7 @@ first_party_execution:
       negative control; shared harness imports are canonical.
     required_action_at_eol: Under the explicit EOL decision, revise current-source v0 dispatch/probes
       while retaining immutable historical compatibility evidence.
-  - path: validators/validate_consumer_wrapper.py
+  - path: tests/test_consumer_wrapper.py
     classification: compatibility-probe
     references:
     - consumer_pack.py
@@ -157,7 +157,7 @@ first_party_execution:
       without facade files.
     required_action_at_eol: Under the explicit EOL decision, revise current-source v0 dispatch/probes
       while retaining immutable historical compatibility evidence.
-  - path: validators/validate_context_boundaries.py
+  - path: checks/validate_context_boundaries.py
     classification: compatibility-probe
     references:
     - adapters.canonical_graph
@@ -172,7 +172,7 @@ first_party_execution:
       subjects.
     required_action_at_eol: Under the explicit EOL decision, revise current-source v0 dispatch/probes
       while retaining immutable historical compatibility evidence.
-  - path: validators/validate_core.py
+  - path: tests/test_core.py
     classification: compatibility-probe
     references:
     - harness
@@ -181,26 +181,26 @@ first_party_execution:
       canonical Core.
     required_action_at_eol: Under the explicit EOL decision, revise current-source v0 dispatch/probes
       while retaining immutable historical compatibility evidence.
-  - path: validators/validate_fresh_context_routing.py
+  - path: tests/test_fresh_context_routing.py
     classification: reference-only
     references:
     - skill_router.py
     reason: Root router filename is a bootstrap documentation assertion, not an execution target; all
       routing imports are canonical.
     required_action_at_eol: Review reference wording separately; no execution migration required.
-  - path: validators/validate_instruction_ownership.py
+  - path: checks/validate_instruction_ownership.py
     classification: reference-only
     references:
     - skill_router.py
     reason: Router filename is a bootstrap discovery assertion; no facade execution.
     required_action_at_eol: Review reference wording separately; no execution migration required.
-  - path: validators/validate_method_router.py
+  - path: tests/test_method_router.py
     classification: reference-only
     references:
     - method_router.py
     reason: Legacy filename is only sys.argv[0] for the imported canonical main function; no facade execution.
     required_action_at_eol: Review reference wording separately; no execution migration required.
-  - path: validators/validate_skill_router.py
+  - path: tests/test_skill_router.py
     classification: compatibility-probe
     references:
     - skill_router.py
@@ -845,13 +845,13 @@ obligations:
 - id: tests
   category: compatibility-validation
   paths:
-  - validators/validate_consumer_api_eol_readiness.py
-  - validators/validate_consumer_api_lifecycle.py
-  - validators/validate_consumer_pack.py
-  - validators/validate_consumer_wrapper.py
-  - validators/validate_context_boundaries.py
-  - validators/validate_core.py
-  - validators/validate_skill_router.py
+  - checks/validate_consumer_api_eol_readiness.py
+  - checks/validate_consumer_api_lifecycle.py
+  - tests/test_consumer_pack.py
+  - tests/test_consumer_wrapper.py
+  - checks/validate_context_boundaries.py
+  - tests/test_core.py
+  - tests/test_skill_router.py
   owner: assurance/distribution
   reason: V0 acceptance remains obligatory during DEPRECATED; structural probes also enforce architecture.
   at_eol: Adjust latest-source support assertions coherently with the EOL decision; retain v1 ratchet,

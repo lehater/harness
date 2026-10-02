@@ -29,16 +29,16 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `evals/behavioral_eval.py` — provider-neutral clean-context behavioral-evaluation runner, semantic normalizer and scorer.
 - `spec/behavioral-evals/first-wave/manifest-v0.yaml` — reviewed first-wave Capability/Authority/task-intent behavioural case inventory.
 - `adapters/copilot_behavioral_eval_agent.py` — provider adapter for clean-context judgement runs; oracle/pass criteria are not provider inputs.
-- `validators/validate_behavioral_eval_cases.py` — deterministic first-wave case/adapter boundary validation; not judgement evidence.
+- `tests/test_behavioral_eval_cases.py` — deterministic first-wave case/adapter boundary validation; not judgement evidence.
 - `.github/workflows/behavioral-eval-copilot.yml` — operator-triggered external provider execution for first-wave behavioural evidence.
-- `validators/validate_behavioral_eval.py` — deterministic substrate contract/self-test; it is not agent-quality evidence.
+- `tests/test_behavioral_eval.py` — deterministic substrate contract/self-test; it is not agent-quality evidence.
 - `docs/design/harness-assurance-policy-v0.md` — canonical evidence-selection, test-level and oracle policy for Harness changes/release claims.
 - `docs/design/harness-ability-to-evidence-v0.md` — canonical Harness ability/failure-mode/evidence blueprint used to design assurance before implementation.
 - `docs/design/harness-test-design-catalog-v0.md` — reviewed framework-neutral test designs and implementation dispositions for Harness assurance gaps.
 - `docs/design/harness-agent-behavioral-evaluation-v0.md` — clean-context behavioural-eval protocol for judgement-dependent agent responsibilities.
 - `docs/design/harness-assurance-registry-v0.md` — canonical design for the machine-readable Ability -> requirement -> evidence assurance denominator/self-test.
 - `spec/assurance/harness-assurance-registry-v0.yaml` — initial machine-readable assurance denominator/evidence seed.
-- `validators/validate_assurance_registry.py` — assurance registry structural/admissibility validator and AR-M01..AR-M08 self-tests.
+- `checks/validate_assurance_registry.py` — assurance registry structural/admissibility validator and AR-M01..AR-M08 self-tests.
 - `docs/design/ci-execution-policy-v0.md` — canonical Harness CI execution/lazy-gate policy.
 - `spec/ci/check-registry-v0.yaml` — machine-readable CI check inventory, cost/stage classification and workflow roles.
 - `docs/design/target-state-v0.md` — Design Profile target-state contract.
@@ -106,14 +106,14 @@ Purpose: retain the detailed repository inventory outside the automatically load
 - `spec/workspace-acceptance/**` — executable managed-workspace scenarios.
 - `spec/scenario-suite/**` — cross-layer executable behavioral scenarios and coverage catalog.
 - `scenario_suite.py` / `scenario_drivers.py` — universal scenario runner and built-in driver registry.
-- `validators/validate_core.py` — Core validator/acceptance runner.
-- `validators/validate_adapters.py` — adapter acceptance runner.
-- `validators/validate_target_state.py` — target-state acceptance runner.
-- `validators/validate_graph_doctor.py` — Graph Doctor v1 acceptance runner.
-- `validators/validate_human_projection.py` — Human Documentation Projection v1 acceptance runner.
-- `validators/validate_workspace.py` — managed-workspace acceptance runner.
-- `validators/validate_agent_layer.py` — agent-layer skill/profile contract validation.
-- `validators/validate_context_boundaries.py` — bounded-context import ratchet plus repository-layout/root-module migration ratchet.
+- `tests/test_core.py` — Core validator/acceptance runner.
+- `tests/test_adapters.py` — adapter acceptance runner.
+- `tests/test_target_state.py` — target-state acceptance runner.
+- `tests/test_graph_doctor.py` — Graph Doctor v1 acceptance runner.
+- `tests/test_human_projection.py` — Human Documentation Projection v1 acceptance runner.
+- `tests/test_workspace.py` — managed-workspace acceptance runner.
+- `checks/validate_agent_layer.py` — agent-layer skill/profile contract validation.
+- `checks/validate_context_boundaries.py` — bounded-context import ratchet plus repository-layout/root-module migration ratchet.
 - `docs/methodology/**` — retained pre-Core material; not part of Core v0 consumer semantics.
 
 - `src/harness/application/` — fifteen canonical Application runtime modules;

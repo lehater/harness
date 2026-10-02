@@ -768,9 +768,9 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     ) -> dict[str, Any]:
         return {
             "id": evidence_id,
-            "providers": ["validators/validate_assurance_registry.py"],
+            "providers": ["checks/validate_assurance_registry.py"],
             "source_refs": [
-                {"path": "validators/validate_assurance_registry.py"}
+                {"path": "checks/validate_assurance_registry.py"}
             ],
             "satisfies": satisfies or ["A05-R01"],
             "test_level": level,
@@ -822,7 +822,7 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
 
     missing_ref = copy.deepcopy(registry)
     bad = candidate("META-MISSING-REF")
-    bad["source_refs"] = [{"path": "validators/does-not-exist.py"}]
+    bad["source_refs"] = [{"path": "checks/does-not-exist.py"}]
     missing_ref["evidence"].append(bad)
     _expect_invalid(missing_ref, "missing evidence reference")
     passed.append("AR-M05")

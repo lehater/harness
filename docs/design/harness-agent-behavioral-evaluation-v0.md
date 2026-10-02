@@ -430,7 +430,7 @@ Behavioural failures should be classified before changing prompts/skills:
 ## Implemented minimal substrate
 
 The first reusable substrate is implemented in `evals/behavioral_eval.py` with
-deterministic contract coverage in `validators/validate_behavioral_eval.py`.
+deterministic contract coverage in `tests/test_behavioral_eval.py`.
 
 The initial adapter boundary is provider-neutral JSON-over-process. Each run gets
 a fresh HOME and isolated working directory; the request contains the frozen
@@ -458,7 +458,7 @@ or evaluation fixture metadata.
 
 `.github/workflows/behavioral-eval-copilot.yml` is intentionally
 `workflow_dispatch`-only under the CI Execution Policy. Deterministic
-`validators/validate_behavioral_eval_cases.py` proves case/schema/oracle
+`tests/test_behavioral_eval_cases.py` proves case/schema/oracle
 isolation and adapter request/response boundaries, but does not count as
 judgement evidence. A TD remains READY until an accepted provider-backed run
 exists for that case.

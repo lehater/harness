@@ -150,13 +150,13 @@ def usage_inventory(contract: dict, layout: dict) -> dict:
               for key, (_, path, target) in surfaces.items()}
     registry_driven_validators = []
     for relative in sorted(set(files)):
-        if relative in (CONTRACT, INVENTORY, DESIGN, 'validators/validate_consumer_api_lifecycle.py'):
+        if relative in (CONTRACT, INVENTORY, DESIGN, 'checks/validate_consumer_api_lifecycle.py'):
             continue
         file = ROOT / relative
         if not file.is_file() or file.suffix not in ('.py', '.md', '.yaml', '.yml', '.json', '.sh'):
             continue
         body = file.read_text(errors='replace')
-        if relative.startswith('validators/') and all(
+        if relative.startswith(('checks/', 'tests/')) and all(
             name in body for name in ('cli_facades', 'module_facades')
         ):
             registry_driven_validators.append(relative)
@@ -174,7 +174,7 @@ def usage_inventory(contract: dict, layout: dict) -> dict:
         category = ('canonical_runtime' if relative.startswith('src/harness/') else
                     'historical' if relative.startswith(('docs/audit/', 'docs/legacy/', 'docs/plans/', 'spec/assurance/evidence/')) else
                     'distribution_tooling' if relative.startswith(('spec/distribution/', 'spec/architecture/')) else
-                    'validators_tests' if relative.startswith(('validators/', 'tests/', 'spec/')) else
+                    'validators_tests' if relative.startswith(('checks/', 'tests/', 'spec/')) else
                     'documentation_examples' if relative.startswith(('docs/', 'examples/', 'skills/')) else
                     'distribution_tooling')
         for key, (identity, path, _) in surfaces.items():
@@ -196,7 +196,18 @@ def main() -> int:
     contract = yaml.safe_load((ROOT / CONTRACT).read_text())
     validate(contract, layout)
     actual = usage_inventory(contract, layout)
-    assert json.loads((ROOT / INVENTORY).read_text()) == actual, 'usage inventory stale'
+    expected = json.loads((ROOT / INVENTORY).read_text())
+    if expected != actual:
+        print('Consumer API usage inventory stale')
+        if expected.get('registry_driven_validators') != actual.get('registry_driven_validators'):
+            print('registry_driven_validators expected=', expected.get('registry_driven_validators'))
+            print('registry_driven_validators actual=', actual.get('registry_driven_validators'))
+        for key in sorted(set(expected.get('surfaces', {})) | set(actual.get('surfaces', {}))):
+            if expected.get('surfaces', {}).get(key) != actual.get('surfaces', {}).get(key):
+                print(f'surface {key}')
+                print('expected=', json.dumps(expected.get('surfaces', {}).get(key), sort_keys=True))
+                print('actual=', json.dumps(actual.get('surfaces', {}).get(key), sort_keys=True))
+        raise AssertionError('usage inventory stale')
     # Contract mutations prove rejection at the smallest surface.
     mutations = []
     bad = copy.deepcopy(contract); bad['compatibility_inventory'].pop(); mutations.append(bad)

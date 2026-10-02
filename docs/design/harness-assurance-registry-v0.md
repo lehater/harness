@@ -46,7 +46,7 @@ definitions.
 The reviewed minimum implementation is:
 
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
-- `validators/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M12 meta-self-tests.
+- `checks/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M12 meta-self-tests.
 
 The seed is intentionally incomplete. It includes HA-A04 Authority formation,
 HA-A05 Capability formation, HA-A09 existing-project bootstrap/reconcile,
@@ -195,7 +195,7 @@ Conceptual shape:
 ~~~yaml
 id: EVID-LIFECYCLE-PREREQ-CHANGE
 providers:
-  - validators/validate_capability_lifecycle.py
+  - tests/test_capability_lifecycle.py
   - spec/scenario-suite/scenarios/selective-lifecycle-revalidation.yaml
 satisfies:
   - A14-R01

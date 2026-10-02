@@ -57,7 +57,7 @@ This is a Maintainer operation. It is not exported to target repositories.
 8. Implement the smallest coherent change and update canonical contracts,
    registries and migrations together.
 9. Run the smallest deterministic affected validators/tests during iteration.
-   For CI topology/inventory changes, run `python validators/validate_ci_policy.py`
+   For CI topology/inventory changes, run `python checks/validate_ci_policy.py`
    before broader checks so policy failures stop expensive work early.
 10. Run the full applicable repository gate (`make harness-check` / PR workflow)
    on a coherent candidate.

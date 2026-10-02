@@ -72,7 +72,7 @@ source, canonical project knowledge, semantic acceptances or product artifacts.
 Target-owned bootstrap guidance that still invokes root facades should use the
 canonical router command above.
 
-`validators/validate_consumer_wrapper.py::test_v0_to_v1_migration` reuses the
+`tests/test_consumer_wrapper.py::test_v0_to_v1_migration` reuses the
 wrapper snapshot/commit helpers and runs one clean target through both APIs.
 Its private interpreter has only PyYAML, no installed Harness, no inherited
 PYTHONPATH and no global/user site fallback. Both source revisions are immutable;

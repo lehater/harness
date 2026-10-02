@@ -1915,7 +1915,7 @@ an integration candidate.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `validators/validate_assurance_registry.py`
+**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `checks/validate_assurance_registry.py`
 
 Fixture:
 
@@ -1938,7 +1938,7 @@ correctness denominator.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `validators/validate_assurance_registry.py`
+**Evidence:** `spec/assurance/harness-assurance-registry-v0.yaml`, `checks/validate_assurance_registry.py`
 
 Expected result:
 

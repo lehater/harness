@@ -73,7 +73,7 @@ time.
 
 ### CI-P04 — explicit inventory
 
-Every `validators/validate_*.py` file and every `tests/test_*.py` file must have
+Every `checks/validate_*.py` file and every `tests/test_*.py` file must have
 an explicit entry in `spec/ci/check-registry-v0.yaml`. Every
 `.github/workflows/*.yml` / `.yaml` file must also have an explicit
 `workflow_roles` entry declaring role, cost class, and draft behavior so a new
@@ -142,7 +142,7 @@ edit alone is not sufficient authority to weaken this policy.
 `spec/ci/check-registry-v0.yaml` is the machine-readable check inventory and
 workflow-role declaration.
 
-`validators/validate_ci_policy.py` verifies:
+`checks/validate_ci_policy.py` verifies:
 
 - workflow trigger invariants for `exhaustive`, `focused`, and `external`
   workflow roles;

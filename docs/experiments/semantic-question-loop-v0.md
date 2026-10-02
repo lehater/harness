@@ -58,7 +58,7 @@ validation defects stay ordinary admission failures.
 
 ## Acceptance proof
 
-`validators/validate_semantic_question_loop.py` verifies:
+`tests/test_semantic_question_loop.py` verifies:
 
 1. subject-scoped missing Task Model semantics are detected;
 2. the gap becomes a deterministic Question for the owning Authority;

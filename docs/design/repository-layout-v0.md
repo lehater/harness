@@ -1,6 +1,6 @@
 # Repository Layout v0
 
-Status: canonical; runtime physical migration closed.
+Status: canonical; runtime and validation-code physical migrations closed.
 
 ## Purpose
 
@@ -320,7 +320,7 @@ unchanged. No provider run is performed.
 ## Evidence
 
 This migration target is enforced at TL0 by
-`validators/validate_context_boundaries.py`, which now validates both the
+`checks/validate_context_boundaries.py`, which now validates both the
 semantic context map and the physical-layout migration ratchet.
 
 Every coherent migration candidate must also pass the existing full
