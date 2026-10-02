@@ -6,6 +6,23 @@ policy: docs/design/harness-assurance-policy-v0.md
 semantic_owner: docs/design/harness-ability-to-evidence-v0.md
 
 abilities:
+  - id: HA-A01
+    title: Core structural truth
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A01-F01
+      - A01-F02
+      - A01-F03
+      - A01-F04
+      - A01-F05
+    requirements:
+      - A01-R01
+      - A01-R02
+      - A01-R03
+
   - id: HA-A19
     title: CI and validation execution policy
     contract_ref:
@@ -117,6 +134,48 @@ abilities:
       - A18-R03
 
 requirements:
+  - id: A01-R01
+    ability: HA-A01
+    failure_modes: [A01-F01, A01-F02, A01-F03]
+    purpose: Core validation rejects invalid ownership/reference structure while preserving legal ownership/provider/Question shapes.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-01, EM-02, EM-03, EM-04, EM-06]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A01-R02
+    ability: HA-A01
+    failure_modes: [A01-F04]
+    purpose: Identical valid Core state has deterministic provider ownership, blocking, affected-set, and next-action semantics.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-03]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A01-R03
+    ability: HA-A01
+    failure_modes: [A01-F05]
+    purpose: Question resolution fails closed on unchanged acceptance identity and records only an explicit accepted semantic transition.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-02, EM-03, EM-06]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A19-R01
     ability: HA-A19
     failure_modes:
@@ -422,6 +481,45 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A01-DETERMINISTIC-STRUCTURAL-SEMANTICS
+    providers:
+      - tests/test_core.py
+    source_refs:
+      - path: tests/test_core.py
+      - path: spec/acceptance/core-v0-cross-authority-change.yaml
+      - path: src/harness/project_model/core.py
+    satisfies: [A01-R02]
+    test_level: TL1
+    methods: [EM-02, EM-03]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves representative owner/provider, blocker granularity, affected-set, completeness/frontier, and next-action semantics over accepted Core fixtures.
+      - Does not establish comprehensive invalid ownership/dangling-reference rejection required by A01-R01.
+
+  - id: EVID-A01-QUESTION-RESOLUTION
+    providers:
+      - tests/test_core.py
+      - tests/test_scenario_suite.py
+    source_refs:
+      - path: tests/test_core.py
+      - path: spec/scenario-suite/scenarios/question-resolution-acceptance-transition.yaml
+      - path: src/harness/project_model/core.py
+    satisfies: [A01-R03]
+    test_level: TL1
+    methods: [EM-02, EM-03, EM-06]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves unchanged acceptance identity is rejected and an explicit changed identity transition resolves the Question.
+      - Does not broaden into general Core structural-validation coverage.
+
   - id: EVID-A18-CONSUMER-PACK-CLOSURE
     providers:
       - tests/test_consumer_pack.py
