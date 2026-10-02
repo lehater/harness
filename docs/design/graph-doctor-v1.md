@@ -193,6 +193,6 @@ Canonical v1 policy:
 - WARN findings are reported but do not fail by default.
 - INFO findings are informational and do not indicate graph defects.
 - Semantic auto-fix is forbidden.
-- The canonical CLI is the standalone `graph_doctor.py`; a future umbrella CLI may delegate to it without changing this contract.
+- The canonical CLI is `python -m harness.application.graph_doctor`; a future umbrella CLI may delegate to it without changing this contract.
 
 No Core entity change is required.

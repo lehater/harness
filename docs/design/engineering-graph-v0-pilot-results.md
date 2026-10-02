@@ -202,7 +202,7 @@ This separates:
 - repository-independent semantic knowledge kind;
 - installed artifact skill implementation.
 
-`agent_router.py` routes only actionable `CREATE` work through
+`harness.application.agent_router` routes only actionable `CREATE` work through
 `skills/artifact-skill-registry-v0.yaml`.
 
 Observed evidence:

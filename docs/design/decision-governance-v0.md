@@ -139,7 +139,7 @@ kinds remain unchanged until project evidence justifies extending the contract.
 
 ## Admission integration
 
-`semantic_admission.py` evaluates Decision Governance after normal semantic
+`harness.application.semantic_admission` evaluates Decision Governance after normal semantic
 acceptance for participating knowledge kinds. A rejected governance evaluation
 rejects admission and clears accepted semantic claims for that candidate.
 

@@ -146,7 +146,7 @@ semantic acceptance across changed identities.
 
 ## Admission integration
 
-`semantic_admission.py` emits the lifecycle assertion for an ACCEPTED
+`harness.application.semantic_admission` emits the lifecycle assertion for an ACCEPTED
 candidate. It publishes semantic atom fingerprints for accepted assertions.
 For non-root productions, admission fails unless every production prerequisite
 is CURRENT and therefore has an acceptance identity that can be recorded in the
@@ -155,7 +155,7 @@ admission records a self-describing `exhaustive: true` baseline with both the
 consumed-source fingerprints and `source_surface_fingerprints` for every
 upstream semantic assertion that was classified during derivation. Non-exhaustive derivation evaluations are not trusted for selective lifecycle baselines.
 
-`semantic_closure.py` requires the selected lifecycle assertion to match the
+`harness.application.semantic_closure` requires the selected lifecycle assertion to match the
 ACCEPTED semantic-admission identity for every routed capability in the
 Consumer closure.
 

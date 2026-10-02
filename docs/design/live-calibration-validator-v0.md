@@ -10,8 +10,7 @@ corpus while preserving three separate responsibilities:
 - expert corpus supplies expected labels;
 - external evaluator supplies only semantic predictions;
 - Harness deterministically validates binding/completeness and delegates scoring
-  to `harness.assurance.semantic_judgement_calibration`
-  (legacy Consumer v0 facade: `semantic_judgement_calibration.py`).
+  to `harness.assurance.semantic_judgement_calibration`.
 
 The validator is generated evidence above Core. No Core entity is added.
 
@@ -35,7 +34,7 @@ Live Calibration Run
 evaluate_live_calibration_run
         |
         v
-semantic_judgement_calibration.py
+harness.assurance.semantic_judgement_calibration
 ```
 
 Scenario Suite remains the orchestration surface. A concrete evaluator adapter
