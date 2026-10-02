@@ -139,14 +139,13 @@ assert harness.validate_model is core.validate_model
         (ROOT / "spec/research/consumer-activation-fixture-core.yaml").read_text()
     )
     validate_model(fixture)
-    for entry in ("harness.py", "-m"):
-        command = [sys.executable, entry]
-        if entry == "-m":
-            command.append("harness.project_model.core")
-        command += ["validate", "spec/research/consumer-activation-fixture-core.yaml"]
-        result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
-        assert result.returncode == 0, result.stderr
-        assert json.loads(result.stdout) == {"valid": True}, result.stdout
+    command = [
+        sys.executable, "-m", "harness.project_model.core",
+        "validate", "spec/research/consumer-activation-fixture-core.yaml",
+    ]
+    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == {"valid": True}, result.stdout
 
 def main() -> int:
     errors: list[str] = []
@@ -159,7 +158,6 @@ def main() -> int:
     required = [
         ROOT / "src/harness/project_model/core.py",
         ROOT / "harness/__init__.py",
-        ROOT / "harness.py",
         ROOT / "docs/design/core-v0.md",
     ]
     for path in required:
