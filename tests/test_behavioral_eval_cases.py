@@ -21,7 +21,7 @@ from evals.behavioral_eval import (
     normalize_result,
     score_result,
 )
-from adapters.copilot_behavioral_eval_agent import (
+from evals.adapters.copilot_behavioral_eval_agent import (
     _bootstrap_route_context,
     _model_payload,
     _observed_cli_version,
@@ -32,7 +32,7 @@ from adapters.copilot_behavioral_eval_agent import (
     _response_contract,
 )
 
-ADAPTER = ROOT / "adapters" / "copilot_behavioral_eval_agent.py"
+ADAPTER = ROOT / "evals" / "adapters" / "copilot_behavioral_eval_agent.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "behavioral-eval-copilot.yml"
 assert ADAPTER.is_file()
 workflow_text = WORKFLOW.read_text(encoding="utf-8")

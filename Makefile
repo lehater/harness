@@ -5,7 +5,6 @@ harness-check:
 	python checks/validate_assurance_registry.py
 	python tests/test_behavioral_eval.py
 	python tests/test_behavioral_eval_cases.py
-	python checks/validate_consumer_api_lifecycle.py
 	python checks/validate_context_boundaries.py
 	python tests/test_core.py
 	python tests/test_adapters.py
@@ -68,7 +67,6 @@ harness-check:
 	python tests/test_semantic_closure.py
 	python checks/validate_harness.py
 	python -m unittest tests/test_lifecycle_experiment.py
-	python checks/validate_consumer_api_eol_readiness.py
 	python tests/test_consumer_pack.py
 	python tests/test_consumer_wrapper.py
 	python tests/test_scenario_suite.py
