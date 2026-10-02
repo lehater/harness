@@ -72,7 +72,6 @@
           "validators/validate_deep_dependency_graphs.py",
           "validators/validate_engineering_graph.py",
           "validators/validate_fresh_context_routing.py",
-          "validators/validate_human_projection.py",
           "validators/validate_method_router.py",
           "validators/validate_project_frontier.py",
           "validators/validate_project_publication.py",
@@ -80,10 +79,8 @@
           "validators/validate_semantic_admission.py",
           "validators/validate_semantic_question_loop.py",
           "validators/validate_skill_router.py",
-          "validators/validate_source_coverage.py",
           "validators/validate_target_state.py",
-          "validators/validate_unified_model.py",
-          "validators/validate_workspace.py"
+          "validators/validate_unified_model.py"
         ]
       }
     },
@@ -165,7 +162,6 @@
           "validators/validate_deep_dependency_graphs.py",
           "validators/validate_engineering_graph.py",
           "validators/validate_fresh_context_routing.py",
-          "validators/validate_human_projection.py",
           "validators/validate_method_router.py",
           "validators/validate_project_frontier.py",
           "validators/validate_project_publication.py",
@@ -173,10 +169,8 @@
           "validators/validate_semantic_admission.py",
           "validators/validate_semantic_question_loop.py",
           "validators/validate_skill_router.py",
-          "validators/validate_source_coverage.py",
           "validators/validate_target_state.py",
-          "validators/validate_unified_model.py",
-          "validators/validate_workspace.py"
+          "validators/validate_unified_model.py"
         ]
       }
     },
@@ -208,9 +202,7 @@
           "validators/validate_adapters.py",
           "validators/validate_consumer_pack.py",
           "validators/validate_context_boundaries.py",
-          "validators/validate_deep_dependency_graphs.py",
-          "validators/validate_graph_doctor.py",
-          "validators/validate_human_projection.py"
+          "validators/validate_deep_dependency_graphs.py"
         ]
       }
     },
@@ -591,9 +583,6 @@
         ],
         "historical": [
           "docs/audit/harness-ddd-context-map.md"
-        ],
-        "validators_tests": [
-          "validators/validate_graph_doctor.py"
         ]
       }
     },
@@ -609,8 +598,7 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_human_projection.py"
+          "validators/validate_consumer_pack.py"
         ]
       }
     },
@@ -979,8 +967,7 @@
           "docs/audit/harness-ci-audit.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_source_coverage.py"
+          "validators/validate_consumer_pack.py"
         ]
       }
     },
@@ -1047,8 +1034,7 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_workspace.py"
+          "validators/validate_consumer_pack.py"
         ]
       }
     },

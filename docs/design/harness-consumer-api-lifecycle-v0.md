@@ -76,7 +76,7 @@ production dependencies. Dynamic/runtime fallback is exercised separately by
 the stripped-source ratchet. The scanner excludes its own contract, generated
 snapshot, design report and scanner implementation to avoid self-references.
 
-Findings: no canonical runtime imports of legacy identities. First-party
+Findings: no canonical runtime imports of legacy identities. Compatibility
 validators/tests deliberately use legacy entrypoints and therefore must be
 adapted at removal; those are compatibility evidence, not production runtime
 dependencies. `distribution/harnessw.py` deliberately invokes root

@@ -2,6 +2,7 @@ name: Greenfield Engineering Graph
 
 on:
   pull_request:
+    types: [opened, ready_for_review, synchronize, reopened]
     paths:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"

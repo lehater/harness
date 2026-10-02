@@ -28,7 +28,7 @@ Canonical new onboarding uses the v1 binding example, target AGENTS fragment,
 `python -m harness.application.skill_router ...`. The lifecycle contract owns
 a bounded onboarding surface list and labels v0-specific compatibility surfaces
 separately. Its validator rejects legacy command recommendations in owned
-onboarding code blocks and validates the canonical v1 binding and bootstrap.
+onboarding code examples and validates the canonical v1 binding and bootstrap.
 Extend that list when adding a first-party onboarding surface.
 
 The implicit Consumer Pack CLI/programmatic default remains v0. Published v1
@@ -37,11 +37,18 @@ argument would break existing callers. Recommended selection for new callers
 is explicit v1, independently of that compatibility default.
 
 First-party CI frontier checks, README/current command examples and active
-Consumer skill commands use canonical modules. Pack/wrapper validator harness
+Consumer skill commands use canonical modules. Graph Doctor, human projection,
+workspace and source coverage validators exercise canonical semantic behavior
+without testing facade identity; their incidental imports become canonical. Pack/wrapper validator harness
 imports use canonical implementation identities; their v0 invocation/import
 probes remain compatibility subjects. Registry-driven facade probes and old
 wrapper execution remain required evidence, not incidental dependencies.
 Historical evidence is preserved.
+
+The Greenfield CI workflow must exercise its migrated canonical commands after
+a stable draft becomes ready for review. Its existing draft guard and path
+filters remain; adding the ready_for_review event closes the observed skipped
+validation gap without changing check stages, costs or final-gate obligations.
 
 ## Core alias semantics
 

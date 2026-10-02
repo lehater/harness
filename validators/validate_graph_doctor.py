@@ -12,8 +12,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from adapters.canonical_graph import project_model  # noqa: E402
-from graph_doctor import diagnose_project  # noqa: E402
+from harness.integration.adapters.canonical_graph import project_model  # noqa: E402
+from harness.application.graph_doctor import diagnose_project  # noqa: E402
 
 
 def load(path: Path):
