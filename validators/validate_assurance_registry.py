@@ -324,6 +324,150 @@ def _validate_execution_bindings(
             )
 
 
+def _validate_provider_case_runs(
+    case: dict[str, Any],
+    *,
+    evidence_id: str,
+    case_id: str,
+    expected_runs: int,
+    sequence: str | None,
+) -> list[dict[str, Any]]:
+    explicit_runs = case.get("runs")
+    if explicit_runs is None:
+        runs = [{
+            key: case.get(key)
+            for key in (
+                "run_id",
+                "run_status",
+                "correctness",
+                "resolved_model",
+                "input_tokens",
+                "output_tokens",
+                "record_sha256",
+            )
+        }]
+        explicit = False
+    else:
+        runs = _mapping_list(
+            explicit_runs,
+            f"{evidence_id} provider case {case_id} runs",
+        )
+        explicit = True
+
+    if len(runs) != expected_runs:
+        raise RegistryError(
+            f"{evidence_id}: provider case {case_id} expected "
+            f"{expected_runs} run(s), recorded {len(runs)}"
+        )
+
+    seen: set[str] = set()
+    for index, run in enumerate(runs, start=1):
+        run_id = run.get("run_id")
+        if not isinstance(run_id, str) or not run_id:
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} run {index} "
+                "requires run_id"
+            )
+        if run_id in seen:
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} duplicate run_id {run_id}"
+            )
+        seen.add(run_id)
+        if run.get("run_status") != "COMPLETED" or run.get("correctness") != "PASS":
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} run {run_id} "
+                "is not an accepted PASS"
+            )
+        record_sha = run.get("record_sha256")
+        if not isinstance(record_sha, str) or not re.fullmatch(
+            r"[0-9a-f]{64}", record_sha
+        ):
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} run {run_id} "
+                "has invalid record_sha256"
+            )
+        model = run.get("resolved_model")
+        if not isinstance(model, str) or not model:
+            raise RegistryError(
+                f"{evidence_id}: provider case {case_id} run {run_id} "
+                "requires resolved_model"
+            )
+        for field in ("input_tokens", "output_tokens"):
+            value = run.get(field)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise RegistryError(
+                    f"{evidence_id}: provider case {case_id} run {run_id} "
+                    f"has invalid {field}"
+                )
+        if explicit:
+            if run.get("started_from_clean_context") is not True:
+                raise RegistryError(
+                    f"{evidence_id}: provider case {case_id} run {run_id} "
+                    "must record clean-context execution"
+                )
+            prompt_bytes = run.get("provider_prompt_utf8_bytes")
+            if (
+                not isinstance(prompt_bytes, int)
+                or isinstance(prompt_bytes, bool)
+                or prompt_bytes <= 0
+            ):
+                raise RegistryError(
+                    f"{evidence_id}: provider case {case_id} run {run_id} "
+                    "has invalid provider_prompt_utf8_bytes"
+                )
+
+    if sequence is None:
+        return runs
+    if sequence != "bootstrap-idempotence":
+        raise RegistryError(
+            f"{evidence_id}: provider case {case_id} has unsupported "
+            f"run sequence {sequence!r}"
+        )
+    if len(runs) != 2:
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "must record exactly two runs"
+        )
+    first_context = runs[0].get("execution_context")
+    second_context = runs[1].get("execution_context")
+    if first_context != {
+        "sequence": "bootstrap-idempotence",
+        "step": 1,
+        "phase": "bootstrap",
+    }:
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "has invalid first execution_context"
+        )
+    if second_context != {
+        "sequence": "bootstrap-idempotence",
+        "step": 2,
+        "phase": "reconcile-existing",
+    }:
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "has invalid second execution_context"
+        )
+    derived = runs[1].get("derived_input_binding")
+    if not isinstance(derived, dict):
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "requires derived_input_binding on run 2"
+        )
+    if derived.get("prior_run_record_sha256") != runs[0]["record_sha256"]:
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "does not bind run 2 to run 1"
+        )
+    core_sha = derived.get("core_model_sha256")
+    if not isinstance(core_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", core_sha):
+        raise RegistryError(
+            f"{evidence_id}: bootstrap-idempotence case {case_id} "
+            "has invalid derived Core-model binding"
+        )
+    return runs
+
+
 def _validate_provider_run_binding(
     evidence_item: dict[str, Any],
     root: Path,
@@ -384,11 +528,6 @@ def _validate_provider_run_binding(
             raise RegistryError(
                 f"{evidence_id}: provider run record missing case {case_id}"
             )
-        if case.get("run_status") != "COMPLETED" or case.get("correctness") != "PASS":
-            raise RegistryError(
-                f"{evidence_id}: provider case {case_id} is not an accepted PASS"
-            )
-
         for field, digest_field in (
             ("fixture", "fixture_sha256"),
             ("oracle", "oracle_sha256"),
@@ -427,6 +566,37 @@ def _validate_provider_run_binding(
             raise RegistryError(
                 f"{evidence_id}: {case_id} case binding is stale"
             )
+        rendered_case = yaml.safe_load(rendered)
+        if not isinstance(rendered_case, dict):
+            raise RegistryError(
+                f"{evidence_id}: {case_id} rendered case must be a mapping"
+            )
+        run_plan = rendered_case.get("run_plan")
+        if not isinstance(run_plan, dict):
+            raise RegistryError(
+                f"{evidence_id}: {case_id} rendered case lacks run_plan"
+            )
+        expected_runs = run_plan.get("runs")
+        if (
+            not isinstance(expected_runs, int)
+            or isinstance(expected_runs, bool)
+            or expected_runs < 1
+        ):
+            raise RegistryError(
+                f"{evidence_id}: {case_id} rendered case has invalid run count"
+            )
+        sequence = run_plan.get("sequence")
+        if sequence is not None and not isinstance(sequence, str):
+            raise RegistryError(
+                f"{evidence_id}: {case_id} rendered case has invalid run sequence"
+            )
+        _validate_provider_case_runs(
+            case,
+            evidence_id=evidence_id,
+            case_id=case_id,
+            expected_runs=expected_runs,
+            sequence=sequence,
+        )
 
 
 def _level_admissible(
@@ -736,6 +906,71 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
             evidence_id="META-UNRELATED-PROVIDER-MUTATION",
         )
         passed.append("AR-M11")
+
+    sequence_case = {
+        "runs": [
+            {
+                "run_id": "TD-BOOT-E04-R01-meta",
+                "run_status": "COMPLETED",
+                "correctness": "PASS",
+                "resolved_model": "model-a",
+                "input_tokens": 10,
+                "output_tokens": 2,
+                "provider_prompt_utf8_bytes": 100,
+                "record_sha256": "1" * 64,
+                "started_from_clean_context": True,
+                "execution_context": {
+                    "sequence": "bootstrap-idempotence",
+                    "step": 1,
+                    "phase": "bootstrap",
+                },
+            },
+            {
+                "run_id": "TD-BOOT-E04-R02-meta",
+                "run_status": "COMPLETED",
+                "correctness": "PASS",
+                "resolved_model": "model-b",
+                "input_tokens": 11,
+                "output_tokens": 3,
+                "provider_prompt_utf8_bytes": 101,
+                "record_sha256": "2" * 64,
+                "started_from_clean_context": True,
+                "execution_context": {
+                    "sequence": "bootstrap-idempotence",
+                    "step": 2,
+                    "phase": "reconcile-existing",
+                },
+                "derived_input_binding": {
+                    "prior_run_record_sha256": "1" * 64,
+                    "core_model_sha256": "3" * 64,
+                },
+            },
+        ]
+    }
+    _validate_provider_case_runs(
+        sequence_case,
+        evidence_id="META-MULTI-RUN-BINDING",
+        case_id="TD-BOOT-E04",
+        expected_runs=2,
+        sequence="bootstrap-idempotence",
+    )
+    broken_sequence = copy.deepcopy(sequence_case)
+    broken_sequence["runs"][1]["derived_input_binding"][
+        "prior_run_record_sha256"
+    ] = "4" * 64
+    try:
+        _validate_provider_case_runs(
+            broken_sequence,
+            evidence_id="META-BROKEN-MULTI-RUN-BINDING",
+            case_id="TD-BOOT-E04",
+            expected_runs=2,
+            sequence="bootstrap-idempotence",
+        )
+    except RegistryError as exc:
+        assert "does not bind run 2 to run 1" in str(exc)
+    else:
+        raise AssertionError("AR-M12 broken multi-run sequence binding was accepted")
+    passed.append("AR-M12")
 
     return passed
 

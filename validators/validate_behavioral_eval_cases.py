@@ -148,9 +148,12 @@ budget = MANIFEST["provider_prompt_budget"]
 assert budget["metric"] == "utf8_bytes"
 max_per_case = budget["max_per_case"]
 max_suite = budget["max_suite"]
+max_sequence_extra = budget["max_sequence_extra"]
 assert isinstance(max_per_case, int) and max_per_case > 0
 assert isinstance(max_suite, int) and max_suite >= max_per_case
+assert isinstance(max_sequence_extra, int) and max_sequence_extra >= max_per_case
 provider_prompt_bytes: dict[str, int] = {}
+sequence_prompt_bytes = 0
 
 descriptor = {
     "version": 1,
@@ -253,6 +256,25 @@ for entry in entries:
                     "step": 2,
                     "phase": "reconcile-existing",
                 }
+                reconcile_request["repository_fixture"] = copy.deepcopy(
+                    binding.fixture
+                )
+                reconcile_request["repository_fixture"]["existing_project"][
+                    "harness_realization"
+                ] = "current-and-usable"
+                reconcile_request["repository_fixture"]["existing_project"][
+                    "current_harness_realization"
+                ] = {
+                    "authorities": [{"id": "PAYMENT-DESIGN"}],
+                    "artifacts": [{
+                        "id": "PAYMENT-API",
+                        "authority": "PAYMENT-DESIGN",
+                        "path": "docs/payment-api.md",
+                        "provides": ["payment.idempotency-contract"],
+                        "depends_on": [],
+                    }],
+                    "questions": [],
+                }
                 reconcile_payload = _model_payload(reconcile_request)
                 assert reconcile_payload["authorized_operation_chain"] == [
                     {
@@ -267,6 +289,15 @@ for entry in entries:
                     "skills/agent/bootstrap-existing-project/SKILL.md"
                     not in reconcile_trusted
                 )
+                reconcile_prompt_bytes = len(
+                    _prompt(reconcile_request).encode("utf-8")
+                )
+                assert reconcile_prompt_bytes <= entry["max_prompt_bytes"], (
+                    entry["design"],
+                    reconcile_prompt_bytes,
+                    entry["max_prompt_bytes"],
+                )
+                sequence_prompt_bytes += reconcile_prompt_bytes
         else:
             contract = _response_contract("selected_operation")
             assert contract["schema"]["selected_operation"] == (
@@ -471,9 +502,20 @@ else:
 
 total_prompt_bytes = sum(provider_prompt_bytes.values())
 assert total_prompt_bytes <= max_suite, (total_prompt_bytes, max_suite)
+assert sequence_prompt_bytes <= max_sequence_extra, (
+    sequence_prompt_bytes,
+    max_sequence_extra,
+)
+execution_prompt_bound = total_prompt_bytes + sequence_prompt_bytes
+assert execution_prompt_bound <= max_suite + max_sequence_extra, (
+    execution_prompt_bound,
+    max_suite + max_sequence_extra,
+)
 print(
     f"first-wave behavioral eval cases: PASS ({len(entries)} cases); "
-    f"provider_prompt_utf8_bytes total={total_prompt_bytes} "
+    f"initial_provider_prompt_utf8_bytes={total_prompt_bytes} "
+    f"sequence_extra_utf8_bytes={sequence_prompt_bytes} "
+    f"execution_prompt_bound={execution_prompt_bound}; "
     f"max_case={max(provider_prompt_bytes.values())}; "
     f"td_comp_001_prompt_utf8_bytes={comp_prompt_bytes}"
 )

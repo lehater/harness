@@ -378,6 +378,18 @@ all bound file identities remain unchanged.
 Expected: binding remains admissible; unrelated repository churn does not stale
 the judgement evidence.
 
+### AR-M12 — multi-run provider case binding
+
+A provider-backed case whose reviewed run plan requires a derived sequence
+records every provider call under one case entry. The recorded run count must
+match the frozen case, every run must be a clean-context PASS, and a
+`bootstrap-idempotence` second run must cryptographically bind to the first run
+record plus the injected Core model.
+
+Expected: the complete linked sequence is admissible; a missing run or broken
+derived-input link is rejected.
+
+
 ## Report shape
 
 A future validator/report should expose, at minimum:
