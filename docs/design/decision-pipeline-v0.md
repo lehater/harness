@@ -153,6 +153,6 @@ Pipeline stages, roadmap buckets and execution outcomes remain orchestration
 procedure above Core. Core continues to own only Authorities,
 CanonicalArtifacts, CapabilityIds, dependencies and Questions.
 
-The cross-layer `project_frontier.py` projection consumes this roadmap together
+The cross-layer `harness.application.project_frontier` projection consumes this roadmap together
 with Semantic Closure and Engineering Coverage. Decision Pipeline does not own
 their precedence or redefine their domain states.

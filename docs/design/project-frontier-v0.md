@@ -4,7 +4,7 @@ Status: canonical application projection.
 
 ## Purpose
 
-`project_frontier.py` is the single application-layer next-action projection
+`harness.application.project_frontier` is the single application-layer next-action projection
 for a selected Consumer. It composes existing Harness read models without
 becoming a new owner of engineering truth.
 
@@ -92,7 +92,7 @@ normalization.
 ## CLI
 
 ```sh
-python project_frontier.py IMPLEMENTATION \
+python -m harness.application.project_frontier IMPLEMENTATION \
   decision-roadmap.yaml \
   semantic-closure.yaml \
   engineering-coverage.yaml \
