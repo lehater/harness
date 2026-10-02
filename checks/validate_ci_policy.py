@@ -179,7 +179,7 @@ def main() -> int:
 
     discovered_paths = {
         str(path.relative_to(ROOT))
-        for pattern in ("validators/validate_*.py", "tests/test_*.py")
+        for pattern in ("checks/validate_*.py", "tests/test_*.py")
         for path in ROOT.glob(pattern)
     }
     for path in sorted(discovered_paths - registered_paths):

@@ -364,9 +364,9 @@ requirements:
 evidence:
   - id: EVID-ASSURE-REGISTRY-SELFTEST
     providers:
-      - validators/validate_assurance_registry.py
+      - checks/validate_assurance_registry.py
     source_refs:
-      - path: validators/validate_assurance_registry.py
+      - path: checks/validate_assurance_registry.py
       - path: spec/assurance/harness-assurance-registry-v0.yaml
     satisfies:
       - A19-R01
@@ -388,7 +388,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies:
@@ -415,7 +415,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies: [A04-R01]
@@ -440,7 +440,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36928079710.yaml
     satisfies: [A16-R01]
@@ -465,7 +465,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
     satisfies: [A05-R01]
@@ -491,7 +491,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
     satisfies: [A04-R01]
@@ -516,7 +516,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
     satisfies: [A16-R01]
@@ -544,7 +544,7 @@ evidence:
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/first-wave-provider-run-36942421201.yaml
     satisfies: [A09-R01]
     test_level: TL2
@@ -569,7 +569,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     satisfies: [A05-R01]
@@ -595,7 +595,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     satisfies: [A04-R01]
@@ -620,7 +620,7 @@ evidence:
       - .github/workflows/behavioral-eval-copilot.yml
     source_refs:
       - path: spec/behavioral-evals/first-wave/manifest-v0.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: .github/workflows/behavioral-eval-copilot.yml
       - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     satisfies: [A16-R01]
@@ -650,7 +650,7 @@ evidence:
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/case.yaml.tmpl
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/fixture.yaml
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/a04-r02-provider-run-36953433978.yaml
     satisfies: [A04-R02]
     test_level: TL1
@@ -676,7 +676,7 @@ evidence:
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/case.yaml.tmpl
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/fixture.yaml
       - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     satisfies: [A04-R03]
     test_level: TL4
@@ -702,7 +702,7 @@ evidence:
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/case.yaml.tmpl
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/fixture.yaml
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     satisfies: [A05-R02]
     test_level: TL3
@@ -728,7 +728,7 @@ evidence:
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/case.yaml.tmpl
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/fixture.yaml
       - path: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/release-critical-formation-provider-run-36953091767.yaml
     satisfies: [A05-R03]
     test_level: TL4
@@ -755,7 +755,7 @@ evidence:
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
       - path: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     satisfies: [A09-R01]
     test_level: TL2
@@ -784,8 +784,8 @@ evidence:
       - path: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl
       - path: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl
       - path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl
-      - path: validators/validate_behavioral_eval.py
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/first-wave-provider-run-36947887869.yaml
     satisfies: [A09-R02]
     test_level: TL3
@@ -813,7 +813,7 @@ evidence:
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
     satisfies: [A09-R03]
     test_level: TL4
@@ -841,7 +841,7 @@ evidence:
       - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
       - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
       - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml
     satisfies: [A09-R04]
     test_level: TL5
@@ -868,7 +868,7 @@ evidence:
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml
-      - path: validators/validate_behavioral_eval_cases.py
+      - path: tests/test_behavioral_eval_cases.py
       - path: spec/assurance/evidence/tl4-existing-project-provider-run-36949909315.yaml
     satisfies: [A16-R05, A16-R06]
     test_level: TL4
@@ -888,9 +888,9 @@ evidence:
 
   - id: EVID-A16-INTERNAL-OP-AUTHORIZATION
     providers:
-      - validators/validate_skill_router.py
+      - tests/test_skill_router.py
     source_refs:
-      - path: validators/validate_skill_router.py
+      - path: tests/test_skill_router.py
       - path: skills/consumer-operation-registry-v0.yaml
     satisfies: [A16-R02]
     test_level: TL1
@@ -905,11 +905,11 @@ evidence:
 
   - id: EVID-A16-METHOD-ARTIFACT-ROUTING
     providers:
-      - validators/validate_method_router.py
-      - validators/validate_skill_router.py
+      - tests/test_method_router.py
+      - tests/test_skill_router.py
     source_refs:
-      - path: validators/validate_method_router.py
-      - path: validators/validate_skill_router.py
+      - path: tests/test_method_router.py
+      - path: tests/test_skill_router.py
       - path: skills/consumer-method-registry-v0.yaml
       - path: skills/artifact-skill-registry-v0.yaml
     satisfies: [A16-R03]
@@ -925,9 +925,9 @@ evidence:
 
   - id: EVID-A16-ACTIONABILITY-GROUPING
     providers:
-      - validators/validate_agent_router.py
+      - tests/test_agent_router.py
     source_refs:
-      - path: validators/validate_agent_router.py
+      - path: tests/test_agent_router.py
       - path: agent_router.py
     satisfies: [A16-R04]
     test_level: TL2

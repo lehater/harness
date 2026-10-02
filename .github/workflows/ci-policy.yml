@@ -6,10 +6,10 @@ on:
       - ".github/workflows/**"
       - "docs/design/ci-execution-policy-v0.md"
       - "spec/ci/**"
-      - "validators/validate_ci_policy.py"
-      - "validators/validate_assurance_registry.py"
-      - "validators/validate_behavioral_eval.py"
-      - "validators/validate_behavioral_eval_cases.py"
+      - "checks/validate_ci_policy.py"
+      - "checks/validate_assurance_registry.py"
+      - "tests/test_behavioral_eval.py"
+      - "tests/test_behavioral_eval_cases.py"
       - "adapters/copilot_behavioral_eval_agent.py"
       - "spec/behavioral-evals/**"
       - "evals/behavioral_eval.py"
@@ -24,10 +24,10 @@ on:
       - ".github/workflows/**"
       - "docs/design/ci-execution-policy-v0.md"
       - "spec/ci/**"
-      - "validators/validate_ci_policy.py"
-      - "validators/validate_assurance_registry.py"
-      - "validators/validate_behavioral_eval.py"
-      - "validators/validate_behavioral_eval_cases.py"
+      - "checks/validate_ci_policy.py"
+      - "checks/validate_assurance_registry.py"
+      - "tests/test_behavioral_eval.py"
+      - "tests/test_behavioral_eval_cases.py"
       - "adapters/copilot_behavioral_eval_agent.py"
       - "spec/behavioral-evals/**"
       - "evals/behavioral_eval.py"
@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: "3.10"
       - run: pip install PyYAML
-      - run: python validators/validate_ci_policy.py
-      - run: python validators/validate_assurance_registry.py
-      - run: python validators/validate_behavioral_eval.py
-      - run: python validators/validate_behavioral_eval_cases.py
+      - run: python checks/validate_ci_policy.py
+      - run: python checks/validate_assurance_registry.py
+      - run: python tests/test_behavioral_eval.py
+      - run: python tests/test_behavioral_eval_cases.py

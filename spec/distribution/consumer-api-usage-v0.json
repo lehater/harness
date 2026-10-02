@@ -2,9 +2,9 @@
   "version": 1,
   "method": "AST absolute imports; bounded textual facade paths/dotted identities outside runtime",
   "registry_driven_validators": [
-    "validators/validate_consumer_api_eol_readiness.py",
-    "validators/validate_consumer_pack.py",
-    "validators/validate_context_boundaries.py"
+    "checks/validate_consumer_api_eol_readiness.py",
+    "tests/test_consumer_pack.py",
+    "checks/validate_context_boundaries.py"
   ],
   "surfaces": {
     "import_aliases:harness": {
@@ -27,9 +27,9 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "tests/test_consumer_pack.py",
+          "tests/test_core.py"
         ]
       }
     },
@@ -59,8 +59,8 @@
         ],
         "validators_tests": [
           "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py"
+          "tests/test_consumer_pack.py",
+          "tests/test_core.py"
         ]
       }
     },
@@ -83,7 +83,7 @@
         ],
         "validators_tests": [
           "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ],
         "distribution_tooling": [
           "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml",
@@ -110,7 +110,7 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -130,7 +130,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -147,7 +147,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -184,7 +184,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -208,7 +208,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -228,7 +228,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -390,7 +390,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -408,7 +408,7 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -442,8 +442,8 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py"
+          "tests/test_consumer_pack.py",
+          "checks/validate_context_boundaries.py"
         ]
       }
     },
@@ -524,7 +524,7 @@
           "spec/distribution/consumer-api-v0-eol-readiness-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py"
+          "tests/test_consumer_pack.py"
         ]
       }
     },
@@ -640,8 +640,8 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_consumer_wrapper.py"
+          "tests/test_consumer_pack.py",
+          "tests/test_consumer_wrapper.py"
         ]
       }
     },
@@ -721,8 +721,8 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_pack.py",
-          "validators/validate_method_router.py"
+          "tests/test_consumer_pack.py",
+          "tests/test_method_router.py"
         ]
       }
     },
@@ -850,11 +850,11 @@
         ],
         "validators_tests": [
           "spec/behavioral-eval-integration/case.yaml",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_consumer_wrapper.py",
-          "validators/validate_fresh_context_routing.py",
-          "validators/validate_instruction_ownership.py",
-          "validators/validate_skill_router.py"
+          "tests/test_consumer_pack.py",
+          "tests/test_consumer_wrapper.py",
+          "tests/test_fresh_context_routing.py",
+          "checks/validate_instruction_ownership.py",
+          "tests/test_skill_router.py"
         ]
       }
     },
@@ -878,9 +878,9 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "tests/test_consumer_pack.py",
+          "tests/test_core.py"
         ]
       }
     },
@@ -904,9 +904,9 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_core.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "tests/test_consumer_pack.py",
+          "tests/test_core.py"
         ]
       }
     },
@@ -924,8 +924,8 @@
           "spec/distribution/consumer-pack-v1.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_context_boundaries.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "checks/validate_context_boundaries.py"
         ]
       }
     },
@@ -946,11 +946,11 @@
           "docs/repository-source-map.md"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py",
-          "validators/validate_live_calibration_process_driver.py",
-          "validators/validate_scenario_suite.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "tests/test_consumer_pack.py",
+          "checks/validate_context_boundaries.py",
+          "tests/test_live_calibration_process_driver.py",
+          "tests/test_scenario_suite.py"
         ]
       }
     },
@@ -972,10 +972,10 @@
           "spec/distribution/consumer-pack-v1.yaml"
         ],
         "validators_tests": [
-          "validators/validate_consumer_api_eol_readiness.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py",
-          "validators/validate_scenario_suite.py"
+          "checks/validate_consumer_api_eol_readiness.py",
+          "tests/test_consumer_pack.py",
+          "checks/validate_context_boundaries.py",
+          "tests/test_scenario_suite.py"
         ]
       }
     },
@@ -1005,9 +1005,9 @@
         ],
         "validators_tests": [
           "spec/assurance/harness-assurance-registry-v0.yaml",
-          "validators/validate_behavioral_eval_cases.py",
-          "validators/validate_consumer_pack.py",
-          "validators/validate_context_boundaries.py"
+          "tests/test_behavioral_eval_cases.py",
+          "tests/test_consumer_pack.py",
+          "checks/validate_context_boundaries.py"
         ]
       }
     }
