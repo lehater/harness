@@ -140,6 +140,23 @@ abilities:
       - A07-R01
       - A07-R02
 
+  - id: HA-A08
+    title: Design target selection
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A08-F01
+      - A08-F02
+      - A08-F03
+      - A08-F04
+      - A08-F05
+    requirements:
+      - A08-R01
+      - A08-R02
+      - A08-R03
+
   - id: HA-A09
     title: Existing-project bootstrap/reconcile
     contract_ref:
@@ -486,6 +503,48 @@ requirements:
       methods_any: [EM-02, EM-03]
       oracle_minimum: O1
       judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A08-R01
+    ability: HA-A08
+    failure_modes: [A08-F01, A08-F02, A08-F03, A08-F04]
+    purpose: Bounded scope-to-obligation selection includes required engineering knowledge, excludes task/workflow pseudo-knowledge, and resists Reference-template lexical bias.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-05]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A08-R02
+    ability: HA-A08
+    failure_modes: [A08-F01, A08-F02, A08-F04]
+    purpose: A project-shaped TL3 selection from explicit downstream obligations yields the minimal sufficient target closure without speculative knowledge.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-05, EM-08]
+      oracle_minimum: O1
+      judgement_execution: true
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A08-R03
+    ability: HA-A08
+    failure_modes: [A08-F05]
+    purpose: Repeated clean-context selection on the same frozen scope converges on materially compatible target closures.
+    required:
+      test_levels: [TL4]
+      methods_any: [EM-09]
+      oracle_minimum: O1
+      judgement_execution: true
     substitution:
       higher_level_alone_allowed: false
     release_applicable: true

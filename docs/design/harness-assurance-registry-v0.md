@@ -51,7 +51,8 @@ The reviewed minimum implementation is:
 The seed is intentionally incomplete. It includes HA-A01 Core structural truth,
 HA-A02 Engineering Graph topology, HA-A03 Target-state action semantics,
 HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Coverage,
-HA-A07 Project Authority migration, HA-A09 existing-project
+HA-A07 Project Authority migration, HA-A08 Design target selection,
+HA-A09 existing-project
 bootstrap/reconcile, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
@@ -103,7 +104,10 @@ A05-R01 are satisfied; HA-A06 satisfies A06-R01 through explicit
 disposition/subject-completeness evidence and A06-R02 through scope-root
 activation isolation. HA-A07 satisfies A07-R01 through fail-closed
 retire/split/merge/rename migration evidence and A07-R02 through unchanged
-assessment preservation. HA-A09 satisfies A09-R01 (TL2),
+assessment preservation. HA-A08 is explicitly INCOMPLETE: A08-R01 requires
+a judgement-backed bounded selection/anti-template-bias case, A08-R02 requires
+the TL3 project-shaped minimal-target proof, and A08-R03 requires repeated
+clean-context convergence. HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
@@ -338,6 +342,12 @@ Accepted applicability is never inherited by a replacement Authority without
 evidence; unmapped retirement is now an explicit conflict rather than silent
 loss. The evidence is synthetic O1 and does not claim TL5 real-project
 generalization.
+
+HA-A08 is now present in the denominator but remains INCOMPLETE. Existing
+deterministic closure evaluation and historical/stale provider runs do not
+substitute for target-selection judgement. TD-CAP-005 and TD-BOOT-G01/G04/G05
+remain the relevant designed evidence paths; TL4 convergence must use repeated
+clean-context execution.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks
