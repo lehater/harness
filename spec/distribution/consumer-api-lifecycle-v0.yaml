@@ -1,0 +1,446 @@
+version: 1
+kind: harness-consumer-api-lifecycle
+id: HARNESS-CONSUMER-API-LIFECYCLE-V0
+owner: distribution
+design: docs/design/harness-consumer-api-lifecycle-v0.md
+compatibility_registry: spec/architecture/repository-layout-v0.yaml
+states:
+- SUPPORTED
+- DEPRECATED
+- EOL
+- REMOVED
+transitions:
+- from: SUPPORTED
+  to: DEPRECATED
+  requires: explicit-distribution-decision
+- from: DEPRECATED
+  to: EOL
+  requires: explicit-distribution-decision
+- from: EOL
+  to: REMOVED
+  requires: explicit-distribution-decision
+state_obligations:
+  SUPPORTED:
+  - latest-source-accepts-api
+  - materialize-pack
+  - wrapper-tooling-support
+  - required-compatibility-tests
+  DEPRECATED:
+  - latest-source-still-works
+  - no-new-consumers
+  - migrate-to-v1
+  - support-compatibility-defects-until-eol
+  EOL:
+  - latest-source-support-and-materialization-no-longer-obligatory
+  - immutable-historical-revisions-remain-artifacts
+  REMOVED:
+  - explicit-prior-eol-decision-required
+  - v0-only-source-deletion-and-registry-simplification-permitted
+apis:
+  v0:
+    state: SUPPORTED
+    decision: docs/design/harness-consumer-api-lifecycle-v0.md
+  v1:
+    state: SUPPORTED
+    decision: docs/design/harness-consumer-api-lifecycle-v0.md
+compatibility_inventory:
+- registry: import_aliases
+  identity: harness
+  role: core-import-alias
+  consumer_apis:
+  - v0
+  - v1
+  disposition: REVIEW_CORE_REEXPORTS_SEPARATELY
+  blocker: Separate Core public-export decision
+- registry: cli_facades
+  identity: harness.py
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: target_state
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: engineering_graph
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: project_status
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: reference_materializer
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: reference_model_evolution
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: source_boundary
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: source_coverage
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: source_set
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_execution_assurance
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_exploration
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_explorer_contract
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_governance
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: architecture_driver_closure
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: concern_activation
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: coverage_obligations
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: coverage_planner
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: engineering_coverage
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: frontend_interface_knowledge
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: frontend_screen_contracts
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: human_projection
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: workspace
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: integration_alignment
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: adapters.canonical_graph
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: repository_realization
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: acceptance_policy
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: capability_lifecycle
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: derivation_test_coverage
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: live_calibration
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: adapters.copilot_live_calibration_evaluator
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_acceptance
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_derivation
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_fingerprint
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_judgement_calibration
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: agent_router
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: authority_context
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: consumer_pack
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: coverage_application
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_explorer_request
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: decision_pipeline
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: graph_doctor
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: method_router
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: project_frontier
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: project_publication
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_admission
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_closure
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: semantic_questions
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: skill_invariant_policy
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+- registry: module_facades
+  identity: skill_router
+  role: v0-facade
+  consumer_apis:
+  - v0
+  disposition: DELETE_AFTER_V0_EOL
+  blocker: Explicit v0 EOL and subsequent removal decision; update first-party references/tests
+special_surfaces:
+- identity: harness/__init__.py#execution-bridge
+  canonical_target: src/harness
+  role: source-tree-execution-bridge
+  consumer_apis:
+  - v0
+  - v1
+  disposition: RETAIN_EXECUTION_BRIDGE_PENDING_SEPARATE_DECISION
+  blocker: Separate installed-package/source-tree execution ADR
+- identity: harness/__init__.py#core-exports
+  canonical_target: harness.project_model.core
+  role: core-reexports
+  consumer_apis:
+  - v0
+  - v1
+  disposition: REVIEW_CORE_REEXPORTS_SEPARATELY
+  blocker: Separate Core public-export decision
+- identity: src/harness/__init__.py#core-exports
+  canonical_target: harness.project_model.core
+  role: canonical-package-core-reexports
+  consumer_apis:
+  - v0
+  - v1
+  disposition: REVIEW_CORE_REEXPORTS_SEPARATELY
+  blocker: Separate Core public-export decision
+- identity: scenario_suite.py
+  canonical_target: scenario_suite
+  role: consumer-scenario-tooling
+  consumer_apis:
+  - v0
+  - v1
+  disposition: RETAIN_CONSUMER_TOOLING
+  blocker: Not a compatibility facade
+- identity: scenario_drivers.py
+  canonical_target: scenario_drivers
+  role: consumer-scenario-tooling
+  consumer_apis:
+  - v0
+  - v1
+  disposition: RETAIN_CONSUMER_TOOLING
+  blocker: Not a compatibility facade
+- identity: adapters/copilot_behavioral_eval_agent.py
+  canonical_target: adapters.copilot_behavioral_eval_agent
+  role: provider-agent-tooling
+  consumer_apis:
+  - v0
+  disposition: RETAIN_PROVIDER_TOOLING_PENDING_SEPARATE_DECISION
+  blocker: Real provider implementation, not a facade; provider execution/distribution
+    decision required
