@@ -141,10 +141,14 @@ foundation.
 ## Core bootstrap migration decision
 
 The first slice moves only Core into `src/harness/project_model/core.py`.
-`engineering_graph.py` remains a canonical root implementation and exercises
-the legacy Core import contract. The second slice moves Target State into
+The second slice moves Target State into
 `src/harness/project_model/target_state.py`, importing Core directly with `.core`;
 root `target_state.py` delegates imports and CLI execution to that canonical owner.
+The third slice moves Engineering Graph into
+`src/harness/project_model/engineering_graph.py`, importing `.core` and `.target_state`
+directly. Root `engineering_graph.py` uses the same module/CLI facade grammar.
+The published Integration boundary names `harness.project_model.engineering_graph`;
+legacy imports are normalized to that canonical identity before symbol checks.
 
 The migration surfaces are distinct:
 

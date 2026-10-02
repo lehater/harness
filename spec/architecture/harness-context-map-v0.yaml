@@ -21,7 +21,7 @@ contexts:
     responsibility: Own project-specific engineering knowledge topology and structural state.
     modules:
       - harness.project_model.core
-      - engineering_graph
+      - harness.project_model.engineering_graph
       - harness.project_model.target_state
     may_depend_on: []
 
@@ -172,7 +172,7 @@ published_boundaries:
       harness.project_model.core:
         - CoreError
         - validate_model
-      engineering_graph:
+      harness.project_model.engineering_graph:
         - derive_profile
         - producer_index
         - production_index

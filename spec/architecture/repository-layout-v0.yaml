@@ -47,7 +47,6 @@ root_python:
     - decision_pipeline
     - derivation_test_coverage
     - engineering_coverage
-    - engineering_graph
     - frontend_interface_knowledge
     - frontend_screen_contracts
     - graph_doctor
@@ -91,3 +90,5 @@ compatibility:
   module_facades:
     target_state:
       target: harness.project_model.target_state
+    engineering_graph:
+      target: harness.project_model.engineering_graph

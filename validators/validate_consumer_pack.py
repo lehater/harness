@@ -56,6 +56,11 @@ for name in core.__all__:
 assert Path(harness.__file__).resolve() == Path('harness/__init__.py').resolve()
 assert Path(core.__file__).resolve() == Path('src/harness/project_model/core.py').resolve()
 import engineering_graph
+from harness.project_model import engineering_graph as canonical_graph
+assert engineering_graph.__all__ is canonical_graph.__all__
+for name in canonical_graph.__all__:
+    assert getattr(engineering_graph, name) is getattr(canonical_graph, name), name
+assert Path(canonical_graph.__file__).resolve() == Path('src/harness/project_model/engineering_graph.py').resolve()
 import target_state
 from harness.project_model import target_state as canonical
 assert target_state.validate_profile is canonical.validate_profile
@@ -88,6 +93,29 @@ assert target_state.CoreError is core.CoreError
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
     assert json.loads(result.stdout) == target_fixture["expect"]["complete"], result.stdout
+
+    graph_fixture = load_yaml(pack / "spec/engineering-graph-acceptance/basic.yaml")
+    graph_path = temp_root / "engineering-graph.yaml"
+    graph_path.write_text(yaml.safe_dump(graph_fixture["graph"]), encoding="utf-8")
+    model_path.write_text(yaml.safe_dump(graph_fixture["cases"]["empty"]["model"]), encoding="utf-8")
+    target = graph_fixture.get("target", "IMPLEMENTATION")
+    outputs = {}
+    for command, arguments in (
+        ("validate", [str(graph_path)]),
+        ("profile", [str(graph_path), target]),
+        ("evaluate", [str(graph_path), target, str(model_path)]),
+    ):
+        result = subprocess.run(
+            [sys.executable, "engineering_graph.py", command, *arguments],
+            cwd=pack, env=env, check=True, capture_output=True, text=True,
+        )
+        outputs[command] = json.loads(result.stdout)
+    assert outputs["validate"] == {"valid": True}
+    assert sorted(item["capability"] for item in outputs["profile"]["expectations"]) == sorted(graph_fixture["expect_profile"]["capabilities"])
+    assert outputs["evaluate"]["profile"] == outputs["profile"]
+    expected = graph_fixture["cases"]["empty"]["expect"]
+    assert outputs["evaluate"]["status"] == expected["status"]
+    assert sorted(item["capability"] for item in outputs["evaluate"]["create"]) == expected["create"]
 
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")
