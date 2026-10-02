@@ -718,6 +718,33 @@ evidence:
       - The fixture includes unrelated and instruction-like project data but is not a TL5 known-project regression.
       - This evidence does not claim raw Capability-formation or Authority-formation convergence.
 
+  - id: EVID-BOOT-EXISTING-TL5-36952038645
+    providers:
+      - behavioral_eval.py
+      - adapters/copilot_behavioral_eval_agent.py
+      - target_state.py
+      - .github/workflows/behavioral-eval-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+      - path: validators/validate_behavioral_eval_cases.py
+      - path: spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml
+    satisfies: [A09-R04]
+    test_level: TL5
+    methods: [EM-10]
+    oracle_class: O2
+    execution_nature: judgement-dependent
+    source_type: known-project
+    provider_run_ref: spec/assurance/evidence/tl5-known-project-provider-run-36952038645.yaml
+    case_ids: [TD-BOOT-E07]
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - One bounded known-project NAPMS regression only; it is not independent TL6 portability evidence.
+      - The two-step bootstrap-idempotence sequence proves reuse and unchanged reconcile for the selected accepted project slice.
+      - Provider-auto resolved both calls to gpt-6-luna.
+
   - id: EVID-ROUTE-TL4-36949909315
     providers:
       - behavioral_eval.py

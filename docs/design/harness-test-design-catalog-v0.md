@@ -1324,7 +1324,7 @@ also has a separately falsifiable selected-operation proof.
 **Methods:** EM-10  
 **Minimum level:** TL5  
 **Oracle:** O2 accepted real-project truth  
-**Status:** READY
+**Status:** IMPLEMENTED
 
 **Known-project baseline:** `lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066`.
 The frozen case uses a bounded first-MVP HCD slice extracted from the project's
@@ -1363,6 +1363,11 @@ removes the ambiguity before re-execution: every accepted Capability binding on
 the selected three NAPMS artifacts is now an explicit Design Profile expectation,
 so dropping any binding is a direct A09-F06 failure rather than an oracle-policy
 choice.
+
+Accepted provider run `36952038645` executed Fixture V2 through the two-step
+bootstrap-idempotence sequence; both clean-context calls returned PASS against
+the O2 known-project baseline. This implements A09-R04. NAPMS remains a
+known-project regression rather than an independent TL6 holdout.
 
 # SF-07 — Greenfield bootstrap micro-project
 
