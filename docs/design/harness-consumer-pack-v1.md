@@ -113,7 +113,9 @@ removes root `consumer_pack.py` to falsify hidden facade dependence. Existing
 Scenario Suite fixtures are executed through isolated v1 tooling to cover
 cross-layer runtime closure; no new domain behavior or scenario DSL is added.
 
-Both APIs remain supported by latest source. Source facades and the repository
+V1 is SUPPORTED and required for every new Consumer integration. V0 is
+DEPRECATED and remains fully functional in latest source. Use
+`spec/distribution/consumer-binding-example-v1.json` for new bindings. Source facades and the repository
 compatibility registry remain unchanged. Future retirement of v0, source facades,
 Core bridge re-exports or the non-installed packaging model requires a separate
 compatibility decision.

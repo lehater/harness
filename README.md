@@ -16,7 +16,7 @@ Target repositories remain the source of product/domain/architecture truth. Harn
 
 Start with `docs/design/core-v0.md`. For project integration, use `docs/design/integration-contract-v0.md`.
 
-Harness Core does not require repository-to-repository ownership binding: a target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts. Agent-enabled consumers use a pinned, locally materialized Harness Consumer Pack for tooling/procedures; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md` and `docs/design/harness-consumer-pack-v0.md`.
+Harness Core does not require repository-to-repository ownership binding: a target repository may declare the small Core model needed by its consumer scenario while keeping canonical semantic truth in its existing artifacts. Agent-enabled consumers use a pinned, locally materialized Harness Consumer Pack for tooling/procedures; see `docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md` and `docs/design/harness-consumer-pack-v1.md`.
 
 ## Engineering Graph v0
 
@@ -32,9 +32,9 @@ Core remains the accepted knowledge state. The Engineering Graph declares:
 Selecting a consumer recursively derives the Design Profile needed to satisfy that consumer. The profile is therefore a view of producer/consumer policy rather than a second manually maintained policy list.
 
 ```sh
-python engineering_graph.py validate /path/to/engineering-graph.yaml
-python engineering_graph.py profile /path/to/engineering-graph.yaml IMPLEMENTATION
-python engineering_graph.py evaluate /path/to/engineering-graph.yaml IMPLEMENTATION /path/to/core-model.yaml
+python -m harness.project_model.engineering_graph validate /path/to/engineering-graph.yaml
+python -m harness.project_model.engineering_graph profile /path/to/engineering-graph.yaml IMPLEMENTATION
+python -m harness.project_model.engineering_graph evaluate /path/to/engineering-graph.yaml IMPLEMENTATION /path/to/core-model.yaml
 ```
 
 See `docs/design/engineering-graph-v0.md`. The repository integration boundary is defined by `docs/design/integration-contract-v0.md` and has been validated against Nutrition Management, NAPMS, and the greenfield acceptance project.
@@ -51,7 +51,7 @@ See `docs/design/frontend-design-v0.md`. `examples/user-facing-application/**` i
 
 A Design Profile can declare the engineering knowledge required for a selected scope as stable expectations of `subject + CapabilityId + Authority`.
 
-`target_state.py` evaluates that target against a Core model:
+`harness.project_model.target_state` evaluates that target against a Core model:
 
 - missing canonical provider -> `CREATE`;
 - provider blocked by unresolved Questions -> `WAIT`;
@@ -74,7 +74,7 @@ docs/generated/**
 
 `.harness/graph.yaml` owns topology, `.harness/knowledge/**` owns typed canonical content, and `docs/generated/**` contains disposable human-readable projections.
 
-`workspace.py validate PROJECT` validates the workspace. `workspace.py validate-artifact CANDIDATE.yaml` validates a candidate before acceptance. `workspace.py render PROJECT` validates accepted managed knowledge and regenerates documentation.
+`python -m harness.workspace.workspace validate PROJECT` validates the workspace. `python -m harness.workspace.workspace validate-artifact CANDIDATE.yaml` validates a candidate before acceptance. `python -m harness.workspace.workspace render PROJECT` validates accepted managed knowledge and regenerates documentation.
 
 Current typed knowledge schemas are `domain-model/v1` and the consumer-piloted `verification-plan/v1`. Additional schemas are intentionally added one at a time instead of introducing a universal semantic DSL. See `docs/design/managed-knowledge-v0.md`.
 
@@ -128,7 +128,7 @@ python -m harness.integration.adapters.canonical_graph /path/to/project/docs/har
 Consumer v0 compatibility entrypoint: `python -m adapters.canonical_graph`.
 
 
-The emitted YAML is an ordinary Core v0 model and can be passed to `harness.py`. Projection metadata is integration metadata, not a second source of product/domain/architecture truth.
+The emitted YAML is an ordinary Core v0 model and can be passed to `python -m harness.project_model.core`. Projection metadata is integration metadata, not a second source of product/domain/architecture truth.
 
 ## Projects without a canonical graph
 
@@ -147,17 +147,17 @@ Stage/Phase, Role/Person/Team, Task/Change, Workflow/Status machine, Gate/Approv
 
 ## Graph Doctor
 
-`graph_doctor.py` performs one non-destructive diagnostic pass over the Engineering Graph, Core/project realization, canonical files and project-graph alignment.
+`harness.application.graph_doctor` performs one non-destructive diagnostic pass over the Engineering Graph, Core/project realization, canonical files and project-graph alignment.
 
 It aggregates stable findings with severity, owner, evidence and suggested human actions. Semantic auto-fix is intentionally not performed.
 
 ```sh
-python graph_doctor.py .harness/engineering-graph.yaml \
+python -m harness.application.graph_doctor .harness/engineering-graph.yaml \
   --core-model .harness/graph.yaml \
   --target IMPLEMENTATION \
   --source-root .
 
-python graph_doctor.py .harness/engineering-graph.yaml \
+python -m harness.application.graph_doctor .harness/engineering-graph.yaml \
   --core-model .harness/graph.yaml \
   --json
 ```
@@ -167,7 +167,7 @@ See `docs/design/graph-doctor-v1.md`.
 
 ## Human Documentation Projection
 
-`human_projection.py` derives a deterministic, Consumer-scoped documentation
+`harness.workspace.human_projection` derives a deterministic, Consumer-scoped documentation
 manifest from accepted Engineering Graph/Core knowledge, validates a
 project-owned presentation recipe, and materializes source-bounded narrative
 packages.
@@ -177,7 +177,7 @@ must reference canonical artifacts allowed by the selected section; optional
 evidence validation binds claims to excerpts from current canonical sources.
 
 ```sh
-python human_projection.py compile \
+python -m harness.workspace.human_projection compile \
   .harness/engineering-graph.yaml \
   FRONTEND-IMPLEMENTATION \
   --core-model .harness/graph.yaml \
@@ -198,3 +198,24 @@ See `docs/design/human-documentation-projection-v1.md` and
 ## Consumer bootstrap
 
 A target repository does not copy Harness skills. For clone-and-run use it keeps only `.harness/harnessw.py` plus `.harness/harness-binding.json`; the wrapper materializes the pinned Consumer Pack into local cache and returns its path. See `docs/design/harness-consumer-wrapper-v0.md`.
+
+New Consumer integrations MUST use `consumer_api: v1` (SUPPORTED). Consumer API
+v0 is DEPRECATED and remains fully functional; existing consumers should migrate
+to v1. Deprecation has no calendar EOL date.
+
+Copy `distribution/harnessw.py` to `.harness/harnessw.py` and use
+`spec/distribution/consumer-binding-example-v1.json` as
+`.harness/harness-binding.json`, pinning an immutable 40-hex Harness revision.
+The example pins a revision already supporting v1; update it to the desired
+reviewed revision explicitly. Then:
+
+```sh
+python .harness/harnessw.py sync
+cd <printed-consumer-pack-directory>
+python -m harness.application.skill_router operation --surface consumer --operation project-bootstrap-reconcile
+```
+
+Load the returned instruction contracts, then the selected skill. Use
+`spec/distribution/target-agents-fragment-v1.md` for target AGENTS instructions.
+The implicit Consumer Pack CLI default remains v0 for compatibility; new
+integrations select v1 explicitly.

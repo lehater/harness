@@ -24,8 +24,8 @@ Read original source/provenance and the sanitized Source Corpus. Do not read pri
 ## Procedure
 
 1. Before per-artifact review, bind the selected source set to an explicit acquisition scope when omission of an entire evidence channel could create false closure. Prefer a project-owned canonical dependency/evidence graph; otherwise use an accepted skill/experiment read boundary or a task-specific acquisition contract. Do not claim open-world evidence completeness.
-2. Validate contract-relative source-set closure with `source_set.py` when that assurance is material. Every required channel must be reviewed, minimum item counts must be met, and QUESTION remains incomplete.
-3. Bind each selected immutable source artifact before semantic enumeration. For free-form text, use a lossless line-range partition validated by `source_boundary.py`; a deterministically complete native item inventory may serve the same role for structured sources.
+2. Validate contract-relative source-set closure with `harness.evidence.source_set` when that assurance is material. Every required channel must be reviewed, minimum item counts must be met, and QUESTION remains incomplete.
+3. Bind each selected immutable source artifact before semantic enumeration. For free-form text, use a lossless line-range partition validated by `harness.evidence.source_boundary`; a deterministically complete native item inventory may serve the same role for structured sources.
 4. Reject uncovered/overlapping source ranges or a source fingerprint mismatch. Boundary coverage proves only that raw source text was not skipped.
 5. Enumerate each covered source unit at **statement-level semantic granularity**, not whole-file granularity.
 6. Give every independently meaningful source statement a stable audit id and source_ref.
@@ -39,7 +39,7 @@ Read original source/provenance and the sanitized Source Corpus. Do not read pri
 9. When one sentence mixes observable requirement with prior design vocabulary, split/preserve the observable constraint rather than excluding the whole sentence.
 10. For exclusions, record a concrete rationale. Never use generic "looks derived" wording when an observable constraint is being discarded.
 11. For QUESTION, identify the Authority and unresolved classification/provenance question; coverage remains INCOMPLETE.
-12. Run `python source_coverage.py validate <ledger.yaml>`.
+12. Run `python -m harness.evidence.source_coverage validate <ledger.yaml>`.
 13. Perform an independent reverse audit: start from every covered original source unit and verify that all independently meaningful statements entered the ledger before checking their dispositions. Do not read downstream design as justification.
 14. Treat `coverage_status: COMPLETE` only as proof of statement disposition coverage. It does not prove source-set completeness, raw-source enumeration completeness, or that an ADMITTED `sanitized_statement` preserves every material clause.
 15. When the admitted Source Corpus will become a machine-addressable semantic surface, review each admitted canonical statement against its extracted semantic atoms before those atoms are accepted as the downstream derivation baseline. Keep the task statement-local: one source statement -> its candidate atom list.
@@ -63,7 +63,7 @@ Do not accept source coverage when:
 
 ## Output contract
 
-Produce a project-native or Harness-shaped YAML ledger accepted by `source_coverage.py`:
+Produce a project-native or Harness-shaped YAML ledger accepted by `harness.evidence.source_coverage`:
 
 ```yaml
 version: 1
@@ -94,7 +94,7 @@ The ledger proves preservation/disposition only. It does not become product/doma
 - exclusions have explicit reasons and do not erase independently observable semantics;
 - duplicates point to another enumerated statement;
 - QUESTION means INCOMPLETE;
-- COMPLETE is deterministic under `source_coverage.py` and is interpreted only as statement disposition completeness;
+- COMPLETE is deterministic under `harness.evidence.source_coverage` and is interpreted only as statement disposition completeness;
 - reverse audit finds no source statement absent from the ledger;
 - every ADMITTED rewrite used as a semantic baseline has a separate completeness/fidelity review when material meaning was decomposed or rewritten;
 - downstream design is not used as evidence for what the original source meant.

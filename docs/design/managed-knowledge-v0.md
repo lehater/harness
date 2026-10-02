@@ -123,7 +123,7 @@ For a managed artifact, existence of a file is insufficient.
 An agent may validate a candidate before making it canonical:
 
 ```sh
-python workspace.py validate-artifact candidate.yaml
+python -m harness.workspace.workspace validate-artifact candidate.yaml
 ```
 
 This checks only the typed artifact structure. It does **not** register a provider or establish semantic correctness.

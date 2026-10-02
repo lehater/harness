@@ -12,8 +12,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError  # noqa: E402
-from workspace import load_workspace, render_workspace, validate_knowledge_document  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.workspace.workspace import load_workspace, render_workspace, validate_knowledge_document  # noqa: E402
 
 
 def main() -> int:

@@ -50,8 +50,8 @@ Adapter output must satisfy exactly the same Harness schemas and runtime semanti
 A conforming integration performs the equivalent of:
 
 ```sh
-python engineering_graph.py validate <engineering-graph>
-python engineering_graph.py evaluate <engineering-graph> <consumer> <core-realization>
+python -m harness.project_model.engineering_graph validate <engineering-graph>
+python -m harness.project_model.engineering_graph evaluate <engineering-graph> <consumer> <core-realization>
 ```
 
 For agent execution, actionable CREATE results may additionally be routed with `agent_router.py`.

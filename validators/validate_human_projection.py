@@ -11,9 +11,9 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from adapters.canonical_graph import project_model  # noqa: E402
-from harness import CoreError  # noqa: E402
-from human_projection import (  # noqa: E402
+from harness.integration.adapters.canonical_graph import project_model  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.workspace.human_projection import (  # noqa: E402
     compile_manifest,
     materialize_package,
     realize_projection_model,

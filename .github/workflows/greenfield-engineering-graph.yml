@@ -2,6 +2,7 @@ name: Greenfield Engineering Graph
 
 on:
   pull_request:
+    types: [opened, ready_for_review, synchronize, reopened]
     paths:
       - "examples/greenfield-csv-deduplicator/**"
       - ".github/workflows/greenfield-engineering-graph.yml"
@@ -33,10 +34,10 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install PyYAML
       - name: Validate graph
-        run: python engineering_graph.py validate examples/greenfield-csv-deduplicator/engineering-graph.yaml
+        run: python -m harness.project_model.engineering_graph validate examples/greenfield-csv-deduplicator/engineering-graph.yaml
       - name: Evaluate implementation target
         run: |
-          python engineering_graph.py evaluate             examples/greenfield-csv-deduplicator/engineering-graph.yaml             IMPLEMENTATION             examples/greenfield-csv-deduplicator/core-state.yaml
+          python -m harness.project_model.engineering_graph evaluate             examples/greenfield-csv-deduplicator/engineering-graph.yaml             IMPLEMENTATION             examples/greenfield-csv-deduplicator/core-state.yaml
 
       - name: Verify semantic skill routing
         run: |
@@ -45,7 +46,7 @@ jobs:
           from pathlib import Path
           import yaml
 
-          from agent_router import route_create_work
+          from harness.application.agent_router import route_create_work
 
           graph = yaml.safe_load(
               Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
@@ -82,7 +83,7 @@ jobs:
           from pathlib import Path
           import yaml
 
-          from agent_router import route_create_work
+          from harness.application.agent_router import route_create_work
 
           graph = yaml.safe_load(
               Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
@@ -127,7 +128,7 @@ jobs:
           from pathlib import Path
           import yaml
 
-          from agent_router import route_create_work
+          from harness.application.agent_router import route_create_work
 
           graph = yaml.safe_load(
               Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()
@@ -159,8 +160,8 @@ jobs:
           from pathlib import Path
           import yaml
 
-          from agent_router import route_create_work
-          from engineering_graph import derive_profile, production_index
+          from harness.application.agent_router import route_create_work
+          from harness.project_model.engineering_graph import derive_profile, production_index
 
           graph = yaml.safe_load(
               Path("examples/greenfield-csv-deduplicator/engineering-graph.yaml").read_text()

@@ -18,7 +18,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from consumer_pack import (  # noqa: E402
+from harness.application.consumer_pack import (  # noqa: E402
     ConsumerPackError,
     PACK_MANIFEST,
     load_yaml,

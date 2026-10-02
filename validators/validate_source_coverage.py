@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Acceptance checks for source_coverage.py."""
+"""Acceptance checks for canonical source coverage semantics."""
 from __future__ import annotations
 
 import copy
@@ -9,8 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from harness import CoreError  # noqa: E402
-from source_coverage import validate_source_coverage  # noqa: E402
+from harness.project_model.core import CoreError  # noqa: E402
+from harness.evidence.source_coverage import validate_source_coverage  # noqa: E402
 
 
 def base() -> dict:

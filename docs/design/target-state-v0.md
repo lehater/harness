@@ -44,7 +44,7 @@ Dependencies must reference expectations in the same profile and must be acyclic
 
 ## Evaluation
 
-`target_state.py PROFILE MODEL` evaluates the declared target state against a normal Core v0 model.
+`python -m harness.project_model.target_state PROFILE MODEL` evaluates the declared target state against a normal Core v0 model.
 
 For an expectation whose prerequisites are satisfied:
 

@@ -95,7 +95,7 @@ A conceptual binding is:
 harness:
   source: github:lehater/harness
   revision: <immutable revision>
-  consumer_api: v0
+  consumer_api: v1
 ```
 
 The exact filename/schema is an implementation detail until separately
@@ -287,12 +287,12 @@ The next concrete work is:
 `docs/design/harness-consumer-pack-v0.md`,
 `docs/design/harness-consumer-wrapper-v0.md` and
 `spec/distribution/consumer-pack-v0.yaml` define the first executable
-realization of this decision. `consumer_pack.py` materializes and validates the pack. The standard-library `distribution/harnessw.py` closes clean-target bootstrap by reading the pinned JSON binding, fetching the exact revision and invoking that revision's pack materializer. Local development override remains explicit.
+realization of this decision. `python -m harness.application.consumer_pack` materializes and validates the pack. The standard-library `distribution/harnessw.py` closes clean-target bootstrap by reading the pinned JSON binding, fetching the exact revision and invoking that revision's pack materializer. Local development override remains explicit.
 
 
 ## Typed discovery entrypoint
 
-`skill_router.py` is the common technical entrypoint for skill discovery, but
+`python -m harness.application.skill_router` is the common technical entrypoint for skill discovery, but
 it does not collapse the three route semantics into one classifier.
 
 ```text
@@ -350,3 +350,9 @@ The separately versioned canonical-only distribution is defined by
 v0 retains legacy module/file compatibility; v1 exposes canonical `harness.*`
 module identities and minimal root test tooling. Both use the existing routed
 Consumer surface. Source facades remain available for v0 materialization.
+
+New integrations MUST select v1; v0 is deprecated compatibility only. Bootstrap
+with `python .harness/harnessw.py sync`, then use
+`python -m harness.application.skill_router ...` from the printed Pack directory.
+Use `spec/distribution/consumer-binding-example-v1.json` and
+`spec/distribution/target-agents-fragment-v1.md`.

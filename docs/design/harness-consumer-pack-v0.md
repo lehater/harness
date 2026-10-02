@@ -5,6 +5,11 @@ Status: canonical distribution contract on the audit branch.
 This document realizes the distribution decision in
 `agent-skill-surfaces-and-consumer-distribution-v0.md`.
 
+Consumer API v0 is DEPRECATED and fully functional. This document describes
+legacy compatibility, not new onboarding. New integrations MUST use
+[Consumer Pack v1](harness-consumer-pack-v1.md) and the
+`spec/distribution/consumer-binding-example-v1.json` binding.
+
 ## Public unit
 
 A target repository consumes one pinned **Harness Consumer Pack**, not the

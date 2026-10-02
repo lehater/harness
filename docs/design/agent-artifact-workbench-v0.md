@@ -151,7 +151,7 @@ This is a filesystem convention for the agent layer, not a new Core entity or wo
 For Harness-managed YAML, use:
 
 ```sh
-python workspace.py validate-artifact /path/to/candidate.yaml
+python -m harness.workspace.workspace validate-artifact /path/to/candidate.yaml
 ```
 
 For project-native artifacts, run the target repository's deterministic validator against the exact required source/coverage contract.

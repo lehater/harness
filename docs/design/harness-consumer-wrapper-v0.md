@@ -1,6 +1,10 @@
 # Harness target-repository wrapper v0
 
-Status: canonical bootstrap transport for Consumer Pack v0 on the audit branch.
+Status: canonical bootstrap transport for Consumer APIs v0 and v1.
+
+New integrations MUST use `consumer_api: v1` and
+`spec/distribution/consumer-binding-example-v1.json`. V0 is deprecated but fully
+functional; its wrapper branch remains required compatibility behavior.
 
 ## Problem
 
@@ -52,7 +56,7 @@ validate pack hashes + API
         ↓
 print local Consumer Pack path
         ↓
-pack/skill_router.py
+python -m harness.application.skill_router ... (from Pack directory)
 ```
 
 The wrapper never follows a moving branch.
@@ -106,4 +110,5 @@ The wrapper/binding are target-repository tooling integration, not:
 - a second routing system.
 
 Once the Consumer Pack path is resolved, all Harness procedure discovery goes
-through the pack's typed `skill_router.py`.
+through `python -m harness.application.skill_router ...` from the Pack directory.
+V0 retains its root router compatibility path.
