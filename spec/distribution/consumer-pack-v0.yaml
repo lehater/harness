@@ -81,6 +81,10 @@ exact_files:
   - src/harness/reference_model/project_status.py
   - src/harness/reference_model/reference_materializer.py
   - src/harness/reference_model/reference_model_evolution.py
+  - src/harness/evidence/__init__.py
+  - src/harness/evidence/source_boundary.py
+  - src/harness/evidence/source_coverage.py
+  - src/harness/evidence/source_set.py
   - skills/consumer-operation-registry-v0.yaml
   - skills/consumer-method-registry-v0.yaml
   - skills/artifact-skill-registry-v0.yaml

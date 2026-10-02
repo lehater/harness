@@ -243,6 +243,33 @@ hashes and existing stale classifications remain unchanged. No provider run is
 performed. Existing CI paths already include `src/harness/**`, and the full gate
 has no path filter, so no execution-policy change is needed.
 
+## Evidence package migration decision
+
+The complete `evidence` context moves to `src/harness/evidence/`:
+`source_boundary.py`, `source_coverage.py` and `source_set.py`. Only their
+`harness.evidence.*` identities own semantics; all three root files become
+`import-and-cli` facades under the existing closed grammar and leave the root
+implementation baseline. No other context moves.
+
+Production function bodies remain unchanged. Explicit `__all__` lists preserve
+all previously available public names, including imported names; canonical and
+legacy symbols have identical object identity. Each module imports `CoreError`
+from `harness.project_model.core` using the existing shared-kernel permission.
+Evidence keeps an empty `may_depend_on` list and gains no published boundary.
+
+Consumer Pack v0 keeps the three root files and adds only the four exact Evidence
+package files. Existing TD-DIST-001/002 isolated execution evidence covers all
+three canonical/legacy imports, every exported-object identity and all three
+legacy CLIs without checkout `PYTHONPATH`. Existing facade mutation checks
+reject implementation. Source Coverage acceptance and Source Boundary/Source Set
+Scenario Suite drivers continue to exercise legacy imports.
+
+No changed file belongs to a provider-run execution binding. AR-M11 therefore
+preserves existing evidence currentness; historical hashes and classifications
+remain unchanged and no provider run is performed. Existing CI filters cover
+`src/harness/**` and the final gate has no path filter; execution policy and check
+inventory remain unchanged.
+
 ## Evidence
 
 This migration target is enforced at TL0 by
