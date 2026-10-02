@@ -54,7 +54,7 @@ semantics.
 4. Reconcile repeated wording into one meaning without changing the underlying decision.
 5. If canonical sources conflict or a required invariant is undecided, create a Core `Question` and stop acceptance of the affected knowledge.
 6. Draft a `harness-knowledge-artifact` using `domain-model/v1`.
-7. Run `workspace.py validate-artifact` on the candidate.
+7. Run `python -m harness.workspace.workspace validate-artifact` on the candidate.
 8. Apply the common semantic-acceptance checks from `docs/design/agent-artifact-workbench-v0.md`.
 9. After acceptance, register the artifact and re-evaluate target state.
 

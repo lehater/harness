@@ -57,7 +57,7 @@ decision was accepted merely because current code behaves that way.
 15. Record non-empty `source_refs` for every requirement; preserve rationale when it materially explains derivation or intent.
 16. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing IDs.
 17. Review the resulting requirement list against the enumerated source/evidence set; no requirement-bearing source statement may disappear silently.
-18. Run `workspace.py validate-artifact` on the candidate.
+18. Run `python -m harness.workspace.workspace validate-artifact` on the candidate.
 19. When machine-addressable semantic acceptance is used, require explicit Authority ownership for candidate/source assertions and constrain admitted source Authorities to the accepted upstream production contract plus Product Requirements itself. Do not admit Domain, Architecture, Interface, Data or Implementation decisions as requirement evidence merely because they are available or stakeholder-confirmed.
 20. Apply common semantic acceptance, register all capabilities actually satisfied by the artifact, then re-evaluate the target Consumer.
 

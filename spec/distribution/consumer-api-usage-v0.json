@@ -42,7 +42,6 @@
       "users": {
         "distribution_tooling": [
           ".github/workflows/greenfield-engineering-graph.yml",
-          "README.md",
           "spec/architecture/repository-layout-v0.yaml",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
@@ -335,7 +334,6 @@
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
-          "docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md",
           "docs/design/harness-consumer-pack-v0.md",
           "docs/design/harness-consumer-pack-v1.md",
           "docs/design/harness-consumer-wrapper-v0.md",
@@ -527,14 +525,11 @@
       "users": {
         "distribution_tooling": [
           ".github/workflows/greenfield-engineering-graph.yml",
-          ".github/workflows/harness.yml",
-          "README.md",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
           "docs/design/context-published-contracts-v0.md",
           "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/integration-contract-v0.md",
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md"
         ],
@@ -589,7 +584,6 @@
       "path": "graph_doctor.py",
       "users": {
         "distribution_tooling": [
-          "README.md",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
@@ -608,7 +602,6 @@
       "path": "human_projection.py",
       "users": {
         "distribution_tooling": [
-          "README.md",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
@@ -919,9 +912,7 @@
         ],
         "documentation_examples": [
           "docs/design/agent-instruction-architecture-v0.md",
-          "docs/design/agent-skill-surfaces-and-consumer-distribution-v0.md",
           "docs/design/harness-consumer-pack-v0.md",
-          "docs/design/harness-consumer-wrapper-v0.md",
           "docs/design/operation-orchestration-v0.md",
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md"
@@ -959,8 +950,7 @@
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md",
           "docs/research/source-boundary-statement-enumeration-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md",
-          "skills/artifacts/source-coverage-audit/SKILL.md"
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
         ],
         "historical": [
           "docs/audit/harness-ci-audit.md"
@@ -983,8 +973,7 @@
           "docs/repository-source-map.md",
           "docs/research/semantic-surface-extraction-admission-v0.md",
           "docs/research/source-boundary-statement-enumeration-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md",
-          "skills/artifacts/source-coverage-audit/SKILL.md"
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
         ],
         "historical": [
           "docs/audit/harness-ci-audit.md"
@@ -1007,8 +996,7 @@
           "docs/design/repository-layout-v0.md",
           "docs/repository-source-map.md",
           "docs/research/source-set-evidence-boundary-v0.md",
-          "docs/research/source-to-derivation-assurance-closure-v1.md",
-          "skills/artifacts/source-coverage-audit/SKILL.md"
+          "docs/research/source-to-derivation-assurance-closure-v1.md"
         ],
         "validators_tests": [
           "validators/validate_consumer_pack.py"
@@ -1020,14 +1008,12 @@
       "path": "target_state.py",
       "users": {
         "distribution_tooling": [
-          "README.md",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
           "docs/design/harness-consumer-pack-v0.md",
           "docs/design/integration-contract-v0.md",
           "docs/design/repository-layout-v0.md",
-          "docs/design/target-state-v0.md",
           "docs/repository-source-map.md",
           "docs/research/lifecycle-cross-model-review.md"
         ],
@@ -1053,20 +1039,12 @@
       "path": "workspace.py",
       "users": {
         "distribution_tooling": [
-          "README.md",
           "spec/distribution/consumer-pack-v0.yaml"
         ],
         "documentation_examples": [
-          "docs/design/agent-artifact-workbench-v0.md",
           "docs/design/integration-contract-v0.md",
-          "docs/design/managed-knowledge-v0.md",
-          "docs/design/project-native-human-projection-v0.md",
           "docs/design/repository-layout-v0.md",
-          "docs/repository-source-map.md",
-          "skills/artifacts/domain-model/SKILL.md",
-          "skills/artifacts/product-requirements/SKILL.md",
-          "skills/artifacts/test-design/SKILL.md",
-          "skills/artifacts/verification-strategy/SKILL.md"
+          "docs/repository-source-map.md"
         ],
         "validators_tests": [
           "validators/validate_consumer_pack.py",

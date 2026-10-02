@@ -20,8 +20,9 @@ introduces no Core entity, domain lifecycle or workflow engine.
 
 `SUPPORTED → DEPRECATED → EOL → REMOVED`. Each adjacent transition requires an
 explicit distribution decision recorded in the API's decision reference; no
-calendar schedule or implicit layout-based transition exists. Current v0 and v1
-states are **SUPPORTED**. This PR authorizes none of these transitions.
+calendar schedule or implicit layout-based transition exists. Current v0 is **DEPRECATED** and v1 is **SUPPORTED**, authorized by
+[ADR-CONSUMER-API-V0-DEPRECATION](harness-consumer-api-v0-deprecation.md).
+No EOL or removal transition is authorized.
 
 | State | Operational obligation |
 | --- | --- |
@@ -46,8 +47,8 @@ EOL/removal decisions and first-party reference updates.
 | Surface | Role / API dependency | Active users | Disposition and blocker |
 | --- | --- | --- | --- |
 | `harness/__init__.py` path bridge | Source-tree canonical execution, v0 + v1; target `src/harness` | Pack definitions and non-installed canonical module execution | Retain pending separate package/execution ADR. Do not simplify with facade retirement. |
-| `harness/__init__.py` Core exports / import alias `harness` | Core public exports, currently v0 + v1; target `harness.project_model.core` | Compatibility import probes and external published API | Review Core exports separately; alias retirement does not authorize bridge deletion. |
-| `src/harness/__init__.py` Core exports | Canonical package exports, v0 + v1; target `harness.project_model.core` | Canonical package API and distribution | Separate Core export decision; never a deletable v0 facade. |
+| `harness/__init__.py` Core exports / import alias `harness` | Core exports physically present in v0 + v1, public alias only in v0; target `harness.project_model.core` | Compatibility import probes and external published API | Review Core exports separately; alias retirement does not authorize bridge deletion. |
+| `src/harness/__init__.py` Core exports | Package exports physically present in v0 + v1, public alias only in v0; target `harness.project_model.core` | Compatibility import probes and distribution | Separate Core export decision; never a deletable v0 facade. |
 | `scenario_suite.py`, `scenario_drivers.py` | Consumer orchestration tooling, v0 + v1; own implementation | Pack scenario execution and repository acceptance | Retain Consumer tooling. Not facades. |
 | `consumer_pack.py` | Root module facade, v0 | v0 wrapper invokes root script; validators and docs | Delete candidate only after EOL/removal plus wrapper/test/doc updates; canonical target remains `harness.application.consumer_pack`. |
 | `skill_router.py` | Root module facade, v0 | v0 Consumer bootstrap, maintainer bootstrap, validators and docs | Delete candidate after EOL/removal plus bootstrap/test/doc updates; canonical target remains `harness.application.skill_router`. |
@@ -87,63 +88,13 @@ historical-only**, because every facade is still distributed in v0 and covered b
 Individual paths under `docs/audit/`, `docs/legacy/`, `docs/plans/` and frozen
 `spec/assurance/evidence/` are classified historical; the JSON enumerates them.
 
-The table lists reference-bearing file counts, not invocation counts. R/T =
-distribution/tooling, V = validators/tests, D = active docs/examples, H = historical.
-All rows have zero canonical runtime imports. Shared registry-driven validators
-are enumerated separately in the snapshot, rather than inflating direct-reference counts. Full active-user paths and canonical
-targets are in the machine snapshot; physical paths are derived from the registry.
-
-| Physical facade | Canonical target | R/T | V | D | H | After explicit v0 EOL/removal |
-| --- | --- | ---: | ---: | ---: | ---: | --- |
-| `harness.py` | `harness.project_model.core` | 4 | 24 | 6 | 4 | Delete candidate; update active references |
-| `target_state.py` | `harness.project_model.target_state` | 2 | 7 | 6 | 4 | Delete candidate; update active references |
-| `engineering_graph.py` | `harness.project_model.engineering_graph` | 4 | 8 | 5 | 1 | Delete candidate; update active references |
-| `project_status.py` | `harness.reference_model.project_status` | 1 | 2 | 2 | 1 | Delete candidate; update active references |
-| `reference_materializer.py` | `harness.reference_model.reference_materializer` | 1 | 5 | 2 | 0 | Delete candidate; update active references |
-| `reference_model_evolution.py` | `harness.reference_model.reference_model_evolution` | 1 | 1 | 2 | 0 | Delete candidate; update active references |
-| `source_boundary.py` | `harness.evidence.source_boundary` | 1 | 1 | 6 | 1 | Delete candidate; update active references |
-| `source_coverage.py` | `harness.evidence.source_coverage` | 1 | 2 | 7 | 1 | Delete candidate; update active references |
-| `source_set.py` | `harness.evidence.source_set` | 1 | 1 | 6 | 0 | Delete candidate; update active references |
-| `decision_execution_assurance.py` | `harness.decision.decision_execution_assurance` | 1 | 1 | 0 | 0 | Delete candidate; update active references |
-| `decision_exploration.py` | `harness.decision.decision_exploration` | 1 | 0 | 0 | 1 | Delete candidate; update active references |
-| `decision_explorer_contract.py` | `harness.decision.decision_explorer_contract` | 1 | 0 | 0 | 2 | Delete candidate; update active references |
-| `decision_governance.py` | `harness.decision.decision_governance` | 1 | 1 | 0 | 0 | Delete candidate; update active references |
-| `architecture_driver_closure.py` | `harness.coverage.architecture_driver_closure` | 1 | 1 | 1 | 0 | Delete candidate; update active references |
-| `concern_activation.py` | `harness.coverage.concern_activation` | 1 | 1 | 1 | 1 | Delete candidate; update active references |
-| `coverage_obligations.py` | `harness.coverage.coverage_obligations` | 1 | 1 | 1 | 0 | Delete candidate; update active references |
-| `coverage_planner.py` | `harness.coverage.coverage_planner` | 1 | 3 | 1 | 0 | Delete candidate; update active references |
-| `engineering_coverage.py` | `harness.coverage.engineering_coverage` | 1 | 5 | 2 | 1 | Delete candidate; update active references |
-| `frontend_interface_knowledge.py` | `harness.workspace.frontend_interface_knowledge` | 1 | 1 | 1 | 0 | Delete candidate; update active references |
-| `frontend_screen_contracts.py` | `harness.workspace.frontend_screen_contracts` | 1 | 2 | 1 | 0 | Delete candidate; update active references |
-| `human_projection.py` | `harness.workspace.human_projection` | 2 | 2 | 2 | 0 | Delete candidate; update active references |
-| `workspace.py` | `harness.workspace.workspace` | 2 | 2 | 10 | 0 | Delete candidate; update active references |
-| `integration_alignment.py` | `harness.integration.integration_alignment` | 1 | 1 | 1 | 0 | Delete candidate; update active references |
-| `adapters/canonical_graph.py` | `harness.integration.adapters.canonical_graph` | 2 | 6 | 2 | 1 | Delete candidate; update active references |
-| `repository_realization.py` | `harness.integration.repository_realization` | 1 | 1 | 1 | 1 | Delete candidate; update active references |
-| `acceptance_policy.py` | `harness.assurance.acceptance_policy` | 1 | 0 | 0 | 0 | Delete candidate; update active references |
-| `capability_lifecycle.py` | `harness.assurance.capability_lifecycle` | 1 | 3 | 1 | 0 | Delete candidate; update active references |
-| `derivation_test_coverage.py` | `harness.assurance.derivation_test_coverage` | 1 | 0 | 1 | 0 | Delete candidate; update active references |
-| `live_calibration.py` | `harness.assurance.live_calibration` | 1 | 1 | 0 | 0 | Delete candidate; update active references |
-| `adapters/copilot_live_calibration_evaluator.py` | `harness.assurance.adapters.copilot_live_calibration_evaluator` | 1 | 2 | 1 | 1 | Delete candidate; update active references |
-| `semantic_acceptance.py` | `harness.assurance.semantic_acceptance` | 1 | 2 | 2 | 0 | Delete candidate; update active references |
-| `semantic_derivation.py` | `harness.assurance.semantic_derivation` | 1 | 1 | 3 | 0 | Delete candidate; update active references |
-| `semantic_fingerprint.py` | `harness.assurance.semantic_fingerprint` | 1 | 0 | 0 | 0 | Delete candidate; update active references |
-| `semantic_judgement_calibration.py` | `harness.assurance.semantic_judgement_calibration` | 1 | 0 | 3 | 0 | Delete candidate; update active references |
-| `agent_router.py` | `harness.application.agent_router` | 1 | 3 | 3 | 4 | Delete candidate; update active references |
-| `authority_context.py` | `harness.application.authority_context` | 1 | 2 | 0 | 2 | Delete candidate; update active references |
-| `consumer_pack.py` | `harness.application.consumer_pack` | 2 | 4 | 6 | 1 | Delete candidate; update active references |
-| `coverage_application.py` | `harness.application.coverage_application` | 1 | 1 | 1 | 2 | Delete candidate; update active references |
-| `decision_explorer_request.py` | `harness.application.decision_explorer_request` | 1 | 1 | 0 | 2 | Delete candidate; update active references |
-| `decision_pipeline.py` | `harness.application.decision_pipeline` | 1 | 1 | 0 | 3 | Delete candidate; update active references |
-| `graph_doctor.py` | `harness.application.graph_doctor` | 2 | 1 | 1 | 1 | Delete candidate; update active references |
-| `method_router.py` | `harness.application.method_router` | 1 | 2 | 0 | 3 | Delete candidate; update active references |
-| `project_frontier.py` | `harness.application.project_frontier` | 1 | 1 | 3 | 1 | Delete candidate; update active references |
-| `project_publication.py` | `harness.application.project_publication` | 1 | 1 | 0 | 1 | Delete candidate; update active references |
-| `semantic_admission.py` | `harness.application.semantic_admission` | 1 | 4 | 3 | 1 | Delete candidate; update active references |
-| `semantic_closure.py` | `harness.application.semantic_closure` | 1 | 2 | 3 | 1 | Delete candidate; update active references |
-| `semantic_questions.py` | `harness.application.semantic_questions` | 1 | 1 | 0 | 1 | Delete candidate; update active references |
-| `skill_invariant_policy.py` | `harness.application.skill_invariant_policy` | 1 | 1 | 0 | 3 | Delete candidate; update active references |
-| `skill_router.py` | `harness.application.skill_router` | 3 | 7 | 7 | 8 | Delete candidate; update active references |
+The machine snapshot lists reference-bearing file paths, not invocation counts.
+All canonical runtime imports of legacy identities remain zero. Shared
+registry-driven compatibility validators are enumerated separately. Active
+incidental CI/README/skill executions now use canonical identities; v0 wrapper
+and intentional compatibility probes remain visible. Physical presence alone
+is not public API membership. The contract's owned onboarding surfaces must
+recommend v1; legacy-specific documents remain compatibility references.
 
 ## Independence and evidence
 
@@ -174,9 +125,10 @@ The focused lifecycle validator checks exact registry coverage, mechanical dotte
 mapping, known/existing identities, supported-state facade presence, immutable
 classification boundaries and protected exceptions. Usage drift fails validation;
 regenerate the JSON using `usage_inventory` and review semantic classifications
-when references change. The current-source state ratchet deliberately requires
-both APIs SUPPORTED; a future explicit lifecycle decision must update that
-baseline and its obligations/tests together.
+when references change. The current-source state ratchet requires v0 DEPRECATED and v1 SUPPORTED,
+with an explicit deprecation decision, canonical v1 onboarding and unchanged
+compatibility obligations. Inventory separates `physically_present_in` from
+`public_consumer_apis`; v1 Core access is `harness.project_model.core`.
 
 ## Consequences and follow-up decisions
 
@@ -185,5 +137,5 @@ provider behavior, Scenario DSL, package installation or execution model changes
 Retirement inventory creates a bounded removal checklist without conflating
 compatibility evidence with canonical dependencies. Execution bridge removal,
 Core re-export retirement and actual provider tooling relocation require their
-own architecture decisions. Actual v0 deprecation/EOL/removal remains future
+own architecture decisions. V0 deprecation is explicit distribution policy; EOL/removal remains future
 explicit distribution work, with no dates implied by this tranche.

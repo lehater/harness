@@ -41,7 +41,7 @@ Do not treat a performance benchmark, lint check or test count as useful evidenc
 6. Preserve important out-of-scope boundaries.
 7. If verification requires semantics that are not decided upstream, create a Core `Question` for the owning Authority rather than specifying an arbitrary expected result.
 8. Draft `verification-plan/v1`.
-9. Run `workspace.py validate-artifact`.
+9. Run `python -m harness.workspace.workspace validate-artifact`.
 10. Apply common semantic acceptance.
 11. After acceptance, register, render and re-evaluate target state.
 

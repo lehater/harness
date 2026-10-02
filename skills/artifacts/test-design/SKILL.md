@@ -39,7 +39,7 @@ Existing production code and executable tests may describe current state, but th
 8. Leave framework, fixtures, helper structure, mocks and assertion syntax to test implementation unless project policy makes one architecturally significant.
 9. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards. Do not use snapshot/visual-regression output as semantic authority unless a visual invariant is intentionally canonical.
 10. Route any missing expected behavior to its upstream Authority instead of inventing it.
-11. Produce `test-design/v1`, run `workspace.py validate-artifact`, accept/register it and reevaluate.
+11. Produce `test-design/v1`, run `python -m harness.workspace.workspace validate-artifact`, accept/register it and reevaluate.
 
 ## Stop conditions
 

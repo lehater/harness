@@ -63,7 +63,7 @@ Every generated file must carry a notice equivalent to:
 
 ### Managed knowledge projection
 
-Existing `workspace.py render` remains authoritative for typed `.harness/knowledge/**` artifacts.
+Existing `python -m harness.workspace.workspace render` remains authoritative for typed `.harness/knowledge/**` artifacts.
 
 ### Project-native projection
 

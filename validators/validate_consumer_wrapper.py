@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from consumer_pack import validate_pack  # noqa: E402
+from harness.application.consumer_pack import validate_pack  # noqa: E402
 
 WRAPPER = ROOT / "distribution/harnessw.py"
 

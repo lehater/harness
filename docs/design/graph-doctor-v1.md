@@ -13,7 +13,7 @@ The tool is a doctor/linter, not an automatic semantic repair engine.
 Examples:
 
 ```sh
-python graph_doctor.py .harness/engineering-graph.yaml \
+python -m harness.application.graph_doctor .harness/engineering-graph.yaml \
   --core-model .harness/graph.yaml \
   --target IMPLEMENTATION \
   --source-root .
@@ -22,7 +22,7 @@ python graph_doctor.py .harness/engineering-graph.yaml \
 For projects with an authoritative canonical graph:
 
 ```sh
-python graph_doctor.py docs/harness-engineering-graph.yaml \
+python -m harness.application.graph_doctor docs/harness-engineering-graph.yaml \
   --source-graph docs/canonical-graph.yaml \
   --projection docs/harness-projection.yaml \
   --target BACKEND-IMPLEMENTATION \
