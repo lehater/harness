@@ -54,10 +54,9 @@ questions:
 ## Derived operations
 
 Canonical implementation is `src/harness/project_model/core.py`, imported as
-`harness.project_model.core`. The temporary source-tree import bridge
-`harness/__init__.py` preserves legacy `from harness import ...` using the
-canonical Core `__all__`, including identical `CoreError` and function objects.
-`harness.py` contains only CLI delegation and provides the existing commands:
+`harness.project_model.core`. `harness/__init__.py` is source-tree package wiring
+only: it binds the package search path to `src/harness` and exports no Core
+symbols. Invoke the CLI as `python -m harness.project_model.core`; it provides:
 
 - `validate MODEL`
 - `affected MODEL ARTIFACT`

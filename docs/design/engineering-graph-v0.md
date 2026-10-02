@@ -170,7 +170,7 @@ The three identities have different purposes:
 
 Engineering Graph validation and structural target-state evaluation do not generally require `knowledge_kind`. A missing or unsupported kind does not change `CREATE` into `WAIT` or `PENDING`, but reusable derived policies may be unable to classify or route that production. In particular, production coding is classified only when the selected Consumer closure includes `knowledge_kind: implementation-design`.
 
-`agent_router.py` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
+`harness.application.agent_router` maps actionable CREATE work through `skills/artifact-skill-registry-v0.yaml`.
 
 When several simultaneously actionable capabilities share the same Authority, subject, knowledge kind and effective direct prerequisite contract, the router groups them into one artifact-work item. The prerequisite contract compares each required CapabilityId together with its effective subject, so list ordering does not matter and an omitted subject is equivalent to the graph default subject. This reflects cases such as one Product Requirements artifact providing both product-intent and acceptance capabilities from the same accepted input boundary. Capabilities with different prerequisite contracts remain separate work items even when one Authority and skill could eventually co-materialize them; strict semantic admission and lifecycle baselines remain capability-specific. Grouping is an agent execution projection, not a Core task entity.
 

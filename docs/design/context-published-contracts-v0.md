@@ -69,13 +69,11 @@ harness.project_model.engineering_graph.producer_index
 harness.project_model.engineering_graph.production_index
 ```
 
-During migration, `from harness import CoreError, validate_model` remains
-supported through the temporary `harness/__init__.py` import bridge. The
-validator normalizes that exact alias to `harness.project_model.core` before
-checking published symbols. Legacy `from engineering_graph import ...` is
-supported only through the temporary root `engineering_graph.py` import/CLI
-facade and normalizes to `harness.project_model.engineering_graph` under the
-same published-symbol checks. `harness.py` is a CLI facade, not the import bridge.
+Source-tree execution imports Core through `harness.project_model.core`.
+`harness/__init__.py` only binds the package search path to `src/harness` and
+exports no Core symbols. Engineering Graph imports use
+`harness.project_model.engineering_graph`. Published-symbol checks therefore
+operate only on canonical module identities.
 
 Integration must not import other Project Model implementation symbols merely
 because they are physically reachable.
@@ -85,7 +83,7 @@ because they are physically reachable.
 The earlier DDD audit already removed:
 
 - Coverage -> Application imports by moving repository/skill orchestration into
-  `coverage_application.py`;
+  `harness.application.coverage_application`;
 - Decision Governance -> Application imports by separating
   `harness.decision.decision_explorer_contract` from the application request
   builder.

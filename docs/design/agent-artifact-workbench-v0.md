@@ -88,7 +88,7 @@ If the router returns `NO_KNOWLEDGE_KIND` or `NO_REGISTERED_SKILL`, the agent st
 
 The handoff must fail closed when any applicable concern/subject remains non-terminal, a registered semantic claim lacks its deterministic validator evidence, an accepted requirement lacks verification disposition, a required TEST disposition lacks executable Test Design, a conditional architecture/repository precondition fails, or a blocking Question remains.
 
-Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results through `project_frontier.py`. Agents consume that projection rather than manually assigning precedence between Target State, Decision Roadmap, Semantic Closure and Engineering Coverage.
+Do not persist a second readiness truth. The aggregate result is recomputed from canonical knowledge and validator results through `harness.application.project_frontier`. Agents consume that projection rather than manually assigning precedence between Target State, Decision Roadmap, Semantic Closure and Engineering Coverage.
 ## Responsibilities
 
 ### Core and target state
@@ -294,7 +294,7 @@ For source-loss-sensitive work:
 - treat a remaining classification/provenance QUESTION as source coverage INCOMPLETE;
 - make a project-specific source-coverage capability a prerequisite of Product Requirements or the terminal consumer when the experiment requires blind/reconstruction assurance.
 
-Use `skills/artifacts/source-coverage-audit/SKILL.md`, `harness.evidence.source_set`, `harness.evidence.source_boundary` and `harness.evidence.source_coverage` for the reusable procedure/validators. Root `source_set.py`, `source_boundary.py` and `source_coverage.py` remain supported import/CLI facades. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
+Use `skills/artifacts/source-coverage-audit/SKILL.md`, `harness.evidence.source_set`, `harness.evidence.source_boundary` and `harness.evidence.source_coverage` for the reusable procedure/validators. These canonical modules are the supported execution surface. The ledger is assurance evidence; admitted product/domain truth remains owned by its normal Authority artifacts.
 
 ## Implementation feedback
 
@@ -388,7 +388,7 @@ The prose skill contract is not itself evidence that the skill was obeyed.
 
 For every production whose `knowledge_kind` is registered in
 `skills/artifact-skill-registry-v0.yaml`, full engineering closure requires
-strict semantic admission through `semantic_admission.py`.
+strict semantic admission through `harness.application.semantic_admission`.
 
 The admission boundary composes:
 
@@ -405,7 +405,7 @@ The admission boundary composes:
 
 A routed skill may not satisfy full closure merely because a file exists, a
 schema validates, or a bare semantic evaluation is absent. Migration/static
-evaluation may retain legacy provider behavior, but `semantic_closure.py`
+evaluation may retain legacy provider behavior, but `harness.application.semantic_closure`
 fails closed for missing admission evidence.
 
 Semantic review is intentionally used for rules that cannot be proven from
@@ -426,13 +426,12 @@ An unclassified active skill is a Harness validation failure.
 
 Accepted knowledge is not permanently current.
 
-`harness.assurance.capability_lifecycle` (legacy Consumer v0 entrypoint:
-`capability_lifecycle.py`) records one acceptance identity per selected
+`harness.assurance.capability_lifecycle` records one acceptance identity per selected
 Capability and the exact prerequisite acceptance identities against which it was
 accepted. If an upstream identity changes, the direct consumer becomes
 `STALE` and is exposed as `REVALIDATE`; further downstream work remains
 non-current until revalidation restores the chain.
 
-`semantic_closure.py` requires both an ACCEPTED strict admission and CURRENT
+`harness.application.semantic_closure` requires both an ACCEPTED strict admission and CURRENT
 lifecycle assertion for every capability in the selected Consumer closure.
 Structural `COMPLETE` without those proofs is not full engineering closure.

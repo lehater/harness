@@ -54,7 +54,7 @@ python -m harness.project_model.engineering_graph validate <engineering-graph>
 python -m harness.project_model.engineering_graph evaluate <engineering-graph> <consumer> <core-realization>
 ```
 
-For agent execution, actionable CREATE results may additionally be routed with `agent_router.py`.
+For agent execution, actionable CREATE results may additionally be routed with `harness.application.agent_router`.
 
 CI may generate either input before these calls. How Harness itself is obtained (checkout, package, image, or another versioned distribution) is deployment policy, not part of the semantic integration contract. CI must use an explicit Harness version rather than an unpinned moving branch. Agent-facing consumer skill distribution follows the same separation: the pinned Harness Consumer Pack is tooling, not project semantic truth; see `agent-skill-surfaces-and-consumer-distribution-v0.md`.
 
@@ -62,11 +62,11 @@ CI may generate either input before these calls. How Harness itself is obtained 
 
 A Design Profile derived from an Engineering Graph is a runtime view. It is not a second normative policy owner and normally must not be persisted.
 
-A separately authored Design Profile remains supported for consumers of `target_state.py`, but it is not required by the canonical Engineering Graph integration.
+A separately authored Design Profile remains supported for consumers of `harness.project_model.target_state`, but it is not required by the canonical Engineering Graph integration.
 
 ## Managed workspace
 
-The managed knowledge workspace is optional and orthogonal. A project may use `.harness/knowledge/**`, `workspace.py`, and generated documentation when it wants Harness-managed typed semantic artifacts. This does not change the Engineering Graph/Core integration contract and must not force other projects to adopt managed knowledge.
+The managed knowledge workspace is optional and orthogonal. A project may use `.harness/knowledge/**`, `harness.workspace.workspace`, and generated documentation when it wants Harness-managed typed semantic artifacts. This does not change the Engineering Graph/Core integration contract and must not force other projects to adopt managed knowledge.
 
 ## Project graph consistency
 
@@ -237,7 +237,7 @@ insufficient proof for strict closure. Upstream supersession makes direct
 consumers STALE/REVALIDATE and prevents downstream CURRENT closure until their
 owning Authorities revalidate.
 
-The canonical strict check is `semantic_closure.py`. Projects may wrap it in
+The canonical strict check is `harness.application.semantic_closure`. Projects may wrap it in
 their own CI entrypoint, but a green structural target alone must not be
 presented as full engineering closure.
 
