@@ -77,6 +77,10 @@ exact_files:
   - src/harness/project_model/core.py
   - src/harness/project_model/target_state.py
   - src/harness/project_model/engineering_graph.py
+  - src/harness/reference_model/__init__.py
+  - src/harness/reference_model/project_status.py
+  - src/harness/reference_model/reference_materializer.py
+  - src/harness/reference_model/reference_model_evolution.py
   - skills/consumer-operation-registry-v0.yaml
   - skills/consumer-method-registry-v0.yaml
   - skills/artifact-skill-registry-v0.yaml

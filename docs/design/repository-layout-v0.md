@@ -75,10 +75,10 @@ directory before it has content.
 During migration the current root Python modules are an explicit finite
 baseline. The architecture validator enforces:
 
-1. a new root `*.py` module cannot appear outside the baseline, declared migration CLI facades, or an explicit
+1. a new root `*.py` module cannot appear outside the baseline, declared migration compatibility facades, or an explicit
    permanent bootstrap exception;
 2. when a root implementation moves or is deleted, its baseline entry must be removed;
-   a retained CLI facade is tracked separately by compatibility metadata;
+   a retained import/CLI facade is tracked separately by compatibility metadata;
 3. every baseline/exception module remains classified by the canonical context
    map or as research/test infrastructure;
 4. the target package mapping covers every bounded context/application layer.
@@ -177,10 +177,12 @@ adopt installed-package execution.
 CLI file to its canonical `target`. These are migration state, never context
 owners or permanent bootstrap exceptions. The first supported import-bridge
 shape is the root `harness` package. `compatibility.module_facades` maps a legacy
-module name to its canonical `target`, separately from package bridges. Its closed
-grammar re-exports canonical symbols and `__all__`, imports canonical `main`, and
-delegates execution under the `__main__` guard. These files are tracked separately
-from the implementation migration baseline.
+module name to its canonical `target` and explicit `mode`, separately from package
+bridges. The shared closed grammar supports `import-only` (canonical symbols and
+`__all__` re-exports) and `import-and-cli` (the same exports plus canonical `main`
+and execution under the `__main__` guard). Unknown modes, extra fields and any
+implementation are rejected. These files are tracked separately from the
+implementation migration baseline.
 
 The architecture validator discovers non-initializer modules under `src/harness`,
 checks their context package, normalizes exact import aliases before dependency,
@@ -205,6 +207,41 @@ runs, the root implementation. This move makes 12 previously active evidence
 entries from five runs stale under the existing assurance contract. Their
 original hashes/outcomes remain historical; deterministic migration checks do
 not replace provider judgement evidence or establish a refreshed release claim.
+
+## Reference Model package migration decision
+
+The next coherent slice moves the complete `reference-model` context into
+`src/harness/reference_model/`: `project_status.py`, `reference_materializer.py`
+and `reference_model_evolution.py`. Only their `harness.reference_model.*`
+identities own semantics in the context map. Production function bodies remain
+unchanged; explicit `__all__` lists preserve the previous public import surface,
+including previously re-exported imports, so legacy and canonical objects have
+identical identity.
+
+Root `project_status.py` and `reference_materializer.py` use `import-and-cli`;
+root `reference_model_evolution.py` uses `import-only` and gains no CLI. Existing
+Target State and Engineering Graph facades use `import-and-cli`. All five use
+the same closed grammar, without filename-specific validation rules.
+
+Reference Materializer imports `CoreError` and `validate_engineering_graph` from
+canonical Project Model modules. The existing Reference Model -> Project Model
+direction permits this dependency and has no separate published-symbol boundary;
+no additional DTO or symbol contract is required. Reference Model remains a
+supporting/research surface, with no new project-truth or completeness authority.
+
+Consumer Pack v0 adds only the four exact Reference Model package files and keeps
+all three root compatibility files. TD-DIST-001/002 evidence extends isolated
+pack execution with both import surfaces, all exported-object identities,
+Project Status bootstrap/status, Reference Materializer validate/materialize,
+and the absence of an evolution CLI. Facade mutation checks reject implementation
+and mismatched import-only/import-and-cli grammars at TL1. Existing Reference
+Model validators continue to exercise semantics through legacy imports.
+
+No changed file belongs to an existing provider-run execution binding. Under
+AR-M11, this slice does not invalidate additional judgement evidence; historical
+hashes and existing stale classifications remain unchanged. No provider run is
+performed. Existing CI paths already include `src/harness/**`, and the full gate
+has no path filter, so no execution-policy change is needed.
 
 ## Evidence
 

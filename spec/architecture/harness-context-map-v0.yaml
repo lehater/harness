@@ -30,9 +30,9 @@ contexts:
     subdomain: supporting
     responsibility: Own reusable Authority types, Capability templates, applicability predicates and reference-model evolution.
     modules:
-      - project_status
-      - reference_materializer
-      - reference_model_evolution
+      - harness.reference_model.project_status
+      - harness.reference_model.reference_materializer
+      - harness.reference_model.reference_model_evolution
     may_depend_on:
       - project-model
 

@@ -69,6 +69,19 @@ assert target_state.__all__ is canonical.__all__
 assert Path(canonical.__file__).resolve() == Path("src/harness/project_model/target_state.py").resolve()
 assert engineering_graph.CoreError is core.CoreError
 assert target_state.CoreError is core.CoreError
+import importlib
+for module in ('project_status', 'reference_materializer', 'reference_model_evolution'):
+    legacy = importlib.import_module(module)
+    canonical = importlib.import_module('harness.reference_model.' + module)
+    assert legacy.__all__ is canonical.__all__
+    for name in canonical.__all__:
+        assert getattr(legacy, name) is getattr(canonical, name), (module, name)
+    assert Path(canonical.__file__).resolve() == Path('src/harness/reference_model/' + module + '.py').resolve()
+import reference_model_evolution
+import reference_materializer
+assert not hasattr(reference_model_evolution, 'main')
+assert reference_materializer.CoreError is core.CoreError
+assert reference_materializer.validate_engineering_graph is canonical_graph.validate_engineering_graph
 """
     result = subprocess.run(
         [sys.executable, "-c", probe], cwd=pack, env=env,
@@ -116,6 +129,51 @@ assert target_state.CoreError is core.CoreError
     expected = graph_fixture["cases"]["empty"]["expect"]
     assert outputs["evaluate"]["status"] == expected["status"]
     assert sorted(item["capability"] for item in outputs["evaluate"]["create"]) == expected["create"]
+
+    catalog_path = temp_root / "authority-catalog.yaml"
+    registry_path = temp_root / "authority-registry.yaml"
+    catalog_path.write_text(yaml.safe_dump({"authorities": [{"id": "PRODUCT"}]}), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "project_status.py", "bootstrap", "--catalog", str(catalog_path),
+         "--write", str(registry_path)],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    assert load_yaml(registry_path)["assessments"] == [
+        {"authority_id": "PRODUCT", "applicability": "UNASSESSED"}
+    ]
+    result = subprocess.run(
+        [sys.executable, "project_status.py", "status", "--catalog", str(catalog_path),
+         "--registry", str(registry_path)],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    assert yaml.safe_load(result.stdout)["rows"] == [
+        {"authority": "PRODUCT", "applicability": "UNASSESSED", "operational_status": None,
+         "artifacts": [], "blocking": []}
+    ]
+
+    result = subprocess.run(
+        [sys.executable, "reference_materializer.py", "validate",
+         "spec/research/reference-engineering-model-v0.yaml"],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    assert json.loads(result.stdout) == {"valid": True, "diagnostics": []}
+    holdout = next(row for row in load_yaml(
+        pack / "spec/research/reference-materializer-fixtures/holdouts-v0.yaml"
+    )["scenarios"] if row["id"] == "holdout-ephemeral-cli")
+    facts_path = temp_root / "project-facts.yaml"
+    request_path = temp_root / "materialization-request.yaml"
+    facts_path.write_text(yaml.safe_dump(holdout["project_facts"]), encoding="utf-8")
+    request_path.write_text(yaml.safe_dump(holdout["request"]), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "reference_materializer.py", "materialize",
+         "spec/research/reference-engineering-model-v0.yaml", str(facts_path), str(request_path)],
+        cwd=pack, env=env, check=True, capture_output=True, text=True,
+    )
+    materialized = json.loads(result.stdout)
+    assert materialized["status"] == holdout["expect"]["status"] == "STABLE"
+    required = {row["template"] for row in materialized["template_status"] if row["status"] == "REQUIRED"}
+    assert set(holdout["expect"]["required_templates"]) <= required
+    assert not set(holdout["expect"]["forbidden_templates"]) & required
 
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")
