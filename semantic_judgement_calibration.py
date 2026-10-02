@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from harness import CoreError
+from harness.project_model.core import CoreError
 
 STATUSES = {"ACCEPTED", "REJECTED"}
 

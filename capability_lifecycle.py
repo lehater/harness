@@ -13,8 +13,8 @@ from typing import Any
 
 import yaml
 
-from engineering_graph import derive_profile, production_index, validate_realization
-from harness import CoreError, artifact_blockers, capability_blockers
+from harness.project_model.engineering_graph import derive_profile, production_index, validate_realization
+from harness.project_model.core import CoreError, artifact_blockers, capability_blockers
 
 
 def _load(path: str | Path) -> dict[str, Any]:

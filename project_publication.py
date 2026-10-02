@@ -15,8 +15,8 @@ import yaml
 
 from capability_lifecycle import lifecycle_index, validate_projection
 from decision_pipeline import decision_failure_index
-from engineering_graph import validate_realization
-from harness import CoreError, artifact_blockers, capability_blockers, capability_resolve
+from harness.project_model.engineering_graph import validate_realization
+from harness.project_model.core import CoreError, artifact_blockers, capability_blockers, capability_resolve
 from semantic_acceptance import evaluation_index
 from semantic_derivation import derivation_evaluation_index
 

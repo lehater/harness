@@ -11,13 +11,13 @@ from typing import Any
 import yaml
 
 from adapters.canonical_graph import project_model
-from engineering_graph import (
+from harness.project_model.engineering_graph import (
     derive_profile,
     producer_index,
     production_index,
     validate_engineering_graph,
 )
-from harness import CoreError, validate_model
+from harness.project_model.core import CoreError, validate_model
 
 
 def _nodes(source_graph: dict[str, Any]) -> dict[str, dict[str, Any]]:

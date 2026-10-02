@@ -9,12 +9,12 @@ from typing import Any
 
 import yaml
 
-from engineering_graph import (
+from harness.project_model.engineering_graph import (
     evaluate_engineering_target,
     production_index,
     validate_engineering_graph,
 )
-from harness import CoreError
+from harness.project_model.core import CoreError
 from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 
 

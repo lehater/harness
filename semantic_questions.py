@@ -6,8 +6,8 @@ import copy
 import re
 from typing import Any
 
-from engineering_graph import producer_index
-from harness import CoreError
+from harness.project_model.engineering_graph import producer_index
+from harness.project_model.core import CoreError
 from semantic_acceptance import evaluation_index
 from semantic_derivation import derivation_evaluation_index
 

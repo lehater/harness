@@ -300,6 +300,64 @@ def _resolve_target(module_name: str, owner: dict[str, str], aliases: dict[str, 
     return None
 
 
+def _validate_runtime_import(
+    source: str,
+    node: ast.AST,
+    owner: dict[str, str],
+    aliases: dict[str, str],
+) -> None:
+    if source not in owner:
+        return
+    modules = []
+    if isinstance(node, ast.ImportFrom) and not node.level:
+        modules = [node.module]
+    elif isinstance(node, ast.Import):
+        modules = [alias.name for alias in node.names]
+    for module in modules:
+        if module in aliases:
+            raise SystemExit(
+                f"{source}:{node.lineno} imports compatibility alias {module}; "
+                f"use canonical target {_resolve_target(module, owner, aliases)} instead"
+            )
+
+
+def test_runtime_import_guards() -> None:
+    source = "agent_router"
+    owner = {source: "application"}
+    aliases = {
+        "engineering_graph": "harness.project_model.engineering_graph",
+        "harness": "harness.project_model.core",
+    }
+    for statement in (
+        "from engineering_graph import X",
+        "from harness import CoreError",
+        "import engineering_graph",
+        "import harness as legacy",
+        "import pathlib, engineering_graph as legacy",
+    ):
+        node = ast.parse(statement).body[0]
+        try:
+            _validate_runtime_import(source, node, owner, aliases)
+        except SystemExit as exc:
+            assert "use canonical target harness.project_model." in str(exc)
+        else:
+            raise AssertionError(f"owned runtime accepted {statement}")
+        for excluded in ("validators.check", "tests.check", "scenario_suite", "engineering_graph"):
+            _validate_runtime_import(excluded, node, owner, aliases)
+    for statement in (
+        "from harness.project_model.core import CoreError",
+        "from harness.project_model.engineering_graph import derive_profile",
+        "from harness.decision.decision_governance import axis_policies",
+        "from harness.coverage.engineering_coverage import evaluate_with_repository_policy",
+        "from harness.workspace.workspace import validate_workspace",
+        "import harness.project_model.core",
+        "from semantic_acceptance import coverage_assurance_view",
+        "from integration_alignment import validate_project_alignment",
+        "from .engineering_graph import derive_profile",
+    ):
+        _validate_runtime_import(source, ast.parse(statement).body[0], owner, aliases)
+
+
 def test_compatibility_guards() -> None:
     target = "harness.project_model.core"
     for kind in ("bridge", "exports", "cli", "import-only", "import-and-cli"):
@@ -339,6 +397,7 @@ def test_compatibility_guards() -> None:
 
 def main() -> int:
     test_compatibility_guards()
+    test_runtime_import_guards()
     spec = load_map()
     contexts = spec.get("contexts", {}) or {}
 
@@ -483,6 +542,7 @@ def main() -> int:
         path = _module_path(source)
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
+            _validate_runtime_import(source, node, owner, aliases)
             if isinstance(node, ast.ImportFrom):
                 module_name = node.module or ""
                 if node.level:

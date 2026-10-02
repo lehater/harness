@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError
+from harness.project_model.core import CoreError
 
 
 DECISION_STATUSES = {
