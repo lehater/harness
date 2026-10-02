@@ -38,8 +38,8 @@ def load_binding(path: Path) -> dict[str, Any]:
         raise WrapperError("Harness binding version must be 1")
     if value.get("kind") != "harness-consumer-binding":
         raise WrapperError("unexpected Harness binding kind")
-    if value.get("consumer_api") != "v0":
-        raise WrapperError("unsupported Harness consumer_api; expected v0")
+    if value.get("consumer_api") not in ("v0", "v1"):
+        raise WrapperError("unsupported Harness consumer_api; expected v0 or v1")
 
     source = value.get("source")
     if not isinstance(source, dict) or set(source) != {"repository", "revision"}:
@@ -147,23 +147,34 @@ def _git_head(path: Path) -> str:
     return revision
 
 
+def _pack_command(python: Path, root: Path, consumer_api: str) -> list[str]:
+    if consumer_api == "v1":
+        return [str(python), "-m", "harness.application.consumer_pack"]
+    tool = root / "consumer_pack.py"
+    if not tool.is_file():
+        raise WrapperError(f"Harness source/Pack has no consumer_pack.py: {root}")
+    return [str(python), str(tool)]
+
+
+def _api_selector(consumer_api: str) -> list[str]:
+    return ["--consumer-api", "v1"] if consumer_api == "v1" else []
+
+
 def _validate_existing_pack(
     python: Path,
     pack: Path,
     revision: str,
+    consumer_api: str = "v0",
 ) -> bool:
-    tool = pack / "consumer_pack.py"
-    if not tool.is_file():
-        return False
     try:
         subprocess.run(
             [
-                str(python),
-                str(tool),
+                *_pack_command(python, pack, consumer_api),
                 "validate-pack",
                 str(pack),
                 "--revision",
                 revision,
+                *_api_selector(consumer_api),
             ],
             cwd=str(pack),
             check=True,
@@ -172,7 +183,7 @@ def _validate_existing_pack(
             text=True,
         )
         return True
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError, WrapperError):
         return False
 
 
@@ -221,15 +232,9 @@ def sync(
 
     if dev_source is not None:
         dev_source = dev_source.expanduser().resolve()
-        tool = dev_source / "consumer_pack.py"
-        if not tool.is_file():
-            raise WrapperError(
-                f"local Harness source does not contain consumer_pack.py: {dev_source}"
-            )
         result = _run(
             [
-                str(python),
-                str(tool),
+                *_pack_command(python, dev_source, consumer_api),
                 "sync",
                 str(binding_path),
                 str(cache_root),
@@ -244,7 +249,7 @@ def sync(
         return output
 
     pack = cache_root / consumer_api / revision
-    if pack.is_dir() and _validate_existing_pack(python, pack, revision):
+    if pack.is_dir() and _validate_existing_pack(python, pack, revision, consumer_api):
         return pack
     if pack.exists():
         shutil.rmtree(pack)
@@ -256,23 +261,20 @@ def sync(
     ) as temp:
         checkout = Path(temp) / "source"
         _fetch_source(source["repository"], revision, checkout)
-        tool = checkout / "consumer_pack.py"
-        if not tool.is_file():
-            raise WrapperError("pinned Harness revision has no consumer_pack.py")
         _run(
             [
-                str(python),
-                str(tool),
+                *_pack_command(python, checkout, consumer_api),
                 "materialize",
                 str(checkout),
                 str(pack),
                 "--revision",
                 revision,
+                *_api_selector(consumer_api),
             ],
             cwd=checkout,
         )
 
-    if not _validate_existing_pack(python, pack, revision):
+    if not _validate_existing_pack(python, pack, revision, consumer_api):
         raise WrapperError("materialized Harness Consumer Pack failed validation")
     return pack
 

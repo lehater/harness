@@ -341,3 +341,12 @@ The deterministic validator proves:
 It deliberately does **not** claim that a language model will always classify
 arbitrary natural-language prompts into the correct structured route. That is a
 separate behavioral-evaluation problem tracked by the Evolution Radar.
+
+
+## Consumer API v1
+
+The separately versioned canonical-only distribution is defined by
+`harness-consumer-pack-v1.md` and `spec/distribution/consumer-pack-v1.yaml`.
+v0 retains legacy module/file compatibility; v1 exposes canonical `harness.*`
+module identities and minimal root test tooling. Both use the existing routed
+Consumer surface. Source facades remain available for v0 materialization.

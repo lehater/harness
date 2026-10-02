@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -219,7 +220,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     target.write_text(original)
 
 
-def test_pack_execution(pack: Path, temp_root: Path) -> None:
+def test_pack_execution(pack: Path, temp_root: Path, consumer_api: str = "v0") -> None:
     """Exercise the distributed files, without inheriting checkout import paths."""
     env = dict(os.environ)
     env.pop("PYTHONPATH", None)
@@ -830,7 +831,8 @@ application_baseline = {'agent_router': {'ast_sha256': '9359c2058a8a450f79d29852
                                    'yaml'],
                        'mode': 'import-and-cli',
                        'root_paths': 0},
- 'consumer_pack': {'ast_sha256': 'b375aab5b3ae312c6d50e67ea958e9b9011fb529c0235eca74d198f6a4e87fe4',
+ # Materializer intentionally evolves for v1; its v0 export contract stays frozen.
+ 'consumer_pack': {'ast_sha256': '6428a246d38e6b9f658c0c52fcf4913199987a7f039fd8eca6673199f4d73813',
                    'canonical': 'harness.application.consumer_pack',
                    'exports': ['Any',
                                'ConsumerPackError',
@@ -1178,32 +1180,57 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     result = run_scenario(scenario)
     assert result.status == 'PASSED', result.as_dict()
 """
+    layout = load_yaml(pack / "spec/architecture/repository-layout-v0.yaml")
+    if consumer_api == "v1":
+        probe = """
+import importlib
+from pathlib import Path
+import yaml
+from harness.project_model import core
+layout = yaml.safe_load(Path('spec/architecture/repository-layout-v0.yaml').read_text())
+for entry in layout['compatibility']['module_facades'].values():
+    identity = entry['target']
+    module = importlib.import_module(identity)
+    assert Path(module.__file__).resolve() == Path('src', *identity.split('.')).with_suffix('.py').resolve()
+    if hasattr(module, 'CoreError'):
+        assert module.CoreError is core.CoreError, identity
+from harness.application import skill_router, coverage_application
+assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
+"""
+
+    def cli(filename: str) -> list[str]:
+        if consumer_api == "v0":
+            return [sys.executable, filename]
+        identity = ("harness.project_model.core" if filename == "harness.py"
+                    else layout["compatibility"]["module_facades"][filename[:-3]]["target"])
+        return [sys.executable, "-m", identity]
+
     result = subprocess.run(
         [sys.executable, "-c", probe], cwd=pack, env=env,
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
-    # Every Application CLI still starts through its root Consumer v0 facade.
+    # Application CLIs use preserved v0 facades or canonical v1 identities.
     for module in ['agent_router', 'authority_context', 'consumer_pack', 'coverage_application', 'decision_explorer_request', 'decision_pipeline', 'graph_doctor', 'method_router', 'project_frontier', 'semantic_admission', 'semantic_closure', 'skill_router']:
         result = subprocess.run(
-            [sys.executable, module + ".py", "--help"], cwd=pack, env=env,
+            [*cli(module + ".py"), "--help"], cwd=pack, env=env,
             capture_output=True, text=True,
         )
         assert result.returncode == 0, (module, result.stderr)
     result = subprocess.run(
-        [sys.executable, "consumer_pack.py", "validate-definition", "--source-root", str(pack)],
+        [*cli("consumer_pack.py"), "validate-definition", "--source-root", str(pack), "--consumer-api", consumer_api],
         cwd=pack, env=env, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
     result = subprocess.run(
-        [sys.executable, "skill_router.py", "operation", "--surface", "consumer", "--operation", "project-bootstrap-reconcile"],
+        [*cli("skill_router.py"), "operation", "--surface", "consumer", "--operation", "project-bootstrap-reconcile"],
         cwd=pack, env=env, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
     route = json.loads(result.stdout)
     assert route["instruction_contracts"] == ["docs/design/agent-instruction-architecture-v0.md"]
     assert (pack / route["skill"]).is_file()
-    # Canonical and Consumer v0 nested module CLIs require no path bootstrap.
+    # Canonical nested adapters execute for both APIs; only v0 also tests aliases.
     fixture = load_yaml(pack / "spec/adapter-acceptance/rich-project-projection.yaml")
     source = temp_root / "nested-source.yaml"
     source.write_text(yaml.safe_dump(fixture["source_graph"]))
@@ -1213,7 +1240,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         if ".adapters." not in entry["target"] or entry["mode"] != "import-and-cli":
             continue
         outputs = []
-        for identity in (entry["target"], legacy):
+        for identity in ((entry["target"], legacy) if consumer_api == "v0" else (entry["target"],)):
             is_copilot = identity.endswith("copilot_live_calibration_evaluator")
             result = subprocess.run(
                 [sys.executable, "-m", identity, *([] if is_copilot else [str(nested_graph)])],
@@ -1224,13 +1251,14 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
             else:
                 assert result.returncode == 0, result.stderr
                 outputs.append(yaml.safe_load(result.stdout))
-        if outputs:
+        if len(outputs) == 2:
             assert outputs[0] == outputs[1]
     # Fresh isolated-pack processes exercise both preserved Workspace CLIs.
-    fixture = "spec/workspace-acceptance/minimal-domain"
+    fixture = temp_root / "workspace-cli-fixture"
+    shutil.copytree(pack / "spec/workspace-acceptance/minimal-domain", fixture)
     for command in ("validate", "render"):
         result = subprocess.run(
-            [sys.executable, "workspace.py", command, fixture],
+            [*cli("workspace.py"), command, str(fixture)],
             cwd=pack, env=env, capture_output=True, text=True,
         )
         assert result.returncode == 0, result.stderr
@@ -1243,7 +1271,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     manifest = projection / "manifest.yaml"
     plan = projection / "plan.yaml"
     result = subprocess.run(
-        [sys.executable, "human_projection.py", "compile", str(projection / "engineering_graph.yaml"),
+        [*cli("human_projection.py"), "compile", str(projection / "engineering_graph.yaml"),
          "BACKEND-IMPLEMENTATION", "--source-graph", str(projection / "source_graph.yaml"),
          "--projection", str(projection / "projection.yaml"),
          "--recipe", "spec/human-projection-acceptance/backend-review.yaml",
@@ -1273,7 +1301,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
             cwd=pack, env=env, check=True, capture_output=True, text=True,
         )
         result = subprocess.run(
-            [sys.executable, module + ".py", *arguments], cwd=pack, env=env,
+            [*cli(module + ".py"), *arguments], cwd=pack, env=env,
             check=True, capture_output=True, text=True,
         )
         assert yaml.safe_load(result.stdout) == json.loads(oracle.stdout), module
@@ -1282,7 +1310,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     model_path = temp_root / "core-model.yaml"
     model_path.write_text(yaml.safe_dump(fixture["model"]), encoding="utf-8")
     result = subprocess.run(
-        [sys.executable, "harness.py", "validate", str(model_path)],
+        [*cli("harness.py"), "validate", str(model_path)],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
     assert json.loads(result.stdout) == {"valid": True}, result.stdout
@@ -1292,7 +1320,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     profile_path.write_text(yaml.safe_dump(target_fixture["profile"]), encoding="utf-8")
     model_path.write_text(yaml.safe_dump(target_fixture["complete_model"]), encoding="utf-8")
     result = subprocess.run(
-        [sys.executable, "target_state.py", str(profile_path), str(model_path)],
+        [*cli("target_state.py"), str(profile_path), str(model_path)],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
     assert json.loads(result.stdout) == target_fixture["expect"]["complete"], result.stdout
@@ -1309,7 +1337,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         ("evaluate", [str(graph_path), target, str(model_path)]),
     ):
         result = subprocess.run(
-            [sys.executable, "engineering_graph.py", command, *arguments],
+            [*cli("engineering_graph.py"), command, *arguments],
             cwd=pack, env=env, check=True, capture_output=True, text=True,
         )
         outputs[command] = json.loads(result.stdout)
@@ -1324,7 +1352,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     registry_path = temp_root / "authority-registry.yaml"
     catalog_path.write_text(yaml.safe_dump({"authorities": [{"id": "PRODUCT"}]}), encoding="utf-8")
     result = subprocess.run(
-        [sys.executable, "project_status.py", "bootstrap", "--catalog", str(catalog_path),
+        [*cli("project_status.py"), "bootstrap", "--catalog", str(catalog_path),
          "--write", str(registry_path)],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
@@ -1332,7 +1360,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
         {"authority_id": "PRODUCT", "applicability": "UNASSESSED"}
     ]
     result = subprocess.run(
-        [sys.executable, "project_status.py", "status", "--catalog", str(catalog_path),
+        [*cli("project_status.py"), "status", "--catalog", str(catalog_path),
          "--registry", str(registry_path)],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
@@ -1342,7 +1370,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     ]
 
     result = subprocess.run(
-        [sys.executable, "reference_materializer.py", "validate",
+        [*cli("reference_materializer.py"), "validate",
          "spec/research/reference-engineering-model-v0.yaml"],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
@@ -1355,7 +1383,7 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
     facts_path.write_text(yaml.safe_dump(holdout["project_facts"]), encoding="utf-8")
     request_path.write_text(yaml.safe_dump(holdout["request"]), encoding="utf-8")
     result = subprocess.run(
-        [sys.executable, "reference_materializer.py", "materialize",
+        [*cli("reference_materializer.py"), "materialize",
          "spec/research/reference-engineering-model-v0.yaml", str(facts_path), str(request_path)],
         cwd=pack, env=env, check=True, capture_output=True, text=True,
     )
@@ -1403,11 +1431,122 @@ for scenario in sorted(Path('spec/scenario-suite/scenarios').glob('decision-*.ya
          {"status": "ACCEPTED", "required_channel_count": 1, "reviewed_channel_count": 1, "findings": []}),
     ):
         result = subprocess.run(
-            [sys.executable, script, *arguments], cwd=pack, env=env,
+            [*cli(script), *arguments], cwd=pack, env=env,
             check=True, capture_output=True, text=True,
         )
         actual = json.loads(result.stdout)
         assert all(actual[key] == value for key, value in expected.items()), (script, actual)
+
+    # Existing representative fixtures have closed dependencies within the Pack.
+    # The source-wide catalog also requires repository-only examples/skills.
+    scenarios = temp_root / "representative-scenarios"
+    scenarios.mkdir()
+    requirements = []
+    for filename in ("decision-autonomy.yaml", "canonical-alignment.yaml",
+                     "structural-provider-removal.yaml", "create-work-routing.yaml",
+                     "workspace-managed.yaml", "semantic-gap-question.yaml"):
+        original = pack / "spec/scenario-suite/scenarios" / filename
+        document = load_yaml(original)
+        for fixture in document.get("fixtures", {}).values():
+            for key in ("yaml", "json", "text", "path", "workspace"):
+                if key in fixture:
+                    fixture[key] = str((original.parent / fixture[key]).resolve())
+        (scenarios / filename).write_text(yaml.safe_dump(document))
+        requirements.extend(document["covers"])
+    catalog = temp_root / "representative-catalog.yaml"
+    catalog.write_text(yaml.safe_dump({
+        "version": 1, "kind": "harness-scenario-coverage-catalog",
+        "requirements": [{"id": identity, "min_scenarios": 1}
+                         for identity in sorted(set(requirements))],
+    }))
+    result = subprocess.run(
+        [sys.executable, "scenario_suite.py", str(scenarios), "--catalog", str(catalog)],
+        cwd=pack, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(result.stdout)["scenario_count"] == 6
+
+
+def test_v1_pack(temp_root: Path) -> None:
+    definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v1.yaml")
+    validate_definition(definition, ROOT)
+    assert definition["root_files"] == ["scenario_drivers.py", "scenario_suite.py"]
+    assert "adapters/" not in definition["include_prefixes"]
+    assert "src/" not in definition["include_prefixes"]
+    revision = "a" * 40
+    pack = temp_root / "v1-pack"
+    manifest = materialize_pack(ROOT, pack, binding_revision=revision, consumer_api="v1")
+    assert manifest["consumer_api"] == "v1"
+    layout = load_yaml(ROOT / "spec/architecture/repository-layout-v0.yaml")
+    compatibility = layout["compatibility"]
+    facades = {name.replace(".", "/") + ".py" for name in compatibility["module_facades"]}
+    facades.update(compatibility["cli_facades"])
+    for relative in facades:
+        assert not (pack / relative).exists(), relative
+    assert not (pack / "adapters").exists()
+    assert (pack / "harness/__init__.py").is_file()
+    assert {path.name for path in pack.glob("*.py")} == {"scenario_drivers.py", "scenario_suite.py"}
+    for item in compatibility["import_aliases"].values():
+        assert item["bridge"] == "harness/__init__.py"  # sole technical bridge exception
+    test_pack_execution(pack, temp_root, "v1")
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTHONDONTWRITEBYTECODE", None)
+    env["PYTHONNOUSERSITE"] = "1"
+    result = subprocess.run(
+        [sys.executable, "-m", "harness.application.consumer_pack", "validate-pack",
+         str(pack), "--consumer-api", "v1"], cwd=pack, env=env, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert list((pack / "src/harness/application/__pycache__").glob("*.pyc"))
+    assert validate_pack(pack, expected_api="v1") == manifest
+    for relative in ("unexpected.txt", "unexpected.pyc", "src/harness/application/__pycache__/unexpected.txt"):
+        extra = pack / relative
+        extra.write_text("untracked")
+        try:
+            validate_pack(pack, expected_api="v1")
+        except ConsumerPackError as exc:
+            assert "manifest/file set mismatch" in str(exc) and relative in str(exc)
+        else:
+            raise AssertionError(f"untracked v1 file accepted: {relative}")
+        finally:
+            extra.unlink()
+    tracked = pack / "src/harness/application/consumer_pack.py"
+    original = tracked.read_bytes()
+    tracked.write_bytes(original + b"\n# tampered\n")
+    try:
+        validate_pack(pack, expected_api="v1")
+    except ConsumerPackError as exc:
+        assert "hash mismatch" in str(exc)
+    else:
+        raise AssertionError("tampered v1 file accepted")
+    tracked.write_bytes(original)
+    second = temp_root / "v1-pack-2"
+    materialize_pack(ROOT, second, binding_revision=revision, consumer_api="v1")
+    assert (pack / PACK_MANIFEST).read_bytes() == (second / PACK_MANIFEST).read_bytes()
+    binding = {"version": 1, "kind": "harness-consumer-binding", "consumer_api": "v1",
+               "source": {"repository": str(ROOT), "revision": revision}}
+    validate_binding(binding)
+    path = temp_root / "v1-binding.json"
+    path.write_text(json.dumps(binding))
+    synced = sync_binding(path, temp_root / "v1-cache", dev_source=ROOT)
+    assert validate_pack(synced, expected_api="v1")["consumer_api"] == "v1"
+    for api in ("v0", "unknown"):
+        try:
+            validate_pack(pack, expected_api=api)
+        except ConsumerPackError:
+            pass
+        else:
+            raise AssertionError(f"v1 Pack accepted as {api}")
+    for api in ("unknown", None, [], {}):
+        binding["consumer_api"] = api
+        try:
+            validate_binding(binding)
+        except ConsumerPackError:
+            pass
+        else:
+            raise AssertionError(f"unsupported binding API accepted: {api}")
+
 
 def main() -> int:
     definition = load_yaml(ROOT / "spec/distribution/consumer-pack-v0.yaml")
@@ -1558,7 +1697,9 @@ def main() -> int:
         # A second sync is idempotent and reuses the validated immutable cache.
         assert sync_binding(pinned_path, pinned_cache) == pinned_pack
 
-    print("Harness Consumer Pack validation passed")
+    with tempfile.TemporaryDirectory(prefix="consumer-v1-validation-") as temp:
+        test_v1_pack(Path(temp))
+    print("Harness Consumer v0 compatibility and v1 canonical distribution validation passed")
     return 0
 
 
