@@ -19,7 +19,7 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError
+from harness.project_model.core import CoreError
 
 
 def semantic_key(item: dict[str, Any]) -> tuple[str, str | None]:

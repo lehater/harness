@@ -13,7 +13,7 @@ from typing import Any
 
 import yaml
 
-from harness import CoreError, validate_model
+from harness.project_model.core import CoreError, validate_model
 
 
 def _source_nodes(graph: dict[str, Any]) -> dict[str, dict[str, Any]]:

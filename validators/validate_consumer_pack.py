@@ -84,6 +84,28 @@ def test_context_dependencies(temp_root: Path) -> None:
     ), str(checkout)]
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+    target = checkout / "agent_router.py"
+    original = target.read_text()
+    for statement in (
+        "from engineering_graph import X", "from harness import CoreError",
+        "import engineering_graph", "import harness as legacy",
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode != 0, statement
+        assert "agent_router:" in result.stderr, result.stderr
+        assert "use canonical target harness.project_model." in result.stderr, result.stderr
+    for statement in (
+        "from harness.project_model.core import CoreError",
+        "from harness.project_model.engineering_graph import derive_profile",
+        "from harness.decision.decision_governance import axis_policies",
+        "from harness.coverage.engineering_coverage import evaluate_with_repository_policy",
+        "from harness.workspace.workspace import validate_workspace",
+    ):
+        target.write_text(original + "\n" + statement + "\n")
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        assert result.returncode == 0, (statement, result.stderr)
+    target.write_text(original)
     target = checkout / "src/harness/coverage/coverage_planner.py"
     original = target.read_text()
     for statement, diagnostic in (
@@ -105,7 +127,7 @@ def test_context_dependencies(temp_root: Path) -> None:
     target = checkout / "src/harness/workspace/human_projection.py"
     original = target.read_text()
     for statement in (
-        "import project_frontier", "import engineering_coverage", "import semantic_acceptance",
+        "import project_frontier", "import harness.coverage.engineering_coverage", "import semantic_acceptance",
     ):
         target.write_text(original + "\n" + statement + "\n")
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)

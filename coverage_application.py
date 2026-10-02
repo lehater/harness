@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from agent_router import validate_skill_registry
-from engineering_coverage import evaluate_with_repository_policy, load, load_scope_source
+from harness.coverage.engineering_coverage import evaluate_with_repository_policy, load, load_scope_source
 from integration_alignment import validate_project_alignment
 from skill_router import GLOBAL_INSTRUCTION_CONTRACTS
 

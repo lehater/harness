@@ -11,10 +11,10 @@ import yaml
 
 from authority_context import build_authority_context
 from capability_lifecycle import lifecycle_index, lifecycle_states
-from decision_explorer_contract import build_decision_explorer_request
-from decision_governance import axis_policies, decision_contract_index
-from engineering_graph import producer_index, production_index, validate_realization
-from harness import CoreError
+from harness.decision.decision_explorer_contract import build_decision_explorer_request
+from harness.decision.decision_governance import axis_policies, decision_contract_index
+from harness.project_model.engineering_graph import producer_index, production_index, validate_realization
+from harness.project_model.core import CoreError
 
 
 def derive_decision_explorer_request(

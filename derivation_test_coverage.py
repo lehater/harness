@@ -7,8 +7,8 @@ from typing import Any
 
 import yaml
 
-from engineering_graph import production_index
-from harness import CoreError
+from harness.project_model.engineering_graph import production_index
+from harness.project_model.core import CoreError
 
 DISPOSITIONS = {"NOT_APPLICABLE"}
 

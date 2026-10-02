@@ -6,7 +6,7 @@ import hashlib
 import json
 from typing import Any
 
-from harness import CoreError
+from harness.project_model.core import CoreError
 
 # Physical source placement is provenance metadata. Lifecycle dependency
 # currentness tracks semantic atom identity/content; Authority and all other

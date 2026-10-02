@@ -7,7 +7,7 @@ import hashlib
 import json
 from typing import Any
 
-from harness import CoreError
+from harness.project_model.core import CoreError
 from semantic_judgement_calibration import evaluate_judgement_calibration
 
 RUN_STATES = {"COMPLETED", "FAILED", "INTERRUPTED", "UNAVAILABLE"}

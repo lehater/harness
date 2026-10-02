@@ -449,3 +449,41 @@ All seven provider-run records under `spec/assurance/evidence/**` and every
 set. There are no intersections. Under AR-M11 this slice introduces no additional
 staleness; historical hashes, outcomes and currentness classifications remain
 unchanged. No provider judgement run is performed. There is no scope deviation.
+
+## Runtime canonical-import normalization
+
+Architecture decision (ADR): compatibility facades are no longer an internal
+runtime dependency mechanism. Modules owned by `contexts.*.modules` in the
+canonical context map must import migrated contexts through their canonical
+identities. The architecture validator rejects exact compatibility aliases for
+both `from ... import ...` and `import ...`, before the existing dependency and
+published-symbol checks. Unmigrated root identities remain canonical; context
+ownership, dependency directions and published boundaries are unchanged.
+
+Internal migration compatibility and public Consumer API compatibility have
+different lifetimes. `repository-layout-v0.yaml` owns the transitional alias
+mapping under `compatibility`; `consumer-pack-v0.yaml` owns distribution and
+public exposure through `root_files`, `exact_files` and `consumer_api: v0`.
+No duplicate compatibility registry is introduced. Existing import/CLI facades
+and the source-tree bridge remain unchanged because Consumer Pack v0 exposes
+them. Facade removal is deferred to an explicit Consumer API compatibility
+decision. Validators, tests, ignored research/scenario modules and external
+consumers may continue exercising legacy surfaces.
+
+Evidence uses TL0/TL1 exact-alias mutation/control checks and existing
+TD-DIST-001/002 isolated Consumer Pack import, identity and CLI checks (HA-A18).
+All 85 objects imported by the 40 normalized runtime imports were checked for
+identity against their canonical re-exports. Production bodies, signatures and
+CLI behavior are unchanged. The Workspace forbidden-dependency mutation uses
+the canonical Coverage identity so it continues testing dependency direction
+rather than being intercepted by the new alias guard.
+
+All seven provider-run records under `spec/assurance/evidence/**` and every
+`execution_bindings.files` list were compared with the complete changed-file
+set. Four records intersect at `skill_router.py`: first-wave runs 36942421201
+and 36947887869, TL4 existing-project run 36949909315, and TL5 known-project run
+36952038645. All seven records were already stale on the base revision. Binding
+intersection exists, but there is no new current -> stale transition. Historical
+hashes, outcomes and currentness classifications remain unchanged. This
+mechanical import normalization requires deterministic assurance only; no
+provider judgement run or refreshed judgement claim is introduced.

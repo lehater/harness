@@ -12,13 +12,13 @@ import yaml
 from authority_context import build_authority_context
 from capability_lifecycle import lifecycle_index, lifecycle_states
 from decision_explorer_request import derive_decision_explorer_request
-from engineering_graph import (
+from harness.project_model.engineering_graph import (
     derive_profile,
     producer_index,
     production_index,
     validate_realization,
 )
-from harness import CoreError, artifact_blockers, capability_blockers
+from harness.project_model.core import CoreError, artifact_blockers, capability_blockers
 
 PIPELINE_STAGES = [
     "FORM_OPTIONS",

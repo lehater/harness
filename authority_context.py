@@ -9,13 +9,13 @@ from typing import Any
 
 import yaml
 
-from engineering_graph import (
+from harness.project_model.engineering_graph import (
     producer_index,
     production_index,
     realize_core_model,
     validate_engineering_graph,
 )
-from harness import (
+from harness.project_model.core import (
     CoreError,
     artifact_blockers,
     capability_blockers,

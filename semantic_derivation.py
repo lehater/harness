@@ -10,8 +10,8 @@ from typing import Any
 
 import yaml
 
-from engineering_graph import producer_index, production_index
-from harness import CoreError
+from harness.project_model.engineering_graph import producer_index, production_index
+from harness.project_model.core import CoreError
 from semantic_fingerprint import semantic_assertion_fingerprint
 
 RELATIONS = {"PRESERVES", "TRANSFORMS", "CONSTRAINS", "REALIZES"}
