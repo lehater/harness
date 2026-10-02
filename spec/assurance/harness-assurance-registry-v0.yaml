@@ -310,6 +310,23 @@ abilities:
       - A16-R05
       - A16-R06
 
+  - id: HA-A17
+    title: Repository realization and projections
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A17-F01
+      - A17-F02
+      - A17-F03
+      - A17-F04
+      - A17-F05
+    requirements:
+      - A17-R01
+      - A17-R02
+      - A17-R03
+
   - id: HA-A18
     title: Consumer distribution and compatibility
     contract_ref:
@@ -1039,6 +1056,48 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A17-R01
+    ability: HA-A17
+    failure_modes: [A17-F01, A17-F02]
+    purpose: Repository and human projections remain derived from canonical inputs; projection-local edits cannot override source-owned truth, and stale canonical source fingerprints fail closed.
+    required:
+      test_levels: [TL2]
+      methods_any: [EM-02, EM-03]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A17-R02
+    ability: HA-A17
+    failure_modes: [A17-F03, A17-F04]
+    purpose: Repository/workspace/frontend projection paths cannot claim closure when required canonical model, source, semantic, verification, or target inputs are absent or stale.
+    required:
+      test_levels: [TL3]
+      methods_any: [EM-03, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A17-R03
+    ability: HA-A17
+    failure_modes: [A17-F05]
+    purpose: Semantically equivalent canonical repository truth yields an equivalent derived projection under irrelevant declaration reordering.
+    required:
+      test_levels: [TL2]
+      methods_any: [EM-05]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
   - id: A18-R01
     ability: HA-A18
     failure_modes: [A18-F02, A18-F03, A18-F05]
@@ -1082,6 +1141,75 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A17-PROJECTION-PROVENANCE
+    providers:
+      - tests/test_human_projection.py
+      - tests/test_adapters.py
+    source_refs:
+      - path: tests/test_human_projection.py
+      - path: tests/test_adapters.py
+      - path: src/harness/integration/adapters/canonical_graph.py
+      - path: src/harness/workspace/human_projection.py
+      - path: spec/unified-model-acceptance/napms-shape.yaml
+    satisfies: [A17-R01]
+    test_level: TL2
+    methods: [EM-02, EM-03]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: known-project
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - The NAPMS-shaped fixture is a repository-shaped regression derived from a known project shape, not an independently pinned whole-project holdout.
+      - Source graph owns artifact paths/dependencies; injected projection-local path/dependency fields and manual edits to materialized human output do not alter canonical manifest truth.
+      - Source hashes, manifest digest and visual hashes reject stale derived packages against changed canonical inputs.
+
+  - id: EVID-A17-PROJECTION-CLOSURE
+    providers:
+      - tests/test_human_projection.py
+      - tests/test_unified_model.py
+      - tests/test_frontend_screen_contracts.py
+      - tests/test_graph_doctor.py
+    source_refs:
+      - path: tests/test_human_projection.py
+      - path: tests/test_unified_model.py
+      - path: tests/test_frontend_screen_contracts.py
+      - path: tests/test_graph_doctor.py
+      - path: src/harness/workspace/human_projection.py
+      - path: src/harness/integration/integration_alignment.py
+      - path: spec/unified-model-acceptance/napms-shape.yaml
+    satisfies: [A17-R02]
+    test_level: TL3
+    methods: [EM-03, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: known-project
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Covers missing paired adapter inputs, incomplete projection bindings, hidden/phantom repository dependencies, missing canonical files, partial target realization, incomplete human evidence, stale source/visual assets, and frontend semantic/verification gating.
+      - This establishes the bounded workspace/repository-shaped realization path only; independent portability/generalization remains HA-A21.
+
+  - id: EVID-A17-PROJECTION-REPRODUCIBILITY
+    providers:
+      - tests/test_human_projection.py
+    source_refs:
+      - path: tests/test_human_projection.py
+      - path: src/harness/integration/adapters/canonical_graph.py
+      - path: src/harness/workspace/human_projection.py
+      - path: spec/unified-model-acceptance/napms-shape.yaml
+    satisfies: [A17-R03]
+    test_level: TL2
+    methods: [EM-05]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: known-project
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Reversing source-node, dependency, Authority, binding and Question declaration order preserves the exact normalized human-projection manifest and digest.
+      - The test proves semantic projection reproducibility for the bounded NAPMS-shaped fixture, not arbitrary repository adapters.
+
   - id: EVID-A15-FRONTIER-COMPOSITION
     providers:
       - tests/test_project_frontier.py

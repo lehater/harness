@@ -41,9 +41,85 @@ def expect_error(fn, contains: str):
         raise AssertionError(f"expected CoreError containing {contains!r}")
 
 
+def test_projection_reproducibility_and_source_ownership(
+    fixture: dict,
+    recipe: dict,
+) -> None:
+    baseline_model = project_model(
+        fixture["source_graph"],
+        fixture["projection"],
+    )
+    baseline_manifest = compile_manifest(
+        fixture["engineering_graph"],
+        baseline_model,
+        "BACKEND-IMPLEMENTATION",
+        harness_version="research-fixture",
+        project_revision="fixture-revision",
+        recipe_id=recipe["id"],
+    )
+
+    reordered_source = copy.deepcopy(fixture["source_graph"])
+    reordered_source["nodes"] = list(reversed(reordered_source["nodes"]))
+    for node in reordered_source["nodes"]:
+        node["depends_on"] = list(reversed(node.get("depends_on", []) or []))
+
+    reordered_projection = copy.deepcopy(fixture["projection"])
+    reordered_projection["authorities"] = list(
+        reversed(reordered_projection["authorities"])
+    )
+    reordered_projection["bindings"] = list(
+        reversed(reordered_projection["bindings"])
+    )
+    reordered_projection["questions"] = list(
+        reversed(reordered_projection.get("questions", []) or [])
+    )
+
+    reordered_model = project_model(
+        reordered_source,
+        reordered_projection,
+    )
+    reordered_manifest = compile_manifest(
+        fixture["engineering_graph"],
+        reordered_model,
+        "BACKEND-IMPLEMENTATION",
+        harness_version="research-fixture",
+        project_revision="fixture-revision",
+        recipe_id=recipe["id"],
+    )
+    assert reordered_manifest == baseline_manifest, (
+        reordered_manifest,
+        baseline_manifest,
+    )
+
+    forged_projection = copy.deepcopy(fixture["projection"])
+    for binding in forged_projection["bindings"]:
+        binding["path"] = f"generated/{binding['artifact']}.md"
+        binding["depends_on"] = []
+    forged_projection["generated_projection_note"] = (
+        "Derived output must never override source-graph truth."
+    )
+    forged_model = project_model(
+        fixture["source_graph"],
+        forged_projection,
+    )
+    forged_manifest = compile_manifest(
+        fixture["engineering_graph"],
+        forged_model,
+        "BACKEND-IMPLEMENTATION",
+        harness_version="research-fixture",
+        project_revision="fixture-revision",
+        recipe_id=recipe["id"],
+    )
+    assert forged_manifest == baseline_manifest, (
+        forged_manifest,
+        baseline_manifest,
+    )
+
+
 def main() -> int:
     fixture = load(ROOT / "spec/unified-model-acceptance/napms-shape.yaml")
     recipe = load(ROOT / "spec/human-projection-acceptance/backend-review.yaml")
+    test_projection_reproducibility_and_source_ownership(fixture, recipe)
     ir_template = load(ROOT / "spec/human-projection-acceptance/backend-review-ir.yaml")
 
     model = project_model(fixture["source_graph"], fixture["projection"])
@@ -206,6 +282,28 @@ def main() -> int:
         assert (review_root / "manifest.yaml").is_file()
         assert (review_root / "documents/overview.md").is_file()
         assert not (review_root / "sources").exists()
+
+        canonical_before_manual_edit = compile_manifest(
+            fixture["engineering_graph"],
+            model,
+            "BACKEND-IMPLEMENTATION",
+            harness_version="research-fixture",
+            project_revision="fixture-revision",
+            recipe_id=recipe["id"],
+        )
+        (review_root / "documents/overview.md").write_text(
+            "manually edited derived projection\n",
+            encoding="utf-8",
+        )
+        canonical_after_manual_edit = compile_manifest(
+            fixture["engineering_graph"],
+            model,
+            "BACKEND-IMPLEMENTATION",
+            harness_version="research-fixture",
+            project_revision="fixture-revision",
+            recipe_id=recipe["id"],
+        )
+        assert canonical_after_manual_edit == canonical_before_manual_edit
 
         handoff_root = Path(temp_dir) / "handoff"
         handoff_result = materialize_package(
