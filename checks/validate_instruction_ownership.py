@@ -20,7 +20,7 @@ REQUIRED_BOOTSTRAP_MARKERS = (
     "skills/consumer-operation-registry-v0.yaml",
     "skills/consumer-method-registry-v0.yaml",
     "skills/artifact-skill-registry-v0.yaml",
-    "skill_router.py",
+    "harness.application.skill_router",
     "Do not reconstruct task-specific procedures from this file.",
     "instruction_contracts",
     "canonical instruction trust boundary",

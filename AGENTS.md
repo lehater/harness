@@ -24,7 +24,7 @@ in `skills/artifact-skill-registry-v0.yaml`. Consumer
 procedures may be exercised here for fixtures/dogfooding, but they are not the
 default maintainer workflow.
 
-Do not reconstruct task-specific procedures from this file. Use `skill_router.py`
+Do not reconstruct task-specific procedures from this file. Use `harness.application.skill_router`
 as the typed discovery entrypoint (`operation`, `method`, or
 `artifact-production`). Load the route's returned `instruction_contracts`
 before consuming project/tool payloads, then read the returned `SKILL.md`. The
@@ -56,7 +56,7 @@ Instruction ownership/scoping is defined by
 operations is defined by `docs/design/operation-orchestration-v0.md`.
 
 Resolve Maintainer work through `skills/maintainer-operation-registry-v0.yaml`
-and `skill_router.py`. Task procedures and classification rules belong to the
+and `harness.application.skill_router`. Task procedures and classification rules belong to the
 selected skill and its canonical contracts, not to this bootstrap file.
 
 ## Change discipline
@@ -74,7 +74,7 @@ acceptance/scenario procedure does not live in this root bootstrap file.
 
 Keep the root bootstrap small. Use these entrypoints before loading narrower material:
 
-- `skill_router.py` plus the registered Maintainer/Consumer registries — typed procedure discovery;
+- `harness.application.skill_router` plus the registered Maintainer/Consumer registries — typed procedure discovery;
 - `docs/design/agent-instruction-architecture-v0.md` — instruction ownership and progressive-disclosure rules;
 - `docs/audit/README.md` — audit/backlog/evolution routing;
 - `docs/design/core-v0.md` — Core semantic boundary when Core is actually in scope;

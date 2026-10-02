@@ -11,7 +11,7 @@ user_task: Identify the independently provable engineering knowledge required by
 selected_scope: synthetic-payment-api
 repository_fixture:
   path: fixture.yaml
-trusted_instruction_entrypoint: [AGENTS.md, skill_router.py]
+trusted_instruction_entrypoint: [AGENTS.md, src/harness/application/skill_router.py]
 allowed_tools: []
 write_policy: read-only
 oracle_ref:

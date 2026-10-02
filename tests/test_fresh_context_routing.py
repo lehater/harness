@@ -83,7 +83,7 @@ def main() -> int:
 
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     assert "Ordinary work in this repository uses the Maintainer Skill Surface" in agents
-    assert "skill_router.py" in agents
+    assert "harness.application.skill_router" in agents
     assert "Do not reconstruct task-specific procedures from this file." in agents
 
     with tempfile.TemporaryDirectory(prefix="fresh-context-pack-") as temp:

@@ -32,7 +32,7 @@ instruction source.
 ### Registries and router
 
 Machine-readable registries own active skill identity, surface, route class and
-exposure. `skill_router.py` is the typed discovery entrypoint.
+exposure. `harness.application.skill_router` is the typed discovery entrypoint.
 
 An agent does not scan the skill tree or infer a physical `SKILL.md` path from
 a task name when a registered route exists.
@@ -99,7 +99,7 @@ procedures. Individual skills reference/consume it; they do not redefine it.
 
 1. Read the applicable `AGENTS.md` chain for the working scope.
 2. Identify the current semantic responsibility and skill surface.
-3. Resolve the corresponding route through `skill_router.py`.
+3. Resolve the corresponding route through `harness.application.skill_router`.
 4. Load every canonical path returned in the route's
    `instruction_contracts` before consuming project/tool payloads.
 5. Read the selected `SKILL.md`.
