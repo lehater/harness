@@ -15,7 +15,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from validators.validate_consumer_api_lifecycle import (  # noqa: E402
+from checks.validate_consumer_api_lifecycle import (  # noqa: E402
     CONTRACT as LIFECYCLE, INVENTORY, facade_paths, usage_inventory, validate as validate_lifecycle,
 )
 

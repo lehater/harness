@@ -249,7 +249,7 @@ def test_matrix(temp_root: Path, source: Path, revision: str, consumer_api: str)
 
 def test_v0_to_v1_migration(temp_root: Path, source: Path, revision: str) -> None:
     """One target/wrapper migrates API and pin without changing project truth."""
-    from validators.validate_consumer_api_lifecycle import facade_paths
+    from checks.validate_consumer_api_lifecycle import facade_paths
 
     target = temp_root / "target"
     harness_dir = target / ".harness"

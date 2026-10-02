@@ -43,7 +43,7 @@ def _git_head() -> str:
 def test_context_dependencies(temp_root: Path) -> None:
     """Check migrated ownership and mutate imports against the architecture validator."""
     import shutil
-    from validators import validate_context_boundaries as boundaries
+    from checks import validate_context_boundaries as boundaries
 
     spec = boundaries.load_map()
     owner = {
@@ -1473,7 +1473,7 @@ assert skill_router.ROOT == coverage_application.ROOT == Path.cwd()
 
 def test_v1_stripped_source(temp_root: Path) -> None:
     """Materialize/execute v1 where no legacy physical fallback is available."""
-    from validators.validate_consumer_api_lifecycle import facade_paths
+    from checks.validate_consumer_api_lifecycle import facade_paths
 
     source = temp_root / "stripped-source"
     shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
