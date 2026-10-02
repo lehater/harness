@@ -2,6 +2,7 @@
 """Validate Harness Engineering Graph v0 acceptance fixtures."""
 from __future__ import annotations
 
+import copy
 import sys
 from pathlib import Path
 
@@ -361,6 +362,24 @@ def main() -> int:
             errors.append(f"AUDIT closure mismatch: {sorted(audit_caps)!r}")
     except CoreError as exc:
         errors.append(f"independent consumer closure should be valid: {exc}")
+
+    try:
+        reordered = copy.deepcopy(multi_consumer_shared_graph)
+        reordered["authorities"] = list(reversed(reordered["authorities"]))
+        for authority in reordered["authorities"]:
+            authority["produces"] = list(reversed(authority["produces"]))
+        reordered["consumers"] = list(reversed(reordered["consumers"]))
+        validate_engineering_graph(reordered)
+        for target in ("IMPLEMENTATION", "AUDIT"):
+            expected_profile = derive_profile(multi_consumer_shared_graph, target)
+            actual_profile = derive_profile(reordered, target)
+            if actual_profile != expected_profile:
+                errors.append(
+                    f"{target} profile changed under declaration reorder: "
+                    f"{actual_profile!r} != {expected_profile!r}"
+                )
+    except CoreError as exc:
+        errors.append(f"declaration reorder should preserve graph semantics: {exc}")
 
     try:
         validate_engineering_graph(valid_same_authority_chain)

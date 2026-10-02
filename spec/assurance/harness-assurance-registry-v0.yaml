@@ -23,6 +23,24 @@ abilities:
       - A01-R02
       - A01-R03
 
+  - id: HA-A02
+    title: Engineering Graph topology
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: deterministic
+    failure_modes:
+      - A02-F01
+      - A02-F02
+      - A02-F03
+      - A02-F04
+      - A02-F05
+      - A02-F06
+    requirements:
+      - A02-R01
+      - A02-R02
+      - A02-R03
+
   - id: HA-A19
     title: CI and validation execution policy
     contract_ref:
@@ -169,6 +187,48 @@ requirements:
     required:
       test_levels: [TL1, TL2]
       methods_any: [EM-02, EM-03, EM-06]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A02-R01
+    ability: HA-A02
+    failure_modes: [A02-F01, A02-F02, A02-F03]
+    purpose: Engineering Graph validation rejects ambiguous producers, cycles, and dead public Capability production unless terminal semantics are explicit.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-02, EM-03, EM-06]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A02-R02
+    ability: HA-A02
+    failure_modes: [A02-F04, A02-F05]
+    purpose: Recursive Consumer closure is exact and invariant under meaning-preserving declaration reorder.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-05, EM-07]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A02-R03
+    ability: HA-A02
+    failure_modes: [A02-F06]
+    purpose: Valid deep dependency DAGs within the tested support envelope do not fail because of Python recursion depth, while deep cycles still fail closed.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-13]
       oracle_minimum: O1
       judgement_execution: false
     substitution:
@@ -481,6 +541,62 @@ requirements:
     status: required
 
 evidence:
+  - id: EVID-A02-TOPOLOGY-VALIDATION
+    providers:
+      - tests/test_engineering_graph.py
+      - tests/test_unified_model.py
+    source_refs:
+      - path: tests/test_engineering_graph.py
+      - path: tests/test_unified_model.py
+      - path: src/harness/project_model/engineering_graph.py
+    satisfies: [A02-R01]
+    test_level: TL1
+    methods: [EM-02, EM-03]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Covers multiple producers, production cycles, subject-collapse rejection, and dead public Capability rejection with explicit terminal positive control.
+      - Does not substitute for the separate closure/order or depth proof slots.
+
+  - id: EVID-A02-CLOSURE-ORDER
+    providers:
+      - tests/test_engineering_graph.py
+    source_refs:
+      - path: tests/test_engineering_graph.py
+      - path: src/harness/project_model/engineering_graph.py
+    satisfies: [A02-R02]
+    test_level: TL2
+    methods: [EM-05, EM-07]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Proves independent Consumer recursive closure and exact profile invariance under reordered Authorities, productions, and Consumers for the controlled graph fixture.
+      - Does not claim arbitrary graph-isomorphism equivalence beyond declaration reorder.
+
+  - id: EVID-A02-DEEP-DAG
+    providers:
+      - tests/test_deep_dependency_graphs.py
+    source_refs:
+      - path: tests/test_deep_dependency_graphs.py
+      - path: src/harness/project_model/engineering_graph.py
+    satisfies: [A02-R03]
+    test_level: TL1
+    methods: [EM-13]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Establishes a 1200-node depth regression for Graph/Profile traversal and rejects a deep cycle without RecursionError.
+      - This is a tested depth envelope, not an unbounded scalability claim.
+
   - id: EVID-A01-STRUCTURAL-VALIDATION-MUTATIONS
     providers:
       - tests/test_core.py

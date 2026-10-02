@@ -49,7 +49,7 @@ The reviewed minimum implementation is:
 - `checks/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M13 meta-self-tests.
 
 The seed is intentionally incomplete. It includes HA-A01 Core structural truth,
-HA-A04 Authority formation, HA-A05 Capability formation, HA-A09 existing-project
+HA-A02 Engineering Graph topology, HA-A04 Authority formation, HA-A05 Capability formation, HA-A09 existing-project
 bootstrap/reconcile, HA-A16 routing, HA-A18 Consumer distribution/compatibility,
 and HA-A19 assurance self-test obligations. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
@@ -91,7 +91,10 @@ realization and BLOCKED Target State in all three runs.
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
 A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
 through deterministic structural interpretation, and A01-R03 through explicit
-Question acceptance-transition evidence. A04-R01 and A05-R01 are satisfied; HA-A09 satisfies A09-R01 (TL2),
+Question acceptance-transition evidence. HA-A02 satisfies A02-R01 through
+topology/dead-production validation, A02-R02 through exact Consumer closure plus
+declaration-reorder metamorphic evidence, and A02-R03 through the 1200-node
+deep-DAG regression. A04-R01 and A05-R01 are satisfied; HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
@@ -308,6 +311,9 @@ HA-A01 is now SATISFIED for its current three proof slots. The A01-R01 mutation
 matrix exercises representative invalid ownership/provider/dependency/Question
 reference shapes. This is bounded O1 evidence; it does not claim exhaustive
 property generation across every representable Core document shape.
+
+HA-A02 is SATISFIED for its three proof slots. Its depth evidence is an
+explicit tested envelope (1200 nodes), not a claim of unbounded graph scale.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks
