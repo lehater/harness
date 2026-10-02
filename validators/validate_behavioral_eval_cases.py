@@ -133,7 +133,20 @@ with tempfile.TemporaryDirectory(prefix="behavioral-cli-version-") as temp:
     assert _observed_cli_version(str(fake_cli), {}) == "1.0.91"
 
 BASE = ROOT / "spec" / "behavioral-evals" / "first-wave"
-MANIFEST = yaml.safe_load((BASE / "manifest-v0.yaml").read_text(encoding="utf-8"))
+DISPATCH_MANIFEST = yaml.safe_load(
+    (BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+assert DISPATCH_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+assert DISPATCH_MANIFEST["id"] == "TL5-KNOWN-PROJECT-DISPATCH-BRIDGE-V1"
+assert DISPATCH_MANIFEST["cases"] == [{
+    "design": "TD-BOOT-E07",
+    "template": "../tl5-known-project/cases/td-boot-e07/case.yaml.tmpl",
+    "dimension": "bootstrap_realization",
+    "max_prompt_bytes": 42000,
+}]
+MANIFEST = yaml.safe_load(
+    (BASE / "baseline-manifest-v0.yaml").read_text(encoding="utf-8")
+)
 EXPECTED = {
     "TD-CAP-001", "TD-CAP-002", "TD-CAP-003", "TD-CAP-004",
     "TD-AUTH-001", "TD-AUTH-002", "TD-AUTH-004",
