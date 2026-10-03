@@ -1672,7 +1672,7 @@ evidence:
       - path: evals/live_calibration_process_driver.py
       - path: spec/live-calibration-provider/copilot-run.yaml.tmpl
       - path: spec/assurance/evidence/a12-live-calibration-provider-run-37088681223.yaml
-    satisfies: [A12-R02]
+    satisfies: [A12-R02, A20-R02]
     test_level: TL4
     methods: [EM-12]
     oracle_class: O4
@@ -1689,6 +1689,7 @@ evidence:
       - Both accepted blinded runs resolved to gpt-6-luna under provider-auto and were 14/14 with zero FP/FN and STABLE verdicts; no cross-model claim is made.
       - Harness proves expert-label withholding and request/runtime binding, while evaluator independence remains explicitly UNVERIFIED.
       - Historical current-surface run 37071325425 remains negative pre-fix evidence and is not treated as superseded proof.
+      - The same current calibration evidence satisfies A20-R02 because that requirement asks for the deployed evaluator's expert-labelled FP/FN and repeated-run stability, not a distinct execution.
 
 
 
