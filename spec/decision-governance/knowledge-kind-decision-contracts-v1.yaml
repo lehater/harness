@@ -68,6 +68,31 @@ contracts:
         material_dimensions: [snapshot-vs-live, staleness-policy, continuation-token]
         challenge_strategies: [recompute-vs-materialize, stale-vs-refresh, continuation-token-perturbation]
 
+  - knowledge_kind: application-process-design
+    required: true
+    minimum_exploration: EXPLORE
+    axes:
+      - id: occurrence-boundary
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [scope, entry, occurrence-identity, completion-boundary]
+        challenge_strategies: [narrow-vs-widen-scope, merge-vs-split-occurrence, entry-boundary-perturbation]
+      - id: composition
+        delegation_requires: BROAD
+        minimum_probes: 2
+        material_dimensions: [ordering, choice, concurrency, decomposition]
+        challenge_strategies: [reorder-constraints, imperative-vs-declarative, split-vs-compose]
+      - id: continuation
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [wait-condition, continuation-identity, correlation-semantics]
+        challenge_strategies: [wait-vs-no-wait, continuation-identity-perturbation, correlation-boundary-shift]
+      - id: completion-recovery
+        delegation_requires: MAXIMUM
+        minimum_probes: 2
+        material_dimensions: [completion-outcomes, cancellation, recovery, compensation]
+        challenge_strategies: [completion-outcome-perturbation, recover-vs-terminate, compensate-vs-no-compensation]
+
   - knowledge_kind: system-architecture
     required: true
     minimum_exploration: EXPLORE
