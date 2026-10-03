@@ -856,7 +856,7 @@ the operation/owner responsible for creating it.
 **Status:** IMPLEMENTED
 
 **Execution surface:** `spec/behavioral-evals/tl4-existing-project/cases/td-qst-001`.
-Provider-backed run `37085699975` executed three independent clean-context
+Provider-backed run `37088500583` executed three independent clean-context
 calls; all three matched the frozen bootstrap-realization oracle.
 
 Fixture:
@@ -1062,7 +1062,7 @@ exists to keep it in the canonical assurance denominator.
 **Oracle:** O1/O4  
 **Status:** IMPLEMENTED
 
-**Execution surface:** reuses `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`; current run `37087748183` passed all three clean contexts.
+**Execution surface:** reuses `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`; current run `37088828742` passed all three clean contexts.
 
 Fixture:
 
@@ -1274,7 +1274,7 @@ The exact unresolved obligation stays visible and prevents completion.
 **Oracle:** O1/O4  
 **Status:** IMPLEMENTED
 
-Current TL4 run `37087748183` passed all three clean-context executions.
+Current TL4 run `37088828742` passed all three clean-context executions.
 
 
 **TL4 execution design:** `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`
@@ -1331,7 +1331,7 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-Current first-wave run `37087746930` passed TD-BOOT-E02 and this E05 mutation against the same frozen oracle.
+Current first-wave run `37088827181` passed TD-BOOT-E02 and this E05 mutation against the same frozen oracle.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies a reviewed profile plus a project-owned accepted graph. The provider must project the graph's canonical sources/dependency edge into Core; target-state evaluation is deterministic.
 

@@ -42,3 +42,9 @@ routes:
     exposure: internal
     invoked_by:
       - human-documentation-projection
+
+  - operation: data-model-dbml
+    skill: skills/agent/data-model-dbml/SKILL.md
+    exposure: internal
+    invoked_by:
+      - human-documentation-projection

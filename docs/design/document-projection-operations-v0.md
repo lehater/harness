@@ -108,6 +108,14 @@ and Skill Surface Registry. It is invoked through the normal typed
 `skill_router` with an authorized parent operation, normally
 `human-documentation-projection`.
 
+Renderer identity is not projection-instance identity. A plan section may carry
+an explicit `scope` owned by the projection responsibility, and the same
+renderer operation may be invoked multiple times for independent scopes. For
+example, separate persistence ownership boundaries may each invoke
+`data-model-dbml` and produce distinct generated outputs. Scope metadata is
+carried by the existing Human Projection recipe/plan; it does not create a new
+router, source registry or Core concept.
+
 Do not introduce a new route class for projections until multiple implemented
 consumers demonstrate that internal operations cannot express the required
 contract without distortion.

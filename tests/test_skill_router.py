@@ -127,6 +127,34 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     _assert_instruction_contract(structurizr, root)
 
     _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="data-model-dbml",
+            root=root,
+        ),
+        "requires invoked_by parent operation",
+    )
+    _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="data-model-dbml",
+            root=root,
+            invoked_by="project-engineering-status",
+        ),
+        "not authorized",
+    )
+    dbml = route_operation(
+        surface="consumer",
+        operation="data-model-dbml",
+        root=root,
+        invoked_by="human-documentation-projection",
+    )
+    assert dbml["skill"] == "skills/agent/data-model-dbml/SKILL.md"
+    assert dbml["exposure"] == "internal"
+    assert dbml["invoked_by"] == "human-documentation-projection"
+    _assert_instruction_contract(dbml, root)
+
+    _expect_error(
         lambda: route_artifact(knowledge_kind="change-transition-design", root=root),
         "no artifact skill registered",
     )

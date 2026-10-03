@@ -1,0 +1,60 @@
+version: 1
+kind: harness-dbml-data-model-profile
+id: DBML-DATA-MODEL-V1
+projection: data-model-dbml
+
+scope:
+  id_pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+
+output:
+  dbml: docs/generated/data/{scope-id}/model.dbml
+  provenance: docs/generated/data/{scope-id}/model.dbml.provenance.yaml
+
+dbml:
+  identifier_pattern: "^[A-Za-z_][A-Za-z0-9_]*$"
+  table_ordering: declaration
+  column_ordering: declaration
+  relationship_representation: "Ref: <fk-table>.<fk-column> > <referenced-table>.<referenced-column>"
+  enum_policy: explicit-canonical-only
+  required_header:
+    - "// GENERATED PROJECTION"
+    - "// NOT A SOURCE OF TRUTH"
+  allowed_column_settings:
+    - pk
+    - not null
+    - unique
+  allowed_constraint_settings:
+    - pk
+    - unique
+  allow_inline_ref: false
+  allow_notes: false
+  allow_defaults: false
+  allow_column_type_arguments: false
+  allow_non_unique_indexes: false
+  basic_data_types:
+    - int
+    - integer
+    - bigint
+    - smallint
+    - uuid
+    - varchar
+    - text
+    - boolean
+    - decimal
+    - numeric
+    - float
+    - double
+    - date
+    - datetime
+    - timestamp
+    - timestamptz
+    - json
+    - jsonb
+    - blob
+    - bytea
+
+validation:
+  require_output_under: docs/generated/
+  require_unique_names: true
+  require_reference_endpoints: true
+  require_reference_target_key: true

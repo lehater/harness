@@ -215,6 +215,58 @@ def main() -> int:
     assert structurizr_section["renderer"] == "architecture-c4-structurizr"
     assert structurizr_section["sources"] == ["ARCHITECTURE"]
 
+    dbml_recipe = {
+        "version": 1,
+        "kind": "harness-human-projection",
+        "id": "data-model-review",
+        "consumer": "BACKEND-IMPLEMENTATION",
+        "documents": [
+            {
+                "id": "orders-data",
+                "title": "Orders Data",
+                "sections": [
+                    {
+                        "id": "dbml",
+                        "renderer": "data-model-dbml",
+                        "scope": "orders",
+                        "select": {"artifacts": ["IMPLEMENTATION-DESIGN"]},
+                    }
+                ],
+            },
+            {
+                "id": "billing-data",
+                "title": "Billing Data",
+                "sections": [
+                    {
+                        "id": "dbml",
+                        "renderer": "data-model-dbml",
+                        "scope": "billing",
+                        "select": {"artifacts": ["IMPLEMENTATION-DESIGN"]},
+                    }
+                ],
+            },
+        ],
+    }
+    dbml_plan = validate_recipe(dbml_recipe, manifest)
+    dbml_sections = [
+        document["sections"][0] for document in dbml_plan["documents"]
+    ]
+    assert [(section["renderer"], section["scope"]) for section in dbml_sections] == [
+        ("data-model-dbml", "orders"),
+        ("data-model-dbml", "billing"),
+    ]
+    assert all(
+        section["sources"] == ["IMPLEMENTATION-DESIGN"]
+        for section in dbml_sections
+    )
+
+    bad_scope_recipe = copy.deepcopy(dbml_recipe)
+    bad_scope_recipe["documents"][0]["sections"][0]["scope"] = []
+    expect_error(
+        lambda: validate_recipe(bad_scope_recipe, manifest),
+        "scope must be a non-empty string",
+    )
+
     bad_renderer_recipe = copy.deepcopy(structurizr_recipe)
     bad_renderer_recipe["documents"][0]["sections"][0]["renderer"] = []
     expect_error(

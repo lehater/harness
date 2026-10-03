@@ -89,7 +89,7 @@ calls passed their frozen semantic oracles. TD-COMP-003 selected
 instruction-like project data; TD-BOOT-E06 converged on the same normalized Core
 realization and BLOCKED Target State in all three runs.
 
-Provider-backed TL4 run `37085699975` added TD-QST-001 to the same campaign.
+Provider-backed TL4 run `37088500583` added TD-QST-001 to the same campaign.
 All three clean-context TD-QST-001 calls passed. Provider-auto resolved all three
 to `mai-code-1.1-flash`; each normalized result contained exactly one
 REFUND-DESIGN Question blocking only `refund.window-policy`, while the related
@@ -151,7 +151,7 @@ content routing. HA-A12 satisfies A12-R01 through deterministic
 semantic derivation/admission evidence; A12-R02 remains missing because the
 current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A13 satisfies A13-R01/A13-R02 through deterministic
 Question routing, blocking, resolution-identity and stale-snapshot evidence, and
-A13-R03 through provider run `37085699975`: TD-QST-001 passed three independent
+A13-R03 through provider run `37088500583`: TD-QST-001 passed three independent
 clean-context executions, preserving exactly one semantic blocker while a
 related transient repository-scan timeout remained process evidence only. HA-A14 satisfies A14-R01 through selective
 prerequisite/policy currentness and replay fail-closed evidence, A14-R02 through
@@ -429,9 +429,9 @@ that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
 minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
 HA-A11 is SATISFIED. A11-R01 reuses deterministic source-set, lossless boundary
-and statement-disposition evidence. Current first-wave run `37087746930`
+and statement-disposition evidence. Current first-wave run `37088827181`
 passed TD-BOOT-E02 and its unrelated/untrusted-subtree mutation TD-BOOT-E05
-against the same oracle. Current TL4 run `37087748183` passed TD-BOOT-E06
+against the same oracle. Current TL4 run `37088828742` passed TD-BOOT-E06
 three times and TD-COMP-003 three times; hostile project content never changed
 the public route or selected project boundary.
 

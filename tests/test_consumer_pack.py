@@ -42,6 +42,7 @@ REPRESENTATIVE_MODULES = (
     "harness.integration.adapters.canonical_graph",
     "harness.workspace.workspace",
     "harness.workspace.structurizr_projection",
+    "harness.workspace.dbml_projection",
     "harness.evidence.source_coverage",
     "harness.application.project_frontier",
 )
@@ -216,10 +217,19 @@ def main() -> int:
             pack / "src/harness/workspace/structurizr_projection.py"
         ).is_file()
         assert (
+            pack / "src/harness/workspace/dbml_projection.py"
+        ).is_file()
+        assert (
             pack / "skills/agent/architecture-c4-structurizr/SKILL.md"
         ).is_file()
         assert (
+            pack / "skills/agent/data-model-dbml/SKILL.md"
+        ).is_file()
+        assert (
             pack / "spec/projection/structurizr-c4-v1.yaml"
+        ).is_file()
+        assert (
+            pack / "spec/projection/dbml-data-model-v1.yaml"
         ).is_file()
         assert not (pack / "adapters").exists()
 
