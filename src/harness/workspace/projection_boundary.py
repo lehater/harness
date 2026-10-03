@@ -49,15 +49,10 @@ def _manifest_source_index(
         if artifact in result:
             raise CoreError(f"duplicate human projection source: {artifact}")
 
-        path = repository_relative_path(
+        repository_relative_path(
             row.get("path"),
             f"canonical source path for {artifact}",
         )
-        if path == GENERATED_ROOT or path.startswith(GENERATED_ROOT + "/"):
-            raise CoreError(
-                f"{projection_label} forbids generated source artifact "
-                f"{artifact}: {path}"
-            )
 
         sha = row.get("sha256")
         if sha is not None and (
@@ -156,7 +151,16 @@ def bind_projection_sources(
     sources: list[dict[str, Any]] = []
     for artifact in source_ids:
         row = source_index[artifact]
-        source = {"artifact": artifact, "path": row["path"]}
+        path = repository_relative_path(
+            row["path"],
+            f"canonical source path for {artifact}",
+        )
+        if path == GENERATED_ROOT or path.startswith(GENERATED_ROOT + "/"):
+            raise CoreError(
+                f"{projection_label} forbids generated source artifact "
+                f"{artifact}: {path}"
+            )
+        source = {"artifact": artifact, "path": path}
         if "sha256" in row:
             source["sha256"] = row["sha256"]
         sources.append(source)
