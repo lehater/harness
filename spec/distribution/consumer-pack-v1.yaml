@@ -95,6 +95,7 @@ exact_files:
   - src/harness/application/semantic_questions.py
   - src/harness/application/skill_invariant_policy.py
   - src/harness/application/skill_router.py
+  - src/harness/application/ui_design_convergence.py
 
 generated_files:
   surface_registry: skills/skill-surface-registry-v0.yaml
