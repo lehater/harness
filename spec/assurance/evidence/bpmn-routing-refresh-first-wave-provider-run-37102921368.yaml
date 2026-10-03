@@ -72,7 +72,7 @@ cases:
   fixture: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
   oracle: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
   case_sha256: 1595aef4c1d7f397b7ffa4db166eb90447623f8754697b7dafdd9610aa2bca5d
-  fixture_sha256: 1fdf37e34c1785c731c81175176e0dc002bd154bb389a7852b3650033964e8cf5
+  fixture_sha256: 1fdf37e34c1785c7318f46a7271bcd7fac9ff1c1ee6189e6e2efaacb48d4bbd5
   oracle_sha256: 4dd9d5627e55bc53d967ab31afc0349945e98c944548b4e377977ceba75c85f4
   runs:
   - {run_id: TD-COMP-001-R01-6bb6b39ba7fe, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9424, output_tokens: 162, provider_prompt_utf8_bytes: 33173, record_sha256: 34daa9c17a376c8be7807f97db6eded2e06d05af3150b05d2cb8fffedd8f241c, started_from_clean_context: true}
