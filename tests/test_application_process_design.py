@@ -185,7 +185,9 @@ def process_graph(*, hidden_source: bool = False) -> dict:
                 "requires": ["demo.application-process"],
             }
         ],
-        "terminal_capabilities": [],
+        "terminal_capabilities": (
+            ["demo.hidden-application"] if hidden_source else []
+        ),
     }
 
 
