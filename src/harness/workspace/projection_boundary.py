@@ -146,16 +146,18 @@ def bind_projection_sources(
     sources: list[dict[str, Any]] = []
     for artifact in source_ids:
         row = source_index[artifact]
-        path = repository_relative_path(
+        normalized_path = repository_relative_path(
             row["path"],
             f"canonical source path for {artifact}",
         )
-        if path == GENERATED_ROOT or path.startswith(GENERATED_ROOT + "/"):
+        if normalized_path == GENERATED_ROOT or normalized_path.startswith(
+            GENERATED_ROOT + "/"
+        ):
             raise CoreError(
                 f"{projection_label} forbids generated source artifact "
-                f"{artifact}: {path}"
+                f"{artifact}: {normalized_path}"
             )
-        source = {"artifact": artifact, "path": path}
+        source = {"artifact": artifact, "path": row["path"]}
         if "sha256" in row:
             source["sha256"] = row["sha256"]
         sources.append(source)
