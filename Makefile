@@ -2,11 +2,6 @@
 
 harness-check:
 	python checks/validate_ci_policy.py
-	python tests/test_application_process_bpmn_projection.py
-	python checks/validate_agent_layer.py
-	python checks/validate_instruction_ownership.py
-	python tests/test_skill_router.py
-	python tests/test_consumer_pack.py
 	python checks/validate_assurance_registry.py
 	python checks/validate_cross_project_portability.py
 	python tests/test_behavioral_eval.py
@@ -28,6 +23,9 @@ harness-check:
 	python tests/test_project_status_e2e.py
 	python tests/test_agent_router.py
 	python tests/test_workspace.py
+	python checks/validate_agent_layer.py
+	python checks/validate_instruction_ownership.py
+	python tests/test_skill_router.py
 	python tests/test_fresh_context_routing.py
 	python tests/test_method_router.py
 	python tests/test_source_coverage.py
@@ -39,6 +37,7 @@ harness-check:
 	python tests/test_human_projection.py
 	python tests/test_structurizr_projection.py
 	python tests/test_dbml_projection.py
+	python tests/test_application_process_bpmn_projection.py
 	python tests/test_coverage_map_experiment.py
 	python tests/test_coverage_derivation_experiment.py
 	python tests/test_coverage_planner_experiment.py
@@ -73,6 +72,7 @@ harness-check:
 	python tests/test_semantic_closure.py
 	python checks/validate_harness.py
 	python -m unittest tests/test_lifecycle_experiment.py
+	python tests/test_consumer_pack.py
 	python tests/test_consumer_wrapper.py
 	python tests/test_scenario_suite.py
 	python tests/test_live_calibration_process_driver.py
