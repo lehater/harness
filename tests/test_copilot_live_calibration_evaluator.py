@@ -180,6 +180,18 @@ stable = evaluate_live_calibration_stability(
 )
 assert stable["status"] == "STABLE", stable
 
+missing_runtime_first = copy.deepcopy(first_eval)
+missing_runtime_second = copy.deepcopy(second_eval)
+missing_runtime_first["execution"] = {}
+missing_runtime_second["execution"] = {}
+missing_runtime = evaluate_live_calibration_stability(
+    evaluations=[missing_runtime_first, missing_runtime_second]
+)
+assert missing_runtime["status"] == "INVALID", missing_runtime
+assert missing_runtime["findings"][0]["code"] == (
+    "LIVE_CALIBRATION_SERIES_RUNTIME_BINDING_MISSING"
+), missing_runtime
+
 changed_runtime = copy.deepcopy(second_eval)
 changed_runtime["execution"]["provider_provenance"]["resolved_model"] = (
     "provider-model-b"

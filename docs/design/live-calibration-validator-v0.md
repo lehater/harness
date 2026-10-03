@@ -152,8 +152,11 @@ distinct run ids and pass the resulting evaluations to
 `evaluate_live_calibration_stability`.
 
 The stability evaluator requires identical corpus, protocol and evaluator
-fingerprints. It reports `STABLE` or `UNSTABLE` and the disagreeing cases.
-It deliberately does not perform consensus voting or alter scorer metrics.
+fingerprints plus a complete observed provider/requested-model/resolved-model/
+resolved-model-source/CLI-version runtime binding for every scorable run.
+Missing or changed runtime binding is `INVALID`; only fully bound runs may
+produce `STABLE` or `UNSTABLE`. It deliberately does not perform consensus
+voting or alter scorer metrics.
 
 
 ## Reference external-process adapter

@@ -1225,7 +1225,7 @@ evidence:
     limitations:
       - Malformed, incomplete, duplicate, unknown-case and invalid-verdict responses fail closed before semantic acceptance.
       - Corpus/protocol/evaluator/run identity, process adapter bytes and timeout are fingerprinted into the request boundary.
-      - Repeated-run stability now rejects a changed observed provider/resolved-model/CLI runtime binding even when requested model policy remains provider-auto.
+      - Repeated-run stability rejects missing, incomplete, or changed observed provider/resolved-model/CLI runtime binding even when requested model policy remains provider-auto.
       - This evidence validates the assurance boundary; it does not establish semantic accuracy for the current provider configuration.
 
   - id: EVID-A20-CLAIM-SCOPE
