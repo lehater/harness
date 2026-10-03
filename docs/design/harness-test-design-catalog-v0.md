@@ -118,7 +118,7 @@ failure boundary with a compatible oracle.
 | SF-11 Projection/distribution | PARTIAL/IMPLEMENTED | Consumer Pack closure strong; broader projection and upgrade compatibility have narrower gaps |
 | SF-12 CI/assurance meta | CI IMPLEMENTED; assurance READY | CI policy exists; independent Ability denominator has not been implemented |
 | SF-13 Evaluator assurance | Mostly IMPLEMENTED/PARTIAL | Binding/calibration exist; repeated provider stability and drift/representativeness remain incomplete |
-| SF-14 Real projects/holdouts | PARTIAL/BLOCKED | Known real evidence exists; independent whole-Harness holdout does not |
+| SF-14 Real projects/holdouts | IMPLEMENTED/POLICY | TL5 direct/adapter equivalence plus an independent TL6/O3 plugin-framework holdout are executable; failure disposition remains policy |
 
 ### Smallest future implementation batch
 
@@ -2286,7 +2286,7 @@ Evidence explicitly records oracle provenance/independence limits.
 **Methods:** EM-10  
 **Minimum level:** TL5  
 **Oracle:** O2  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
 
 Use a pinned known project that directly declares Harness logical inputs.
 
@@ -2295,6 +2295,11 @@ Purpose:
 System/regression evidence only after responsible lower-level mechanisms are
 green.
 
+**Evidence:** `spec/portability/tl5-napms-mode-equivalence-v1.yaml` and
+`checks/validate_cross_project_portability.py`. The accepted NAPMS slice is
+executed as a direct Core declaration and compared with the adapter-projection
+mode below against the same O2 project oracle.
+
 ## TD-REAL-002 — Known adapter-projection regression
 
 **Abilities:** HA-A21, HA-A17  
@@ -2302,7 +2307,7 @@ green.
 **Methods:** EM-10  
 **Minimum level:** TL5  
 **Oracle:** O2  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
 
 Use a pinned known project whose project-owned adapter projects Harness inputs.
 
@@ -2311,6 +2316,11 @@ Expected result:
 Same generic Harness semantics as direct declaration; no project branch inside
 generic evaluator.
 
+**Evidence:** the same NAPMS TL5/O2 fixture projects accepted project-owned
+canonical graph/projection truth through
+`harness.integration.adapters.canonical_graph` and requires exact agreement of
+generic Core observations with the direct-declaration mode.
+
 ## TD-REAL-003 — Independent project-shape holdout
 
 **Abilities:** HA-A21, selected judgement abilities  
@@ -2318,7 +2328,7 @@ generic evaluator.
 **Methods:** EM-11  
 **Minimum level:** TL6  
 **Oracle:** O3  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED
 
 Selection rule:
 
@@ -2332,6 +2342,14 @@ normalization before execution.
 Expected result:
 
 Generic Harness contract succeeds without changing generic semantics.
+
+**Evidence:** `spec/portability/tl6-pluggy-independent-holdout-v1.yaml` freezes
+`pytest-dev/pluggy` revision
+`7aa82ed6543db40a0c44b68e933c5ae630bce6ab`, six upstream oracle/source
+blob identities, the plugin-framework failure shape, and an O3 expected semantic
+observation. `checks/validate_cross_project_portability.py` runs the same
+generic adapter/Core path and also rejects executable coupling to the holdout
+repository identity.
 
 ## TD-REAL-004 — Holdout failure is diagnostic, not auto-fix authority
 

@@ -1313,6 +1313,50 @@ evidence:
       - Establishes deterministic correctness for depth 1200, fan-out 512, and lifecycle cardinality 2000 only.
       - Synthetic scale evidence does not substitute for a materially different independent project-shape holdout.
 
+  - id: EVID-A21-TL5-MODE-EQUIVALENCE
+    providers:
+      - checks/validate_cross_project_portability.py
+      - src/harness/integration/adapters/canonical_graph.py
+      - src/harness/project_model/core.py
+    source_refs:
+      - path: spec/portability/tl5-napms-mode-equivalence-v1.yaml
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+      - path: checks/validate_cross_project_portability.py
+    satisfies: [A21-R03]
+    test_level: TL5
+    methods: [EM-10]
+    oracle_class: O2
+    execution_nature: deterministic
+    source_type: known-project
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Uses accepted NAPMS project truth at immutable revision 42481577fab7f795cf3a2118b7b6f1c3c075d066.
+      - Proves direct-declaration and project-owned canonical-graph adapter projection produce the same generic Core ownership/provider/dependency/question semantics for the frozen slice.
+      - NAPMS participated in Harness design, so this evidence is known-project regression only and does not satisfy A21-R04.
+
+  - id: EVID-A21-TL6-PLUGGY-HOLDOUT
+    providers:
+      - checks/validate_cross_project_portability.py
+      - src/harness/integration/adapters/canonical_graph.py
+      - src/harness/project_model/core.py
+    source_refs:
+      - path: spec/portability/tl6-pluggy-independent-holdout-v1.yaml
+      - path: checks/validate_cross_project_portability.py
+    satisfies: [A21-R04]
+    test_level: TL6
+    methods: [EM-11]
+    oracle_class: O3
+    execution_nature: deterministic
+    source_type: independent-holdout
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - The holdout is pytest-dev/pluggy at immutable revision 7aa82ed6543db40a0c44b68e933c5ae630bce6ab, absent from Harness current/history before holdout selection.
+      - The frozen O3 oracle binds upstream docs/code blobs and a plugin-framework topology materially different from the NAPMS document/requirements pipeline.
+      - Proves the selected independent plugin-framework slice only; it is not a claim that every possible project shape is portable.
+
   - id: EVID-A20-LIVE-BOUNDARY
     providers:
       - tests/test_copilot_live_calibration_evaluator.py
