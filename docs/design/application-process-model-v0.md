@@ -394,6 +394,42 @@ This contract does not introduce:
 - task/project-management workflow;
 - Harness agent-operation sequencing as project behavior.
 
+## Validation evidence
+
+A real-project thin slice was executed against
+`lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066` in draft PR #202.
+
+The slice added one canonical provider:
+
+```text
+engineering.application.process.policy-export
+authority: APPLICATION-JOURNEY-DESIGN
+knowledge_kind: application-design
+```
+
+The provider composes accepted Product Requirements, application journey /
+materialization, Task Model and User Journey knowledge into an explicit bounded
+process contract. `SYSTEM-RULES` then consumes that process Capability directly
+instead of depending directly on the broad application-journey Capability for
+process reconstruction.
+
+Deterministic project checks establish that:
+
+- the new Capability remains under the existing application Authority;
+- the existing `application-design` route is sufficient;
+- process-instance boundary, causal relations, completion and explicit
+  NOT_APPLICABLE dimensions are independently addressable;
+- the downstream System Architecture contract can depend on the process
+  Capability directly;
+- NAPMS Harness integration, Engineering Coverage, design and architecture
+  checks remain green.
+
+This evidence supports an independently addressable process Capability but does
+not demonstrate a distinct production procedure, acceptance lifecycle or owner.
+It therefore strengthens the case **against** introducing
+`PROCESS-DESIGN`, a new Core concept or a routed
+`application-process-design` knowledge kind at this stage.
+
 ## Adoption sequence
 
 Use the smallest evidence-driven path:
