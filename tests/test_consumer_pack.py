@@ -41,6 +41,7 @@ REPRESENTATIVE_MODULES = (
     "harness.project_model.engineering_graph",
     "harness.integration.adapters.canonical_graph",
     "harness.workspace.workspace",
+    "harness.workspace.structurizr_projection",
     "harness.evidence.source_coverage",
     "harness.application.project_frontier",
 )
@@ -211,6 +212,15 @@ def main() -> int:
         assert not list(pack.glob("*.py"))
         assert (pack / "src/harness/application/skill_router.py").is_file()
         assert (pack / "src/harness/application/scenario_suite.py").is_file()
+        assert (
+            pack / "src/harness/workspace/structurizr_projection.py"
+        ).is_file()
+        assert (
+            pack / "skills/agent/architecture-c4-structurizr/SKILL.md"
+        ).is_file()
+        assert (
+            pack / "spec/projection/structurizr-c4-v1.yaml"
+        ).is_file()
         assert not (pack / "adapters").exists()
 
         run_pack_acceptance(pack, python)

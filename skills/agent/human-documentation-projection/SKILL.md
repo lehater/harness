@@ -33,17 +33,40 @@ A missing fact is omitted or reported as unresolved. It is never recovered from 
 
 ## Procedure
 
-1. Read the section purpose and exact allowed source list.
-2. Extract the smallest set of substantive statements needed for the human audience.
-3. Preserve accepted distinctions, negative constraints, scope limits and failure semantics.
-4. Prefer one claim per independently traceable assertion; combine claims only when the same source set supports them.
-5. Attach every substantive claim to one or more allowed CanonicalArtifact IDs.
-6. If sources disagree materially, create a conflict/incomplete note; do not select a winner.
-7. If a Question/gap affects the section, state the gap explicitly and avoid completing the missing semantics.
-8. Keep implementation detail out unless the section's allowed sources own it.
-9. Produce projection IR first.
-10. Validate the IR against the compiled plan.
-11. Render Markdown from validated IR.
+1. Inspect each planned section's `renderer`.
+2. For `renderer: narrative`, follow the narrative path below using only that
+   section's allowed source list.
+3. For any non-narrative renderer, treat the renderer value as a semantic
+   internal Consumer operation id. The coordinator must resolve it through
+   `harness.application.skill_router` with
+   `invoked_by=human-documentation-projection`; never open another
+   `SKILL.md` by filesystem path.
+4. The first specialized slice is
+   `architecture-c4-structurizr`. A specialized document must contain exactly
+   one specialized section in v1; do not mix narrative and specialized sections
+   inside one output document until a later accepted contract defines that
+   composition.
+5. Supply the internal projection operation only the current manifest, plan,
+   document/section identity and its exact source-bounded inputs. The internal
+   operation owns transformation/format validation, not source discovery.
+6. Do not create narrative projection IR for a specialized section. If the
+   generated asset is included in a REVIEW/HANDOFF package, reuse the existing
+   visual-asset provenance/package boundary rather than creating a second
+   packaging model.
+
+For each narrative section:
+
+7. Read the section purpose and exact allowed source list.
+8. Extract the smallest set of substantive statements needed for the human audience.
+9. Preserve accepted distinctions, negative constraints, scope limits and failure semantics.
+10. Prefer one claim per independently traceable assertion; combine claims only when the same source set supports them.
+11. Attach every substantive claim to one or more allowed CanonicalArtifact IDs.
+12. If sources disagree materially, create a conflict/incomplete note; do not select a winner.
+13. If a Question/gap affects the section, state the gap explicitly and avoid completing the missing semantics.
+14. Keep implementation detail out unless the section's allowed sources own it.
+15. Produce projection IR first.
+16. Validate the IR against the compiled plan.
+17. Render Markdown from validated IR.
 
 ## Output contract
 

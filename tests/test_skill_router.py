@@ -97,6 +97,36 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     _assert_instruction_contract(internal, root)
 
     _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="architecture-c4-structurizr",
+            root=root,
+        ),
+        "requires invoked_by parent operation",
+    )
+    _expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="architecture-c4-structurizr",
+            root=root,
+            invoked_by="project-engineering-status",
+        ),
+        "not authorized",
+    )
+    structurizr = route_operation(
+        surface="consumer",
+        operation="architecture-c4-structurizr",
+        root=root,
+        invoked_by="human-documentation-projection",
+    )
+    assert structurizr["skill"] == (
+        "skills/agent/architecture-c4-structurizr/SKILL.md"
+    )
+    assert structurizr["exposure"] == "internal"
+    assert structurizr["invoked_by"] == "human-documentation-projection"
+    _assert_instruction_contract(structurizr, root)
+
+    _expect_error(
         lambda: route_artifact(knowledge_kind="change-transition-design", root=root),
         "no artifact skill registered",
     )

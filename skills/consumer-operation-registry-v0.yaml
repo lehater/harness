@@ -36,3 +36,9 @@ routes:
     exposure: internal
     invoked_by:
       - project-bootstrap-reconcile
+
+  - operation: architecture-c4-structurizr
+    skill: skills/agent/architecture-c4-structurizr/SKILL.md
+    exposure: internal
+    invoked_by:
+      - human-documentation-projection

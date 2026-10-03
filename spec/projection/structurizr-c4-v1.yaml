@@ -1,0 +1,32 @@
+version: 1
+kind: harness-structurizr-c4-profile
+id: STRUCTURIZR-C4-V1
+projection: architecture-c4-structurizr
+
+output:
+  dsl: docs/generated/architecture/workspace.dsl
+  provenance: docs/generated/architecture/workspace.dsl.provenance.yaml
+
+dsl:
+  identifiers: hierarchical
+  implied_relationships: false
+  auto_layout: lr
+  require_explicit_view_keys: true
+  require_include_wildcard: true
+  allow_styles: false
+  allowed_directives:
+    - "!identifiers"
+    - "!impliedRelationships"
+
+semantics:
+  supported_elements:
+    - person
+    - softwareSystem
+    - container
+    - component
+  supported_views:
+    - systemContext
+    - container
+    - component
+  relationship_policy: explicit-canonical-only
+  component_policy: emit-only-when-explicitly-supported-by-selected-canonical-sources
