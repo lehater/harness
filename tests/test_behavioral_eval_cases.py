@@ -21,6 +21,16 @@ from evals.behavioral_eval import (
     normalize_result,
     score_result,
 )
+from evals.greenfield_bootstrap_eval import (
+    normalize_result as normalize_greenfield_result,
+    score_result as score_greenfield_result,
+)
+from evals.adapters.copilot_greenfield_bootstrap_eval_agent import (
+    _model_payload as _greenfield_model_payload,
+    _parse_model_response as _parse_greenfield_model_response,
+    _prompt as _greenfield_prompt,
+)
+
 from evals.adapters.copilot_behavioral_eval_agent import (
     _bootstrap_route_context,
     _model_payload,
@@ -1101,6 +1111,216 @@ print(
     f"execution_prompt_bound={target_prompt_bound}; "
     f"max_per_call={target_max_per_call}"
 )
+
+
+GREENFIELD_BASE = ROOT / "spec" / "behavioral-evals" / "greenfield-bootstrap"
+GREENFIELD_MANIFEST = yaml.safe_load(
+    (GREENFIELD_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+GREENFIELD_EXPECTED = {
+    "TD-BOOT-G01": ("TL3", 1, {"A10-F01", "A10-F02", "A10-F03", "A10-F04"}),
+    "TD-BOOT-G05": ("TL4", 3, {"A10-F05"}),
+}
+assert GREENFIELD_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+greenfield_entries = GREENFIELD_MANIFEST["cases"]
+assert {item["design"] for item in greenfield_entries} == set(GREENFIELD_EXPECTED)
+greenfield_budget = GREENFIELD_MANIFEST["provider_prompt_budget"]
+assert greenfield_budget["metric"] == "utf8_bytes"
+greenfield_max_per_call = greenfield_budget["max_per_call"]
+greenfield_max_suite = greenfield_budget["max_suite"]
+assert isinstance(greenfield_max_per_call, int) and greenfield_max_per_call > 0
+assert isinstance(greenfield_max_suite, int) and greenfield_max_suite >= 4 * greenfield_max_per_call
+
+greenfield_prompt_bound = 0
+greenfield_provider_calls = 0
+for entry in greenfield_entries:
+    template = GREENFIELD_BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-greenfield-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(
+            encoding="utf-8"
+        )
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        expected_level, runs, failures = GREENFIELD_EXPECTED[entry["design"]]
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["abilities"] == ["HA-A10"]
+        assert binding.case["test_level"] == expected_level
+        assert binding.case["normalization_profile"]["dimensions"] == [
+            "greenfield_bootstrap"
+        ]
+        assert binding.case["pass_criteria"]["require_dimensions"] == [
+            "greenfield_bootstrap"
+        ]
+        assert binding.case["run_plan"] == {
+            "runs": runs,
+            "all_runs_must_pass": True,
+        }
+        assert set(binding.case["failure_modes"]) == failures
+        assert entry["runs"] == runs
+        assert entry["dimension"] == "greenfield_bootstrap"
+
+        request = build_execution_request(
+            binding,
+            run_id=entry["design"] + "-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        payload = _greenfield_model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
+        trusted_paths = {item["path"] for item in payload["trusted_instructions"]}
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+        assert all("spec/behavioral-evals" not in path for path in trusted_paths)
+
+        prompt_bytes = len(_greenfield_prompt(request).encode("utf-8"))
+        assert prompt_bytes <= greenfield_max_per_call, (
+            entry["design"], prompt_bytes, greenfield_max_per_call
+        )
+        greenfield_prompt_bound += prompt_bytes * runs
+        greenfield_provider_calls += runs
+
+        expected = binding.oracle["dimensions"]["greenfield_bootstrap"]
+        provider_output = {
+            "capabilities": copy.deepcopy(expected["capabilities"]),
+            "questions": copy.deepcopy(expected["questions"]),
+        }
+        raw_response = json.dumps({
+            "version": 1,
+            "kind": "harness-agent-behavioral-model-response",
+            "output": {"greenfield_bootstrap": provider_output},
+        })
+        parsed = _parse_greenfield_model_response(raw_response)
+        normalized = normalize_greenfield_result(
+            binding,
+            {"run_status": "COMPLETED", **parsed},
+        )
+        scored = score_greenfield_result(binding, normalized)
+        assert scored["status"] == "PASS"
+        assert scored["dimensions"]["greenfield_bootstrap"]["status"] == "PASS"
+
+        atom_ids = {atom["id"] for atom in binding.fixture["atoms"]}
+        capability_atoms = {
+            atom
+            for capability in expected["capabilities"]
+            for atom in capability["support_atoms"]
+        }
+        question_atoms = {
+            atom
+            for question in expected["questions"]
+            for atom in question["support_atoms"]
+        }
+        assert capability_atoms | question_atoms <= atom_ids
+        assert {"D1", "D2"}.isdisjoint(capability_atoms | question_atoms)
+        assert expected["questions"] == [{
+            "support_atoms": ["U1"],
+            "blocks_atoms": ["K5"],
+        }]
+        frontier = {
+            tuple(item["support_atoms"]): item["disposition"]
+            for item in expected["frontier"]
+        }
+        assert frontier == {
+            ("K1",): "CREATE",
+            ("K2", "K3"): "CREATE",
+            ("K4",): "PENDING",
+            ("K5",): "PENDING",
+        }
+        assert "COMPLETE" not in frontier.values()
+
+        compatible = copy.deepcopy(provider_output)
+        compatible["questions"][0]["support_atoms"] = ["U1", "K5"]
+        compatible_normalized = normalize_greenfield_result(
+            binding,
+            {
+                "run_status": "COMPLETED",
+                "output": {"greenfield_bootstrap": compatible},
+            },
+        )
+        assert score_greenfield_result(
+            binding,
+            compatible_normalized,
+        )["status"] == "PASS"
+
+        missing_unresolved = copy.deepcopy(provider_output)
+        missing_unresolved["questions"][0]["support_atoms"] = ["K5"]
+        missing_normalized = normalize_greenfield_result(
+            binding,
+            {
+                "run_status": "COMPLETED",
+                "output": {"greenfield_bootstrap": missing_unresolved},
+            },
+        )
+        assert score_greenfield_result(
+            binding,
+            missing_normalized,
+        )["status"] == "FAIL"
+
+        unrelated_support = copy.deepcopy(provider_output)
+        unrelated_support["questions"][0]["support_atoms"] = ["U1", "D1"]
+        unrelated_normalized = normalize_greenfield_result(
+            binding,
+            {
+                "run_status": "COMPLETED",
+                "output": {"greenfield_bootstrap": unrelated_support},
+            },
+        )
+        assert score_greenfield_result(
+            binding,
+            unrelated_normalized,
+        )["status"] == "FAIL"
+
+        missing_prerequisite = copy.deepcopy(provider_output)
+        for capability in missing_prerequisite["capabilities"]:
+            if capability["support_atoms"] == ["K4"]:
+                capability["prerequisite_atoms"] = []
+        prerequisite_normalized = normalize_greenfield_result(
+            binding,
+            {
+                "run_status": "COMPLETED",
+                "output": {"greenfield_bootstrap": missing_prerequisite},
+            },
+        )
+        assert any(
+            item["support_atoms"] == ["K4"]
+            and item["disposition"] == "CREATE"
+            for item in prerequisite_normalized["greenfield_bootstrap"]["frontier"]
+        )
+        assert score_greenfield_result(
+            binding,
+            prerequisite_normalized,
+        )["status"] == "FAIL"
+
+assert greenfield_provider_calls == 4
+assert greenfield_prompt_bound <= greenfield_max_suite, (
+    greenfield_prompt_bound,
+    greenfield_max_suite,
+)
+print(
+    "Greenfield bootstrap campaign: PASS "
+    f"({len(greenfield_entries)} cases); provider_calls={greenfield_provider_calls}; "
+    f"execution_prompt_bound={greenfield_prompt_bound}; "
+    f"max_per_call={greenfield_max_per_call}"
+)
+
+GREENFIELD_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "greenfield-bootstrap-assurance.yml"
+)
+greenfield_workflow_text = GREENFIELD_WORKFLOW.read_text(encoding="utf-8")
+assert "ready_for_review" in greenfield_workflow_text
+assert "workflow_dispatch" in greenfield_workflow_text
+assert "spec/behavioral-evals/greenfield-bootstrap/**" in greenfield_workflow_text
+assert 'MODEL="auto"' in greenfield_workflow_text
+assert 'MODEL_SELECTION="provider-auto"' in greenfield_workflow_text
 
 CAMPAIGN_WORKFLOW = ROOT / ".github" / "workflows" / "assurance-campaign-copilot.yml"
 campaign_workflow_text = CAMPAIGN_WORKFLOW.read_text(encoding="utf-8")

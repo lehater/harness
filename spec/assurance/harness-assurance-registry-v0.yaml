@@ -1693,6 +1693,60 @@ evidence:
 
 
 
+  - id: EVID-A10-GREENFIELD-TL3-37100906328
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - docs/design/target-state-v0.md
+      - evals/greenfield_bootstrap_eval.py
+      - evals/adapters/copilot_greenfield_bootstrap_eval_agent.py
+      - .github/workflows/greenfield-bootstrap-assurance.yml
+    source_refs:
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/fixture.yaml}
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/oracle.yaml}
+      - {path: spec/assurance/evidence/a10-greenfield-bootstrap-provider-run-37100906328.yaml}
+    satisfies: [A10-R01, A10-R02]
+    test_level: TL3
+    methods: [EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a10-greenfield-bootstrap-provider-run-37100906328.yaml
+    case_ids: [TD-BOOT-G01]
+    status: verified
+    verified_at_revision: 54f17e45e869ec4bc5bc20f4896a18e713a1d956
+    limitations:
+      - One frozen synthetic greenfield goal proves minimal initial Capability/prerequisite/Question formation and the deterministic first frontier derived from that model.
+      - The provider does not re-judge deterministic frontier rules; Harness derives CREATE/PENDING/WAIT from the admitted formation semantics.
+      - This evidence does not establish cross-project portability or cross-model convergence.
+
+  - id: EVID-A10-GREENFIELD-TL4-37100906328
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - docs/design/target-state-v0.md
+      - evals/greenfield_bootstrap_eval.py
+      - evals/adapters/copilot_greenfield_bootstrap_eval_agent.py
+      - .github/workflows/greenfield-bootstrap-assurance.yml
+    source_refs:
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/fixture.yaml}
+      - {path: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/oracle.yaml}
+      - {path: spec/assurance/evidence/a10-greenfield-bootstrap-provider-run-37100906328.yaml}
+    satisfies: [A10-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a10-greenfield-bootstrap-provider-run-37100906328.yaml
+    case_ids: [TD-BOOT-G05]
+    status: verified
+    verified_at_revision: 54f17e45e869ec4bc5bc20f4896a18e713a1d956
+    limitations:
+      - Three independent clean-context calls on the same frozen goal all produced materially compatible normalized initial models and the same derived frontier.
+      - Provider-auto resolved all three selected TL4 calls to mai-code-1.1-flash; this is not a cross-model convergence claim.
+      - Bounded synthetic convergence only; HA-A21 owns cross-project portability.
+
   - id: EVID-A11-SOURCE-COMPLETENESS
     providers:
       - tests/test_source_coverage.py

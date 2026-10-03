@@ -153,6 +153,8 @@ contexts:
 ignored_modules:
   - evals.behavioral_eval
   - evals.adapters.copilot_behavioral_eval_agent
+  - evals.greenfield_bootstrap_eval
+  - evals.adapters.copilot_greenfield_bootstrap_eval_agent
   - experiments.authority_role_projection_experiment
   - experiments.concern_activation_experiment
   - experiments.coverage_control_loop_experiment

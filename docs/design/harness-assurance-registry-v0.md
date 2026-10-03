@@ -141,9 +141,15 @@ assessment preservation. HA-A08 satisfies A08-R01 through current bounded
 selection plus Reference-template/noise rejection, A08-R02 through the frozen
 TL3 project-shaped minimal-target case, and A08-R03 through three independent
 clean-context target-selection runs. HA-A09 satisfies A09-R01 (TL2), A09-R02 (TL3), A09-R03 (TL4), and
-A09-R04 (TL5); HA-A10 is explicitly INCOMPLETE with
-A10-R01/A10-R02 waiting on the blocked TD-BOOT-G01..G04 TL3 greenfield cases
-and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A11
+A09-R04 (TL5). HA-A10 satisfies A10-R01/A10-R02 through current provider run
+`37100906328`: composite TD-BOOT-G01 forms the minimal greenfield
+Capability/prerequisite/Question model while rejecting descriptive technology
+and future-idea noise, and Harness deterministically derives the safe first
+CREATE/PENDING frontier from that admitted model. A10-R03 is satisfied by
+TD-BOOT-G05 from the same frozen goal: all three independent clean-context runs
+passed with materially compatible normalized models/frontiers. The claim remains
+bounded to this synthetic greenfield fixture and does not establish HA-A21
+cross-project portability. HA-A11
 satisfies A11-R01 through deterministic source completeness, A11-R02 through
 current TD-BOOT-E02/E05 base-plus-noise selection, and A11-R03 through
 three-run TD-BOOT-E06 boundary convergence plus three-run TD-COMP-003 hostile
