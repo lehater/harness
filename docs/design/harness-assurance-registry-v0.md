@@ -1,6 +1,6 @@
 # Harness Assurance Registry Design v0
 
-Status: canonical assurance design; initial machine-readable seed implemented.
+Status: canonical assurance design; canonical HA-A01..HA-A21 denominator registered.
 
 ## Purpose
 
@@ -41,21 +41,18 @@ CI Policy
 The registry must not become a second independent semantic owner for ability
 definitions.
 
-## Implemented initial seed
+## Implemented canonical denominator
 
 The reviewed minimum implementation is:
 
 - `spec/assurance/harness-assurance-registry-v0.yaml` — machine-readable Ability -> requirement -> evidence seed;
 - `checks/validate_assurance_registry.py` — structural validation, admissibility/completeness report, and AR-M01..AR-M13 meta-self-tests.
 
-The seed is intentionally incomplete. It includes HA-A01 Core structural truth,
-HA-A02 Engineering Graph topology, HA-A03 Target-state action semantics,
-HA-A04 Authority formation, HA-A05 Capability formation, HA-A06 Engineering Coverage,
-HA-A07 Project Authority migration, HA-A08 Design target selection,
-HA-A09 existing-project
-bootstrap/reconcile, HA-A10 Greenfield bootstrap, HA-A11 Source acquisition/completeness,
-HA-A12 Semantic derivation/admission, HA-A13 Questions/blockers, HA-A14 Lifecycle/currentness, HA-A15 Frontier/publication, HA-A16 routing, HA-A17 Repository realization/projections, HA-A18 Consumer distribution/compatibility,
-HA-A19 assurance self-test obligations, and HA-A20 External semantic assurance. HA-A05 remains split
+The registry now includes the complete canonical HA-A01..HA-A21 Ability
+denominator. Proof completeness remains deliberately separate: registering an
+Ability does not make its requirements satisfied. HA-A21 Cross-project
+portability is registered with distinct runtime-neutrality, bounded-scale, TL5
+known-project mode-equivalence, and TL6 independent-holdout proof slots. HA-A05 remains split
 into separate TL1 discovery/granularity, TL3 Reference-vocabulary/novel-
 Capability, and TL4 clean-context convergence proof slots. HA-A09 now exposes
 separate TL2 controlled handoff, TL3 existing-project micro-project, TL4
@@ -144,7 +141,14 @@ request/response binding plus observed resolved-runtime binding, and A20-R03
 through explicit corpus-population limits and UNVERIFIED independence metadata.
 A20-R02 remains missing: current-surface provider run `37071325425` produced
 one false negative in its first scorable run and an INCOMPLETE malformed-envelope
-second run, so it cannot establish the required current FP/FN+stability proof. HA-A16 satisfies A16-R01..R06; and HA-A18
+second run, so it cannot establish the required current FP/FN+stability proof.
+HA-A21 satisfies A21-R01 through a source-derived known-project runtime-neutrality
+meta-check and A21-R02 through the explicit deep/broad/cardinality support
+envelope. A21-R03 remains missing because there is no current TL5 O2 pair proving
+both direct-declaration and adapter-projection modes against the same generic
+semantics; the historical NAPMS TD-BOOT-E07 run is stale and covers only one
+known project that participated in Harness design. A21-R04 remains missing
+because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
@@ -160,11 +164,11 @@ provider/runtime bindings. Adding another case to a suite does not by itself
 stale existing case evidence; shared provider/runtime semantics and trusted
 instructions actually used by selected cases do.
 
-Registry validity remains separate from release-claim completeness. Because the
-seed does not yet register every canonical HA-A01..HA-A21 ability, the report
-must expose `denominator_complete: false` plus the missing canonical ability
-identities, and `release_claim_ready` must remain false even if every currently
-registered seed requirement becomes satisfied.
+Registry validity remains separate from release-claim completeness. The
+canonical HA-A01..HA-A21 denominator is now fully registered, so the live report
+must expose `denominator_complete: true` with no missing canonical Ability IDs.
+`release_claim_ready` remains false while any release-critical requirement is
+missing; denominator completeness must never be interpreted as proof completeness.
 
 ## Core model
 

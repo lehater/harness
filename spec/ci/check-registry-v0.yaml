@@ -68,6 +68,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: cross_project_portability
+  command: python checks/validate_cross_project_portability.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: behavioral_eval
   command: python tests/test_behavioral_eval.py
   stage: focused

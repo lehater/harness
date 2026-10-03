@@ -2215,6 +2215,27 @@ A holdout failure produces a classified assurance finding. It does not
 automatically justify adding project-specific generic behavior; root cause must
 first be reproduced at the smallest feasible lower test level.
 
+## TD-REAL-005 — Generic runtime known-project neutrality
+
+**Abilities:** HA-A21  
+**Failure modes:** A21-F01  
+**Methods:** EM-13, EM-14  
+**Minimum level:** TL1  
+**Oracle:** O1  
+**Status:** IMPLEMENTED
+
+**Evidence:** `checks/validate_cross_project_portability.py`.
+
+The check derives known-project repository identities from registered TL5
+known-project fixtures and inspects executable AST under `src/harness/**`.
+Project names in comments/docstrings are non-executable and ignored.
+
+Expected result:
+
+No generic runtime branch, identifier, or executable string literal depends on a
+registered known-project identity. This is a bounded mechanically detectable
+neutrality proof, not a substitute for TL5/TL6 portability evidence.
+
 # Full ability coverage map
 
 Every canonical ability now has at least one designed evidence path.
@@ -2241,7 +2262,7 @@ Every canonical ability now has at least one designed evidence path.
 | HA-A18 | TD-DIST-001/002 |
 | HA-A19 | TD-CI-001..003, TD-ASSURE-001/002 |
 | HA-A20 | TD-SEM-006, TD-EVAL-001..006 |
-| HA-A21 | TD-LIFE-006, TD-REAL-001..004 |
+| HA-A21 | TD-LIFE-006, TD-REAL-001..005 |
 
 HA-A01 and portions of HA-A03/HA-A11 intentionally point to existing
 deterministic acceptance families rather than creating duplicate new design IDs.

@@ -3,6 +3,7 @@
 harness-check:
 	python checks/validate_ci_policy.py
 	python checks/validate_assurance_registry.py
+	python checks/validate_cross_project_portability.py
 	python tests/test_behavioral_eval.py
 	python tests/test_behavioral_eval_cases.py
 	python checks/validate_context_boundaries.py
