@@ -56,10 +56,12 @@ NAPMS supplied real-project semantic examples, but its pinned Harness revision
 is older than current Harness and therefore is not treated as current-runtime
 proof.
 
-A current-Harness Scenario Suite validation separately demonstrated that an
-independently addressable process Capability can use the existing
-`application-design` route and be consumed directly by System Architecture
-without introducing a new Authority, Core concept or knowledge kind.
+Initial current-Harness validation demonstrated that an independently
+addressable process Capability fits inside APPLICATION-DESIGN without a new
+Authority or Core concept. Integration work then established a dedicated
+`application-process-design` knowledge kind because Process v1 has a distinct
+production/decision/semantic-acceptance contract. The split is routing and
+acceptance specialization, not a new decision owner.
 
 A source-bounded BPMN experiment demonstrated that the process contract can
 drive a disposable projection while refusing to infer richer BPMN runtime
@@ -67,3 +69,24 @@ semantics.
 
 These experiments are evidence for the boundary, not part of the canonical
 contract.
+
+
+## Harness integration decision
+
+Process v1 is integrated through the existing Harness discovery and production
+pipeline:
+
+- Engineering Coverage exposes `application.process` with proof claim
+  `engineering.application.process`;
+- the application Authority role can produce that claim;
+- Design Profile forms a separate Process Capability when the contract has an
+  independent consumer/acceptance/revalidation boundary;
+- `application-process-design` routes the Capability to the Process producer;
+- semantic admission enforces mandatory boundary, referenced-work, composition
+  and completion assertions plus process-specific review checks;
+- Decision Governance explores occurrence boundary, composition,
+  continuation/correlation and completion/recovery;
+- Reference Engineering Model contains an optional `APPLICATION-PROCESS`
+  proposal keyed by explicit `application_process_material` project evidence.
+
+No Process Authority, Core Process entity or universal process DSL is introduced.
