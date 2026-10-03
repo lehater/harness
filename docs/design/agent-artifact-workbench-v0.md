@@ -131,6 +131,10 @@ Structural validation is necessary but not sufficient for semantic acceptance.
 ### Renderer
 
 A renderer creates disposable human-readable documentation from accepted managed knowledge.
+Specialized generated document/diagram projections that require their own
+procedure use the internal-operation mechanism defined by
+`docs/design/document-projection-operations-v0.md` while reusing Human
+Projection source boundaries and normal skill routing.
 
 Generated documentation is never an independent source of truth.
 
