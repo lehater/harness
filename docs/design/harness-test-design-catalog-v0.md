@@ -856,8 +856,9 @@ the operation/owner responsible for creating it.
 **Status:** IMPLEMENTED
 
 **Execution surface:** `spec/behavioral-evals/tl4-existing-project/cases/td-qst-001`.
-Provider-backed run `37088500583` executed three independent clean-context
-calls; all three matched the frozen bootstrap-realization oracle.
+Current run `37091191705` executed three independent clean-context calls on
+the clarified instruction surface; all three matched the frozen
+bootstrap-realization oracle.
 
 Fixture:
 
@@ -930,7 +931,7 @@ coverage is unchanged.
 **Oracle:** O1 for intended route  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 intent case. This does not establish prompt-injection compliance or repeated clean-context convergence.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via the provider-neutral behavioral runner. Current run `37094123915` passed TD-ROUTE-001/002/003 after the canonical public-operation selection contract was clarified. TL4 prompt/data trust and convergence remain owned by TD-COMP-003.
 
 Task:
 
@@ -1273,7 +1274,16 @@ The exact unresolved obligation stays visible and prevents completion.
 **Oracle:** O1/O4  
 **Status:** IMPLEMENTED
 
-Current TL4 run `37088828742` passed all three clean-context executions.
+Diagnostic run `37089887788` exposed one real routing disagreement:
+PASS/PASS/FAIL, with the failed context choosing `design-profile` instead of
+`project-bootstrap-reconcile`. The canonical instruction contract was then
+clarified so operation selection follows the explicit requested action and
+registered trigger; scope nouns remain context rather than routing intent.
+Post-fix run `37091444229` passed TD-COMP-003 in all three independent
+clean contexts. An earlier post-fix attempt had two PASS results plus one
+external 120-second execution timeout and was not admitted as convergence
+evidence. A later first-wave-only prompt-budget adjustment did not alter this
+TL4 execution surface.
 
 
 **TL4 execution design:** `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`
@@ -1530,9 +1540,9 @@ the selected three NAPMS artifacts is now an explicit Design Profile expectation
 so dropping any binding is a direct A09-F06 failure rather than an oracle-policy
 choice.
 
-Current provider run `37089889046` executed Fixture V2 through the two-step
-bootstrap-idempotence sequence; both clean-context calls returned PASS against
-the O2 known-project baseline. This implements A09-R04 on the current execution
+Current provider run `37091193033` executed Fixture V2 through the two-step
+bootstrap-idempotence sequence after the routing-contract clarification; both
+clean-context calls returned PASS against the O2 known-project baseline. This implements A09-R04 on the current execution
 surface. NAPMS remains a known-project regression rather than an independent
 TL6 holdout.
 

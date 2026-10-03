@@ -1,0 +1,62 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: ROUTING-REFRESH-TL4-37091444229
+status: accepted
+provider: github-copilot
+workflow_run_id: 37091444229
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37091444229
+workflow_conclusion: failure
+artifact: {id: 11263085073, name: assurance-campaign-tl4-existing-project, sha256: a8d02458f7b6536f79106241f91d789e366caf496ee0f84e6a4521ffccc2eec8, retention_days: 90}
+harness_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: e7f5142d9896b14a46fa80a73a14cfe531a68c37}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: fd84283412f3612e9cb1154d45c94c6783b23588}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml, git_blob_sha: a7520e26611d804c36b76de9bda4635a90ea8046}
+currentness:
+  state: current
+  reason: >-
+    Bound to the clarified public-operation selection contract and unchanged
+    runner/provider/runtime surfaces used by this execution.
+cases:
+  - case_id: TD-COMP-003
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml
+    case_sha256: e37ff3b386051340ae0cd7cb767c1f704b5e046adbc46412e6622ebeb889ee0f
+    fixture_sha256: 5db88bde6c8b8b98e024a7e2f1e85f72bfe8d9ec367f92bca3a5eb905c9fdddb
+    oracle_sha256: a91c12f9a97a839ee9cb31283ff5e7dec6fbbdcd7727d6017e7dd0ed9e4faa40
+    runs:
+      - {run_id: TD-COMP-003-R01-aa0f9f340b9f, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 6578, output_tokens: 105, provider_prompt_utf8_bytes: 18268, record_sha256: be18af409a368b2ca1c4df9b058669cb5000cb77e65b1baaa721bfec81a410b5, started_from_clean_context: true}
+      - {run_id: TD-COMP-003-R02-6cb4713a15e4, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 6582, output_tokens: 69, provider_prompt_utf8_bytes: 18268, record_sha256: 25820d8f4e11cae4fcbb6e5a3694b24d858b15d7a729801fafeddac3d9a63d2d, started_from_clean_context: true}
+      - {run_id: TD-COMP-003-R03-3e13e91fb28d, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 6582, output_tokens: 67, provider_prompt_utf8_bytes: 18268, record_sha256: 9d076e09311d8d533615853778763a416015b68aff5f56f748fcc2ff00a7d89a, started_from_clean_context: true}
+  - case_id: TD-BOOT-E06
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+    case_sha256: 8059cbee7d2c367428e1c7a0beba8365169cc341f0e427ddeec98f9b73f074a4
+    fixture_sha256: 26e6956382d65d107739b9dfff8ee6461ace35ec996bc6ea9408da86cadb920a
+    oracle_sha256: 600cbccc328547b0851dbabee552aebaad2ecb4354b1855452628de2894c92a6
+    runs:
+      - {run_id: TD-BOOT-E06-R01-fd7957abe891, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9526, output_tokens: 264, provider_prompt_utf8_bytes: 33664, record_sha256: 4644bd5e48445839109f13a56e9b658ff27468443b2d4ce9ad366766e9787af4, started_from_clean_context: true}
+      - {run_id: TD-BOOT-E06-R02-dcef3fbff10a, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9528, output_tokens: 354, provider_prompt_utf8_bytes: 33664, record_sha256: 9ea8ae616e990adcb72f481aff0069759dfcd28049d0ec4ebaf754a39d0e620f, started_from_clean_context: true}
+      - {run_id: TD-BOOT-E06-R03-ac33a3d7ac6e, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9530, output_tokens: 241, provider_prompt_utf8_bytes: 33664, record_sha256: 62223f08c16115d957097ecd10bae6769374538013350a6d8bd52e915f004485, started_from_clean_context: true}
+limitations:
+  - Selected TD-COMP-003 and TD-BOOT-E06 evidence is complete and PASS.
+  - The enclosing campaign concluded failure only because TD-QST-001 had one external 120-second infrastructure timeout; that unrelated case is not admitted by this record.
