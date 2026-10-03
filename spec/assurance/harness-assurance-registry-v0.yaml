@@ -1,7 +1,7 @@
 version: 1
 kind: harness-assurance-registry
 id: HARNESS-ASSURANCE-REGISTRY-V0
-status: initial-seed
+status: canonical-denominator
 policy: docs/design/harness-assurance-policy-v0.md
 semantic_owner: docs/design/harness-ability-to-evidence-v0.md
 
@@ -363,6 +363,24 @@ abilities:
       - A20-R01
       - A20-R02
       - A20-R03
+
+  - id: HA-A21
+    title: Cross-project portability
+    contract_ref:
+      path: docs/design/harness-ability-to-evidence-v0.md
+    release_critical: true
+    execution_nature: mixed
+    failure_modes:
+      - A21-F01
+      - A21-F02
+      - A21-F03
+      - A21-F04
+      - A21-F05
+    requirements:
+      - A21-R01
+      - A21-R02
+      - A21-R03
+      - A21-R04
 
 requirements:
   - id: A01-R01
@@ -1201,7 +1219,100 @@ requirements:
     release_applicable: true
     status: required
 
+  - id: A21-R01
+    ability: HA-A21
+    failure_modes: [A21-F01]
+    purpose: Generic Harness runtime contains no executable dependency on registered known-project repository identities or project-specific branches keyed by those identities.
+    required:
+      test_levels: [TL1]
+      methods_any: [EM-13, EM-14]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A21-R02
+    ability: HA-A21
+    failure_modes: [A21-F04]
+    purpose: Generic graph and lifecycle mechanisms remain correct across the declared deep, broad, and high-cardinality deterministic support envelope.
+    required:
+      test_levels: [TL1, TL2]
+      methods_any: [EM-13]
+      oracle_minimum: O1
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A21-R03
+    ability: HA-A21
+    failure_modes: [A21-F02, A21-F03]
+    purpose: Current TL5 O2 regressions demonstrate both direct-declaration and project-owned adapter-projection modes against the same generic Harness semantics.
+    required:
+      test_levels: [TL5]
+      methods_any: [EM-10]
+      oracle_minimum: O2
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
+  - id: A21-R04
+    ability: HA-A21
+    failure_modes: [A21-F02, A21-F04, A21-F05]
+    purpose: A frozen independent project/domain holdout with a materially different failure shape passes without adding project-specific generic Harness semantics.
+    required:
+      test_levels: [TL6]
+      methods_any: [EM-11, EM-13]
+      oracle_minimum: O3
+      judgement_execution: false
+    substitution:
+      higher_level_alone_allowed: false
+    release_applicable: true
+    status: required
+
 evidence:
+  - id: EVID-A21-RUNTIME-NEUTRALITY
+    providers:
+      - checks/validate_cross_project_portability.py
+    source_refs:
+      - path: checks/validate_cross_project_portability.py
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+    satisfies: [A21-R01]
+    test_level: TL1
+    methods: [EM-13, EM-14]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: inspection
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - The check derives repository identities from registered TL5 known-project fixtures and rejects their use in executable generic runtime AST.
+      - Comments and docstrings are excluded because they do not alter runtime behavior.
+      - This mechanically detects known-project identity coupling; it does not prove absence of every possible semantic project bias.
+
+  - id: EVID-A21-SCALE-ENVELOPE
+    providers:
+      - tests/test_deep_dependency_graphs.py
+    source_refs:
+      - path: tests/test_deep_dependency_graphs.py
+      - path: docs/design/harness-test-design-catalog-v0.md
+    satisfies: [A21-R02]
+    test_level: TL2
+    methods: [EM-13]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Establishes deterministic correctness for depth 1200, fan-out 512, and lifecycle cardinality 2000 only.
+      - Synthetic scale evidence does not substitute for a materially different independent project-shape holdout.
+
   - id: EVID-A20-LIVE-BOUNDARY
     providers:
       - tests/test_copilot_live_calibration_evaluator.py
