@@ -84,6 +84,53 @@ projection operation does not independently rediscover CanonicalArtifacts by
 walking the repository, searching by filename, or reconstructing a second
 artifact index.
 
+## Shared deterministic projection boundary
+
+After more than one specialized projection demonstrated the same invariant,
+the common deterministic source boundary is owned once by the Workspace
+projection mechanism rather than reimplemented by each renderer.
+
+The shared boundary is responsible for:
+
+1. validating the Human Projection manifest and plan identities expected by
+   the projection mechanism;
+2. resolving exactly one planned document/section instance;
+3. confirming that the section renderer matches the invoked projection
+   operation;
+4. requiring a non-empty, duplicate-free selected source set;
+5. requiring every selected source id to exist in the current manifest;
+6. validating selected canonical source paths as repository-relative paths;
+7. rejecting a selected source under `docs/generated/**`, so disposable
+   projections cannot feed semantic truth back into another projection;
+8. returning only the selected source bindings needed by the specialized
+   projection.
+
+The boundary is **section-local**. An unrelated artifact present elsewhere in
+the manifest neither widens nor blocks the selected projection. In particular,
+generated material that is not selected by the planned section is irrelevant
+to that projection instance.
+
+Path normalization is a validation concern, not a source-identity rewrite.
+Provenance preserves the source path recorded by the Human Projection manifest;
+the boundary may normalize a path transiently to validate safety, but must not
+silently replace the manifest path with a different representation.
+
+The current Workspace realization is
+`harness.workspace.projection_boundary`. Specialized validators consume this
+boundary and then apply only their projection-specific rules.
+
+The following remain outside the shared boundary:
+
+- scope semantics and whether a projection requires a scope;
+- format/profile validation;
+- output-path templates specific to a projection;
+- target-language syntax and structural validation;
+- projection-specific completeness, relationship or representation rules;
+- semantic mapping from accepted source meaning into the target format.
+
+Those responsibilities remain with the specialized projection skill/profile
+and validator until another repeated invariant is demonstrated.
+
 ## Projection operation identity
 
 A reusable specialized projection is modeled initially as an **internal
@@ -224,8 +271,13 @@ At minimum the projection result or its package metadata should bind to:
 - projection/renderer operation identity;
 - current Human Projection manifest digest;
 - selected CanonicalArtifact IDs;
-- source paths and source digests/baseline when the manifest records them;
+- source paths exactly as recorded by the manifest, plus source
+  digests/baseline when the manifest records them;
 - generated output path(s).
+
+Validation may use a normalized repository-relative form to enforce path
+safety, but that normalized form is not a replacement source identity in
+provenance.
 
 Existing Human Projection freshness validation remains authoritative for
 canonical source changes. A generated output must not be accepted as current
@@ -275,10 +327,19 @@ recipe/plan
   → assurance for source/routing/distribution boundaries
 ```
 
-The first implementation should remain specific. Extract a generic renderer
-dispatcher, shared result type, new route class or other common abstraction only
-after more than one implemented projection demonstrates the same invariant and
-the existing mechanism is insufficient.
+The first implementation should remain specific. Promote behavior into the
+shared projection mechanism only when at least two implemented slices
+demonstrate the same invariant and the extraction does not require
+format-specific semantics.
+
+The first proven shared extraction is the deterministic source boundary:
+manifest/plan/section binding, selected-source closure, repository-relative
+source-path safety and generated-input rejection.
+
+Do not infer from that extraction that a generic renderer dispatcher, universal
+projection IR, shared result type, new route class or other framework is
+required. Such an abstraction needs its own repeated invariant and evidence
+that the existing internal-operation composition is insufficient.
 
 ## Assurance boundary
 
