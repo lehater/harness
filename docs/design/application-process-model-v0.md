@@ -396,10 +396,16 @@ This contract does not introduce:
 
 ## Validation evidence
 
-A real-project thin slice was executed against
-`lehater/napms@42481577fab7f795cf3a2118b7b6f1c3c075d066` in draft PR #202.
+Two separate checks are required because NAPMS currently pins an older Harness
+runtime.
 
-The slice added one canonical provider:
+### Real-project semantic evidence
+
+NAPMS `main` pins Harness
+`d85bbf9152381605a5d3e8b166d15cc70b1d420c`, while the Harness baseline used
+for this model is `2c38f2c1560a64406ca089a60e69b64e3ab9dba4` (67 commits ahead).
+
+A real-project thin slice in NAPMS draft PR #202 added:
 
 ```text
 engineering.application.process.policy-export
@@ -407,28 +413,35 @@ authority: APPLICATION-JOURNEY-DESIGN
 knowledge_kind: application-design
 ```
 
-The provider composes accepted Product Requirements, application journey /
-materialization, Task Model and User Journey knowledge into an explicit bounded
-process contract. `SYSTEM-RULES` then consumes that process Capability directly
-instead of depending directly on the broad application-journey Capability for
-process reconstruction.
+Under the pinned older runtime the project remains structurally valid and the
+System Architecture contract can consume the process Capability directly.
+This establishes useful project evidence, but it is not by itself proof of
+compatibility with current Harness.
 
-Deterministic project checks establish that:
+A direct NAPMS repin experiment in draft PR #203 fails before process semantics
+are evaluated because NAPMS still invokes retired Harness root-script paths such
+as `repository_realization.py` and `engineering_coverage.py`. Current Harness
+uses the packaged/distribution layout. This is an integration-migration gap,
+not evidence against the process model.
 
-- the new Capability remains under the existing application Authority;
-- the existing `application-design` route is sufficient;
-- process-instance boundary, causal relations, completion and explicit
-  NOT_APPLICABLE dimensions are independently addressable;
-- the downstream System Architecture contract can depend on the process
-  Capability directly;
-- NAPMS Harness integration, Engineering Coverage, design and architecture
-  checks remain green.
+### Current-Harness executable evidence
 
-This evidence supports an independently addressable process Capability but does
-not demonstrate a distinct production procedure, acceptance lifecycle or owner.
-It therefore strengthens the case **against** introducing
-`PROCESS-DESIGN`, a new Core concept or a routed
-`application-process-design` knowledge kind at this stage.
+Harness draft PR #177 adds an isolated Scenario Suite case directly on current
+`main`. The full `make harness-check` gate passes.
+
+The scenario proves that current Harness:
+
+- routes a missing process Capability through the existing
+  `application-design` skill;
+- treats the process as an independently addressable Capability without a new
+  Authority or knowledge kind;
+- supplies that Capability as the direct input to System Architecture;
+- keeps the broader Journey only as same-Authority supporting upstream context.
+
+Together these checks support a separate process Capability inside the existing
+Application Design Authority and provide no evidence for a new Core concept,
+`PROCESS-DESIGN` Authority or routed `application-process-design` knowledge
+kind.
 
 ## Adoption sequence
 
