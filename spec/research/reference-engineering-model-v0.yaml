@@ -76,6 +76,11 @@
       "source_class": "accepted-project-fact"
     },
     {
+      "id": "application_process_material",
+      "type": "boolean",
+      "source_class": "accepted-project-fact"
+    },
+    {
       "id": "runtime_topology_material",
       "type": "boolean",
       "source_class": "accepted-project-fact"
@@ -579,6 +584,39 @@
         },
         {
           "template": "APPLICATION-FAILURE-CONTRACT"
+        }
+      ]
+    },
+    {
+      "id": "APPLICATION-PROCESS",
+      "authority_type": "APPLICATION-DESIGN",
+      "knowledge_kind": "application-process-design",
+      "claim_surface": [
+        "engineering.application.process"
+      ],
+      "primary_claims": [
+        "engineering.application.process"
+      ],
+      "applicability": {
+        "candidate_when": {
+          "predicate": "application_process_material",
+          "equals": true
+        },
+        "required_when": {
+          "predicate": "application_process_material",
+          "equals": true
+        },
+        "not_applicable_when": {
+          "predicate": "application_process_material",
+          "equals": false
+        }
+      },
+      "scope": {
+        "mode": "singleton"
+      },
+      "requires": [
+        {
+          "template": "APPLICATION-ORCHESTRATION"
         }
       ]
     },
