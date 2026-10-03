@@ -41,15 +41,6 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
     return value
 
 
-def _repo_relative(value: Any, label: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise CoreError(f"{label} is required")
-    path = Path(value)
-    if path.is_absolute() or ".." in path.parts:
-        raise CoreError(f"{label} must be repository-relative: {value}")
-    return path.as_posix()
-
-
 def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     if profile.get("version") != 1:
         raise CoreError("Structurizr C4 profile version must be 1")
