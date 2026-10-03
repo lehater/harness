@@ -246,6 +246,14 @@ Notation elements such as BPMN Gateways, Sequence Flows, Service Tasks, Message
 Flows or workflow-engine state are not canonical Process concepts unless their
 underlying meaning is independently present in accepted project knowledge.
 
+The Harness-owned `application-process-bpmn` specialized projection is
+deliberately narrower than the canonical Process model. Its v1 profile supports
+generic start/end events, generic tasks, explicit human tasks, explicit
+exclusive/parallel gateways and strict sequence flows. Material waits,
+repetition, subprocess decomposition and recovery/compensation remain canonical
+Process semantics but stop the BPMN v1 projection rather than being
+approximated or invented.
+
 ## Non-goals
 
 This contract does not introduce:
