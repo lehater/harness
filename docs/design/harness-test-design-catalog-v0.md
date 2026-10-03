@@ -1734,6 +1734,13 @@ or reclassified.
 
 # SF-09 — Lifecycle, graph evolution, and scale
 
+
+**Current A20 execution:** the same accepted run `37088681223` satisfies
+A20-R02 because the deployed evaluator configuration and all bound corpus,
+protocol, adapter, scorer, template and workflow bytes remain current. The two
+blinded runs were 14/14 with zero FP/FN and `STABLE`; claim scope remains
+limited by A20-R03 and evaluator independence remains `UNVERIFIED`.
+
 ## TD-LIFE-001 — Prerequisite acceptance change
 
 **Abilities:** HA-A14  

@@ -168,11 +168,16 @@ adapter/projection provenance and stale-source rejection, A17-R02 through the
 NAPMS-shaped repository/workspace fail-closed realization path, and A17-R03
 through exact projection-manifest invariance under irrelevant declaration
 reordering. Independent whole-project portability remains owned by HA-A21. HA-A20 satisfies A20-R01 through fail-closed
-request/response binding plus observed resolved-runtime binding, and A20-R03
+request/response binding plus observed resolved-runtime binding, A20-R02 through
+the current deployed-evaluator calibration run `37088681223`, and A20-R03
 through explicit corpus-population limits and UNVERIFIED independence metadata.
-A20-R02 remains missing: current-surface provider run `37071325425` produced
-one false negative in its first scorable run and an INCOMPLETE malformed-envelope
-second run, so it cannot establish the required current FP/FN+stability proof.
+The earlier current-surface run `37071325425` remains negative pre-fix
+evidence: one false negative plus one malformed-envelope invocation. The
+hardened evaluator then ran twice against the unchanged audited corpus v3 and
+protocol v2; both blinded runs scored 14/14 with TP=7, TN=7, FP=0, FN=0,
+identical observed runtime binding and `STABLE` with no unstable cases. The
+same immutable calibration fact legitimately satisfies both A12-R02 and A20-R02;
+A20's claim remains bounded to that labelled corpus population.
 HA-A21 satisfies A21-R01 through a source-derived known-project runtime-neutrality
 meta-check and A21-R02 through the explicit deep/broad/cardinality support
 envelope. A21-R03 remains missing because there is no current TL5 O2 pair proving
