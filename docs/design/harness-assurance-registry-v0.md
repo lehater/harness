@@ -429,9 +429,9 @@ that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
 minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
 HA-A11 is SATISFIED. A11-R01 reuses deterministic source-set, lossless boundary
-and statement-disposition evidence. Current first-wave run `37087746930`
+and statement-disposition evidence. Current first-wave run `37088827181`
 passed TD-BOOT-E02 and its unrelated/untrusted-subtree mutation TD-BOOT-E05
-against the same oracle. Current TL4 run `37087748183` passed TD-BOOT-E06
+against the same oracle. Current TL4 run `37088828742` passed TD-BOOT-E06
 three times and TD-COMP-003 three times; hostile project content never changed
 the public route or selected project boundary.
 
