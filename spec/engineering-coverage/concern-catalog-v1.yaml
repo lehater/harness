@@ -37,6 +37,7 @@ concerns:
     children:
       - {id: application.use-cases, title: Use cases and journeys}
       - {id: application.orchestration, title: Orchestration and transaction boundaries}
+      - {id: application.process, title: Bounded application process semantics}
       - {id: application.failures, title: Application failure semantics}
 
   - id: architecture
