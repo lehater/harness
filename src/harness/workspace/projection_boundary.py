@@ -24,8 +24,6 @@ def repository_relative_path(value: Any, label: str) -> str:
 
 def _manifest_source_index(
     manifest: dict[str, Any],
-    *,
-    projection_label: str,
 ) -> dict[str, dict[str, Any]]:
     if manifest.get("version") != 1 or manifest.get("kind") != MANIFEST_KIND:
         raise CoreError("unexpected human projection manifest")
@@ -116,10 +114,7 @@ def bind_projection_sources(
     projection_label: str,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Validate one planned projection's exact canonical source boundary."""
-    source_index = _manifest_source_index(
-        manifest,
-        projection_label=projection_label,
-    )
+    source_index = _manifest_source_index(manifest)
     if plan.get("manifest_digest") != manifest["manifest_digest"]:
         raise CoreError("projection plan manifest digest does not match manifest")
 
