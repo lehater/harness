@@ -2208,7 +2208,7 @@ evidence:
       - Accepted provider-backed run 36942421201 covers TD-ROUTE-001..003 natural-language intent at TL1 with current execution bindings.
       - Does not establish prompt/data trust-boundary behavior or repeated clean-context consistency.
 
-  - id: EVID-A16-INTENT-TL1-37091190364
+  - id: EVID-A16-INTENT-TL1-37092423399
     providers:
       - docs/design/agent-instruction-architecture-v0.md
       - evals/behavioral_eval.py
@@ -2218,17 +2218,17 @@ evidence:
       - {path: spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-route-002/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-route-003/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml}
+      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml}
     satisfies: [A16-R01]
     test_level: TL1
     methods: [EM-02]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml
+    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml
     case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 827f57dbea42849b7f29526c7ad11999127084a8
     limitations:
       - Three bounded public-intent discrimination cases only; TL4 trust/convergence is separate.
 
@@ -2258,25 +2258,25 @@ evidence:
       - One frozen bootstrap/reconcile intent only; this is not a universal natural-language classifier claim.
       - The enclosing workflow was red because unrelated TD-QST-001 had one external timeout; selected A16 case evidence is complete and PASS.
 
-  - id: EVID-A09-TL2-37091190364
+  - id: EVID-A09-TL2-37092423399
     providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
     source_refs:
       - {path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml}
+      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml}
     satisfies: [A09-R01]
     test_level: TL2
     methods: [EM-07]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml
+    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml
     case_ids: [TD-COMP-001]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 827f57dbea42849b7f29526c7ad11999127084a8
     limitations:
       - One controlled reviewed-target to bootstrap-realization handoff; higher-level A09 guarantees use separate evidence.
 
-  - id: EVID-A09-TL3-37091190364
+  - id: EVID-A09-TL3-37092423399
     providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
     source_refs:
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl}
@@ -2284,17 +2284,17 @@ evidence:
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml}
+      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml}
     satisfies: [A09-R02]
     test_level: TL3
     methods: [EM-03, EM-05, EM-08]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml
+    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml
     case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 827f57dbea42849b7f29526c7ad11999127084a8
     limitations:
       - Controlled synthetic existing-project micro-project evidence only; TL4 convergence and TL5 known-project regression are separate.
 
@@ -2334,22 +2334,22 @@ evidence:
     limitations:
       - One bounded co-design NAPMS regression; not an independent TL6 holdout.
 
-  - id: EVID-A11-SOURCE-SELECTION-TL3-37091190364
+  - id: EVID-A11-SOURCE-SELECTION-TL3-37092423399
     providers: [skills/agent/project-bootstrap-reconcile/SKILL.md, skills/agent/bootstrap-existing-project/SKILL.md, evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
     source_refs:
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml}
+      - {path: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml}
     satisfies: [A11-R02]
     test_level: TL3
     methods: [EM-05, EM-08]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37091190364.yaml
+    provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37092423399.yaml
     case_ids: [TD-BOOT-E02, TD-BOOT-E05]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 827f57dbea42849b7f29526c7ad11999127084a8
     limitations:
       - Bounded synthetic base-plus-unrelated-subtree source-selection evidence only.
 
