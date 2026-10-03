@@ -161,6 +161,21 @@ def main() -> int:
         "outside manifest",
     )
 
+    generated_manifest = copy.deepcopy(manifest)
+    generated_manifest["sources"][0]["path"] = (
+        "docs/generated/architecture/previous-workspace.dsl"
+    )
+    expect_error(
+        lambda: expected_provenance(
+            generated_manifest,
+            plan,
+            document_id="architecture-model",
+            section_id="c4",
+            profile=profile,
+        ),
+        "forbids generated source artifact",
+    )
+
     wrong_renderer = copy.deepcopy(plan)
     wrong_renderer["documents"][0]["sections"][0]["renderer"] = "narrative"
     expect_error(
