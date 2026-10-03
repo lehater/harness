@@ -443,6 +443,14 @@ Application Design Authority and provide no evidence for a new Core concept,
 `PROCESS-DESIGN` Authority or routed `application-process-design` knowledge
 kind.
 
+A subsequent source-bounded BPMN v0 projection in NAPMS PR #202 reads only
+the canonical process artifact. Its design/architecture/coverage/integration
+checks pass. The renderer fails closed when waits, timers, parallelism,
+convergence, compensation or independent process state become applicable, and
+does not infer Service Tasks, Message Flows or other runtime-specific BPMN
+semantics. This provides concrete evidence that BPMN can remain a disposable
+projection when the canonical process contract is sufficiently explicit.
+
 ## Adoption sequence
 
 Use the smallest evidence-driven path:
