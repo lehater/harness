@@ -176,7 +176,10 @@ Outputs:
 - remain generated views rather than CanonicalArtifacts.
 
 Human Projection does not define how Structurizr, PlantUML or other project
-visuals are generated.
+visuals are generated. Harness-owned specialized generated projections are
+composed through the reusable mechanism in
+`docs/design/document-projection-operations-v0.md`; this v1 contract remains
+the owner of their source scope, provenance, freshness and packaging boundary.
 
 ## Non-goals
 

@@ -103,6 +103,10 @@ registered public operation and that the target internal route authorizes it.
 A boolean internal-routing bypass is not a valid authorization contract. A
 direct `SKILL.md` filesystem path is not the orchestration contract.
 
+Specialized generated-document projections use the same composition mechanism;
+`docs/design/document-projection-operations-v0.md` defines their projection-
+specific boundary without introducing another router or route class.
+
 ## Failure and retry
 
 An operation reports failure/blocking in terms owned by its domain contract.

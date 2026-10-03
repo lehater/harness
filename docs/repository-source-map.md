@@ -40,6 +40,7 @@ it is not a second implementation tree.
 - `spec/architecture/repository-layout-v0.yaml` — physical layout/closed-root contract.
 - `docs/design/context-published-contracts-v0.md` — explicit published cross-context symbols.
 - `docs/design/repository-layout-v0.md` — canonical physical layout.
+- `docs/design/document-projection-operations-v0.md` — reusable mechanism for specialized source-bounded generated document/diagram projection operations.
 
 ## Agent surfaces
 
