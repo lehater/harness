@@ -1,0 +1,26 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+id: GREENFIELD-BOOTSTRAP-ORACLE-V1
+dimensions:
+  greenfield_bootstrap:
+    capabilities:
+      - support_atoms: [K1]
+        prerequisite_atoms: []
+      - support_atoms: [K2, K3]
+        prerequisite_atoms: []
+      - support_atoms: [K4]
+        prerequisite_atoms: [K1, K2, K3]
+      - support_atoms: [K5]
+        prerequisite_atoms: [K2, K3]
+    questions:
+      - support_atoms: [U1]
+        blocks_atoms: [K5]
+    frontier:
+      - support_atoms: [K1]
+        disposition: CREATE
+      - support_atoms: [K2, K3]
+        disposition: CREATE
+      - support_atoms: [K4]
+        disposition: PENDING
+      - support_atoms: [K5]
+        disposition: PENDING

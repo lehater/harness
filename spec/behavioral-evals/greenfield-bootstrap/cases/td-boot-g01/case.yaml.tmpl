@@ -1,0 +1,34 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-BOOT-G01
+abilities: [HA-A10]
+failure_modes: [A10-F01, A10-F02, A10-F03, A10-F04]
+test_level: TL3
+fixture_revision: TD-BOOT-G01-FIXTURE-V1
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: >-
+  From this greenfield goal, form the smallest justified initial engineering
+  model from which Harness can derive the safe first frontier. Preserve only
+  actual engineering obligations, explicit prerequisites, and unresolved
+  semantic choices. Do not create capabilities from descriptive technology or
+  future-idea noise, and do not choose an architecture option that the accepted
+  goal leaves unresolved.
+selected_scope: durable-cli-deduplicator
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - docs/design/core-v0.md
+  - docs/design/target-state-v0.md
+  - skills/agent/design-profile/SKILL.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [greenfield_bootstrap]
+pass_criteria:
+  require_dimensions: [greenfield_bootstrap]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

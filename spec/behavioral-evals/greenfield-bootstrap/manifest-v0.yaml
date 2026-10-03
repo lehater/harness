@@ -1,0 +1,10 @@
+version: 1
+kind: harness-agent-behavioral-eval-manifest
+id: GREENFIELD-BOOTSTRAP-V1
+provider_prompt_budget:
+  metric: utf8_bytes
+  max_per_call: 30000
+  max_suite: 120000
+cases:
+  - {design: TD-BOOT-G01, template: cases/td-boot-g01/case.yaml.tmpl, dimension: greenfield_bootstrap, runs: 1}
+  - {design: TD-BOOT-G05, template: cases/td-boot-g05/case.yaml.tmpl, dimension: greenfield_bootstrap, runs: 3}
