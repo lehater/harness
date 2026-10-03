@@ -41,6 +41,7 @@ REPRESENTATIVE_MODULES = (
     "harness.project_model.engineering_graph",
     "harness.integration.adapters.canonical_graph",
     "harness.workspace.workspace",
+    "harness.workspace.structurizr_projection",
     "harness.evidence.source_coverage",
     "harness.application.project_frontier",
 )
