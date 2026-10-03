@@ -11,6 +11,10 @@ from typing import Any
 import yaml
 
 from harness.project_model.core import CoreError
+from harness.workspace.projection_boundary import (
+    bind_projection_sources,
+    repository_relative_path,
+)
 
 PROJECTION_ID = "architecture-c4-structurizr"
 PROFILE_KIND = "harness-structurizr-c4-profile"
