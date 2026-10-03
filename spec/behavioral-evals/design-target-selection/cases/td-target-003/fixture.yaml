@@ -1,0 +1,19 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-TARGET-003-FIXTURE-V2
+atoms:
+  - id: S1
+    statement: "Each meter-reading batch carries a monotonically increasing sequence number scoped to the meter."
+    source_path: "docs/ingestion/replay-contract.md"
+  - id: S2
+    statement: "The receiver rejects a batch whose sequence number is not greater than the last accepted sequence for that meter."
+    source_path: "docs/ingestion/receiver-rules.md"
+  - id: T1
+    statement: "Create two implementation subtasks for receiver and persistence work."
+    source_path: "planning/backlog.md"
+  - id: W1
+    statement: "The release board moves the ingestion item from Review to Ready after approval."
+    source_path: "planning/workflow.md"
+  - id: D1
+    statement: "An example dashboard and deployment manifest mention retries and metrics but create no replay-protection obligation."
+    source_path: "examples/ops.md"

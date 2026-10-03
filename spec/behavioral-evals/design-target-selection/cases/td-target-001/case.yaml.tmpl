@@ -1,0 +1,28 @@
+version: 1
+kind: harness-agent-behavioral-eval-case
+case_id: TD-TARGET-001
+abilities: [HA-A08]
+failure_modes: [A08-F01, A08-F02, A08-F03]
+test_level: TL1
+fixture_revision: TD-TARGET-001-FIXTURE-V2
+harness_revision: __HARNESS_REVISION__
+consumer_pack_revision: null
+user_task: "Build the smallest justified Design Profile knowledge target for the selected password-reset API scope. Include every material engineering knowledge surface needed downstream; exclude tasks, workflow or delivery state, and descriptive implementation examples."
+selected_scope: "customer-password-reset-api"
+repository_fixture:
+  path: fixture.yaml
+trusted_instruction_entrypoint:
+  - AGENTS.md
+  - docs/design/core-v0.md
+  - skills/agent/design-profile/SKILL.md
+allowed_tools: []
+write_policy: read-only
+oracle_ref:
+  path: oracle.yaml
+normalization_profile:
+  dimensions: [capability_partition]
+pass_criteria:
+  require_dimensions: [capability_partition]
+run_plan:
+  runs: 1
+  all_runs_must_pass: true

@@ -2513,6 +2513,87 @@ evidence:
       - Three independent clean-context executions preserve the same normalized Capability partition for the frozen metamorphic fixture.
       - Provider-auto resolved all three calls to mai-code-1.1-flash; this is not cross-model convergence.
 
+  - id: EVID-A08-TL1-37085690353
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/design-target-selection/cases/td-cap-005/case.yaml.tmpl
+      - path: spec/behavioral-evals/design-target-selection/cases/td-cap-005/fixture.yaml
+      - path: spec/behavioral-evals/design-target-selection/cases/td-cap-005/oracle.yaml
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-001/fixture.yaml
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-001/oracle.yaml
+      - path: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    satisfies: [A08-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    case_ids: [TD-CAP-005, TD-TARGET-001]
+    status: verified
+    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    limitations:
+      - The frozen TL1 cases prove required-knowledge inclusion plus task/workflow/descriptive-noise exclusion and Reference-template resistance for bounded synthetic scopes.
+      - The A08 fixtures intentionally contain one unambiguous selected knowledge surface so the reused capability-partition IR does not add an A05 granularity claim.
+
+  - id: EVID-A08-TL3-37085690353
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-002/case.yaml.tmpl
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-002/fixture.yaml
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-002/oracle.yaml
+      - path: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    satisfies: [A08-R02]
+    test_level: TL3
+    methods: [EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    case_ids: [TD-TARGET-002]
+    status: verified
+    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    limitations:
+      - One frozen project-shaped repository slice proves minimal archive-integrity target selection under nearby infrastructure/template and delivery noise.
+      - This is synthetic TL3 evidence, not real-project or TL6 portability evidence.
+
+  - id: EVID-A08-TL4-37085690353
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-003/case.yaml.tmpl
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-003/fixture.yaml
+      - path: spec/behavioral-evals/design-target-selection/cases/td-target-003/oracle.yaml
+      - path: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    satisfies: [A08-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
+    case_ids: [TD-TARGET-003]
+    status: verified
+    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    limitations:
+      - Three independent clean-context calls selected the same frozen replay-protection target while excluding task/workflow/example noise.
+      - Provider-auto resolved all three calls to mai-code-1.1-flash; this is not cross-model convergence.
+
   - id: EVID-BOOT-COMP-TL2-36947887869
     providers:
       - evals/behavioral_eval.py

@@ -296,7 +296,10 @@ Assertions:
 **Methods:** EM-02, EM-05  
 **Minimum level:** TL1  
 **Oracle:** O1  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+**Execution surface:** `spec/behavioral-evals/design-target-selection/cases/td-cap-005`.
+Provider run `37085690353` passed the frozen lexical-trap case.
 
 Fixture:
 
@@ -1092,6 +1095,83 @@ switch the operation:
 Expected semantic result:
 
 Semantic route follows the changed responsibility, not shared vocabulary.
+
+# Design-target selection judgement
+
+These cases exercise the judgement that forms the smallest justified Design
+Profile target from a selected scope. The existing `capability_partition`
+semantic IR is reused deliberately: every material atom in these fixtures maps
+unambiguously to one independently provable knowledge surface, so exact group
+agreement simultaneously proves inclusion/exclusion and avoids introducing a
+parallel target-selection evaluator.
+
+## TD-TARGET-001 — Bounded minimal target excludes process pseudo-knowledge
+
+**Abilities:** HA-A08  
+**Failure modes:** A08-F01, A08-F02, A08-F03  
+**Methods:** EM-02, EM-05  
+**Minimum level:** TL1  
+**Oracle:** O1  
+**Status:** IMPLEMENTED
+
+**Execution surface:** `spec/behavioral-evals/design-target-selection/cases/td-target-001`.
+Provider run `37085690353` passed frozen Fixture V2. Diagnostic run
+`37085479048` is excluded: Fixture V1 introduced a separate verification
+Capability and therefore made the existing `capability_partition` scorer test
+HA-A05 granularity in addition to A08 selection. Every V1 failure still selected
+the exact required atom set and no prohibited atom.
+
+Fixture:
+
+A password-reset scope contains one unambiguous product-contract knowledge
+surface, one implementation task, one delivery workflow statement and
+descriptive deployment/telemetry vocabulary.
+
+Expected semantic result:
+
+Only the product-contract knowledge is selected. Task, workflow/delivery state
+and descriptive examples are not engineering knowledge.
+
+## TD-TARGET-002 — Project-shaped minimal sufficient target
+
+**Abilities:** HA-A08  
+**Failure modes:** A08-F01, A08-F02, A08-F04  
+**Methods:** EM-05, EM-08  
+**Minimum level:** TL3  
+**Oracle:** O1  
+**Status:** IMPLEMENTED
+
+**Execution surface:** `spec/behavioral-evals/design-target-selection/cases/td-target-002`.
+Provider run `37085690353` passed frozen project-shaped Fixture V2. Diagnostic
+run `37085479048` is excluded for the same cross-ability oracle issue: V1
+selected all required atoms but sometimes merged its separate verification
+surface with archive integrity.
+
+Expected semantic result:
+
+The selected target contains exactly the archive-integrity knowledge surface;
+no infrastructure/template or delivery knowledge is speculated.
+
+## TD-TARGET-003 — Design-target clean-context convergence
+
+**Abilities:** HA-A08  
+**Failure modes:** A08-F05  
+**Methods:** EM-09  
+**Minimum level:** TL4  
+**Oracle:** O1  
+**Status:** IMPLEMENTED
+
+**Execution surface:** `spec/behavioral-evals/design-target-selection/cases/td-target-003`.
+Provider run `37085690353` passed Fixture V2 in all three independent
+clean-context runs. Diagnostic run `37085479048` is excluded: all three V1
+runs selected the same required atom set, while only one differed in whether a
+separate verification surface was merged, which belongs to HA-A05 granularity
+rather than A08 closure selection.
+
+Expected semantic result:
+
+All three runs select the same meter-reading replay-protection knowledge surface
+while excluding task/workflow/example noise.
 
 # Composition designs after TL1 review
 
@@ -2251,7 +2331,7 @@ Every canonical ability now has at least one designed evidence path.
 | HA-A05 | TD-CAP-001..008, TD-COMP-001, TD-BOOT-E06, TD-BOOT-G04/G05 |
 | HA-A06 | TD-APP-001..006, TD-COMP-002 |
 | HA-A07 | TD-AUTH-005/006, TD-LIFE-005 |
-| HA-A08 | TD-CAP-005, TD-ROUTE-003, TD-BOOT-G01/G04/G05 |
+| HA-A08 | TD-CAP-005, TD-TARGET-001..003, TD-ROUTE-003, TD-BOOT-G01/G04/G05 |
 | HA-A09 | TD-BOOT-E01..007 |
 | HA-A10 | TD-BOOT-G01..005 |
 | HA-A11 | TD-BOOT-E05/E06, TD-ROUTE-007 plus existing source-boundary designs |

@@ -1,0 +1,30 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-TARGET-002-FIXTURE-V2
+repository_shape:
+  selected_paths:
+    - "docs/export/archive-integrity.md"
+    - "docs/export/import-validation.md"
+    - "deploy/README.md"
+    - "planning/release-checklist.md"
+  downstream_context:
+    - "Implementation must not invent archive-integrity semantics."
+    - "The selected Design Profile should contain only independently provable knowledge needed for this export handoff."
+  reference_pressure:
+    - "Nearby examples mention Kafka, S3, telemetry, caching, deployment pipelines, and release automation."
+atoms:
+  - id: I1
+    statement: "Every offline export archive contains a manifest listing each payload file with its SHA-256 digest."
+    source_path: "docs/export/archive-integrity.md"
+  - id: I2
+    statement: "An importer rejects an export archive when any payload digest differs from the digest recorded in its manifest."
+    source_path: "docs/export/import-validation.md"
+  - id: D1
+    statement: "The deployment README demonstrates Kafka and S3 environment variables but declares neither technology mandatory for offline export."
+    source_path: "deploy/README.md"
+  - id: D2
+    statement: "A release checklist says to schedule rollout after sign-off; this is delivery workflow rather than engineering knowledge."
+    source_path: "planning/release-checklist.md"
+  - id: D3
+    statement: "A starter example mentions telemetry and caching as optional examples with no accepted requirement for this scope."
+    source_path: "docs/examples/starter-profile.md"

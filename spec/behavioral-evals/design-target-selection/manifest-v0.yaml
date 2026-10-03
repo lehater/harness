@@ -1,0 +1,12 @@
+version: 1
+kind: harness-agent-behavioral-eval-manifest
+id: DESIGN-TARGET-SELECTION-V1
+provider_prompt_budget:
+  metric: utf8_bytes
+  max_per_call: 28000
+  max_suite: 168000
+cases:
+  - {design: TD-CAP-005, template: cases/td-cap-005/case.yaml.tmpl, dimension: capability_partition, runs: 1}
+  - {design: TD-TARGET-001, template: cases/td-target-001/case.yaml.tmpl, dimension: capability_partition, runs: 1}
+  - {design: TD-TARGET-002, template: cases/td-target-002/case.yaml.tmpl, dimension: capability_partition, runs: 1}
+  - {design: TD-TARGET-003, template: cases/td-target-003/case.yaml.tmpl, dimension: capability_partition, runs: 3}
