@@ -95,6 +95,15 @@ to `mai-code-1.1-flash`; each normalized result contained exactly one
 REFUND-DESIGN Question blocking only `refund.window-policy`, while the related
 retryable repository-scan timeout created no semantic Question.
 
+HA-A05 refresh on current main first exposed a real project-shaped granularity
+failure: run `37083176344` returned `WRONG_GRANULARITY` for unchanged
+TD-CAP-008 by splitting its two complementary maintenance-handoff atoms. The
+generic `design-profile` procedure now defines Capability boundaries by semantic
+acceptance/revalidation/consumer lifecycle rather than sentence, file or
+Reference vocabulary. On revision `f8e347b9ac4e3f61fe67d997ab3133769deec043`, run `37083515120` passed
+TD-CAP-001..004, and run `37083516399` passed TD-CAP-008 plus all three
+clean-context TD-CAP-007 executions against the unchanged frozen oracles.
+
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
 A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
 through deterministic structural interpretation, and A01-R03 through explicit
@@ -103,8 +112,11 @@ topology/dead-production validation, A02-R02 through exact Consumer closure plus
 declaration-reorder metamorphic evidence, and A02-R03 through the 1200-node
 deep-DAG regression. HA-A03 satisfies A03-R01 through Target State truth-table,
 provider-removal/blocker, multi-provider, and lifecycle-gap composition evidence,
-and A03-R02 through explicit representation-order invariance. A04-R01 and
-A05-R01 are satisfied; HA-A06 satisfies A06-R01 through explicit
+and A03-R02 through explicit representation-order invariance. HA-A04 remains
+INCOMPLETE on its current provider surface; HA-A05 satisfies A05-R01 through
+the four TL1 omission/invention/split/merge cases, A05-R02 through the
+project-shaped novel-Capability/Reference-pressure case, and A05-R03 through
+three clean-context convergence runs. HA-A06 satisfies A06-R01 through explicit
 disposition/subject-completeness evidence and A06-R02 through scope-root
 activation isolation. HA-A07 satisfies A07-R01 through fail-closed
 retire/split/merge/rename migration evidence and A07-R02 through unchanged

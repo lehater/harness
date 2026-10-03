@@ -1,0 +1,76 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A05-FORMATION-PROVIDER-RUN-37083516399
+status: accepted
+provider: github-copilot
+workflow_run_id: 37083516399
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37083516399
+workflow_conclusion: success
+accepted_scope:
+  - TD-CAP-008
+  - TD-CAP-007
+artifact:
+  id: 11259920420
+  name: assurance-campaign-release-critical-formation
+  sha256: 5411aedc510d1564ef2b37e36c50e78503ca5459f13cf099bbd3364545b92628
+  retention_days: 90
+harness_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: d63d0d94db5ddcafc1cf7a7ae05188cf1bae75bb}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+currentness:
+  state: current
+  reason: >-
+    Selected Capability cases are bound to the current trusted instructions,
+    behavioral runner, provider adapter, frozen fixtures/oracles and provider
+    runtime descriptor; later registry/document-only integration does not alter
+    this execution surface.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 2
+  total_cases: 2
+  provider_calls: 4
+resolved_models:
+  mai-code-1.1-flash: 4
+token_usage:
+  input_tokens: 24534
+  output_tokens: 2196
+  total_tokens: 26730
+provider_prompt_utf8_bytes: 95271
+cases:
+  - case_id: TD-CAP-008
+    template: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-cap-008/oracle.yaml
+    case_sha256: ab535dffd391f87353d931fa5a47cba3ed2c2f30098def3e383c2b9794b4bb70
+    fixture_sha256: 8ca91d0c31ff1df0b08890e89e70f9f31f10e1cb807b19cf4ea44bc355ddac58
+    oracle_sha256: 1624a4f9db5b8cdf21f2bc74b1664d87c3c5a3b5043773f12818179279e5befc
+    runs:
+      - {run_id: TD-CAP-008-R01-832de444ffe7, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6144, output_tokens: 607, provider_prompt_utf8_bytes: 23952, record_sha256: 27a615f0d4e91481ce8df5c8f1289496d95377c87d6dc726c6d025cc89c4827a, started_from_clean_context: true}
+  - case_id: TD-CAP-007
+    template: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-cap-007/oracle.yaml
+    case_sha256: 0278146f4c9adaa2ee884e394734b6ca40ee2451699ab327fe6865c1ee17aaff
+    fixture_sha256: e3c2247304754797c38d526a098024dea6cc7aaa13dc4db9975fe84267c06f3e
+    oracle_sha256: 9af9d821156930e48df0426968f89b7472b7d2d41591a7ce4b110a994fe31dc9
+    runs:
+      - {run_id: TD-CAP-007-R01-bb10d1512ad3, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6129, output_tokens: 553, provider_prompt_utf8_bytes: 23773, record_sha256: 46c4d64fc39fce5bd5cc0715a1256bc613b76ff9da4740569bc232b2dd53563b, started_from_clean_context: true}
+      - {run_id: TD-CAP-007-R02-c69eb4c6f996, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6130, output_tokens: 438, provider_prompt_utf8_bytes: 23773, record_sha256: df945f8c06b9a8542b2d964cb10a69b7df7e19b2d70dca2c2ae0029cc7846f05, started_from_clean_context: true}
+      - {run_id: TD-CAP-007-R03-0ea2973e8b7a, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6131, output_tokens: 598, provider_prompt_utf8_bytes: 23773, record_sha256: 1a473368124b3141dfdef8df001bc4a55cbd440c1bf8f9193d898c310b91d850, started_from_clean_context: true}
+limitations:
+  - TD-CAP-008 proves one frozen synthetic TL3 project-shaped novel-Capability case under Reference-like lexical pressure; it is not a generalization/holdout claim.
+  - TD-CAP-007 passed three independent clean-context executions and establishes convergence only for its frozen Capability-partition fixture.
+  - Provider-auto resolved all selected calls to mai-code-1.1-flash; this is not cross-model convergence.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.
