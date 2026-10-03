@@ -324,15 +324,25 @@ def validate_recipe(recipe: dict[str, Any], manifest: dict[str, Any]) -> dict[st
                     f"projection section {doc_id}/{section_id} renderer must be a non-empty string"
                 )
 
-            normalized_sections.append(
-                {
-                    "id": section_id,
-                    "title": section.get("title") or section_id.replace("-", " ").title(),
-                    "purpose": section.get("purpose", ""),
-                    "renderer": renderer,
-                    "sources": sorted(selected),
-                }
-            )
+            scope = section.get("scope")
+            if scope is not None and (
+                not isinstance(scope, str) or not scope.strip()
+            ):
+                raise CoreError(
+                    f"projection section {doc_id}/{section_id} scope must be a non-empty string"
+                )
+
+            normalized_section = {
+                "id": section_id,
+                "title": section.get("title") or section_id.replace("-", " ").title(),
+                "purpose": section.get("purpose", ""),
+                "renderer": renderer,
+                "sources": sorted(selected),
+            }
+            if scope is not None:
+                normalized_section["scope"] = scope
+
+            normalized_sections.append(normalized_section)
 
         normalized_docs.append(
             {
