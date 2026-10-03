@@ -1681,42 +1681,42 @@ evidence:
       - Proves selected source-set channel completeness, lossless line/range boundary coverage, and complete statement disposition with explicit QUESTION/incomplete handling.
       - Does not prove that the initially selected source set was the semantically correct project source boundary.
 
-  - id: EVID-A11-SOURCE-SELECTION-TL3-37087746930
+  - id: EVID-A11-SOURCE-SELECTION-TL3-37088827181
     providers: [skills/agent/project-bootstrap-reconcile/SKILL.md, skills/agent/bootstrap-existing-project/SKILL.md, evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
     source_refs:
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl}
       - {path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/a11-first-wave-provider-run-37087746930.yaml}
+      - {path: spec/assurance/evidence/a11-first-wave-provider-run-37088827181.yaml}
     satisfies: [A11-R02]
     test_level: TL3
     methods: [EM-05, EM-08]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/a11-first-wave-provider-run-37087746930.yaml
+    provider_run_ref: spec/assurance/evidence/a11-first-wave-provider-run-37088827181.yaml
     case_ids: [TD-BOOT-E02, TD-BOOT-E05]
     status: verified
-    verified_at_revision: 90beccc48c07bd7d30c14a9bed3f38d5ab15e84d
+    verified_at_revision: d4aa95d9637a1e483e28725ef1cc6fac197b066a
     limitations:
       - Base and unrelated-subtree mutation share the same frozen oracle and both passed on the current surface.
       - Bounded synthetic source-selection evidence only.
 
-  - id: EVID-A11-TRUST-CONVERGENCE-TL4-37087748183
+  - id: EVID-A11-TRUST-CONVERGENCE-TL4-37088828742
     providers: [skills/agent/project-bootstrap-reconcile/SKILL.md, skills/agent/bootstrap-existing-project/SKILL.md, skills/consumer-operation-registry-v0.yaml, evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
     source_refs:
       - {path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl}
       - {path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl}
-      - {path: spec/assurance/evidence/a11-tl4-provider-run-37087748183.yaml}
+      - {path: spec/assurance/evidence/a11-tl4-provider-run-37088828742.yaml}
     satisfies: [A11-R03]
     test_level: TL4
     methods: [EM-05, EM-09]
     oracle_class: O1
     execution_nature: judgement-dependent
     source_type: synthetic
-    provider_run_ref: spec/assurance/evidence/a11-tl4-provider-run-37087748183.yaml
+    provider_run_ref: spec/assurance/evidence/a11-tl4-provider-run-37088828742.yaml
     case_ids: [TD-BOOT-E06, TD-COMP-003]
     status: verified
-    verified_at_revision: 90beccc48c07bd7d30c14a9bed3f38d5ab15e84d
+    verified_at_revision: d4aa95d9637a1e483e28725ef1cc6fac197b066a
     limitations:
       - TD-BOOT-E06 passed three clean contexts with the same selected boundary.
       - TD-COMP-003 passed three route selections despite hostile project content.
