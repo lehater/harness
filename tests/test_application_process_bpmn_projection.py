@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness.project_model.core import CoreError  # noqa: E402
+from harness.workspace.human_projection import validate_recipe  # noqa: E402
 from harness.workspace.application_process_bpmn_projection import (  # noqa: E402
     expected_output_paths,
     expected_provenance,
@@ -41,6 +42,17 @@ def valid_fixture() -> tuple[dict, dict, dict, str]:
         "version": 1,
         "kind": "harness-human-projection-manifest",
         "manifest_digest": "a" * 64,
+        "consumer": "IMPLEMENTATION",
+        "capabilities": [
+            {
+                "capability": "demo.application-process.policy-export",
+                "providers": ["APPLICATION-PROCESS"],
+            },
+            {
+                "capability": "demo.application",
+                "providers": ["APPLICATION"],
+            },
+        ],
         "sources": [
             {
                 "artifact": "APPLICATION-PROCESS",
@@ -56,12 +68,11 @@ def valid_fixture() -> tuple[dict, dict, dict, str]:
             },
         ],
     }
-    plan = {
+    recipe = {
         "version": 1,
-        "kind": "harness-human-projection-plan",
-        "projection": "process-review",
+        "kind": "harness-human-projection",
+        "id": "process-review",
         "consumer": "IMPLEMENTATION",
-        "manifest_digest": manifest["manifest_digest"],
         "documents": [
             {
                 "id": "policy-export-process",
@@ -73,12 +84,18 @@ def valid_fixture() -> tuple[dict, dict, dict, str]:
                         "purpose": "Project accepted policy export process semantics.",
                         "renderer": "application-process-bpmn",
                         "scope": "policy-export",
-                        "sources": ["APPLICATION-PROCESS", "APPLICATION"],
+                        "select": {
+                            "capabilities": [
+                                "demo.application-process.policy-export",
+                                "demo.application",
+                            ]
+                        },
                     }
                 ],
             }
         ],
     }
+    plan = validate_recipe(recipe, manifest)
     profile = load(ROOT / "spec/projection/application-process-bpmn-v1.yaml")
     bpmn = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- GENERATED PROJECTION -->
@@ -258,16 +275,28 @@ def main() -> int:
         "child constructs are unsupported",
     )
 
-    cycle = bpmn.replace(
-        '<task id="Task_publish" name="Publish export" />',
-        '<task id="Task_publish" name="Publish export" />\n'
-        '    <parallelGateway id="Gateway_loop_merge" name="Loop merge" gatewayDirection="Converging" />',
-    ).replace(
-        '<sequenceFlow id="Flow_5" sourceRef="Task_publish" targetRef="End_published" />',
-        '<sequenceFlow id="Flow_5" sourceRef="Task_publish" targetRef="Gateway_loop_merge" />\n'
-        '    <sequenceFlow id="Flow_loop_in" sourceRef="Gateway_decision" targetRef="Gateway_loop_merge" />\n'
-        '    <sequenceFlow id="Flow_loop_out" sourceRef="Gateway_loop_merge" targetRef="Task_review" />',
-    )
+    cycle = """<?xml version="1.0" encoding="UTF-8"?>
+<!-- GENERATED PROJECTION -->
+<!-- NOT A SOURCE OF TRUTH -->
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             id="Definitions_cycle"
+             targetNamespace="urn:harness:generated:application-process">
+  <process id="Process_cycle" name="Cycle" isExecutable="false">
+    <startEvent id="Start" name="Start" />
+    <parallelGateway id="Merge" name="Loop merge" gatewayDirection="Converging" />
+    <task id="Work" name="Work" />
+    <exclusiveGateway id="Choice" name="Continue?" gatewayDirection="Diverging" />
+    <task id="Again" name="Again" />
+    <endEvent id="End" name="Completed" />
+    <sequenceFlow id="F1" sourceRef="Start" targetRef="Merge" />
+    <sequenceFlow id="F2" sourceRef="Merge" targetRef="Work" />
+    <sequenceFlow id="F3" sourceRef="Work" targetRef="Choice" />
+    <sequenceFlow id="F4" name="finish" sourceRef="Choice" targetRef="End" />
+    <sequenceFlow id="F5" name="repeat" sourceRef="Choice" targetRef="Again" />
+    <sequenceFlow id="F6" sourceRef="Again" targetRef="Merge" />
+  </process>
+</definitions>
+"""
     expect_error(
         lambda: validate_bpmn(cycle, profile),
         "does not support cycles/repetition",
