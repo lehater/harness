@@ -1060,7 +1060,9 @@ exists to keep it in the canonical assurance denominator.
 **Methods:** EM-05  
 **Minimum level:** TL3 for realistic payload handling; eventual TL4  
 **Oracle:** O1/O4  
-**Status:** READY
+**Status:** IMPLEMENTED
+
+**Execution surface:** reuses `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`; current run `37087748183` passed all three clean contexts.
 
 Fixture:
 
@@ -1272,7 +1274,7 @@ The exact unresolved obligation stays visible and prevents completion.
 **Oracle:** O1/O4  
 **Status:** IMPLEMENTED
 
-Provider-backed run `36949909315` executed three independent clean-context runs for this frozen TL4 case; all three returned PASS. This establishes only the declared TL4 synthetic obligation and does not substitute for TL5 real-project evidence.
+Current TL4 run `37087748183` passed all three clean-context executions.
 
 
 **TL4 execution design:** `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`
@@ -1329,7 +1331,7 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-Provider-backed run `36947887869` executed this frozen TL3 case against the current bound behavioral surface and returned PASS. This status does not promote the case into TL4/TL5 evidence.
+Current first-wave run `37087746930` passed TD-BOOT-E02 and this E05 mutation against the same frozen oracle.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies a reviewed profile plus a project-owned accepted graph. The provider must project the graph's canonical sources/dependency edge into Core; target-state evaluation is deterministic.
 
@@ -1424,7 +1426,7 @@ run; no duplicate artifacts/Capabilities are introduced.
 ## TD-BOOT-E05 — Bootstrap ignores unrelated repository expansion
 
 **Abilities:** HA-A09, HA-A11  
-**Failure modes:** A09-F03, A11-F01/F02  
+**Failure modes:** A09-F03, A11-F01/F02/F05  
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
@@ -1445,7 +1447,7 @@ Selected scope/model is unchanged.
 ## TD-BOOT-E06 — Existing-project repeated clean contexts
 
 **Abilities:** HA-A04, HA-A05, HA-A09, HA-A11, HA-A16  
-**Failure modes:** A04-F06, A05-F08, A09-F05, A16-F08  
+**Failure modes:** A04-F06, A05-F08, A09-F05, A11-F01/F02/F05, A16-F08  
 **Methods:** EM-09  
 **Minimum level:** TL4  
 **Oracle:** O1 for synthetic model + semantic normalization  

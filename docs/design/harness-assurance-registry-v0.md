@@ -144,10 +144,10 @@ clean-context target-selection runs. HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A10 is explicitly INCOMPLETE with
 A10-R01/A10-R02 waiting on the blocked TD-BOOT-G01..G04 TL3 greenfield cases
 and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A11
-satisfies A11-R01 through deterministic source-set/boundary/statement
-completeness; A11-R02 source relevance/noise selection and A11-R03 repeated
-trust-boundary execution remain missing because their current provider records
-are stale or their designs are not yet implemented. HA-A12 satisfies A12-R01 through deterministic
+satisfies A11-R01 through deterministic source completeness, A11-R02 through
+current TD-BOOT-E02/E05 base-plus-noise selection, and A11-R03 through
+three-run TD-BOOT-E06 boundary convergence plus three-run TD-COMP-003 hostile
+content routing. HA-A12 satisfies A12-R01 through deterministic
 semantic derivation/admission evidence; A12-R02 remains missing because the
 current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A13 satisfies A13-R01/A13-R02 through deterministic
 Question routing, blocking, resolution-identity and stale-snapshot evidence, and
@@ -428,12 +428,12 @@ Greenfield bootstrap cannot be proven from pre-authored graph fixtures because
 that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
 minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
-HA-A11 is partially satisfied. A11-R01 reuses deterministic source-set,
-lossless boundary, and statement-disposition evidence. A11-R02/R03 remain
-missing: source relevance/noise selection is judgement-dependent, the relevant
-TD-BOOT-E05/E06 provider records are stale after bound runtime changes, and
-TD-ROUTE-007 trust-boundary execution is not yet implemented at the required
-level.
+HA-A11 is SATISFIED. A11-R01 reuses deterministic source-set, lossless boundary
+and statement-disposition evidence. Current first-wave run `37087746930`
+passed TD-BOOT-E02 and its unrelated/untrusted-subtree mutation TD-BOOT-E05
+against the same oracle. Current TL4 run `37087748183` passed TD-BOOT-E06
+three times and TD-COMP-003 three times; hostile project content never changed
+the public route or selected project boundary.
 
 HA-A12 is partially satisfied. A12-R01 reuses deterministic derivation,
 admission, contradiction, semantic-loss, and real-project atom evidence; the
