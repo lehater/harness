@@ -173,3 +173,47 @@ Run 2:
 This refresh therefore does **not** support an A12-F06/HA-A20 calibration PASS.
 The frozen expert oracle is retained unchanged. Repeating executions until a
 convenient PASS would be cherry-picking rather than assurance evidence.
+
+
+## Evaluator hardening refresh — run 37088681223
+
+The failed current-surface refresh above was not retried unchanged until a
+convenient provider route passed. Instead the provider adapter was changed while
+the audited oracle surface stayed fixed:
+
+- corpus remained `semantic-derivation-calibration-v3`;
+- protocol remained `semantic-derivation-live-calibration-v2`;
+- expert labels and deterministic scorer remained unchanged;
+- adapter version advanced to `github-copilot-cli-live-calibration@2`.
+
+The hardening restates the protocol's closed-world sufficiency rule at the
+provider boundary: a related/contributory mechanism is not enough to establish a
+stronger required effect, and no unstated exclusive path, enforcement mechanism,
+side effect, or surrounding context may be assumed. It also makes the required
+top-level versioned JSON envelope explicit.
+
+GitHub Actions run: `37088681223`.
+
+Artifact: `live-calibration-evidence`, id `11261094262`, digest
+`sha256:9a86348ccb9a6232e56ce32554cbfac0d26b237a03e0ea7f892a1f140d9a0154`.
+
+Both runs:
+
+- resolved model: `gpt-6-luna`;
+- scored cases: 14 / 14;
+- TP=7, TN=7, FN=0, FP=0;
+- accuracy=`1.0`;
+- detection recall=`1.0`;
+- false-positive rate=`0.0`;
+- misses: none;
+- provider response: valid versioned envelope.
+
+The previously missed `semantic-enforcement-gap` case was REJECTED in both
+runs. The observed provider/requested-model/resolved-model/source/CLI binding
+was identical across the pair, and the stability evaluator returned
+`STABLE` with `unstable_cases: []`.
+
+This is evidence for the bounded audited corpus, not a universal semantic
+correctness or cross-model claim. Harness still reports evaluator independence
+as `UNVERIFIED`; what it establishes is expert-label withholding, request
+binding, runtime binding, complete scoring, and repeated observed agreement.

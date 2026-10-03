@@ -468,6 +468,230 @@ def _validate_provider_case_runs(
     return runs
 
 
+def _validate_live_calibration_provider_run(
+    evidence_item: dict[str, Any],
+    run_record: dict[str, Any],
+    *,
+    root: Path,
+    evidence_id: str,
+) -> None:
+    calibration = run_record.get("calibration")
+    if not isinstance(calibration, dict):
+        raise RegistryError(
+            f"{evidence_id}: live calibration record requires calibration"
+        )
+
+    bound_docs: dict[str, dict[str, Any]] = {}
+    for label in ("corpus", "protocol"):
+        item = calibration.get(label)
+        if not isinstance(item, dict):
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} must be a mapping"
+            )
+        path = item.get("path")
+        expected_blob = item.get("git_blob_sha")
+        fingerprint = item.get("fingerprint")
+        if not isinstance(path, str) or not path:
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} path is required"
+            )
+        if not isinstance(expected_blob, str) or not re.fullmatch(
+            r"[0-9a-f]{40}", expected_blob
+        ):
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} git_blob_sha is invalid"
+            )
+        if not isinstance(fingerprint, str) or not re.fullmatch(
+            r"LC(?:CORPUS|PROTO)-[0-9a-f]{64}", fingerprint
+        ):
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} fingerprint is invalid"
+            )
+        target = root / path
+        if not target.is_file():
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} path is missing"
+            )
+        if _git_blob_sha(target.read_bytes()) != expected_blob:
+            raise RegistryError(
+                f"{evidence_id}: live calibration {label} binding is stale"
+            )
+        bound_docs[label] = load_yaml(target)
+
+    cases = bound_docs["corpus"].get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise RegistryError(
+            f"{evidence_id}: live calibration corpus requires cases"
+        )
+    expected_case_count = len(cases)
+
+    evaluator = calibration.get("evaluator")
+    if not isinstance(evaluator, dict):
+        raise RegistryError(
+            f"{evidence_id}: live calibration evaluator must be a mapping"
+        )
+    evaluator_fingerprint = evaluator.get("fingerprint")
+    if not isinstance(evaluator_fingerprint, str) or not re.fullmatch(
+        r"LCEVAL-[0-9a-f]{64}", evaluator_fingerprint
+    ):
+        raise RegistryError(
+            f"{evidence_id}: live calibration evaluator fingerprint is invalid"
+        )
+    adapter_path = evaluator.get("adapter_path")
+    adapter_sha = evaluator.get("adapter_executable_sha256")
+    if not isinstance(adapter_path, str) or not adapter_path:
+        raise RegistryError(
+            f"{evidence_id}: live calibration adapter_path is required"
+        )
+    if not isinstance(adapter_sha, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", adapter_sha
+    ):
+        raise RegistryError(
+            f"{evidence_id}: live calibration adapter executable digest is invalid"
+        )
+    adapter_file = root / adapter_path
+    if not adapter_file.is_file():
+        raise RegistryError(
+            f"{evidence_id}: live calibration adapter path is missing"
+        )
+    if _sha256_bytes(adapter_file.read_bytes()) != adapter_sha:
+        raise RegistryError(
+            f"{evidence_id}: live calibration adapter executable binding is stale"
+        )
+
+    runs = _mapping_list(
+        calibration.get("runs"),
+        f"{evidence_id} live calibration runs",
+    )
+    if len(runs) < 2:
+        raise RegistryError(
+            f"{evidence_id}: live calibration requires at least two scorable runs"
+        )
+    selected = evidence_item.get("calibration_run_ids")
+    if not isinstance(selected, list) or not selected or not all(
+        isinstance(item, str) and item for item in selected
+    ):
+        raise RegistryError(
+            f"{evidence_id}: active live calibration evidence requires calibration_run_ids"
+        )
+
+    run_ids: list[str] = []
+    runtime_binding: tuple[str, str, str, str, str] | None = None
+    for index, run in enumerate(runs, start=1):
+        run_id = run.get("run_id")
+        request_id = run.get("request_id")
+        if not isinstance(run_id, str) or not run_id:
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {index} requires run_id"
+            )
+        if run_id in run_ids:
+            raise RegistryError(
+                f"{evidence_id}: duplicate live calibration run_id {run_id}"
+            )
+        if not isinstance(request_id, str) or not request_id:
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} requires request_id"
+            )
+        run_ids.append(run_id)
+        if run.get("status") != "PASS":
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} is not PASS"
+            )
+        if run.get("state") != "COMPLETED":
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} is not COMPLETED"
+            )
+        if run.get("response") != "VALID_ENVELOPE":
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} response is not valid"
+            )
+        if run.get("scored_count") != expected_case_count:
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} is not fully scored"
+            )
+        if run.get("missing") != [] or run.get("misses") != []:
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} has missing/missed cases"
+            )
+        confusion = run.get("confusion")
+        if not isinstance(confusion, dict):
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} lacks confusion"
+            )
+        if confusion.get("false_positive") != 0 or confusion.get("false_negative") != 0:
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} has FP/FN"
+            )
+        if (
+            confusion.get("true_positive", 0) + confusion.get("true_negative", 0)
+            != expected_case_count
+        ):
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} confusion is incomplete"
+            )
+        if run.get("evaluator_fingerprint") != evaluator_fingerprint:
+            raise RegistryError(
+                f"{evidence_id}: live calibration evaluator fingerprint mismatch"
+            )
+        if run.get("corpus_fingerprint") != calibration["corpus"]["fingerprint"]:
+            raise RegistryError(
+                f"{evidence_id}: live calibration corpus fingerprint mismatch"
+            )
+        if run.get("protocol_fingerprint") != calibration["protocol"]["fingerprint"]:
+            raise RegistryError(
+                f"{evidence_id}: live calibration protocol fingerprint mismatch"
+            )
+
+        observed = run.get("runtime_binding")
+        if not isinstance(observed, dict):
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} lacks runtime binding"
+            )
+        binding = tuple(
+            observed.get(field)
+            for field in (
+                "provider",
+                "requested_model",
+                "resolved_model",
+                "resolved_model_source",
+                "observed_cli_version",
+            )
+        )
+        if not all(isinstance(item, str) and item for item in binding):
+            raise RegistryError(
+                f"{evidence_id}: live calibration run {run_id} runtime binding is incomplete"
+            )
+        if runtime_binding is None:
+            runtime_binding = binding  # type: ignore[assignment]
+        elif binding != runtime_binding:
+            raise RegistryError(
+                f"{evidence_id}: live calibration runtime binding mismatch"
+            )
+
+    if selected != run_ids:
+        raise RegistryError(
+            f"{evidence_id}: calibration_run_ids do not match recorded runs"
+        )
+
+    stability = calibration.get("stability")
+    if not isinstance(stability, dict):
+        raise RegistryError(
+            f"{evidence_id}: live calibration stability must be a mapping"
+        )
+    if stability.get("status") != "STABLE":
+        raise RegistryError(
+            f"{evidence_id}: live calibration is not STABLE"
+        )
+    if stability.get("run_ids") != run_ids:
+        raise RegistryError(
+            f"{evidence_id}: live calibration stability run_ids mismatch"
+        )
+    if stability.get("unstable_cases") != []:
+        raise RegistryError(
+            f"{evidence_id}: live calibration has unstable cases"
+        )
+
+
 def _validate_provider_run_binding(
     evidence_item: dict[str, Any],
     root: Path,
@@ -490,7 +714,11 @@ def _validate_provider_run_binding(
     run_record = load_yaml(run_path)
     if run_record.get("version") != 1:
         raise RegistryError(f"{evidence_id}: provider run record version must be 1")
-    if run_record.get("kind") != "harness-provider-behavioral-evidence":
+    kind = run_record.get("kind")
+    if kind not in {
+        "harness-provider-behavioral-evidence",
+        "harness-provider-live-calibration-evidence",
+    }:
         raise RegistryError(f"{evidence_id}: invalid provider run record kind")
     if run_record.get("status") != "accepted":
         raise RegistryError(f"{evidence_id}: provider run record is not accepted")
@@ -502,6 +730,15 @@ def _validate_provider_run_binding(
     revision = run_record.get("harness_revision")
     if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise RegistryError(f"{evidence_id}: invalid provider run revision")
+
+    if kind == "harness-provider-live-calibration-evidence":
+        _validate_live_calibration_provider_run(
+            evidence_item,
+            run_record,
+            root=root,
+            evidence_id=evidence_id,
+        )
+        return
 
     cases = _mapping_list(run_record.get("cases"), f"{evidence_id} provider cases")
     cases_by_id: dict[str, dict[str, Any]] = {}
@@ -1021,6 +1258,125 @@ def run_meta_self_tests(registry: dict[str, Any]) -> list[str]:
     ]
     assert denominator_report["summary"]["release_claim_ready"] is False
     passed.append("AR-M13")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        live_root = Path(tmpdir)
+        corpus_path = live_root / "corpus.yaml"
+        protocol_path = live_root / "protocol.yaml"
+        adapter_path = live_root / "adapter.py"
+        corpus_path.write_text(
+            "version: 1\nkind: harness-semantic-judgement-calibration-corpus\n"
+            "id: meta-corpus\ncases:\n"
+            "  - {id: a, expected_status: ACCEPTED, mutation_class: valid}\n"
+            "  - {id: b, expected_status: REJECTED, mutation_class: defect}\n",
+            encoding="utf-8",
+        )
+        protocol_path.write_text(
+            "version: 1\nkind: harness-live-semantic-evaluator-protocol\n"
+            "id: meta-protocol\ninstruction: classify\n",
+            encoding="utf-8",
+        )
+        adapter_path.write_text("print('adapter')\n", encoding="utf-8")
+        runtime = {
+            "provider": "provider",
+            "requested_model": "auto",
+            "resolved_model": "model-a",
+            "resolved_model_source": "session",
+            "observed_cli_version": "1.0.0",
+        }
+        meta_live_record = {
+            "calibration": {
+                "corpus": {
+                    "path": "corpus.yaml",
+                    "git_blob_sha": _git_blob_sha(corpus_path.read_bytes()),
+                    "fingerprint": "LCCORPUS-" + "1" * 64,
+                },
+                "protocol": {
+                    "path": "protocol.yaml",
+                    "git_blob_sha": _git_blob_sha(protocol_path.read_bytes()),
+                    "fingerprint": "LCPROTO-" + "2" * 64,
+                },
+                "evaluator": {
+                    "fingerprint": "LCEVAL-" + "3" * 64,
+                    "adapter_path": "adapter.py",
+                    "adapter_executable_sha256": _sha256_bytes(adapter_path.read_bytes()),
+                },
+                "runs": [
+                    {
+                        "run_id": "run-1",
+                        "request_id": "request-1",
+                        "status": "PASS",
+                        "state": "COMPLETED",
+                        "response": "VALID_ENVELOPE",
+                        "scored_count": 2,
+                        "missing": [],
+                        "misses": [],
+                        "confusion": {
+                            "true_positive": 1,
+                            "true_negative": 1,
+                            "false_positive": 0,
+                            "false_negative": 0,
+                        },
+                        "evaluator_fingerprint": "LCEVAL-" + "3" * 64,
+                        "corpus_fingerprint": "LCCORPUS-" + "1" * 64,
+                        "protocol_fingerprint": "LCPROTO-" + "2" * 64,
+                        "runtime_binding": copy.deepcopy(runtime),
+                    },
+                    {
+                        "run_id": "run-2",
+                        "request_id": "request-2",
+                        "status": "PASS",
+                        "state": "COMPLETED",
+                        "response": "VALID_ENVELOPE",
+                        "scored_count": 2,
+                        "missing": [],
+                        "misses": [],
+                        "confusion": {
+                            "true_positive": 1,
+                            "true_negative": 1,
+                            "false_positive": 0,
+                            "false_negative": 0,
+                        },
+                        "evaluator_fingerprint": "LCEVAL-" + "3" * 64,
+                        "corpus_fingerprint": "LCCORPUS-" + "1" * 64,
+                        "protocol_fingerprint": "LCPROTO-" + "2" * 64,
+                        "runtime_binding": copy.deepcopy(runtime),
+                    },
+                ],
+                "stability": {
+                    "status": "STABLE",
+                    "run_ids": ["run-1", "run-2"],
+                    "unstable_cases": [],
+                },
+            }
+        }
+        meta_live_evidence = {
+            "calibration_run_ids": ["run-1", "run-2"],
+        }
+        _validate_live_calibration_provider_run(
+            meta_live_evidence,
+            meta_live_record,
+            root=live_root,
+            evidence_id="META-LIVE-CALIBRATION",
+        )
+        broken_live = copy.deepcopy(meta_live_record)
+        broken_live["calibration"]["runs"][1]["runtime_binding"][
+            "resolved_model"
+        ] = "model-b"
+        try:
+            _validate_live_calibration_provider_run(
+                meta_live_evidence,
+                broken_live,
+                root=live_root,
+                evidence_id="META-LIVE-CALIBRATION-MISMATCH",
+            )
+        except RegistryError as exc:
+            assert "runtime binding mismatch" in str(exc)
+        else:
+            raise AssertionError(
+                "AR-M14 changed live-calibration runtime binding was accepted"
+            )
+    passed.append("AR-M14")
 
     return passed
 

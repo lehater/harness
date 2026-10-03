@@ -148,8 +148,9 @@ satisfies A11-R01 through deterministic source completeness, A11-R02 through
 current TD-BOOT-E02/E05 base-plus-noise selection, and A11-R03 through
 three-run TD-BOOT-E06 boundary convergence plus three-run TD-COMP-003 hostile
 content routing. HA-A12 satisfies A12-R01 through deterministic
-semantic derivation/admission evidence; A12-R02 remains missing because the
-current provider-auto calibration refresh did not meet the frozen O4 protocol. HA-A13 satisfies A13-R01/A13-R02 through deterministic
+semantic derivation/admission evidence and A12-R02 through current blinded O4
+calibration run `37088681223`: both repeated runs scored 14/14 with zero FP/FN
+and the identical observed runtime binding returned STABLE. HA-A13 satisfies A13-R01/A13-R02 through deterministic
 Question routing, blocking, resolution-identity and stale-snapshot evidence, and
 A13-R03 through provider run `37088500583`: TD-QST-001 passed three independent
 clean-context executions, preserving exactly one semantic blocker while a
@@ -435,15 +436,20 @@ against the same oracle. Current TL4 run `37088828742` passed TD-BOOT-E06
 three times and TD-COMP-003 three times; hostile project content never changed
 the public route or selected project boundary.
 
-HA-A12 is partially satisfied. A12-R01 reuses deterministic derivation,
-admission, contradiction, semantic-loss, and real-project atom evidence; the
-remaining TD-SEM-005 metamorphic gap is now covered by an irrelevant-source
-invariance regression. A12-R02 remains missing. Current-surface live calibration
-run `37071325425` used provider-auto: its first scorable run resolved to
-`mai-code-1.1-flash` and produced one false negative on
-`semantic-enforcement-gap` (13/14 correct), while the second provider response
-violated the versioned JSON envelope and was rejected as INCOMPLETE. This is
-evidence against an A12-F06 PASS, not a reason to weaken the oracle.
+HA-A12 is SATISFIED. A12-R01 reuses deterministic derivation, admission,
+contradiction, semantic-loss, real-project atom, and irrelevant-source
+invariance evidence. The earlier current-surface run `37071325425` remains
+negative evidence: one `semantic-enforcement-gap` false negative plus one
+malformed-envelope invocation. The evaluator adapter was then hardened without
+changing corpus v3, protocol v2, expert labels, or the deterministic scorer: its
+closed-world sufficiency prompt now explicitly forbids treating a merely
+contributory mechanism as a stronger required effect and reiterates the exact
+versioned JSON envelope. Current run `37088681223` then produced two complete
+blinded runs, both resolving to `gpt-6-luna`, each 14/14 with TP=7, TN=7,
+FP=0, FN=0; the runtime-bound stability evaluator returned `STABLE` with no
+unstable cases. This closes A12-R02 for the audited 14-case O4 corpus only.
+Provider/evaluator independence remains explicitly UNVERIFIED and no cross-model
+or universal semantic-correctness claim is made.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks
