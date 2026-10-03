@@ -130,6 +130,7 @@ contexts:
       - harness.application.coverage_application
       - harness.application.decision_explorer_request
       - harness.application.decision_pipeline
+      - harness.application.ui_design_convergence
       - distribution.harnessw
       - harness.application.graph_doctor
       - harness.application.method_router
