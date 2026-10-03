@@ -204,6 +204,7 @@ def test_process_decision_exploration_required() -> None:
         sources={"semantic_assertions": []},
         candidate=candidate(),
         acceptance_id="PROCESS-1",
+        decision_policy={"version": 1, "kind": "harness-decision-policy"},
         decision_exploration=None,
     )
     assert result["status"] == "REJECTED", result
