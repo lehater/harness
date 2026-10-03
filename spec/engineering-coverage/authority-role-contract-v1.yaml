@@ -25,6 +25,7 @@ roles:
     can_produce_claims:
       - engineering.application.use-cases
       - engineering.application.orchestration
+      - engineering.application.process
       - engineering.application.failures
       - engineering.reliability.failure-semantics
       - engineering.reliability.dependency-failure

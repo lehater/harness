@@ -415,6 +415,7 @@ def _validate_skill_contracts(
     artifact_count = 0
     decision_governed = {
         "application-design",
+        "application-process-design",
         "domain-model",
         "implementation-design",
         "system-architecture",

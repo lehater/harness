@@ -30,6 +30,9 @@ proofs:
     accepted_semantic_claims: [engineering.application.use-cases]
   application.orchestration:
     accepted_semantic_claims: [engineering.application.orchestration]
+  application.process:
+    accepted_semantic_claims: [engineering.application.process]
+    requires_semantic_evaluation: true
   application.failures:
     accepted_semantic_claims: [engineering.application.failures]
 

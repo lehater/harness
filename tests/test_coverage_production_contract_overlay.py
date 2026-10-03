@@ -149,6 +149,86 @@ def main():
     assert phantom_lifecycle["action"] == "PRODUCE_CAPABILITY", phantom_lifecycle
     assert not phantom["completion_ready"], phantom
 
+    # Strict semantic claims must preserve produce -> validate ordering.
+    # A declared Process production contract with no provider is CREATE work,
+    # not another MODEL_PRODUCTION_CONTRACT gap.
+    process_graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "STRICT-PRODUCE-THEN-VALIDATE",
+        "default_subject": "STRICT-PRODUCE-THEN-VALIDATE",
+        "authorities": [
+            {
+                "id": "APPLICATION-DESIGN",
+                "responsibility": "Own application design and process semantics.",
+                "boundary": {
+                    "semantic_cohesion": "Application composition.",
+                    "independent_change": "Application composition changes independently.",
+                    "public_contract": "Accepted application contracts.",
+                },
+                "produces": [
+                    {
+                        "capability": "fixture.application",
+                        "knowledge_kind": "application-design",
+                        "semantic_claims": ["engineering.application.orchestration"],
+                        "requires": [],
+                    },
+                    {
+                        "capability": "fixture.application-process",
+                        "knowledge_kind": "application-process-design",
+                        "semantic_claims": ["engineering.application.process"],
+                        "requires": ["fixture.application"],
+                    },
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "IMPLEMENTATION",
+                "purpose": "Consume process semantics.",
+                "requires": ["fixture.application-process"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    process_realization = {
+        "artifacts": [
+            {
+                "id": "APPLICATION",
+                "authority": "APPLICATION-DESIGN",
+                "path": "docs/application.yaml",
+                "provides": ["fixture.application"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [],
+    }
+    process_result = evaluate_project_coverage(
+        graph=process_graph,
+        realization=process_realization,
+        consumer="IMPLEMENTATION",
+        scope="default",
+        project_overlay={
+            "subject_inventory": {
+                "state": "NOT_APPLICABLE",
+                "rationale": "Single process fixture.",
+            }
+        },
+    )
+    process_row = {
+        row["concern"]: row for row in process_result["rows"]
+    }["application.process"]
+    assert process_row["state"] == "MISSING", process_row
+    assert process_row["action"] == "PRODUCE_CAPABILITY", process_row
+    process_items = [
+        item for item in process_result["work_items"]
+        if item.get("capability") == "fixture.application-process"
+    ]
+    assert len(process_items) == 1, process_items
+    assert process_items[0]["execution_route"]["knowledge_kind"] == (
+        "application-process-design"
+    ), process_items[0]
+
     print("production contract overlay: ok")
     return 0
 

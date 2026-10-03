@@ -42,10 +42,11 @@ a non-delegated material choice becomes a blocking Core `Question`.
 4. Define cross-owner reference validation and snapshot/currentness requirements without selecting database/API mechanics unless upstream architecture already constrains them.
 5. Define application outcomes: success, domain rejection, unresolved result, dependency failure and cancellation where material.
 6. Define application-level orchestration, continuation and semantic atomicity only when accepted behavior requires them. Route interacting-execution ordering, isolation, conflict, retry/idempotency and consistency correctness to CONCURRENCY-CONSISTENCY-DESIGN; route physical realization to Data Design.
-7. Keep domain invariants in Domain ownership, external representation in Interface, trust/protection in Security and runtime topology in System.
-8. State implementation freedoms and explicit NOT_APPLICABLE choices.
-9. Route missing upstream semantics as Questions rather than filling them with application conventions.
-10. Produce/register the project-native application design and reevaluate.
+7. If a bounded process has independently consumable boundary/composition/continuation/completion semantics, do not bury that contract inside broad Application Design. Route/model an APPLICATION-DESIGN Process Capability with `knowledge_kind: application-process-design`; the process producer then follows `docs/design/application-process-model-v1.md`.
+8. Keep domain invariants in Domain ownership, external representation in Interface, trust/protection in Security and runtime topology in System.
+9. State implementation freedoms and explicit NOT_APPLICABLE choices.
+10. Route missing upstream semantics as Questions rather than filling them with application conventions.
+11. Produce/register the project-native application design and reevaluate.
 
 ## Stop conditions
 

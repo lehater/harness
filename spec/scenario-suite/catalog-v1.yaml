@@ -181,6 +181,12 @@ requirements:
     description: Engineering Coverage exposes missing activated engineering knowledge even when structural artifacts exist.
     min_scenarios: 1
 
+  - id: application-process-discovery-routing
+    category: coverage
+    enforcement: required
+    description: Application process applicability becomes an explicit Coverage gap, a project-owned Process Capability, and routed application-process-design CREATE work without adding a new Authority.
+    min_scenarios: 1
+
   - id: graph-diagnostics
     description: Graph Doctor exposes structural ownership or dependency defects without treating normal incompleteness as a graph error.
     min_scenarios: 1

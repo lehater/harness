@@ -355,6 +355,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: application_process_design
+  command: python tests/test_application_process_design.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: skill_invariant_policy
   command: python checks/validate_skill_invariant_policy.py
   stage: focused

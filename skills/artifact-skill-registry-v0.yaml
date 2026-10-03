@@ -27,6 +27,9 @@ routes:
   - knowledge_kind: application-design
     skill: skills/artifacts/application-design/SKILL.md
 
+  - knowledge_kind: application-process-design
+    skill: skills/artifacts/application-process-design/SKILL.md
+
   - knowledge_kind: task-model
     skill: skills/artifacts/task-model/SKILL.md
 

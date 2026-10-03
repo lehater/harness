@@ -14,13 +14,13 @@ The Reference Model owns reusable construction rules. The generated graph remain
 
 The catalog was derived from the canonical Engineering Coverage proof space, not from project graphs:
 
-1. start from all 118 canonical semantic proof claims;
+1. start from all 119 canonical semantic proof claims;
 2. preserve current Authority ownership boundaries;
 3. group claims only when the output is independently acceptable reusable engineering knowledge;
 4. keep cross-Authority analysis methods as skills/lenses when no residual semantic product exists;
 5. use PREP/NAPMS only after the model is frozen, as regression evidence.
 
-Result: 39 Reference Capability Templates and 46 normalized predicates. Every canonical proof claim is routed to exactly one template claim surface. A claim surface is competence, not proof: a project capability emits only intrinsic primary claims plus exact claims activated by accepted concern applicability.
+Result: 40 Reference Capability Templates and 47 normalized predicates. Every canonical proof claim is routed to exactly one template claim surface. A claim surface is competence, not proof: a project capability emits only intrinsic primary claims plus exact claims activated by accepted concern applicability.
 
 ## Important falsification result
 

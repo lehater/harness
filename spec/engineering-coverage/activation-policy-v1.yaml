@@ -24,6 +24,12 @@ baseline:
   - verification.architecture
 
 rules:
+  - id: APPLICATION-PROCESS
+    when:
+      knowledge_kinds_any: [application-design, application-process-design]
+    activate:
+      - application.process
+
   - id: CONCURRENCY-CONSISTENCY
     when:
       knowledge_kinds_any: [concurrency-consistency-design]

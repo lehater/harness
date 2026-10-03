@@ -69,6 +69,13 @@ skills:
     lifecycle: active
     route_status: routed
     knowledge_kind: application-design
+  - id: application-process-design
+    path: skills/artifacts/application-process-design/SKILL.md
+    surface: consumer
+    route_class: artifact-production
+    lifecycle: active
+    route_status: routed
+    knowledge_kind: application-process-design
   - id: change-transition-design
     path: skills/artifacts/change-transition-design/SKILL.md
     surface: consumer

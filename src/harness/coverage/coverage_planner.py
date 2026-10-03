@@ -709,7 +709,11 @@ def derive_plan(
                 continue
 
         production_candidates = []
-        for cap, claims_for_cap in cap_claims.items():
+        # Production discovery must use declared claims, including claims whose
+        # realized provider later requires explicit semantic evaluation.
+        # Otherwise a known missing ProductionContract is misclassified as
+        # MODEL_PRODUCTION_CONTRACT and can never reach produce -> validate.
+        for cap, claims_for_cap in declared_cap_claims.items():
             if scoped_caps is not None and cap not in scoped_caps:
                 continue
             if cap in provided_caps:
