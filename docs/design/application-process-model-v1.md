@@ -36,12 +36,14 @@ example:
 <project>.application-process.<scope>
 ```
 
-The existing `application-design` knowledge kind remains sufficient while the
-same production and acceptance procedure can own the process coherently.
+Process Capability production is routed through the dedicated
+`application-process-design` knowledge kind. This does not create a new
+Authority: the decisions remain owned by APPLICATION-DESIGN. The separate
+knowledge kind exists so routing, decision exploration and semantic admission
+can enforce the Process v1 acceptance boundary without weakening or
+overloading the broader `application-design` contract.
 
-Do not introduce a `PROCESS-DESIGN` Authority, a Core Process entity or an
-`application-process-design` knowledge kind without concrete evidence of a
-distinct decision family, lifecycle and public producer/consumer contract.
+Do not introduce a `PROCESS-DESIGN` Authority or a Core Process entity.
 
 ## Canonical contract
 
@@ -250,7 +252,7 @@ This contract does not introduce:
 
 - a new Core entity or universal Process metamodel;
 - a `PROCESS-DESIGN` Authority;
-- a mandatory process-specific knowledge kind;
+- a new Process Authority merely because `application-process-design` is routed;
 - a universal process DSL or fixed constraint enum;
 - BPMN as canonical truth;
 - a workflow engine;
