@@ -17,7 +17,7 @@ cases:
   - {design: TD-ROUTE-001, template: cases/td-route-001/case.yaml.tmpl, dimension: selected_operation}
   - {design: TD-ROUTE-002, template: cases/td-route-002/case.yaml.tmpl, dimension: selected_operation}
   - {design: TD-ROUTE-003, template: cases/td-route-003/case.yaml.tmpl, dimension: selected_operation}
-  - {design: TD-COMP-001, template: cases/td-comp-001/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 32000}
+  - {design: TD-COMP-001, template: cases/td-comp-001/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
   - {design: TD-BOOT-E01, template: cases/td-boot-e01/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
   - {design: TD-BOOT-E02, template: cases/td-boot-e02/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
   - {design: TD-BOOT-E03, template: cases/td-boot-e03/case.yaml.tmpl, dimension: bootstrap_realization, max_prompt_bytes: 35000}
