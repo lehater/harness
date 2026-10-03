@@ -48,3 +48,9 @@ routes:
     exposure: internal
     invoked_by:
       - human-documentation-projection
+
+  - operation: application-process-bpmn
+    skill: skills/agent/application-process-bpmn/SKILL.md
+    exposure: internal
+    invoked_by:
+      - human-documentation-projection
