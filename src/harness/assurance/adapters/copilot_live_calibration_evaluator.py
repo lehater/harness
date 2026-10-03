@@ -74,9 +74,21 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
 def _prompt(request: dict[str, Any]) -> str:
     payload = _model_payload(request)
     return (
-        "Perform only the semantic classification described by this JSON input. "
-        "Do not infer hidden labels or use external tools. "
-        "Return exactly the requested JSON response object.\n"
+        "Perform only the blinded semantic classification described by this JSON input. "
+        "Apply a strict closed-world sufficiency check to every case: first identify "
+        "each behavior, constraint, governed actor/object, trigger, and required effect "
+        "explicitly stated by the source and relevant to the declared relation; then "
+        "return ACCEPTED only if the target itself explicitly entails every such "
+        "obligation without contradiction or material loss. A related or contributory "
+        "mechanism is not sufficient for a stronger required effect: interface/action "
+        "availability does not by itself establish execution denial, logging does not "
+        "by itself establish user-visible state, and warning does not by itself establish "
+        "prevention. Never assume an unstated exclusive path, enforcement mechanism, "
+        "side effect, or surrounding context. Do not infer hidden labels or use external "
+        "tools. Before returning, verify that every input case has exactly one result and "
+        "that the response is exactly one JSON object with top-level "
+        "version=1, kind=harness-live-semantic-evaluator-response, and results=[...]. "
+        "Do not omit version, kind, or results; do not return markdown or surrounding text.\n"
         + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     )
 

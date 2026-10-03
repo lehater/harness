@@ -16,6 +16,7 @@ from harness.assurance.adapters.copilot_live_calibration_evaluator import (
     _model_payload,
     _parse_copilot_jsonl,
     _parse_model_response,
+    _prompt,
 )
 from harness.assurance.live_calibration import (
     build_live_calibration_request,
@@ -80,6 +81,15 @@ assert set(model_payload) == {
 assert len(model_payload["cases"]) == len(CORPUS["cases"])
 for case in model_payload["cases"]:
     assert set(case) == {"case_request_id", "source", "target", "relation"}
+
+prompt = _prompt(process_request)
+assert "strict closed-world sufficiency check" in prompt
+assert "interface/action availability does not by itself establish execution denial" in prompt
+assert "version=1, kind=harness-live-semantic-evaluator-response" in prompt
+assert "expected_status" not in prompt
+assert "mutation_class" not in prompt
+for canonical in (case["id"] for case in CORPUS["cases"]):
+    assert canonical not in prompt
 
 rendered = json.dumps(model_payload, ensure_ascii=False)
 assert "expected_status" not in rendered

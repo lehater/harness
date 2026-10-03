@@ -1711,6 +1711,13 @@ Normalized admitted downstream semantics are unchanged.
 Use an expert-labelled corpus with explicit positive/negative semantic
 transformations and report confusion/stability rather than only aggregate pass.
 
+**Current A12 execution:** provider run `37088681223` used the unchanged
+14-case corpus v3 and protocol v2 through hardened adapter version 2. Both
+blinded runs resolved to `gpt-6-luna`, scored 14/14 with zero FP/FN, and the
+runtime-bound repeated-run evaluation returned `STABLE`. The earlier run
+`37071325425` remains recorded as pre-fix negative evidence and was not erased
+or reclassified.
+
 # SF-09 — Lifecycle, graph evolution, and scale
 
 ## TD-LIFE-001 — Prerequisite acceptance change

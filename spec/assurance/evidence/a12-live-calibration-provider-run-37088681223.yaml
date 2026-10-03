@@ -1,0 +1,97 @@
+version: 1
+kind: harness-provider-live-calibration-evidence
+id: A12-LIVE-CALIBRATION-PROVIDER-RUN-37088681223
+status: accepted
+provider: github-copilot
+workflow_run_id: 37088681223
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37088681223
+workflow_conclusion: success
+artifact:
+  id: 11261094262
+  name: live-calibration-evidence
+  sha256: 9a86348ccb9a6232e56ce32554cbfac0d26b237a03e0ea7f892a1f140d9a0154
+  retention_days: 90
+harness_revision: 87898d62c6ac0b6f0e25b4707936a45b0e89edff
+execution_bindings:
+  files:
+    - {path: spec/semantic-derivation/calibration-corpus-v3.yaml, git_blob_sha: ff695bba3603dc55e86193103de3d36ce4934c94}
+    - {path: spec/semantic-derivation/live-calibration-protocol-v2.yaml, git_blob_sha: 125d35fb984f9d50176f8a5bbeda47cec519b3ea}
+    - {path: src/harness/assurance/adapters/copilot_live_calibration_evaluator.py, git_blob_sha: c3e419d9d87d1e64fca15557c9edc9b93be9ddd9}
+    - {path: src/harness/assurance/live_calibration.py, git_blob_sha: 5f8a370cfec6c2cdc93f524bc247440019d6bdd8}
+    - {path: src/harness/assurance/semantic_judgement_calibration.py, git_blob_sha: c1d3af3b27e2d519d67cc420fe6fbe9799855263}
+    - {path: evals/live_calibration_process_driver.py, git_blob_sha: 13711ca639cd6b6fb1680f9ddf7339737aac01ef}
+    - {path: spec/live-calibration-provider/copilot-run.yaml.tmpl, git_blob_sha: deb8725af77066b5cf174c0852a7bc737cd437fb}
+    - {path: .github/workflows/live-calibration-copilot.yml, git_blob_sha: 99b0d246647badad26668964a6885922593d3161}
+currentness:
+  state: current
+  reason: >-
+    The accepted run is bound to the hardened adapter bytes, unchanged audited
+    corpus v3, unchanged protocol v2, deterministic scorer/binding code, runtime
+    scenario template and operator workflow used by the execution.
+calibration:
+  corpus:
+    path: spec/semantic-derivation/calibration-corpus-v3.yaml
+    git_blob_sha: ff695bba3603dc55e86193103de3d36ce4934c94
+    fingerprint: LCCORPUS-f2fa93992fc0bacbc1a3c54eb7b2bf60fab7f4e8764b3d5abc3b8ffc779ce342
+  protocol:
+    path: spec/semantic-derivation/live-calibration-protocol-v2.yaml
+    git_blob_sha: 125d35fb984f9d50176f8a5bbeda47cec519b3ea
+    fingerprint: LCPROTO-8d603fe525420519d8a51c6554aa889f5a84f645b9226c845c22c593280065af
+  evaluator:
+    fingerprint: LCEVAL-e09732a1c423102a905ddd6da75f14a3a315772d402c5c839d994dd58621c725
+    adapter_path: src/harness/assurance/adapters/copilot_live_calibration_evaluator.py
+    adapter_executable_sha256: 95a02ec9fc07774e97af6cb97260e8fbd71177094c0aff70fe78e7695863cd1d
+    provider_adapter_version: "2"
+  independence:
+    status: UNVERIFIED
+    harness_guarantees:
+      - EXPERT_LABELS_WITHHELD_FROM_EVALUATOR_REQUEST
+      - REQUEST_BOUND_RESPONSE_VALIDATION
+  runs:
+    - run_id: GH-37088681223-1-1
+      request_id: LCREQ-e8b8d5613464919a19a010491286b08a94242500059135c5fe178a9331c6f13e
+      status: PASS
+      state: COMPLETED
+      response: VALID_ENVELOPE
+      scored_count: 14
+      missing: []
+      misses: []
+      confusion: {true_positive: 7, true_negative: 7, false_positive: 0, false_negative: 0}
+      metrics: {accuracy: 1.0, detection_recall: 1.0, false_positive_rate: 0.0}
+      evaluator_fingerprint: LCEVAL-e09732a1c423102a905ddd6da75f14a3a315772d402c5c839d994dd58621c725
+      corpus_fingerprint: LCCORPUS-f2fa93992fc0bacbc1a3c54eb7b2bf60fab7f4e8764b3d5abc3b8ffc779ce342
+      protocol_fingerprint: LCPROTO-8d603fe525420519d8a51c6554aa889f5a84f645b9226c845c22c593280065af
+      runtime_binding:
+        provider: github-copilot
+        requested_model: auto
+        resolved_model: gpt-6-luna
+        resolved_model_source: copilot-cli-session-events
+        observed_cli_version: "1.0.86"
+    - run_id: GH-37088681223-1-2
+      request_id: LCREQ-d4718dd20057cbc78e9f83b9d97e149a2a563f5e56a19764da261cefde5eb039
+      status: PASS
+      state: COMPLETED
+      response: VALID_ENVELOPE
+      scored_count: 14
+      missing: []
+      misses: []
+      confusion: {true_positive: 7, true_negative: 7, false_positive: 0, false_negative: 0}
+      metrics: {accuracy: 1.0, detection_recall: 1.0, false_positive_rate: 0.0}
+      evaluator_fingerprint: LCEVAL-e09732a1c423102a905ddd6da75f14a3a315772d402c5c839d994dd58621c725
+      corpus_fingerprint: LCCORPUS-f2fa93992fc0bacbc1a3c54eb7b2bf60fab7f4e8764b3d5abc3b8ffc779ce342
+      protocol_fingerprint: LCPROTO-8d603fe525420519d8a51c6554aa889f5a84f645b9226c845c22c593280065af
+      runtime_binding:
+        provider: github-copilot
+        requested_model: auto
+        resolved_model: gpt-6-luna
+        resolved_model_source: copilot-cli-session-events
+        observed_cli_version: "1.0.86"
+  stability:
+    status: STABLE
+    run_ids: [GH-37088681223-1-1, GH-37088681223-1-2]
+    unstable_cases: []
+limitations:
+  - The O4 claim is bounded to the audited 14-case semantic-derivation calibration corpus v3; it is not a universal semantic-correctness claim.
+  - Harness proves expert-label withholding and exact request/runtime binding but reports provider/evaluator independence as UNVERIFIED.
+  - Provider-auto resolved both accepted runs to gpt-6-luna; this does not establish cross-model calibration.
+  - The pre-fix current-surface run 37071325425 remains negative historical evidence and is not replaced or hidden.

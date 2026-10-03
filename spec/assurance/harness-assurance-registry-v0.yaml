@@ -1656,6 +1656,41 @@ evidence:
     limitations:
       - Covers required-atom preservation and omission mutation, undeclared prerequisite/Authority rejection, contradiction rejection, admission/lifecycle composition, real-project semantic-loss localization, and exact invariance under an irrelevant source-statement addition.
       - "Does not satisfy A12-R02: current provider-backed calibration must independently meet the O4 protocol."
+  - id: EVID-A12-DELEGATED-CALIBRATION-37088681223
+    providers:
+      - src/harness/assurance/adapters/copilot_live_calibration_evaluator.py
+      - src/harness/assurance/live_calibration.py
+      - src/harness/assurance/semantic_judgement_calibration.py
+      - evals/live_calibration_process_driver.py
+      - checks/validate_assurance_registry.py
+    source_refs:
+      - path: spec/semantic-derivation/calibration-corpus-v3.yaml
+      - path: spec/semantic-derivation/live-calibration-protocol-v2.yaml
+      - path: src/harness/assurance/adapters/copilot_live_calibration_evaluator.py
+      - path: src/harness/assurance/live_calibration.py
+      - path: src/harness/assurance/semantic_judgement_calibration.py
+      - path: evals/live_calibration_process_driver.py
+      - path: spec/live-calibration-provider/copilot-run.yaml.tmpl
+      - path: spec/assurance/evidence/a12-live-calibration-provider-run-37088681223.yaml
+    satisfies: [A12-R02]
+    test_level: TL4
+    methods: [EM-12]
+    oracle_class: O4
+    execution_nature: judgement-dependent
+    source_type: external
+    provider_run_ref: spec/assurance/evidence/a12-live-calibration-provider-run-37088681223.yaml
+    calibration_run_ids:
+      - GH-37088681223-1-1
+      - GH-37088681223-1-2
+    status: verified
+    verified_at_revision: 87898d62c6ac0b6f0e25b4707936a45b0e89edff
+    limitations:
+      - The expert-labelled O4 result is bounded to the audited 14-case semantic-derivation calibration corpus v3.
+      - Both accepted blinded runs resolved to gpt-6-luna under provider-auto and were 14/14 with zero FP/FN and STABLE verdicts; no cross-model claim is made.
+      - Harness proves expert-label withholding and request/runtime binding, while evaluator independence remains explicitly UNVERIFIED.
+      - Historical current-surface run 37071325425 remains negative pre-fix evidence and is not treated as superseded proof.
+
+
 
   - id: EVID-A11-SOURCE-COMPLETENESS
     providers:
