@@ -26,7 +26,7 @@ baseline:
 rules:
   - id: APPLICATION-PROCESS
     when:
-      authority_roles_any: [application]
+      knowledge_kinds_any: [application-design, application-process-design]
     activate:
       - application.process
 
