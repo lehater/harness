@@ -29,15 +29,14 @@ Use before target-state evaluation when no suitable profile exists, or when a co
    - repeated/paraphrased statements remain evidence for one Capability rather than new Capabilities;
    - a novel project-specific Capability is valid even when no Reference Model template or existing `knowledge_kind` names it;
    - descriptive terminology, filenames, examples, deployment/release/observability vocabulary, and other lexical pressure never create or substitute for an engineering obligation.
-7. Before finalizing APPLICATION-DESIGN knowledge for the selected scope, assess whether downstream consumers need an independently accepted bounded process contract. When boundary/composition/continuation/completion would otherwise have to be reconstructed from operations, use cases, journeys or implementation, require a separate `<project>.application-process.<scope>` Capability under APPLICATION-DESIGN with `knowledge_kind: application-process-design`. If existing accepted application knowledge already provides the same independently consumable contract, reuse it instead of duplicating the Capability.
-8. Represent each required knowledge item as `subject + capability + authority`. Treat `capability`, not `subject`, as the provider-resolution key.
-9. If one broad capability is provided by several same-Authority artifacts for different subjects and the selected policy requires subject-specific coverage, do not assume the `subject` field filters those providers. Reuse the target-owned coverage policy/adapter to derive subject-scoped CapabilityIds, or evaluate the project-specific coverage check alongside the consumer profile, so each required subject can be proven independently.
-10. Add `depends_on` between expectations when downstream knowledge cannot be responsibly formed before upstream knowledge is accepted. Derive ordering from existing canonical dependency/consumer topology when available rather than inventing a parallel workflow.
-11. Keep project-level design knowledge separate from change/slice-specific readiness.
-12. Prefer existing project vocabulary for capabilities and Authorities.
-13. Reuse a starter profile only as a checklist; adapt it to the actual repository.
-14. Evaluate every applicable derived profile/check against the current Core/project graph and inspect the resulting frontier. Do not report the selected scope COMPLETE while an accepted project-owned completeness/coverage policy remains incomplete.
-15. If implementation later exposes a semantic capability that was genuinely required for the selected scope but absent from the profile, add that expectation after the gap is understood. Do not rely only on the historical Question: the refined profile should remember the newly demonstrated knowledge requirement.
+7. Represent each required knowledge item as `subject + capability + authority`. Treat `capability`, not `subject`, as the provider-resolution key.
+8. If one broad capability is provided by several same-Authority artifacts for different subjects and the selected policy requires subject-specific coverage, do not assume the `subject` field filters those providers. Reuse the target-owned coverage policy/adapter to derive subject-scoped CapabilityIds, or evaluate the project-specific coverage check alongside the consumer profile, so each required subject can be proven independently.
+9. Add `depends_on` between expectations when downstream knowledge cannot be responsibly formed before upstream knowledge is accepted. Derive ordering from existing canonical dependency/consumer topology when available rather than inventing a parallel workflow.
+10. Keep project-level design knowledge separate from change/slice-specific readiness.
+11. Prefer existing project vocabulary for capabilities and Authorities.
+12. Reuse a starter profile only as a checklist; adapt it to the actual repository.
+13. Evaluate every applicable derived profile/check against the current Core/project graph and inspect the resulting frontier. Do not report the selected scope COMPLETE while an accepted project-owned completeness/coverage policy remains incomplete.
+14. If implementation later exposes a semantic capability that was genuinely required for the selected scope but absent from the profile, add that expectation after the gap is understood. Do not rely only on the historical Question: the refined profile should remember the newly demonstrated knowledge requirement.
 
 ## Review questions
 
