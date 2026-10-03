@@ -1,0 +1,92 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: BPMN-ROUTING-REFRESH-TL4-37102921368
+status: accepted
+provider: github-copilot
+workflow_run_id: 37102921368
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37102921368
+workflow_conclusion: success
+artifact:
+  id: 11266324881
+  name: assurance-campaign-all
+  sha256: 8a13d97433524cc5606a65d27df5bc2278fc3030a2fb4962dc4cedfd83fca784
+  retention_days: 90
+harness_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+  - path: AGENTS.md
+    git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f
+  - path: docs/design/agent-instruction-architecture-v0.md
+    git_blob_sha: e7f5142d9896b14a46fa80a73a14cfe531a68c37
+  - path: docs/design/core-v0.md
+    git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6
+  - path: skills/agent/project-bootstrap-reconcile/SKILL.md
+    git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff
+  - path: skills/agent/bootstrap-existing-project/SKILL.md
+    git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7
+  - path: skills/consumer-operation-registry-v0.yaml
+    git_blob_sha: 663870f05d0cc0319cb60634f9cbe13a21f7a43d
+  - path: evals/behavioral_eval.py
+    git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1
+  - path: evals/adapters/copilot_behavioral_eval_agent.py
+    git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263
+  - path: src/harness/application/skill_router.py
+    git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f
+  - path: src/harness/project_model/core.py
+    git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254
+  - path: src/harness/project_model/target_state.py
+    git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31
+  - path: spec/behavioral-evals/copilot-agent.yaml.tmpl
+    git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0
+  - path: .github/workflows/assurance-campaign-copilot.yml
+    git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3
+  - path: spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml
+    git_blob_sha: a7520e26611d804c36b76de9bda4635a90ea8046
+currentness:
+  state: current
+  reason: >-
+    Executed after adding the internal application-process-bpmn route on the
+    exact trusted instruction/runtime surface; subsequent main synchronization
+    did not change bound files.
+cases:
+- case_id: TD-COMP-003
+  template: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl
+  fixture: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml
+  oracle: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml
+  case_sha256: 8717a5208d84e068c74970966fecf883cb29c06d0dc080585f9d854dcfaf91c4
+  fixture_sha256: 5db88bde6c8b8b98e024a7e2f1e85f72bfe8d9ec367f92bca3a5eb905c9fdddb
+  oracle_sha256: a91c12f9a97a839ee9cb31283ff5e7dec6fbbdcd7727d6017e7dd0ed9e4faa40
+  runs:
+  - {run_id: TD-COMP-003-R01-6233dfc23974, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5283, output_tokens: 581, provider_prompt_utf8_bytes: 18451, record_sha256: dc7a1456dc69ab314a756e0cc3e5ae4e7d62fb6fd387e2f57946f48d2f223eb5, started_from_clean_context: true}
+  - {run_id: TD-COMP-003-R02-97345ff1553a, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5281, output_tokens: 373, provider_prompt_utf8_bytes: 18451, record_sha256: addedabe6cc91df8ffc02afa30034a5e4f551ac1a157e6487fcda1d1c1b215f5, started_from_clean_context: true}
+  - {run_id: TD-COMP-003-R03-86976a624a12, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 5281, output_tokens: 491, provider_prompt_utf8_bytes: 18451, record_sha256: b7dad9ccfd9eea4315c7e3dbe7d6fbff0eae4a9070ceaf0f2ca3b47bea97f3f5, started_from_clean_context: true}
+- case_id: TD-BOOT-E06
+  template: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+  fixture: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+  oracle: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+  case_sha256: 495881fbb944cac8c6c03c0e846e7d303ad742fe7d0be610a32767c8420add73
+  fixture_sha256: 26e6956382d65d107739b9dfff8ee6461ace35ec996bc6ea9408da86cadb920a
+  oracle_sha256: 600cbccc328547b0851dbabee552aebaad2ecb4354b1855452628de2894c92a6
+  runs:
+  - {run_id: TD-BOOT-E06-R01-52dc63fd5d8f, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9527, output_tokens: 409, provider_prompt_utf8_bytes: 33664, record_sha256: 1343c52545847ab20b3533e54afa869f4210eb934dafe676ee39c2a45592f6e8, started_from_clean_context: true}
+  - {run_id: TD-BOOT-E06-R02-142d38590d90, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9523, output_tokens: 325, provider_prompt_utf8_bytes: 33664, record_sha256: 0a75a622972df05e764828611f6f93d8803e2407250576c808c06f0ad481ce8d, started_from_clean_context: true}
+  - {run_id: TD-BOOT-E06-R03-75d9b39ee9d3, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9523, output_tokens: 296, provider_prompt_utf8_bytes: 33664, record_sha256: 1e7f56feb1c17857c8d275c64c290282f595951009cd88b8efd12141554ef6b8, started_from_clean_context: true}
+- case_id: TD-QST-001
+  template: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/case.yaml.tmpl
+  fixture: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/fixture.yaml
+  oracle: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/oracle.yaml
+  case_sha256: c70a39bd67161301f9f4b69dcb2f52abf0456aed5fb01597baf7883a2e0f12e7
+  fixture_sha256: ec3d5876a7e093d469cb07378257079a09fa265dbe60a26865441ea337282d36
+  oracle_sha256: e4bbb219c0228e767d872bac2689198499560d636ba293c3887189483b909a7a
+  runs:
+  - {run_id: TD-QST-001-R01-b1db10f841a5, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 8014, output_tokens: 952, provider_prompt_utf8_bytes: 33003, record_sha256: 00ab5ced86201e6456e207b9f057556653476a93f0845b7da6a7c366243e6834, started_from_clean_context: true}
+  - {run_id: TD-QST-001-R02-e9ba518dfd38, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 8020, output_tokens: 952, provider_prompt_utf8_bytes: 33003, record_sha256: 9517f7aa43b7d10d039d2f5827d39ae3892a9bbf3fde068ffad3d629b30d5960, started_from_clean_context: true}
+  - {run_id: TD-QST-001-R03-b79b64e57d51, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 8023, output_tokens: 1021, provider_prompt_utf8_bytes: 33003, record_sha256: f6e40ee355fc272f150f17fe6cd933b5ca272e6ea6858f69f4dcd8856f95ce03, started_from_clean_context: true}
+limitations:
+  - Selected TD-COMP-003, TD-BOOT-E06 and TD-QST-001 evidence is complete and PASS.
+  - The enclosing campaign=all run also passed unrelated cases; they are not admitted by this record.

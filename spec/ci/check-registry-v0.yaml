@@ -255,6 +255,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: application_process_bpmn_projection
+  command: python tests/test_application_process_bpmn_projection.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: coverage_map_experiment
   command: python tests/test_coverage_map_experiment.py
   stage: focused

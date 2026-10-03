@@ -1,0 +1,90 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: BPMN-ROUTING-REFRESH-TL5-37102921368
+status: accepted
+provider: github-copilot
+workflow_run_id: 37102921368
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37102921368
+workflow_conclusion: success
+artifact:
+  id: 11266324881
+  name: assurance-campaign-all
+  sha256: 8a13d97433524cc5606a65d27df5bc2278fc3030a2fb4962dc4cedfd83fca784
+  retention_days: 90
+harness_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+  - path: AGENTS.md
+    git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f
+  - path: docs/design/agent-instruction-architecture-v0.md
+    git_blob_sha: e7f5142d9896b14a46fa80a73a14cfe531a68c37
+  - path: docs/design/core-v0.md
+    git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6
+  - path: skills/agent/project-bootstrap-reconcile/SKILL.md
+    git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff
+  - path: skills/agent/bootstrap-existing-project/SKILL.md
+    git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7
+  - path: skills/consumer-operation-registry-v0.yaml
+    git_blob_sha: 663870f05d0cc0319cb60634f9cbe13a21f7a43d
+  - path: evals/behavioral_eval.py
+    git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1
+  - path: evals/adapters/copilot_behavioral_eval_agent.py
+    git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263
+  - path: src/harness/application/skill_router.py
+    git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f
+  - path: src/harness/project_model/core.py
+    git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254
+  - path: src/harness/project_model/target_state.py
+    git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31
+  - path: spec/behavioral-evals/copilot-agent.yaml.tmpl
+    git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0
+  - path: .github/workflows/assurance-campaign-copilot.yml
+    git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3
+  - path: spec/behavioral-evals/tl5-known-project/manifest-v0.yaml
+    git_blob_sha: 0c46177d87ba6df5572a709c0dc4b1c3417d4692
+currentness:
+  state: current
+  reason: >-
+    Executed after adding the internal application-process-bpmn route on the
+    exact trusted instruction/runtime surface; subsequent main synchronization
+    did not change bound files.
+cases:
+- case_id: TD-BOOT-E07
+  template: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+  fixture: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+  oracle: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+  case_sha256: 3b212940b96288cafc6dfa727d06b093ae5cb6921db586c49ff122e59524f520
+  fixture_sha256: c55e0ceae5913faeafaed45300454670ba3b5e39a33e6bff2b1934d2393d1d03
+  oracle_sha256: bf2f8137f29339ddc3c326d058c688a7bbf5a19566a8ffee3dd1233a440124aa
+  runs:
+  - run_id: TD-BOOT-E07-R01-c478ae195bab
+    run_status: COMPLETED
+    correctness: PASS
+    resolved_model: mai-code-1.1-flash
+    input_tokens: 8981
+    output_tokens: 1249
+    provider_prompt_utf8_bytes: 36548
+    record_sha256: 683c27caa0c8b937480001277e8e1885a2e8d41a1f8f145e0e612b42ec257903
+    started_from_clean_context: true
+    execution_context: {phase: bootstrap, sequence: bootstrap-idempotence, step: 1}
+  - run_id: TD-BOOT-E07-R02-75710fab839a
+    run_status: COMPLETED
+    correctness: PASS
+    resolved_model: mai-code-1.1-flash
+    input_tokens: 8572
+    output_tokens: 937
+    provider_prompt_utf8_bytes: 34107
+    record_sha256: 0232b8be01f86ee79f5dc6b95312ed5e6796c5a27359b2af32ef7f81ac876e27
+    started_from_clean_context: true
+    execution_context: {phase: reconcile-existing, sequence: bootstrap-idempotence, step: 2}
+    derived_input_binding:
+      core_model_sha256: 61e0baec227a32ed76054a964f54adda5b6d6d966d61da82f0c307d73a238630
+      prior_run_record_sha256: 683c27caa0c8b937480001277e8e1885a2e8d41a1f8f145e0e612b42ec257903
+limitations:
+  - Current bounded NAPMS O2 regression on the refreshed instruction surface.
+  - It remains a co-design known-project regression, not an independent TL6 portability holdout.

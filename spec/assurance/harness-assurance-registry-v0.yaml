@@ -2282,8 +2282,33 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37094123915.yaml
     case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - Three bounded public-intent discrimination cases only; TL4 trust/convergence is separate.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A16-INTENT-TL1-37102921368
+    providers:
+      - docs/design/agent-instruction-architecture-v0.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - {path: spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-route-002/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-route-003/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml}
+    satisfies: [A16-R01]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
+    case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
     status: verified
-    verified_at_revision: 58da538aa367bbb158f4e20b74c1c312205ef34e
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - Three bounded public-intent discrimination cases only; TL4 trust/convergence is separate.
 
@@ -2306,12 +2331,38 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-tl4-provider-run-37091444229.yaml
     case_ids: [TD-COMP-003]
-    status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    status: stale
+    verified_at_revision: null
     limitations:
       - Three independent clean-context calls all selected project-bootstrap-reconcile despite hostile project route directives.
       - One frozen bootstrap/reconcile intent only; this is not a universal natural-language classifier claim.
       - The enclosing workflow was red because unrelated TD-QST-001 had one external timeout; selected A16 case evidence is complete and PASS.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A16-ROUTE-TL4-37102921368
+    providers:
+      - docs/design/agent-instruction-architecture-v0.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/fixture.yaml}
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/oracle.yaml}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml}
+    satisfies: [A16-R05, A16-R06]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
+    case_ids: [TD-COMP-003]
+    status: verified
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    limitations:
+      - Three independent clean-context calls selected project-bootstrap-reconcile despite hostile project route directives.
+      - One frozen bootstrap/reconcile intent only; this is not a universal natural-language classifier claim.
 
   - id: EVID-A09-TL2-37094123915
     providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
@@ -2326,8 +2377,27 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37094123915.yaml
     case_ids: [TD-COMP-001]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - One controlled reviewed-target to bootstrap-realization handoff; higher-level A09 guarantees use separate evidence.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A09-TL2-37102921368
+    providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
+    source_refs:
+      - {path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml}
+    satisfies: [A09-R01]
+    test_level: TL2
+    methods: [EM-07]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
+    case_ids: [TD-COMP-001]
     status: verified
-    verified_at_revision: 58da538aa367bbb158f4e20b74c1c312205ef34e
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - One controlled reviewed-target to bootstrap-realization handoff; higher-level A09 guarantees use separate evidence.
 
@@ -2348,8 +2418,31 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37094123915.yaml
     case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - Controlled synthetic existing-project micro-project evidence only; TL4 convergence and TL5 known-project regression are separate.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A09-TL3-37102921368
+    providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
+    source_refs:
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml}
+    satisfies: [A09-R02]
+    test_level: TL3
+    methods: [EM-03, EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
+    case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
     status: verified
-    verified_at_revision: 58da538aa367bbb158f4e20b74c1c312205ef34e
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - Controlled synthetic existing-project micro-project evidence only; TL4 convergence and TL5 known-project regression are separate.
 
@@ -2366,8 +2459,27 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-tl4-provider-run-37091444229.yaml
     case_ids: [TD-BOOT-E06]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - Three clean contexts for one frozen synthetic existing-project realization; not a known-project claim.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A09-TL4-37102921368
+    providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
+    source_refs:
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml}
+    satisfies: [A09-R03]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
+    case_ids: [TD-BOOT-E06]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - Three clean contexts for one frozen synthetic existing-project realization; not a known-project claim.
 
@@ -2384,8 +2496,27 @@ evidence:
     source_type: known-project
     provider_run_ref: spec/assurance/evidence/routing-refresh-tl5-provider-run-37091193033.yaml
     case_ids: [TD-BOOT-E07]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - One bounded co-design NAPMS regression; not an independent TL6 holdout.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A09-TL5-37102921368
+    providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py, src/harness/project_model/target_state.py]
+    source_refs:
+      - {path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-tl5-provider-run-37102921368.yaml}
+    satisfies: [A09-R04]
+    test_level: TL5
+    methods: [EM-10]
+    oracle_class: O2
+    execution_nature: judgement-dependent
+    source_type: known-project
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl5-provider-run-37102921368.yaml
+    case_ids: [TD-BOOT-E07]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - One bounded co-design NAPMS regression; not an independent TL6 holdout.
 
@@ -2403,8 +2534,28 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-first-wave-provider-run-37094123915.yaml
     case_ids: [TD-BOOT-E02, TD-BOOT-E05]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - Bounded synthetic base-plus-unrelated-subtree source-selection evidence only.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A11-SOURCE-SELECTION-TL3-37102921368
+    providers: [skills/agent/project-bootstrap-reconcile/SKILL.md, skills/agent/bootstrap-existing-project/SKILL.md, evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
+    source_refs:
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml}
+    satisfies: [A11-R02]
+    test_level: TL3
+    methods: [EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
+    case_ids: [TD-BOOT-E02, TD-BOOT-E05]
     status: verified
-    verified_at_revision: 58da538aa367bbb158f4e20b74c1c312205ef34e
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - Bounded synthetic base-plus-unrelated-subtree source-selection evidence only.
 
@@ -2422,8 +2573,28 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-tl4-provider-run-37091444229.yaml
     case_ids: [TD-BOOT-E06, TD-COMP-003]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - One frozen synthetic bootstrap/reconcile source and route boundary; no portability claim.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A11-TRUST-CONVERGENCE-TL4-37102921368
+    providers: [skills/agent/project-bootstrap-reconcile/SKILL.md, skills/agent/bootstrap-existing-project/SKILL.md, skills/consumer-operation-registry-v0.yaml, evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
+    source_refs:
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-comp-003/case.yaml.tmpl}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml}
+    satisfies: [A11-R03]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
+    case_ids: [TD-BOOT-E06, TD-COMP-003]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - One frozen synthetic bootstrap/reconcile source and route boundary; no portability claim.
 
@@ -2442,8 +2613,29 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/routing-refresh-qst-provider-run-37091191705.yaml
     case_ids: [TD-QST-001]
+    status: stale
+    verified_at_revision: null
+    limitations:
+      - One frozen synthetic semantic-unknown versus process-failure classification case; no arbitrary wording guarantee.
+      - Superseded after the trusted consumer operation registry changed for application-process-bpmn.
+
+  - id: EVID-A13-QUESTION-CLASSIFICATION-TL4-37102921368
+    providers: [evals/behavioral_eval.py, evals/adapters/copilot_behavioral_eval_agent.py]
+    source_refs:
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/case.yaml.tmpl}
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/fixture.yaml}
+      - {path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/oracle.yaml}
+      - {path: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml}
+    satisfies: [A13-R03]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
+    case_ids: [TD-QST-001]
     status: verified
-    verified_at_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
     limitations:
       - One frozen synthetic semantic-unknown versus process-failure classification case; no arbitrary wording guarantee.
 

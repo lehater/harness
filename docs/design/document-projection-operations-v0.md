@@ -142,6 +142,7 @@ tool names:
 ```text
 architecture-c4-structurizr
 data-model-dbml
+application-process-bpmn
 sequence-diagram-plantuml
 state-machine-plantuml
 ```
