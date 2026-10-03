@@ -931,7 +931,7 @@ coverage is unchanged.
 **Oracle:** O1 for intended route  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via the provider-neutral behavioral runner. Current run `37091190364` passed TD-ROUTE-001/002/003 after the canonical public-operation selection contract was clarified. TL4 prompt/data trust and convergence remain owned by TD-COMP-003.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via the provider-neutral behavioral runner. Current run `37092423399` passed TD-ROUTE-001/002/003 after the canonical public-operation selection contract was clarified. TL4 prompt/data trust and convergence remain owned by TD-COMP-003.
 
 Task:
 
@@ -1282,7 +1282,8 @@ registered trigger; scope nouns remain context rather than routing intent.
 Post-fix run `37091444229` passed TD-COMP-003 in all three independent
 clean contexts. An earlier post-fix attempt had two PASS results plus one
 external 120-second execution timeout and was not admitted as convergence
-evidence.
+evidence. A later first-wave-only prompt-budget adjustment did not alter this
+TL4 execution surface.
 
 
 **TL4 execution design:** `spec/behavioral-evals/tl4-existing-project/cases/td-comp-003`
