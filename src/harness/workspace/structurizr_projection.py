@@ -56,8 +56,8 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
     output = profile.get("output")
     if not isinstance(output, dict):
         raise CoreError("Structurizr C4 profile output must be a mapping")
-    dsl_path = _repo_relative(output.get("dsl"), "Structurizr DSL output")
-    provenance_path = _repo_relative(
+    dsl_path = repository_relative_path(output.get("dsl"), "Structurizr DSL output")
+    provenance_path = repository_relative_path(
         output.get("provenance"),
         "Structurizr provenance output",
     )
