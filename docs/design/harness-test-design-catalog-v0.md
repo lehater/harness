@@ -1680,7 +1680,12 @@ derivation.
 
 Expected result:
 
-Admission fails or surfaces the exact missing obligation.
+Admission fails or surfaces the exact missing obligation. When an obligation
+requires explicit target provenance, an evidence link alone is insufficient:
+at least one linked target semantic assertion must name the source atom in its
+`derived_from` provenance or the source remains unresolved.
+
+**Evidence:** `tests/test_semantic_admission.py::test_required_target_provenance`.
 
 ## TD-SEM-003 — Unsupported provenance rejected
 

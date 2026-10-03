@@ -30,6 +30,7 @@ model:
       min_count: optional-default-1
       subject: optional
       allow_not_applicable: optional-default-false
+      require_target_provenance: optional-default-false
   evidence:
     kind: harness-semantic-derivation-evidence
     required:
@@ -63,6 +64,7 @@ model:
       - INVALID_DERIVATION_RELATION
       - UNKNOWN_DERIVATION_SOURCE
       - UNKNOWN_DERIVATION_TARGET
+      - DERIVATION_TARGET_PROVENANCE_MISSING
       - INVALID_DERIVATION_DISPOSITIONS
       - INVALID_DERIVATION_DISPOSITION
       - DUPLICATE_DERIVATION_DISPOSITION
@@ -98,6 +100,13 @@ rules:
   alternatives: >-
     Several downstream designs may be valid. Acceptance depends on required
     semantic coverage and valid evidence, not literal target identities or shape.
+  explicit_target_provenance: >-
+    An obligation may set require_target_provenance when a source atom must be
+    materially represented by the downstream semantic contract rather than merely
+    named in external derivation evidence. Such a source is covered only when at
+    least one linked target assertion explicitly lists that source id in derived_from.
+    This is a deterministic provenance/realization guard; it does not by itself
+    prove arbitrary natural-language entailment.
   semantic_truth: >-
     A derivation contract may require semantic judgement when deterministic
     trace structure cannot establish meaning preservation. Harness generates a

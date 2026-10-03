@@ -229,8 +229,73 @@ def test_irrelevant_source_invariance() -> None:
     assert noisy == baseline, (noisy, baseline)
 
 
+def test_required_target_provenance() -> None:
+    contract = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-contract",
+        "source_capability": "example.user-needs",
+        "target_capability": "example.requirements",
+        "obligations": [
+            {
+                "id": "needs",
+                "source_kind": "user-need",
+                "require_target_provenance": True,
+            }
+        ],
+    }
+    evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.user-needs",
+        "target_capability": "example.requirements",
+        "links": [
+            {
+                "sources": ["NEED-AUTHORIZED-SOURCE"],
+                "relation": "REALIZES",
+                "targets": ["REQ-AUTHORIZED-SOURCE"],
+            }
+        ],
+        "dispositions": [],
+    }
+
+    accepted = evaluate_derivation(
+        graph=GRAPH,
+        contract=contract,
+        source=sources(),
+        candidate=candidate(),
+        evidence=evidence,
+    )
+    assert accepted["status"] == "ACCEPTED", accepted
+    assert accepted["coverage"] == {
+        "required": 1,
+        "covered": 1,
+        "disposed": 0,
+        "unresolved": 0,
+    }
+
+    missing_provenance = candidate()
+    missing_provenance["semantic_assertions"][0]["derived_from"] = []
+    rejected = evaluate_derivation(
+        graph=GRAPH,
+        contract=contract,
+        source=sources(),
+        candidate=missing_provenance,
+        evidence=evidence,
+    )
+    assert rejected["status"] == "REJECTED", rejected
+    assert rejected["coverage"]["covered"] == 0, rejected
+    assert rejected["coverage"]["unresolved"] == 1, rejected
+    assert any(
+        finding.get("code") == "DERIVATION_TARGET_PROVENANCE_MISSING"
+        and finding.get("source") == "NEED-AUTHORIZED-SOURCE"
+        and finding.get("targets") == ["REQ-AUTHORIZED-SOURCE"]
+        for finding in rejected["findings"]
+    ), rejected
+
+
 def main() -> int:
     test_irrelevant_source_invariance()
+    test_required_target_provenance()
     registry = load("skills/artifact-skill-registry-v0.yaml")
     contracts = load(
         "spec/semantic-acceptance/knowledge-kind-contracts-v1.yaml"
