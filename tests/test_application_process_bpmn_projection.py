@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -12,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness.project_model.core import CoreError  # noqa: E402
+from harness.application.consumer_pack import materialize_pack  # noqa: E402
+from harness.application.skill_router import route_operation  # noqa: E402
 from harness.workspace.human_projection import validate_recipe  # noqa: E402
 from harness.workspace.application_process_bpmn_projection import (  # noqa: E402
     expected_output_paths,
@@ -123,7 +126,55 @@ def valid_fixture() -> tuple[dict, dict, dict, str]:
     return manifest, plan, profile, bpmn
 
 
+def test_route_and_distribution() -> None:
+    route = route_operation(
+        surface="consumer",
+        operation="application-process-bpmn",
+        root=ROOT,
+        invoked_by="human-documentation-projection",
+    )
+    assert route["skill"] == "skills/agent/application-process-bpmn/SKILL.md"
+    assert route["exposure"] == "internal"
+    assert route["invoked_by"] == "human-documentation-projection"
+
+    expect_error(
+        lambda: route_operation(
+            surface="consumer",
+            operation="application-process-bpmn",
+            root=ROOT,
+        ),
+        "requires invoked_by parent operation",
+    )
+
+    with tempfile.TemporaryDirectory(prefix="bpmn-process-pack-") as tmp:
+        pack = Path(tmp) / "pack"
+        materialize_pack(
+            ROOT,
+            pack,
+            binding_revision="1" * 40,
+        )
+        assert (
+            pack / "src/harness/workspace/application_process_bpmn_projection.py"
+        ).is_file()
+        assert (
+            pack / "skills/agent/application-process-bpmn/SKILL.md"
+        ).is_file()
+        assert (
+            pack / "spec/projection/application-process-bpmn-v1.yaml"
+        ).is_file()
+        packed_route = route_operation(
+            surface="consumer",
+            operation="application-process-bpmn",
+            root=pack,
+            invoked_by="human-documentation-projection",
+        )
+        assert packed_route["skill"] == (
+            "skills/agent/application-process-bpmn/SKILL.md"
+        )
+
+
 def main() -> int:
+    test_route_and_distribution()
     manifest, plan, profile, bpmn = valid_fixture()
     validate_profile(profile)
     validate_bpmn(bpmn, profile)
