@@ -300,7 +300,6 @@ def main() -> int:
 
     process_contract = contracts["application-process-design"]
     assert process_contract["required"] is True, process_contract
-    assert process_contract["minimum_exploration"] == "EXPLORE", process_contract
     assert set(process_contract["axes"]) == {
         "occurrence-boundary",
         "composition",
@@ -311,6 +310,10 @@ def main() -> int:
     assert process_contract["axes"]["composition"]["delegation_requires"] == "BROAD"
     assert process_contract["axes"]["continuation"]["delegation_requires"] == "MAXIMUM"
     assert process_contract["axes"]["completion-recovery"]["delegation_requires"] == "MAXIMUM"
+    assert all(
+        item["minimum_exploration"] == "EXPLORE"
+        for item in process_contract["axes"].values()
+    ), process_contract
 
     # A global project decision policy must not accidentally govern knowledge
     # kinds that have no decision contract.
