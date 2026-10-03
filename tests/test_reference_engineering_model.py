@@ -48,7 +48,7 @@ def run_regressions(model,authorities,proof):
         generated=kinds(r["graph"]); existing=kinds(load(ROOT/s["existing_graph"])); aliases=e.get("legacy_kind_equivalents",{}) or {}; covered={k for k in generated if k in existing or aliases.get(k) in existing}; ratio=len(covered)/len(generated) if generated else 1.0
         assert ratio>=float(e["minimum_kind_coverage"]),{"scenario":s["id"],"ratio":ratio,"generated":sorted(generated),"existing":sorted(existing),"uncovered":sorted(generated-covered)}
 def main():
-    model=load_yaml(MODEL); authorities=load_yaml(AUTHORITIES); proof=load_yaml(PROOF); errors=validate_reference_model(model,authorities,proof); assert not errors,errors; assert len(model["templates"])==39; assert len(model["predicates"])==46
-    canonical={claim for row in (proof.get("proofs",{}) or {}).values() for claim in (row.get("accepted_semantic_claims",[]) or [])}; routed={claim for t in model["templates"] for claim in t.get("claim_surface",[]) or []}; assert routed==canonical; assert len(canonical)==118
+    model=load_yaml(MODEL); authorities=load_yaml(AUTHORITIES); proof=load_yaml(PROOF); errors=validate_reference_model(model,authorities,proof); assert not errors,errors; assert len(model["templates"])==40; assert len(model["predicates"])==47
+    canonical={claim for row in (proof.get("proofs",{}) or {}).values() for claim in (row.get("accepted_semantic_claims",[]) or [])}; routed={claim for t in model["templates"] for claim in t.get("claim_surface",[]) or []}; assert routed==canonical; assert len(canonical)==119
     run_holdouts(model,authorities,proof,HOLDOUTS); run_holdouts(model,authorities,proof,HOLDOUTS_V1); run_mutations(model,authorities,proof); run_regressions(model,authorities,proof); print("reference engineering model v0: PASS"); return 0
 if __name__=="__main__": raise SystemExit(main())
