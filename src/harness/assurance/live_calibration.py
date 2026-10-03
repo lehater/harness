@@ -428,13 +428,16 @@ def _runtime_binding(evaluation: dict[str, Any]) -> tuple[Any, ...] | None:
     provenance = execution.get("provider_provenance")
     if not isinstance(provenance, dict):
         return None
-    return (
+    binding = (
         provenance.get("provider"),
         provenance.get("requested_model"),
         provenance.get("resolved_model"),
         provenance.get("resolved_model_source"),
         provenance.get("observed_cli_version"),
     )
+    if not all(isinstance(value, str) and value for value in binding):
+        return None
+    return binding
 
 
 def evaluate_live_calibration_stability(
@@ -486,6 +489,18 @@ def evaluate_live_calibration_stability(
             }
 
         current_runtime_binding = _runtime_binding(evaluation)
+        if current_runtime_binding is None:
+            return {
+                "version": 1,
+                "kind": "harness-live-semantic-calibration-stability",
+                "status": "INVALID",
+                "findings": [
+                    {
+                        "code": "LIVE_CALIBRATION_SERIES_RUNTIME_BINDING_MISSING"
+                    }
+                ],
+                "unstable_cases": [],
+            }
         if current_runtime_binding != required_runtime_binding:
             return {
                 "version": 1,

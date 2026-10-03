@@ -2075,8 +2075,9 @@ reported rather than overwritten.
 
 **Implemented boundary evidence:** `src/harness/assurance/live_calibration.py`
 and `tests/test_copilot_live_calibration_evaluator.py` reject stability
-comparison when the observed provider/resolved-model/CLI runtime binding changes,
-even if the requested policy remains `model: auto`. Corpus-specific scope and
+comparison when the observed provider/resolved-model/CLI runtime binding is
+missing, incomplete, or changes, even if the requested policy remains
+`model: auto`. Corpus-specific scope and
 non-independence claims are documented explicitly. A current passing repeated
 provider calibration is still required before this design is fully VERIFIED.
 

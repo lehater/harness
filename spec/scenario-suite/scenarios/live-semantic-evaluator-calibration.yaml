@@ -28,6 +28,15 @@ fixtures:
       configuration: {temperature: 0}
       adapter: {id: example-adapter, version: "1"}
 
+  runtime_execution:
+    value:
+      provider_provenance:
+        provider: example
+        requested_model: semantic-evaluator
+        resolved_model: semantic-evaluator
+        resolved_model_source: synthetic-fixture
+        observed_cli_version: "fixture-cli-1"
+
 steps:
   - id: request-a
     driver: semantic.live_calibration.request
@@ -82,6 +91,13 @@ steps:
       - {path: /calibration/confusion/false_negative, op: equals, value: 0}
       - {path: /calibration/confusion/false_positive, op: equals, value: 0}
       - {path: /independence/status, op: equals, value: UNVERIFIED}
+
+  - id: bound-valid-run-a
+    driver: data.patch
+    with:
+      value: {ref: step.valid-run-a}
+      operations:
+        - {op: add, path: /execution, value: {ref: fixture.runtime_execution}}
 
   - id: changed-evaluator
     driver: data.patch
@@ -329,12 +345,19 @@ steps:
       - {path: /status, op: equals, value: FAIL}
       - {path: /calibration/confusion/false_negative, op: equals, value: 1}
 
+  - id: bound-unstable-run
+    driver: data.patch
+    with:
+      value: {ref: step.unstable-run}
+      operations:
+        - {op: add, path: /execution, value: {ref: fixture.runtime_execution}}
+
   - id: detect-instability
     driver: semantic.live_calibration.stability
     with:
       evaluations:
-        - {ref: step.valid-run-a}
-        - {ref: step.unstable-run}
+        - {ref: step.bound-valid-run-a}
+        - {ref: step.bound-unstable-run}
     expect:
       - {path: /status, op: equals, value: UNSTABLE}
       - {path: /unstable_cases, op: contains, value: semantic-weakening}
