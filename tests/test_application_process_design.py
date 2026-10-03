@@ -273,7 +273,7 @@ def test_process_cannot_read_undeclared_semantic_source() -> None:
             decision_exploration=None,
         )
     except CoreError as exc:
-        assert "outside declared production prerequisites" in str(exc), str(exc)
+        assert "outside its execution context" in str(exc), str(exc)
     else:
         raise AssertionError("undeclared semantic source must be rejected")
 
