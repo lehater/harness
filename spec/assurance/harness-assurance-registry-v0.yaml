@@ -2784,6 +2784,112 @@ evidence:
       - The two-step bootstrap-idempotence sequence proves reuse and unchanged reconcile for the selected accepted project slice.
       - Provider-auto resolved both calls to gpt-6-luna.
 
+  - id: EVID-A09-TL2-37089886520
+    providers:
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - src/harness/project_model/target_state.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
+      - path: spec/assurance/evidence/a09-first-wave-provider-run-37089886520.yaml
+    satisfies: [A09-R01]
+    test_level: TL2
+    methods: [EM-07]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a09-first-wave-provider-run-37089886520.yaml
+    case_ids: [TD-COMP-001]
+    status: verified
+    verified_at_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+    limitations:
+      - One controlled reviewed-target to bootstrap-realization handoff only.
+      - TL3/TL4/TL5 existing-project guarantees are proved by separate current evidence records.
+
+  - id: EVID-A09-TL3-37089886520
+    providers:
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - src/harness/project_model/target_state.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl
+      - path: spec/assurance/evidence/a09-first-wave-provider-run-37089886520.yaml
+    satisfies: [A09-R02]
+    test_level: TL3
+    methods: [EM-03, EM-05, EM-08]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a09-first-wave-provider-run-37089886520.yaml
+    case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
+    status: verified
+    verified_at_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+    limitations:
+      - Controlled synthetic existing-project micro-project evidence only.
+      - TD-BOOT-E04 contains the cryptographically linked bootstrap/reconcile two-run sequence.
+      - Provider-auto used more than one resolved model across the selected cases; this slot is not a same-model convergence claim.
+
+  - id: EVID-A09-TL4-37089887788
+    providers:
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - src/harness/project_model/target_state.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+      - path: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+      - path: spec/assurance/evidence/a09-tl4-provider-run-37089887788.yaml
+    satisfies: [A09-R03]
+    test_level: TL4
+    methods: [EM-05, EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a09-tl4-provider-run-37089887788.yaml
+    case_ids: [TD-BOOT-E06]
+    status: verified
+    verified_at_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+    limitations:
+      - TD-BOOT-E06 passed all three clean-context runs with the same frozen semantic oracle.
+      - The enclosing TL4 campaign was red only because unrelated routing case TD-COMP-003 had one failed repetition; that case is not admitted as A09 evidence.
+      - Synthetic TL4 convergence only; known-project regression is separate.
+
+  - id: EVID-A09-TL5-37089889046
+    providers:
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+      - src/harness/project_model/target_state.py
+      - .github/workflows/assurance-campaign-copilot.yml
+    source_refs:
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+      - path: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+      - path: spec/assurance/evidence/a09-tl5-provider-run-37089889046.yaml
+    satisfies: [A09-R04]
+    test_level: TL5
+    methods: [EM-10]
+    oracle_class: O2
+    execution_nature: judgement-dependent
+    source_type: known-project
+    provider_run_ref: spec/assurance/evidence/a09-tl5-provider-run-37089889046.yaml
+    case_ids: [TD-BOOT-E07]
+    status: verified
+    verified_at_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+    limitations:
+      - One bounded known-project NAPMS regression only; it is not an independent TL6 portability holdout.
+      - The two-step bootstrap/reconcile sequence passed both clean-context calls and preserves the accepted O2 baseline.
+      - Both provider-auto calls resolved to gpt-6-luna; no cross-model claim is made.
+
+
   - id: EVID-ROUTE-TL4-36949909315
     providers:
       - evals/behavioral_eval.py

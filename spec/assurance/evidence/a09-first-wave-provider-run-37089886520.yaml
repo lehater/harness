@@ -1,0 +1,128 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A09-FIRST-WAVE-PROVIDER-RUN-37089886520
+status: accepted
+provider: github-copilot
+workflow_run_id: 37089886520
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37089886520
+workflow_conclusion: success
+artifact: {id: 11261413588, name: assurance-campaign-first-wave, sha256: ab04ebd4a5e71cebf9e9711e68dc09f9ccc51dab7237b4a8254a353a11bfb4a5, retention_days: 90}
+harness_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: f634ac50f326c6dad8c24674337ebfec6f7e4412}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: fd84283412f3612e9cb1154d45c94c6783b23588}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/first-wave/manifest-v0.yaml, git_blob_sha: 87cfc3037c700bdd40b2dc21705e0f3f0eb0d28a}
+currentness:
+  state: current
+  reason: >-
+    The selected TL2/TL3 bootstrap cases are bound to the current instruction,
+    routing, runner, provider adapter, Core/Target-State scorer surfaces and
+    first-wave manifest. PR #172 changed only projection design prose outside
+    these execution bindings.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 6
+  total_cases: 6
+  provider_calls: 7
+resolved_models: {gpt-6-luna: 6, mai-code-1.1-flash: 1}
+token_usage: {input_tokens: 61729, output_tokens: 1970, total_tokens: 63699}
+provider_prompt_utf8_bytes: 217344
+cases:
+  - case_id: TD-COMP-001
+    template: spec/behavioral-evals/first-wave/cases/td-comp-001/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-comp-001/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-comp-001/oracle.yaml
+    case_sha256: f0339101bf7d2ecd2e3a231a55a58d414afa3a1af4e9160f885c28653d95a8a8
+    fixture_sha256: 1fdf37e34c1785c7318f46a7271bcd7fac9ff1c1ee6189e6e2efaacb48d4bbd5
+    oracle_sha256: 4dd9d5627e55bc53d967ab31afc0349945e98c944548b4e377977ceba75c85f4
+    runs:
+      - {run_id: TD-COMP-001-R01-b44ab89d60a1, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9115, output_tokens: 228, provider_prompt_utf8_bytes: 31611, record_sha256: 29de94bd123db94e3f045c800cc43c7cdc636bbb2bd1e313bd5df1a88199d1d9, started_from_clean_context: true}
+  - case_id: TD-BOOT-E01
+    template: spec/behavioral-evals/first-wave/cases/td-boot-e01/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-boot-e01/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-boot-e01/oracle.yaml
+    case_sha256: b36ff42df3bdcd27ee61fe5e28d0f46e4deb9e5a48f02dc53fcaa3cb2f91e588
+    fixture_sha256: 5a0517f570b7c7cebda8128adb084e1d19c25940c5956312acc9613a7226b05b
+    oracle_sha256: c4844072bbc6cfca7ab5dda6ba10665b2c744c2105a08d23cd4dd57c8b22da82
+    runs:
+      - {run_id: TD-BOOT-E01-R01-8d4d51496e13, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9136, output_tokens: 201, provider_prompt_utf8_bytes: 31648, record_sha256: 56362e9ae049a5559328057ded22f35f89a9c2965f7359f997f084dbc7c0b3de, started_from_clean_context: true}
+  - case_id: TD-BOOT-E02
+    template: spec/behavioral-evals/first-wave/cases/td-boot-e02/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-boot-e02/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-boot-e02/oracle.yaml
+    case_sha256: 17324321d4b4bc669d19b49b67eb04d109c7600da5504d367dca4c7a4bc1bc16
+    fixture_sha256: f769cfa3d0d2f468543a1f9b3779eac5383e3492dca6b0b1e7e771fcb5ea8048
+    oracle_sha256: 796483f2a9fe0f8442ce64f75b9e5a58f9da9e75f30d66110536826a714af8ec
+    runs:
+      - {run_id: TD-BOOT-E02-R01-fe092819132c, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9071, output_tokens: 211, provider_prompt_utf8_bytes: 31381, record_sha256: 90af7b56bcb403570b9b9f6df8d1728673866eb54a777e0943398415d59ac325, started_from_clean_context: true}
+  - case_id: TD-BOOT-E03
+    template: spec/behavioral-evals/first-wave/cases/td-boot-e03/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-boot-e03/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-boot-e03/oracle.yaml
+    case_sha256: 7db96fae484acfa427e34ddac1518830dbe3d8e625910ce04a8e945acd612591
+    fixture_sha256: e7e6efeeae8390d1c4ae4c9c3738a88d9b49f778df59b1316c691d1789369bc0
+    oracle_sha256: e4bbb219c0228e767d872bac2689198499560d636ba293c3887189483b909a7a
+    runs:
+      - {run_id: TD-BOOT-E03-R01-1f8034e6201d, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 7645, output_tokens: 764, provider_prompt_utf8_bytes: 31043, record_sha256: 7a4d17534388531e86afa13e6d99da5662383af5e4fcb2311604710d81c0ed75, started_from_clean_context: true}
+  - case_id: TD-BOOT-E04
+    template: spec/behavioral-evals/first-wave/cases/td-boot-e04/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-boot-e04/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-boot-e04/oracle.yaml
+    case_sha256: 5ee9a1152c8e98664c840ddb784ca3c1afb554b7acec9ef17f223da80b40d18d
+    fixture_sha256: 47d0b636bef8104a35d7b998106364e1b90e4dd66d72f366525eca86d0c495e1
+    oracle_sha256: 796483f2a9fe0f8442ce64f75b9e5a58f9da9e75f30d66110536826a714af8ec
+    runs:
+      - run_id: TD-BOOT-E04-R01-c29e6f44d003
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9058
+        output_tokens: 184
+        provider_prompt_utf8_bytes: 31295
+        record_sha256: 8bd454d7aae8d2f7462832a45dc1f7ab5cfdb0e8a55c724d7fc50e78b49706ac
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 1, phase: bootstrap}
+      - run_id: TD-BOOT-E04-R02-b80bddca1cec
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 8446
+        output_tokens: 198
+        provider_prompt_utf8_bytes: 28048
+        record_sha256: 9a2c52ab3d940fda315253d5edc3e3e693117187cdbce12e1c0fa4b74e0ae93e
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 2, phase: reconcile-existing}
+        derived_input_binding:
+          prior_run_record_sha256: 8bd454d7aae8d2f7462832a45dc1f7ab5cfdb0e8a55c724d7fc50e78b49706ac
+          core_model_sha256: 4963ac90d1622c02fd4465ec97fb6dfe5f53551ce6333ce04efa37792a5a134c
+  - case_id: TD-BOOT-E05
+    template: spec/behavioral-evals/first-wave/cases/td-boot-e05/case.yaml.tmpl
+    fixture: spec/behavioral-evals/first-wave/cases/td-boot-e05/fixture.yaml
+    oracle: spec/behavioral-evals/first-wave/cases/td-boot-e05/oracle.yaml
+    case_sha256: 82ad657df113f3b4b26f94fcb3b4a286d001e9c5a0199a2b637c40f1e7cfb9e7
+    fixture_sha256: a7a4714a9cdd70a00b0f0993c55fde50c6ab8725d86053a5d49704b968044447
+    oracle_sha256: 796483f2a9fe0f8442ce64f75b9e5a58f9da9e75f30d66110536826a714af8ec
+    runs:
+      - {run_id: TD-BOOT-E05-R01-85cb53fa7d43, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9258, output_tokens: 184, provider_prompt_utf8_bytes: 32318, record_sha256: f613829a4c949625265daa6213c8d53453575b113e8775400fd9a4b8aceb5a00, started_from_clean_context: true}
+limitations:
+  - Controlled synthetic TL2/TL3 bootstrap evidence only; TL4 and TL5 are recorded separately.
+  - Provider-auto resolved one selected TL3 call to mai-code-1.1-flash and the others to gpt-6-luna; this suite is not a same-model convergence claim.
+  - Artifact retention is finite; this repository record preserves the accepted selected-case summary and immutable bindings.
