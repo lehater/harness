@@ -49,8 +49,10 @@ For each required view:
 14. attach accepted reference/evidence anchors to the regions or states they actually constrain;
 15. define verification obligations for contract/semantic/rendered realization when material;
 16. classify remaining choices as controlled freedom or ordinary implementation detail;
-17. record local overrides only with rationale;
-18. route missing upstream semantics as Questions.
+17. for each material screen-composition decision, record the decision question, accepted basis, applicable UI Decision Rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty;
+18. when the remaining discriminator is representative-user behavior rather than a deterministic constraint, record `EMPIRICAL_VALIDATION_REQUIRED` and keep the production-readiness claim open while preserving the bounded prototype contract;
+19. record local overrides only with rationale;
+20. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -86,6 +88,7 @@ Machine-readable YAML/JSON is preferred when it can express:
 - responsive transformations;
 - accessibility/focus semantics affected by composition;
 - overrides with rationale;
+- material decision evidence with decision id/axis, question, basis refs, applied UI rule ids, disposition/selection, required evaluation levels/evidence, controlled freedom and residual uncertainty;
 - unresolved Questions.
 
 The contract should be sufficient to generate review projections such as a screen spec, wireframe skeleton, state matrix or prototype scaffold. Generated visuals are not canonical by default.
@@ -109,6 +112,7 @@ The contract should be sufficient to generate review projections such as a scree
 - a performance-sensitive visualization with accepted scale/performance constraints traces those constraints and preserves semantic access under any accepted degradation mode;
 - listing a pattern id without the material screen-specific composition it requires is insufficient;
 - reference-backed regions/states declare what the reference constrains and what it does not;
+- material composition decisions expose evidence and residual uncertainty; prototype-valid decisions are not silently presented as production-converged when empirical validation remains open;
 - framework/CSS implementation freedom remains.
 
 ## Registration
