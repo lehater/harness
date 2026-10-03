@@ -2091,6 +2091,30 @@ evidence:
       - Proves immutable 40-hex pin enforcement, unsupported API rejection, pinned fetch/materialization, offline cache reuse, and tamper rebuild.
       - Does not establish the separate A18-R03 cross-revision published-identity compatibility obligation.
 
+  - id: EVID-A18-CROSS-REVISION-COMPATIBILITY
+    providers:
+      - tests/test_consumer_api_compatibility.py
+    source_refs:
+      - path: tests/test_consumer_api_compatibility.py
+      - path: spec/distribution/consumer-api-v1-baseline.yaml
+      - path: spec/distribution/consumer-pack-v1.yaml
+      - path: skills/consumer-operation-registry-v0.yaml
+      - path: skills/consumer-method-registry-v0.yaml
+      - path: skills/artifact-skill-registry-v0.yaml
+      - path: docs/design/harness-consumer-pack-v1.md
+    satisfies: [A18-R03]
+    test_level: TL2
+    methods: [EM-03, EM-06]
+    oracle_class: O1
+    execution_nature: deterministic
+    source_type: synthetic
+    status: implemented
+    verified_at_revision: null
+    limitations:
+      - Baseline revision 876a85854d7b876ea90a3ec5614a04311bb987fc freezes the published Consumer API v1 runtime modules, public operations, methods, and artifact-kind identities.
+      - Additive identities are compatible; removal or rename under v1 fails closed and requires a new consumer_api while preserving v1.
+      - This is a deterministic cross-revision API-contract proof, not a TL5 target-project upgrade regression.
+
   - id: EVID-ASSURE-REGISTRY-SELFTEST
     providers:
       - checks/validate_assurance_registry.py

@@ -2039,7 +2039,7 @@ Pack contains all and only declared Consumer surface/contracts.
 **Methods:** EM-02, EM-03, EM-06  
 **Minimum level:** TL1-TL2  
 **Oracle:** O1  
-**Status:** PARTIAL
+**Status:** IMPLEMENTED
 
 Cases include moving ref, incompatible consumer_api, and renamed published
 identity without compatibility mapping.
@@ -2047,6 +2047,17 @@ identity without compatibility mapping.
 Expected result:
 
 Fail closed unless explicit compatible upgrade contract exists.
+
+**Evidence:** `tests/test_consumer_pack.py`,
+`tests/test_consumer_wrapper.py`, and
+`tests/test_consumer_api_compatibility.py`.
+
+The cross-revision case freezes Consumer API v1 published identities at
+`876a85854d7b876ea90a3ec5614a04311bb987fc` and compares every current
+revision against that baseline. Additions are compatible; removing or renaming
+a published v1 runtime module, public operation, method, or artifact kind fails
+closed. A breaking change therefore requires a new `consumer_api` while v1
+remains available to existing bindings.
 
 # SF-12 — CI and assurance meta-testing
 
