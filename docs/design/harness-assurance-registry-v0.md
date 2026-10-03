@@ -184,14 +184,17 @@ protocol v2; both blinded runs scored 14/14 with TP=7, TN=7, FP=0, FN=0,
 identical observed runtime binding and `STABLE` with no unstable cases. The
 same immutable calibration fact legitimately satisfies both A12-R02 and A20-R02;
 A20's claim remains bounded to that labelled corpus population.
-HA-A21 satisfies A21-R01 through a source-derived known-project runtime-neutrality
-meta-check and A21-R02 through the explicit deep/broad/cardinality support
-envelope. A21-R03 remains missing because there is no current TL5 O2 pair proving
-both direct-declaration and adapter-projection modes against the same generic
-semantics. Current NAPMS TD-BOOT-E07 evidence is a bootstrap/reconcile
-known-project regression from one project that participated in Harness design;
-it does not prove the required mode-equivalence pair. A21-R04 remains missing
-because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies
+HA-A21 satisfies A21-R01 through the generic-runtime project-identity
+neutrality check and A21-R02 through the explicit deep/broad/cardinality support
+envelope. A21-R03 is satisfied by the frozen NAPMS TL5/O2 mode-equivalence
+fixture: the same accepted project slice is supplied as direct Core declaration
+and as a project-owned canonical-graph adapter projection, and both yield the
+same generic ownership/provider/dependency/question semantics. A21-R04 is
+satisfied by the independent TL6/O3 `pytest-dev/pluggy` holdout at immutable
+revision `7aa82ed6543db40a0c44b68e933c5ae630bce6ab`: its upstream docs/code
+blobs and plugin-framework topology were frozen before execution, it did not
+participate in Harness design, and the generic adapter/Core path passes without
+project-specific runtime semantics. HA-A16 satisfies
 A16-R01..R06 on the clarified public-operation selection contract; and HA-A18
 satisfies A18-R01 (current public-pack closure), A18-R02 (immutable pin/API
 compatibility), and A18-R03 through the Consumer API v1 cross-revision baseline

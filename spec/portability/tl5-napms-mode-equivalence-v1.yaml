@@ -1,0 +1,122 @@
+version: 1
+kind: harness-portability-known-project-pair
+id: NAPMS-TL5-MODE-EQUIVALENCE-V1
+test_level: TL5
+oracle_class: O2
+method: EM-10
+
+known_project:
+  repository: lehater/napms
+  commit: 42481577fab7f795cf3a2118b7b6f1c3c075d066
+  classification: known-project
+  selected_scope: first-MVP problem evidence -> user needs -> requirements
+  source_artifacts:
+    canonical_graph:
+      path: docs/canonical-graph.yaml
+      git_blob_sha: a1c8c5d98c2b4cb927e9b424f3ea70fc0f89d2de
+    harness_projection:
+      path: docs/harness-projection.yaml
+      git_blob_sha: 3e4d074e8ac4e67d259c4d0c721da62c0dff3b91
+
+direct_model:
+  authorities:
+    - {id: DISCOVERY}
+    - {id: PRODUCT-REQUIREMENTS}
+  artifacts:
+    - id: FIRST-MVP-HCD-PROBLEM-EVIDENCE
+      authority: DISCOVERY
+      path: docs/discovery/first-mvp-hcd-problem-evidence.yaml
+      provides: [engineering.hcd.first-mvp.problem-evidence]
+      depends_on: []
+    - id: FIRST-MVP-HCD-USER-NEEDS
+      authority: DISCOVERY
+      path: docs/discovery/first-mvp-hcd-user-needs.yaml
+      provides:
+        - engineering.hcd.application-components.user-needs
+        - engineering.hcd.access-request.user-needs
+        - engineering.hcd.policy-export.user-needs
+      depends_on: [FIRST-MVP-HCD-PROBLEM-EVIDENCE]
+    - id: FIRST-MVP-REQUIREMENTS
+      authority: PRODUCT-REQUIREMENTS
+      path: docs/requirements/first-mvp-product-requirements.yaml
+      provides:
+        - engineering.requirements.product-intent
+        - engineering.requirements.acceptance
+        - engineering.hcd.application-components.requirements
+        - engineering.hcd.access-request.requirements
+        - engineering.hcd.policy-export.requirements
+      depends_on: [FIRST-MVP-HCD-USER-NEEDS]
+  questions: []
+
+adapter_projection:
+  source_graph:
+    nodes:
+      - id: FIRST-MVP-HCD-PROBLEM-EVIDENCE
+        path: docs/discovery/first-mvp-hcd-problem-evidence.yaml
+        depends_on: []
+      - id: FIRST-MVP-HCD-USER-NEEDS
+        path: docs/discovery/first-mvp-hcd-user-needs.yaml
+        depends_on: [FIRST-MVP-HCD-PROBLEM-EVIDENCE]
+      - id: FIRST-MVP-REQUIREMENTS
+        path: docs/requirements/first-mvp-product-requirements.yaml
+        depends_on: [FIRST-MVP-HCD-USER-NEEDS]
+  projection:
+    authorities:
+      - {id: DISCOVERY}
+      - {id: PRODUCT-REQUIREMENTS}
+    bindings:
+      - artifact: FIRST-MVP-HCD-PROBLEM-EVIDENCE
+        authority: DISCOVERY
+        provides: [engineering.hcd.first-mvp.problem-evidence]
+      - artifact: FIRST-MVP-HCD-USER-NEEDS
+        authority: DISCOVERY
+        provides:
+          - engineering.hcd.application-components.user-needs
+          - engineering.hcd.access-request.user-needs
+          - engineering.hcd.policy-export.user-needs
+      - artifact: FIRST-MVP-REQUIREMENTS
+        authority: PRODUCT-REQUIREMENTS
+        provides:
+          - engineering.requirements.product-intent
+          - engineering.requirements.acceptance
+          - engineering.hcd.application-components.requirements
+          - engineering.hcd.access-request.requirements
+          - engineering.hcd.policy-export.requirements
+    questions: []
+
+oracle:
+  unresolved_questions: []
+  capabilities:
+    engineering.hcd.first-mvp.problem-evidence:
+      owner: DISCOVERY
+      providers: [FIRST-MVP-HCD-PROBLEM-EVIDENCE]
+    engineering.hcd.application-components.user-needs:
+      owner: DISCOVERY
+      providers: [FIRST-MVP-HCD-USER-NEEDS]
+    engineering.hcd.access-request.user-needs:
+      owner: DISCOVERY
+      providers: [FIRST-MVP-HCD-USER-NEEDS]
+    engineering.hcd.policy-export.user-needs:
+      owner: DISCOVERY
+      providers: [FIRST-MVP-HCD-USER-NEEDS]
+    engineering.requirements.product-intent:
+      owner: PRODUCT-REQUIREMENTS
+      providers: [FIRST-MVP-REQUIREMENTS]
+    engineering.requirements.acceptance:
+      owner: PRODUCT-REQUIREMENTS
+      providers: [FIRST-MVP-REQUIREMENTS]
+    engineering.hcd.application-components.requirements:
+      owner: PRODUCT-REQUIREMENTS
+      providers: [FIRST-MVP-REQUIREMENTS]
+    engineering.hcd.access-request.requirements:
+      owner: PRODUCT-REQUIREMENTS
+      providers: [FIRST-MVP-REQUIREMENTS]
+    engineering.hcd.policy-export.requirements:
+      owner: PRODUCT-REQUIREMENTS
+      providers: [FIRST-MVP-REQUIREMENTS]
+  affected:
+    FIRST-MVP-HCD-PROBLEM-EVIDENCE:
+      - FIRST-MVP-HCD-USER-NEEDS
+      - FIRST-MVP-REQUIREMENTS
+    FIRST-MVP-HCD-USER-NEEDS: [FIRST-MVP-REQUIREMENTS]
+    FIRST-MVP-REQUIREMENTS: []

@@ -1,0 +1,91 @@
+version: 1
+kind: harness-portability-independent-holdout
+id: PLUGGY-TL6-INDEPENDENT-HOLDOUT-V1
+test_level: TL6
+oracle_class: O3
+method: EM-11
+
+holdout:
+  repository: pytest-dev/pluggy
+  commit: 7aa82ed6543db40a0c44b68e933c5ae630bce6ab
+  classification: independent-holdout
+  selected_scope: hook contract -> execution bridge -> plugin manager
+  failure_shape: >-
+    Plugin-framework topology with role-specific runtime modules, compatibility
+    re-export bridges, and one manager depending on both hook-contract and
+    hook-execution semantics; materially different from Harness co-design
+    document/requirements pipelines.
+  independence:
+    absent_from_harness_before_selection: true
+    did_not_shape_tested_mechanism: true
+    oracle_frozen_before_execution: true
+  oracle_basis:
+    - {path: docs/index.rst, git_blob_sha: 3768e54c2e78b61f4227d70afa237a9bd73a97d8}
+    - {path: src/pluggy/_decorators.py, git_blob_sha: c5574a670d6c1e225dd7e9cd8dc8862b4ec2201c}
+    - {path: src/pluggy/_execution.py, git_blob_sha: 0e62b4d3f231a2e8bb837f0ea9d03fb5ce6cfa47}
+    - {path: src/pluggy/_callers.py, git_blob_sha: 1bde11850487e660325a5364709b5b41080718a5}
+    - {path: src/pluggy/_hooks.py, git_blob_sha: b57aae66b7c9167aabeb9bea454c52b19f49e959}
+    - {path: src/pluggy/_manager.py, git_blob_sha: 33009344614e94853a9e538b5b86c27a12ca21af}
+
+adapter_projection:
+  source_graph:
+    nodes:
+      - id: HOOK-MARKERS
+        path: src/pluggy/_decorators.py
+        depends_on: []
+      - id: HOOK-EXECUTION
+        path: src/pluggy/_execution.py
+        depends_on: []
+      - id: CALLER-COMPAT-BRIDGE
+        path: src/pluggy/_callers.py
+        depends_on: [HOOK-EXECUTION]
+      - id: HOOK-INTERFACE
+        path: src/pluggy/_hooks.py
+        depends_on: [HOOK-MARKERS]
+      - id: PLUGIN-MANAGER
+        path: src/pluggy/_manager.py
+        depends_on: [CALLER-COMPAT-BRIDGE, HOOK-INTERFACE]
+  projection:
+    authorities:
+      - {id: HOOK-CONTRACT}
+      - {id: HOOK-EXECUTION}
+      - {id: PLUGIN-MANAGEMENT}
+    bindings:
+      - artifact: HOOK-MARKERS
+        authority: HOOK-CONTRACT
+        provides: [plugin.hook-markers]
+      - artifact: HOOK-EXECUTION
+        authority: HOOK-EXECUTION
+        provides: [plugin.hook-execution]
+      - artifact: CALLER-COMPAT-BRIDGE
+        authority: HOOK-EXECUTION
+        provides: []
+      - artifact: HOOK-INTERFACE
+        authority: HOOK-CONTRACT
+        provides: [plugin.hook-interface]
+      - artifact: PLUGIN-MANAGER
+        authority: PLUGIN-MANAGEMENT
+        provides: [plugin.registration]
+    questions: []
+
+oracle:
+  unresolved_questions: []
+  capabilities:
+    plugin.hook-markers:
+      owner: HOOK-CONTRACT
+      providers: [HOOK-MARKERS]
+    plugin.hook-interface:
+      owner: HOOK-CONTRACT
+      providers: [HOOK-INTERFACE]
+    plugin.hook-execution:
+      owner: HOOK-EXECUTION
+      providers: [HOOK-EXECUTION]
+    plugin.registration:
+      owner: PLUGIN-MANAGEMENT
+      providers: [PLUGIN-MANAGER]
+  affected:
+    HOOK-MARKERS: [HOOK-INTERFACE, PLUGIN-MANAGER]
+    HOOK-EXECUTION: [CALLER-COMPAT-BRIDGE, PLUGIN-MANAGER]
+    CALLER-COMPAT-BRIDGE: [PLUGIN-MANAGER]
+    HOOK-INTERFACE: [PLUGIN-MANAGER]
+    PLUGIN-MANAGER: []
