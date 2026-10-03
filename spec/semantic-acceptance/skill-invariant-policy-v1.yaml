@@ -12,6 +12,7 @@ enforced:
   - {knowledge_kind: concurrency-consistency-design, skill: skills/artifacts/concurrency-consistency-design/SKILL.md}
   - {knowledge_kind: domain-use-case, skill: skills/artifacts/domain-use-case/SKILL.md}
   - {knowledge_kind: application-design, skill: skills/artifacts/application-design/SKILL.md}
+  - {knowledge_kind: application-process-design, skill: skills/artifacts/application-process-design/SKILL.md}
   - {knowledge_kind: task-model, skill: skills/artifacts/task-model/SKILL.md}
   - {knowledge_kind: user-journey-design, skill: skills/artifacts/user-journey-design/SKILL.md}
   - {knowledge_kind: quality-design, skill: skills/artifacts/quality-design/SKILL.md}
