@@ -1,0 +1,67 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A09-TL4-PROVIDER-RUN-37089887788
+status: accepted
+provider: github-copilot
+workflow_run_id: 37089887788
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37089887788
+workflow_conclusion: failure
+artifact: {id: 11262411457, name: assurance-campaign-tl4-existing-project, sha256: bf621e84d220dfcefc2c43280d7d8aebd2232697c9653421fdf2e3256d43df6e, retention_days: 90}
+harness_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: f634ac50f326c6dad8c24674337ebfec6f7e4412}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: fd84283412f3612e9cb1154d45c94c6783b23588}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml, git_blob_sha: a7520e26611d804c36b76de9bda4635a90ea8046}
+currentness:
+  state: current
+  reason: >-
+    TD-BOOT-E06 is bound to the current bootstrap and behavioral execution
+    surface. PR #172 changed only unrelated projection design prose.
+campaign_outcome:
+  workflow_conclusion: failure
+  reason: >-
+    The full TL4 campaign was red because unrelated routing case TD-COMP-003
+    returned PASS/PASS/FAIL. Selected A09 case TD-BOOT-E06 completed all three
+    clean-context runs and passed all three frozen oracles.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 1
+  total_cases: 1
+  provider_calls: 3
+resolved_models: {gpt-6-luna: 3}
+token_usage: {input_tokens: 27661, output_tokens: 823, total_tokens: 28484}
+provider_prompt_utf8_bytes: 96306
+cases:
+  - case_id: TD-BOOT-E06
+    template: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/fixture.yaml
+    oracle: spec/behavioral-evals/tl4-existing-project/cases/td-boot-e06/oracle.yaml
+    case_sha256: a855e1cf6bcf16a29fc27cde43f6d65ed5462eef46587aac61673c227a1de9f3
+    fixture_sha256: 26e6956382d65d107739b9dfff8ee6461ace35ec996bc6ea9408da86cadb920a
+    oracle_sha256: 600cbccc328547b0851dbabee552aebaad2ecb4354b1855452628de2894c92a6
+    runs:
+      - {run_id: TD-BOOT-E06-R01-e7bdbb7c00fc, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9222, output_tokens: 253, provider_prompt_utf8_bytes: 32102, record_sha256: e0589da769f951138fd7258674fe7b49de97345be3e31364ab6ba98e4eb991fb, started_from_clean_context: true}
+      - {run_id: TD-BOOT-E06-R02-4d484f1fd0ac, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9219, output_tokens: 281, provider_prompt_utf8_bytes: 32102, record_sha256: 9f913263afb8f65932e386323191dda66595fd45fe9afc8728230c1d8a56b307, started_from_clean_context: true}
+      - {run_id: TD-BOOT-E06-R03-40278544964c, run_status: COMPLETED, correctness: PASS, resolved_model: gpt-6-luna, input_tokens: 9220, output_tokens: 289, provider_prompt_utf8_bytes: 32102, record_sha256: f7d771f8ffed87b21f75fb655e0c487025f1af0f8904937d8c345dbe9db0c718, started_from_clean_context: true}
+limitations:
+  - The selected A09 proof is exactly TD-BOOT-E06; the unrelated TD-COMP-003 failure is not hidden and is not admitted as A09 evidence.
+  - Three clean contexts establish convergence only for the frozen synthetic existing-project boundary; this is not TL5 known-project evidence.
+  - Artifact retention is finite; this repository record preserves the selected-case summary and immutable bindings.

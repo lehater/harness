@@ -1,0 +1,83 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A09-TL5-KNOWN-PROJECT-PROVIDER-RUN-37089889046
+status: accepted
+provider: github-copilot
+workflow_run_id: 37089889046
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37089889046
+workflow_conclusion: success
+artifact: {id: 11262266546, name: assurance-campaign-tl5-known-project, sha256: bc99df7e5de08086f8a7f8204885b0c8a1e09c670b89ff2f8f4438e1fb4673b7, retention_days: 90}
+harness_revision: b15d1abf7a3a05f1e23d41ae9173c603bb7eaaef
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: f634ac50f326c6dad8c24674337ebfec6f7e4412}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: fd84283412f3612e9cb1154d45c94c6783b23588}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/tl5-known-project/manifest-v0.yaml, git_blob_sha: 0c46177d87ba6df5572a709c0dc4b1c3417d4692}
+currentness:
+  state: current
+  reason: >-
+    The frozen NAPMS known-project case and the generic bootstrap/reconcile
+    execution surface match current repository bytes. PR #172 changed only
+    unrelated projection design prose.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 1
+  total_cases: 1
+  provider_calls: 2
+resolved_models: {gpt-6-luna: 2}
+token_usage: {input_tokens: 19635, output_tokens: 816, total_tokens: 20451}
+provider_prompt_utf8_bytes: 67531
+cases:
+  - case_id: TD-BOOT-E07
+    template: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+    oracle: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+    case_sha256: e23c073d0bd5e3f70879bfe3d1e56032c334e1ffa3b3e2db57c6b070a96bc81c
+    fixture_sha256: c55e0ceae5913faeafaed45300454670ba3b5e39a33e6bff2b1934d2393d1d03
+    oracle_sha256: bf2f8137f29339ddc3c326d058c688a7bbf5a19566a8ffee3dd1233a440124aa
+    runs:
+      - run_id: TD-BOOT-E07-R01-54e75cdfb24d
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 10023
+        output_tokens: 431
+        provider_prompt_utf8_bytes: 34986
+        record_sha256: 5a71f1bdc44d411a971fef013e407c2392076ca924994b383ec4b04d364573e7
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 1, phase: bootstrap}
+      - run_id: TD-BOOT-E07-R02-ad512a46cfe2
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: gpt-6-luna
+        input_tokens: 9612
+        output_tokens: 385
+        provider_prompt_utf8_bytes: 32545
+        record_sha256: a5b9a72639369192334095d35a5a035a6c9331a31cd5632bcd1f213d69637f09
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 2, phase: reconcile-existing}
+        derived_input_binding:
+          prior_run_record_sha256: 5a71f1bdc44d411a971fef013e407c2392076ca924994b383ec4b04d364573e7
+          core_model_sha256: 61e0baec227a32ed76054a964f54adda5b6d6d966d61da82f0c307d73a238630
+limitations:
+  - This is one bounded O2 regression slice from the known NAPMS project that participated in Harness design; it is not an independent TL6 portability holdout.
+  - The two-step sequence proves reuse and unchanged reconcile of the selected accepted NAPMS slice only.
+  - Both provider-auto calls resolved to gpt-6-luna; no cross-model claim is made.
+  - Artifact retention is finite; this repository record preserves the accepted summary and immutable bindings.

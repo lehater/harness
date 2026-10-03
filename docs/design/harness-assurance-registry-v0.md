@@ -140,8 +140,8 @@ retire/split/merge/rename migration evidence and A07-R02 through unchanged
 assessment preservation. HA-A08 satisfies A08-R01 through current bounded
 selection plus Reference-template/noise rejection, A08-R02 through the frozen
 TL3 project-shaped minimal-target case, and A08-R03 through three independent
-clean-context target-selection runs. HA-A09 satisfies A09-R01 (TL2),
-A09-R02 (TL3), and A09-R03 (TL4); HA-A10 is explicitly INCOMPLETE with
+clean-context target-selection runs. HA-A09 satisfies A09-R01 (TL2), A09-R02 (TL3), A09-R03 (TL4), and
+A09-R04 (TL5); HA-A10 is explicitly INCOMPLETE with
 A10-R01/A10-R02 waiting on the blocked TD-BOOT-G01..G04 TL3 greenfield cases
 and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A11
 satisfies A11-R01 through deterministic source completeness, A11-R02 through
@@ -176,11 +176,12 @@ HA-A21 satisfies A21-R01 through a source-derived known-project runtime-neutrali
 meta-check and A21-R02 through the explicit deep/broad/cardinality support
 envelope. A21-R03 remains missing because there is no current TL5 O2 pair proving
 both direct-declaration and adapter-projection modes against the same generic
-semantics; the historical NAPMS TD-BOOT-E07 run is stale and covers only one
-known project that participated in Harness design. A21-R04 remains missing
+semantics. Current NAPMS TD-BOOT-E07 evidence is a bootstrap/reconcile
+known-project regression from one project that participated in Harness design;
+it does not prove the required mode-equivalence pair. A21-R04 remains missing
 because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies A16-R01..R06; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
-compatibility). A04-R02/R03, A05-R02/R03, A09-R04, and A18-R03 remain missing. TD-BOOT-E06 does not satisfy raw Capability- or
+compatibility). A18-R03 remains missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
 bootstrap-realization fixture rather than outputs of formation judgement. The
 previous TD-CAP-003 disagreement in run `36947239747` therefore remains
@@ -423,6 +424,15 @@ A08 selection with a separate A05 Capability-granularity decision. In that
 diagnostic run the required atom set itself was selected correctly, so Fixture
 V2 removed the cross-ability confound rather than relaxing a failed selection
 criterion.
+
+HA-A09 is SATISFIED on the current bootstrap/reconcile surface. Provider run
+`37089886520` passed TD-COMP-001 plus TD-BOOT-E01..E05, including both linked
+TD-BOOT-E04 bootstrap/reconcile calls. Run `37089887788` passed all three
+TD-BOOT-E06 clean-context executions; the enclosing TL4 campaign was red only
+because unrelated routing case TD-COMP-003 had one failed repetition, which is
+not admitted as A09 evidence. Run `37089889046` passed both linked TD-BOOT-E07
+calls against the frozen O2 NAPMS baseline. PR #172 changed only projection
+design prose outside the recorded A09 execution bindings.
 
 HA-A10 is present in the denominator and remains INCOMPLETE by design.
 Greenfield bootstrap cannot be proven from pre-authored graph fixtures because

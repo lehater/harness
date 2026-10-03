@@ -1193,10 +1193,9 @@ are reviewed.
 `bootstrap_realization` semantic dimension for this case. The adapter
 deterministically authorizes `project-bootstrap-reconcile` followed by internal
 `bootstrap-existing-project`; the provider realizes only the Core model, then
-Core validation and Target State evaluation run deterministically. Provider-
-backed run `36942421201` executed TD-COMP-001 against the current bound
-instruction/runtime surface and returned PASS; the case establishes this
-controlled TL2 handoff only.
+Core validation and Target State evaluation run deterministically. Current A09 refresh run `37089886520` executed TD-COMP-001 against the
+current bound instruction/runtime surface and returned PASS; the case
+establishes this controlled TL2 handoff only.
 
 Review correction:
 
@@ -1331,7 +1330,7 @@ The TL3 oracle should be a normalized semantic model, not a golden file dump.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-Current first-wave run `37088827181` passed TD-BOOT-E02 and this E05 mutation against the same frozen oracle.
+Current A09 refresh run `37089886520` passed TD-BOOT-E01 on the frozen oracle.
 
 **Execution design:** one TL3 `bootstrap_realization` case supplies a reviewed profile plus a project-owned accepted graph. The provider must project the graph's canonical sources/dependency edge into Core; target-state evaluation is deterministic.
 
@@ -1453,7 +1452,11 @@ Selected scope/model is unchanged.
 **Oracle:** O1 for synthetic model + semantic normalization  
 **Status:** IMPLEMENTED
 
-Provider-backed run `36949909315` executed three independent clean-context runs for this frozen TL4 case; all three returned PASS. This establishes only the declared TL4 synthetic obligation and does not substitute for TL5 real-project evidence.
+Current A09 refresh run `37089887788` executed three independent clean-context
+TD-BOOT-E06 runs; all three returned PASS. The enclosing TL4 campaign was red
+only because unrelated TD-COMP-003 had one failed repetition. This establishes
+the declared A09 TL4 synthetic obligation and does not substitute for TL5
+real-project evidence.
 
 Prerequisite:
 
@@ -1527,10 +1530,11 @@ the selected three NAPMS artifacts is now an explicit Design Profile expectation
 so dropping any binding is a direct A09-F06 failure rather than an oracle-policy
 choice.
 
-Accepted provider run `36952038645` executed Fixture V2 through the two-step
+Current provider run `37089889046` executed Fixture V2 through the two-step
 bootstrap-idempotence sequence; both clean-context calls returned PASS against
-the O2 known-project baseline. This implements A09-R04. NAPMS remains a
-known-project regression rather than an independent TL6 holdout.
+the O2 known-project baseline. This implements A09-R04 on the current execution
+surface. NAPMS remains a known-project regression rather than an independent
+TL6 holdout.
 
 # SF-07 — Greenfield bootstrap micro-project
 
