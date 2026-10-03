@@ -148,6 +148,24 @@ def main() -> int:
         provenance=provenance,
     )
 
+    manifest_with_unrelated_generated = copy.deepcopy(manifest)
+    manifest_with_unrelated_generated["sources"].append(
+        {
+            "artifact": "UNRELATED-GENERATED",
+            "authority": "OTHER",
+            "path": "docs/generated/other/disposable.md",
+            "sha256": "e" * 64,
+        }
+    )
+    unrelated_provenance = expected_provenance(
+        manifest_with_unrelated_generated,
+        plan,
+        document_id="architecture-model",
+        section_id="c4",
+        profile=profile,
+    )
+    assert unrelated_provenance["sources"] == provenance["sources"]
+
     outside = copy.deepcopy(plan)
     outside["documents"][0]["sections"][0]["sources"].append("OUTSIDE")
     expect_error(
