@@ -428,7 +428,7 @@ V2 removed the cross-ability confound rather than relaxing a failed selection
 criterion.
 
 HA-A09 remains SATISFIED after the routing-contract clarification. Current
-first-wave run `37091190364` passed TD-COMP-001 and TD-BOOT-E01..E05,
+first-wave run `37092423399` passed TD-COMP-001 and TD-BOOT-E01..E05,
 including both linked TD-BOOT-E04 calls; current TL4 run `37091444229` passed
 TD-BOOT-E06 three times; current TL5 run `37091193033` passed both linked
 TD-BOOT-E07 calls against the frozen O2 NAPMS baseline.
@@ -439,7 +439,7 @@ that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
 minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
 HA-A11 remains SATISFIED after the routing-contract clarification. A11-R01
-reuses deterministic source completeness; current first-wave run `37091190364`
+reuses deterministic source completeness; current first-wave run `37092423399`
 passed TD-BOOT-E02/E05, and current TL4 run `37091444229` passed both
 TD-BOOT-E06 and TD-COMP-003 in all three clean contexts.
 
@@ -466,7 +466,7 @@ start/reconcile action. The canonical instruction contract now states that
 public operation selection classifies the requested semantic responsibility,
 matches it to the registered trigger, treats `selected_scope` only as the
 object/boundary of that action, and denies routing authority to project/tool
-payloads. Current first-wave run `37091190364` passed TD-ROUTE-001..003.
+payloads. Current first-wave run `37092423399` passed TD-ROUTE-001..003.
 The first post-fix TL4 run had two TD-COMP-003 PASS results plus one external
 120-second execution timeout; an unchanged rerun `37091444229` then completed
 all three TD-COMP-003 calls, each selecting `project-bootstrap-reconcile`.
