@@ -72,6 +72,7 @@ harness-check:
 	python tests/test_semantic_closure.py
 	python checks/validate_harness.py
 	python -m unittest tests/test_lifecycle_experiment.py
+	python tests/test_consumer_api_compatibility.py
 	python tests/test_consumer_pack.py
 	python tests/test_consumer_wrapper.py
 	python tests/test_scenario_suite.py

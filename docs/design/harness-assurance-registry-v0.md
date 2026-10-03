@@ -193,8 +193,12 @@ known-project regression from one project that participated in Harness design;
 it does not prove the required mode-equivalence pair. A21-R04 remains missing
 because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies
 A16-R01..R06 on the clarified public-operation selection contract; and HA-A18
-satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
-compatibility). A18-R03 remains missing. TD-BOOT-E06 does not satisfy raw Capability- or
+satisfies A18-R01 (current public-pack closure), A18-R02 (immutable pin/API
+compatibility), and A18-R03 through the Consumer API v1 cross-revision baseline
+guard. The guard freezes published runtime-module, public-operation, method, and
+artifact-kind identities at revision `876a85854d7b876ea90a3ec5614a04311bb987fc`;
+additive evolution remains compatible while rename/removal under v1 fails closed
+and requires a new Consumer API identity. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
 bootstrap-realization fixture rather than outputs of formation judgement. The
 previous TD-CAP-003 disagreement in run `36947239747` therefore remains

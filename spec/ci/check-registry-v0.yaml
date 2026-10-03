@@ -193,6 +193,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: consumer_api_compatibility
+  command: python tests/test_consumer_api_compatibility.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: consumer_pack
   command: python tests/test_consumer_pack.py
   stage: deferred

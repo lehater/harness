@@ -1,0 +1,65 @@
+version: 1
+kind: harness-consumer-api-baseline
+id: HARNESS-CONSUMER-API-V1-BASELINE
+consumer_api: v1
+baseline_revision: 876a85854d7b876ea90a3ec5614a04311bb987fc
+breaking_change_policy: new-consumer-api
+
+published_identities:
+  runtime_modules:
+    - harness.application.consumer_pack
+    - harness.application.skill_router
+    - harness.application.scenario_suite
+  public_operations:
+    - project-bootstrap-reconcile
+    - project-engineering-status
+    - design-profile
+    - decision-pipeline
+    - human-documentation-projection
+  methods:
+    - concurrency-consistency-analysis
+    - data-evidence-analysis
+    - data-governance-lifecycle-analysis
+    - external-dependency-analysis
+    - human-interface-quality-analysis
+    - internationalization-localization-analysis
+    - obligation-analysis
+    - performance-capacity-analysis
+    - recovery-continuity-analysis
+    - reliability-analysis
+  artifact_kinds:
+    - problem-evidence
+    - user-needs
+    - product-requirements
+    - domain-strategy
+    - model-context-strategy
+    - concurrency-consistency-design
+    - domain-use-case
+    - application-design
+    - application-process-design
+    - task-model
+    - user-journey-design
+    - quality-design
+    - system-architecture
+    - security-architecture
+    - interface-contract
+    - conceptual-interface-model
+    - information-architecture-design
+    - interaction-design
+    - interface-topology-design
+    - human-interface-design
+    - presentation-system-design
+    - screen-view-design
+    - data-design
+    - operability-design
+    - security-analysis
+    - engineering-policy
+    - component-design
+    - test-design
+    - implementation-design
+    - acceptance-scenarios
+    - domain-model
+    - verification-strategy
+    - pinned-source-entity-set
+    - source-classification-registry
+    - source-coverage-audit

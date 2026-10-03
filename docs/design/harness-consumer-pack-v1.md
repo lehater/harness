@@ -49,6 +49,18 @@ python -m harness.application.scenario_suite SCENARIOS --catalog CATALOG
 
 The CLI defaults to v1; retired API identities are rejected.
 
+## Compatibility
+
+Consumer API v1 published identities are append-only across Harness revisions.
+The compatibility baseline is `spec/distribution/consumer-api-v1-baseline.yaml`.
+Existing public runtime modules, public operations, methods, and artifact
+knowledge-kind identities must remain available under v1. Additive identities
+are compatible. A rename or removal is a breaking change and must be handled by
+introducing a new `consumer_api` while preserving v1 for existing bindings.
+
+The full gate compares the current Consumer surface with the frozen baseline so
+an ordinary Harness upgrade cannot silently break a pinned Consumer contract.
+
 ## Integrity
 
 Materialization records a manifest containing the immutable binding revision,
