@@ -147,14 +147,14 @@ def main() -> int:
     assert provenance["scope"] == "policy-export"
     assert provenance["sources"] == [
         {
-            "artifact": "APPLICATION-PROCESS",
-            "path": "docs/application-process.yaml",
-            "sha256": "b" * 64,
-        },
-        {
             "artifact": "APPLICATION",
             "path": "docs/application.yaml",
             "sha256": "c" * 64,
+        },
+        {
+            "artifact": "APPLICATION-PROCESS",
+            "path": "docs/application-process.yaml",
+            "sha256": "b" * 64,
         },
     ]
 
