@@ -1,0 +1,138 @@
+version: 1
+kind: harness-scenario
+id: application-process-discovery-and-routing
+title: Application process concern becomes an explicit process capability and routed producer
+dimensions:
+  project_archetype: backend-service
+  stage: design
+  behavior_class: coverage
+  execution_type: deterministic
+covers:
+  - application-process-discovery-routing
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: PROCESS-INTEGRATION
+      default_subject: PROCESS-INTEGRATION
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own application composition and process semantics.
+          boundary:
+            semantic_cohesion: Application-level composition of accepted behavior.
+            independent_change: Application composition can evolve behind accepted upstream semantics.
+            public_contract: Accepted application behavior and process contracts.
+          produces:
+            - capability: demo.application
+              knowledge_kind: application-design
+              semantic_claims: [engineering.application.orchestration]
+              requires: []
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Implement the selected application scope.
+          requires:
+            - capability: demo.application
+      terminal_capabilities: []
+  realization:
+    value:
+      artifacts:
+        - id: APPLICATION
+          authority: APPLICATION-DESIGN
+          path: docs/application.yaml
+          provides: [demo.application]
+          depends_on: []
+      questions: []
+  overlay:
+    value:
+      subject_inventory:
+        state: NOT_APPLICABLE
+        rationale: The fixture has one explicitly bounded application scope.
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: PROCESS-INTEGRATION-REGISTRY
+      routes:
+        - knowledge_kind: application-process-design
+          skill: skills/artifacts/application-process-design/SKILL.md
+
+steps:
+  - id: coverage-before
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.realization}
+      consumer: IMPLEMENTATION
+      scope: default
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: application.process
+          state: MISSING
+          action: MODEL_PRODUCTION_CONTRACT
+
+  - id: model-process-capability
+    driver: data.patch
+    with:
+      value: {ref: fixture.graph}
+      operations:
+        - op: add
+          path: /authorities/0/produces/-
+          value:
+            capability: demo.application-process
+            knowledge_kind: application-process-design
+            semantic_claims: [engineering.application.process]
+            requires:
+              - capability: demo.application
+        - op: add
+          path: /consumers/0/requires/-
+          value:
+            capability: demo.application-process
+
+  - id: coverage-after
+    driver: engineering.coverage
+    with:
+      graph: {ref: step.model-process-capability}
+      realization: {ref: fixture.realization}
+      consumer: IMPLEMENTATION
+      scope: default
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: application.process
+          state: MISSING
+          action: PRODUCE_CAPABILITY
+      - path: /work_items
+        op: contains_match
+        value:
+          action: PRODUCE_CAPABILITY
+          capability: demo.application-process
+          authority: APPLICATION-DESIGN
+          execution_route:
+            status: ROUTED
+            knowledge_kind: application-process-design
+            skill: skills/artifacts/application-process-design/SKILL.md
+
+  - id: route-create
+    driver: agent.route
+    with:
+      graph: {ref: step.model-process-capability}
+      target: IMPLEMENTATION
+      model: {ref: fixture.realization}
+      registry: {ref: fixture.registry}
+    expect:
+      - {path: /target_status, op: equals, value: READY}
+      - path: /routed
+        op: contains_match
+        value:
+          authority: APPLICATION-DESIGN
+          knowledge_kind: application-process-design
+          capabilities: [demo.application-process]
+          skill: skills/artifacts/application-process-design/SKILL.md
+      - {path: /unrouted, op: length, value: 0}
