@@ -50,6 +50,29 @@ contracts:
     required_review_checks: [behavior-not-tactical]
   - knowledge_kind: application-design
     required_review_checks: [orchestration-not-domain-reownership]
+  - knowledge_kind: application-process-design
+    owned_assertion_kinds:
+      - application-process-boundary
+      - application-process-work-reference
+      - application-process-composition
+      - application-process-continuation
+      - application-process-recovery
+      - application-process-progress
+      - application-process-completion
+    obligations:
+      - {id: process-boundary, kind: application-process-boundary}
+      - {id: referenced-work, kind: application-process-work-reference}
+      - {id: composition, kind: application-process-composition}
+      - {id: completion, kind: application-process-completion}
+    required_review_checks:
+      - process-boundary-complete
+      - process-references-not-reowned
+      - process-composition-explicit
+      - process-continuation-explicit-when-material
+      - process-recovery-explicit-when-material
+      - process-progress-semantic-only
+      - process-completion-explicit
+      - process-not-runtime-topology
   - knowledge_kind: task-model
     owned_assertion_kinds:
       - task-goal
