@@ -41,14 +41,18 @@ A missing fact is omitted or reported as unresolved. It is never recovered from 
    `harness.application.skill_router` with
    `invoked_by=human-documentation-projection`; never open another
    `SKILL.md` by filesystem path.
-4. The first specialized slice is
-   `architecture-c4-structurizr`. A specialized document must contain exactly
-   one specialized section in v1; do not mix narrative and specialized sections
+4. Specialized slices include `architecture-c4-structurizr` and
+   `data-model-dbml`. A specialized document must contain exactly one
+   specialized section in v1; do not mix narrative and specialized sections
    inside one output document until a later accepted contract defines that
    composition.
-5. Supply the internal projection operation only the current manifest, plan,
-   document/section identity and its exact source-bounded inputs. The internal
-   operation owns transformation/format validation, not source discovery.
+5. Treat optional section `scope` as projection-instance identity. Pass it to
+   the internal operation when present; `data-model-dbml` requires it.
+   Multiple planned sections may use the same renderer with different scopes.
+6. Supply the internal projection operation only the current manifest, plan,
+   document/section identity, optional scope and its exact source-bounded
+   inputs. The internal operation owns transformation/format validation, not
+   source discovery.
 6. Do not create narrative projection IR for a specialized section. If the
    generated asset is included in a REVIEW/HANDOFF package, reuse the existing
    visual-asset provenance/package boundary rather than creating a second
