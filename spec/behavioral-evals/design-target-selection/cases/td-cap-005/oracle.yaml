@@ -1,0 +1,7 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+id: TD-CAP-005-ORACLE-V1
+dimensions:
+  capability_partition:
+    groups:
+      - [M1, M2]

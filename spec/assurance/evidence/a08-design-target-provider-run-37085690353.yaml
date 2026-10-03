@@ -1,0 +1,99 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A08-DESIGN-TARGET-PROVIDER-RUN-37085690353
+status: accepted
+provider: github-copilot
+workflow_run_id: 37085690353
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37085690353
+workflow_conclusion: success
+accepted_scope:
+  - TD-CAP-005
+  - TD-TARGET-001
+  - TD-TARGET-002
+  - TD-TARGET-003
+artifact:
+  id: 11259764339
+  name: assurance-campaign-design-target-selection
+  sha256: aecd6e9c8dc15fffebe70634724dc999f4ce6b17418ee94b5239ec7eef9ba6ee
+  retention_days: 90
+harness_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: d63d0d94db5ddcafc1cf7a7ae05188cf1bae75bb}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/design-target-selection/manifest-v0.yaml, git_blob_sha: 881909c1f3bc95c392c438a7fb0fcc2317b45f4e}
+currentness:
+  state: current
+  reason: >-
+    The accepted V2 cases, fixtures, oracles, trusted instructions, behavioral
+    runner, provider adapter, campaign manifest/workflow and provider runtime
+    descriptor exactly match this execution surface. Diagnostic V1 run
+    37085479048 is excluded because its oracle conflated A08 selection with
+    separate A05 granularity.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 4
+  total_cases: 4
+  provider_calls: 6
+resolved_models:
+  mai-code-1.1-flash: 6
+token_usage:
+  input_tokens: 36565
+  output_tokens: 3179
+  total_tokens: 39744
+provider_prompt_utf8_bytes: 141915
+cases:
+  - case_id: TD-CAP-005
+    template: spec/behavioral-evals/design-target-selection/cases/td-cap-005/case.yaml.tmpl
+    fixture: spec/behavioral-evals/design-target-selection/cases/td-cap-005/fixture.yaml
+    oracle: spec/behavioral-evals/design-target-selection/cases/td-cap-005/oracle.yaml
+    case_sha256: a51e05260ea3e676905a3c023d14cbf0eab5a698a78f9ba171270ef65499398e
+    fixture_sha256: 90f0992e15e1e363b8fb01644aa5f61e3abbd534631bddf6011d7dbaf09901e9
+    oracle_sha256: 180b2481d1ea0cfe027a6633ab5003be5b740dabd6365ca4898ef3d892b397be
+    runs:
+      - {run_id: TD-CAP-005-R01-1832e2a08cdd, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6098, output_tokens: 537, provider_prompt_utf8_bytes: 23729, record_sha256: 8dcf01caa8ff9562804a62c5e959b82a01f57716a045bc0f882421934dc10874, started_from_clean_context: true}
+  - case_id: TD-TARGET-001
+    template: spec/behavioral-evals/design-target-selection/cases/td-target-001/case.yaml.tmpl
+    fixture: spec/behavioral-evals/design-target-selection/cases/td-target-001/fixture.yaml
+    oracle: spec/behavioral-evals/design-target-selection/cases/td-target-001/oracle.yaml
+    case_sha256: c151c6afdbdcdf04a7046145bf5f29dcd5e7e141d681a7a61b5bc64dd92051f0
+    fixture_sha256: c44581749fcef93747b504b2ed77b30ee9babce66b43f99f33b95ab433913e45
+    oracle_sha256: 2358d348172c85a531e30b3ba4102140336a3502d520d930a785c9fcdba15e2c
+    runs:
+      - {run_id: TD-TARGET-001-R01-cdeee42991e2, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6059, output_tokens: 581, provider_prompt_utf8_bytes: 23506, record_sha256: 7649a9c891e0669761f2399f2e29c7da99452352d86de3696e40a3e10686065b, started_from_clean_context: true}
+  - case_id: TD-TARGET-002
+    template: spec/behavioral-evals/design-target-selection/cases/td-target-002/case.yaml.tmpl
+    fixture: spec/behavioral-evals/design-target-selection/cases/td-target-002/fixture.yaml
+    oracle: spec/behavioral-evals/design-target-selection/cases/td-target-002/oracle.yaml
+    case_sha256: e49f75382e4802d3eb37513e6c31ece71b8f9367f7a59deed86806fe9d5442e3
+    fixture_sha256: 54d754ae549e4315aa1c4bdbc8effce9688aad410419c922793e212ffbe28805
+    oracle_sha256: 7729b7a6c05ae3d133f23c2e0cc898dcb6b628b204fa093e59686f1b0e0aab62
+    runs:
+      - {run_id: TD-TARGET-002-R01-2773c47813ef, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6171, output_tokens: 690, provider_prompt_utf8_bytes: 24126, record_sha256: bdd8ab9bce8c3d282bd63f4bc38704e3a53cbbfaa3705433dcd449bab1f51d3d, started_from_clean_context: true}
+  - case_id: TD-TARGET-003
+    template: spec/behavioral-evals/design-target-selection/cases/td-target-003/case.yaml.tmpl
+    fixture: spec/behavioral-evals/design-target-selection/cases/td-target-003/fixture.yaml
+    oracle: spec/behavioral-evals/design-target-selection/cases/td-target-003/oracle.yaml
+    case_sha256: 76b992c81b81a7ec48dafde3799858d27c703feb6486992bf9b899c085a4f9a6
+    fixture_sha256: e560e8e7eb1bfe4b54bc7e966f706615e9b36cb41ca087e0a2c40255ac9a73a9
+    oracle_sha256: 4b89f0ca4a788fe6d263f85cc58d77be97c9d86d744ce47484ec2c1bfe50e0b3
+    runs:
+      - {run_id: TD-TARGET-003-R01-d7595c5d901a, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6079, output_tokens: 611, provider_prompt_utf8_bytes: 23518, record_sha256: 600c3c99c7065e8dff17c3ab33403c939da52c2116b6ae13e849e2bf3e601502, started_from_clean_context: true}
+      - {run_id: TD-TARGET-003-R02-5ba1c22dafdb, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6081, output_tokens: 342, provider_prompt_utf8_bytes: 23518, record_sha256: 5e1797454bf605a842435b7bf46346f46a338baba84e2c25647d212ea270ec84, started_from_clean_context: true}
+      - {run_id: TD-TARGET-003-R03-30d1f46c7b7e, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6077, output_tokens: 418, provider_prompt_utf8_bytes: 23518, record_sha256: 1945478580759b53cab089d155a0141d307be3d2b058832a4ecdaa239b3aed89, started_from_clean_context: true}
+limitations:
+  - The A08 cases deliberately contain one unambiguous selected knowledge surface so the reused capability_partition IR measures target inclusion/exclusion without adding an A05 granularity claim.
+  - Diagnostic V1 run 37085479048 is not admitted evidence: it selected the correct required atom sets but its oracle also required a separate verification Capability partition, conflating HA-A08 with HA-A05.
+  - TD-TARGET-003 establishes three-run convergence only for one frozen synthetic scope.
+  - Provider-auto resolved all six calls to mai-code-1.1-flash; this is not cross-model convergence or a TL6 portability claim.

@@ -110,6 +110,15 @@ change: run `37083515120` passed TD-AUTH-001/002/004, while run
 executions. The admitted TD-AUTH-003 oracle remains corrected Fixture V2; the
 historical ambiguous V1 diagnostic result is not evidence.
 
+HA-A08 then received its first dedicated target-selection campaign. Diagnostic
+run `37085479048` exposed an oracle-design error rather than a selection
+failure: all A08 runs selected exactly the required atom sets and no prohibited
+atoms, but the scorer also required a separate verification Capability and
+therefore measured A05 granularity. Frozen Fixture V2 removed that unrelated
+partition dimension. Run `37085690353` then passed all four frozen cases and
+all six provider calls without changing Harness semantics or the Design Profile
+skill.
+
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
 A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
 through deterministic structural interpretation, and A01-R03 through explicit
@@ -128,10 +137,10 @@ three clean-context convergence runs. HA-A06 satisfies A06-R01 through explicit
 disposition/subject-completeness evidence and A06-R02 through scope-root
 activation isolation. HA-A07 satisfies A07-R01 through fail-closed
 retire/split/merge/rename migration evidence and A07-R02 through unchanged
-assessment preservation. HA-A08 is explicitly INCOMPLETE: A08-R01 requires
-a judgement-backed bounded selection/anti-template-bias case, A08-R02 requires
-the TL3 project-shaped minimal-target proof, and A08-R03 requires repeated
-clean-context convergence. HA-A09 satisfies A09-R01 (TL2),
+assessment preservation. HA-A08 satisfies A08-R01 through current bounded
+selection plus Reference-template/noise rejection, A08-R02 through the frozen
+TL3 project-shaped minimal-target case, and A08-R03 through three independent
+clean-context target-selection runs. HA-A09 satisfies A09-R01 (TL2),
 A09-R02 (TL3), and A09-R03 (TL4); HA-A10 is explicitly INCOMPLETE with
 A10-R01/A10-R02 waiting on the blocked TD-BOOT-G01..G04 TL3 greenfield cases
 and A10-R03 waiting on TD-BOOT-G05 repeated clean-context execution. HA-A11
@@ -403,11 +412,16 @@ evidence; unmapped retirement is now an explicit conflict rather than silent
 loss. The evidence is synthetic O1 and does not claim TL5 real-project
 generalization.
 
-HA-A08 is now present in the denominator but remains INCOMPLETE. Existing
-deterministic closure evaluation and historical/stale provider runs do not
-substitute for target-selection judgement. TD-CAP-005 and TD-BOOT-G01/G04/G05
-remain the relevant designed evidence paths; TL4 convergence must use repeated
-clean-context execution.
+HA-A08 is SATISFIED for its three target-selection proof slots. Provider run
+`37085690353` passed TD-CAP-005, TD-TARGET-001 and TD-TARGET-002 once each and
+TD-TARGET-003 in three independent clean contexts. The proof is intentionally
+bounded to selected-scope inclusion/exclusion: task/workflow/delivery state and
+descriptive Reference-like vocabulary stayed outside the selected target.
+Diagnostic run `37085479048` is not evidence; its V1 oracle accidentally mixed
+A08 selection with a separate A05 Capability-granularity decision. In that
+diagnostic run the required atom set itself was selected correctly, so Fixture
+V2 removed the cross-ability confound rather than relaxing a failed selection
+criterion.
 
 HA-A10 is present in the denominator and remains INCOMPLETE by design.
 Greenfield bootstrap cannot be proven from pre-authored graph fixtures because

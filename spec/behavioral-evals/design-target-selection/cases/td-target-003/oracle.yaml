@@ -1,0 +1,7 @@
+version: 1
+kind: harness-agent-behavioral-eval-oracle
+id: TD-TARGET-003-ORACLE-V2
+dimensions:
+  capability_partition:
+    groups:
+      - [S1, S2]

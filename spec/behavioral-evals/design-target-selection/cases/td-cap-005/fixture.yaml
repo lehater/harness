@@ -1,0 +1,19 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-CAP-005-FIXTURE-V1
+reference_pressure:
+  - "The repository repeatedly uses deployment, observability, metrics, release-pipeline, cache, and telemetry vocabulary."
+  - "Those terms occur only in descriptive examples and filenames for this selected scope."
+atoms:
+  - id: M1
+    statement: "A customer password-reset token expires fifteen minutes after issuance."
+    source_path: "docs/account/password-reset-contract.md"
+  - id: M2
+    statement: "A password-reset token that has already been consumed must be rejected on every later use."
+    source_path: "docs/account/password-reset-contract.md"
+  - id: D1
+    statement: "The README calls one example component ObservabilityGateway and shows a metrics endpoint, without creating an observability requirement for password reset."
+    source_path: "observability/README.md"
+  - id: D2
+    statement: "A deployment example uses the label release-pipeline and a cache-named sidecar, but it is illustrative and not accepted design truth for the selected scope."
+    source_path: "deploy/examples/reset.yaml"

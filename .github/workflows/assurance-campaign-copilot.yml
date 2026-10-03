@@ -14,6 +14,7 @@ on:
           - tl4-existing-project
           - tl5-known-project
           - release-critical-formation
+          - design-target-selection
 
 permissions:
   contents: read
@@ -67,6 +68,7 @@ jobs:
               "tl4-existing-project": [Path("spec/behavioral-evals/tl4-existing-project/manifest-v0.yaml")],
               "tl5-known-project": [Path("spec/behavioral-evals/tl5-known-project/manifest-v0.yaml")],
               "release-critical-formation": [Path("spec/behavioral-evals/release-critical-formation/manifest-v0.yaml")],
+              "design-target-selection": [Path("spec/behavioral-evals/design-target-selection/manifest-v0.yaml")],
           }
           selected = os.environ["CAMPAIGN"]
           selected_manifests = (

@@ -1,0 +1,19 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: TD-TARGET-001-FIXTURE-V2
+atoms:
+  - id: K1
+    statement: "A password-reset token expires fifteen minutes after issuance."
+    source_path: "requirements/password-reset.md"
+  - id: K2
+    statement: "A consumed password-reset token cannot be accepted again."
+    source_path: "requirements/password-reset.md"
+  - id: T1
+    statement: "Create an implementation ticket for the password-reset endpoint before coding begins."
+    source_path: "planning/backlog.md"
+  - id: W1
+    statement: "Move the delivery card to Ready after product review and then to Done after deployment."
+    source_path: "planning/workflow.md"
+  - id: D1
+    statement: "An example deployment file mentions metrics, tracing, a release pipeline, and a cache sidecar without defining requirements for this scope."
+    source_path: "deploy/examples/reset.yaml"

@@ -989,10 +989,124 @@ print(
     f"max_per_call={formation_max_per_call}"
 )
 
+TARGET_BASE = ROOT / "spec" / "behavioral-evals" / "design-target-selection"
+TARGET_MANIFEST = yaml.safe_load(
+    (TARGET_BASE / "manifest-v0.yaml").read_text(encoding="utf-8")
+)
+TARGET_EXPECTED = {
+    "TD-CAP-005": ("TL1", 1, {"A05-F06", "A05-F02", "A08-F04"}),
+    "TD-TARGET-001": ("TL1", 1, {"A08-F01", "A08-F02", "A08-F03"}),
+    "TD-TARGET-002": ("TL3", 1, {"A08-F01", "A08-F02", "A08-F04"}),
+    "TD-TARGET-003": ("TL4", 3, {"A08-F05"}),
+}
+assert TARGET_MANIFEST["kind"] == "harness-agent-behavioral-eval-manifest"
+target_entries = TARGET_MANIFEST["cases"]
+assert {item["design"] for item in target_entries} == set(TARGET_EXPECTED)
+target_budget = TARGET_MANIFEST["provider_prompt_budget"]
+assert target_budget["metric"] == "utf8_bytes"
+target_max_per_call = target_budget["max_per_call"]
+target_max_suite = target_budget["max_suite"]
+assert isinstance(target_max_per_call, int) and target_max_per_call > 0
+assert isinstance(target_max_suite, int) and target_max_suite >= 6 * target_max_per_call
+
+target_prompt_bound = 0
+target_provider_calls = 0
+for entry in target_entries:
+    template = TARGET_BASE / entry["template"]
+    assert template.is_file(), entry
+    with tempfile.TemporaryDirectory(prefix="behavioral-target-case-") as temp:
+        temp_root = Path(temp)
+        shutil.copytree(template.parent, temp_root / "case")
+        runtime = temp_root / "case" / "case.yaml"
+        rendered = (temp_root / "case" / "case.yaml.tmpl").read_text(
+            encoding="utf-8"
+        )
+        runtime.write_text(
+            rendered.replace("__HARNESS_REVISION__", "a" * 40),
+            encoding="utf-8",
+        )
+        binding = load_case(runtime)
+        expected_level, runs, failures = TARGET_EXPECTED[entry["design"]]
+        assert binding.case["case_id"] == entry["design"]
+        assert binding.case["test_level"] == expected_level
+        assert binding.case["normalization_profile"]["dimensions"] == [
+            "capability_partition"
+        ]
+        assert binding.case["pass_criteria"]["require_dimensions"] == [
+            "capability_partition"
+        ]
+        assert binding.case["run_plan"] == {
+            "runs": runs,
+            "all_runs_must_pass": True,
+        }
+        assert set(binding.case["failure_modes"]) == failures
+        assert entry["dimension"] == "capability_partition"
+        assert entry["runs"] == runs
+
+        request = build_execution_request(
+            binding,
+            run_id=entry["design"] + "-BOUNDARY",
+            agent_descriptor=descriptor,
+            agent_descriptor_sha256="b" * 64,
+        )
+        payload = _model_payload(request)
+        serialized = json.dumps(payload, sort_keys=True)
+        assert entry["design"] not in serialized
+        assert "id" not in payload["repository_fixture"]
+        assert "kind" not in payload["repository_fixture"]
+        trusted_paths = {item["path"] for item in payload["trusted_instructions"]}
+        assert all("harness-ability-to-evidence" not in path for path in trusted_paths)
+        assert all("harness-test-design-catalog" not in path for path in trusted_paths)
+        assert all("spec/behavioral-evals" not in path for path in trusted_paths)
+
+        prompt_bytes = len(_prompt(request).encode("utf-8"))
+        assert prompt_bytes <= target_max_per_call, (
+            entry["design"], prompt_bytes, target_max_per_call
+        )
+        target_prompt_bound += prompt_bytes * runs
+        target_provider_calls += runs
+
+        groups = binding.oracle["dimensions"]["capability_partition"]["groups"]
+        response = {
+            "run_status": "COMPLETED",
+            "output": {
+                "capabilities": [{"support_atoms": group} for group in groups],
+            },
+        }
+        normalized = normalize_result(binding, response)
+        assert score_result(binding, normalized)["status"] == "PASS"
+
+        selected_atoms = {atom for group in groups for atom in group}
+        all_atoms = {atom["id"] for atom in binding.fixture["atoms"]}
+        assert selected_atoms <= all_atoms
+        if entry["design"] == "TD-TARGET-001":
+            assert {"T1", "W1", "D1"}.isdisjoint(selected_atoms)
+        elif entry["design"] == "TD-TARGET-002":
+            assert {"D1", "D2", "D3"}.isdisjoint(selected_atoms)
+            assert len(binding.fixture["repository_shape"]["selected_paths"]) >= 4
+        elif entry["design"] == "TD-TARGET-003":
+            assert {"T1", "W1", "D1"}.isdisjoint(selected_atoms)
+        elif entry["design"] == "TD-CAP-005":
+            assert {"D1", "D2"}.isdisjoint(selected_atoms)
+            assert binding.fixture["reference_pressure"]
+
+assert target_provider_calls == 6
+assert target_prompt_bound <= target_max_suite, (
+    target_prompt_bound,
+    target_max_suite,
+)
+print(
+    "Design-target selection campaign: PASS "
+    f"({len(target_entries)} cases); provider_calls={target_provider_calls}; "
+    f"execution_prompt_bound={target_prompt_bound}; "
+    f"max_per_call={target_max_per_call}"
+)
+
 CAMPAIGN_WORKFLOW = ROOT / ".github" / "workflows" / "assurance-campaign-copilot.yml"
 campaign_workflow_text = CAMPAIGN_WORKFLOW.read_text(encoding="utf-8")
 assert 'default: all' in campaign_workflow_text
 assert 'release-critical-formation' in campaign_workflow_text
+assert 'design-target-selection' in campaign_workflow_text
 assert 'tl5-known-project' in campaign_workflow_text
 assert 'tl4-existing-project' in campaign_workflow_text
 assert 'first-wave' in campaign_workflow_text
