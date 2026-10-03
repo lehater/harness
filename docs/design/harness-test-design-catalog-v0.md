@@ -162,7 +162,7 @@ A design may move to READY only when:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
 
 Fixture:
 
@@ -206,7 +206,7 @@ A dedicated semantic fixture/eval contract, not a Core validator.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
 
 Fixture:
 
@@ -237,7 +237,7 @@ remain empty.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-003/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-003/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
 
 Fixture:
 
@@ -272,7 +272,7 @@ Assertions:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-cap-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A05 TL3/TL4 proof slots remain separate.
 
 Fixture:
 
@@ -350,7 +350,7 @@ Assertions:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-007`; provider run `36953091767` passed all three clean-context executions.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-007`; current provider run `37083516399` passed all three clean-context executions.
 
 Base fixture:
 
@@ -377,7 +377,9 @@ Same normalized Capability identities and granularity.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-008`; provider run `36953091767` passed the controlled TL3 project-shaped case.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-cap-008`; current provider run `37083516399` passed the controlled TL3 project-shaped case.
+
+Diagnostic refresh `37083176344` on the pre-fix current main failed the same frozen oracle with `WRONG_GRANULARITY` by splitting the two complementary novel atoms. The current PASS follows a generic `design-profile` semantic/lifecycle granularity clarification; fixture and oracle were not weakened.
 
 Fixture:
 
@@ -409,7 +411,7 @@ Assertions:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-001/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
 
 Fixture:
 
@@ -434,7 +436,7 @@ Assertions:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-002/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
 
 Fixture:
 
@@ -497,7 +499,7 @@ Ambiguous ownership is tested separately by TD-AUTH-005.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and provider-backed run `36928079710` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-auth-004/case.yaml.tmpl` via `.github/workflows/behavioral-eval-copilot.yml`. Deterministic boundary validation is implemented and current provider-backed run `37083515120` is accepted for this frozen TL1 case. This implements the declared TL1 design only; broader HA-A04 proof slots remain separate.
 
 Base fixture:
 
