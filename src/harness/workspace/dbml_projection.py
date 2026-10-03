@@ -10,6 +10,10 @@ from typing import Any
 import yaml
 
 from harness.project_model.core import CoreError
+from harness.workspace.projection_boundary import (
+    bind_projection_sources,
+    repository_relative_path,
+)
 
 PROJECTION_ID = "data-model-dbml"
 PROFILE_KIND = "harness-dbml-data-model-profile"
@@ -25,15 +29,6 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise CoreError(f"{path} must contain a mapping")
     return value
-
-
-def _repo_relative(value: Any, label: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise CoreError(f"{label} is required")
-    path = Path(value)
-    if path.is_absolute() or ".." in path.parts:
-        raise CoreError(f"{label} must be repository-relative: {value}")
-    return path.as_posix()
 
 
 def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
@@ -74,7 +69,7 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
             "{scope-id}", ""
         ):
             raise CoreError(f"DBML {key} output template has unsupported placeholder")
-        rendered = _repo_relative(
+        rendered = repository_relative_path(
             template.replace("{scope-id}", "scope"),
             f"DBML {key} output",
         )
@@ -165,7 +160,7 @@ def validate_scope(scope_id: Any, profile: dict[str, Any]) -> str:
 def expected_output_paths(profile: dict[str, Any], scope_id: str) -> dict[str, str]:
     validate_scope(scope_id, profile)
     rendered = {
-        key: _repo_relative(
+        key: repository_relative_path(
             value.replace("{scope-id}", scope_id),
             f"DBML {key} output",
         )
@@ -180,83 +175,6 @@ def expected_output_paths(profile: dict[str, Any], scope_id: str) -> dict[str, s
     return rendered
 
 
-def _manifest_source_index(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    if (
-        manifest.get("version") != 1
-        or manifest.get("kind") != "harness-human-projection-manifest"
-    ):
-        raise CoreError("unexpected human projection manifest")
-    digest = manifest.get("manifest_digest")
-    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
-        raise CoreError("human projection manifest digest is required")
-
-    sources = manifest.get("sources")
-    if not isinstance(sources, list):
-        raise CoreError("human projection manifest sources must be a list")
-    result: dict[str, dict[str, Any]] = {}
-    for row in sources:
-        if not isinstance(row, dict):
-            raise CoreError("human projection source row must be a mapping")
-        artifact = row.get("artifact")
-        path = row.get("path")
-        if not isinstance(artifact, str) or not artifact:
-            raise CoreError("human projection source artifact id is required")
-        if artifact in result:
-            raise CoreError(f"duplicate human projection source: {artifact}")
-        normalized = _repo_relative(path, f"canonical source path for {artifact}")
-        if normalized == "docs/generated" or normalized.startswith("docs/generated/"):
-            raise CoreError(
-                f"DBML projection forbids generated source artifact {artifact}: {normalized}"
-            )
-        sha = row.get("sha256")
-        if sha is not None and (
-            not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{64}", sha)
-        ):
-            raise CoreError(f"canonical source {artifact} sha256 is invalid")
-        result[artifact] = row
-    return result
-
-
-def _find_section(
-    plan: dict[str, Any],
-    *,
-    document_id: str,
-    section_id: str,
-) -> dict[str, Any]:
-    if (
-        plan.get("version") != 1
-        or plan.get("kind") != "harness-human-projection-plan"
-    ):
-        raise CoreError("unexpected human projection plan")
-    documents = plan.get("documents")
-    if not isinstance(documents, list):
-        raise CoreError("human projection plan documents must be a list")
-    document = next(
-        (
-            item
-            for item in documents
-            if isinstance(item, dict) and item.get("id") == document_id
-        ),
-        None,
-    )
-    if document is None:
-        raise CoreError(f"unknown projection document: {document_id}")
-    sections = document.get("sections")
-    if not isinstance(sections, list):
-        raise CoreError(f"projection document {document_id} sections must be a list")
-    section = next(
-        (
-            item
-            for item in sections
-            if isinstance(item, dict) and item.get("id") == section_id
-        ),
-        None,
-    )
-    if section is None:
-        raise CoreError(f"unknown projection section: {document_id}/{section_id}")
-    return section
-
-
 def expected_provenance(
     manifest: dict[str, Any],
     plan: dict[str, Any],
@@ -268,45 +186,19 @@ def expected_provenance(
 ) -> dict[str, Any]:
     validate_profile(profile)
     validate_scope(scope_id, profile)
-    source_index = _manifest_source_index(manifest)
-    if plan.get("manifest_digest") != manifest["manifest_digest"]:
-        raise CoreError("projection plan manifest digest does not match manifest")
-
-    section = _find_section(
+    section, sources = bind_projection_sources(
+        manifest,
         plan,
         document_id=document_id,
         section_id=section_id,
+        renderer=PROJECTION_ID,
+        projection_label="DBML projection",
     )
-    if section.get("renderer") != PROJECTION_ID:
-        raise CoreError(f"projection section renderer must be {PROJECTION_ID}")
     if section.get("scope") != scope_id:
         raise CoreError(
             f"DBML projection scope-id {scope_id} does not match plan scope "
             f"{section.get('scope')!r}"
         )
-
-    source_ids = section.get("sources")
-    if (
-        not isinstance(source_ids, list)
-        or not source_ids
-        or any(not isinstance(value, str) or not value for value in source_ids)
-    ):
-        raise CoreError("DBML projection section requires source ids")
-    if len(source_ids) != len(set(source_ids)):
-        raise CoreError("DBML projection section source ids must be unique")
-    outside = sorted(set(source_ids) - set(source_index))
-    if outside:
-        raise CoreError(
-            "DBML projection sources are outside manifest: " + ", ".join(outside)
-        )
-
-    sources: list[dict[str, Any]] = []
-    for artifact in source_ids:
-        row = source_index[artifact]
-        source = {"artifact": artifact, "path": row["path"]}
-        if "sha256" in row:
-            source["sha256"] = row["sha256"]
-        sources.append(source)
 
     outputs = expected_output_paths(profile, scope_id)
     return {
@@ -577,11 +469,11 @@ def validate_generated_projection(
             "DBML projection provenance does not match current manifest/plan/scope"
         )
     paths = expected_output_paths(profile, scope_id)
-    if dbml_path is not None and _repo_relative(dbml_path, "DBML path") != paths["dbml"]:
+    if dbml_path is not None and repository_relative_path(dbml_path, "DBML path") != paths["dbml"]:
         raise CoreError("DBML projection path does not match profile/scope")
     if (
         provenance_path is not None
-        and _repo_relative(provenance_path, "DBML provenance path")
+        and repository_relative_path(provenance_path, "DBML provenance path")
         != paths["provenance"]
     ):
         raise CoreError("DBML provenance path does not match profile/scope")
@@ -629,7 +521,7 @@ def main() -> int:
         )
         if args.output:
             expected_path = expected_output_paths(profile, args.scope)["provenance"]
-            if _repo_relative(args.output, "DBML provenance output") != expected_path:
+            if repository_relative_path(args.output, "DBML provenance output") != expected_path:
                 raise CoreError(
                     "DBML provenance output path does not match profile/scope"
                 )
@@ -639,10 +531,10 @@ def main() -> int:
         return 0
 
     expected_paths = expected_output_paths(profile, args.scope)
-    if _repo_relative(args.dbml, "DBML path") != expected_paths["dbml"]:
+    if repository_relative_path(args.dbml, "DBML path") != expected_paths["dbml"]:
         raise CoreError("DBML projection path does not match profile/scope")
     if (
-        _repo_relative(args.provenance, "DBML provenance path")
+        repository_relative_path(args.provenance, "DBML provenance path")
         != expected_paths["provenance"]
     ):
         raise CoreError("DBML provenance path does not match profile/scope")

@@ -171,7 +171,11 @@ existing Consumer Pack rules rather than copied into target-project skill trees.
 For one planned projection, the coordinator supplies the source set already
 resolved by Human Projection.
 
-The projection skill may read only those sources. It must not:
+The projection skill may read only those sources. Deterministic source-boundary
+validation applies generated-input rejection to the sources selected for that
+planned section; unrelated manifest members do not widen or block that section.
+
+It must not:
 
 - use generated documentation as authority;
 - search implementation/code as substitute architecture/domain truth unless

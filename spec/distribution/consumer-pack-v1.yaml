@@ -50,6 +50,7 @@ exact_files:
   - src/harness/workspace/frontend_interface_knowledge.py
   - src/harness/workspace/frontend_screen_contracts.py
   - src/harness/workspace/human_projection.py
+  - src/harness/workspace/projection_boundary.py
   - src/harness/workspace/structurizr_projection.py
   - src/harness/workspace/workspace.py
   - skills/consumer-operation-registry-v0.yaml

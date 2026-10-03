@@ -110,6 +110,7 @@ contexts:
       - harness.workspace.frontend_interface_knowledge
       - harness.workspace.frontend_screen_contracts
       - harness.workspace.human_projection
+      - harness.workspace.projection_boundary
       - harness.workspace.structurizr_projection
       - harness.workspace.workspace
     may_depend_on:

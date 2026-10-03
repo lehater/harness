@@ -148,6 +148,24 @@ def main() -> int:
         provenance=provenance,
     )
 
+    manifest_with_unrelated_generated = copy.deepcopy(manifest)
+    manifest_with_unrelated_generated["sources"].append(
+        {
+            "artifact": "UNRELATED-GENERATED",
+            "authority": "OTHER",
+            "path": "docs/generated/other/disposable.md",
+            "sha256": "e" * 64,
+        }
+    )
+    unrelated_provenance = expected_provenance(
+        manifest_with_unrelated_generated,
+        plan,
+        document_id="architecture-model",
+        section_id="c4",
+        profile=profile,
+    )
+    assert unrelated_provenance["sources"] == provenance["sources"]
+
     outside = copy.deepcopy(plan)
     outside["documents"][0]["sections"][0]["sources"].append("OUTSIDE")
     expect_error(
@@ -159,6 +177,21 @@ def main() -> int:
             profile=profile,
         ),
         "outside manifest",
+    )
+
+    generated_manifest = copy.deepcopy(manifest)
+    generated_manifest["sources"][0]["path"] = (
+        "docs/generated/architecture/previous-workspace.dsl"
+    )
+    expect_error(
+        lambda: expected_provenance(
+            generated_manifest,
+            plan,
+            document_id="architecture-model",
+            section_id="c4",
+            profile=profile,
+        ),
+        "forbids generated source artifact",
     )
 
     wrong_renderer = copy.deepcopy(plan)

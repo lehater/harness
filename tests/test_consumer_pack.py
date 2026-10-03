@@ -220,6 +220,9 @@ def main() -> int:
             pack / "src/harness/workspace/dbml_projection.py"
         ).is_file()
         assert (
+            pack / "src/harness/workspace/projection_boundary.py"
+        ).is_file()
+        assert (
             pack / "skills/agent/architecture-c4-structurizr/SKILL.md"
         ).is_file()
         assert (
