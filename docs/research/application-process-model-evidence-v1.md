@@ -76,7 +76,8 @@ contract.
 Process v1 is integrated through the existing Harness discovery and production
 pipeline:
 
-- Engineering Coverage exposes `application.process` with proof claim
+- Engineering Coverage activates `application.process` for selected scope containing
+  `application-design` or `application-process-design`, with proof claim
   `engineering.application.process`;
 - the application Authority role can produce that claim;
 - Design Profile forms a separate Process Capability when the contract has an
