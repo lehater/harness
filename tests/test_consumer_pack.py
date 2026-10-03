@@ -46,6 +46,7 @@ REPRESENTATIVE_MODULES = (
     "harness.workspace.application_process_bpmn_projection",
     "harness.evidence.source_coverage",
     "harness.application.project_frontier",
+    "harness.application.ui_design_convergence",
 )
 
 
@@ -177,6 +178,7 @@ def main() -> int:
     assert definition["root_files"] == []
     assert "src/harness/application/scenario_suite.py" in definition["exact_files"]
     assert "src/harness/application/scenario_drivers.py" in definition["exact_files"]
+    assert "src/harness/application/ui_design_convergence.py" in definition["exact_files"]
 
     valid = {
         "version": 1,
@@ -214,6 +216,8 @@ def main() -> int:
         assert not list(pack.glob("*.py"))
         assert (pack / "src/harness/application/skill_router.py").is_file()
         assert (pack / "src/harness/application/scenario_suite.py").is_file()
+        assert (pack / "src/harness/application/ui_design_convergence.py").is_file()
+        assert (pack / "catalogs/ui/decision-rules-v0.yaml").is_file()
         assert (
             pack / "src/harness/workspace/structurizr_projection.py"
         ).is_file()
