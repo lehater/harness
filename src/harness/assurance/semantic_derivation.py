@@ -324,6 +324,7 @@ def evaluate_derivation(
     required_sources: set[str] = set()
     source_obligation: dict[str, str] = {}
     obligation_allows_not_applicable: dict[str, bool] = {}
+    obligation_requires_target_provenance: dict[str, bool] = {}
 
     obligations = contract.get("obligations", []) or []
     if not isinstance(obligations, list) or not obligations:
@@ -342,6 +343,9 @@ def evaluate_derivation(
         seen_obligations.add(obligation_id)
         obligation_allows_not_applicable[obligation_id] = bool(
             item.get("allow_not_applicable", False)
+        )
+        obligation_requires_target_provenance[obligation_id] = bool(
+            item.get("require_target_provenance", False)
         )
         source_kind = _require_string(
             item.get("source_kind"),
@@ -411,6 +415,9 @@ def evaluate_derivation(
     lifecycle_exhaustive = bool(lifecycle_contract.get("exhaustive", False))
 
     covered_sources: set[str] = set()
+    linked_sources: set[str] = set()
+    provenance_covered_sources: set[str] = set()
+    link_targets_by_source: dict[str, set[str]] = {}
     evaluated_links: list[dict[str, Any]] = []
     seen_link_ids: set[str] = set()
     links = evidence.get("links", []) or []
@@ -488,7 +495,19 @@ def evaluate_derivation(
         if unknown_sources or unknown_targets:
             continue
 
-        covered_sources.update(valid_sources)
+        linked_sources.update(valid_sources)
+        for source_id in valid_sources:
+            link_targets_by_source.setdefault(source_id, set()).update(valid_targets)
+            obligation_id = source_obligation.get(source_id)
+            if not obligation_requires_target_provenance.get(obligation_id or "", False):
+                covered_sources.add(source_id)
+                continue
+            for target_id in valid_targets:
+                derived_from = target_assertions[target_id].get("derived_from", []) or []
+                if isinstance(derived_from, list) and source_id in derived_from:
+                    provenance_covered_sources.add(source_id)
+                    covered_sources.add(source_id)
+                    break
         evaluated_link = {
             "relation": relation,
             "sources": valid_sources,
@@ -497,6 +516,24 @@ def evaluate_derivation(
         if isinstance(link_id, str) and link_id:
             evaluated_link["id"] = link_id
         evaluated_links.append(evaluated_link)
+
+    for source_id in sorted(required_sources & linked_sources):
+        obligation_id = source_obligation[source_id]
+        if not obligation_requires_target_provenance.get(obligation_id, False):
+            continue
+        if source_id in provenance_covered_sources:
+            continue
+        findings.append(
+            {
+                "code": "DERIVATION_TARGET_PROVENANCE_MISSING",
+                "source": source_id,
+                "obligation": obligation_id,
+                "targets": sorted(link_targets_by_source.get(source_id, set())),
+                "source_capability": source_capability,
+                "target_capability": target_capability,
+                "owner_authority": target_authority,
+            }
+        )
 
     disposition_by_source: dict[str, dict[str, Any]] = {}
     dispositions = evidence.get("dispositions", []) or []
