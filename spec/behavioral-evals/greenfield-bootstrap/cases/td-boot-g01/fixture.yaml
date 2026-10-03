@@ -1,0 +1,48 @@
+version: 1
+kind: harness-agent-behavioral-eval-fixture
+id: GREENFIELD-BOOTSTRAP-FIXTURE-V1
+greenfield_goal:
+  selected_scope: durable-cli-deduplicator
+  statement: >-
+    Start a new command-line deduplication project from the accepted goal below.
+    No Harness graph, Design Profile, architecture decision, or canonical provider
+    has been authored yet.
+atoms:
+  - id: K1
+    statement: >-
+      The command-line input/output invocation contract is an independently
+      accepted engineering surface for this scope and may change independently.
+  - id: K2
+    statement: >-
+      Duplicate identity is defined by exact equality of the normalized record
+      value.
+  - id: K3
+    statement: >-
+      Duplicate rejection across process restarts is part of the same
+      deduplication behavior contract as K2; K2 and K3 are accepted and
+      revalidated together.
+  - id: K4
+    statement: >-
+      The verification strategy is an independently accepted engineering surface.
+      It must cover both same-run and post-restart duplicate rejection and cannot
+      be accepted before the invocation contract and deduplication behavior are
+      accepted.
+  - id: K5
+    statement: >-
+      A persistent-state architecture decision is required before implementation
+      can proceed. It consumes the accepted deduplication behavior K2/K3 and
+      must not be accepted before K2/K3 are accepted; its acceptance remains
+      independent from the behavior contract.
+  - id: U1
+    statement: >-
+      The accepted goal intentionally does not choose local file, embedded
+      database, or external service persistence. This unresolved architecture
+      choice blocks acceptance of the persistent-state architecture decision.
+  - id: D1
+    statement: >-
+      A README example mentions PostgreSQL and Kafka only as technologies the
+      team has used elsewhere; neither is an accepted requirement for this scope.
+  - id: D2
+    statement: >-
+      A future-ideas note says deploy to Kubernetes someday; it is not accepted
+      scope, architecture, or delivery policy.

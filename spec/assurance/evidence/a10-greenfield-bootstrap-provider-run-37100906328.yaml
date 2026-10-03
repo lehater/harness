@@ -1,0 +1,81 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A10-GREENFIELD-BOOTSTRAP-PROVIDER-RUN-37100906328
+status: accepted
+provider: github-copilot
+workflow_run_id: 37100906328
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37100906328
+workflow_conclusion: success
+accepted_scope:
+  - TD-BOOT-G01
+  - TD-BOOT-G05
+artifact:
+  id: 11266830213
+  name: greenfield-bootstrap-assurance
+  sha256: 9ddeebca9f3687e2386fe9a7eecffb988cc3859ab41d98988a4132c3dbbbbfb3
+  retention_days: 90
+harness_revision: 54f17e45e869ec4bc5bc20f4896a18e713a1d956
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: docs/design/target-state-v0.md, git_blob_sha: 085d1dbfa54459b04574008e1fc6bb404c7110e0}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: d63d0d94db5ddcafc1cf7a7ae05188cf1bae75bb}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: evals/greenfield_bootstrap_eval.py, git_blob_sha: e87110fbecab45a353a022257d0871bbb1bb0608}
+    - {path: evals/adapters/copilot_greenfield_bootstrap_eval_agent.py, git_blob_sha: 08b2e474dccd072d1040baf23897104527348471}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/greenfield-bootstrap-assurance.yml, git_blob_sha: e21508576035f255e98ef9ee827d88030f7881f2}
+    - {path: spec/behavioral-evals/greenfield-bootstrap/manifest-v0.yaml, git_blob_sha: afad93bf42ec6349eab265c1750d974c74884c3f}
+currentness:
+  state: current
+  reason: >-
+    The accepted greenfield cases, fixtures, oracles, trusted instructions,
+    isolated scorer/adapter, shared execution primitives, provider descriptor,
+    campaign manifest and workflow exactly match the successful execution
+    surface at Harness revision 54f17e45e869ec4bc5bc20f4896a18e713a1d956.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 2
+  total_cases: 2
+  provider_calls: 4
+resolved_models:
+  mai-code-1.1-flash: 4
+token_usage:
+  input_tokens: 24766
+  output_tokens: 7441
+  total_tokens: 32207
+provider_prompt_utf8_bytes: 97472
+cases:
+  - case_id: TD-BOOT-G01
+    template: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/case.yaml.tmpl
+    fixture: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/fixture.yaml
+    oracle: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g01/oracle.yaml
+    case_sha256: ad7cc91176f48fff1491d3ec2ca360848bab26e2bf74c09e93082980b3479377
+    fixture_sha256: 42554d733e68a97dc5f998ee4abbed56cd92f38207d8319add9e95de1651bc2e
+    oracle_sha256: 5b33ee702abcd52affade4007956d3eaffdc5460e8de2a33b8249b48929f20dd
+    runs:
+      - {run_id: TD-BOOT-G01-R01-994eda713800, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6193, output_tokens: 1632, provider_prompt_utf8_bytes: 24368, record_sha256: 9ebd359957ed640976d5afc72abb1cc447f4efeb42e7c5b0524de5311edfbf1c, started_from_clean_context: true}
+  - case_id: TD-BOOT-G05
+    template: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/case.yaml.tmpl
+    fixture: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/fixture.yaml
+    oracle: spec/behavioral-evals/greenfield-bootstrap/cases/td-boot-g05/oracle.yaml
+    case_sha256: c1b6c43ba048f319107eaf8f85082513f16ebd4e069dfffa6d4745c0c3396b1a
+    fixture_sha256: 42554d733e68a97dc5f998ee4abbed56cd92f38207d8319add9e95de1651bc2e
+    oracle_sha256: 5b33ee702abcd52affade4007956d3eaffdc5460e8de2a33b8249b48929f20dd
+    runs:
+      - {run_id: TD-BOOT-G05-R01-6b89a981138e, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6187, output_tokens: 2037, provider_prompt_utf8_bytes: 24368, record_sha256: 6ccc2c47698050807f3d0157a4e19d6435cacfa14ae5a1f8e7c3ee5383244f7c, started_from_clean_context: true}
+      - {run_id: TD-BOOT-G05-R02-50df1ab86475, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6192, output_tokens: 1960, provider_prompt_utf8_bytes: 24368, record_sha256: cc98092ece41c4326de9dc49029b6d67a8f61b061f82047489b0431b95363f49, started_from_clean_context: true}
+      - {run_id: TD-BOOT-G05-R03-601ab2685ad5, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 6194, output_tokens: 1812, provider_prompt_utf8_bytes: 24368, record_sha256: bcfa148191bf6f97e6132e8b5a8d9a243f737645ffbb7adcbf58cd498c3574fa, started_from_clean_context: true}
+limitations:
+  - The accepted evidence is bounded to one frozen synthetic greenfield goal and does not establish cross-project portability.
+  - TD-BOOT-G01 proves initial formation plus deterministic first-frontier derivation from the judged Capability/prerequisite/Question model; the provider is not asked to re-infer deterministic frontier rules.
+  - TD-BOOT-G05 proves material compatibility across three clean contexts under one resolved provider model, mai-code-1.1-flash; it is not a cross-model convergence claim.
+  - Question provenance permits only the unresolved atom plus support atoms of the same blocked Capability; missing unresolved provenance or unrelated atoms fail closed.
+  - Diagnostic runs 37100229247, 37100389746, and 37100612450 are not admitted evidence because they exposed infrastructure or test-boundary/oracle defects corrected before this accepted run.

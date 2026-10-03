@@ -1555,7 +1555,7 @@ TL6 holdout.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED
 
 Fixture:
 
@@ -1567,6 +1567,11 @@ Expected semantic result:
 The smallest model satisfying those obligations; no speculative architecture or
 delivery/process structure.
 
+Current execution: provider run `37100906328` executes one composite
+TD-BOOT-G01 greenfield judgement. Its normalized oracle covers the G01..G04
+TL3 concerns together so the provider forms the semantic model once rather than
+repeating the same goal in four separate calls.
+
 ## TD-BOOT-G02 — Unresolved architecture choice is not invented
 
 **Abilities:** HA-A10, HA-A13  
@@ -1574,16 +1579,17 @@ delivery/process structure.
 **Methods:** EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED (composite TD-BOOT-G01)
 
 Fixture:
 
-The goal requires a storage/public-contract decision but provides no accepted
-basis to choose among alternatives.
+The goal requires a persistence decision but provides no accepted basis to
+choose among alternatives.
 
 Expected semantic result:
 
-Question/decision frontier remains explicit; no canonical choice is invented.
+The unresolved choice remains an explicit Question blocking the affected
+Capability; no persistence option is promoted into accepted project truth.
 
 ## TD-BOOT-G03 — Safe first frontier
 
@@ -1592,11 +1598,14 @@ Question/decision frontier remains explicit; no canonical choice is invented.
 **Methods:** EM-07, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED (composite TD-BOOT-G01)
 
 Expected semantic result:
 
 Only foundational work whose prerequisites are satisfied appears actionable.
+The deterministic greenfield scorer derives frontier dispositions from the
+judged Capability/prerequisite/Question model instead of asking the provider to
+re-infer Harness frontier rules.
 
 ## TD-BOOT-G04 — Reference Model does not overbuild greenfield scope
 
@@ -1605,16 +1614,17 @@ Only foundational work whose prerequisites are satisfied appears actionable.
 **Methods:** EM-05, EM-08  
 **Minimum level:** TL3  
 **Oracle:** O1  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED (composite TD-BOOT-G01)
 
 Fixture:
 
-Goal vocabulary resembles several reusable templates but only one obligation is
-material.
+Goal-adjacent material contains PostgreSQL/Kafka/Kubernetes vocabulary without
+accepted obligations for those technologies.
 
 Expected semantic result:
 
-Only material project knowledge is admitted.
+Only material project knowledge is admitted; descriptive technology and
+future-idea noise do not create Capabilities.
 
 ## TD-BOOT-G05 — Greenfield repeated clean contexts
 
@@ -1623,9 +1633,15 @@ Only material project knowledge is admitted.
 **Methods:** EM-09  
 **Minimum level:** TL4  
 **Oracle:** O1/O4  
-**Status:** BLOCKED
+**Status:** IMPLEMENTED
 
 Compare normalized semantic model and frontier across repeated clean runs.
+
+Current execution: provider run `37100906328` executes TD-BOOT-G05 three
+times from the same frozen goal in independent clean contexts. All three runs
+passed the same normalized semantic oracle and derived frontier. Provider-auto
+resolved all three calls to `mai-code-1.1-flash`; this is a bounded
+same-model convergence result, not a cross-model or cross-project claim.
 
 # SF-08 — Semantic derivation and admission
 
