@@ -150,11 +150,12 @@ three-run TD-BOOT-E06 boundary convergence plus three-run TD-COMP-003 hostile
 content routing. HA-A12 satisfies A12-R01 through deterministic
 semantic derivation/admission evidence and A12-R02 through current blinded O4
 calibration run `37088681223`: both repeated runs scored 14/14 with zero FP/FN
-and the identical observed runtime binding returned STABLE. HA-A13 satisfies A13-R01/A13-R02 through deterministic
-Question routing, blocking, resolution-identity and stale-snapshot evidence, and
-A13-R03 through provider run `37088500583`: TD-QST-001 passed three independent
-clean-context executions, preserving exactly one semantic blocker while a
-related transient repository-scan timeout remained process evidence only. HA-A14 satisfies A14-R01 through selective
+and the identical observed runtime binding returned STABLE. HA-A13 satisfies A13-R01/A13-R02 through deterministic Question routing,
+blocking, resolution-identity and stale-snapshot evidence, and A13-R03 through
+current provider run `37091191705`: TD-QST-001 passed three independent
+clean-context executions after the routing-contract clarification, preserving
+exactly one semantic blocker while the related transient repository-scan
+timeout remained process evidence only. HA-A14 satisfies A14-R01 through selective
 prerequisite/policy currentness and replay fail-closed evidence, A14-R02 through
 conservative remove/rename/split/merge plus prerequisite-topology evolution, and
 A14-R03 through the explicit depth=1200, fan-out=512 and cardinality=2000
@@ -179,7 +180,8 @@ both direct-declaration and adapter-projection modes against the same generic
 semantics. Current NAPMS TD-BOOT-E07 evidence is a bootstrap/reconcile
 known-project regression from one project that participated in Harness design;
 it does not prove the required mode-equivalence pair. A21-R04 remains missing
-because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies A16-R01..R06; and HA-A18
+because no frozen independent TL6/O3 holdout exists. HA-A16 satisfies
+A16-R01..R06 on the clarified public-operation selection contract; and HA-A18
 satisfies A18-R01 (current public-pack closure) plus A18-R02 (immutable pin/API
 compatibility). A18-R03 remains missing. TD-BOOT-E06 does not satisfy raw Capability- or
 Authority-formation convergence because those identities are inputs to the
@@ -425,26 +427,21 @@ diagnostic run the required atom set itself was selected correctly, so Fixture
 V2 removed the cross-ability confound rather than relaxing a failed selection
 criterion.
 
-HA-A09 is SATISFIED on the current bootstrap/reconcile surface. Provider run
-`37089886520` passed TD-COMP-001 plus TD-BOOT-E01..E05, including both linked
-TD-BOOT-E04 bootstrap/reconcile calls. Run `37089887788` passed all three
-TD-BOOT-E06 clean-context executions; the enclosing TL4 campaign was red only
-because unrelated routing case TD-COMP-003 had one failed repetition, which is
-not admitted as A09 evidence. Run `37089889046` passed both linked TD-BOOT-E07
-calls against the frozen O2 NAPMS baseline. PR #172 changed only projection
-design prose outside the recorded A09 execution bindings.
+HA-A09 remains SATISFIED after the routing-contract clarification. Current
+first-wave run `37091190364` passed TD-COMP-001 and TD-BOOT-E01..E05,
+including both linked TD-BOOT-E04 calls; current TL4 run `37091444229` passed
+TD-BOOT-E06 three times; current TL5 run `37091193033` passed both linked
+TD-BOOT-E07 calls against the frozen O2 NAPMS baseline.
 
 HA-A10 is present in the denominator and remains INCOMPLETE by design.
 Greenfield bootstrap cannot be proven from pre-authored graph fixtures because
 that would bypass the ability itself. TD-BOOT-G01..G04 own the TL3
 minimality/unknown/frontier obligations and TD-BOOT-G05 owns TL4 convergence.
 
-HA-A11 is SATISFIED. A11-R01 reuses deterministic source-set, lossless boundary
-and statement-disposition evidence. Current first-wave run `37088827181`
-passed TD-BOOT-E02 and its unrelated/untrusted-subtree mutation TD-BOOT-E05
-against the same oracle. Current TL4 run `37088828742` passed TD-BOOT-E06
-three times and TD-COMP-003 three times; hostile project content never changed
-the public route or selected project boundary.
+HA-A11 remains SATISFIED after the routing-contract clarification. A11-R01
+reuses deterministic source completeness; current first-wave run `37091190364`
+passed TD-BOOT-E02/E05, and current TL4 run `37091444229` passed both
+TD-BOOT-E06 and TD-COMP-003 in all three clean contexts.
 
 HA-A12 is SATISFIED. A12-R01 reuses deterministic derivation, admission,
 contradiction, semantic-loss, real-project atom, and irrelevant-source
@@ -460,6 +457,21 @@ FP=0, FN=0; the runtime-bound stability evaluator returned `STABLE` with no
 unstable cases. This closes A12-R02 for the audited 14-case O4 corpus only.
 Provider/evaluator independence remains explicitly UNVERIFIED and no cross-model
 or universal semantic-correctness claim is made.
+
+HA-A16 is SATISFIED on the current routing surface. The fresh pre-fix
+`TD-COMP-003` run `37089887788` exposed real instability: two clean contexts
+selected `project-bootstrap-reconcile`, while one selected `design-profile`
+because scope vocabulary was allowed to compete with the user's explicit
+start/reconcile action. The canonical instruction contract now states that
+public operation selection classifies the requested semantic responsibility,
+matches it to the registered trigger, treats `selected_scope` only as the
+object/boundary of that action, and denies routing authority to project/tool
+payloads. Current first-wave run `37091190364` passed TD-ROUTE-001..003.
+The first post-fix TL4 run had two TD-COMP-003 PASS results plus one external
+120-second execution timeout; an unchanged rerun `37091444229` then completed
+all three TD-COMP-003 calls, each selecting `project-bootstrap-reconcile`.
+This closes A16-R01/R05/R06 without changing the frozen task, fixture or oracle.
+Deterministic A16-R02/R03/R04 evidence remains unchanged.
 
 HA-A18 deliberately remains INCOMPLETE: current deterministic evidence proves
 pack closure/integrity and immutable pin/API handling, while A18-F06 still lacks

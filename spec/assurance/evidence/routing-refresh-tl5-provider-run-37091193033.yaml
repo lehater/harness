@@ -1,0 +1,60 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: ROUTING-REFRESH-TL5-37091193033
+status: accepted
+provider: github-copilot
+workflow_run_id: 37091193033
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37091193033
+workflow_conclusion: success
+artifact: {id: 11261749309, name: assurance-campaign-tl5-known-project, sha256: a818bacc7b0ec61f7f4d1a53b577d84df064fe73cc5a543e1b059a861c6c7bec, retention_days: 90}
+harness_revision: 1c7a3f5e0c95cfabbc42e262aa08439571f93a96
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/agent-instruction-architecture-v0.md, git_blob_sha: e7f5142d9896b14a46fa80a73a14cfe531a68c37}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/project-bootstrap-reconcile/SKILL.md, git_blob_sha: 103b911316a9cc1846e466ffd80c4125ebece6ff}
+    - {path: skills/agent/bootstrap-existing-project/SKILL.md, git_blob_sha: e2579adefe579e7a447ff903e1471970ea1537c7}
+    - {path: skills/consumer-operation-registry-v0.yaml, git_blob_sha: fd84283412f3612e9cb1154d45c94c6783b23588}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: src/harness/application/skill_router.py, git_blob_sha: f3344105b80ad4b7ca7441599107d2450e064e1f}
+    - {path: src/harness/project_model/core.py, git_blob_sha: e38c0ae0994cd47ccc48f76e7f49f550d3691254}
+    - {path: src/harness/project_model/target_state.py, git_blob_sha: a98d9c0eb6e107579970ca0ce373874355c82e31}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+    - {path: .github/workflows/assurance-campaign-copilot.yml, git_blob_sha: d676ed36336ac69e6eabe78269a0b512a394ffa3}
+    - {path: spec/behavioral-evals/tl5-known-project/manifest-v0.yaml, git_blob_sha: 0c46177d87ba6df5572a709c0dc4b1c3417d4692}
+currentness:
+  state: current
+  reason: >-
+    Bound to the clarified public-operation selection contract and unchanged
+    runner/provider/runtime surfaces used by this execution.
+cases:
+  - case_id: TD-BOOT-E07
+    template: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/case.yaml.tmpl
+    fixture: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/fixture.yaml
+    oracle: spec/behavioral-evals/tl5-known-project/cases/td-boot-e07/oracle.yaml
+    case_sha256: b2b8b99f9fbf51efd3f41f749627aa4fa9ad843ed80608ad0f95dfe79ea785bc
+    fixture_sha256: c55e0ceae5913faeafaed45300454670ba3b5e39a33e6bff2b1934d2393d1d03
+    oracle_sha256: bf2f8137f29339ddc3c326d058c688a7bbf5a19566a8ffee3dd1233a440124aa
+    runs:
+      - {run_id: TD-BOOT-E07-R01-d66cc981028b, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 8981, output_tokens: 1245, provider_prompt_utf8_bytes: 36548, record_sha256: 3560a334f0933b785bb083633a74fd4c4febccb72476c063eee4390b5bc8be30, started_from_clean_context: true, execution_context: {sequence: bootstrap-idempotence, step: 1, phase: bootstrap}}
+      - run_id: TD-BOOT-E07-R02-acbb255d2111
+        run_status: COMPLETED
+        correctness: PASS
+        resolved_model: mai-code-1.1-flash
+        input_tokens: 8563
+        output_tokens: 713
+        provider_prompt_utf8_bytes: 34107
+        record_sha256: a7546b2d2054458c136731d9acbbcfee5012fed74b1c9f22906b96df6f0c9bf6
+        started_from_clean_context: true
+        execution_context: {sequence: bootstrap-idempotence, step: 2, phase: reconcile-existing}
+        derived_input_binding: {prior_run_record_sha256: 3560a334f0933b785bb083633a74fd4c4febccb72476c063eee4390b5bc8be30, core_model_sha256: 61e0baec227a32ed76054a964f54adda5b6d6d966d61da82f0c307d73a238630}
+limitations:
+  - Current bounded NAPMS O2 regression on the clarified instruction surface.
+  - It remains a co-design known-project regression, not an independent TL6 portability holdout.
