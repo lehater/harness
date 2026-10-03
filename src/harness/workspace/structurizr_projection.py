@@ -107,40 +107,14 @@ def expected_provenance(
     profile: dict[str, Any],
 ) -> dict[str, Any]:
     validate_profile(profile)
-    source_index = _manifest_source_index(manifest)
-    if plan.get("manifest_digest") != manifest["manifest_digest"]:
-        raise CoreError("projection plan manifest digest does not match manifest")
-
-    section = _find_section(
+    _, sources = bind_projection_sources(
+        manifest,
         plan,
         document_id=document_id,
         section_id=section_id,
+        renderer=PROJECTION_ID,
+        projection_label="Structurizr projection",
     )
-    if section.get("renderer") != PROJECTION_ID:
-        raise CoreError(f"projection section renderer must be {PROJECTION_ID}")
-    source_ids = section.get("sources")
-    if (
-        not isinstance(source_ids, list)
-        or not source_ids
-        or any(not isinstance(value, str) or not value for value in source_ids)
-    ):
-        raise CoreError("Structurizr projection section requires source ids")
-    if len(source_ids) != len(set(source_ids)):
-        raise CoreError("Structurizr projection section source ids must be unique")
-    outside = sorted(set(source_ids) - set(source_index))
-    if outside:
-        raise CoreError(
-            "Structurizr projection sources are outside manifest: "
-            + ", ".join(outside)
-        )
-
-    sources: list[dict[str, Any]] = []
-    for artifact in source_ids:
-        row = source_index[artifact]
-        source = {"artifact": artifact, "path": row["path"]}
-        if "sha256" in row:
-            source["sha256"] = row["sha256"]
-        sources.append(source)
 
     return {
         "version": 1,
