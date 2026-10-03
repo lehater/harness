@@ -49,6 +49,29 @@ fixtures:
       subject_inventory:
         state: NOT_APPLICABLE
         rationale: The fixture has one explicitly bounded application scope.
+  not_applicable_overlay:
+    value:
+      subject_inventory:
+        state: NOT_APPLICABLE
+        rationale: The fixture has one explicitly bounded application scope.
+      decisions:
+        - concern: application.process
+          state: NOT_APPLICABLE
+          rationale: The selected application scope has no independently valuable process composition.
+          evidence: [fixture:single-operation-scope]
+  accepted_process_evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: PROCESS
+          capability: demo.application-process
+          status: ACCEPTED
+          findings: []
+          semantic_claims:
+            accepted: [engineering.application.process]
   registry:
     value:
       version: 1
@@ -136,3 +159,67 @@ steps:
           capabilities: [demo.application-process]
           skill: skills/artifacts/application-process-design/SKILL.md
       - {path: /unrouted, op: length, value: 0}
+
+  - id: add-process-provider
+    driver: data.patch
+    with:
+      value: {ref: fixture.realization}
+      operations:
+        - op: add
+          path: /artifacts/-
+          value:
+            id: PROCESS
+            authority: APPLICATION-DESIGN
+            path: docs/process.yaml
+            provides: [demo.application-process]
+            depends_on: [APPLICATION]
+
+  - id: coverage-needs-semantic-validation
+    driver: engineering.coverage
+    with:
+      graph: {ref: step.model-process-capability}
+      realization: {ref: step.add-process-provider}
+      consumer: IMPLEMENTATION
+      scope: default
+      project_overlay: {ref: fixture.overlay}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: application.process
+          state: MISSING
+          action: VALIDATE_SEMANTICS
+          capabilities: [demo.application-process]
+
+  - id: coverage-covered
+    driver: engineering.coverage
+    with:
+      graph: {ref: step.model-process-capability}
+      realization: {ref: step.add-process-provider}
+      consumer: IMPLEMENTATION
+      scope: default
+      project_overlay: {ref: fixture.overlay}
+      semantic_evaluations: {ref: fixture.accepted_process_evaluations}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: application.process
+          state: COVERED
+          action: NONE
+
+  - id: coverage-not-applicable
+    driver: engineering.coverage
+    with:
+      graph: {ref: fixture.graph}
+      realization: {ref: fixture.realization}
+      consumer: IMPLEMENTATION
+      scope: default
+      project_overlay: {ref: fixture.not_applicable_overlay}
+    expect:
+      - path: /rows
+        op: contains_match
+        value:
+          concern: application.process
+          state: NOT_APPLICABLE
+          action: NONE
