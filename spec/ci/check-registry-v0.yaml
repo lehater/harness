@@ -245,6 +245,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: dbml_projection
+  command: python tests/test_dbml_projection.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: coverage_map_experiment
   command: python tests/test_coverage_map_experiment.py
   stage: focused
