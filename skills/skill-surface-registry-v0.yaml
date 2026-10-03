@@ -25,6 +25,12 @@ skills:
     route_class: operation
     lifecycle: active
     route_status: routed
+  - id: application-process-bpmn
+    path: skills/agent/application-process-bpmn/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
   - id: decision-pipeline
     path: skills/agent/decision-pipeline/SKILL.md
     surface: consumer
