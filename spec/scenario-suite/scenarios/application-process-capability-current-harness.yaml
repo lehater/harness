@@ -1,0 +1,134 @@
+version: 1
+kind: harness-scenario
+id: application-process-capability-current-harness
+title: Application process is an independently addressable Application Design capability
+dimensions:
+  project_archetype: real-project
+  stage: design
+  behavior_class: routing
+  execution_type: deterministic
+covers:
+  - structural-target-reaction
+  - create-work-skill-routing
+  - authority-context-read-boundary
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: APPLICATION-PROCESS-CAPABILITY
+      authorities:
+        - id: APPLICATION-DESIGN
+          responsibility: Own application-level composition and process semantics.
+          boundary:
+            semantic_cohesion: Application operations, orchestration and bounded process composition.
+            independent_change: Application composition can evolve behind accepted domain/product truth.
+            public_contract: Accepted application design including independently consumable process knowledge.
+          produces:
+            - capability: demo.application.journey
+              knowledge_kind: application-design
+              requires: []
+            - capability: demo.application.process.policy-export
+              knowledge_kind: application-design
+              requires: [demo.application.journey]
+        - id: SYSTEM-ARCHITECTURE
+          responsibility: Own runtime and structural architecture.
+          boundary:
+            semantic_cohesion: Runtime structure and interaction mechanisms.
+            independent_change: Architecture can change behind accepted application semantics.
+            public_contract: Accepted system architecture.
+          produces:
+            - capability: demo.system.rules
+              knowledge_kind: system-architecture
+              requires: [demo.application.process.policy-export]
+      consumers:
+        - id: IMPLEMENTATION
+          purpose: Consume system rules derived from accepted process semantics.
+          requires: [demo.system.rules]
+      terminal_capabilities: []
+
+  before:
+    value:
+      artifacts:
+        - id: JOURNEY
+          authority: APPLICATION-DESIGN
+          path: docs/application-journey.yaml
+          provides: [demo.application.journey]
+          depends_on: []
+      questions: []
+
+  after:
+    value:
+      artifacts:
+        - id: JOURNEY
+          authority: APPLICATION-DESIGN
+          path: docs/application-journey.yaml
+          provides: [demo.application.journey]
+          depends_on: []
+        - id: PROCESS
+          authority: APPLICATION-DESIGN
+          path: docs/policy-export-process.yaml
+          provides: [demo.application.process.policy-export]
+          depends_on: [JOURNEY]
+        - id: SYSTEM-RULES
+          authority: SYSTEM-ARCHITECTURE
+          path: docs/system-rules.yaml
+          provides: [demo.system.rules]
+          depends_on: [PROCESS]
+      questions: []
+
+  registry:
+    value:
+      version: 1
+      kind: harness-artifact-skill-registry
+      id: APPLICATION-PROCESS-REGISTRY
+      routes:
+        - knowledge_kind: application-design
+          skill: skills/artifacts/application-design/SKILL.md
+        - knowledge_kind: system-architecture
+          skill: skills/artifacts/system-architecture/SKILL.md
+
+steps:
+  - id: route-process
+    driver: agent.route
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.before}
+      registry: {ref: fixture.registry}
+    expect:
+      - {path: /target_status, op: equals, value: READY}
+      - path: /routed
+        op: contains_match
+        value:
+          knowledge_kind: application-design
+          capabilities: [demo.application.process.policy-export]
+      - {path: /unrouted, op: length, value: 0}
+
+  - id: complete-target
+    driver: engineering.target
+    with:
+      graph: {ref: fixture.graph}
+      target: IMPLEMENTATION
+      model: {ref: fixture.after}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /create, op: length, value: 0}
+      - {path: /wait, op: length, value: 0}
+
+  - id: system-context
+    driver: authority.context
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.after}
+      authority_id: SYSTEM-ARCHITECTURE
+      capability_ids: [demo.system.rules]
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /requirements/0/capability, op: equals, value: demo.application.process.policy-export}
+      - {path: /requirements/0/status, op: equals, value: SATISFIED}
+      - {path: /requirements/0/providers, op: equals, value: [PROCESS]}
+      - {path: /input_artifacts, op: contains_match, value: {id: PROCESS, path: docs/policy-export-process.yaml}}
+      - {path: /supporting_input_artifacts, op: contains_match, value: {id: JOURNEY, path: docs/application-journey.yaml}}
+      - {path: /access/write, op: set_equals, value: [docs/system-rules.yaml]}
