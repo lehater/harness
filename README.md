@@ -47,6 +47,8 @@ User-facing applications use the same Engineering Graph and Core semantics as ba
 
 See `docs/design/frontend-design-v0.md`. `examples/user-facing-application/**` is the current granular full-stack frontend fixture; `examples/frontend-legacy-compatibility/**` is the minimal broad-interface migration/compatibility fixture.
 
+Evidence-driven UI convergence is specified in `docs/design/ui-design-convergence-v0.md`; the initial known-project pilot is `docs/design/ui-design-convergence-prep-knowledge-pilot-v0.md`. This layer distinguishes structural/semantic completeness from production UI design assurance without adding a Core readiness entity.
+
 ## Design target state
 
 A Design Profile can declare the engineering knowledge required for a selected scope as stable expectations of `subject + CapabilityId + Authority`.
