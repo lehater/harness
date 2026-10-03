@@ -1617,7 +1617,7 @@ evidence:
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/case.yaml.tmpl
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/fixture.yaml
       - path: spec/behavioral-evals/tl4-existing-project/cases/td-qst-001/oracle.yaml
-      - path: spec/assurance/evidence/ha-a13-question-classification-provider-run-37085699975.yaml
+      - path: spec/assurance/evidence/ha-a13-question-classification-provider-run-37088500583.yaml
     satisfies: [A13-R03]
     test_level: TL4
     methods: [EM-05, EM-09]
@@ -1625,8 +1625,8 @@ evidence:
     execution_nature: judgement-dependent
     source_type: synthetic
     status: verified
-    verified_at_revision: 645102d0bc32d47412228ef4690a8373dabe5d3b
-    provider_run_ref: spec/assurance/evidence/ha-a13-question-classification-provider-run-37085699975.yaml
+    verified_at_revision: 67d3241d58b5baf110eafdfd26023c58962eb022
+    provider_run_ref: spec/assurance/evidence/ha-a13-question-classification-provider-run-37088500583.yaml
     case_ids: [TD-QST-001]
     limitations:
       - Three provider-auto clean-context runs all preserved exactly one semantic Question while excluding the related transient repository-scan timeout from Core Question state.
