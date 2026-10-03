@@ -104,6 +104,12 @@ Reference vocabulary. On revision `f8e347b9ac4e3f61fe67d997ab3133769deec043`, ru
 TD-CAP-001..004, and run `37083516399` passed TD-CAP-008 plus all three
 clean-context TD-CAP-007 executions against the unchanged frozen oracles.
 
+The same current provider campaigns also close HA-A04 without a semantic code
+change: run `37083515120` passed TD-AUTH-001/002/004, while run
+`37083516399` passed TD-AUTH-003/006 and all three clean-context TD-AUTH-007
+executions. The admitted TD-AUTH-003 oracle remains corrected Fixture V2; the
+historical ambiguous V1 diagnostic result is not evidence.
+
 The current admitted proof state remains deliberately partial: HA-A01 satisfies
 A01-R01 through a focused TL1 ownership/reference mutation matrix, A01-R02
 through deterministic structural interpretation, and A01-R03 through explicit
@@ -112,8 +118,10 @@ topology/dead-production validation, A02-R02 through exact Consumer closure plus
 declaration-reorder metamorphic evidence, and A02-R03 through the 1200-node
 deep-DAG regression. HA-A03 satisfies A03-R01 through Target State truth-table,
 provider-removal/blocker, multi-provider, and lifecycle-gap composition evidence,
-and A03-R02 through explicit representation-order invariance. HA-A04 remains
-INCOMPLETE on its current provider surface; HA-A05 satisfies A05-R01 through
+and A03-R02 through explicit representation-order invariance. HA-A04 satisfies
+A04-R01 through current TL1 merge/split/layout cases, A04-R02 through the
+corrected joint-ownership plus Reference-boundary cases, and A04-R03 through
+three clean-context partition-convergence runs. HA-A05 satisfies A05-R01 through
 the four TL1 omission/invention/split/merge cases, A05-R02 through the
 project-shaped novel-Capability/Reference-pressure case, and A05-R03 through
 three clean-context convergence runs. HA-A06 satisfies A06-R01 through explicit

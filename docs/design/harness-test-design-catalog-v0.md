@@ -462,7 +462,7 @@ Assertions:
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; corrected Fixture V2 passed provider run `36953433978`.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-003`; corrected Fixture V2 passed current provider run `37083516399`.
 
 Diagnostic provider run `36953091767` exposed an oracle error in Fixture V1:
 the worker-consumption statement was evidence that the payment decision is
@@ -568,7 +568,7 @@ was assumed while Authority identity was the unresolved subject.
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-006`; provider runs `36953091767` and `36953433978` both passed.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-006`; current provider run `37083516399` passed.
 
 Fixture:
 
@@ -584,12 +584,12 @@ contract.
 
 **Abilities:** HA-A04  
 **Failure modes:** A04-F06 instability  
-**Methods:** EM-05  
-**Minimum level:** TL1  
+**Methods:** EM-05, EM-09  
+**Minimum level:** TL4  
 **Oracle:** O1  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-007`; provider run `36953091767` passed all three clean-context executions.
+**Execution surface:** `spec/behavioral-evals/release-critical-formation/cases/td-auth-007`; current provider run `37083516399` passed all three clean-context executions.
 
 Transformations:
 

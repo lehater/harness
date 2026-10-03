@@ -2343,6 +2343,90 @@ evidence:
       - Three clean-context runs establish convergence only for one frozen Capability-partition fixture.
       - Provider-auto resolved all three calls to mai-code-1.1-flash.
 
+  - id: EVID-A04-TL1-37083515120
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-001/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-001/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-001/oracle.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-002/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-002/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-002/oracle.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-004/case.yaml.tmpl
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-004/fixture.yaml
+      - path: spec/behavioral-evals/first-wave/cases/td-auth-004/oracle.yaml
+      - path: spec/assurance/evidence/a04-first-wave-provider-run-37083515120.yaml
+    satisfies: [A04-R01]
+    test_level: TL1
+    methods: [EM-02, EM-05]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a04-first-wave-provider-run-37083515120.yaml
+    case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
+    status: verified
+    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    limitations:
+      - Three frozen TL1 merge/split/layout cases each passed one clean-context provider execution.
+      - Joint ownership, Reference pressure and repeated convergence are owned separately by A04-R02/A04-R03.
+
+  - id: EVID-A04-OVERLAP-REFERENCE-TL1-37083516399
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/oracle.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/oracle.yaml
+      - path: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
+    satisfies: [A04-R02]
+    test_level: TL1
+    methods: [EM-02]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
+    case_ids: [TD-AUTH-003, TD-AUTH-006]
+    status: verified
+    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    limitations:
+      - Corrected overlap/joint-ownership and frozen Reference-boundary cases both passed.
+      - TD-AUTH-003 Fixture V1 remains historical diagnostic evidence and is not admitted.
+
+  - id: EVID-A04-CONVERGENCE-TL4-37083516399
+    providers:
+      - skills/agent/design-profile/SKILL.md
+      - evals/behavioral_eval.py
+      - evals/adapters/copilot_behavioral_eval_agent.py
+    source_refs:
+      - path: skills/agent/design-profile/SKILL.md
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/case.yaml.tmpl
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/fixture.yaml
+      - path: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/oracle.yaml
+      - path: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
+    satisfies: [A04-R03]
+    test_level: TL4
+    methods: [EM-09]
+    oracle_class: O1
+    execution_nature: judgement-dependent
+    source_type: synthetic
+    provider_run_ref: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
+    case_ids: [TD-AUTH-007]
+    status: verified
+    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    limitations:
+      - Three independent clean-context executions preserve the same frozen Authority partition.
+      - All calls resolved to mai-code-1.1-flash; this is not cross-model convergence.
+
   - id: EVID-A05-TL1-37083515120
     providers:
       - skills/agent/design-profile/SKILL.md
