@@ -41,7 +41,8 @@ it is not a second implementation tree.
 - `docs/design/context-published-contracts-v0.md` — explicit published cross-context symbols.
 - `docs/design/repository-layout-v0.md` — canonical physical layout.
 - `docs/design/document-projection-operations-v0.md` — reusable mechanism for specialized source-bounded generated document/diagram projection operations.
-- `docs/design/application-process-model-v0.md` — canonical boundary for project application-process knowledge and its separation from notation-specific projections.
+- `docs/design/application-process-model-v1.md` — minimal canonical boundary for project application-process knowledge: occurrence boundary, composition, continuation and completion.
+- `docs/research/application-process-model-evidence-v1.md` — standards/research and validation evidence behind the v1 boundary.
 
 ## Agent surfaces
 
