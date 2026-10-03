@@ -135,6 +135,144 @@ def referenced_python_path(command: str) -> str | None:
     return None
 
 
+def validate_execution_profiles(
+    registry: dict[str, Any],
+    makefile_text: str,
+    errors: list[str],
+) -> None:
+    profiles = registry.get("execution_profiles")
+    if not isinstance(profiles, dict):
+        errors.append("CI-P11 execution_profiles mapping is required")
+        return
+
+    required_names = {"fast", "full", "external-release"}
+    names = set(profiles)
+    missing = sorted(required_names - names)
+    extra = sorted(names - required_names)
+    if missing:
+        errors.append(f"CI-P11 missing assurance execution profiles: {missing}")
+    if extra:
+        errors.append(f"CI-P11 unknown assurance execution profiles: {extra}")
+
+    for name in sorted(required_names & names):
+        profile = profiles.get(name)
+        if not isinstance(profile, dict):
+            errors.append(f"CI-P11 profile {name} must be a mapping")
+            continue
+        target = profile.get("makefile_target")
+        command = profile.get("command")
+        if not isinstance(target, str) or not target:
+            errors.append(f"CI-P11 profile {name} requires makefile_target")
+            continue
+        if not isinstance(command, str) or not command:
+            errors.append(f"CI-P11 profile {name} requires command")
+            continue
+        target_commands = extract_make_target_commands(makefile_text, target)
+        if target_commands != [command]:
+            errors.append(
+                f"CI-P11 profile {name} target {target!r} must execute exactly "
+                f"{command!r}; found {target_commands!r}"
+            )
+
+    fast = profiles.get("fast")
+    if isinstance(fast, dict):
+        if fast.get("kind") != "deterministic":
+            errors.append("CI-P11 fast profile must be deterministic")
+        if fast.get("disposition") != "full_gate":
+            errors.append("CI-P11 fast profile must select full_gate checks")
+        if fast.get("stages") != ["policy", "focused"]:
+            errors.append("CI-P11 fast profile stages must be [policy, focused]")
+        if fast.get("cost_classes") != ["cheap"]:
+            errors.append("CI-P11 fast profile cost_classes must be [cheap]")
+
+    full = profiles.get("full")
+    full_gate = registry.get("full_gate")
+    if isinstance(full, dict) and isinstance(full_gate, dict):
+        if full.get("kind") != "deterministic":
+            errors.append("CI-P11 full profile must be deterministic")
+        if full.get("delegate_target") != full_gate.get("makefile_target"):
+            errors.append(
+                "CI-P11 full profile must delegate to the canonical full_gate target"
+            )
+
+    external = profiles.get("external-release")
+    if not isinstance(external, dict):
+        return
+    if external.get("kind") != "external":
+        errors.append("CI-P11 external-release profile must be external")
+    if external.get("preflight_profile") != "full":
+        errors.append("CI-P11 external-release must preflight the full profile")
+
+    dispatches = external.get("workflow_dispatches")
+    if not isinstance(dispatches, list) or not dispatches:
+        errors.append("CI-P11 external-release requires workflow_dispatches")
+        return
+
+    expected = {
+        ".github/workflows/assurance-campaign-copilot.yml",
+        ".github/workflows/greenfield-bootstrap-assurance.yml",
+        ".github/workflows/live-calibration-copilot.yml",
+    }
+    seen: set[str] = set()
+    for item in dispatches:
+        if not isinstance(item, dict):
+            errors.append("CI-P11 external-release dispatch must be a mapping")
+            continue
+        workflow_path = item.get("workflow")
+        ref = item.get("ref")
+        inputs = item.get("inputs")
+        if not isinstance(workflow_path, str) or not workflow_path:
+            errors.append("CI-P11 external-release dispatch requires workflow")
+            continue
+        if workflow_path in seen:
+            errors.append(
+                f"CI-P11 external-release duplicate workflow dispatch: {workflow_path}"
+            )
+        seen.add(workflow_path)
+        if ref != "main":
+            errors.append(
+                f"CI-P11 external-release workflow {workflow_path} must dispatch ref main"
+            )
+        if not isinstance(inputs, dict):
+            errors.append(
+                f"CI-P11 external-release workflow {workflow_path} inputs must be a mapping"
+            )
+
+        path = ROOT / workflow_path
+        if not path.is_file():
+            errors.append(
+                f"CI-P11 external-release workflow does not exist: {workflow_path}"
+            )
+            continue
+        events = workflow_events(load_yaml(path))
+        if "workflow_dispatch" not in events:
+            errors.append(
+                f"CI-P11 external-release workflow is not manually dispatchable: "
+                f"{workflow_path}"
+            )
+
+    if seen != expected:
+        errors.append(
+            "CI-P11 external-release dispatch set must be aggregate campaign + "
+            f"greenfield + live calibration; found {sorted(seen)}"
+        )
+    campaign = next(
+        (
+            item
+            for item in dispatches
+            if isinstance(item, dict)
+            and item.get("workflow")
+            == ".github/workflows/assurance-campaign-copilot.yml"
+        ),
+        None,
+    )
+    if not isinstance(campaign, dict) or campaign.get("inputs") != {"campaign": "all"}:
+        errors.append(
+            "CI-P11 assurance campaign dispatch must use campaign=all to avoid "
+            "duplicating first-wave/TL4 provider runs"
+        )
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -143,6 +281,9 @@ def main() -> int:
     except Exception as exc:
         print(f"Harness CI policy validation failed:\n- CI-P04 registry unreadable: {exc}")
         return 1
+
+    makefile_text = MAKEFILE_PATH.read_text(encoding="utf-8")
+    validate_execution_profiles(registry, makefile_text, errors)
 
     policy_path = ROOT / str(registry.get("policy", ""))
     if not policy_path.is_file():
@@ -226,9 +367,7 @@ def main() -> int:
         full_gate = {}
 
     target = str(full_gate.get("makefile_target", "harness-check"))
-    make_commands = extract_make_target_commands(
-        MAKEFILE_PATH.read_text(encoding="utf-8"), target
-    )
+    make_commands = extract_make_target_commands(makefile_text, target)
 
     policy_first = str(full_gate.get("policy_first_command", ""))
     if not make_commands or make_commands[0] != policy_first:

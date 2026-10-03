@@ -1,4 +1,16 @@
-.PHONY: harness-check
+.PHONY: harness-check assurance-fast assurance-full assurance-external-release assurance-external-release-plan
+
+assurance-fast:
+	python -m harness.assurance.execution_profiles fast
+
+assurance-full:
+	python -m harness.assurance.execution_profiles full
+
+assurance-external-release:
+	python -m harness.assurance.execution_profiles external-release
+
+assurance-external-release-plan:
+	python -m harness.assurance.execution_profiles external-release --plan
 
 harness-check:
 	python checks/validate_ci_policy.py
@@ -72,6 +84,7 @@ harness-check:
 	python tests/test_semantic_closure.py
 	python checks/validate_harness.py
 	python -m unittest tests/test_lifecycle_experiment.py
+	python tests/test_assurance_execution_profiles.py
 	python tests/test_consumer_api_compatibility.py
 	python tests/test_consumer_pack.py
 	python tests/test_consumer_wrapper.py

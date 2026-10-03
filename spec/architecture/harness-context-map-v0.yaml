@@ -59,6 +59,7 @@ contexts:
       - harness.assurance.acceptance_policy
       - harness.assurance.capability_lifecycle
       - harness.assurance.derivation_test_coverage
+      - harness.assurance.execution_profiles
       - harness.assurance.live_calibration
       - harness.assurance.adapters.copilot_live_calibration_evaluator
       - harness.assurance.semantic_acceptance
