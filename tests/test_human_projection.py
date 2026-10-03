@@ -190,6 +190,38 @@ def main() -> int:
     product = next(item for item in overview["sections"] if item["id"] == "product-boundary")
     assert product["sources"] == ["REQUIREMENTS"]
 
+    structurizr_recipe = {
+        "version": 1,
+        "kind": "harness-human-projection",
+        "id": "architecture-c4-review",
+        "consumer": "BACKEND-IMPLEMENTATION",
+        "documents": [
+            {
+                "id": "architecture-model",
+                "title": "Architecture Model",
+                "sections": [
+                    {
+                        "id": "c4",
+                        "title": "C4",
+                        "renderer": "architecture-c4-structurizr",
+                        "select": {"artifacts": ["ARCHITECTURE"]},
+                    }
+                ],
+            }
+        ],
+    }
+    structurizr_plan = validate_recipe(structurizr_recipe, manifest)
+    structurizr_section = structurizr_plan["documents"][0]["sections"][0]
+    assert structurizr_section["renderer"] == "architecture-c4-structurizr"
+    assert structurizr_section["sources"] == ["ARCHITECTURE"]
+
+    bad_renderer_recipe = copy.deepcopy(structurizr_recipe)
+    bad_renderer_recipe["documents"][0]["sections"][0]["renderer"] = []
+    expect_error(
+        lambda: validate_recipe(bad_renderer_recipe, manifest),
+        "renderer must be a non-empty string",
+    )
+
     ir = copy.deepcopy(ir_template)
     ir["manifest_digest"] = manifest["manifest_digest"]
     validate_projection_ir(ir, plan)
