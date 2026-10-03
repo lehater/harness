@@ -58,6 +58,7 @@ harness-check:
 	python tests/test_coverage_blocker_transition.py
 	python tests/test_coverage_production_contract_overlay.py
 	python tests/test_semantic_acceptance.py
+	python tests/test_application_process_design.py
 	python checks/validate_skill_invariant_policy.py
 	python tests/test_capability_lifecycle.py
 	python tests/test_deep_dependency_graphs.py
