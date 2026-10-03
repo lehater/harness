@@ -42,11 +42,13 @@ Read accepted project requirements, tasks/journeys, conceptual/IA/interaction/to
 4. Define typography/color/spacing/iconography roles and design tokens only when they carry stable reusable decisions.
 5. Define responsive/accessibility/localization defaults where applicable.
 6. Classify each consequential presentation choice as a material invariant, controlled freedom or ordinary implementation detail.
-7. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
-8. Define inheritance and local-deviation policy. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
-9. Preserve implementation freedom for framework, CSS mechanics and private component structure.
-10. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
-11. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
+7. For each material shared presentation decision, use the reusable UI Decision Rule catalog when its predicates apply and record the decision question, accepted basis, applied rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty.
+8. If semantic constraints and reusable rules cannot discriminate among viable alternatives because the remaining uncertainty is user-empirical, record `EMPIRICAL_VALIDATION_REQUIRED`; do not promote an interim prototype preference into a production-authoritative default. The semantic artifact may still remain accepted for bounded prototype use.
+9. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
+10. Define inheritance and local-deviation policy. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
+11. Preserve implementation freedom for framework, CSS mechanics and private component structure.
+12. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
+13. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
 
 ## Facets
 
@@ -99,6 +101,7 @@ A useful contract includes:
 - responsive/accessibility defaults;
 - reference/evidence links with role and scope when presentation intent was reconstructed from screenshots, design files or executable UI;
 - explicit material invariants, controlled freedoms and ordinary implementation details;
+- material decision evidence with stable decision id/axis, question, basis refs, applied UI rule ids, disposition/selection, required evaluation levels/evidence, controlled freedom and residual uncertainty;
 - deviation policy: local override requires rationale and cannot silently weaken accepted semantics/obligations;
 - unresolved Questions.
 
@@ -111,6 +114,7 @@ A useful contract includes:
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
 - downstream screen design can choose composition without inventing the application's common visual/interaction language;
 - every material presentation decision is constrained by canonical knowledge or explicitly classified as controlled freedom;
+- material decisions expose their evidence basis and any required empirical validation instead of hiding unresolved selection behind agent preference;
 - references contribute only the presentation facts they can support and cannot silently redefine product/domain semantics.
 
 ## Registration

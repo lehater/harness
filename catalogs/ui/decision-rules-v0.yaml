@@ -1,0 +1,72 @@
+version: 1
+kind: harness-ui-decision-rule-catalog
+id: UI-DECISION-RULES-V0
+status: experimental
+
+rules:
+  - id: UI-RULE-SYMBOLIC-EXACT-INSPECTION
+    question: Which representation family should carry exact symbolic inspection?
+    observable_predicates:
+      - task requires exact concept identity, labels, attributes, or relation predicates
+      - user must inspect symbolic meaning rather than only spatial shape
+    consequence:
+      preferred:
+        - structured symbolic results with selected detail
+      allowed:
+        - table
+        - list
+        - cards with explicit labeled fields
+        - supplementary visualization
+      disallowed:
+        - visualization-only path when exact symbolic inspection is task-critical
+    applicability:
+      requires:
+        - exact identity or symbolic value inspection is material to task success
+      excludes:
+        - task is purely spatial or motor with no exact symbolic inspection
+    exceptions:
+      - condition: spatial representation itself is the accepted task object
+        consequence: spatial representation may be primary but exact required semantics still need inspectable access
+    evidence:
+      class: EMPIRICAL
+      strength: MODERATE
+      sources:
+        - https://doi.org/10.1111/j.1540-5915.1991.tb00344.x
+    project_validation:
+      required_when:
+        - task mix includes material spatial or relational subtasks whose benefit may outweigh symbolic inspection cost
+      suggested_method: Compare representative task correctness, effort, and errors across admissible representation families.
+    freedom_remaining:
+      - exact table versus list versus card composition
+      - visual styling and component implementation
+      - optional supplementary visualization when it does not replace required semantic access
+
+  - id: UI-RULE-TASK-CRITICAL-KEYBOARD
+    question: May a task-critical interaction depend only on pointer or direct manipulation?
+    observable_predicates:
+      - interaction is task-critical
+      - an accepted accessibility obligation or interface contract requires keyboard-operable access
+    consequence:
+      preferred:
+        - named semantic keyboard-operable path
+      allowed:
+        - pointer or direct-manipulation interaction as a supplement
+      disallowed:
+        - pointer-only task completion
+    applicability:
+      requires:
+        - accepted accessibility obligation or interface contract makes keyboard access applicable
+      excludes: []
+    exceptions: []
+    evidence:
+      class: STANDARD
+      strength: STRONG
+      sources:
+        - https://www.w3.org/TR/WCAG22/#keyboard
+    project_validation:
+      required_when:
+        - custom widgets or spatial controls implement task-critical behavior
+      suggested_method: Exercise keyboard operation, focus order, focus visibility, and semantic status in an executable prototype.
+    freedom_remaining:
+      - exact shortcut set when not otherwise constrained
+      - pointer gestures and spatial manipulation as supplemental interaction

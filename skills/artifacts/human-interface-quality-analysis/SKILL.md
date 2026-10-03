@@ -32,7 +32,8 @@ Accepted project design is authority. Standards and user-research findings impro
 6. Route measurable architecture-significant constraints to Quality Design.
 7. Route external conformance duties to Obligation Analysis.
 8. Route proof to Verification/Test.
-9. Record COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING or QUESTION.
+9. For an open material presentation/composition decision, choose the cheapest evidence that can actually discriminate it: deterministic constraint/check -> analytical inspection -> executable prototype -> representative-user task evidence. Do not substitute a larger or more subjective evaluation for a cheaper valid oracle.
+10. Record COVERED, NOT_APPLICABLE, DEFERRED_NONBLOCKING or QUESTION.
 
 ## Reusable concern matrix
 
@@ -65,11 +66,14 @@ Stop and route a QUESTION when target users, required interaction modes, conform
 
 Produce interface-quality coverage by user/journey/surface, concern, owning Authority, accepted criterion, evidence obligation and coverage state.
 
+When supplying UI Design Convergence evidence, explicitly cover: critical task disposition, semantic traceability, applicable accessibility obligations, critical executable paths, and prototype/contract consistency. Missing empirical evidence remains unresolved rather than being converted into a heuristic pass.
+
 ## Acceptance checks
 
 - criteria trace to accepted users/journeys or applicable obligations;
 - accessibility is not reduced to automated linting;
 - usability is not represented by a generic score without accepted meaning;
+- deterministic, analytical, executable and representative-user evidence remain distinguishable rather than being flattened into one confidence score;
 - Interface, Product, Quality, Obligation and Verification ownership remains distinct;
 - standards remain lenses unless made applicable.
 
