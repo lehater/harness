@@ -1,0 +1,56 @@
+version: 1
+kind: harness-bpmn-process-profile
+id: BPMN-PROCESS-V1
+projection: application-process-bpmn
+
+scope:
+  id_pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+
+output:
+  bpmn: docs/generated/process/{scope-id}/process.bpmn
+  provenance: docs/generated/process/{scope-id}/process.bpmn.provenance.yaml
+
+bpmn:
+  namespace: "http://www.omg.org/spec/BPMN/20100524/MODEL"
+  target_namespace: "urn:harness:generated:application-process"
+  process_is_executable: false
+  require_markers:
+    - "GENERATED PROJECTION"
+    - "NOT A SOURCE OF TRUTH"
+  supported_flow_nodes:
+    - startEvent
+    - endEvent
+    - task
+    - userTask
+    - exclusiveGateway
+    - parallelGateway
+  supported_gateway_directions:
+    - Diverging
+    - Converging
+  allow_cycles: false
+  allow_event_definitions: false
+  allow_extensions: false
+  require_explicit_exclusive_branch_labels: true
+
+semantics:
+  start_event_policy: generic-only-unless-trigger-type-is-canonical
+  task_policy: generic-task-by-default
+  user_task_policy: emit-only-when-human-task-semantics-are-explicit
+  service_task_policy: forbidden
+  message_flow_policy: forbidden
+  exclusive_gateway_policy: emit-only-for-explicit-choice-or-exclusion
+  parallel_gateway_policy: emit-only-for-explicit-concurrency-or-synchronization
+  wait_event_policy: unsupported-v1
+  recovery_compensation_policy: unsupported-v1
+  repetition_policy: unsupported-v1
+  subprocess_policy: unsupported-v1
+  sequence_flow_policy: explicit-control-precedence-only
+
+validation:
+  require_output_under: docs/generated/
+  require_single_process: true
+  require_one_start_event: true
+  require_at_least_one_end_event: true
+  require_all_nodes_reachable: true
+  require_all_nodes_lead_to_completion: true
+  require_explicit_branching_gateways: true
