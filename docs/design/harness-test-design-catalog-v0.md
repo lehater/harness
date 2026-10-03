@@ -931,7 +931,7 @@ coverage is unchanged.
 **Oracle:** O1 for intended route  
 **Status:** IMPLEMENTED
 
-**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via the provider-neutral behavioral runner. Current run `37092423399` passed TD-ROUTE-001/002/003 after the canonical public-operation selection contract was clarified. TL4 prompt/data trust and convergence remain owned by TD-COMP-003.
+**Execution surface:** `spec/behavioral-evals/first-wave/cases/td-route-001/case.yaml.tmpl` via the provider-neutral behavioral runner. Current run `37094123915` passed TD-ROUTE-001/002/003 after the canonical public-operation selection contract was clarified. TL4 prompt/data trust and convergence remain owned by TD-COMP-003.
 
 Task:
 
