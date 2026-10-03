@@ -26,6 +26,9 @@ real-project evidence are owned by
   `make harness-check`.
 - **external assurance** — provider-backed or otherwise nondeterministic
   evidence that is not part of the ordinary deterministic integration gate.
+- **assurance execution profile** — a named orchestration entrypoint over
+  existing registered checks/workflows; it changes execution selection, never
+  the assurance denominator or evidence semantics.
 
 ## Stage model
 
@@ -141,6 +144,32 @@ mandatory check, or broadens automatic heavy execution requires explicit
 repository decision/evidence in addition to editing the policy file. A workflow
 edit alone is not sufficient authority to weaken this policy.
 
+### CI-P11 — canonical assurance execution profiles
+
+The CI registry owns exactly three public assurance execution profiles:
+
+- `fast` — all cheap `policy` + `focused` checks with `full_gate`
+  disposition. It is intended for local iteration and may not include
+  `deferred` or `exhaustive` work.
+- `full` — delegates to the unchanged canonical `harness-check` target. It
+  is the complete deterministic integration gate.
+- `external-release` — first runs `full`, then explicitly dispatches the
+  provider-backed release evidence on `main`. It remains operator initiated
+  and therefore does not weaken CI-P08.
+
+The external release profile dispatches the aggregate assurance campaign with
+`campaign=all`, greenfield bootstrap assurance, and live calibration. The
+specialized first-wave and TL4 workflows remain individually runnable for
+diagnostics, but are not dispatched again by the aggregate profile because the
+campaign already contains them.
+
+The profile runner is
+`python -m harness.assurance.execution_profiles <profile>`. Public Make targets
+are `assurance-fast`, `assurance-full`, and
+`assurance-external-release`; `assurance-external-release-plan` prints the
+full preflight/dispatch plan without executing it. External dispatch requires an
+authenticated GitHub CLI and does not run implicitly in ordinary CI.
+
 ## Machine-readable application
 
 `spec/ci/check-registry-v0.yaml` is the machine-readable check inventory and
@@ -158,7 +187,9 @@ workflow-role declaration.
   `full_gate` check in `make harness-check`;
 - non-decreasing stage order;
 - the policy validator itself is the first full-gate command;
-- required rationale for medium/heavy checks.
+- required rationale for medium/heavy checks;
+- exact `fast/full/external-release` profile contracts, their Make entrypoints,
+  and the manually dispatchable external-release workflow set.
 
 The validator is deliberately conservative. If it cannot classify an execution
 path safely, it reports a violation rather than assuming a skip is safe.
@@ -171,4 +202,7 @@ registry and use them for draft feedback, while CI-P06 keeps unknown impact
 conservative.
 
 The existing `make harness-check` entrypoint remains the compatibility definition
-of the full deterministic gate until a separately accepted refactor changes it.
+of the full deterministic gate. `assurance-full` delegates to it rather than
+redefining the command list, while `assurance-fast` derives its selection from
+registry metadata so newly registered cheap focused checks join the fast profile
+without a second hand-maintained inventory.

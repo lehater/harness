@@ -20,6 +20,38 @@ full_gate:
   workflow: .github/workflows/harness.yml
   command: make harness-check
   policy_first_command: python checks/validate_ci_policy.py
+execution_profiles:
+  fast:
+    kind: deterministic
+    makefile_target: assurance-fast
+    command: python -m harness.assurance.execution_profiles fast
+    disposition: full_gate
+    stages: [policy, focused]
+    cost_classes: [cheap]
+    purpose: Cheap deterministic feedback for local iteration without deferred or exhaustive work.
+  full:
+    kind: deterministic
+    makefile_target: assurance-full
+    command: python -m harness.assurance.execution_profiles full
+    delegate_target: harness-check
+    purpose: Canonical exhaustive deterministic integration gate.
+  external-release:
+    kind: external
+    makefile_target: assurance-external-release
+    command: python -m harness.assurance.execution_profiles external-release
+    preflight_profile: full
+    purpose: Explicit release-time provider assurance; never part of automatic PR or push gating.
+    workflow_dispatches:
+      - workflow: .github/workflows/assurance-campaign-copilot.yml
+        ref: main
+        inputs: {campaign: all}
+      - workflow: .github/workflows/greenfield-bootstrap-assurance.yml
+        ref: main
+        inputs: {}
+      - workflow: .github/workflows/live-calibration-copilot.yml
+        ref: main
+        inputs: {}
+
 workflow_roles:
 - path: .github/workflows/ci-policy.yml
   role: focused
@@ -190,6 +222,11 @@ checks:
   disposition: full_gate
 - id: fresh_context_routing
   command: python tests/test_fresh_context_routing.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: assurance_execution_profiles
+  command: python tests/test_assurance_execution_profiles.py
   stage: focused
   cost_class: cheap
   disposition: full_gate
