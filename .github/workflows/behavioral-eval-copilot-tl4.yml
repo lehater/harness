@@ -2,9 +2,6 @@ name: behavioral eval copilot tl4 evidence
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/architecture-c4-structurizr
 
 permissions:
   contents: read
