@@ -186,7 +186,15 @@ def process_graph(*, hidden_source: bool = False) -> dict:
             }
         ],
         "terminal_capabilities": (
-            ["demo.hidden-application"] if hidden_source else []
+            [
+                {
+                    "capability": "demo.hidden-application",
+                    "authority": "APPLICATION-DESIGN",
+                    "reason": "Fixture-only same-Authority source kept public for read-boundary testing.",
+                }
+            ]
+            if hidden_source
+            else []
         ),
     }
 
