@@ -13,14 +13,14 @@ skills:
     route_class: operation
     lifecycle: active
     route_status: routed
-  - id: data-model-dbml
-    path: skills/agent/data-model-dbml/SKILL.md
+  - id: bootstrap-existing-project
+    path: skills/agent/bootstrap-existing-project/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
     route_status: routed
-  - id: bootstrap-existing-project
-    path: skills/agent/bootstrap-existing-project/SKILL.md
+  - id: data-model-dbml
+    path: skills/agent/data-model-dbml/SKILL.md
     surface: consumer
     route_class: operation
     lifecycle: active
