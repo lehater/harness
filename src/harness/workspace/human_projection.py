@@ -318,12 +318,18 @@ def validate_recipe(recipe: dict[str, Any], manifest: dict[str, Any]) -> dict[st
                     f"projection section {doc_id}/{section_id} selects no canonical sources"
                 )
 
+            renderer = section.get("renderer", "narrative")
+            if not isinstance(renderer, str) or not renderer.strip():
+                raise CoreError(
+                    f"projection section {doc_id}/{section_id} renderer must be a non-empty string"
+                )
+
             normalized_sections.append(
                 {
                     "id": section_id,
                     "title": section.get("title") or section_id.replace("-", " ").title(),
                     "purpose": section.get("purpose", ""),
-                    "renderer": section.get("renderer", "narrative"),
+                    "renderer": renderer,
                     "sources": sorted(selected),
                 }
             )
