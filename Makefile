@@ -2,6 +2,7 @@
 
 harness-check:
 	python checks/validate_ci_policy.py
+	python tests/test_application_process_bpmn_projection.py
 	python checks/validate_assurance_registry.py
 	python checks/validate_cross_project_portability.py
 	python tests/test_behavioral_eval.py
@@ -37,7 +38,6 @@ harness-check:
 	python tests/test_human_projection.py
 	python tests/test_structurizr_projection.py
 	python tests/test_dbml_projection.py
-	python tests/test_application_process_bpmn_projection.py
 	python tests/test_coverage_map_experiment.py
 	python tests/test_coverage_derivation_experiment.py
 	python tests/test_coverage_planner_experiment.py
