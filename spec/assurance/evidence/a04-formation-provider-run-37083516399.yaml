@@ -1,0 +1,85 @@
+version: 1
+kind: harness-provider-behavioral-evidence
+id: A04-FORMATION-PROVIDER-RUN-37083516399
+status: accepted
+provider: github-copilot
+workflow_run_id: 37083516399
+workflow_run_url: https://github.com/lehater/harness/actions/runs/37083516399
+workflow_conclusion: success
+accepted_scope:
+  - TD-AUTH-003
+  - TD-AUTH-006
+  - TD-AUTH-007
+artifact:
+  id: 11259920420
+  name: assurance-campaign-release-critical-formation
+  sha256: 5411aedc510d1564ef2b37e36c50e78503ca5459f13cf099bbd3364545b92628
+  retention_days: 90
+harness_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+agent_descriptor:
+  requested_model: auto
+  model_selection: provider-auto
+  copilot_cli_version: "1.0.91"
+  sha256: ccff5c7828cdc38d3b13ef5973bdce6f422826bfcb3d529bb4191068ea4b3f54
+execution_bindings:
+  files:
+    - {path: AGENTS.md, git_blob_sha: 6e88e3ef96d813f9338fb430c19dafaee40d102f}
+    - {path: docs/design/core-v0.md, git_blob_sha: 30558c50edf6e8c203a40fb11bf7247d92e8bcf6}
+    - {path: skills/agent/design-profile/SKILL.md, git_blob_sha: d63d0d94db5ddcafc1cf7a7ae05188cf1bae75bb}
+    - {path: evals/behavioral_eval.py, git_blob_sha: ee4184d92a7594b6d9f8dc8dea226e3d9a4bade1}
+    - {path: evals/adapters/copilot_behavioral_eval_agent.py, git_blob_sha: 1c760463123cb46cdc1f71a9d3f9a27b44831263}
+    - {path: spec/behavioral-evals/copilot-agent.yaml.tmpl, git_blob_sha: d4fd0faeab97c7d0afcc65579b8a9a9e22aab7c0}
+currentness:
+  state: current
+  reason: >-
+    Selected Authority cases are bound to the current trusted instructions,
+    behavioral runner, provider adapter, frozen fixtures/oracles and provider
+    runtime descriptor; current main preserves those exact execution bindings.
+outcome:
+  run_status: COMPLETED
+  correctness: PASS
+  passed_cases: 3
+  total_cases: 3
+  provider_calls: 5
+resolved_models:
+  mai-code-1.1-flash: 5
+token_usage:
+  input_tokens: 24659
+  output_tokens: 2386
+  total_tokens: 27045
+provider_prompt_utf8_bytes: 85377
+cases:
+  - case_id: TD-AUTH-003
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-003/oracle.yaml
+    case_sha256: 7ef555d81d89cc5e02bd940a6ff8b6e4d60d237279822e5e0cd2c79e4165e4c9
+    fixture_sha256: 1ab717e02812339a016ee5e635c6c989aa36600e7fd7a6adadc41e1af57a9549
+    oracle_sha256: abd7bdb6846c187bbb48f08846721f86cf89361ce83e98afccd30ed319c89735
+    runs:
+      - {run_id: TD-AUTH-003-R01-2696d171c8ce, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4907, output_tokens: 353, provider_prompt_utf8_bytes: 16957, record_sha256: 7127ba21a020c3b99304aafd59480efcb28bed527ddb95a27654570dfa849852, started_from_clean_context: true}
+  - case_id: TD-AUTH-006
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-006/oracle.yaml
+    case_sha256: dbf81f4069eb3ce7f30e33c4b86e19c9224842383a089f4d02d7710b48ec6b6f
+    fixture_sha256: 39c30368e7623af3e65ff8d03bb762fffee3dfd2042c34044f9f0aad2cc08393
+    oracle_sha256: 54bf3d5a84e45a2c960f069820cac6c90ad161f2046e22a0593450ec6bf0070f
+    runs:
+      - {run_id: TD-AUTH-006-R01-3f4b8f1d5d72, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4938, output_tokens: 321, provider_prompt_utf8_bytes: 17114, record_sha256: 7427bd40e67cd71d43725f692c3033a7076185753fe0ce55983b191bc8df3aed, started_from_clean_context: true}
+  - case_id: TD-AUTH-007
+    template: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/case.yaml.tmpl
+    fixture: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/fixture.yaml
+    oracle: spec/behavioral-evals/release-critical-formation/cases/td-auth-007/oracle.yaml
+    case_sha256: 6f05f0098b0ac9c78101d8f04ff9a463e0505c6bfb2449c0b7d6cd4ea189c4a1
+    fixture_sha256: cf5ecd100ad7ea068c5bb0f8e24a8f12c90b1a9bb85ae1af5ed30c7f2a2b8f42
+    oracle_sha256: 6a86ddc70350b2ad52e12a67cbc89c30d6eebc5e4bf6885d69dbd0f2e2204e46
+    runs:
+      - {run_id: TD-AUTH-007-R01-9cb5a242e5b4, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4940, output_tokens: 580, provider_prompt_utf8_bytes: 17102, record_sha256: 35b2e127f670a0093012ca4259e5358d803b429ec605e62fb7cb8407536b76c3, started_from_clean_context: true}
+      - {run_id: TD-AUTH-007-R02-234303bff30b, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4939, output_tokens: 561, provider_prompt_utf8_bytes: 17102, record_sha256: 14733bebe99af05a7cd3e02501b2c4a493d854422d8484833068ad7bceab5dac, started_from_clean_context: true}
+      - {run_id: TD-AUTH-007-R03-7ab56260d2bd, run_status: COMPLETED, correctness: PASS, resolved_model: mai-code-1.1-flash, input_tokens: 4935, output_tokens: 571, provider_prompt_utf8_bytes: 17102, record_sha256: 82098b6b99aa4faecb00636a8a63164f7cde2f30edd64c981b83a574433d4359, started_from_clean_context: true}
+limitations:
+  - TD-AUTH-003 uses corrected Fixture V2; the historical ambiguous V1 diagnostic failure remains excluded.
+  - TD-AUTH-006 proves one frozen Reference-boundary trap only.
+  - TD-AUTH-007 passed three independent clean-context executions and establishes convergence only for its frozen partition fixture.
+  - All selected calls resolved to mai-code-1.1-flash; this is not cross-model convergence.
