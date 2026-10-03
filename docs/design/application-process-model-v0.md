@@ -54,6 +54,33 @@ A process may coordinate:
 Commands, queries, events and activities may participate in a process, but none
 of them is itself the process.
 
+### Process instance boundary
+
+A process contract must distinguish the work that belongs to one process
+instance from knowledge that merely makes that work possible.
+
+In particular, these relations are not interchangeable:
+
+- a **precondition** must already hold before the process activity can proceed;
+- a **control precedence** relation means one process activity or outcome
+  causally enables another within the selected process instance;
+- a **data dependency** means later work requires information produced or
+  selected elsewhere, without by itself defining execution order;
+- **provenance** explains why an accepted fact or activity exists and does not
+  imply runtime sequencing;
+- **concurrency** means accepted work may overlap;
+- **synchronization/convergence** means continuation depends on completion or
+  outcomes from more than one accepted branch.
+
+An explanatory list, dependency chain, domain history or artifact provenance
+must not be projected as process control flow merely because it is ordered in a
+source document.
+
+The process boundary should therefore identify the initiating condition and the
+bounded completion outcome of one meaningful execution. Accepted state created
+before that boundary is an input or precondition unless the owning project
+semantics explicitly make its creation part of the same process.
+
 ## Ownership
 
 Application process knowledge is owned by **APPLICATION-DESIGN**.
@@ -87,7 +114,8 @@ progression. Useful dimensions include, where applicable:
 - required inputs and references;
 - activities / application operations;
 - produced outcomes and relevant events;
-- ordering and dependency constraints;
+- typed causal relations, including control precedence, data dependency,
+  preconditions, provenance and concurrency where material;
 - branch conditions / decisions;
 - parallelism and convergence;
 - waits, timers and external continuation;
@@ -100,6 +128,34 @@ progression. Useful dimensions include, where applicable:
 Not every process needs every dimension. Missing material semantics must remain
 explicitly unresolved rather than being invented by a projection or
 implementation.
+
+A process contract should use the narrowest relation semantics supported by
+accepted knowledge. Generic source ordering must not be promoted to causal
+ordering, and absence of an ordering constraint must not be promoted to
+parallelism.
+
+### Process state and progress
+
+Process progress is canonical application knowledge only when it carries
+project meaning required to decide valid continuation, recovery, cancellation
+or completion and cannot be derived unambiguously from already accepted domain
+or application facts.
+
+Keep these state categories separate:
+
+- **domain state** is owned by the relevant Domain Authority;
+- **semantic process state/progress**, when independently material, belongs to
+  APPLICATION-DESIGN;
+- **application orchestration state** belongs to APPLICATION-DESIGN only where
+  its meaning survives implementation choices;
+- **persisted workflow-engine state** is a realization concern owned by the
+  relevant Architecture/Data/Implementation decisions;
+- **technical execution state** such as thread, transaction, queue-consumer or
+  scheduler state is implementation/runtime knowledge.
+
+Do not introduce a mandatory ProcessState Core entity. A short-lived process
+whose continuation is fully determined by existing accepted facts may need no
+independent canonical process-state representation.
 
 ## Inputs
 
@@ -195,6 +251,21 @@ boundaries or deployment mechanisms.
 Architecture may realize an accepted process, but implementation topology is not
 process truth.
 
+### Domain process concepts
+
+A project's domain model may contain concepts named Process, Business Process,
+Workflow or similar terms. Such a concept remains domain-owned when it carries
+business identity, lifecycle, invariants or meaning.
+
+An Application Process is the application-level causal/temporal composition of
+accepted work. It must not silently reinterpret a domain Business Process as an
+executable workflow, and a matching name does not establish identity between
+the two concepts.
+
+If a domain Process participates in an Application Process, reference its
+accepted domain identity and semantics rather than copying or extending them
+inside the application process contract.
+
 ## Projection boundary
 
 Process notation is downstream representation.
@@ -247,17 +318,23 @@ Application Process Model describes the target project's accepted behavior.
 This contract establishes the semantic boundary but does **not** yet add a new
 registered knowledge kind or mandatory CapabilityId family.
 
-The expected next validation question is whether real project consumers benefit
-from an independently actionable process capability inside APPLICATION-DESIGN,
-for example a scoped capability equivalent to:
+A process may be exposed as an independently addressable Capability inside
+APPLICATION-DESIGN before any new knowledge kind exists, for example:
 
 ```text
 <project>.application-process.<scope>
 ```
 
-If a vertical slice proves independent production, consumption, lifecycle and
-acceptance value, Harness may introduce a routed
-`application-process-design` knowledge kind.
+Such a Capability can still use the existing `application-design`
+knowledge kind when the same Application Design procedure can produce and
+accept it coherently. Capability identity expresses independently consumable
+project knowledge; it does not require a one-to-one Authority or knowledge-kind
+split.
+
+Introduce a routed `application-process-design` knowledge kind only after a
+vertical slice demonstrates that process production needs a materially distinct
+procedure, acceptance contract or lifecycle that would distort the existing
+`application-design` route.
 
 Do not add that registry/runtime surface merely because a diagram format exists.
 
@@ -285,16 +362,23 @@ An accepted process contract should satisfy:
 
 1. every material activity traces to accepted upstream behavior or an owned
    Application Design decision;
-2. domain outcomes and invariants are consumed rather than re-owned;
-3. material ordering, branching, waiting, parallelism and completion semantics
-   are explicit where applicable;
-4. failures and recovery remain distinguishable where they affect accepted
-   behavior;
-5. unresolved upstream meaning becomes a Question rather than an invented path;
-6. transport, persistence and runtime topology are not promoted to process
+2. the process-instance boundary distinguishes in-process work from
+   prerequisites, domain history and provenance;
+3. domain outcomes and invariants are consumed rather than re-owned;
+4. material causal relations distinguish control precedence from preconditions,
+   data dependency, provenance and concurrency rather than using generic source
+   ordering as control flow;
+5. branching, waiting, parallelism, convergence and completion semantics are
+   explicit only where accepted knowledge supports them;
+6. failures, cancellation, alternate outcomes and recovery remain
+   distinguishable where they affect accepted behavior;
+7. process state/progress is explicit only when independently semantic, and
+   technical workflow/runtime state is not promoted to project truth;
+8. unresolved upstream meaning becomes a Question rather than an invented path;
+9. transport, persistence and runtime topology are not promoted to process
    semantics without an owning upstream decision;
-7. a notation-specific projection can be produced without adding new project
-   meaning.
+10. a notation-specific projection can be produced without adding new project
+    meaning.
 
 ## Non-goals
 
@@ -315,11 +399,14 @@ This contract does not introduce:
 Use the smallest evidence-driven path:
 
 1. exercise this boundary against one real project process;
-2. test whether existing Application Design can produce and consume the process
-   contract without ambiguity;
-3. introduce `application-process-design` only if independent capability value
-   is demonstrated;
-4. after canonical process knowledge exists, implement one process-projection
+2. expose one minimal process Capability under APPLICATION-DESIGN using the
+   existing `application-design` route;
+3. test whether a downstream consumer can use that Capability and its declared
+   dependency closure without reconstructing control flow from neighboring
+   artifacts;
+4. introduce `application-process-design` only if the production/acceptance
+   procedure proves materially distinct from ordinary Application Design;
+5. after canonical process knowledge exists, implement one process-projection
    vertical slice, with BPMN as a candidate rather than a prerequisite;
-5. extract shared abstractions only after more than one process projection or
+6. extract shared abstractions only after more than one process projection or
    producer demonstrates the same invariant.
