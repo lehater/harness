@@ -56,6 +56,42 @@ A Design Profile may be derived from several accepted project-owned policy sourc
 
 The `subject` field identifies the expectation but does not filter capability providers. If several same-Authority artifacts provide one broad capability for different subjects, subject-specific completeness requires subject-scoped CapabilityIds or a target-owned coverage check/profile. A broad capability alone must not be used as proof of per-subject coverage.
 
+## Scenario-sliced semantic elaboration
+
+Harness does not require exhaustive downstream modeling of every applicable
+domain area before a bounded implementation or prototype scenario can be
+explored. It does require enough global semantic ownership and boundary knowledge
+to prevent a local scenario from silently redefining shared meaning.
+
+When the selected scope spans several semantic responsibilities:
+
+1. Establish the applicable Authority/model-context landscape and the
+   cross-context relationships needed to keep ownership unambiguous before
+   relying on scenario-local elaboration.
+2. After those global boundaries are accepted, downstream knowledge may be
+   elaborated by bounded scenario slices across Tactical Domain, Application,
+   Interface and later realization responsibilities.
+3. Elaborate each participating responsibility only as deeply as needed for
+   **semantic closure of that scenario**: no downstream artifact should need to
+   invent an unresolved upstream concept, relationship, invariant or ownership
+   rule in order to proceed.
+4. Do not treat scenario slicing as permission to create a second local semantic
+   owner. A concept, relationship or invariant discovered inside one slice that
+   is intended to remain valid outside that scenario must be routed to and
+   accepted by its owning Authority before downstream consumers rely on it as
+   reusable truth.
+5. Keep genuinely scenario-specific Application or Interface behavior local to
+   those Authorities. Do not promote interaction or presentation choices into
+   Domain truth merely because they appear in a reusable UI flow.
+6. If a later slice or realization exposes a missing reusable semantic decision,
+   stop only the affected slice, route the gap to the highest owning Authority,
+   update canonical knowledge there, and then revalidate affected downstream
+   knowledge through normal currentness rules.
+
+This is an elaboration strategy, not a Core workflow entity, Stage, Phase or
+Gate. Project-owned Engineering Graph and coverage policy still determine which
+capabilities and subjects are required for the selected Consumer.
+
 ## Engineering Graph execution path
 
 When the target project exposes an Engineering Graph, do not manually choose or maintain a Design Profile as the primary target policy.
