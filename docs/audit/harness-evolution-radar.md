@@ -95,6 +95,7 @@ separate defect has been demonstrated.
 | EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
 | EVO-033 | RESEARCH | CAPTURED | Project-model discovery assurance | Prove selected-scope unfamiliar-repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies with independent holdouts and repeated clean-context semantic convergence. |
 | EVO-034 | RECOMMENDATION | ADOPTED | Capability assurance | Canonical Harness Assurance Policy now requires ability-driven evidence, bottom-up test levels, explicit oracle strength, and separation between evidence sufficiency and CI execution. |
+| EVO-035 | RESEARCH | CAPTURED | UI / HCI | Validate evidence-backed screen/view boundary criteria before promoting them into UI Decision Rules or Interface Topology/Interaction acceptance checks. |
 
 ## Detailed entries
 
@@ -1300,3 +1301,64 @@ increases cost and reduces failure localization.
 - EVO-033
 - `docs/design/harness-assurance-policy-v0.md`
 - `docs/design/harness-ability-to-evidence-v0.md`
+
+---
+
+### EVO-035 — Evidence-backed screen/view boundary criteria
+
+**Type:** RESEARCH  
+**Status:** CAPTURED
+
+**Question**
+
+Which evidence-backed criteria are stable enough for Harness to use when
+mapping accepted tasks and interaction contexts into user-facing views, without
+collapsing into either `one task = one screen` or `one domain entity = one
+screen`?
+
+**Current evidence**
+
+Research is captured in
+`docs/research/ui-view-boundary-evidence-v0.md`.
+
+The external evidence supports several mechanisms strongly enough to guide
+analysis now: task suitability, co-location of information used in one mental
+operation, recognition/context preservation, progressive disclosure when
+information is genuinely secondary, and explicit mode/recovery semantics.
+
+The concrete D0-D3 dependency scale, merge/split tests and VB-* candidate rules
+remain engineering synthesis rather than accepted Harness law.
+
+**Potential value**
+
+A validated rule set could improve:
+
+- Interaction Context quality before topology;
+- Interface Topology partitioning and responsibility cohesion;
+- material UI Decision Rule coverage in
+  `docs/design/ui-design-convergence-v0.md`;
+- deterministic/analytical review of proposed `VIEW-*` inventories before
+  wireframes and frontend code.
+
+**Evidence needed**
+
+Run the proposed task/decision -> interaction-context -> view audit and
+information-dependency analysis against an accepted real-project topology.
+Record false positives and unresolved cases. Promote rules only when the
+evidence demonstrates stable value across materially different interaction
+shapes or a sufficiently direct external source already justifies the rule.
+
+**Not a defect**
+
+Current Harness already separates Interaction Design, Interface Topology and
+Screen/View Design coherently. This research may sharpen their decision
+criteria, but no current invariant violation has been demonstrated.
+
+**Related**
+
+- `docs/research/ui-view-boundary-evidence-v0.md`
+- `docs/design/ui-design-convergence-v0.md`
+- `skills/artifacts/interaction-design/SKILL.md`
+- `skills/artifacts/interface-topology-design/SKILL.md`
+- `skills/artifacts/screen-view-design/SKILL.md`
+
