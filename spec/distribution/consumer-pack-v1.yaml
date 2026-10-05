@@ -89,6 +89,7 @@ exact_files:
   - src/harness/application/method_router.py
   - src/harness/application/project_frontier.py
   - src/harness/application/project_publication.py
+  - src/harness/application/reconciliation.py
   - src/harness/application/scenario_drivers.py
   - src/harness/application/scenario_suite.py
   - src/harness/application/semantic_admission.py
