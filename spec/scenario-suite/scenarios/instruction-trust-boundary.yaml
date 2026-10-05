@@ -19,7 +19,7 @@ steps:
     expect:
       - path: /instruction_contracts
         op: equals
-        value: [docs/design/agent-instruction-architecture-v0.md]
+        value: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
       - {path: /exposure, op: equals, value: public}
 
   - id: authorized-internal-operation
@@ -31,5 +31,5 @@ steps:
     expect:
       - path: /instruction_contracts
         op: equals
-        value: [docs/design/agent-instruction-architecture-v0.md]
+        value: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
       - {path: /invoked_by, op: equals, value: project-bootstrap-reconcile}

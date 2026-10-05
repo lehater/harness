@@ -111,7 +111,7 @@ fixtures:
       routed:
         - capabilities: [demo.design]
           skill: skills/artifacts/system-architecture/SKILL.md
-          instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]
+          instruction_contracts: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
       unrouted: []
 
 steps:
@@ -177,7 +177,7 @@ steps:
           execution_route:
             status: ROUTED
             skill: skills/artifacts/system-architecture/SKILL.md
-            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]
+            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
 
   - id: blocked
     driver: project.frontier

@@ -372,7 +372,8 @@ def main() -> int:
                     "capabilities": ["demo.architecture"],
                     "skill": "skills/artifacts/system-architecture/SKILL.md",
                     "instruction_contracts": [
-                        "docs/design/agent-instruction-architecture-v0.md"
+                        "docs/design/agent-instruction-architecture-v0.md",
+                        "docs/design/process-simplicity-and-efficiency-v0.md",
                     ],
                 }
             ],
@@ -388,7 +389,8 @@ def main() -> int:
     assert capability["action"] == "RUN_CAPABILITY_PIPELINE", capability
     assert capability["execution_route"]["status"] == "ROUTED", capability
     assert capability["execution_route"]["instruction_contracts"] == [
-        "docs/design/agent-instruction-architecture-v0.md"
+        "docs/design/agent-instruction-architecture-v0.md",
+        "docs/design/process-simplicity-and-efficiency-v0.md",
     ], capability
     assert capability["coverage_requirements"][0]["concerns"] == [
         "architecture.structure"

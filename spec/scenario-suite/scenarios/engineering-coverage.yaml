@@ -51,4 +51,4 @@ steps:
             status: ROUTED
             knowledge_kind: domain-model
             skill: skills/artifacts/domain-model/SKILL.md
-            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md]
+            instruction_contracts: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
