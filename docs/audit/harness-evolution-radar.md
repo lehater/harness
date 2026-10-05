@@ -92,7 +92,7 @@ separate defect has been demonstrated.
 | EVO-029 | RESEARCH | CAPTURED | Conditional producer promotion | Decide when the research CHANGE-TRANSITION-DESIGN contract is mature enough to receive a canonical `knowledge_kind` and deterministic artifact-production route. |
 | EVO-030 | RECOMMENDATION | CAPTURED | Orchestration observability | Add a minimal operation-decision trace so maintainers can reconstruct task intent -> selected operation -> resolved skill/contracts without persisting private reasoning. |
 | EVO-031 | RESEARCH | CAPTURED | Evaluator calibration | Define calibration-corpus representativeness and drift/recalibration triggers so passing a small bootstrap corpus is not treated as broad evaluator-quality proof. |
-| EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
+| EVO-032 | RESEARCH | INVESTIGATING | Harness scale envelope | Define supported graph/artifact/question/publication scale and add stress fixtures that measure depth, breadth, semantic fan-out, publication size and repeated recomputation separately. |
 | EVO-033 | RESEARCH | CAPTURED | Project-model discovery assurance | Prove selected-scope unfamiliar-repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies with independent holdouts and repeated clean-context semantic convergence. |
 | EVO-034 | RECOMMENDATION | ADOPTED | Capability assurance | Canonical Harness Assurance Policy now requires ability-driven evidence, bottom-up test levels, explicit oracle strength, and separation between evidence sufficiency and CI execution. |
 | EVO-035 | RECOMMENDATION | ADOPTED | Process economy / reconciliation | Make minimum-sufficient process a repository-wide constraint and move repeated generic semantic-reconciliation mechanics behind a bounded Application service while preserving Project Publication, Authority and acceptance invariants. |
@@ -1162,7 +1162,7 @@ behavior.
 ### EVO-032 — Supported scale envelope and stress fixtures
 
 **Type:** RESEARCH  
-**Status:** CAPTURED
+**Status:** INVESTIGATING
 
 **Question**
 
@@ -1179,26 +1179,62 @@ Candidate independent dimensions:
 - dependency breadth / fan-out;
 - number of Authorities/Capabilities/Artifacts/Questions;
 - number of Consumers and coverage obligations;
+- semantic-derivation fan-out and repeated prerequisite semantic surfaces;
+- direct Project Publication serialized size and write/diff churn;
 - repeated recomputation after one upstream change;
 - multi-provider and multi-subject density.
+
+**Current real-project evidence**
+
+Prep revision `5efa07ffb701595edd2e6b29e7f92625873659e5` exposes a
+publication-cardinality case that the existing graph-depth/cardinality stress
+fixture does not cover:
+
+- 23 lifecycle providers and 65 derivation edges;
+- 470 unique semantic atom/fingerprint pairs represented by 9,400 mapping
+  occurrences in the publication snapshot;
+- 436 fingerprint-map blocks but only 44 unique map contents;
+- `.harness/project-publication.yaml` is 1,397,298 bytes / 22,256 lines and
+  approximately 23.5% of the repository tree's blob bytes at that revision.
+
+A representation-only experiment over that frozen snapshot shows that interning
+equal fingerprint maps during YAML serialization would reduce the projected
+direct-file representation to about 493 KB, roughly 64.7%, while decoding to
+the same logical v1 publication. This is evidence of physical repetition, not
+evidence that the logical Project Publication boundary is wrong.
 
 **Evidence needed**
 
 Add generated deterministic fixtures at representative sizes and measure both
-correctness and runtime/memory. Start with a small tier that is cheap enough for
-local/CI regression and a larger opt-in benchmark tier. Define limits only from
-observed behavior and real-project needs rather than arbitrary round numbers.
+correctness and runtime/memory/storage. Separate provider count, derivation
+fan-out, semantic-surface size and publication serialization so one dimension
+does not hide another. Start with a small tier that is cheap enough for local/CI
+regression and a larger opt-in benchmark tier.
+
+Compare at least:
+
+1. current logical v1 state with lossless serialization interning;
+2. a normalized/content-addressed persistence projection that stores immutable
+   semantic surfaces once and references them from derivation/lifecycle data.
+
+Measure serialized bytes, load/dump cost, diff/churn and round-trip logical
+equivalence. Define support limits only from observed behavior and real-project
+needs rather than arbitrary round numbers.
 
 **Not a defect**
 
-The missing envelope itself does not prove incorrect current behavior. HARN-023
-tracks the concrete deep-recursion failure class separately.
+The missing envelope itself does not prove incorrect current behavior. The
+current publication remains semantically valid and atomic; this item tracks the
+cost/scale representation question. HARN-023 tracks the concrete deep-recursion
+failure class separately.
 
 **Related**
 
 - AP-22 / AUD-019
 - HARN-023
 - AP-18 performance / cost
+- EVO-035
+- `docs/design/project-publication-v0.md`
 
 
 ### EVO-033 — Project-model discovery assurance

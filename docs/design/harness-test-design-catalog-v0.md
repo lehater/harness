@@ -1970,6 +1970,42 @@ Expected result:
 Interrupted pre-commit attempt leaves no mixed visible revision; safe retry
 produces one coherent result.
 
+## TD-PUB-004 — Publication serialization/cardinality envelope
+
+**Abilities:** HA-A14, HA-A21  
+**Failure modes:** A14-F08, A21-F04  
+**Methods:** EM-06, EM-13, EM-10  
+**Minimum level:** TL1 synthetic serialization plus TL5 known-project observation  
+**Oracle:** O1 for the mechanism; O2 for the Prep observation  
+**Status:** PARTIAL
+
+**Evidence:** `tests/test_project_publication.py::test_yaml_serialization_deduplicates_fingerprint_maps_losslessly`;
+Prep revision `5efa07ffb701595edd2e6b29e7f92625873659e5` measurements captured
+under EVO-032.
+
+Fixture dimensions:
+
+- repeated equal fingerprint maps across semantic evaluation, derivation and
+  lifecycle-shaped structures;
+- provider count;
+- derivation fan-out;
+- semantic-surface atom count.
+
+Expected result:
+
+- serialization-level deduplication round-trips to the identical logical
+  Project Publication state;
+- revision/acceptance/currentness semantics are representation-independent;
+- storage growth is measured independently from lifecycle correctness;
+- no universal byte threshold is asserted until the support-envelope research
+  has enough synthetic and real-project evidence.
+
+Remaining evidence:
+
+- generated fan-out/cardinality benchmark across the independent dimensions;
+- measured comparison with a normalized/content-addressed persistence
+  projection before changing the logical publication/storage contract.
+
 # SF-11 — Repository realization, projections, and distribution
 
 ## TD-PROJ-001 — Derived projection cannot become truth
@@ -2417,14 +2453,14 @@ Every canonical ability now has at least one designed evidence path.
 | HA-A11 | TD-BOOT-E05/E06, TD-ROUTE-007 plus existing source-boundary designs |
 | HA-A12 | TD-DEP-001..005, TD-SEM-001..006 |
 | HA-A13 | TD-AUTH-003/005, TD-APP-004, TD-BOOT-E03, TD-SEM/LIFE controls |
-| HA-A14 | TD-DEP-003/006, TD-LIFE-001..006 |
+| HA-A14 | TD-DEP-003/006, TD-LIFE-001..006, TD-PUB-004 |
 | HA-A15 | TD-COMP-002, TD-BOOT-G03, TD-FRONT-001..003, TD-PUB-001..003 |
 | HA-A16 | TD-ROUTE-001..008, TD-COMP-003, TD-BOOT-E06/G05 |
 | HA-A17 | TD-BOOT-E01, TD-ROUTE-005, TD-PROJ-001..003, TD-REAL-002 |
 | HA-A18 | TD-DIST-001/002 |
 | HA-A19 | TD-CI-001..003, TD-ASSURE-001/002 |
 | HA-A20 | TD-SEM-006, TD-EVAL-001..006 |
-| HA-A21 | TD-LIFE-006, TD-REAL-001..005 |
+| HA-A21 | TD-LIFE-006, TD-PUB-004, TD-REAL-001..005 |
 
 HA-A01 and portions of HA-A03/HA-A11 intentionally point to existing
 deterministic acceptance families rather than creating duplicate new design IDs.

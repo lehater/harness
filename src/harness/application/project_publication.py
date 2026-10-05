@@ -64,6 +64,49 @@ STATE_KEYS = {
     "lifecycle",
     "decision_failures",
 }
+_YAML_INTERNED_FINGERPRINT_KEYS = frozenset(
+    {
+        "semantic_atom_fingerprints",
+        "semantic_atoms",
+        "source_surface_fingerprints",
+    }
+)
+
+
+def _yaml_serialization_projection(
+    publication: dict[str, Any],
+) -> dict[str, Any]:
+    """Intern repeated fingerprint maps without changing logical publication state."""
+    projected = copy.deepcopy(publication)
+    interned: dict[str, dict[str, Any]] = {}
+
+    def visit(value: Any) -> None:
+        if isinstance(value, dict):
+            for key, child in list(value.items()):
+                if (
+                    key in _YAML_INTERNED_FINGERPRINT_KEYS
+                    and isinstance(child, dict)
+                    and child
+                ):
+                    identity = json.dumps(
+                        child,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                        ensure_ascii=False,
+                    )
+                    existing = interned.get(identity)
+                    if existing is None:
+                        interned[identity] = child
+                    else:
+                        value[key] = existing
+                    continue
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(projected)
+    return projected
 
 
 def _empty_failure_set() -> dict[str, Any]:
@@ -600,6 +643,7 @@ def publish_project_publication(
                     "initial project publication must have parent_revision=null"
                 )
 
+        serialization_projection = _yaml_serialization_projection(publication)
         fd, temp_name = tempfile.mkstemp(
             prefix=f".{path.name}.",
             suffix=".tmp",
@@ -608,7 +652,7 @@ def publish_project_publication(
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
                 yaml.safe_dump(
-                    publication,
+                    serialization_projection,
                     handle,
                     sort_keys=False,
                     allow_unicode=True,
