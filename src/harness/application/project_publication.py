@@ -109,6 +109,36 @@ def _yaml_serialization_projection(
     return projected
 
 
+def _detach_yaml_aliases(
+    value: Any,
+    *,
+    active: set[int] | None = None,
+) -> Any:
+    """Materialize independent logical nodes from YAML alias-backed containers."""
+    if not isinstance(value, (dict, list)):
+        return value
+
+    if active is None:
+        active = set()
+    marker = id(value)
+    if marker in active:
+        raise CoreError("project publication YAML must not contain cyclic aliases")
+
+    active.add(marker)
+    try:
+        if isinstance(value, dict):
+            return {
+                key: _detach_yaml_aliases(child, active=active)
+                for key, child in value.items()
+            }
+        return [
+            _detach_yaml_aliases(child, active=active)
+            for child in value
+        ]
+    finally:
+        active.remove(marker)
+
+
 def _empty_failure_set() -> dict[str, Any]:
     return {
         "version": 1,
@@ -564,6 +594,7 @@ def read_project_publication(
         raise CoreError(f"cannot load project publication {path}: {exc}") from exc
     if not isinstance(value, dict):
         raise CoreError(f"project publication {path} must contain a mapping")
+    value = _detach_yaml_aliases(value)
     validate_project_publication(graph, value)
     return value
 

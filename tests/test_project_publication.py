@@ -467,8 +467,230 @@ def test_yaml_serialization_deduplicates_fingerprint_maps_losslessly() -> None:
     assert yaml.safe_load(compact) == publication
 
 
+def test_yaml_serialization_does_not_alias_unrelated_equal_mappings() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(16)
+    }
+    publication = {
+        "fingerprint": {
+            "semantic_atom_fingerprints": copy.deepcopy(fingerprints),
+        },
+        "unrelated_a": {"payload": copy.deepcopy(fingerprints)},
+        "unrelated_b": {"payload": copy.deepcopy(fingerprints)},
+    }
+
+    projection = _yaml_serialization_projection(publication)
+
+    assert projection == publication
+    assert (
+        projection["unrelated_a"]["payload"]
+        is not projection["unrelated_b"]["payload"]
+    )
+
+
+def test_publish_project_publication_writes_compact_lossless_yaml() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(64)
+    }
+    evaluations = copy.deepcopy(CURRENT_EVALUATIONS)
+    evaluation = evaluations["semantic_evaluations"][0]
+    evaluation["semantic_atom_fingerprints"] = copy.deepcopy(fingerprints)
+    evaluation["source_surface_fingerprints"] = copy.deepcopy(fingerprints)
+
+    publication = build_project_publication(
+        graph=GRAPH,
+        core_model=CURRENT_CORE,
+        semantic_evaluations=evaluations,
+        lifecycle=CURRENT_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+    naive = yaml.safe_dump(
+        publication,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="project-publication-compact-") as temp_dir:
+        path = Path(temp_dir) / "project-publication.yaml"
+        publish_project_publication(
+            path,
+            graph=GRAPH,
+            publication=publication,
+            expected_revision=None,
+        )
+
+        raw = path.read_text(encoding="utf-8")
+        reloaded = read_project_publication(path, graph=GRAPH)
+
+    assert len(raw) < len(naive), (len(raw), len(naive))
+    assert "&id" in raw, raw
+    assert "*id" in raw, raw
+    assert reloaded == publication
+    assert reloaded["revision"] == publication["revision"]
+
+
+def test_read_project_publication_detaches_yaml_alias_identity() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(32)
+    }
+    evaluations = copy.deepcopy(CURRENT_EVALUATIONS)
+    evaluation = evaluations["semantic_evaluations"][0]
+    evaluation["semantic_atom_fingerprints"] = copy.deepcopy(fingerprints)
+    evaluation["source_surface_fingerprints"] = copy.deepcopy(fingerprints)
+    publication = build_project_publication(
+        graph=GRAPH,
+        core_model=CURRENT_CORE,
+        semantic_evaluations=evaluations,
+        lifecycle=CURRENT_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="project-publication-aliases-") as temp_dir:
+        path = Path(temp_dir) / "project-publication.yaml"
+        publish_project_publication(
+            path,
+            graph=GRAPH,
+            publication=publication,
+            expected_revision=None,
+        )
+        raw = path.read_text(encoding="utf-8")
+        reloaded = read_project_publication(path, graph=GRAPH)
+
+    assert "&id" in raw and "*id" in raw, raw
+    reloaded_evaluation = reloaded["state"]["semantic_evaluations"][
+        "semantic_evaluations"
+    ][0]
+    semantic_atoms = reloaded_evaluation["semantic_atom_fingerprints"]
+    source_surface = reloaded_evaluation["source_surface_fingerprints"]
+    assert semantic_atoms == source_surface
+    assert semantic_atoms is not source_surface
+
+    semantic_atoms["MUTATED"] = "SAF-" + "f" * 64
+    assert "MUTATED" not in source_surface
+
+
+def test_yaml_serialization_compaction_scales_with_repeated_fanout() -> None:
+    for atom_count in (8, 64, 128):
+        fingerprints = {
+            f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+            for index in range(atom_count)
+        }
+        one_edge = {
+            "edges": [
+                {
+                    "source_surface_fingerprints": copy.deepcopy(fingerprints),
+                }
+            ]
+        }
+        many_edges = {
+            "edges": [
+                {
+                    "source_surface_fingerprints": copy.deepcopy(fingerprints),
+                }
+                for _ in range(32)
+            ]
+        }
+
+        one_naive = yaml.safe_dump(
+            one_edge,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        many_naive = yaml.safe_dump(
+            many_edges,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        one_compact = yaml.safe_dump(
+            _yaml_serialization_projection(one_edge),
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        many_compact = yaml.safe_dump(
+            _yaml_serialization_projection(many_edges),
+            sort_keys=False,
+            allow_unicode=True,
+        )
+
+        assert yaml.safe_load(many_compact) == many_edges
+        naive_growth = len(many_naive) - len(one_naive)
+        compact_growth = len(many_compact) - len(one_compact)
+        assert compact_growth * 8 < naive_growth, (
+            atom_count,
+            compact_growth,
+            naive_growth,
+        )
+
+
+def test_yaml_serialization_compaction_scales_with_lifecycle_provider_count() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(64)
+    }
+
+    def lifecycle_shape(provider_count: int) -> dict[str, object]:
+        return {
+            "lifecycle": {
+                "providers": [
+                    {
+                        "artifact": f"ARTIFACT-{index:03d}",
+                        "capability": f"demo.capability.{index:03d}",
+                        "accepted_prerequisite_semantics": {
+                            "demo.upstream": {
+                                "semantic_atoms": copy.deepcopy(fingerprints),
+                                "source_surface_fingerprints": copy.deepcopy(
+                                    fingerprints
+                                ),
+                            }
+                        },
+                    }
+                    for index in range(provider_count)
+                ]
+            }
+        }
+
+    one_provider = lifecycle_shape(1)
+    many_providers = lifecycle_shape(24)
+    one_naive = yaml.safe_dump(
+        one_provider,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    many_naive = yaml.safe_dump(
+        many_providers,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    one_compact = yaml.safe_dump(
+        _yaml_serialization_projection(one_provider),
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    many_compact = yaml.safe_dump(
+        _yaml_serialization_projection(many_providers),
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+    assert yaml.safe_load(many_compact) == many_providers
+    naive_growth = len(many_naive) - len(one_naive)
+    compact_growth = len(many_compact) - len(one_compact)
+    assert compact_growth * 8 < naive_growth, (
+        compact_growth,
+        naive_growth,
+    )
+
+
 def main() -> int:
     test_yaml_serialization_deduplicates_fingerprint_maps_losslessly()
+    test_yaml_serialization_does_not_alias_unrelated_equal_mappings()
+    test_publish_project_publication_writes_compact_lossless_yaml()
+    test_read_project_publication_detaches_yaml_alias_identity()
+    test_yaml_serialization_compaction_scales_with_repeated_fanout()
+    test_yaml_serialization_compaction_scales_with_lifecycle_provider_count()
     test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
     test_reconciliation_publication_batches_terminal_outcomes()

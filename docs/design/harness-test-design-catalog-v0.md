@@ -1979,7 +1979,12 @@ produces one coherent result.
 **Oracle:** O1 for the mechanism; O2 for the Prep observation  
 **Status:** PARTIAL
 
-**Evidence:** `tests/test_project_publication.py::test_yaml_serialization_deduplicates_fingerprint_maps_losslessly`;
+**Evidence:** `tests/test_project_publication.py::test_yaml_serialization_deduplicates_fingerprint_maps_losslessly`,
+`tests/test_project_publication.py::test_yaml_serialization_does_not_alias_unrelated_equal_mappings`,
+`tests/test_project_publication.py::test_publish_project_publication_writes_compact_lossless_yaml`,
+`tests/test_project_publication.py::test_read_project_publication_detaches_yaml_alias_identity`,
+`tests/test_project_publication.py::test_yaml_serialization_compaction_scales_with_repeated_fanout`,
+`tests/test_project_publication.py::test_yaml_serialization_compaction_scales_with_lifecycle_provider_count`;
 Prep revision `5efa07ffb701595edd2e6b29e7f92625873659e5` measurements captured
 under EVO-032.
 
@@ -2002,7 +2007,6 @@ Expected result:
 
 Remaining evidence:
 
-- generated fan-out/cardinality benchmark across the independent dimensions;
 - load/dump and diff/churn comparison against normalized/content-addressed
   persistence. The frozen Prep byte-size comparison already favors v1 YAML
   interning (~493 KB) over the reference projection (~523 KB), so size alone
