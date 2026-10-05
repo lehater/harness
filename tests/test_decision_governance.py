@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from unittest.mock import patch
 from pathlib import Path
 import sys
 import yaml
@@ -506,6 +507,29 @@ def main() -> int:
     assert not_determined["status"] == "REJECTED", not_determined
     assert "DECISION_NOT_DETERMINED" in codes(not_determined), not_determined
     assert "acceptance_id" not in not_determined, not_determined
+
+    # Admission must short-circuit on deterministic decision rejection instead
+    # of running the more expensive artifact semantic evaluation first.
+    with patch(
+        "harness.application.semantic_admission.evaluate_artifact",
+        side_effect=AssertionError(
+            "artifact semantics must not run before rejected decision preflight"
+        ),
+    ):
+        early_rejection = admit(
+            registry=registry,
+            semantic_contracts=semantic_contracts,
+            decision_contracts=decision_contracts,
+            policy=broad_policy,
+            candidate_value=candidate(
+                contract,
+                runtime_disposition="DETERMINED",
+            ),
+            exploration_value=valid_exploration,
+            acceptance_id="ARCH-PREFLIGHT-FIRST",
+        )
+    assert early_rejection["status"] == "REJECTED", early_rejection
+    assert "DECISION_NOT_DETERMINED" in codes(early_rejection), early_rejection
 
     conservative_exploration = bind_exploration(
         contract,

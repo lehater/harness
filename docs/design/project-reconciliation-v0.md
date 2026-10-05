@@ -65,20 +65,34 @@ changes and the caller must use the new plan instead of applying stale work.
 This provides bounded restartability without a workflow engine or second source
 of truth.
 
-## Execution direction
+## Bounded execution
 
-A later execution slice may process deterministic work in plan order, stopping
-only where candidate/evidence/Authority input is required. Intermediate results remain non-current. Publication occurs once after a
-coherent final state has been assembled and validated against the original
-current revision.
+`harness.application.reconciliation.execute_reconciliation` processes the
+planned affected set in dependency order while continuing across independent
+branches. It reuses the current Project Publication as the immutable base and
+keeps all intermediate evaluation/lifecycle updates non-current.
 
-`prepare_reconciliation_publication` is the batch publication primitive. It
-validates all supplied terminal Capability outcomes against one final snapshot
-and creates at most one child revision of the current publication. It does not
-chain hidden per-Capability publications.
+The v0 executor is deliberately narrow:
 
-No executor may synthesize `acceptance_id`; successful re-admission must carry
-a real caller/admission identity.
+- it may re/admit only providers already present in the Core model;
+- callers must supply real `sources`, `candidate` and `acceptance_id` inputs;
+- it does not create canonical artifacts or change Engineering Graph topology;
+- it does not invent Authority decisions, semantic evidence or acceptance ids;
+- independent validation failures are aggregated in one result;
+- dependent work waits when an affected prerequisite did not complete;
+- no durable workflow/continuation state is created.
+
+`prepare_reconciliation_publication` is the batch publication primitive. The
+executor invokes it only after final Semantic Closure is COMPLETE and no
+blockers, failures, gaps or external actions remain. It validates all completed
+Capability outcomes against one final snapshot and creates at most one child
+revision of the original current publication. It never chains hidden
+per-Capability publications.
+
+A retry recomputes/uses a plan bound to the same publication revision. The
+optional supplied resume token must match that plan. If the current publication
+changed, CAS/plan validation rejects the stale continuation and the caller must
+re-plan.
 
 ## Completion UX
 
@@ -92,3 +106,12 @@ Consumer-facing reconciliation output must keep these independent facts visible:
 
 Structural COMPLETE therefore remains structural completeness and cannot be
 mistaken for semantic closure.
+
+
+## Consumer operation
+
+The public routed operation is `project-reconcile`. It applies to an existing,
+usable Project Publication and a selected Consumer target. Startup,
+compatibility/bootstrap repair remains owned by `project-bootstrap-reconcile`;
+provider creation or topology changes remain in their existing production and
+decision procedures rather than being absorbed into reconciliation.

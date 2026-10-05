@@ -437,6 +437,34 @@ def _accepted_prerequisite_semantics(
     return result
 
 
+
+def _decision_preflight_rejection_evaluation(
+    semantic_contract: dict[str, Any],
+    candidate: dict[str, Any],
+) -> dict[str, Any]:
+    """Return the semantic-evaluation envelope without running artifact review."""
+    expected = [
+        item["id"]
+        for item in semantic_contract.get("obligations", []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item["id"]
+    ]
+    return {
+        "version": 1,
+        "kind": "harness-artifact-semantic-evaluation",
+        "artifact": candidate.get("id"),
+        "capability": candidate.get("capability"),
+        "status": "REJECTED",
+        "obligations": {
+            "expected": expected,
+            "satisfied": [],
+            "dispositions": [],
+        },
+        "findings": [],
+        "semantic_claims": {"accepted": []},
+    }
+
 def admit_artifact(
     *,
     graph: dict[str, Any],
@@ -658,7 +686,6 @@ def admit_artifact(
         current_provider_baseline=current_provider_baseline,
     )
 
-    evaluation = evaluate_artifact(semantic_contract, sources, candidate)
     preflight = evaluate_decision_preflight(
         contract=decision_contract,
         policy=decision_policy,
@@ -674,21 +701,24 @@ def admit_artifact(
     exploration_evaluation = preflight["decision_exploration"]
     execution_evaluation = preflight["decision_execution_assurance"]
     decision_evaluation = preflight["decision_governance"]
+
+    # Decision evidence is cheaper than artifact semantic review. A rejected
+    # deterministic preflight therefore stops before evaluate_artifact rather
+    # than discovering the same blocker after the expensive boundary.
+    if preflight["status"] == "REJECTED":
+        evaluation = _decision_preflight_rejection_evaluation(
+            semantic_contract,
+            candidate,
+        )
+    else:
+        evaluation = evaluate_artifact(semantic_contract, sources, candidate)
+
     if exploration_evaluation["status"] != "NOT_REQUIRED":
         evaluation["decision_exploration"] = exploration_evaluation
         evaluation["decision_execution_assurance"] = execution_evaluation
         evaluation["decision_governance"] = decision_evaluation
-        if (
-            exploration_evaluation["status"] != "ACCEPTED"
-            or execution_evaluation["status"] != "ACCEPTED"
-            or decision_evaluation["status"] != "ACCEPTED"
-        ):
-            evaluation["status"] = "REJECTED"
-            evaluation["findings"].extend(
-                exploration_evaluation["findings"]
-            )
-            evaluation["findings"].extend(execution_evaluation["findings"])
-            evaluation["findings"].extend(decision_evaluation["findings"])
+        if preflight["status"] == "REJECTED":
+            evaluation["findings"].extend(preflight["findings"])
             evaluation["semantic_claims"]["accepted"] = []
 
     evaluation["question_proposals"] = (

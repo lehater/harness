@@ -11,6 +11,11 @@ routes:
     exposure: public
     trigger: project-start-or-reconcile
 
+  - operation: project-reconcile
+    skill: skills/agent/project-reconcile/SKILL.md
+    exposure: public
+    trigger: project-target-reconciliation-requested
+
   - operation: project-engineering-status
     skill: skills/agent/project-engineering-status/SKILL.md
     exposure: public

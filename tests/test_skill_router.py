@@ -63,6 +63,15 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
     assert status["exposure"] == "public"
     _assert_instruction_contract(status, root)
 
+    reconcile = route_operation(
+        surface="consumer",
+        operation="project-reconcile",
+        root=root,
+    )
+    assert reconcile["skill"] == "skills/agent/project-reconcile/SKILL.md"
+    assert reconcile["exposure"] == "public"
+    _assert_instruction_contract(reconcile, root)
+
     _expect_error(
         lambda: route_operation(
             surface="consumer",

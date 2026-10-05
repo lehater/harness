@@ -22,6 +22,18 @@ steps:
         value: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
       - {path: /exposure, op: equals, value: public}
 
+  - id: project-reconciliation-operation
+    driver: skill.operation
+    with:
+      surface: consumer
+      operation: project-reconcile
+    expect:
+      - path: /instruction_contracts
+        op: equals
+        value: [docs/design/agent-instruction-architecture-v0.md, docs/design/process-simplicity-and-efficiency-v0.md]
+      - {path: /exposure, op: equals, value: public}
+      - {path: /skill, op: equals, value: skills/agent/project-reconcile/SKILL.md}
+
   - id: authorized-internal-operation
     driver: skill.operation
     with:

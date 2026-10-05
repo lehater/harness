@@ -99,6 +99,8 @@ required_drivers:
   - graph.doctor
   - project.authority_bootstrap
   - project.frontier
+  - project.reconciliation.plan
+  - project.reconciliation.execute
   - publication.build
   - publication.transition
   - publication.validate
@@ -376,6 +378,12 @@ requirements:
     category: routing
     enforcement: required
     description: Application orchestration composes decision, semantic and coverage read models into one unambiguous next-action frontier and distinguishes COMPLETE/BLOCKED/WAITING/INCOMPLETE.
+    min_scenarios: 1
+
+  - id: project-reconciliation-bounded-execution
+    category: integration
+    enforcement: required
+    description: Reconciliation reuses unaffected current state, requires caller-owned semantic acceptance inputs, and exposes at most one coherent CAS publication after final semantic closure.
     min_scenarios: 1
 
   - id: capability-publication-atomicity

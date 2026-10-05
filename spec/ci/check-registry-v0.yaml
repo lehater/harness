@@ -442,6 +442,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: project_reconciliation
+  command: python tests/test_reconciliation.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: project_publication
   command: python tests/test_project_publication.py
   stage: focused

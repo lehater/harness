@@ -78,6 +78,7 @@ harness-check:
 	python tests/test_decision_governance.py
 	python tests/test_decision_pipeline.py
 	python tests/test_project_frontier.py
+	python tests/test_reconciliation.py
 	python tests/test_project_publication.py
 	python tests/test_semantic_admission.py
 	python tests/test_semantic_question_loop.py

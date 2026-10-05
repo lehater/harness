@@ -35,6 +35,7 @@ REPRESENTATIVE_SCENARIOS = (
     "create-work-routing.yaml",
     "workspace-managed.yaml",
     "semantic-gap-question.yaml",
+    "project-reconciliation.yaml",
 )
 REPRESENTATIVE_MODULES = (
     "harness.project_model.core",
@@ -46,6 +47,7 @@ REPRESENTATIVE_MODULES = (
     "harness.workspace.application_process_bpmn_projection",
     "harness.evidence.source_coverage",
     "harness.application.project_frontier",
+    "harness.application.reconciliation",
     "harness.application.ui_design_convergence",
 )
 
@@ -109,6 +111,7 @@ names = (
     "create-work-routing.yaml",
     "workspace-managed.yaml",
     "semantic-gap-question.yaml",
+    "project-reconciliation.yaml",
 )
 root = Path("spec/scenario-suite/scenarios")
 for name in names:
@@ -143,6 +146,29 @@ for name in names:
     )
     assert json.loads(cli.stdout)["skill"] == (
         "skills/agent/project-engineering-status/SKILL.md"
+    )
+
+    reconcile_cli = subprocess.run(
+        [
+            str(python),
+            "-m",
+            "harness.application.skill_router",
+            "operation",
+            "--surface",
+            "consumer",
+            "--operation",
+            "project-reconcile",
+            "--root",
+            str(pack),
+        ],
+        cwd=pack,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert json.loads(reconcile_cli.stdout)["skill"] == (
+        "skills/agent/project-reconcile/SKILL.md"
     )
 
     validated = subprocess.run(
