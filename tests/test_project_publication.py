@@ -467,8 +467,126 @@ def test_yaml_serialization_deduplicates_fingerprint_maps_losslessly() -> None:
     assert yaml.safe_load(compact) == publication
 
 
+def test_yaml_serialization_does_not_alias_unrelated_equal_mappings() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(16)
+    }
+    publication = {
+        "fingerprint": {
+            "semantic_atom_fingerprints": copy.deepcopy(fingerprints),
+        },
+        "unrelated_a": {"payload": copy.deepcopy(fingerprints)},
+        "unrelated_b": {"payload": copy.deepcopy(fingerprints)},
+    }
+
+    projection = _yaml_serialization_projection(publication)
+
+    assert projection == publication
+    assert (
+        projection["unrelated_a"]["payload"]
+        is not projection["unrelated_b"]["payload"]
+    )
+
+
+def test_publish_project_publication_writes_compact_lossless_yaml() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(64)
+    }
+    evaluations = copy.deepcopy(CURRENT_EVALUATIONS)
+    evaluation = evaluations["semantic_evaluations"][0]
+    evaluation["semantic_atom_fingerprints"] = copy.deepcopy(fingerprints)
+    evaluation["source_surface_fingerprints"] = copy.deepcopy(fingerprints)
+
+    publication = build_project_publication(
+        graph=GRAPH,
+        core_model=CURRENT_CORE,
+        semantic_evaluations=evaluations,
+        lifecycle=CURRENT_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+    naive = yaml.safe_dump(
+        publication,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="project-publication-compact-") as temp_dir:
+        path = Path(temp_dir) / "project-publication.yaml"
+        publish_project_publication(
+            path,
+            graph=GRAPH,
+            publication=publication,
+            expected_revision=None,
+        )
+
+        raw = path.read_text(encoding="utf-8")
+        reloaded = read_project_publication(path, graph=GRAPH)
+
+    assert len(raw) < len(naive), (len(raw), len(naive))
+    assert "&id" in raw, raw
+    assert "*id" in raw, raw
+    assert reloaded == publication
+    assert reloaded["revision"] == publication["revision"]
+
+
+def test_yaml_serialization_compaction_scales_with_repeated_fanout() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(96)
+    }
+    one_edge = {
+        "edges": [
+            {
+                "source_surface_fingerprints": copy.deepcopy(fingerprints),
+            }
+        ]
+    }
+    many_edges = {
+        "edges": [
+            {
+                "source_surface_fingerprints": copy.deepcopy(fingerprints),
+            }
+            for _ in range(32)
+        ]
+    }
+
+    one_naive = yaml.safe_dump(
+        one_edge,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    many_naive = yaml.safe_dump(
+        many_edges,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    one_compact = yaml.safe_dump(
+        _yaml_serialization_projection(one_edge),
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    many_compact = yaml.safe_dump(
+        _yaml_serialization_projection(many_edges),
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+    assert yaml.safe_load(many_compact) == many_edges
+    naive_growth = len(many_naive) - len(one_naive)
+    compact_growth = len(many_compact) - len(one_compact)
+    assert compact_growth * 8 < naive_growth, (
+        compact_growth,
+        naive_growth,
+    )
+
+
 def main() -> int:
     test_yaml_serialization_deduplicates_fingerprint_maps_losslessly()
+    test_yaml_serialization_does_not_alias_unrelated_equal_mappings()
+    test_publish_project_publication_writes_compact_lossless_yaml()
+    test_yaml_serialization_compaction_scales_with_repeated_fanout()
     test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
     test_reconciliation_publication_batches_terminal_outcomes()
