@@ -3,13 +3,12 @@ Status: canonical global constraint.
 
 ## Normative rule
 
-When procedures preserve the same guarantees, require the simpler one: fewer
-steps, artifacts, round trips, persisted state, recomputation and coordination.
-Target **minimum sufficient process**, not minimum validation.
+For equal guarantees, require the simpler process: fewer steps, artifacts,
+round trips, persisted state and repeated work. Use **minimum sufficient
+process**, not minimum validation.
 
 Validate at the cheapest sufficient layer; reuse unchanged CURRENT state;
-evaluate affected closure; aggregate independent blockers; keep intermediate
-state non-current.
+evaluate affected closure; aggregate independent blockers.
 
 CI is a verification boundary, not an interactive exploration mechanism.
 Repeated generic project glue belongs in Harness.
