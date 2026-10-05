@@ -14,6 +14,7 @@ from harness.project_model.core import CoreError
 from harness.application.project_publication import (
     build_project_publication,
     prepare_capability_transition,
+    prepare_reconciliation_publication,
     publish_project_publication,
     read_project_publication,
     validate_project_publication,
@@ -257,6 +258,138 @@ def test_capability_blocker_granularity() -> None:
     assert current["state"]["lifecycle"]["providers"][0]["capability"] == "product.intent"
 
 
+def test_reconciliation_publication_batches_terminal_outcomes() -> None:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "BATCH-PUBLICATION",
+        "authorities": [
+            {
+                "id": "PRODUCT",
+                "responsibility": "Own product knowledge.",
+                "boundary": {
+                    "semantic_cohesion": "Product knowledge.",
+                    "independent_change": "Product knowledge changes.",
+                    "public_contract": "Accepted product knowledge.",
+                },
+                "produces": [
+                    {
+                        "capability": "demo.one",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                    {
+                        "capability": "demo.two",
+                        "knowledge_kind": "product-requirements",
+                        "requires": [],
+                    },
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "TARGET",
+                "purpose": "Consume both.",
+                "requires": ["demo.one", "demo.two"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    initial = build_project_publication(
+        graph=graph,
+        core_model=EMPTY_CORE,
+        semantic_evaluations=EMPTY_EVALUATIONS,
+        lifecycle=EMPTY_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+    core = {
+        "artifacts": [
+            {
+                "id": "PRODUCT",
+                "authority": "PRODUCT",
+                "path": "docs/product.yaml",
+                "provides": ["demo.one", "demo.two"],
+                "depends_on": [],
+            }
+        ],
+        "questions": [],
+    }
+    evaluations = {
+        "version": 1,
+        "kind": "harness-semantic-evaluation-set",
+        "semantic_evaluations": [
+            {
+                "version": 1,
+                "kind": "harness-artifact-semantic-evaluation",
+                "artifact": "PRODUCT",
+                "capability": capability,
+                "status": "ACCEPTED",
+                "obligations": {
+                    "expected": [],
+                    "satisfied": [],
+                    "dispositions": [],
+                },
+                "findings": [],
+                "semantic_claims": {"accepted": []},
+                "admission": {
+                    "status": "ACCEPTED",
+                    "acceptance_id": acceptance_id,
+                },
+            }
+            for capability, acceptance_id in (
+                ("demo.one", "ONE-1"),
+                ("demo.two", "TWO-1"),
+            )
+        ],
+    }
+    lifecycle = {
+        "version": 1,
+        "kind": "harness-capability-lifecycle",
+        "providers": [
+            {
+                "artifact": "PRODUCT",
+                "capability": capability,
+                "acceptance_id": acceptance_id,
+                "accepted_prerequisites": {},
+            }
+            for capability, acceptance_id in (
+                ("demo.one", "ONE-1"),
+                ("demo.two", "TWO-1"),
+            )
+        ],
+    }
+
+    result = prepare_reconciliation_publication(
+        graph=graph,
+        current_publication=initial,
+        expected_revision=initial["revision"],
+        outcomes={"demo.one": "CURRENT", "demo.two": "CURRENT"},
+        core_model=core,
+        semantic_evaluations=evaluations,
+        lifecycle=lifecycle,
+        decision_failures=EMPTY_FAILURES,
+    )
+    assert result["parent_revision"] == initial["revision"], result
+    assert result["revision"] != initial["revision"], result
+    assert {
+        item["capability"] for item in result["state"]["lifecycle"]["providers"]
+    } == {"demo.one", "demo.two"}, result
+
+    expect_core_error(
+        lambda: prepare_reconciliation_publication(
+            graph=graph,
+            current_publication=result,
+            expected_revision=initial["revision"],
+            outcomes={"demo.one": "CURRENT", "demo.two": "CURRENT"},
+            core_model=core,
+            semantic_evaluations=evaluations,
+            lifecycle=lifecycle,
+            decision_failures=EMPTY_FAILURES,
+        ),
+        "compare-and-swap failed",
+    )
+
+
 def test_semantic_snapshot_currentness() -> None:
     duplicate_derivation_snapshot = {
         "version": 1,
@@ -296,6 +429,7 @@ def test_semantic_snapshot_currentness() -> None:
 def main() -> int:
     test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
+    test_reconciliation_publication_batches_terminal_outcomes()
     initial = build_project_publication(
         graph=GRAPH,
         core_model=EMPTY_CORE,

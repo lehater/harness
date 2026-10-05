@@ -1316,9 +1316,9 @@ GREENFIELD_WORKFLOW = (
     ROOT / ".github" / "workflows" / "greenfield-bootstrap-assurance.yml"
 )
 greenfield_workflow_text = GREENFIELD_WORKFLOW.read_text(encoding="utf-8")
-assert "ready_for_review" in greenfield_workflow_text
 assert "workflow_dispatch" in greenfield_workflow_text
-assert "spec/behavioral-evals/greenfield-bootstrap/**" in greenfield_workflow_text
+assert "pull_request:" not in greenfield_workflow_text
+assert "ready_for_review" not in greenfield_workflow_text
 assert 'MODEL="auto"' in greenfield_workflow_text
 assert 'MODEL_SELECTION="provider-auto"' in greenfield_workflow_text
 

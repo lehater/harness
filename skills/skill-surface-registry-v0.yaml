@@ -55,6 +55,12 @@ skills:
     route_class: operation
     lifecycle: active
     route_status: routed
+  - id: project-reconcile
+    path: skills/agent/project-reconcile/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: routed
   - id: project-engineering-status
     path: skills/agent/project-engineering-status/SKILL.md
     surface: consumer

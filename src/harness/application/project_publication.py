@@ -44,6 +44,7 @@ __all__ = ['Any',
  'lifecycle_index',
  'os',
  'prepare_capability_transition',
+ 'prepare_reconciliation_publication',
  'publish_project_publication',
  'read_project_publication',
  'tempfile',
@@ -440,6 +441,72 @@ def prepare_capability_transition(
         outcome=outcome,
     )
     return next_publication
+
+
+def prepare_reconciliation_publication(
+    *,
+    graph: dict[str, Any],
+    current_publication: dict[str, Any],
+    expected_revision: str,
+    outcomes: dict[str, str],
+    core_model: dict[str, Any],
+    semantic_evaluations: dict[str, Any],
+    lifecycle: dict[str, Any],
+    decision_failures: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Prepare one atomic publication for several terminal Capability outcomes.
+
+    This is the batch publication boundary used by reconciliation. It validates
+    every terminal outcome against one coherent final snapshot and creates at
+    most one child revision of the current publication.
+    """
+    validate_project_publication(graph, current_publication)
+    current_revision = current_publication["revision"]
+    if expected_revision != current_revision:
+        raise CoreError(
+            f"project publication compare-and-swap failed: expected "
+            f"{expected_revision}, current {current_revision}"
+        )
+    if (
+        not isinstance(outcomes, dict)
+        or not outcomes
+        or any(
+            not isinstance(capability, str)
+            or not capability
+            or outcome not in OUTCOMES
+            for capability, outcome in outcomes.items()
+        )
+    ):
+        raise CoreError(
+            "reconciliation publication requires capability terminal outcomes"
+        )
+
+    next_state = _state(
+        core_model=core_model,
+        semantic_evaluations=semantic_evaluations,
+        lifecycle=lifecycle,
+        decision_failures=decision_failures,
+    )
+    if next_state == current_publication["state"]:
+        candidate = copy.deepcopy(current_publication)
+    else:
+        candidate = {
+            "version": PUBLICATION_VERSION,
+            "kind": PUBLICATION_KIND,
+            "revision": _revision(current_revision, next_state),
+            "parent_revision": current_revision,
+            "state": next_state,
+        }
+
+    validate_project_publication(graph, candidate)
+    for capability, outcome in sorted(outcomes.items()):
+        _validate_terminal_outcome(
+            graph=graph,
+            publication=candidate,
+            capability=capability,
+            outcome=outcome,
+        )
+    return candidate
 
 
 def read_project_publication(

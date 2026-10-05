@@ -54,6 +54,15 @@ cases:
       operation: project-engineering-status
     expect_skill: skills/agent/project-engineering-status/SKILL.md
 
+  - id: consumer-reconcile-current-target
+    environment: consumer-pack
+    prompt_example: "Bring the current project target back to semantic closure after accepted knowledge changed."
+    route:
+      class: operation
+      surface: consumer
+      operation: project-reconcile
+    expect_skill: skills/agent/project-reconcile/SKILL.md
+
   - id: consumer-method-from-concern
     environment: consumer-pack
     prompt_example: "Analyze retry/idempotency reliability."

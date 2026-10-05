@@ -32,6 +32,10 @@ from harness.workspace.human_projection import compile_manifest
 from harness.integration.integration_alignment import validate_project_alignment
 from harness.project_model.core import resolve_question, validate_model
 from harness.application.project_frontier import compose_project_frontier
+from harness.application.reconciliation import (
+    execute_reconciliation,
+    plan_reconciliation,
+)
 from harness.application.project_publication import (
     build_project_publication,
     prepare_capability_transition,
@@ -322,6 +326,16 @@ def project_authority_bootstrap(
 @scenario_driver("project.frontier")
 def project_frontier_driver(**kwargs: Any) -> dict[str, Any]:
     return compose_project_frontier(**kwargs)
+
+
+@scenario_driver("project.reconciliation.plan")
+def project_reconciliation_plan_driver(**kwargs: Any) -> dict[str, Any]:
+    return plan_reconciliation(**kwargs)
+
+
+@scenario_driver("project.reconciliation.execute")
+def project_reconciliation_execute_driver(**kwargs: Any) -> dict[str, Any]:
+    return execute_reconciliation(**kwargs)
 
 
 @scenario_driver("publication.build")

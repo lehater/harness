@@ -79,7 +79,8 @@ def main() -> int:
     assert cli_route["surface"] == "consumer", cli_route
     assert cli_route["route_class"] == "method", cli_route
     assert cli_route["instruction_contracts"] == [
-        "docs/design/agent-instruction-architecture-v0.md"
+        "docs/design/agent-instruction-architecture-v0.md",
+        "docs/design/process-simplicity-and-efficiency-v0.md",
     ], cli_route
 
     duplicate = copy.deepcopy(registry)

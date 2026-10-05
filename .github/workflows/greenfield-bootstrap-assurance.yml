@@ -1,15 +1,6 @@
 name: greenfield bootstrap assurance
 
 on:
-  pull_request:
-    types: [ready_for_review]
-    paths:
-      - "spec/behavioral-evals/greenfield-bootstrap/**"
-      - "evals/greenfield_bootstrap_eval.py"
-      - "evals/adapters/copilot_greenfield_bootstrap_eval_agent.py"
-      - "evals/behavioral_eval.py"
-      - "evals/adapters/copilot_behavioral_eval_agent.py"
-      - ".github/workflows/greenfield-bootstrap-assurance.yml"
   workflow_dispatch:
 
 permissions:

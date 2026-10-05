@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from harness.project_model.core import CoreError
 from harness.application.project_frontier import compose_project_frontier
+from harness.application.reconciliation import plan_reconciliation
 
 
 def decision(status: str, **extra):
@@ -191,8 +192,140 @@ def test_cross_layer_precedence_matrix() -> None:
         assert result["status"] != "COMPLETE", result
 
 
+def test_reconciliation_plan_reuses_unaffected_and_expands_stale_closure() -> None:
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "RECONCILIATION",
+        "authorities": [
+            {
+                "id": "A",
+                "responsibility": "Own A.",
+                "boundary": {
+                    "semantic_cohesion": "A.",
+                    "independent_change": "A changes.",
+                    "public_contract": "A.",
+                },
+                "produces": [
+                    {"capability": "a", "knowledge_kind": "user-needs", "requires": []}
+                ],
+            },
+            {
+                "id": "B",
+                "responsibility": "Own B.",
+                "boundary": {
+                    "semantic_cohesion": "B.",
+                    "independent_change": "B changes.",
+                    "public_contract": "B.",
+                },
+                "produces": [
+                    {"capability": "b", "knowledge_kind": "product-requirements", "requires": ["a"]}
+                ],
+            },
+            {
+                "id": "X",
+                "responsibility": "Own X.",
+                "boundary": {
+                    "semantic_cohesion": "X.",
+                    "independent_change": "X changes.",
+                    "public_contract": "X.",
+                },
+                "produces": [
+                    {"capability": "x", "knowledge_kind": "user-needs", "requires": []}
+                ],
+            },
+        ],
+        "consumers": [
+            {"id": "TARGET", "purpose": "Consume B and X.", "requires": ["b", "x"]}
+        ],
+        "terminal_capabilities": [],
+    }
+    frontier = {
+        "version": 1,
+        "kind": "harness-project-frontier",
+        "target": "TARGET",
+        "status": "READY",
+        "next_actions": [
+            {
+                "source": "DECISION_ROADMAP",
+                "action": "RUN_CAPABILITY_PIPELINE",
+                "capability": "a",
+                "reason": "REVISE_NONCURRENT_PROVIDER",
+            }
+        ],
+        "failed_validation": [],
+        "blocked": [
+            {"source": "DECISION_ROADMAP", "capability": "q1", "questions": ["Q1"]},
+            {"source": "DECISION_ROADMAP", "capability": "q2", "questions": ["Q2"]},
+        ],
+        "waiting": [],
+        "gaps": [],
+        "source_status": {
+            "decision": "READY",
+            "semantic": "INCOMPLETE",
+            "structural": "COMPLETE",
+            "coverage_completion_ready": True,
+        },
+    }
+    closure = {
+        "version": 1,
+        "kind": "harness-semantic-closure-evaluation",
+        "target": "TARGET",
+        "status": "INCOMPLETE",
+        "structural_status": "COMPLETE",
+        "semantic_gaps": [],
+        "currentness_gaps": [
+            {"capability": "a", "state": "STALE", "details": {"state": "STALE"}},
+            {"capability": "b", "state": "STALE", "details": {"state": "STALE"}},
+        ],
+        "question_frontier": [],
+        "revalidate": [{"capability": "a"}],
+        "pending": [{"capability": "b"}],
+        "satisfied_capabilities": ["x"],
+    }
+
+    first = plan_reconciliation(
+        graph=graph,
+        target="TARGET",
+        current_publication_revision="sha256:publication-1",
+        project_frontier=frontier,
+        semantic_closure=closure,
+    )
+    assert first["status"] == "READY", first
+    assert first["closure"] == {
+        "structural": "COMPLETE",
+        "semantic": "INCOMPLETE",
+    }, first
+    assert first["affected"] == ["a", "b"], first
+    assert first["unchanged"] == ["x"], first
+    assert [item["capability"] for item in first["work"]] == ["a", "b"], first
+    assert len(first["blocked"]) == 2, first
+
+    repeated = plan_reconciliation(
+        graph=graph,
+        target="TARGET",
+        current_publication_revision="sha256:publication-1",
+        project_frontier=frontier,
+        semantic_closure=closure,
+    )
+    assert repeated["resume_token"] == first["resume_token"], (first, repeated)
+
+    changed_publication = plan_reconciliation(
+        graph=graph,
+        target="TARGET",
+        current_publication_revision="sha256:publication-2",
+        project_frontier=frontier,
+        semantic_closure=closure,
+    )
+    assert changed_publication["resume_token"] != first["resume_token"], (
+        first,
+        changed_publication,
+    )
+
+
 def main() -> int:
     test_cross_layer_precedence_matrix()
+    test_reconciliation_plan_reuses_unaffected_and_expands_stale_closure()
     complete = compose_project_frontier(
         target="IMPLEMENTATION",
         decision_roadmap=decision("COMPLETE"),
@@ -239,7 +372,8 @@ def main() -> int:
                     "capabilities": ["demo.architecture"],
                     "skill": "skills/artifacts/system-architecture/SKILL.md",
                     "instruction_contracts": [
-                        "docs/design/agent-instruction-architecture-v0.md"
+                        "docs/design/agent-instruction-architecture-v0.md",
+                        "docs/design/process-simplicity-and-efficiency-v0.md",
                     ],
                 }
             ],
@@ -255,7 +389,8 @@ def main() -> int:
     assert capability["action"] == "RUN_CAPABILITY_PIPELINE", capability
     assert capability["execution_route"]["status"] == "ROUTED", capability
     assert capability["execution_route"]["instruction_contracts"] == [
-        "docs/design/agent-instruction-architecture-v0.md"
+        "docs/design/agent-instruction-architecture-v0.md",
+        "docs/design/process-simplicity-and-efficiency-v0.md",
     ], capability
     assert capability["coverage_requirements"][0]["concerns"] == [
         "architecture.structure"

@@ -41,25 +41,50 @@ def _mapping(value: Any, label: str) -> dict[str, Any]:
     return value
 
 
+def _trusted_instruction(raw: str) -> dict[str, str]:
+    if not isinstance(raw, str) or not raw:
+        raise ValueError("trusted instruction path must be a non-empty string")
+    if any(part in raw for part in FORBIDDEN_INSTRUCTION_PATH_PARTS):
+        raise ValueError(f"evaluation/test artifact cannot be a trusted instruction: {raw}")
+    path = (ROOT / raw).resolve()
+    try:
+        path.relative_to(ROOT.resolve())
+    except ValueError as exc:
+        raise ValueError(f"trusted instruction escapes repository: {raw}") from exc
+    if not path.is_file():
+        raise ValueError(f"trusted instruction missing: {raw}")
+    return {"path": raw, "content": path.read_text(encoding="utf-8")}
+
+
 def _trusted_instruction_bundle(request: dict[str, Any]) -> list[dict[str, str]]:
     paths = request.get("trusted_instruction_entrypoint")
     if not isinstance(paths, list) or not paths:
         raise ValueError("trusted_instruction_entrypoint must be a non-empty list")
-    bundle: list[dict[str, str]] = []
-    for raw in paths:
-        if not isinstance(raw, str) or not raw:
-            raise ValueError("trusted instruction path must be a non-empty string")
-        if any(part in raw for part in FORBIDDEN_INSTRUCTION_PATH_PARTS):
-            raise ValueError(f"evaluation/test artifact cannot be a trusted instruction: {raw}")
-        path = (ROOT / raw).resolve()
-        try:
-            path.relative_to(ROOT.resolve())
-        except ValueError as exc:
-            raise ValueError(f"trusted instruction escapes repository: {raw}") from exc
-        if not path.is_file():
-            raise ValueError(f"trusted instruction missing: {raw}")
-        bundle.append({"path": raw, "content": path.read_text(encoding="utf-8")})
-    return bundle
+    return [_trusted_instruction(raw) for raw in paths]
+
+
+def _with_registered_instruction_contracts(
+    bundle: list[dict[str, str]],
+    routes: dict[str, dict[str, Any]],
+) -> list[dict[str, str]]:
+    """Add router-owned global contracts without duplicating them in every case.
+
+    Behavioral fixtures still explicitly select operation skills and other
+    case-specific trusted inputs. The router is the semantic owner of global
+    instruction contracts, so those contracts are loaded from the resolved
+    operation routes rather than copied into every fixture.
+    """
+    result = list(bundle)
+    existing = {item["path"] for item in result}
+    required = {
+        path
+        for route in routes.values()
+        for path in route.get("instruction_contracts", []) or []
+        if isinstance(path, str) and path
+    }
+    for raw in sorted(required - existing):
+        result.append(_trusted_instruction(raw))
+    return result
 
 
 def _public_operations() -> list[str]:
@@ -222,11 +247,18 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("execution_context must be a mapping")
     phase = execution_context.get("phase", "bootstrap")
     trusted_instructions = _trusted_instruction_bundle(request)
-    if dimension == "bootstrap_realization" and phase == "reconcile-existing":
-        trusted_instructions = [
-            item for item in trusted_instructions
-            if item["path"] != "skills/agent/bootstrap-existing-project/SKILL.md"
-        ]
+    bootstrap_routes = None
+    if dimension == "bootstrap_realization":
+        bootstrap_routes = _bootstrap_route_context(phase)
+        trusted_instructions = _with_registered_instruction_contracts(
+            trusted_instructions,
+            bootstrap_routes,
+        )
+        if phase == "reconcile-existing":
+            trusted_instructions = [
+                item for item in trusted_instructions
+                if item["path"] != "skills/agent/bootstrap-existing-project/SKILL.md"
+            ]
     payload = {
         "instruction": (
             "Execute the user task using only the trusted Harness instructions below. "
@@ -247,7 +279,9 @@ def _model_payload(request: dict[str, Any]) -> dict[str, Any]:
     if execution_context:
         payload["execution_context"] = execution_context
     if dimension == "bootstrap_realization":
-        routes = _bootstrap_route_context(phase)
+        routes = bootstrap_routes
+        if routes is None:
+            raise ValueError("bootstrap route context is unavailable")
         trusted_paths = {item["path"] for item in trusted_instructions}
         required_paths = {
             routes["entry"]["skill"],

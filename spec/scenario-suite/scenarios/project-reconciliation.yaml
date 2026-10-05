@@ -1,0 +1,192 @@
+version: 1
+kind: harness-scenario
+id: project-reconciliation-bounded-execution
+title: Project reconciliation batches existing-provider revalidation into one publication
+dimensions:
+  project_archetype: synthetic
+  stage: revalidation
+  behavior_class: integration
+  execution_type: deterministic
+covers:
+  - project-reconciliation-bounded-execution
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: RECONCILIATION-SCENARIO
+      authorities:
+        - id: PRODUCT
+          responsibility: Own product requirement knowledge.
+          boundary:
+            semantic_cohesion: Product semantics.
+            independent_change: Product semantics change independently.
+            public_contract: Accepted product requirement.
+          produces:
+            - capability: demo.requirement
+              knowledge_kind: product-requirements
+              requires: []
+      consumers:
+        - id: TARGET
+          purpose: Consume accepted product requirement.
+          requires: [demo.requirement]
+      terminal_capabilities: []
+  core:
+    value:
+      artifacts:
+        - id: REQUIREMENT
+          authority: PRODUCT
+          path: docs/requirement.yaml
+          provides: [demo.requirement]
+          depends_on: []
+      questions: []
+  semantic_evaluations:
+    value:
+      version: 1
+      kind: harness-semantic-evaluation-set
+      semantic_evaluations:
+        - version: 1
+          kind: harness-artifact-semantic-evaluation
+          artifact: REQUIREMENT
+          capability: demo.requirement
+          status: ACCEPTED
+          obligations: {expected: [], satisfied: [], dispositions: []}
+          findings: []
+          semantic_claims: {accepted: []}
+          question_proposals: []
+          admission:
+            status: ACCEPTED
+            acceptance_id: REQ-1
+            acceptance_policy_fingerprint: sha256:stale-policy
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - artifact: REQUIREMENT
+          capability: demo.requirement
+          acceptance_id: REQ-1
+          acceptance_policy_fingerprint: sha256:stale-policy
+          accepted_prerequisites: {}
+  failures:
+    value:
+      version: 1
+      kind: harness-decision-failure-set
+      failures: []
+  semantic_closure:
+    value:
+      version: 1
+      kind: harness-semantic-closure-evaluation
+      target: TARGET
+      status: INCOMPLETE
+      structural_status: COMPLETE
+      semantic_gaps: []
+      currentness_gaps:
+        - capability: demo.requirement
+          authority: PRODUCT
+          state: STALE
+          details:
+            state: STALE
+            capability: demo.requirement
+      question_proposals: []
+      question_frontier: []
+      revalidate: [{capability: demo.requirement}]
+      pending: []
+      satisfied_capabilities: []
+  frontier:
+    value:
+      version: 1
+      kind: harness-project-frontier
+      target: TARGET
+      status: READY
+      next_actions:
+        - source: SEMANTIC_CLOSURE
+          action: REVALIDATE_SEMANTICS
+          capability: demo.requirement
+          state: STALE
+      failed_validation: []
+      blocked: []
+      waiting: []
+      gaps: []
+      source_status:
+        decision: COMPLETE
+        semantic: INCOMPLETE
+        structural: COMPLETE
+        coverage_completion_ready: true
+  registry:
+    yaml: ../../../skills/artifact-skill-registry-v0.yaml
+  contracts:
+    yaml: ../../semantic-acceptance/knowledge-kind-contracts-v1.yaml
+  decision_contracts:
+    yaml: ../../decision-governance/knowledge-kind-decision-contracts-v1.yaml
+  admission_inputs:
+    value:
+      demo.requirement:
+        sources:
+          semantic_assertions: []
+        candidate:
+          id: REQUIREMENT
+          capability: demo.requirement
+          path: docs/requirement.yaml
+          semantic_assertions: []
+          semantic_review:
+            status: ACCEPTED
+            checks:
+              - source-discipline
+              - authority-boundary
+              - no-invention
+              - observable-product-level
+              - no-downstream-design-promotion
+        acceptance_id: REQ-2
+
+steps:
+  - id: current
+    driver: publication.build
+    with:
+      graph: {ref: fixture.graph}
+      core_model: {ref: fixture.core}
+      semantic_evaluations: {ref: fixture.semantic_evaluations}
+      lifecycle: {ref: fixture.lifecycle}
+      decision_failures: {ref: fixture.failures}
+    expect:
+      - {path: /revision, op: truthy}
+
+  - id: plan
+    driver: project.reconciliation.plan
+    with:
+      graph: {ref: fixture.graph}
+      target: TARGET
+      current_publication_revision: {ref: step.current#/revision}
+      project_frontier: {ref: fixture.frontier}
+      semantic_closure: {ref: fixture.semantic_closure}
+    expect:
+      - {path: /status, op: equals, value: READY}
+      - {path: /affected, op: equals, value: [demo.requirement]}
+      - {path: /unchanged, op: length, value: 0}
+      - {path: /resume_token, op: truthy}
+
+  - id: execute
+    driver: project.reconciliation.execute
+    with:
+      graph: {ref: fixture.graph}
+      target: TARGET
+      current_publication: {ref: step.current}
+      expected_revision: {ref: step.current#/revision}
+      plan: {ref: step.plan}
+      skill_registry: {ref: fixture.registry}
+      knowledge_contracts: {ref: fixture.contracts}
+      decision_contracts: {ref: fixture.decision_contracts}
+      admission_inputs: {ref: fixture.admission_inputs}
+      resume_token: {ref: step.plan#/resume_token}
+    expect:
+      - {path: /status, op: equals, value: COMPLETE}
+      - {path: /completed, op: equals, value: [demo.requirement]}
+      - {path: /closure/structural, op: equals, value: COMPLETE}
+      - {path: /closure/semantic, op: equals, value: COMPLETE}
+      - path: /publication/parent_revision
+        op: equals
+        value: {ref: step.current#/revision}
+      - path: /publication/revision
+        op: not_equals
+        value: {ref: step.current#/revision}
