@@ -120,7 +120,9 @@ particular YAML spelling. The direct-file writer may therefore use lossless
 serialization-level deduplication such as YAML anchors/aliases for repeated
 fingerprint maps. Reading that file must reconstruct the same logical mapping,
 and representational deduplication must not change revision, acceptance,
-currentness or terminal-outcome semantics.
+currentness or terminal-outcome semantics. Serialization aliases must not leak
+shared mutable container identity into the decoded logical publication; equal
+mapping occurrences remain independently mutable after read.
 
 Separate convenience files such as `core.yaml` may still exist as generated or
 migration views, but they must not be independently treated as the authoritative

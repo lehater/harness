@@ -531,6 +531,47 @@ def test_publish_project_publication_writes_compact_lossless_yaml() -> None:
     assert reloaded["revision"] == publication["revision"]
 
 
+def test_read_project_publication_detaches_yaml_alias_identity() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(32)
+    }
+    evaluations = copy.deepcopy(CURRENT_EVALUATIONS)
+    evaluation = evaluations["semantic_evaluations"][0]
+    evaluation["semantic_atom_fingerprints"] = copy.deepcopy(fingerprints)
+    evaluation["source_surface_fingerprints"] = copy.deepcopy(fingerprints)
+    publication = build_project_publication(
+        graph=GRAPH,
+        core_model=CURRENT_CORE,
+        semantic_evaluations=evaluations,
+        lifecycle=CURRENT_LIFECYCLE,
+        decision_failures=EMPTY_FAILURES,
+    )
+
+    with tempfile.TemporaryDirectory(prefix="project-publication-aliases-") as temp_dir:
+        path = Path(temp_dir) / "project-publication.yaml"
+        publish_project_publication(
+            path,
+            graph=GRAPH,
+            publication=publication,
+            expected_revision=None,
+        )
+        raw = path.read_text(encoding="utf-8")
+        reloaded = read_project_publication(path, graph=GRAPH)
+
+    assert "&id" in raw and "*id" in raw, raw
+    reloaded_evaluation = reloaded["state"]["semantic_evaluations"][
+        "semantic_evaluations"
+    ][0]
+    semantic_atoms = reloaded_evaluation["semantic_atom_fingerprints"]
+    source_surface = reloaded_evaluation["source_surface_fingerprints"]
+    assert semantic_atoms == source_surface
+    assert semantic_atoms is not source_surface
+
+    semantic_atoms["MUTATED"] = "SAF-" + "f" * 64
+    assert "MUTATED" not in source_surface
+
+
 def test_yaml_serialization_compaction_scales_with_repeated_fanout() -> None:
     for atom_count in (8, 64, 128):
         fingerprints = {
@@ -647,6 +688,7 @@ def main() -> int:
     test_yaml_serialization_deduplicates_fingerprint_maps_losslessly()
     test_yaml_serialization_does_not_alias_unrelated_equal_mappings()
     test_publish_project_publication_writes_compact_lossless_yaml()
+    test_read_project_publication_detaches_yaml_alias_identity()
     test_yaml_serialization_compaction_scales_with_repeated_fanout()
     test_yaml_serialization_compaction_scales_with_lifecycle_provider_count()
     test_semantic_snapshot_currentness()
