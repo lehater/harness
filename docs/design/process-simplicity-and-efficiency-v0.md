@@ -1,4 +1,4 @@
-## Normative rule
-Use **minimum sufficient process**: cheapest sufficient validation; reuse CURRENT;
-aggregate independent blockers. CI is a verification boundary. Preserve
-semantic/Authority/CAS guarantees; **automate mechanics, not authority**.
+# Process Simplicity and Efficiency v0
+Status: canonical global constraint.
+
+For equal guarantees, require the simpler process. Validate at the cheapest sufficient layer; reuse unchanged state; CI verifies, not explores. Automate mechanics, never Authority.
