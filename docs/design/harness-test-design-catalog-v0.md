@@ -1982,7 +1982,8 @@ produces one coherent result.
 **Evidence:** `tests/test_project_publication.py::test_yaml_serialization_deduplicates_fingerprint_maps_losslessly`,
 `tests/test_project_publication.py::test_yaml_serialization_does_not_alias_unrelated_equal_mappings`,
 `tests/test_project_publication.py::test_publish_project_publication_writes_compact_lossless_yaml`,
-`tests/test_project_publication.py::test_yaml_serialization_compaction_scales_with_repeated_fanout`;
+`tests/test_project_publication.py::test_yaml_serialization_compaction_scales_with_repeated_fanout`,
+`tests/test_project_publication.py::test_yaml_serialization_compaction_scales_with_lifecycle_provider_count`;
 Prep revision `5efa07ffb701595edd2e6b29e7f92625873659e5` measurements captured
 under EVO-032.
 

@@ -532,48 +532,109 @@ def test_publish_project_publication_writes_compact_lossless_yaml() -> None:
 
 
 def test_yaml_serialization_compaction_scales_with_repeated_fanout() -> None:
+    for atom_count in (8, 64, 128):
+        fingerprints = {
+            f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+            for index in range(atom_count)
+        }
+        one_edge = {
+            "edges": [
+                {
+                    "source_surface_fingerprints": copy.deepcopy(fingerprints),
+                }
+            ]
+        }
+        many_edges = {
+            "edges": [
+                {
+                    "source_surface_fingerprints": copy.deepcopy(fingerprints),
+                }
+                for _ in range(32)
+            ]
+        }
+
+        one_naive = yaml.safe_dump(
+            one_edge,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        many_naive = yaml.safe_dump(
+            many_edges,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        one_compact = yaml.safe_dump(
+            _yaml_serialization_projection(one_edge),
+            sort_keys=False,
+            allow_unicode=True,
+        )
+        many_compact = yaml.safe_dump(
+            _yaml_serialization_projection(many_edges),
+            sort_keys=False,
+            allow_unicode=True,
+        )
+
+        assert yaml.safe_load(many_compact) == many_edges
+        naive_growth = len(many_naive) - len(one_naive)
+        compact_growth = len(many_compact) - len(one_compact)
+        assert compact_growth * 8 < naive_growth, (
+            atom_count,
+            compact_growth,
+            naive_growth,
+        )
+
+
+def test_yaml_serialization_compaction_scales_with_lifecycle_provider_count() -> None:
     fingerprints = {
         f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
-        for index in range(96)
-    }
-    one_edge = {
-        "edges": [
-            {
-                "source_surface_fingerprints": copy.deepcopy(fingerprints),
-            }
-        ]
-    }
-    many_edges = {
-        "edges": [
-            {
-                "source_surface_fingerprints": copy.deepcopy(fingerprints),
-            }
-            for _ in range(32)
-        ]
+        for index in range(64)
     }
 
+    def lifecycle_shape(provider_count: int) -> dict[str, object]:
+        return {
+            "lifecycle": {
+                "providers": [
+                    {
+                        "artifact": f"ARTIFACT-{index:03d}",
+                        "capability": f"demo.capability.{index:03d}",
+                        "accepted_prerequisite_semantics": {
+                            "demo.upstream": {
+                                "semantic_atoms": copy.deepcopy(fingerprints),
+                                "source_surface_fingerprints": copy.deepcopy(
+                                    fingerprints
+                                ),
+                            }
+                        },
+                    }
+                    for index in range(provider_count)
+                ]
+            }
+        }
+
+    one_provider = lifecycle_shape(1)
+    many_providers = lifecycle_shape(24)
     one_naive = yaml.safe_dump(
-        one_edge,
+        one_provider,
         sort_keys=False,
         allow_unicode=True,
     )
     many_naive = yaml.safe_dump(
-        many_edges,
+        many_providers,
         sort_keys=False,
         allow_unicode=True,
     )
     one_compact = yaml.safe_dump(
-        _yaml_serialization_projection(one_edge),
+        _yaml_serialization_projection(one_provider),
         sort_keys=False,
         allow_unicode=True,
     )
     many_compact = yaml.safe_dump(
-        _yaml_serialization_projection(many_edges),
+        _yaml_serialization_projection(many_providers),
         sort_keys=False,
         allow_unicode=True,
     )
 
-    assert yaml.safe_load(many_compact) == many_edges
+    assert yaml.safe_load(many_compact) == many_providers
     naive_growth = len(many_naive) - len(one_naive)
     compact_growth = len(many_compact) - len(one_compact)
     assert compact_growth * 8 < naive_growth, (
@@ -587,6 +648,7 @@ def main() -> int:
     test_yaml_serialization_does_not_alias_unrelated_equal_mappings()
     test_publish_project_publication_writes_compact_lossless_yaml()
     test_yaml_serialization_compaction_scales_with_repeated_fanout()
+    test_yaml_serialization_compaction_scales_with_lifecycle_provider_count()
     test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
     test_reconciliation_publication_batches_terminal_outcomes()
