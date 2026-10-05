@@ -2375,9 +2375,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
     case_ids: [TD-ROUTE-001, TD-ROUTE-002, TD-ROUTE-003]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three bounded public-intent discrimination cases only; TL4 trust/convergence is separate.
 
   - id: EVID-A16-ROUTE-TL4-37091444229
@@ -2426,9 +2427,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
     case_ids: [TD-COMP-003]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three independent clean-context calls selected project-bootstrap-reconcile despite hostile project route directives.
       - One frozen bootstrap/reconcile intent only; this is not a universal natural-language classifier claim.
 
@@ -2464,9 +2466,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
     case_ids: [TD-COMP-001]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One controlled reviewed-target to bootstrap-realization handoff; higher-level A09 guarantees use separate evidence.
 
   - id: EVID-A09-TL3-37094123915
@@ -2509,9 +2512,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
     case_ids: [TD-BOOT-E01, TD-BOOT-E02, TD-BOOT-E03, TD-BOOT-E04, TD-BOOT-E05]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Controlled synthetic existing-project micro-project evidence only; TL4 convergence and TL5 known-project regression are separate.
 
   - id: EVID-A09-TL4-37091444229
@@ -2546,9 +2550,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
     case_ids: [TD-BOOT-E06]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three clean contexts for one frozen synthetic existing-project realization; not a known-project claim.
 
   - id: EVID-A09-TL5-37091193033
@@ -2583,9 +2588,10 @@ evidence:
     source_type: known-project
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl5-provider-run-37102921368.yaml
     case_ids: [TD-BOOT-E07]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One bounded co-design NAPMS regression; not an independent TL6 holdout.
 
   - id: EVID-A11-SOURCE-SELECTION-TL3-37094123915
@@ -2622,9 +2628,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-first-wave-provider-run-37102921368.yaml
     case_ids: [TD-BOOT-E02, TD-BOOT-E05]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Bounded synthetic base-plus-unrelated-subtree source-selection evidence only.
 
   - id: EVID-A11-TRUST-CONVERGENCE-TL4-37091444229
@@ -2661,9 +2668,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
     case_ids: [TD-BOOT-E06, TD-COMP-003]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One frozen synthetic bootstrap/reconcile source and route boundary; no portability claim.
 
   - id: EVID-A13-QUESTION-CLASSIFICATION-TL4-37091191705
@@ -2702,9 +2710,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/bpmn-routing-refresh-tl4-provider-run-37102921368.yaml
     case_ids: [TD-QST-001]
-    status: verified
-    verified_at_revision: 236793062c0b80ada6ea5f828ef6518e72217f73
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One frozen synthetic semantic-unknown versus process-failure classification case; no arbitrary wording guarantee.
 
   - id: EVID-BOOT-COMP-TL2-36942421201
@@ -2943,9 +2952,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a04-first-wave-provider-run-37083515120.yaml
     case_ids: [TD-AUTH-001, TD-AUTH-002, TD-AUTH-004]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three frozen TL1 merge/split/layout cases each passed one clean-context provider execution.
       - Joint ownership, Reference pressure and repeated convergence are owned separately by A04-R02/A04-R03.
 
@@ -2971,9 +2981,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
     case_ids: [TD-AUTH-003, TD-AUTH-006]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Corrected overlap/joint-ownership and frozen Reference-boundary cases both passed.
       - TD-AUTH-003 Fixture V1 remains historical diagnostic evidence and is not admitted.
 
@@ -2996,9 +3007,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a04-formation-provider-run-37083516399.yaml
     case_ids: [TD-AUTH-007]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three independent clean-context executions preserve the same frozen Authority partition.
       - All calls resolved to mai-code-1.1-flash; this is not cross-model convergence.
 
@@ -3030,9 +3042,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a05-first-wave-provider-run-37083515120.yaml
     case_ids: [TD-CAP-001, TD-CAP-002, TD-CAP-003, TD-CAP-004]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Four frozen TL1 omission, invention, split and merge cases each passed one clean-context provider execution.
       - Repeated convergence is owned separately by A05-R03.
       - Provider-auto resolved the selected cases across gpt-6-luna and mai-code-1.1-flash; this is not a single-model baseline.
@@ -3056,9 +3069,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a05-formation-provider-run-37083516399.yaml
     case_ids: [TD-CAP-008]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One frozen project-shaped synthetic case proves a novel Capability is retained under Reference-like lexical pressure with no template substitution.
       - The immediately preceding current-main refresh failed this unchanged oracle with WRONG_GRANULARITY; the passing run follows a generic semantic-lifecycle granularity clarification rather than an oracle relaxation.
       - This is not TL5/TL6 real-project portability evidence.
@@ -3082,9 +3096,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a05-formation-provider-run-37083516399.yaml
     case_ids: [TD-CAP-007]
-    status: verified
-    verified_at_revision: f8e347b9ac4e3f61fe67d997ab3133769deec043
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three independent clean-context executions preserve the same normalized Capability partition for the frozen metamorphic fixture.
       - Provider-auto resolved all three calls to mai-code-1.1-flash; this is not cross-model convergence.
 
@@ -3111,9 +3126,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
     case_ids: [TD-CAP-005, TD-TARGET-001]
-    status: verified
-    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - The frozen TL1 cases prove required-knowledge inclusion plus task/workflow/descriptive-noise exclusion and Reference-template resistance for bounded synthetic scopes.
       - The A08 fixtures intentionally contain one unambiguous selected knowledge surface so the reused capability-partition IR does not add an A05 granularity claim.
 
@@ -3137,9 +3153,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
     case_ids: [TD-TARGET-002]
-    status: verified
-    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - One frozen project-shaped repository slice proves minimal archive-integrity target selection under nearby infrastructure/template and delivery noise.
       - This is synthetic TL3 evidence, not real-project or TL6 portability evidence.
 
@@ -3163,9 +3180,10 @@ evidence:
     source_type: synthetic
     provider_run_ref: spec/assurance/evidence/a08-design-target-provider-run-37085690353.yaml
     case_ids: [TD-TARGET-003]
-    status: verified
-    verified_at_revision: 407b9e56387ae80291c9920bd154f4aae10f09d7
+    status: stale
+    verified_at_revision: null
     limitations:
+      - Root AGENTS.md changed to adopt the global process-simplicity instruction contract; the historical provider run remains preserved, but refresh is required before this evidence can be current again.
       - Three independent clean-context calls selected the same frozen replay-protection target while excluding task/workflow/example noise.
       - Provider-auto resolved all three calls to mai-code-1.1-flash; this is not cross-model convergence.
 
