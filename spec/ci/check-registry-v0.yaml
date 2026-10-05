@@ -68,10 +68,10 @@ workflow_roles:
   draft_behavior: skip
   rationale: Historical runs are about 8-15 seconds and PR path filters use cumulative PR diffs; skip automatic draft execution.
 - path: .github/workflows/greenfield-bootstrap-assurance.yml
-  role: focused
+  role: external
   cost_class: heavy
-  draft_behavior: skip
-  rationale: Greenfield TL3/TL4 provider evidence runs only when a ready PR explicitly changes its greenfield evaluation surface; ordinary PRs and drafts do not pay this cost.
+  draft_behavior: manual
+  rationale: Provider-backed greenfield TL3/TL4 evidence is explicitly operator-triggered; ordinary PR integration uses deterministic gates and may leave judgement evidence stale until an external-release refresh.
 - path: .github/workflows/live-calibration-copilot.yml
   role: external
   cost_class: heavy
