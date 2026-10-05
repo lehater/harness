@@ -130,12 +130,14 @@ contexts:
       - harness.application.coverage_application
       - harness.application.decision_explorer_request
       - harness.application.decision_pipeline
+      - harness.application.decision_preflight
       - harness.application.ui_design_convergence
       - distribution.harnessw
       - harness.application.graph_doctor
       - harness.application.method_router
       - harness.application.project_frontier
       - harness.application.project_publication
+      - harness.application.reconciliation
       - harness.application.scenario_drivers
       - harness.application.scenario_suite
       - harness.application.semantic_admission
