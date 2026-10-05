@@ -115,6 +115,13 @@ replaces the published path. A crash before replace leaves the previous revision
 visible; concurrent writers serialize before the compare-and-swap check. After
 replace, readers validate the revision before consuming the state.
 
+The publication revision is defined over the decoded logical state, not over a
+particular YAML spelling. The direct-file writer may therefore use lossless
+serialization-level deduplication such as YAML anchors/aliases for repeated
+fingerprint maps. Reading that file must reconstruct the same logical mapping,
+and representational deduplication must not change revision, acceptance,
+currentness or terminal-outcome semantics.
+
 Separate convenience files such as `core.yaml` may still exist as generated or
 migration views, but they must not be independently treated as the authoritative
 strict-pipeline publication boundary.

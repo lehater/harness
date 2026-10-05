@@ -7,11 +7,14 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness.project_model.core import CoreError
 from harness.application.project_publication import (
+    _yaml_serialization_projection,
     build_project_publication,
     prepare_capability_transition,
     prepare_reconciliation_publication,
@@ -426,7 +429,46 @@ def test_semantic_snapshot_currentness() -> None:
     )
 
 
+def test_yaml_serialization_deduplicates_fingerprint_maps_losslessly() -> None:
+    fingerprints = {
+        f"ATOM-{index:03d}": "SAF-" + f"{index:064x}"
+        for index in range(64)
+    }
+    publication = {
+        "first": {
+            "semantic_atom_fingerprints": copy.deepcopy(fingerprints),
+        },
+        "second": {
+            "semantic_atoms": copy.deepcopy(fingerprints),
+        },
+        "third": {
+            "source_surface_fingerprints": copy.deepcopy(fingerprints),
+        },
+    }
+
+    projection = _yaml_serialization_projection(publication)
+    assert projection == publication
+    first = projection["first"]["semantic_atom_fingerprints"]
+    second = projection["second"]["semantic_atoms"]
+    third = projection["third"]["source_surface_fingerprints"]
+    assert first is second is third
+
+    naive = yaml.safe_dump(
+        publication,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    compact = yaml.safe_dump(
+        projection,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+    assert len(compact) < len(naive) / 2, (len(compact), len(naive))
+    assert yaml.safe_load(compact) == publication
+
+
 def main() -> int:
+    test_yaml_serialization_deduplicates_fingerprint_maps_losslessly()
     test_semantic_snapshot_currentness()
     test_capability_blocker_granularity()
     test_reconciliation_publication_batches_terminal_outcomes()
