@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT))
 
 from harness.application.authority_context import build_authority_context
 from harness.application.decision_explorer_request import build_decision_explorer_request
+from harness.application.decision_preflight import evaluate_decision_preflight
 from harness.decision.decision_execution_assurance import evaluate_execution_assurance
 from harness.decision.decision_governance import axis_policies, decision_contract_index
 from harness.assurance.semantic_acceptance import evaluate_artifact
@@ -225,6 +226,37 @@ def bind_exploration(contract, policy, value, *, model=MODEL):
     result = copy.deepcopy(value)
     result["explorer_request_id"] = request["request_id"]
     return result
+
+
+def preflight(*, contract, policy, candidate_value, exploration_value, model=MODEL):
+    context = build_authority_context(
+        GRAPH,
+        model,
+        "SYSTEM-ARCHITECTURE",
+        ["example.architecture"],
+    )
+    request = build_decision_explorer_request(
+        capability="example.architecture",
+        knowledge_kind="system-architecture",
+        authority="SYSTEM-ARCHITECTURE",
+        authority_context=context,
+        contract=contract,
+        axis_policies=axis_policies(contract, policy),
+        prerequisite_baseline={},
+        model=model,
+    )
+    return evaluate_decision_preflight(
+        contract=contract,
+        policy=policy,
+        axis_policies=axis_policies(contract, policy),
+        explorer_request=request,
+        capability="example.architecture",
+        knowledge_kind="system-architecture",
+        authority="SYSTEM-ARCHITECTURE",
+        exploration_evidence=exploration_value,
+        candidate=candidate_value,
+        model=model,
+    )
 
 
 def admit(
@@ -462,6 +494,41 @@ def main() -> int:
 
     # With accepted exploration, autonomy remains an independent later decision.
     valid_exploration = bind_exploration(contract, broad_policy, exploration(contract))
+
+    # Cheap preflight catches governance failures without running artifact
+    # semantic evaluation or requiring an acceptance identity.
+    not_determined = preflight(
+        contract=contract,
+        policy=broad_policy,
+        candidate_value=candidate(contract, runtime_disposition="DETERMINED"),
+        exploration_value=valid_exploration,
+    )
+    assert not_determined["status"] == "REJECTED", not_determined
+    assert "DECISION_NOT_DETERMINED" in codes(not_determined), not_determined
+    assert "acceptance_id" not in not_determined, not_determined
+
+    conservative_exploration = bind_exploration(
+        contract,
+        strict_policy,
+        exploration(contract),
+    )
+    autonomy_blocked = preflight(
+        contract=contract,
+        policy=strict_policy,
+        candidate_value=candidate(contract),
+        exploration_value=conservative_exploration,
+    )
+    assert autonomy_blocked["status"] == "REJECTED", autonomy_blocked
+    assert "DECISION_AUTONOMY_EXCEEDED" in codes(autonomy_blocked), autonomy_blocked
+
+    accepted_preflight = preflight(
+        contract=contract,
+        policy=broad_policy,
+        candidate_value=candidate(contract),
+        exploration_value=valid_exploration,
+    )
+    assert accepted_preflight["status"] == "ACCEPTED", accepted_preflight
+
     result = admit(
         registry=registry,
         semantic_contracts=semantic_contracts,

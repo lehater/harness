@@ -24,6 +24,7 @@ from harness.decision.decision_execution_assurance import (
 )
 from harness.decision.decision_exploration import evaluate_decision_exploration
 from .decision_explorer_request import build_decision_explorer_request
+from .decision_preflight import evaluate_decision_preflight
 from harness.decision.decision_governance import (
     axis_policies,
     decision_contract_index,
@@ -658,30 +659,21 @@ def admit_artifact(
     )
 
     evaluation = evaluate_artifact(semantic_contract, sources, candidate)
-    exploration_evaluation = evaluate_decision_exploration(
+    preflight = evaluate_decision_preflight(
         contract=decision_contract,
+        policy=decision_policy,
         axis_policies=decision_axis_policies,
+        explorer_request=explorer_request,
         capability=capability,
         knowledge_kind=knowledge_kind,
-        evidence=decision_exploration,
-        explorer_request=explorer_request,
-        model=realized,
-    )
-    execution_evaluation = evaluate_execution_assurance(
-        policy=decision_policy,
-        knowledge_kind=knowledge_kind,
-        explorer_request=explorer_request,
-        exploration_evaluation=exploration_evaluation,
-    )
-    decision_evaluation = evaluate_decision_governance(
-        contract=decision_contract,
-        policy=decision_policy,
-        exploration_evaluation=exploration_evaluation,
         authority=authority,
-        capability=capability,
+        exploration_evidence=decision_exploration,
         candidate=candidate,
         model=realized,
     )
+    exploration_evaluation = preflight["decision_exploration"]
+    execution_evaluation = preflight["decision_execution_assurance"]
+    decision_evaluation = preflight["decision_governance"]
     if exploration_evaluation["status"] != "NOT_REQUIRED":
         evaluation["decision_exploration"] = exploration_evaluation
         evaluation["decision_execution_assurance"] = execution_evaluation

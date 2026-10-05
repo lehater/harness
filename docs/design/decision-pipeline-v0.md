@@ -115,9 +115,20 @@ After the decision space is reviewed:
   `DELEGATED`;
 - otherwise -> `ESCALATED` through the existing Core Question mechanism.
 
-Governance evaluates exactly the reviewed decision/alternative set. Candidate
-production follows the accepted dispositions and then goes through strict
-semantic admission.
+Governance evaluates exactly the reviewed decision/alternative set.
+
+Before strict semantic admission, the Application Layer may run
+`harness.application.decision_preflight`. It composes the same Decision
+Exploration, execution-assurance and Governance evaluators used by admission,
+but does not evaluate artifact semantics, persist state or create an acceptance
+identity. Deterministic errors such as an invalid disposition or insufficient
+delegation autonomy should therefore be rejected at this cheaper boundary
+instead of using semantic admission as an interactive probe.
+
+Candidate production follows accepted preflight dispositions and then goes
+through strict semantic admission. Admission reuses the same preflight
+composition so the cheap and terminal checks cannot drift into different
+decision semantics.
 
 If a later stage discovers that the decision space itself was malformed despite
 the review gate, treat that as `FAILED_VALIDATION`. Fix the option-formation

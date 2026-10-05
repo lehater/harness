@@ -84,6 +84,7 @@ exact_files:
   - src/harness/application/coverage_application.py
   - src/harness/application/decision_explorer_request.py
   - src/harness/application/decision_pipeline.py
+  - src/harness/application/decision_preflight.py
   - src/harness/application/graph_doctor.py
   - src/harness/application/method_router.py
   - src/harness/application/project_frontier.py
