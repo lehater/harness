@@ -2003,8 +2003,10 @@ Expected result:
 Remaining evidence:
 
 - generated fan-out/cardinality benchmark across the independent dimensions;
-- measured comparison with a normalized/content-addressed persistence
-  projection before changing the logical publication/storage contract.
+- load/dump and diff/churn comparison against normalized/content-addressed
+  persistence. The frozen Prep byte-size comparison already favors v1 YAML
+  interning (~493 KB) over the reference projection (~523 KB), so size alone
+  does not justify changing the logical publication/storage contract.
 
 # SF-11 — Repository realization, projections, and distribution
 

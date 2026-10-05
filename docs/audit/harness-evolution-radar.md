@@ -1200,8 +1200,16 @@ fixture does not cover:
 A representation-only experiment over that frozen snapshot shows that interning
 equal fingerprint maps during YAML serialization would reduce the projected
 direct-file representation to about 493 KB, roughly 64.7%, while decoding to
-the same logical v1 publication. This is evidence of physical repetition, not
-evidence that the logical Project Publication boundary is wrong.
+the same logical v1 publication. A content-addressed/reference projection of the
+same fingerprint maps is about 523 KB, roughly 62.6% smaller than current v1 but
+slightly larger than YAML interning because explicit references and the shared
+pool add their own representation cost.
+
+This is evidence of physical repetition, not evidence that the logical Project
+Publication boundary is wrong. It also means a publication-v2 normalization is
+not justified by serialized size alone; changing the storage contract needs a
+separate demonstrated benefit such as lower diff/churn, load/dump cost, or a
+project-native non-YAML persistence requirement.
 
 **Evidence needed**
 
@@ -1211,15 +1219,14 @@ fan-out, semantic-surface size and publication serialization so one dimension
 does not hide another. Start with a small tier that is cheap enough for local/CI
 regression and a larger opt-in benchmark tier.
 
-Compare at least:
+Continue comparing the current logical v1 state with serialization interning
+against normalized/content-addressed persistence projections, but treat the Prep
+size comparison above as the first falsification result: normalization does not
+beat alias interning on serialized bytes for this snapshot.
 
-1. current logical v1 state with lossless serialization interning;
-2. a normalized/content-addressed persistence projection that stores immutable
-   semantic surfaces once and references them from derivation/lifecycle data.
-
-Measure serialized bytes, load/dump cost, diff/churn and round-trip logical
-equivalence. Define support limits only from observed behavior and real-project
-needs rather than arbitrary round numbers.
+Measure load/dump cost, diff/churn and round-trip logical equivalence before
+considering a storage-contract change. Define support limits only from observed
+behavior and real-project needs rather than arbitrary round numbers.
 
 **Not a defect**
 
