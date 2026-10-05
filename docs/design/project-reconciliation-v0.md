@@ -68,9 +68,14 @@ of truth.
 ## Execution direction
 
 A later execution slice may process deterministic work in plan order, stopping
-only where candidate/evidence/Authority input is required. Intermediate results
-remain non-current. Publication occurs once after a coherent final state has
-been assembled and validated against the original current revision.
+only where candidate/evidence/Authority input is required. Intermediate results remain non-current. Publication occurs once after a
+coherent final state has been assembled and validated against the original
+current revision.
+
+`prepare_reconciliation_publication` is the batch publication primitive. It
+validates all supplied terminal Capability outcomes against one final snapshot
+and creates at most one child revision of the current publication. It does not
+chain hidden per-Capability publications.
 
 No executor may synthesize `acceptance_id`; successful re-admission must carry
 a real caller/admission identity.
