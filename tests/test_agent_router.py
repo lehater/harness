@@ -81,9 +81,13 @@ def main() -> int:
         assert routed["capabilities"] == ["example.verification"], routed
         assert routed["skill"] == "skills/artifacts/verification-strategy/SKILL.md", routed
         assert routed["instruction_contracts"] == [
-            "docs/design/agent-instruction-architecture-v0.md"
+            "docs/design/agent-instruction-architecture-v0.md",
+            "docs/design/process-simplicity-and-efficiency-v0.md",
         ], routed
-        assert (ROOT / routed["instruction_contracts"][0]).is_file(), routed
+        assert all(
+            (ROOT / path).is_file()
+            for path in routed["instruction_contracts"]
+        ), routed
     except Exception as exc:
         errors.append(f"registered route: {exc}")
 
