@@ -52,8 +52,10 @@ validation remains preferred when it can answer the question.
 ## Instruction and operation routing
 
 Instruction ownership/scoping is defined by
-`docs/design/agent-instruction-architecture-v0.md`. Composition across routed
-operations is defined by `docs/design/operation-orchestration-v0.md`.
+`docs/design/agent-instruction-architecture-v0.md`. Repository-wide process
+economy is defined by `docs/design/process-simplicity-and-efficiency-v0.md`.
+Composition across routed operations is defined by
+`docs/design/operation-orchestration-v0.md`.
 
 Resolve Maintainer work through `skills/maintainer-operation-registry-v0.yaml`
 and `harness.application.skill_router`. Task procedures and classification rules belong to the
@@ -76,6 +78,7 @@ Keep the root bootstrap small. Use these entrypoints before loading narrower mat
 
 - `harness.application.skill_router` plus the registered Maintainer/Consumer registries — typed procedure discovery;
 - `docs/design/agent-instruction-architecture-v0.md` — instruction ownership and progressive-disclosure rules;
+- `docs/design/process-simplicity-and-efficiency-v0.md` — minimum-sufficient process and operational-cost constraint;
 - `docs/audit/README.md` — audit/backlog/evolution routing;
 - `docs/design/core-v0.md` — Core semantic boundary when Core is actually in scope;
 - `docs/repository-source-map.md` — detailed implementation/design/evidence inventory; load it only when repository navigation is needed.

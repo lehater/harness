@@ -24,6 +24,7 @@ REQUIRED_BOOTSTRAP_MARKERS = (
     "Do not reconstruct task-specific procedures from this file.",
     "instruction_contracts",
     "canonical instruction trust boundary",
+    "docs/design/process-simplicity-and-efficiency-v0.md",
     "Never push or commit changes directly to",
 )
 
@@ -32,6 +33,7 @@ CANONICAL_POLICY_FILES = (
     "docs/audit/README.md",
     "docs/design/core-v0.md",
     "docs/design/scenario-suite-v0.md",
+    "docs/design/process-simplicity-and-efficiency-v0.md",
 )
 
 
@@ -66,6 +68,22 @@ def main() -> int:
         if marker not in instruction_architecture:
             errors.append(
                 "agent instruction architecture missing trust-boundary marker: "
+                + marker
+            )
+
+    process_simplicity = (
+        ROOT / "docs/design/process-simplicity-and-efficiency-v0.md"
+    ).read_text(encoding="utf-8")
+    for marker in (
+        "## Normative rule",
+        "CI is a verification boundary",
+        "aggregate independent blockers",
+        "automate mechanics, not authority",
+        "minimum sufficient process",
+    ):
+        if marker not in process_simplicity:
+            errors.append(
+                "process simplicity contract missing global invariant marker: "
                 + marker
             )
 

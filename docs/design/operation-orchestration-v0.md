@@ -37,6 +37,9 @@ router.
 7. The router resolves routes; it is not a workflow/state-machine engine.
 8. Operation sequencing is not project truth and must not introduce Stage,
    Phase, Gate, Handoff or universal workflow-state entities into Core.
+9. When equivalent guarantees can be preserved with fewer coordination
+   boundaries, external round trips or repeated work, use the smaller process
+   defined by `docs/design/process-simplicity-and-efficiency-v0.md`.
 
 ## Operation contract
 
@@ -78,6 +81,22 @@ responsibility complete?
 
 The continuation decision belongs to the coordinator using operation semantics,
 not to a hard-coded physical skill-to-skill call.
+
+## Process economy
+
+Coordinator ownership does not imply that every repeated technical transition
+must remain an agent-level operation. When a stable sequence repeatedly
+performs one application responsibility and can preserve all participating
+invariants internally, consolidate it behind the owning Application boundary.
+
+In particular, repeated project-side loops around currentness calculation,
+deterministic validation, blocker aggregation and coherent publication are
+evidence to consider an Application service rather than normalizing more glue or
+CI choreography.
+
+The router remains a procedure-discovery boundary, not a workflow engine.
+Consolidation belongs in the application capability that owns the coherent
+operation.
 
 ## Public and internal operations
 

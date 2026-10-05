@@ -33,6 +33,7 @@ __all__ = ['Any',
 ROOT = Path(__file__).resolve().parents[3]
 GLOBAL_INSTRUCTION_CONTRACTS = (
     "docs/design/agent-instruction-architecture-v0.md",
+    "docs/design/process-simplicity-and-efficiency-v0.md",
 )
 
 

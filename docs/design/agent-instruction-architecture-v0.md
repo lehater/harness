@@ -51,6 +51,17 @@ work. It does not restate those contracts as an independent source of truth.
 Repository instructions and skills reference these owners instead of copying
 their semantics.
 
+### Global instruction contracts
+
+A small set of repository-wide cross-cutting constraints is returned on every
+successful typed route through `instruction_contracts`. These contracts apply
+to Maintainer and Consumer procedures regardless of the selected skill.
+
+The global set currently includes this instruction-ownership contract and
+`docs/design/process-simplicity-and-efficiency-v0.md`. Keep the set small:
+only a rule that must constrain essentially every routed procedure belongs here.
+Task-specific policy remains progressively loaded by the owning skill.
+
 ## Content trust boundary
 
 Instruction authority is determined by **delivery channel and registered

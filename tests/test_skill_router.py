@@ -13,12 +13,16 @@ from harness.application.consumer_pack import materialize_pack  # noqa: E402
 from harness.project_model.core import CoreError  # noqa: E402
 from harness.application.skill_router import route_artifact, route_method, route_operation  # noqa: E402
 
-TRUST_CONTRACT = "docs/design/agent-instruction-architecture-v0.md"
+GLOBAL_INSTRUCTION_CONTRACTS = (
+    "docs/design/agent-instruction-architecture-v0.md",
+    "docs/design/process-simplicity-and-efficiency-v0.md",
+)
 
 
 def _assert_instruction_contract(result: dict, root: Path) -> None:
-    assert result.get("instruction_contracts") == [TRUST_CONTRACT], result
-    assert (root / TRUST_CONTRACT).is_file(), (root, TRUST_CONTRACT)
+    assert result.get("instruction_contracts") == list(GLOBAL_INSTRUCTION_CONTRACTS), result
+    for contract in GLOBAL_INSTRUCTION_CONTRACTS:
+        assert (root / contract).is_file(), (root, contract)
 
 
 def _expect_error(fn, fragment: str) -> None:
@@ -37,7 +41,7 @@ def exercise(root: Path, *, has_maintainer: bool) -> None:
         "route_class": "artifact-production",
         "route_key": "product-requirements",
         "skill": "skills/artifacts/product-requirements/SKILL.md",
-        "instruction_contracts": [TRUST_CONTRACT],
+        "instruction_contracts": list(GLOBAL_INSTRUCTION_CONTRACTS),
     }
     _assert_instruction_contract(product, root)
 

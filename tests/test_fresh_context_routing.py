@@ -17,7 +17,10 @@ from harness.project_model.core import CoreError  # noqa: E402
 from harness.application.skill_router import route_artifact, route_method, route_operation  # noqa: E402
 
 FIXTURES = ROOT / "spec/agent-routing/fresh-context-v0.yaml"
-TRUST_CONTRACT = "docs/design/agent-instruction-architecture-v0.md"
+GLOBAL_INSTRUCTION_CONTRACTS = (
+    "docs/design/agent-instruction-architecture-v0.md",
+    "docs/design/process-simplicity-and-efficiency-v0.md",
+)
 
 
 def load() -> dict[str, Any]:
@@ -66,11 +69,12 @@ def assert_case(case: dict[str, Any], root: Path) -> None:
         return
 
     result = route_case(case, root)
-    assert result.get("instruction_contracts") == [TRUST_CONTRACT], (
+    assert result.get("instruction_contracts") == list(GLOBAL_INSTRUCTION_CONTRACTS), (
         case["id"],
         result,
     )
-    assert (root / TRUST_CONTRACT).is_file(), (case["id"], root)
+    for contract in GLOBAL_INSTRUCTION_CONTRACTS:
+        assert (root / contract).is_file(), (case["id"], root, contract)
     if "expect_skill" in case:
         assert result.get("skill") == case["expect_skill"], (case["id"], result)
     if "expect_methods" in case:

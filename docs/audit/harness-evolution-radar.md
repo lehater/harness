@@ -95,6 +95,7 @@ separate defect has been demonstrated.
 | EVO-032 | RESEARCH | CAPTURED | Harness scale envelope | Define supported graph/artifact/question scale and add stress fixtures that measure depth, breadth and repeated recomputation separately. |
 | EVO-033 | RESEARCH | CAPTURED | Project-model discovery assurance | Prove selected-scope unfamiliar-repository -> fresh routed agent -> project-specific Authorities/Capabilities/dependencies with independent holdouts and repeated clean-context semantic convergence. |
 | EVO-034 | RECOMMENDATION | ADOPTED | Capability assurance | Canonical Harness Assurance Policy now requires ability-driven evidence, bottom-up test levels, explicit oracle strength, and separation between evidence sufficiency and CI execution. |
+| EVO-035 | RECOMMENDATION | ADOPTED | Process economy / reconciliation | Make minimum-sufficient process a repository-wide constraint and move repeated generic semantic-reconciliation mechanics behind a bounded Application service while preserving Project Publication, Authority and acceptance invariants. |
 
 ## Detailed entries
 
@@ -1300,3 +1301,49 @@ increases cost and reduces failure localization.
 - EVO-033
 - `docs/design/harness-assurance-policy-v0.md`
 - `docs/design/harness-ability-to-evidence-v0.md`
+
+
+---
+
+### EVO-035 — Process economy and bounded reconciliation
+
+**Type:** RECOMMENDATION  
+**Status:** ADOPTED
+
+The accepted repository-wide constraint is owned by
+`docs/design/process-simplicity-and-efficiency-v0.md`. The empirical and
+architecture audit is recorded in
+`docs/audit/process-simplicity-reconciliation-audit-v0.md`.
+
+**Decision**
+
+When equivalent guarantees are available, Harness chooses the lower-cost
+process. Repeated generic currentness/preflight/blocker/publication orchestration
+belongs behind a bounded Application reconciliation capability rather than in
+project scripts or repeated CI choreography.
+
+The selected direction preserves existing semantic owners:
+
+- Project Publication remains the only current-state atomic/CAS boundary;
+- lifecycle, semantic admission, Decision Governance and Coverage retain their
+  own invariants;
+- Authority decisions and acceptance identity are never fabricated;
+- resumability begins as revision/fingerprint-bound derived continuation, not a
+  durable workflow engine.
+
+**Why adopted**
+
+Current Harness already exposes the necessary mechanisms but leaves the repeated
+multi-Capability loop to the coordinator. Current Prep contains generic
+project-side revalidation glue and a 1.4 MB whole publication, demonstrating
+that external transitions and whole-snapshot churn can dominate the work even
+when individual deterministic calculations are modest.
+
+**Related**
+
+- AUD-026
+- EVO-010
+- EVO-020
+- EVO-032
+- HARN-012
+- `docs/design/operation-orchestration-v0.md`
