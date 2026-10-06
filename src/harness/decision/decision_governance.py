@@ -20,6 +20,7 @@ __all__ = [
     "ALT_STATES",
     "DISPOSITIONS",
     "decision_contract_index",
+    "policy_applies_to_kind",
     "effective_policy",
     "axis_policies",
     "evaluate_decision_governance",
@@ -128,6 +129,34 @@ def _policy_item(policy: dict[str, Any] | None, kind: str) -> dict[str, Any]:
     return matches[0] if matches else {}
 
 
+def policy_applies_to_kind(
+    policy: dict[str, Any] | None,
+    knowledge_kind: str,
+) -> bool:
+    if policy is None:
+        return False
+    if (
+        policy.get("version") != 1
+        or policy.get("kind") != "harness-decision-policy"
+    ):
+        raise CoreError("invalid decision policy document")
+    items = policy.get("knowledge_kinds", []) or []
+    if not isinstance(items, list):
+        raise CoreError("decision policy knowledge_kinds must be a list")
+    matches = [
+        item
+        for item in items
+        if isinstance(item, dict) and item.get("knowledge_kind") == knowledge_kind
+    ]
+    if len(matches) > 1:
+        raise CoreError(f"duplicate decision policy knowledge_kind: {knowledge_kind}")
+    # Backward-compatible global policies keep their existing meaning when they
+    # declare defaults or when no explicit knowledge-kind scope is present.
+    if "defaults" in policy or not items:
+        return True
+    return bool(matches)
+
+
 def effective_policy(
     contract: dict[str, Any],
     policy: dict[str, Any] | None,
@@ -167,7 +196,11 @@ def axis_policies(
     contract: dict[str, Any] | None,
     policy: dict[str, Any] | None,
 ) -> dict[str, dict[str, str]] | None:
-    if contract is None or not contract.get("required") or policy is None:
+    if (
+        contract is None
+        or not contract.get("required")
+        or not policy_applies_to_kind(policy, contract["knowledge_kind"])
+    ):
         return None
     return {
         axis: effective_policy(contract, policy, axis)
