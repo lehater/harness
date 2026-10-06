@@ -13,7 +13,10 @@ sys.path.insert(0, str(ROOT))
 from harness.application.authority_context import build_authority_context
 from harness.application.decision_explorer_request import build_decision_explorer_request
 from harness.application.decision_preflight import evaluate_decision_preflight
-from harness.decision.decision_execution_assurance import evaluate_execution_assurance
+from harness.decision.decision_execution_assurance import (
+    effective_execution_assurance,
+    evaluate_execution_assurance,
+)
 from harness.decision.decision_governance import axis_policies, decision_contract_index
 from harness.assurance.semantic_acceptance import evaluate_artifact
 from harness.application.semantic_admission import admit_artifact
@@ -194,6 +197,7 @@ def exploration(contract, *, research_axis=None, research_evidence=True):
             "checks": [
                 "mixed-decision-split",
                 "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
                 "accepted-constraint-cross-check",
                 "authority-boundary-cross-check",
             ],
@@ -302,10 +306,24 @@ def main() -> int:
     contract = contracts["system-architecture"]
     presentation_contract = contracts["presentation-system-design"]
     assert set(presentation_contract["axes"]) == {
+        "application-surface",
         "knowledge-representation",
         "information-density",
         "control-surface",
     }, presentation_contract
+    surface_axis = presentation_contract["axes"]["application-surface"]
+    assert set(surface_axis["material_dimensions"]) == {
+        "surface-archetype",
+        "viewport-ownership",
+        "navigation-persistence",
+        "overflow-ownership",
+    }, surface_axis
+    assert set(surface_axis["challenge_strategies"]) == {
+        "document-vs-bounded-workspace",
+        "workspace-vs-step-flow",
+        "page-scroll-vs-region-overflow",
+        "persistent-vs-contextual-navigation",
+    }, surface_axis
     assert all(
         item["delegation_requires"] == "CONSERVATIVE"
         for item in presentation_contract["axes"].values()
@@ -412,6 +430,58 @@ def main() -> int:
             {"knowledge_kind": "system-architecture", "autonomy": "BROAD"}
         ],
     }
+    sparse_unrelated_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "knowledge_kinds": [
+            {"knowledge_kind": "presentation-system-design", "autonomy": "CONSERVATIVE"}
+        ],
+    }
+    assert axis_policies(contract, sparse_unrelated_policy) is None
+    assert (
+        effective_execution_assurance(
+            sparse_unrelated_policy,
+            "product-requirements",
+        )
+        is None
+    )
+    sparse_preflight = evaluate_decision_preflight(
+        contract=contract,
+        policy=sparse_unrelated_policy,
+        axis_policies=axis_policies(contract, sparse_unrelated_policy),
+        explorer_request=None,
+        capability="example.architecture",
+        knowledge_kind="system-architecture",
+        authority="SYSTEM-ARCHITECTURE",
+        exploration_evidence=None,
+        candidate=candidate(contract),
+        model=MODEL,
+    )
+    assert sparse_preflight["status"] == "NOT_REQUIRED", sparse_preflight
+    assert all(
+        sparse_preflight[key]["status"] == "NOT_REQUIRED"
+        for key in (
+            "decision_exploration",
+            "decision_execution_assurance",
+            "decision_governance",
+        )
+    ), sparse_preflight
+    global_defaults_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "defaults": {"autonomy": "CONSERVATIVE"},
+        "knowledge_kinds": [
+            {"knowledge_kind": "presentation-system-design"}
+        ],
+    }
+    assert axis_policies(contract, global_defaults_policy) is not None
+    assert (
+        effective_execution_assurance(
+            global_defaults_policy,
+            "product-requirements",
+        )
+        == "REQUEST_BOUND"
+    )
 
     attested_policy = {
         "version": 1,
@@ -486,6 +556,24 @@ def main() -> int:
     )
     assert result["status"] == "REJECTED", result
     assert "DECISION_SPACE_REVIEW_REQUIRED" in codes(result), result
+
+    # The frontier completeness check is mandatory even when all already-discovered
+    # decision points were reviewed.
+    no_frontier = bind_exploration(contract, broad_policy, exploration(contract))
+    no_frontier["decision_space_review"]["checks"].remove(
+        "impact-and-reversal-frontier-check"
+    )
+    result = admit(
+        registry=registry,
+        semantic_contracts=semantic_contracts,
+        decision_contracts=decision_contracts,
+        policy=broad_policy,
+        candidate_value=candidate(contract),
+        exploration_value=no_frontier,
+        acceptance_id="ARCH-FRONTIER-REVIEW",
+    )
+    assert result["status"] == "REJECTED", result
+    assert "DECISION_SPACE_REVIEW_CHECKS_MISSING" in codes(result), result
 
     # Exploration must remain pre-choice/blind. A selected/preferred marker
     # contaminates the evidence and is rejected before governance.

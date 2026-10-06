@@ -66,6 +66,7 @@ fixtures:
         checks:
           - mixed-decision-split
           - missing-material-case-search
+          - impact-and-reversal-frontier-check
           - accepted-constraint-cross-check
           - authority-boundary-cross-check
         reviewed_decisions: [shape-choice]

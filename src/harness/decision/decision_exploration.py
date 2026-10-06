@@ -14,6 +14,7 @@ AUTHORITATIVE_SOURCES = {"official", "standard", "primary", "maintainer"}
 DECISION_SPACE_REVIEW_CHECKS = {
     "mixed-decision-split",
     "missing-material-case-search",
+    "impact-and-reversal-frontier-check",
     "accepted-constraint-cross-check",
     "authority-boundary-cross-check",
 }

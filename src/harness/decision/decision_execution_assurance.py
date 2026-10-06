@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from harness.project_model.core import CoreError
+from harness.decision.decision_governance import policy_applies_to_kind
 
 ASSURANCE = {"REQUEST_BOUND", "ATTESTED_ISOLATED"}
 
@@ -22,10 +23,8 @@ def effective_execution_assurance(
     policy: dict[str, Any] | None,
     knowledge_kind: str,
 ) -> str | None:
-    if policy is None:
+    if not policy_applies_to_kind(policy, knowledge_kind):
         return None
-    if policy.get("version") != 1 or policy.get("kind") != "harness-decision-policy":
-        raise CoreError("invalid decision policy document")
     defaults = policy.get("defaults", {}) or {}
     if not isinstance(defaults, dict):
         raise CoreError("decision policy defaults must be a mapping")

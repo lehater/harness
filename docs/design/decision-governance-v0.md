@@ -133,7 +133,7 @@ knowledge_kinds:
         autonomy: NONE
 ```
 
-A project policy activates the experiment. Without one, strict admission retains existing behavior. Participating knowledge kinds and their current decision axes are defined by `spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml`; adding an axis requires project evidence that the decision is material and belongs to that knowledge owner.
+A project policy activates the experiment. A policy with `defaults` (or a bare policy with no explicit `knowledge_kinds`) is global, preserving the original behavior. A policy that omits `defaults` and lists one or more `knowledge_kinds` is sparse: Decision Governance and execution assurance apply only to those listed kinds, so incremental adoption does not invalidate unrelated accepted knowledge. Without a policy, strict admission retains existing behavior. Participating knowledge kinds and their current decision axes are defined by `spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml`; adding an axis requires project evidence that the decision is material and belongs to that knowledge owner.
 
 ## Admission integration
 

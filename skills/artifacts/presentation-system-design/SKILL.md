@@ -38,7 +38,7 @@ Read accepted project requirements, tasks/journeys, conceptual/IA/interaction/to
 
 1. Identify the user-facing surfaces that share a presentation language.
 2. Resolve applicable shared facets only to the depth needed by downstream screens.
-3. Define semantic hierarchy, density/layout defaults, action/navigation/feedback conventions and reusable task patterns.
+3. Define semantic hierarchy, density/layout defaults, action/navigation/feedback conventions and reusable task patterns. When material, explicitly resolve the application-surface archetype (for example document/page flow, bounded application/workbench or step/task flow), viewport/container ownership, navigation persistence and page-scroll versus bounded-region overflow before downstream screens inherit the presentation contract.
 4. Define typography/color/spacing/iconography roles and design tokens only when they carry stable reusable decisions.
 5. Define responsive/accessibility/localization defaults where applicable.
 6. Classify each consequential presentation choice as a material invariant, controlled freedom or ordinary implementation detail.
@@ -58,6 +58,7 @@ Resolve only applicable facets, at the minimum depth needed to prevent material 
 - typography roles and hierarchy;
 - color roles and non-color semantic redundancy;
 - spacing/rhythm and density;
+- application-surface archetype and viewport/container/overflow ownership when material;
 - layout/grid/container principles;
 - action hierarchy and placement conventions;
 - navigation presentation patterns;
@@ -112,7 +113,7 @@ A useful contract includes:
 - design-system/vendor mechanics are not mistaken for project semantics;
 - external template/provider features cannot silently introduce product actions, routes, states or data semantics;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
-- downstream screen design can choose composition without inventing the application's common visual/interaction language;
+- downstream screen design can choose local composition without inventing the application's common visual/interaction language or a high-impact application-surface archetype;
 - every material presentation decision is constrained by canonical knowledge or explicitly classified as controlled freedom;
 - material decisions expose their evidence basis and any required empirical validation instead of hiding unresolved selection behind agent preference;
 - references contribute only the presentation facts they can support and cannot silently redefine product/domain semantics.
