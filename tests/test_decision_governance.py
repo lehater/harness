@@ -13,7 +13,10 @@ sys.path.insert(0, str(ROOT))
 from harness.application.authority_context import build_authority_context
 from harness.application.decision_explorer_request import build_decision_explorer_request
 from harness.application.decision_preflight import evaluate_decision_preflight
-from harness.decision.decision_execution_assurance import evaluate_execution_assurance
+from harness.decision.decision_execution_assurance import (
+    effective_execution_assurance,
+    evaluate_execution_assurance,
+)
 from harness.decision.decision_governance import axis_policies, decision_contract_index
 from harness.assurance.semantic_acceptance import evaluate_artifact
 from harness.application.semantic_admission import admit_artifact
@@ -427,6 +430,37 @@ def main() -> int:
             {"knowledge_kind": "system-architecture", "autonomy": "BROAD"}
         ],
     }
+    sparse_unrelated_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "knowledge_kinds": [
+            {"knowledge_kind": "presentation-system-design", "autonomy": "CONSERVATIVE"}
+        ],
+    }
+    assert axis_policies(contract, sparse_unrelated_policy) is None
+    assert (
+        effective_execution_assurance(
+            sparse_unrelated_policy,
+            "product-requirements",
+        )
+        is None
+    )
+    global_defaults_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "defaults": {"autonomy": "CONSERVATIVE"},
+        "knowledge_kinds": [
+            {"knowledge_kind": "presentation-system-design"}
+        ],
+    }
+    assert axis_policies(contract, global_defaults_policy) is not None
+    assert (
+        effective_execution_assurance(
+            global_defaults_policy,
+            "product-requirements",
+        )
+        == "REQUEST_BOUND"
+    )
 
     attested_policy = {
         "version": 1,
