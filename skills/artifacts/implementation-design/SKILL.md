@@ -52,7 +52,7 @@ Quality semantics must be escalated to the owning Authority instead.
 5. Identify migrations/data transitions and compatibility risks when applicable.
 6. Derive repository realization from accepted semantic/component boundaries: physical module/package roots, composition root, source/generated/test/migration/configuration topology and explicit implementation freedoms. Do not prescribe a universal folder layout.
 7. For every applicable engineering/security/quality/supply-chain obligation, select a concrete deterministic enforcement mechanism or record an explicit terminal disposition. Keep the obligation independent from the selected tool.
-8. Define the reproducible dependency/tool environment. If the project's delivery workflow has merge/release gating, define its authoritative reproducible gate; local/pre-commit checks may optimize feedback but do not replace that gate.
+8. Define the reproducible dependency/tool environment. If the project's delivery workflow has merge/release gating, define its authoritative reproducible gate; local/pre-commit checks may optimize feedback but do not replace that gate. When validation execution is materially non-trivial (multiple suites/triggers, conditional selection, external or nondeterministic checks, or meaningful execution cost), apply the applicability-driven review in `docs/design/validation-execution-review-checklist-v1.md`. Treat the review as analysis: use `MEASURE` when economic evidence is missing and `QUESTION` when an owning decision is unresolved rather than inventing execution topology.
 9. Identify code/test/CI surfaces each slice must change.
 10. Define completion criteria that prove the accepted design is realized.
 11. If any slice would require a new product/domain/architecture/interface
