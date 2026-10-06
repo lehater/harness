@@ -445,6 +445,27 @@ def main() -> int:
         )
         is None
     )
+    sparse_preflight = evaluate_decision_preflight(
+        contract=contract,
+        policy=sparse_unrelated_policy,
+        axis_policies=axis_policies(contract, sparse_unrelated_policy),
+        explorer_request=None,
+        capability="example.architecture",
+        knowledge_kind="system-architecture",
+        authority="SYSTEM-ARCHITECTURE",
+        exploration_evidence=None,
+        candidate=candidate(contract),
+        model=MODEL,
+    )
+    assert sparse_preflight["status"] == "NOT_REQUIRED", sparse_preflight
+    assert all(
+        sparse_preflight[key]["status"] == "NOT_REQUIRED"
+        for key in (
+            "decision_exploration",
+            "decision_execution_assurance",
+            "decision_governance",
+        )
+    ), sparse_preflight
     global_defaults_policy = {
         "version": 1,
         "kind": "harness-decision-policy",
