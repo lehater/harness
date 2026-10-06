@@ -88,6 +88,14 @@ quality_gates: []
 
 Exact field extensions are project-native; Harness only requires the semantic invariants.
 
+## Validation execution review
+
+When gate execution is materially non-trivial, review the selected realization with the applicability-driven `validation-execution-review-checklist-v1.md`.
+
+The checklist is guidance, not a new completeness layer or semantic owner. It checks evidence coverage, authoritative decision boundaries, trigger/selectivity behavior, candidate/input binding, dependency-source reuse, execution economics, caching/reuse, determinism/externality and evolution. Findings are classified with the existing Repository Realization decision classes and marked `SUPPORTED`, `MEASURE` or `QUESTION` according to their basis.
+
+Only accepted project decisions are written back into Repository Realization. Platform-specific workflow syntax remains a projection.
+
 ## Completeness
 
 Repository realization is complete for an Implementation consumer when:
