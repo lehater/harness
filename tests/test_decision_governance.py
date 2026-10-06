@@ -194,6 +194,7 @@ def exploration(contract, *, research_axis=None, research_evidence=True):
             "checks": [
                 "mixed-decision-split",
                 "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
                 "accepted-constraint-cross-check",
                 "authority-boundary-cross-check",
             ],
@@ -302,10 +303,24 @@ def main() -> int:
     contract = contracts["system-architecture"]
     presentation_contract = contracts["presentation-system-design"]
     assert set(presentation_contract["axes"]) == {
+        "application-surface",
         "knowledge-representation",
         "information-density",
         "control-surface",
     }, presentation_contract
+    surface_axis = presentation_contract["axes"]["application-surface"]
+    assert set(surface_axis["material_dimensions"]) == {
+        "surface-archetype",
+        "viewport-ownership",
+        "navigation-persistence",
+        "overflow-ownership",
+    }, surface_axis
+    assert set(surface_axis["challenge_strategies"]) == {
+        "document-vs-bounded-workspace",
+        "workspace-vs-step-flow",
+        "page-scroll-vs-region-overflow",
+        "persistent-vs-contextual-navigation",
+    }, surface_axis
     assert all(
         item["delegation_requires"] == "CONSERVATIVE"
         for item in presentation_contract["axes"].values()
@@ -486,6 +501,24 @@ def main() -> int:
     )
     assert result["status"] == "REJECTED", result
     assert "DECISION_SPACE_REVIEW_REQUIRED" in codes(result), result
+
+    # The frontier completeness check is mandatory even when all already-discovered
+    # decision points were reviewed.
+    no_frontier = bind_exploration(contract, broad_policy, exploration(contract))
+    no_frontier["decision_space_review"]["checks"].remove(
+        "impact-and-reversal-frontier-check"
+    )
+    result = admit(
+        registry=registry,
+        semantic_contracts=semantic_contracts,
+        decision_contracts=decision_contracts,
+        policy=broad_policy,
+        candidate_value=candidate(contract),
+        exploration_value=no_frontier,
+        acceptance_id="ARCH-FRONTIER-REVIEW",
+    )
+    assert result["status"] == "REJECTED", result
+    assert "DECISION_SPACE_REVIEW_CHECKS_MISSING" in codes(result), result
 
     # Exploration must remain pre-choice/blind. A selected/preferred marker
     # contaminates the evidence and is rejected before governance.
