@@ -151,6 +151,11 @@ contracts:
     required: true
     minimum_exploration: EXPLORE
     axes:
+      - id: application-surface
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [surface-archetype, viewport-ownership, navigation-persistence, overflow-ownership]
+        challenge_strategies: [document-vs-bounded-workspace, workspace-vs-step-flow, page-scroll-vs-region-overflow, persistent-vs-contextual-navigation]
       - id: knowledge-representation
         delegation_requires: CONSERVATIVE
         minimum_probes: 2
