@@ -34,7 +34,13 @@ before option formation is complete.
    strategies and describe materially distinct alternatives without selecting.
 2. REVIEW OPTIONS: review every discovered decision point for mixed concerns,
    missing material cases, accepted-constraint conflicts and Authority-boundary
-   mistakes. Refine locally until the decision-space review is COMPLETE.
+   mistakes. Also inspect the material decision frontier across the Capability
+   responsibility and downstream consequences. A reasonably discoverable choice
+   with high semantic impact, blast radius, reversal cost or primary-task impact
+   must become an explicit decision point, be routed/escalated, or remain an open
+   material gap. Local, cheap, reversible choices that do not materially change
+   semantics or task success remain downstream freedom. Refine locally until the
+   decision-space review is COMPLETE.
 3. If review exposes an unresolved semantic fact, create a Core Question
    addressed to its owning Authority, block the affected artifact/capability and
    finish this Capability as BLOCKED.
@@ -59,8 +65,14 @@ with all required checks:
 
 - `mixed-decision-split`
 - `missing-material-case-search`
+- `impact-and-reversal-frontier-check`
 - `accepted-constraint-cross-check`
 - `authority-boundary-cross-check`
+
+The frontier check is about undiscovered decision points, not merely alternatives
+inside decisions already listed. Search for choices whose semantic impact, blast
+radius, reversal cost or primary-task impact is high. Any such undispositioned
+choice is an open material gap and blocks choice.
 
 Any open material gap blocks choice.
 
