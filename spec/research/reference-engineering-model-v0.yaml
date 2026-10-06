@@ -972,6 +972,9 @@
       "requires": [
         {
           "template": "INFORMATION-ARCHITECTURE"
+        },
+        {
+          "template": "INTERACTION-DESIGN"
         }
       ]
     },
