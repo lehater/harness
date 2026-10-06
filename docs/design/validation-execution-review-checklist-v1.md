@@ -119,6 +119,3 @@ If all required deterministic checks are cheap relative to orchestration overhea
 
 If an authoritative package/build graph exists and checks are materially expensive, the checklist may support dependency-aware selection as a project decision. Unknown or unmapped impact must not silently remove required evidence. The workflow should reuse the authoritative graph rather than encode a second hand-maintained dependency graph.
 
-### Prep regression
-
-Prep's current design is compatible with the checklist without becoming a universal template: cheap frontend/repository validation remains always-on, an explicitly isolated knowledge experiment uses conditional execution, broader integrated validation runs at different boundaries, and the choices are justified by project measurements and ownership. The transferable result is the review method, not Prep's concrete topology.
