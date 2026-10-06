@@ -310,6 +310,25 @@ def main() -> int:
         item["delegation_requires"] == "CONSERVATIVE"
         for item in presentation_contract["axes"].values()
     ), presentation_contract
+    topology_contract = contracts["interface-topology-design"]
+    assert topology_contract["required"] is True, topology_contract
+    assert set(topology_contract["axes"]) == {"view-boundaries"}, topology_contract
+    boundary_axis = topology_contract["axes"]["view-boundaries"]
+    assert boundary_axis["delegation_requires"] == "CONSERVATIVE", boundary_axis
+    assert set(boundary_axis["material_dimensions"]) == {
+        "goal-continuity",
+        "information-dependency",
+        "working-state-continuity",
+        "commit-recovery-boundary",
+        "mode-authority-boundary",
+        "independent-addressability",
+    }, boundary_axis
+    assert set(boundary_axis["challenge_strategies"]) == {
+        "merge-vs-separate-view",
+        "persistent-context-vs-navigation",
+        "contextual-surface-vs-destination",
+    }, boundary_axis
+
     screen_contract = contracts["screen-view-design"]
     assert set(screen_contract["axes"]) == {
         "view-composition",
@@ -320,6 +339,16 @@ def main() -> int:
         item["delegation_requires"] == "CONSERVATIVE"
         for item in screen_contract["axes"].values()
     ), screen_contract
+    assert set(screen_contract["axes"]["view-composition"]["challenge_strategies"]) == {
+        "region-vs-pane",
+        "co-locate-vs-disclose",
+        "region-priority-shift",
+    }, screen_contract
+    assert set(screen_contract["axes"]["detail-edit-placement"]["challenge_strategies"]) == {
+        "inline-vs-overlay",
+        "local-detail-vs-disclosure",
+        "context-preservation-perturbation",
+    }, screen_contract
     component_contract = contracts["component-design"]
     assert set(component_contract["axes"]) == {
         "responsibility-boundaries",
