@@ -66,6 +66,8 @@ def run_regressions(model,authorities,proof):
         assert ratio>=float(e["minimum_kind_coverage"]),{"scenario":s["id"],"ratio":ratio,"generated":sorted(generated),"existing":sorted(existing),"uncovered":sorted(generated-covered)}
 def main():
     model=load_yaml(MODEL); authorities=load_yaml(AUTHORITIES); proof=load_yaml(PROOF); errors=validate_reference_model(model,authorities,proof); assert not errors,errors; assert len(model["templates"])==40; assert len(model["predicates"])==47
+    topology=next(t for t in model["templates"] if t["id"]=="INTERFACE-TOPOLOGY")
+    assert {x["template"] for x in topology.get("requires",[]) or []}=={"INFORMATION-ARCHITECTURE","INTERACTION-DESIGN"},topology
     canonical={claim for row in (proof.get("proofs",{}) or {}).values() for claim in (row.get("accepted_semantic_claims",[]) or [])}; routed={claim for t in model["templates"] for claim in t.get("claim_surface",[]) or []}; assert routed==canonical; assert len(canonical)==119
     run_holdouts(model,authorities,proof,HOLDOUTS); run_holdouts(model,authorities,proof,HOLDOUTS_V1); test_application_process_applicability(model,authorities,proof); run_mutations(model,authorities,proof); run_regressions(model,authorities,proof); print("reference engineering model v0: PASS"); return 0
 if __name__=="__main__": raise SystemExit(main())
