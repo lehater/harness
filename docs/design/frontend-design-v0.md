@@ -116,6 +116,26 @@ Purpose: define the complete material view/frame inventory and navigation relati
 
 Task views carry interaction-context coverage. Material shells/workspaces may be explicit `structural: true` topology views without claiming USER tasks. Site maps/app maps/screen maps are projections from this knowledge.
 
+#### View-boundary decision method
+
+Interface Topology owns semantic view/navigation boundaries. A proposed separate view must be justified from accepted user/task/interaction semantics rather than from backend entities, APIs, tables, aggregates, routes or component structure.
+
+For every material candidate boundary, inspect:
+
+- continuity of the current user goal or decision;
+- whether required information must be simultaneously visible, persistently available, only occasionally retrievable, or is independent;
+- continuity of transient working state such as selection/edit context;
+- commit, cancel, recovery and resumability boundaries;
+- material mode, role or authorization changes;
+- independent revisit/deep-link value;
+- context-switch/refinding cost, especially repeated A -> B -> A movement under one unchanged goal.
+
+These factors are evidence for a decision, not a deterministic scoring formula. No single factor universally requires merge or separation.
+
+When materially different topologies remain viable, `interface-topology-design` uses Decision Governance to challenge at least merge-versus-separate-view and persistent-context-versus-navigation alternatives before selection or escalation.
+
+Interface Topology decides whether an independent semantic navigation/view boundary exists. Presentation System and Screen/View Design decide regions, panes, disclosures, overlays and responsive physical composition inside an accepted view.
+
 ### human-interface-design — compatibility only
 
 Owner: HUMAN-INTERFACE-DESIGN.
