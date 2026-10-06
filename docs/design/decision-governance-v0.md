@@ -133,9 +133,7 @@ knowledge_kinds:
         autonomy: NONE
 ```
 
-A project policy activates the experiment. Without one, strict admission retains existing behavior. The initial experiment covers `domain-model`, `application-design`,
-`system-architecture`, and `implementation-design`. Other routed knowledge
-kinds remain unchanged until project evidence justifies extending the contract.
+A project policy activates the experiment. Without one, strict admission retains existing behavior. Participating knowledge kinds and their current decision axes are defined by `spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml`; adding an axis requires project evidence that the decision is material and belongs to that knowledge owner.
 
 ## Admission integration
 
