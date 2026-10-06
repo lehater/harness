@@ -240,7 +240,14 @@ def evaluate_decision_governance(
         "capability": capability,
         "knowledge_kind": contract.get("knowledge_kind") if contract else None,
     }
-    if contract is None or not contract.get("required") or policy is None:
+    if (
+        contract is None
+        or not contract.get("required")
+        or not policy_applies_to_kind(
+            policy,
+            contract["knowledge_kind"],
+        )
+    ):
         return {**base, "status": "NOT_REQUIRED", "findings": [], "axes": []}
     if exploration_evaluation.get("status") != "ACCEPTED":
         return {
