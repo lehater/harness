@@ -25,7 +25,9 @@ rules:
   - RESEARCH and DEEP_RESEARCH add external evidence obligations.
   - Exploration demonstrates process sufficiency, not exhaustive enumeration of every possible solution.
   - Before choice, decision_space_review must be COMPLETE and cover every discovered decision point.
-  - decision_space_review must check mixed-decision splitting, missing material cases, accepted constraints and Authority boundaries.
+  - decision_space_review must check mixed-decision splitting, missing material cases, the impact-and-reversal materiality frontier, accepted constraints and Authority boundaries.
+  - The impact-and-reversal frontier review searches beyond already-discovered decision points for reasonably discoverable choices with high semantic impact, blast radius, reversal cost or primary-task impact.
+  - A frontier choice with any high criterion must become an explicit decision point, be routed/escalated, or remain an open material gap; local cheap reversible choices that do not materially affect semantics or task success remain downstream freedom.
   - Any open material gap rejects option formation and must be fixed locally or routed as a normal Core Question when it is a semantic unknown.
 
 non_goals:
