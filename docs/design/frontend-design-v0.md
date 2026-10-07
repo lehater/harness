@@ -264,6 +264,8 @@ Component Design should prevent:
 - global state becoming the default owner;
 - framework-specific stores/routes becoming hidden cross-feature integration contracts.
 
+For user-facing applications, Component Design must separately inspect repeated presentation/interaction mechanics across sibling views after feature ownership is established. Feature boundaries and shared presentation primitives answer different questions: a task feature may own semantic state while composing a shared stateless primitive for recurring mechanics such as table sizing, splitters, fields, panels or action treatment. Repeated current mechanics require an explicit shared/local disposition; do not treat "feature-local state" as evidence that the rendering/interaction primitive itself must also be feature-local.
+
 Frontend Test Design derives observable oracles from accepted human-interface semantics. It may cover journeys, view-state transitions, navigation, validation/recovery, keyboard/focus behavior, permission-sensitive behavior and backend-outcome-to-UI-state mapping.
 
 Snapshot or visual-regression tests do not become semantic authority unless the corresponding visual invariant is intentionally canonical.
