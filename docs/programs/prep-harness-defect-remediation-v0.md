@@ -193,7 +193,7 @@ The priority may change after root-cause analysis, but the id and history remain
 | ID | Priority | Systemic defect / missing protection | Primary affected Prep defects | Status |
 |---|---:|---|---|---|
 | HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
-| HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | HARNESS_GREEN |
+| HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | INTEGRATED |
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | REGISTERED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | REGISTERED |
@@ -258,6 +258,7 @@ REGISTERED
   -> HARNESS_RED
   -> FIX_IMPLEMENTED
   -> HARNESS_GREEN
+  -> INTEGRATED
 ```
 
 RED evidence:
@@ -297,7 +298,7 @@ GREEN evidence:
 - `Greenfield Engineering Graph`: run `37582648533` PASS;
 - PR: #200.
 
-Integration is still pending at HARNESS_GREEN. `PREP-UX-005`, `PREP-UX-007` and `PREP-UX-014` do not advance because their remaining Harness dependency sets are not yet terminal. Prep remains unchanged.
+Integration evidence: PR #200 was squash-merged to Harness `main` as `6b46b99603e2b805d7777e6c76d1a9e5a42d4850`. `PREP-UX-005`, `PREP-UX-007` and `PREP-UX-014` remain unchanged because their complete Harness dependency sets are not yet terminal. Prep and `.harness-version` remain unchanged.
 
 ### PREP-UX-005 / PREP-UX-014 — Required Capability filter
 
@@ -618,6 +619,6 @@ This file in Harness is the single source of truth for the denominator, statuses
 
 ## 12. Current program frontier
 
-WP-H2 / HARNESS-002 is HARNESS_GREEN. The immediate bounded action is integration of PR #200 into Harness `main`; no later work package is started from this state.
+WP-H2 / HARNESS-002 is integrated. The next stage is intentionally not selected here; under the stage gate the managing chat must choose and issue the next bounded work package. This executor does not start later work.
 
 Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.
