@@ -13,6 +13,7 @@ ownership:
     - security
     - quality
     - verification
+    - test-design
   note: Concrete realization may be a distinct Capability without creating a new knowledge kind.
 
 decision_classes:
@@ -43,6 +44,7 @@ facets:
   - dependency-enforcement
   - shared-code-policy
   - test-topology
+  - test-design-executable-conformance
   - fixture-test-data-topology
   - migration-topology
   - generated-artifact-topology
@@ -65,6 +67,7 @@ completeness:
   - applicable-obligations-have-enforcement-or-explicit-terminal-disposition
   - source-generated-boundary-is-explicit-when-applicable
   - test-migration-configuration-topology-is-explicit-when-applicable
+  - selected-test-contracts-have-reviewed-complete-executable-obligation-accounting
   - dependency-environment-resolution-is-reproducible-as-required
   - authoritative-gates-are-explicit-when-merge-or-release-gating-is-applicable
   - no-unresolved-question-remains
