@@ -210,6 +210,36 @@ def _validate_test_design(document: dict[str, Any]) -> None:
                     f"test-design/v1 test {test_id} requires {field}"
                 )
 
+        obligation_ids: set[str] = set()
+        for field in ("operation_obligations", "oracle_obligations"):
+            obligations = item.get(field)
+            if obligations is None:
+                continue
+            if not isinstance(obligations, list) or not obligations:
+                raise CoreError(
+                    f"test-design/v1 test {test_id} {field} must be a non-empty list"
+                )
+            for obligation in obligations:
+                if not isinstance(obligation, dict):
+                    raise CoreError(
+                        f"test-design/v1 test {test_id} {field} obligation must be a mapping"
+                    )
+                obligation_id = obligation.get("id")
+                description = obligation.get("description")
+                if not isinstance(obligation_id, str) or not obligation_id.strip():
+                    raise CoreError(
+                        f"test-design/v1 test {test_id} {field} obligation id is required"
+                    )
+                if obligation_id in obligation_ids:
+                    raise CoreError(
+                        f"test-design/v1 test {test_id} duplicate obligation id: {obligation_id}"
+                    )
+                if not isinstance(description, str) or not description.strip():
+                    raise CoreError(
+                        f"test-design/v1 test {test_id} obligation {obligation_id} requires description"
+                    )
+                obligation_ids.add(obligation_id)
+
 
 def _validate_verification_plan(document: dict[str, Any]) -> None:
     content = document.get("content")
