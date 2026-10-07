@@ -71,6 +71,7 @@ exact_files:
   - src/harness/assurance/semantic_derivation.py
   - src/harness/assurance/semantic_fingerprint.py
   - src/harness/assurance/semantic_judgement_calibration.py
+  - src/harness/assurance/test_realization.py
   - src/harness/integration/__init__.py
   - src/harness/integration/adapters/__init__.py
   - src/harness/integration/adapters/canonical_graph.py
