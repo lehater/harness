@@ -392,6 +392,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: traceability_projection
+  command: python tests/test_traceability_projection.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: architecture_driver_closure
   command: python tests/test_architecture_driver_closure.py
   stage: focused
