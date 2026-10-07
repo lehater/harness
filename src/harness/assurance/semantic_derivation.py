@@ -162,10 +162,10 @@ def _observable_realization_selection(
             continue
 
         reviewed_matching.add(assertion_id)
-        categories[assertion_id] = category
         rationale = item.get("rationale")
 
         if status == "REQUIRED":
+            categories[assertion_id] = category
             selected.append(source_assertions[assertion_id])
             continue
 
