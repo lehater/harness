@@ -587,7 +587,13 @@ def _h3_observable_graph() -> dict:
                 ],
             }
         ],
-        "consumers": [],
+        "consumers": [
+            {
+                "id": "FRONTEND",
+                "purpose": "Consume the accepted screen contract.",
+                "requires": ["example.screen"],
+            }
+        ],
         "terminal_capabilities": [],
     }
 
