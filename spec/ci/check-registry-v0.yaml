@@ -387,6 +387,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: test_realization_conformance
+  command: python tests/test_test_realization_conformance.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: architecture_driver_closure
   command: python tests/test_architecture_driver_closure.py
   stage: focused

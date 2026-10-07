@@ -36,10 +36,11 @@ Existing production code and executable tests may describe current state, but th
 5. Identify property/state-machine/generated-test obligations where examples alone are weak.
 6. Preserve substitutability: test consumer-owned/public contracts rather than concrete provider internals unless the verification objective specifically owns an integration boundary.
 7. Trace every contract through non-empty `verification_refs` to accepted Verification Design checks; Product Requirement coverage is inherited through those checks rather than re-stating requirement text.
-8. Leave framework, fixtures, helper structure, mocks and assertion syntax to test implementation unless project policy makes one architecturally significant.
-9. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards. Do not use snapshot/visual-regression output as semantic authority unless a visual invariant is intentionally canonical.
-10. Route any missing expected behavior to its upstream Authority instead of inventing it.
-11. Produce `test-design/v1`, run `python -m harness.workspace.workspace validate-artifact`, accept/register it and reevaluate.
+8. When a contract contains operations or oracles that can be executed, omitted or verified independently, assign stable ids in `operation_obligations` and `oracle_obligations`. Preserve the aggregate `operation`/`oracle` prose for readability; the ids are the realization-accounting surface.
+9. Leave framework, fixtures, helper structure, mocks and assertion syntax to test implementation unless project policy makes one architecturally significant.
+10. For user-facing scopes, derive tests from accepted interface/policy obligations where applicable: state mapping, journey completion, keyboard reachability/focus restoration, status announcements, validation/error association and recovery, authorization-sensitive actions, responsive/reflow invariants and destructive-action safeguards. Do not use snapshot/visual-regression output as semantic authority unless a visual invariant is intentionally canonical.
+11. Route any missing expected behavior to its upstream Authority instead of inventing it.
+12. Produce `test-design/v1`, run `python -m harness.workspace.workspace validate-artifact`, accept/register it and reevaluate.
 
 ## Stop conditions
 
@@ -60,6 +61,8 @@ Required per test contract:
 - controlled `operation`;
 - observable `oracle`.
 
+When an operation or oracle contains independently executable/verifiable obligations, add non-empty `operation_obligations` / `oracle_obligations` entries with stable `id` and `description`. A Test Design contract selected for executable-realization conformance must expose both obligation lists so missing evidence can be identified precisely.
+
 Additional project-native detail may elaborate invariants, failure/atomicity, properties and implementation freedoms, but must not replace the canonical trace to Verification Design.
 
 ## Acceptance checks
@@ -70,6 +73,7 @@ Additional project-native detail may elaborate invariants, failure/atomicity, pr
 - every Verification check with `method: TEST` has at least one Test Design contract;
 - public/consumer contracts are preferred over provider internals;
 - implementation mechanics remain free unless materially constrained;
+- independently executable/verifiable operation and oracle obligations are machine-addressable before implementation evidence is evaluated;
 - test design can survive reasonable implementation refactoring;
 - unresolved semantics are routed upstream.
 
