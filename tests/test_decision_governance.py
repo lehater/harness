@@ -333,6 +333,7 @@ def main() -> int:
     assert set(topology_contract["axes"]) == {"view-boundaries"}, topology_contract
     boundary_axis = topology_contract["axes"]["view-boundaries"]
     assert boundary_axis["delegation_requires"] == "CONSERVATIVE", boundary_axis
+    assert boundary_axis["subject_scope"] == "view-boundary", boundary_axis
     assert set(boundary_axis["material_dimensions"]) == {
         "goal-continuity",
         "information-dependency",
@@ -474,6 +475,24 @@ def main() -> int:
                 "authority-boundary",
                 "no-invention",
                 "topology-not-screen-composition",
+                "view-boundary-semantics",
+            ],
+            "view_boundary_requirements": [
+                {
+                    "id": "BOUNDARY-A-B",
+                    "participants": ["VIEW-A", "VIEW-B"],
+                    "materiality": "MATERIAL",
+                    "contestability": "CONTESTABLE",
+                    "outcome": "SEPARATE",
+                    "rationale_bases": [
+                        {
+                            "id": "GOAL-BOUNDARY",
+                            "classification": "USER_FACING",
+                            "rationale": "The boundary is materially user-facing.",
+                        }
+                    ],
+                    "decision_refs": ["overall-view-structure"],
+                }
             ],
         },
         "decision_review": {
@@ -513,6 +532,7 @@ def main() -> int:
         model=topology_model,
     )
     assert h003_red["status"] == "REJECTED", h003_red
+    assert "VIEW_BOUNDARY_DECISION_COVERAGE_MISSING" in codes(h003_red), h003_red
 
     # WP-H4 / HARNESS-008 RED: task/application responsibility separation can
     # currently masquerade as sufficient user-facing view-boundary rationale.
@@ -564,6 +584,7 @@ def main() -> int:
         responsibility_shaped,
     )
     assert h008_red["status"] == "REJECTED", h008_red
+    assert "VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED" in codes(h008_red), h008_red
 
     screen_contract = contracts["screen-view-design"]
     assert set(screen_contract["axes"]) == {
