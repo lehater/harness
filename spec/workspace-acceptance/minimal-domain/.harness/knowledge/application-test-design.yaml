@@ -12,4 +12,12 @@ content:
         - VER-COMPONENT-UNIQUENESS
       precondition: An Application already contains Component C1.
       operation: Attempt to add Component C1 to the same Application again.
+      operation_obligations:
+        - id: OP-ATTEMPT-DUPLICATE
+          description: Attempt to add Component C1 to the same Application again.
       oracle: The duplicate membership is rejected and the existing membership remains unchanged.
+      oracle_obligations:
+        - id: ORACLE-DUPLICATE-REJECTED
+          description: The duplicate membership is rejected.
+        - id: ORACLE-EXISTING-UNCHANGED
+          description: The existing membership remains unchanged.
