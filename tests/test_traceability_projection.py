@@ -5,6 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+# HARNESS-007 RED: this standard projection is intentionally absent at baseline.
 from harness.assurance.traceability_projection import build_traceability_projection
 
 
