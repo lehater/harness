@@ -483,7 +483,13 @@ def test_h3_role_and_observable_realization_false_greens() -> None:
                 ],
             }
         ],
-        "consumers": [],
+        "consumers": [
+            {
+                "id": "FRONTEND",
+                "purpose": "Consume the accepted screen contract.",
+                "requires": ["example.screen"],
+            }
+        ],
         "terminal_capabilities": [],
     }
     source = {
