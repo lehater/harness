@@ -732,6 +732,15 @@ def _evaluate_representation_selection_applicability(
                     "representation_subject": subject_id,
                 }
             )
+        if disposition in {"DECIDE", "OVERRIDE"} and (
+            not isinstance(required_challenges, list) or not required_challenges
+        ):
+            findings.append(
+                {
+                    "code": "REPRESENTATION_REQUIRED_CHALLENGES_REQUIRED",
+                    "representation_subject": subject_id,
+                }
+            )
 
         if disposition == "DECIDE":
             if not decision_refs:
