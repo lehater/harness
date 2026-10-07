@@ -201,6 +201,11 @@ contracts:
         minimum_probes: 2
         material_dimensions: [boundary-granularity, ownership-basis, cross-feature-sharing]
         challenge_strategies: [split-vs-merge, feature-vs-technical, local-vs-shared]
+      - id: reuse-composition
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        material_dimensions: [repeated-responsibility, sharing-scope, state-ownership, local-specialization]
+        challenge_strategies: [duplicate-vs-shared, shared-vs-local-state, composition-vs-specialization]
       - id: provider-seams
         delegation_requires: CONSERVATIVE
         minimum_probes: 2
