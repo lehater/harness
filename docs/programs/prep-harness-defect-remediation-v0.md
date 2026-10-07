@@ -193,7 +193,7 @@ The priority may change after root-cause analysis, but the id and history remain
 | ID | Priority | Systemic defect / missing protection | Primary affected Prep defects | Status |
 |---|---:|---|---|---|
 | HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
-| HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | REGISTERED |
+| HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | HARNESS_GREEN |
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | REGISTERED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | REGISTERED |
@@ -247,6 +247,57 @@ GREEN evidence:
 - PR: #198.
 
 Integration evidence: PR #198 was squash-merged to Harness `main` as `64915278c04d14ecd385efd22f974b82529cfdaa`. `PREP-UX-005` stays `REPRODUCED`; HARNESS-002 and HARNESS-005 remain unresolved dependencies, so it does not advance to `HARNESS_DISPOSITIONED`.
+
+### HARNESS-002 — executable Test Design conformance
+
+Status history for WP-H2:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- regression: `tests/test_test_realization_conformance.py::test_test_design_realization_rejects_missing_operation`;
+- RED-only commit: `60aeaeb78123260ea4e01df5e509de323c0ff9d1`;
+- CI run `37582618670` failed after the baseline `repository_realization` evaluator returned `complete: true` for executable evidence that covered scoped-state observation, clear/reset and restored-state observation while omitting `OP-APPLY`.
+
+Root cause:
+
+Accepted Test Design defined the executable behavioral contract, but its operation/oracle content was not independently addressable for realization accounting and Harness had no conformance boundary from that contract to concrete executable evidence. Repository realization could therefore be complete while a green test exercised only a weaker neighboring flow.
+
+Implemented invariant:
+
+- independently executable/verifiable Test Design operations and oracles use stable `operation_obligations` / `oracle_obligations` ids;
+- executable test code remains noncanonical implementation evidence and binds concrete test locators to those canonical ids;
+- a binding contributes coverage only after an ACCEPTED `executable-correspondence` semantic review and only when its referenced executable evidence is `PASSED`;
+- deterministic assurance then accounts every required operation/oracle and reports the exact missing obligation;
+- no regex/AST/framework-specific inference or Prep-specific semantics are used; one executable may cover several obligations and several executables may jointly realize one contract.
+
+Negative mutations:
+
+- missing `OP-APPLY`: REJECTED with `TEST_REALIZATION_OPERATION_MISSING`;
+- missing `ORACLE-RESTORED`: REJECTED with `TEST_REALIZATION_ORACLE_MISSING`;
+- an unreviewed binding claim does not count as correspondence.
+
+Positive controls:
+
+- full realization of all operation/oracle obligations: ACCEPTED;
+- one-test and split-test organizations both realize the same Test Design contract: ACCEPTED.
+
+GREEN evidence:
+
+- validated implementation head: `17798f12547ea05578607fa3cef3f7302345fb20`;
+- `harness core` / `make harness-check`: run `37582648536` PASS;
+- `CI policy`: run `37582648539` PASS;
+- `Greenfield Engineering Graph`: run `37582648533` PASS;
+- PR: #200.
+
+Integration is still pending at HARNESS_GREEN. `PREP-UX-005`, `PREP-UX-007` and `PREP-UX-014` do not advance because their remaining Harness dependency sets are not yet terminal. Prep remains unchanged.
 
 ### PREP-UX-005 / PREP-UX-014 — Required Capability filter
 
@@ -567,14 +618,6 @@ This file in Harness is the single source of truth for the denominator, statuses
 
 ## 12. Current program frontier
 
-WP-H1 / HARNESS-001 is integrated. The recommended next work package is:
-
-```
-WP-H2
-HARNESS-002
-executable Test Design conformance
-```
-
-This document records the recommendation only; WP-H2 is not started by WP-H1.
+WP-H2 / HARNESS-002 is HARNESS_GREEN. The immediate bounded action is integration of PR #200 into Harness `main`; no later work package is started from this state.
 
 Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.
