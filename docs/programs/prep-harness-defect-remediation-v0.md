@@ -192,7 +192,7 @@ The priority may change after root-cause analysis, but the id and history remain
 
 | ID | Priority | Systemic defect / missing protection | Primary affected Prep defects | Status |
 |---|---:|---|---|---|
-| HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | HARNESS_GREEN |
+| HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
 | HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | REGISTERED |
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | REGISTERED |
@@ -213,6 +213,7 @@ REGISTERED
   -> HARNESS_RED
   -> FIX_IMPLEMENTED
   -> HARNESS_GREEN
+  -> INTEGRATED
 ```
 
 RED evidence:
@@ -245,7 +246,7 @@ GREEN evidence:
 - `Greenfield Engineering Graph`: run `37579171021` PASS;
 - PR: #198.
 
-Integration remains the only WP-H1 state transition still pending on this branch. `PREP-UX-005` stays `REPRODUCED`; HARNESS-002 and HARNESS-005 remain unresolved dependencies.
+Integration evidence: PR #198 was squash-merged to Harness `main` as `64915278c04d14ecd385efd22f974b82529cfdaa`. `PREP-UX-005` stays `REPRODUCED`; HARNESS-002 and HARNESS-005 remain unresolved dependencies, so it does not advance to `HARNESS_DISPOSITIONED`.
 
 ### PREP-UX-005 / PREP-UX-014 — Required Capability filter
 
@@ -566,14 +567,14 @@ This file in Harness is the single source of truth for the denominator, statuses
 
 ## 12. Current program frontier
 
-The immediate next action is:
+WP-H1 / HARNESS-001 is integrated. The recommended next work package is:
 
 ```
-WP-H1
-HARNESS-001
-integrate the GREEN semantic-surface completeness / atom-granularity fix
+WP-H2
+HARNESS-002
+executable Test Design conformance
 ```
 
-After WP-H1 integration, the recommended next work package is WP-H2 so that accepted Test Design operations are also bound to executable evidence. The executor does not start WP-H2 from this document update.
+This document records the recommendation only; WP-H2 is not started by WP-H1.
 
 Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.
