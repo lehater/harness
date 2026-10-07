@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 from copy import deepcopy
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from harness.assurance.test_realization import evaluate
 
@@ -222,3 +227,20 @@ def test_materially_different_test_organizations_can_realize_same_contract() -> 
 
     assert split_result["status"] == "ACCEPTED", split_result
     assert split_result["coverage"] == single_result["coverage"]
+
+
+def main() -> int:
+    test_test_design_realization_rejects_missing_operation()
+    test_test_design_realization_rejects_missing_oracle()
+    test_binding_claim_does_not_count_without_semantic_correspondence_review()
+    test_full_test_design_realization_is_accepted()
+    test_materially_different_test_organizations_can_realize_same_contract()
+    print(
+        "test realization conformance: ok "
+        "(missing operation/oracle + reviewed correspondence + implementation freedom)"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
