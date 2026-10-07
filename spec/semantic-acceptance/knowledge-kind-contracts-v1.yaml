@@ -145,10 +145,12 @@ contracts:
     required_review_checks:
       - presentation-not-domain-semantics
       - independent-obligation-granularity
+      - representation-selection-applicability
   - knowledge_kind: screen-view-design
     required_review_checks:
       - screen-not-product-semantics
       - independent-obligation-granularity
+      - representation-selection-applicability
   - knowledge_kind: data-design
     required_review_checks: [storage-not-semantic-owner]
   - knowledge_kind: operability-design

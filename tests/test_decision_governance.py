@@ -310,6 +310,7 @@ def main() -> int:
         "knowledge-representation",
         "information-density",
         "control-surface",
+        "representation-selection",
     }, presentation_contract
     surface_axis = presentation_contract["axes"]["application-surface"]
     assert set(surface_axis["material_dimensions"]) == {
@@ -896,11 +897,716 @@ def main() -> int:
     )
     assert grouped["status"] == "ACCEPTED", grouped
 
+
+    # WP-H5 / HARNESS-006 RED A+B: accepted task semantics can identify a
+    # material comparison/collection representation need while all current
+    # Presentation Decision Governance axes are complete. The baseline has no
+    # representation-scoped axis, so both cases false-green.
+    presentation_graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "H5-PRESENTATION",
+        "authorities": [
+            {
+                "id": "HUMAN-INTERFACE-DESIGN",
+                "responsibility": "Own user-facing presentation decisions.",
+                "boundary": {
+                    "semantic_cohesion": "Application presentation semantics.",
+                    "independent_change": "Presentation can change independently.",
+                    "public_contract": "Accepted presentation system.",
+                },
+                "produces": [
+                    {
+                        "capability": "example.presentation",
+                        "knowledge_kind": "presentation-system-design",
+                        "requires": [],
+                    }
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "PRESENTATION-CONSUMER",
+                "purpose": "Consume accepted presentation decisions.",
+                "requires": ["example.presentation"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    presentation_model = {"artifacts": [], "questions": []}
+    presentation_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "knowledge_kinds": [
+            {
+                "knowledge_kind": "presentation-system-design",
+                "autonomy": "CONSERVATIVE",
+            }
+        ],
+    }
+    presentation_context = build_authority_context(
+        presentation_graph,
+        presentation_model,
+        "HUMAN-INTERFACE-DESIGN",
+        ["example.presentation"],
+    )
+    presentation_request = build_decision_explorer_request(
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        authority_context=presentation_context,
+        contract=presentation_contract,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        prerequisite_baseline={},
+        model=presentation_model,
+    )
+    legacy_presentation_axes = [
+        "application-surface",
+        "knowledge-representation",
+        "information-density",
+        "control-surface",
+    ]
+    legacy_axes = []
+    legacy_review_axes = []
+    for axis in legacy_presentation_axes:
+        axis_contract = presentation_contract["axes"][axis]
+        dim = axis_contract["material_dimensions"][0]
+        strategies = axis_contract["challenge_strategies"][:2]
+        decision_id = f"{axis}-legacy-choice"
+        alternative_ids = [f"{axis}-legacy-a", f"{axis}-legacy-b"]
+        legacy_axes.append(
+            {
+                "axis": axis,
+                "applicability": "APPLICABLE",
+                "exploration_level": "EXPLORE",
+                "probes": [
+                    {
+                        "strategy": strategies[0],
+                        "challenge": f"Challenge {axis} through {strategies[0]}.",
+                        "alternatives": alternative_ids,
+                        "decision_points": [decision_id],
+                    },
+                    {
+                        "strategy": strategies[1],
+                        "challenge": f"Challenge {axis} through {strategies[1]}.",
+                        "alternatives": alternative_ids,
+                        "decision_points": [decision_id],
+                    },
+                ],
+                "decision_points": [
+                    {
+                        "id": decision_id,
+                        "alternatives": [
+                            {
+                                "id": alternative_ids[0],
+                                "difference": f"Alternative A for {axis}.",
+                                "material_effects": {dim: "A"},
+                            },
+                            {
+                                "id": alternative_ids[1],
+                                "difference": f"Alternative B for {axis}.",
+                                "material_effects": {dim: "B"},
+                            },
+                        ],
+                    }
+                ],
+            }
+        )
+        legacy_review_axes.append(
+            {
+                "axis": axis,
+                "decisions": [
+                    {
+                        "id": decision_id,
+                        "owner_authority": "HUMAN-INTERFACE-DESIGN",
+                        "alternatives": [
+                            {"id": alternative_ids[0], "state": "VIABLE"},
+                            {
+                                "id": alternative_ids[1],
+                                "state": "REJECTED",
+                                "rationale": "Accepted constraints eliminate alternative B.",
+                            },
+                        ],
+                        "disposition": "DETERMINED",
+                        "selected": alternative_ids[0],
+                    }
+                ],
+            }
+        )
+    legacy_presentation_exploration = {
+        "version": 1,
+        "kind": "harness-decision-exploration",
+        "capability": "example.presentation",
+        "knowledge_kind": "presentation-system-design",
+        "explorer_request_id": presentation_request["request_id"],
+        "research_sources": [],
+        "axes": legacy_axes,
+        "decision_space_review": {
+            "status": "COMPLETE",
+            "checks": [
+                "mixed-decision-split",
+                "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
+                "accepted-constraint-cross-check",
+                "authority-boundary-cross-check",
+            ],
+            "reviewed_decisions": [
+                item["decisions"][0]["id"] for item in legacy_review_axes
+            ],
+            "open_gaps": [],
+        },
+    }
+
+    def legacy_representation_candidate(subject):
+        return {
+            "id": f"PRESENTATION-{subject['id']}",
+            "capability": "example.presentation",
+            "semantic_assertions": [],
+            "semantic_review": {
+                "status": "ACCEPTED",
+                "representation_requirements": [subject],
+            },
+            "decision_review": {"axes": copy.deepcopy(legacy_review_axes)},
+        }
+
+    h006_red_a = evaluate_decision_preflight(
+        contract=presentation_contract,
+        policy=presentation_policy,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        explorer_request=presentation_request,
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=legacy_presentation_exploration,
+        candidate=legacy_representation_candidate(
+            {
+                "id": "REP-COMPARE-A-B",
+                "materiality": "MATERIAL",
+                "disposition": "DECIDE",
+                "task_semantics": "Compare N candidate entities over the same semantic dimensions.",
+                "required_dimensions": ["cross-entity-alignment"],
+                "required_challenges": ["independent-vs-aligned-records"],
+                "decision_refs": [],
+            }
+        ),
+        model=presentation_model,
+    )
+    assert h006_red_a["status"] == "REJECTED", h006_red_a
+
+    h006_red_b = evaluate_decision_preflight(
+        contract=presentation_contract,
+        policy=presentation_policy,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        explorer_request=presentation_request,
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=legacy_presentation_exploration,
+        candidate=legacy_representation_candidate(
+            {
+                "id": "REP-HOMOGENEOUS-COLLECTION",
+                "materiality": "MATERIAL",
+                "disposition": "DECIDE",
+                "task_semantics": "Scan homogeneous records over shared fields and repeated state.",
+                "required_dimensions": ["record-scan-structure"],
+                "required_challenges": ["repeated-vs-structured-collection"],
+                "decision_refs": [],
+            }
+        ),
+        model=presentation_model,
+    )
+    assert h006_red_b["status"] == "REJECTED", h006_red_b
+
+    representation_axis = presentation_contract["axes"]["representation-selection"]
+    assert representation_axis["subject_scope"] == "representation-subject", representation_axis
+    assert set(representation_axis["material_dimensions"]) == {
+        "cross-entity-alignment",
+        "record-scan-structure",
+        "selection-mechanics",
+        "relation-encoding",
+        "detail-context-preservation",
+        "responsive-semantic-preservation",
+    }, representation_axis
+    assert {
+        "independent-vs-aligned-records",
+        "repeated-vs-structured-collection",
+        "overview-vs-progressive-detail",
+        "spatial-vs-nonspatial",
+        "selection-mechanic-perturbation",
+        "responsive-representation-perturbation",
+    } == set(representation_axis["challenge_strategies"]), representation_axis
+
+    def task_basis(basis_id="TASK"):
+        return [
+            {
+                "id": basis_id,
+                "classification": "TASK_SEMANTICS",
+                "rationale": "Accepted user task semantics make representation choice material.",
+            }
+        ]
+
+    def representation_requirement(
+        subject_id,
+        *,
+        dimensions,
+        challenges,
+        decision_id=None,
+        bases=None,
+        disposition="DECIDE",
+        shared_default_ref=None,
+        override_rationale=None,
+    ):
+        value = {
+            "id": subject_id,
+            "materiality": "MATERIAL",
+            "disposition": disposition,
+            "task_semantics": f"Task-facing representation semantics for {subject_id}.",
+            "bases": task_basis(subject_id) if bases is None else bases,
+            "required_dimensions": list(dimensions),
+            "required_challenges": list(challenges),
+            "decision_refs": [decision_id] if decision_id else [],
+        }
+        if shared_default_ref is not None:
+            value["shared_default_ref"] = shared_default_ref
+        if override_rationale is not None:
+            value["override_rationale"] = override_rationale
+        return value
+
+    def representation_preflight(
+        requirement,
+        alternatives,
+        strategies,
+        *,
+        decision_id="representation-choice",
+    ):
+        alt_ids = [item["id"] for item in alternatives]
+        axes = copy.deepcopy(legacy_axes)
+        axes.append(
+            {
+                "axis": "representation-selection",
+                "applicability": "APPLICABLE",
+                "exploration_level": "EXPLORE",
+                "probes": [
+                    {
+                        "strategy": strategy,
+                        "challenge": f"Challenge {requirement['id']} through {strategy}.",
+                        "alternatives": alt_ids,
+                        "decision_points": [decision_id],
+                    }
+                    for strategy in strategies
+                ],
+                "decision_points": [
+                    {
+                        "id": decision_id,
+                        "subjects": [requirement["id"]],
+                        "alternatives": copy.deepcopy(alternatives),
+                    }
+                ],
+            }
+        )
+        review_axes = copy.deepcopy(legacy_review_axes)
+        review_axes.append(
+            {
+                "axis": "representation-selection",
+                "decisions": [
+                    {
+                        "id": decision_id,
+                        "owner_authority": "HUMAN-INTERFACE-DESIGN",
+                        "alternatives": [
+                            {"id": alt_ids[0], "state": "VIABLE"},
+                            *[
+                                {
+                                    "id": alt_id,
+                                    "state": "REJECTED",
+                                    "rationale": "Accepted task constraints favor the selected alternative.",
+                                }
+                                for alt_id in alt_ids[1:]
+                            ],
+                        ],
+                        "disposition": "DETERMINED",
+                        "selected": alt_ids[0],
+                    }
+                ],
+            }
+        )
+        exploration_value = {
+            "version": 1,
+            "kind": "harness-decision-exploration",
+            "capability": "example.presentation",
+            "knowledge_kind": "presentation-system-design",
+            "explorer_request_id": presentation_request["request_id"],
+            "research_sources": [],
+            "axes": axes,
+            "decision_space_review": {
+                "status": "COMPLETE",
+                "checks": [
+                    "mixed-decision-split",
+                    "missing-material-case-search",
+                    "impact-and-reversal-frontier-check",
+                    "accepted-constraint-cross-check",
+                    "authority-boundary-cross-check",
+                ],
+                "reviewed_decisions": [
+                    item["decisions"][0]["id"] for item in review_axes
+                ],
+                "open_gaps": [],
+            },
+        }
+        candidate_value = {
+            "id": f"PRESENTATION-{requirement['id']}",
+            "capability": "example.presentation",
+            "semantic_assertions": [],
+            "semantic_review": {
+                "status": "ACCEPTED",
+                "representation_requirements": [copy.deepcopy(requirement)],
+            },
+            "decision_review": {"axes": review_axes},
+        }
+        return evaluate_decision_preflight(
+            contract=presentation_contract,
+            policy=presentation_policy,
+            axis_policies=axis_policies(presentation_contract, presentation_policy),
+            explorer_request=presentation_request,
+            capability="example.presentation",
+            knowledge_kind="presentation-system-design",
+            authority="HUMAN-INTERFACE-DESIGN",
+            exploration_evidence=exploration_value,
+            candidate=candidate_value,
+            model=presentation_model,
+        )
+
+    # M1: an unrelated representation decision cannot cover the material subject.
+    m1_requirement = representation_requirement(
+        "REP-COMPARE-M1",
+        dimensions=["cross-entity-alignment"],
+        challenges=["independent-vs-aligned-records"],
+    )
+    m1 = representation_preflight(
+        m1_requirement,
+        [
+            {
+                "id": "aligned-rows",
+                "difference": "Align same dimensions across candidates.",
+                "material_effects": {"cross-entity-alignment": "aligned"},
+            },
+            {
+                "id": "independent-records",
+                "difference": "Keep each candidate independently grouped.",
+                "material_effects": {"cross-entity-alignment": "independent"},
+            },
+        ],
+        ["independent-vs-aligned-records", "overview-vs-progressive-detail"],
+        decision_id="unrelated-representation-choice",
+    )
+    assert m1["status"] == "REJECTED", m1
+    assert "REPRESENTATION_DECISION_COVERAGE_MISSING" in codes(m1), m1
+
+    # M2: visually different card variants are not a semantic challenge to
+    # same-dimension alignment when alignment itself never varies.
+    m2_requirement = representation_requirement(
+        "REP-COMPARE-M2",
+        dimensions=["cross-entity-alignment"],
+        challenges=["independent-vs-aligned-records"],
+        decision_id="compare-m2-choice",
+    )
+    m2 = representation_preflight(
+        m2_requirement,
+        [
+            {
+                "id": "large-cards",
+                "difference": "Large independent record surfaces.",
+                "material_effects": {
+                    "cross-entity-alignment": "independent",
+                    "record-scan-structure": "large-repeated-records",
+                },
+            },
+            {
+                "id": "compact-cards",
+                "difference": "Compact independent record surfaces.",
+                "material_effects": {
+                    "cross-entity-alignment": "independent",
+                    "record-scan-structure": "compact-repeated-records",
+                },
+            },
+        ],
+        ["independent-vs-aligned-records", "overview-vs-progressive-detail"],
+        decision_id="compare-m2-choice",
+    )
+    assert m2["status"] == "REJECTED", m2
+    assert "REPRESENTATION_REQUIRED_DIMENSION_NOT_CHALLENGED" in codes(m2), m2
+
+    # M3: implementation availability is evidence about feasibility, not
+    # authority for a material representation choice.
+    m3_requirement = representation_requirement(
+        "REP-COLLECTION-M3",
+        dimensions=["record-scan-structure"],
+        challenges=["repeated-vs-structured-collection"],
+        decision_id="collection-m3-choice",
+        bases=[
+            {
+                "id": "EXISTING-DATATABLE",
+                "classification": "IMPLEMENTATION_PRIMITIVE",
+                "rationale": "A reusable DataTable already exists.",
+            }
+        ],
+    )
+    m3 = representation_preflight(
+        m3_requirement,
+        [
+            {
+                "id": "tabular-records",
+                "difference": "Aligned shared fields.",
+                "material_effects": {"record-scan-structure": "aligned-fields"},
+            },
+            {
+                "id": "grouped-list",
+                "difference": "Grouped records with repeated labels.",
+                "material_effects": {"record-scan-structure": "grouped-records"},
+            },
+        ],
+        ["repeated-vs-structured-collection", "overview-vs-progressive-detail"],
+        decision_id="collection-m3-choice",
+    )
+    assert m3["status"] == "REJECTED", m3
+    assert "REPRESENTATION_TASK_BASIS_REQUIRED" in codes(m3), m3
+
+    # M4: homogeneous collection fallthrough is the collection analogue of RED A.
+    m4_requirement = representation_requirement(
+        "REP-COLLECTION-M4",
+        dimensions=["record-scan-structure"],
+        challenges=["repeated-vs-structured-collection"],
+    )
+    m4 = representation_preflight(
+        m4_requirement,
+        [
+            {
+                "id": "aligned-records",
+                "difference": "Expose shared fields in aligned record structure.",
+                "material_effects": {"record-scan-structure": "aligned-fields"},
+            },
+            {
+                "id": "repeated-surfaces",
+                "difference": "Repeat the full record surface.",
+                "material_effects": {"record-scan-structure": "repeated-fields"},
+            },
+        ],
+        ["repeated-vs-structured-collection", "overview-vs-progressive-detail"],
+        decision_id="unrelated-collection-choice",
+    )
+    assert m4["status"] == "REJECTED", m4
+    assert "REPRESENTATION_DECISION_COVERAGE_MISSING" in codes(m4), m4
+
+    representation_semantic_contract = {
+        "requires_semantic_review": True,
+        "required_semantic_review_checks": ["representation-selection-applicability"],
+    }
+
+    # M5: a screen with a shared default must call a local change an OVERRIDE
+    # and carry explicit rationale; silently choosing another representation is rejected.
+    m5_candidate = {
+        "id": "SCREEN-M5",
+        "capability": "example.screen",
+        "semantic_assertions": [],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["representation-selection-applicability"],
+            "representation_requirements": [
+                representation_requirement(
+                    "REP-SCREEN-M5",
+                    dimensions=["record-scan-structure"],
+                    challenges=["repeated-vs-structured-collection"],
+                    decision_id="screen-local-choice",
+                    disposition="DECIDE",
+                    shared_default_ref="REP-SHARED-COLLECTION",
+                )
+            ],
+        },
+    }
+    m5 = evaluate_artifact(
+        representation_semantic_contract,
+        {"semantic_assertions": []},
+        m5_candidate,
+    )
+    assert m5["status"] == "REJECTED", m5
+    assert "REPRESENTATION_OVERRIDE_DISPOSITION_REQUIRED" in codes(m5), m5
+
+    # P1: cards remain a valid result when individual rich inspection is the task.
+    p1 = representation_preflight(
+        representation_requirement(
+            "REP-RICH-ENTITIES",
+            dimensions=["detail-context-preservation"],
+            challenges=["overview-vs-progressive-detail"],
+            decision_id="rich-entity-choice",
+        ),
+        [
+            {
+                "id": "rich-cards",
+                "difference": "Keep rich entity context co-located for individual inspection.",
+                "material_effects": {"detail-context-preservation": "co-located"},
+            },
+            {
+                "id": "summary-plus-detail",
+                "difference": "Use compact summaries with progressive detail.",
+                "material_effects": {"detail-context-preservation": "progressive"},
+            },
+        ],
+        ["overview-vs-progressive-detail", "repeated-vs-structured-collection"],
+        decision_id="rich-entity-choice",
+    )
+    assert p1["status"] == "ACCEPTED", p1
+
+    # P2: homogeneous records are not forced into a table.
+    p2 = representation_preflight(
+        representation_requirement(
+            "REP-HOMOGENEOUS-P2",
+            dimensions=["record-scan-structure"],
+            challenges=["repeated-vs-structured-collection"],
+            decision_id="homogeneous-p2-choice",
+        ),
+        [
+            {
+                "id": "grouped-list",
+                "difference": "Use a grouped list optimized for the accepted scan task.",
+                "material_effects": {"record-scan-structure": "grouped-scan"},
+            },
+            {
+                "id": "tabular-alignment",
+                "difference": "Use aligned shared fields.",
+                "material_effects": {"record-scan-structure": "aligned-fields"},
+            },
+        ],
+        ["repeated-vs-structured-collection", "overview-vs-progressive-detail"],
+        decision_id="homogeneous-p2-choice",
+    )
+    assert p2["status"] == "ACCEPTED", p2
+
+    # P3: same-dimension comparison can be aligned without selecting an HTML table.
+    p3 = representation_preflight(
+        representation_requirement(
+            "REP-COMPARE-P3",
+            dimensions=["cross-entity-alignment"],
+            challenges=["independent-vs-aligned-records"],
+            decision_id="compare-p3-choice",
+        ),
+        [
+            {
+                "id": "synchronized-columns",
+                "difference": "Synchronize candidate columns over shared dimensions.",
+                "material_effects": {"cross-entity-alignment": "aligned"},
+            },
+            {
+                "id": "independent-records",
+                "difference": "Keep dimensions inside independent candidate records.",
+                "material_effects": {"cross-entity-alignment": "independent"},
+            },
+        ],
+        ["independent-vs-aligned-records", "overview-vs-progressive-detail"],
+        decision_id="compare-p3-choice",
+    )
+    assert p3["status"] == "ACCEPTED", p3
+
+    # P4: spatial/relational knowledge remains free to select graph or mixed forms.
+    p4 = representation_preflight(
+        representation_requirement(
+            "REP-RELATIONAL-P4",
+            dimensions=["relation-encoding"],
+            challenges=["spatial-vs-nonspatial"],
+            decision_id="relational-p4-choice",
+        ),
+        [
+            {
+                "id": "mixed-graph-and-results",
+                "difference": "Use spatial overview plus nonspatial results.",
+                "material_effects": {"relation-encoding": "mixed-spatial"},
+            },
+            {
+                "id": "nonspatial-results",
+                "difference": "Use only nonspatial relation listings.",
+                "material_effects": {"relation-encoding": "nonspatial"},
+            },
+        ],
+        ["spatial-vs-nonspatial", "overview-vs-progressive-detail"],
+        decision_id="relational-p4-choice",
+    )
+    assert p4["status"] == "ACCEPTED", p4
+
+    # P5: a local override is valid when the shared default is explicit and the
+    # deviation is intentionally justified.
+    p5_requirement = representation_requirement(
+        "REP-SCREEN-P5",
+        dimensions=["record-scan-structure"],
+        challenges=["repeated-vs-structured-collection"],
+        decision_id="screen-p5-choice",
+        disposition="OVERRIDE",
+        shared_default_ref="REP-SHARED-COLLECTION",
+        override_rationale="This screen preserves required context through a local master-detail form.",
+    )
+    p5_semantics = evaluate_artifact(
+        representation_semantic_contract,
+        {"semantic_assertions": []},
+        {
+            "id": "SCREEN-P5",
+            "capability": "example.screen",
+            "semantic_assertions": [],
+            "semantic_review": {
+                "status": "ACCEPTED",
+                "checks": ["representation-selection-applicability"],
+                "representation_requirements": [p5_requirement],
+            },
+        },
+    )
+    assert p5_semantics["status"] == "ACCEPTED", p5_semantics
+    p5 = representation_preflight(
+        p5_requirement,
+        [
+            {
+                "id": "local-master-detail",
+                "difference": "Preserve local context with master-detail.",
+                "material_effects": {"record-scan-structure": "master-detail"},
+            },
+            {
+                "id": "shared-aligned-records",
+                "difference": "Inherit aligned shared records unchanged.",
+                "material_effects": {"record-scan-structure": "aligned-fields"},
+            },
+        ],
+        ["repeated-vs-structured-collection", "overview-vs-progressive-detail"],
+        decision_id="screen-p5-choice",
+    )
+    assert p5["status"] == "ACCEPTED", p5
+
+    # P6: responsive structure may transform as long as preservation itself was
+    # materially challenged rather than frozen to one primitive/layout.
+    p6 = representation_preflight(
+        representation_requirement(
+            "REP-RESPONSIVE-P6",
+            dimensions=["responsive-semantic-preservation"],
+            challenges=["responsive-representation-perturbation"],
+            decision_id="responsive-p6-choice",
+        ),
+        [
+            {
+                "id": "wide-aligned-narrow-serialized",
+                "difference": "Align on wide surfaces and serialize on narrow surfaces.",
+                "material_effects": {"responsive-semantic-preservation": "preserved"},
+            },
+            {
+                "id": "fixed-wide-structure",
+                "difference": "Keep the wide structure unchanged at narrow width.",
+                "material_effects": {"responsive-semantic-preservation": "degraded"},
+            },
+        ],
+        ["responsive-representation-perturbation", "independent-vs-aligned-records"],
+        decision_id="responsive-p6-choice",
+    )
+    assert p6["status"] == "ACCEPTED", p6
+
     screen_contract = contracts["screen-view-design"]
     assert set(screen_contract["axes"]) == {
         "view-composition",
         "detail-edit-placement",
         "responsive-composition",
+        "representation-selection",
     }, screen_contract
     assert all(
         item["delegation_requires"] == "CONSERVATIVE"

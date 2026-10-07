@@ -535,6 +535,278 @@ def _evaluate_interaction_role_coherence(
 
     return findings
 
+
+def _evaluate_representation_selection_applicability(
+    review: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Validate semantic-review-selected material representation subjects.
+
+    Semantic judgement owns whether representation choice is material and which
+    task-facing dimensions/challenges matter. This validator checks only the
+    machine-addressable accounting and inheritance/override disposition; it does
+    not infer applicability from words such as card/list/table/compare.
+    """
+    if not isinstance(review, dict):
+        return [{"code": "REPRESENTATION_REVIEW_REQUIRED"}]
+    items = review.get("representation_requirements")
+    if not isinstance(items, list):
+        return [{"code": "REPRESENTATION_REVIEW_REQUIRED"}]
+
+    findings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    allowed_materiality = {"MATERIAL", "NOT_MATERIAL"}
+    allowed_dispositions = {
+        "DECIDE",
+        "INHERIT",
+        "OVERRIDE",
+        "NOT_REQUIRED",
+        "QUESTION",
+    }
+    allowed_basis_classes = {
+        "TASK_SEMANTICS",
+        "INFORMATION_SEMANTICS",
+        "ACCEPTED_CONSTRAINT",
+        "IMPLEMENTATION_PRIMITIVE",
+        "LEGACY_IMPLEMENTATION",
+        "OTHER",
+    }
+    task_facing_basis_classes = {
+        "TASK_SEMANTICS",
+        "INFORMATION_SEMANTICS",
+        "ACCEPTED_CONSTRAINT",
+    }
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append(
+                {"code": "INVALID_REPRESENTATION_REQUIREMENT", "index": index}
+            )
+            continue
+        subject_id = item.get("id")
+        materiality = item.get("materiality")
+        disposition = item.get("disposition")
+        task_semantics = item.get("task_semantics")
+        if (
+            not isinstance(subject_id, str)
+            or not subject_id
+            or subject_id in seen_ids
+            or materiality not in allowed_materiality
+            or disposition not in allowed_dispositions
+            or not isinstance(task_semantics, str)
+            or not task_semantics.strip()
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_REPRESENTATION_REQUIREMENT",
+                    "index": index,
+                    **(
+                        {"representation_subject": subject_id}
+                        if isinstance(subject_id, str) and subject_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+        seen_ids.add(subject_id)
+
+        bases = item.get("bases", []) or []
+        valid_bases: list[dict[str, Any]] = []
+        basis_ids: set[str] = set()
+        if not isinstance(bases, list):
+            findings.append(
+                {
+                    "code": "INVALID_REPRESENTATION_BASES",
+                    "representation_subject": subject_id,
+                }
+            )
+            bases = []
+        for basis_index, basis in enumerate(bases):
+            if not isinstance(basis, dict):
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_BASIS",
+                        "representation_subject": subject_id,
+                        "index": basis_index,
+                    }
+                )
+                continue
+            basis_id = basis.get("id")
+            classification = basis.get("classification")
+            rationale = basis.get("rationale")
+            if (
+                not isinstance(basis_id, str)
+                or not basis_id
+                or basis_id in basis_ids
+                or classification not in allowed_basis_classes
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_BASIS",
+                        "representation_subject": subject_id,
+                        "index": basis_index,
+                    }
+                )
+                continue
+            basis_ids.add(basis_id)
+            valid_bases.append(basis)
+
+        required_dimensions = item.get("required_dimensions", []) or []
+        required_challenges = item.get("required_challenges", []) or []
+        for field, value in (
+            ("required_dimensions", required_dimensions),
+            ("required_challenges", required_challenges),
+        ):
+            if (
+                not isinstance(value, list)
+                or any(not isinstance(entry, str) or not entry for entry in value)
+                or len(set(value)) != len(value)
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_REQUIREMENT",
+                        "representation_subject": subject_id,
+                        "field": field,
+                    }
+                )
+
+        decision_refs = item.get("decision_refs", []) or []
+        if (
+            not isinstance(decision_refs, list)
+            or any(not isinstance(ref, str) or not ref for ref in decision_refs)
+            or len(set(decision_refs)) != len(decision_refs)
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_REPRESENTATION_DECISION_REFS",
+                    "representation_subject": subject_id,
+                }
+            )
+            decision_refs = []
+
+        shared_default_ref = item.get("shared_default_ref")
+        if shared_default_ref is not None and (
+            not isinstance(shared_default_ref, str) or not shared_default_ref
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_REPRESENTATION_SHARED_DEFAULT_REF",
+                    "representation_subject": subject_id,
+                }
+            )
+            shared_default_ref = None
+
+        if materiality == "NOT_MATERIAL":
+            rationale = item.get("rationale")
+            if (
+                disposition != "NOT_REQUIRED"
+                or decision_refs
+                or shared_default_ref is not None
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_NOT_MATERIAL_DISPOSITION",
+                        "representation_subject": subject_id,
+                    }
+                )
+            continue
+
+        if not any(
+            basis.get("classification") in task_facing_basis_classes
+            for basis in valid_bases
+        ):
+            findings.append(
+                {
+                    "code": "REPRESENTATION_TASK_BASIS_REQUIRED",
+                    "representation_subject": subject_id,
+                }
+            )
+
+        if not isinstance(required_dimensions, list) or not required_dimensions:
+            findings.append(
+                {
+                    "code": "REPRESENTATION_REQUIRED_DIMENSIONS_REQUIRED",
+                    "representation_subject": subject_id,
+                }
+            )
+        if disposition in {"DECIDE", "OVERRIDE"} and (
+            not isinstance(required_challenges, list) or not required_challenges
+        ):
+            findings.append(
+                {
+                    "code": "REPRESENTATION_REQUIRED_CHALLENGES_REQUIRED",
+                    "representation_subject": subject_id,
+                }
+            )
+
+        if disposition == "DECIDE":
+            if not decision_refs:
+                findings.append(
+                    {
+                        "code": "REPRESENTATION_DECISION_REFS_REQUIRED",
+                        "representation_subject": subject_id,
+                    }
+                )
+            if shared_default_ref is not None:
+                findings.append(
+                    {
+                        "code": "REPRESENTATION_OVERRIDE_DISPOSITION_REQUIRED",
+                        "representation_subject": subject_id,
+                    }
+                )
+        elif disposition == "INHERIT":
+            if shared_default_ref is None or decision_refs:
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_INHERITANCE",
+                        "representation_subject": subject_id,
+                    }
+                )
+        elif disposition == "OVERRIDE":
+            rationale = item.get("override_rationale")
+            if (
+                shared_default_ref is None
+                or not decision_refs
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "REPRESENTATION_OVERRIDE_RATIONALE_REQUIRED",
+                        "representation_subject": subject_id,
+                    }
+                )
+        elif disposition == "QUESTION":
+            rationale = item.get("rationale")
+            if not isinstance(rationale, str) or not rationale.strip():
+                findings.append(
+                    {
+                        "code": "INVALID_REPRESENTATION_REQUIREMENT",
+                        "representation_subject": subject_id,
+                    }
+                )
+            else:
+                findings.append(
+                    {
+                        "code": "REPRESENTATION_SELECTION_QUESTION",
+                        "representation_subject": subject_id,
+                        "rationale": rationale,
+                    }
+                )
+        else:
+            findings.append(
+                {
+                    "code": "INVALID_REPRESENTATION_MATERIAL_DISPOSITION",
+                    "representation_subject": subject_id,
+                }
+            )
+
+    return findings
+
+
 def _evaluate_view_boundary_semantics(
     review: dict[str, Any] | None,
 ) -> list[dict[str, Any]]:
@@ -1209,6 +1481,11 @@ def evaluate_artifact(
     if "interaction-role-coherence" in required_review_checks:
         findings.extend(
             _evaluate_interaction_role_coherence(review, candidate)
+        )
+
+    if "representation-selection-applicability" in required_review_checks:
+        findings.extend(
+            _evaluate_representation_selection_applicability(review)
         )
 
     if "view-boundary-semantics" in required_review_checks:

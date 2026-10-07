@@ -322,6 +322,7 @@ def evaluate_decision_exploration(
 
             alt_ids: list[str] = []
             effect_signatures: set[str] = set()
+            material_effects_by_alternative: dict[str, dict[str, Any]] = {}
             for alt in alternatives:
                 alt_id = alt.get("id") if isinstance(alt, dict) else None
                 if not isinstance(alt_id, str) or not alt_id or alt_id in alt_ids:
@@ -363,6 +364,7 @@ def evaluate_decision_exploration(
                         )
                     )
                 effect_signatures.add(effects)
+                material_effects_by_alternative[alt_id] = dict(alt["material_effects"])
 
             minimum_alternatives = (
                 1 if EXPLORATION[required] == EXPLORATION["LOCAL"] else 2
@@ -440,6 +442,7 @@ def evaluate_decision_exploration(
                     "alternatives": alt_ids,
                     "subjects": list(subjects),
                     "scoped_probe_strategies": sorted(scoped_strategies),
+                    "alternative_material_effects": material_effects_by_alternative,
                 }
             )
 

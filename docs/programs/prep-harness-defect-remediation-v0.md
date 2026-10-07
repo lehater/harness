@@ -169,16 +169,16 @@ The register intentionally keeps observed symptoms separate even when several sh
 | PREP-UX-004 | P1 | Capability is insufficiently visible as a first-class user-facing meaning across target requirements, current state and gaps. | observable-realization gap | HARNESS-005 | REGISTERED |
 | PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | implementation drift + verification/traceability gap | HARNESS-001, HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
 | PREP-UX-006 | P1 | Focus presentation is too easy to interpret as Capability; the distinct meanings are not made sufficiently observable. | observable semantic-distinction gap | HARNESS-004, HARNESS-005 | REGISTERED |
-| PREP-UX-007 | P1 | Target comparison is rendered as independent cards rather than an operationally aligned comparison over common dimensions. | presentation derivation + verification gap | HARNESS-001, HARNESS-002, HARNESS-006 | REPRODUCED |
-| PREP-UX-008 | P1 | Current Position uses repeated cards for homogeneous/comparable state information where a collection/table-like representation may better support scanning and comparison. | representation decision not sufficiently explored | HARNESS-006 | REGISTERED |
-| PREP-UX-009 | P1 | Target requirements use repeated cards where a structured collection/table-like representation may better express homogeneous requirement dimensions. | representation decision not sufficiently explored | HARNESS-006 | REGISTERED |
-| PREP-UX-010 | P1 | Shared `DataTable` exists but its use across applicable homogeneous collections is inconsistent. | presentation/component policy coverage gap | HARNESS-006 | REGISTERED |
-| PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | REGISTERED |
-| PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | REGISTERED |
+| PREP-UX-007 | P1 | Target comparison is rendered as independent cards rather than an operationally aligned comparison over common dimensions. | presentation derivation + verification gap | HARNESS-001, HARNESS-002, HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-008 | P1 | Current Position uses repeated cards for homogeneous/comparable state information where a collection/table-like representation may better support scanning and comparison. | representation decision not sufficiently explored | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-009 | P1 | Target requirements use repeated cards where a structured collection/table-like representation may better express homogeneous requirement dimensions. | representation decision not sufficiently explored | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-010 | P1 | Shared `DataTable` exists but its use across applicable homogeneous collections is inconsistent. | presentation/component policy coverage gap | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | BLOCKED:same-role-equivalence-not-established |
 | PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | boundary/local grouping exploration gap | HARNESS-003, HARNESS-008 | HARNESS_DISPOSITIONED |
 | PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | observable-control realization gap; related to but distinct from PREP-UX-005 | HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
-| PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | REGISTERED |
-| PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | REGISTERED |
+| PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
+| PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | ROOT_CAUSE_CLASSIFIED |
 
 ### Registration policy
 
@@ -197,7 +197,7 @@ The priority may change after root-cause analysis, but the id and history remain
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | INTEGRATED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | INTEGRATED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | INTEGRATED |
-| HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | REGISTERED |
+| HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | HARNESS_GREEN |
 | HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | REGISTERED |
 | HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | INTEGRATED |
 
@@ -557,6 +557,78 @@ This is the mandatory first Harness RED reproduction because it proves the progr
 The current separation is already canonical in Prep Information Architecture and Interface Topology, and its broad topology decision exploration selected separate task-responsibility views.
 
 Therefore it must not be "fixed in React". The Harness-side question is whether boundary-local exploration should have been required for the concrete `VIEW-TARGETS <-> VIEW-TARGET` boundary and whether user-facing grouping may differ from application/task ownership.
+
+
+### HARNESS-006 — task-grounded representation selection
+
+Status history for WP-H5:
+
+\`\`\`
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+\`\`\`
+
+RED evidence:
+
+- regression: WP-H5 block in \`tests/test_decision_governance.py\`;
+- RED-only commit: \`09a77ce5c648aca4f9f1da5acce67db1c466362d\`;
+- \`harness core\` run \`37593472987\` failed because baseline preflight returned \`ACCEPTED\` with no findings for material \`REP-COMPARE-A-B\` while all legacy Presentation axes were complete;
+- the same RED block also covers homogeneous collection fallthrough with \`REP-HOMOGENEOUS-COLLECTION\`.
+
+Root cause:
+
+Presentation/System and Screen/View semantic review had no machine-addressable material representation subjects, so Decision Governance could close broad presentation/composition axes while collection/comparison form fell through to existing patterns or primitives. Decision Exploration evaluation also discarded per-alternative material effects, so Governance could not prove that a task-relevant dimension such as cross-entity alignment was actually challenged.
+
+Implemented invariant:
+
+- Presentation System and Screen/View now require semantic \`representation-selection-applicability\` review;
+- semantic review records stable representation-subject ids, task/information/accepted-constraint basis, material dimensions, required challenge strategies and DECIDE/INHERIT/OVERRIDE disposition;
+- both knowledge kinds expose subject-scoped \`representation-selection\` Decision Governance;
+- Decision Exploration preserves alternative material effects, and Governance proves required challenge coverage plus actual variation of every required material dimension;
+- implementation primitives and legacy implementations cannot be the sole authority for a material representation choice;
+- a local decision against an inherited shared default must be an explicit justified OVERRIDE;
+- no card/list/table/detail/graph enum or Prep-specific representation policy is encoded.
+
+Negative mutations:
+
+- unexplored material comparison: REJECTED;
+- cosmetic card-only diversity for an alignment requirement: REJECTED with \`REPRESENTATION_REQUIRED_DIMENSION_NOT_CHALLENGED\`;
+- implementation primitive as sole authority: REJECTED with \`REPRESENTATION_TASK_BASIS_REQUIRED\`;
+- homogeneous collection fallthrough: REJECTED;
+- silent local deviation from a shared default: REJECTED with \`REPRESENTATION_OVERRIDE_DISPOSITION_REQUIRED\`.
+
+Positive controls:
+
+- justified rich-entity cards: ACCEPTED;
+- non-table homogeneous collection: ACCEPTED;
+- synchronized-column aligned comparison: ACCEPTED without requiring an HTML table;
+- graph/mixed relational representation: ACCEPTED;
+- explicit shared-default override with rationale: ACCEPTED;
+- wide-aligned/narrow-serialized responsive transformation: ACCEPTED.
+
+Prep calibration:
+
+- \`PREP-UX-007\`: \`REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner \`PS-PATTERN-TARGET-COMPARISON\`. Canonical Presentation/Screen semantics require aligned comparison over common requirement/state/gap dimensions, while \`TargetDirectionFeature.tsx\` renders each candidate as an independent \`comparison-card\`.
+- \`PREP-UX-008\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner \`PS-PATTERN-STATE-BASIS\` / local application \`SV-CURRENT\`. Current Position renders repeated \`state-card\` and \`gap-card\` collections without representation-specific decision evidence.
+- \`PREP-UX-009\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner \`SV-TARGET\`. Target requirements are the dominant accepted work surface but are emitted as repeated \`requirement-card\` surfaces without a task-grounded collection representation decision.
+- \`PREP-UX-010\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner Presentation System reusable representation policy. Shared \`DataTable\` exists and Knowledge uses it, while other homogeneous collections use repeated surfaces; no accepted representation default/override policy explains the difference. This does not imply broader DataTable use.
+- \`PREP-UX-011\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner Presentation System. Current accepted decision evidence has application-surface/knowledge-representation/information-density/control-surface but no material collection/comparison representation-selection decision.
+- \`PREP-UX-012\`: \`REGISTERED -> BLOCKED:same-role-equivalence-not-established\`. Current evidence shows different accepted actions/roles: candidate comparison multi-select, candidate-to-continue, Next-focus and support selection. Their different checkbox/radio mechanics do not prove same-role pattern inconsistency. Resume only with evidence identifying two instances of the same accepted interaction role whose materially different mechanics lack rationale.
+- \`PREP-UX-015\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner Presentation System representation policy. Repeated \`Surface\`/\`ChoiceCard\` use across comparison/state/requirements confirms default-container bias where no material representation decision exists; cards remain valid after explicit exploration.
+- \`PREP-UX-016\`: \`REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED\`; earliest owner Presentation System / Screen decision evidence. Current exploration contains no representation-selection subject and therefore does not explicitly challenge aligned/structured alternatives for the reproduced comparison/collection cases.
+
+GREEN evidence:
+
+- validated implementation head: \`c62b83283e7faef0fe292b5c3bee975774baef82\`;
+- \`harness core\` / full \`make harness-check\`: run \`37594152582\` PASS;
+- \`Greenfield Engineering Graph\`: run \`37594152606\` PASS;
+- implementation PR: #209.
+
+Integration evidence: pending merge of PR #209; status intentionally stops at \`HARNESS_GREEN\`. Prep and \`.harness-version\` remain unchanged and Prep revalidation has not started.
+
 
 ## 7. Execution strategy
 

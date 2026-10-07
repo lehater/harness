@@ -392,6 +392,206 @@ def _evaluate_view_boundary_subject_governance(
     return findings
 
 
+
+def _evaluate_representation_subject_governance(
+    *,
+    explored_axis: dict[str, Any],
+    review_axis: dict[str, Any] | None,
+    candidate: dict[str, Any],
+    axis_contract: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Bind semantic-review-selected representation subjects to local decisions.
+
+    Semantic review owns applicability and task-facing requirements. Decision
+    Governance proves deterministic subject coverage and that the explored
+    alternatives actually challenge the dimensions/strategies the review marked
+    material. Concrete UI primitives remain downstream choices.
+    """
+    semantic_review = candidate.get("semantic_review")
+    if not isinstance(semantic_review, dict):
+        return [_finding("REPRESENTATION_REVIEW_REQUIRED", explored_axis.get("axis"))]
+    requirements = semantic_review.get("representation_requirements")
+    if not isinstance(requirements, list):
+        return [_finding("REPRESENTATION_REVIEW_REQUIRED", explored_axis.get("axis"))]
+
+    axis = explored_axis.get("axis")
+    findings: list[dict[str, Any]] = []
+    explored_decisions = {
+        item.get("id"): item
+        for item in explored_axis.get("decision_points", []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    reviewed_decisions = {
+        item.get("id"): item
+        for item in (review_axis.get("decisions", []) if isinstance(review_axis, dict) else []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    material_dimensions = set(axis_contract.get("material_dimensions", []) or [])
+    challenge_strategies = set(axis_contract.get("challenge_strategies", []) or [])
+    task_facing_basis_classes = {
+        "TASK_SEMANTICS",
+        "INFORMATION_SEMANTICS",
+        "ACCEPTED_CONSTRAINT",
+    }
+
+    for requirement in requirements:
+        if not isinstance(requirement, dict):
+            continue
+        subject_id = requirement.get("id")
+        if (
+            not isinstance(subject_id, str)
+            or not subject_id
+            or requirement.get("materiality") != "MATERIAL"
+        ):
+            continue
+
+        bases = requirement.get("bases", []) or []
+        if not any(
+            isinstance(item, dict)
+            and item.get("classification") in task_facing_basis_classes
+            for item in bases
+        ):
+            findings.append(
+                _finding(
+                    "REPRESENTATION_TASK_BASIS_REQUIRED",
+                    axis,
+                    representation_subject=subject_id,
+                )
+            )
+
+        disposition = requirement.get("disposition")
+        shared_default_ref = requirement.get("shared_default_ref")
+        if disposition == "INHERIT":
+            continue
+        if disposition == "DECIDE" and isinstance(shared_default_ref, str) and shared_default_ref:
+            findings.append(
+                _finding(
+                    "REPRESENTATION_OVERRIDE_DISPOSITION_REQUIRED",
+                    axis,
+                    representation_subject=subject_id,
+                )
+            )
+        if disposition == "OVERRIDE":
+            rationale = requirement.get("override_rationale")
+            if (
+                not isinstance(shared_default_ref, str)
+                or not shared_default_ref
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    _finding(
+                        "REPRESENTATION_OVERRIDE_RATIONALE_REQUIRED",
+                        axis,
+                        representation_subject=subject_id,
+                    )
+                )
+
+        if disposition not in {"DECIDE", "OVERRIDE"}:
+            continue
+
+        refs = requirement.get("decision_refs", []) or []
+        if not isinstance(refs, list) or not refs:
+            findings.append(
+                _finding(
+                    "REPRESENTATION_DECISION_COVERAGE_MISSING",
+                    axis,
+                    representation_subject=subject_id,
+                )
+            )
+            continue
+
+        required_dimensions = requirement.get("required_dimensions", []) or []
+        required_challenges = requirement.get("required_challenges", []) or []
+        for dimension in required_dimensions:
+            if dimension not in material_dimensions:
+                findings.append(
+                    _finding(
+                        "REPRESENTATION_REQUIRED_DIMENSION_UNKNOWN",
+                        axis,
+                        representation_subject=subject_id,
+                        dimension=dimension,
+                    )
+                )
+        for challenge in required_challenges:
+            if challenge not in challenge_strategies:
+                findings.append(
+                    _finding(
+                        "REPRESENTATION_REQUIRED_CHALLENGE_UNKNOWN",
+                        axis,
+                        representation_subject=subject_id,
+                        challenge=challenge,
+                    )
+                )
+
+        for decision_id in refs:
+            explored = explored_decisions.get(decision_id)
+            reviewed = reviewed_decisions.get(decision_id)
+            subjects = (
+                explored.get("subjects", [])
+                if isinstance(explored, dict)
+                else []
+            ) or []
+            if (
+                explored is None
+                or reviewed is None
+                or subject_id not in subjects
+            ):
+                findings.append(
+                    _finding(
+                        "REPRESENTATION_DECISION_COVERAGE_MISSING",
+                        axis,
+                        decision_id if isinstance(decision_id, str) else None,
+                        representation_subject=subject_id,
+                    )
+                )
+                continue
+
+            scoped_strategies = set(
+                explored.get("scoped_probe_strategies", []) or []
+            )
+            missing_challenges = sorted(
+                set(required_challenges) - scoped_strategies
+            )
+            if missing_challenges:
+                findings.append(
+                    _finding(
+                        "REPRESENTATION_REQUIRED_CHALLENGE_MISSING",
+                        axis,
+                        decision_id,
+                        representation_subject=subject_id,
+                        challenges=missing_challenges,
+                    )
+                )
+
+            effects = explored.get("alternative_material_effects", {}) or {}
+            for dimension in required_dimensions:
+                if dimension not in material_dimensions:
+                    continue
+                values = {
+                    material_effects.get(dimension)
+                    for material_effects in effects.values()
+                    if isinstance(material_effects, dict)
+                    and dimension in material_effects
+                }
+                if len(values) < 2:
+                    findings.append(
+                        _finding(
+                            "REPRESENTATION_REQUIRED_DIMENSION_NOT_CHALLENGED",
+                            axis,
+                            decision_id,
+                            representation_subject=subject_id,
+                            dimension=dimension,
+                        )
+                    )
+
+    return findings
+
+
 def evaluate_decision_governance(
     *,
     contract: dict[str, Any] | None,
@@ -458,6 +658,15 @@ def evaluate_decision_governance(
                     explored_axis=explored_axis,
                     review_axis=review_axes.get(axis),
                     candidate=candidate,
+                )
+            )
+        if axis_contract.get("subject_scope") == "representation-subject":
+            findings.extend(
+                _evaluate_representation_subject_governance(
+                    explored_axis=explored_axis,
+                    review_axis=review_axes.get(axis),
+                    candidate=candidate,
+                    axis_contract=axis_contract,
                 )
             )
         if applicability == "NOT_APPLICABLE":
