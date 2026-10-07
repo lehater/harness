@@ -41,20 +41,22 @@ For each required view:
 6. define allowed user-visible capabilities and their backing read/command/navigation/local semantics; record material exclusions;
 7. define primary/secondary/destructive actions and their placement role;
 8. select reusable presentation/interaction patterns by id and explicitly bind provider/pattern features only when authorized by accepted screen semantics;
-9. define local list/table/form/detail/search/filter/selection composition where applicable and backed upstream;
-10. define state variants and map material server outcomes to accepted operation outcomes rather than inventing impossible states;
-11. define responsive transformations by semantic effect, not CSS breakpoint mechanics; every screen must either declare at least one material transformation or explicitly justify responsive non-applicability;
-12. define focus/read-order consequences where composition changes;
-13. when a material interactive visualization is constrained by accepted Quality/performance knowledge, reference that constraint and define semantic degradation/fallback behavior that preserves required information access; renderer knobs remain downstream unless their user-visible effect is intentionally accepted;
-14. attach accepted reference/evidence anchors to the regions or states they actually constrain;
-15. For upstream interaction obligations whose accepted semantic review marks observable realization REQUIRED, create screen/view semantic assertions with `kind: observable-realization`, preserve ACTION/STATE/DISTINCTION category, record upstream provenance, and bind them with semantic derivation relation `REALIZES`. The derivation must use request-bound semantic judgement for observable-realization correspondence; a source id/reference alone is not realization.
-16. Define verification obligations for contract/semantic/rendered realization when material.
-17. Classify remaining choices as controlled freedom or ordinary implementation detail;
-18. for each material screen-composition decision, record the decision question, accepted basis, applicable UI Decision Rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty;
-19. when the remaining discriminator is representative-user behavior rather than a deterministic constraint, record `EMPIRICAL_VALIDATION_REQUIRED` and keep the production-readiness claim open while preserving the bounded prototype contract;
-20. before semantic admission, identify independently losable user-observable screen obligations and account each in `semantic_review.independent_obligations`; a summary such as “explicit/reversible” cannot replace distinct apply/show/clear-style obligations when they can fail independently;
-21. record local overrides only with rationale;
-22. route missing upstream semantics as Questions.
+9. classify screen-local representation applicability in `semantic_review.representation_requirements`. Inherit an applicable Presentation System representation default explicitly; when the screen needs a materially different representation, mark it as an explicit local override with the shared-default ref and rationale. A representation unique to this screen may be decided locally without inventing a global default.
+10. for every material local representation decision or override, use subject-scoped `representation-selection` Decision Exploration and challenge the task-relevant dimensions selected by semantic review. Do not select list/table/card/detail/graph or selection mechanics because a component already exists; concrete primitives follow the accepted representation semantics. Responsive structure may change when the required comparison/selection/detail semantics remain preserved.
+11. define local list/table/form/detail/search/filter/selection composition where applicable and backed upstream;
+12. define state variants and map material server outcomes to accepted operation outcomes rather than inventing impossible states;
+13. define responsive transformations by semantic effect, not CSS breakpoint mechanics; every screen must either declare at least one material transformation or explicitly justify responsive non-applicability;
+14. define focus/read-order consequences where composition changes;
+15. when a material interactive visualization is constrained by accepted Quality/performance knowledge, reference that constraint and define semantic degradation/fallback behavior that preserves required information access; renderer knobs remain downstream unless their user-visible effect is intentionally accepted;
+16. attach accepted reference/evidence anchors to the regions or states they actually constrain;
+17. For upstream interaction obligations whose accepted semantic review marks observable realization REQUIRED, create screen/view semantic assertions with `kind: observable-realization`, preserve ACTION/STATE/DISTINCTION category, record upstream provenance, and bind them with semantic derivation relation `REALIZES`. The derivation must use request-bound semantic judgement for observable-realization correspondence; a source id/reference alone is not realization.
+18. Define verification obligations for contract/semantic/rendered realization when material.
+19. Classify remaining choices as controlled freedom or ordinary implementation detail;
+20. for each material screen-composition decision, record the decision question, accepted basis, applicable UI Decision Rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty;
+21. when the remaining discriminator is representative-user behavior rather than a deterministic constraint, record `EMPIRICAL_VALIDATION_REQUIRED` and keep the production-readiness claim open while preserving the bounded prototype contract;
+22. before semantic admission, identify independently losable user-observable screen obligations and account each in `semantic_review.independent_obligations`; a summary such as “explicit/reversible” cannot replace distinct apply/show/clear-style obligations when they can fail independently;
+23. record local overrides only with rationale;
+24. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -88,8 +90,9 @@ Machine-readable YAML/JSON is preferred when it can express:
 - patterns plus material nesting/slot composition and authorized feature bindings;
 - states/variants and material outcome mappings;
 - responsive transformations;
+- material representation subjects with stable ids, task/information basis, material dimensions/challenges and explicit INHERIT/DECIDE/OVERRIDE disposition;
 - accessibility/focus semantics affected by composition;
-- overrides with rationale;
+- overrides with shared-default reference and rationale;
 - material decision evidence with decision id/axis, question, basis refs, applied UI rule ids, disposition/selection, required evaluation levels/evidence, controlled freedom and residual uncertainty;
 - unresolved Questions.
 
@@ -100,6 +103,8 @@ The contract should be sufficient to generate review projections such as a scree
 - every required user-facing view has a contract or explicit non-applicability;
 - every screen references one Presentation System;
 - repeated presentation knowledge is inherited, not copied;
+- every material representation subject is either explicitly inherited from a shared default, locally decided when no shared default applies, or intentionally overridden with rationale;
+- representation decisions are task-grounded and cannot use an existing component/legacy primitive as sole authority;
 - required states/actions/data are covered and trace to accepted operation/local/navigation semantics;
 - every upstream semantic obligation classified REQUIRED for observable realization has a category-preserving `REALIZES` binding to an explicit observable-realization assertion accepted by semantic judgement; visible state cannot substitute for an independent action;
 - independently losable user-observable obligations have separate semantic accounting, while cohesive assertions remain unsplit when no independent lifecycle/oracle exists;
