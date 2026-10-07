@@ -433,6 +433,15 @@ def main() -> int:
         "implementation-slices-explicit",
         "repository-realization-derived-from-accepted-boundaries",
     } <= set(contract_index["implementation-design"]["required_review_checks"])
+    for knowledge_kind in (
+        "user-journey-design",
+        "interaction-design",
+        "presentation-system-design",
+        "screen-view-design",
+    ):
+        assert "independent-obligation-granularity" in set(
+            contract_index[knowledge_kind]["required_review_checks"]
+        ), knowledge_kind
 
     derivation = evaluate_derivation(
         graph=GRAPH,
