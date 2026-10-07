@@ -535,6 +535,237 @@ def _evaluate_interaction_role_coherence(
 
     return findings
 
+def _evaluate_view_boundary_semantics(
+    review: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Validate semantic-review classification for concrete topology boundaries.
+
+    Semantic review owns which candidate boundaries are material/contestable and
+    whether a separation rationale is genuinely user-facing. Harness validates
+    only the machine-addressable review structure; it does not infer semantics
+    from task names, capability ids, routes, components, or rationale wording.
+    """
+    if not isinstance(review, dict):
+        return [{"code": "VIEW_BOUNDARY_REVIEW_REQUIRED"}]
+    items = review.get("view_boundary_requirements")
+    if not isinstance(items, list):
+        return [{"code": "VIEW_BOUNDARY_REVIEW_REQUIRED"}]
+
+    findings: list[dict[str, Any]] = []
+    boundaries: dict[str, dict[str, Any]] = {}
+    allowed_materiality = {"MATERIAL", "NOT_MATERIAL"}
+    allowed_contestability = {"CONTESTABLE", "DETERMINISTIC"}
+    allowed_outcomes = {"SEPARATE", "MERGED", "QUESTION"}
+    allowed_basis_classes = {
+        "USER_FACING",
+        "UPSTREAM_RESPONSIBILITY",
+        "IMPLEMENTATION_STRUCTURE",
+        "OTHER",
+    }
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append({"code": "INVALID_VIEW_BOUNDARY_REQUIREMENT", "index": index})
+            continue
+        boundary_id = item.get("id")
+        participants = item.get("participants")
+        materiality = item.get("materiality")
+        contestability = item.get("contestability")
+        outcome = item.get("outcome")
+        if (
+            not isinstance(boundary_id, str)
+            or not boundary_id
+            or boundary_id in boundaries
+            or not isinstance(participants, list)
+            or len(participants) < 2
+            or any(not isinstance(value, str) or not value for value in participants)
+            or len(set(participants)) != len(participants)
+            or materiality not in allowed_materiality
+            or contestability not in allowed_contestability
+            or outcome not in allowed_outcomes
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_VIEW_BOUNDARY_REQUIREMENT",
+                    "index": index,
+                    **(
+                        {"boundary": boundary_id}
+                        if isinstance(boundary_id, str) and boundary_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+
+        bases = item.get("rationale_bases", []) or []
+        if not isinstance(bases, list):
+            findings.append(
+                {"code": "INVALID_VIEW_BOUNDARY_BASES", "boundary": boundary_id}
+            )
+            bases = []
+        basis_ids: set[str] = set()
+        user_facing = False
+        for basis_index, basis in enumerate(bases):
+            if not isinstance(basis, dict):
+                findings.append(
+                    {
+                        "code": "INVALID_VIEW_BOUNDARY_BASIS",
+                        "boundary": boundary_id,
+                        "index": basis_index,
+                    }
+                )
+                continue
+            basis_id = basis.get("id")
+            classification = basis.get("classification")
+            rationale = basis.get("rationale")
+            if (
+                not isinstance(basis_id, str)
+                or not basis_id
+                or basis_id in basis_ids
+                or classification not in allowed_basis_classes
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_VIEW_BOUNDARY_BASIS",
+                        "boundary": boundary_id,
+                        "index": basis_index,
+                    }
+                )
+                continue
+            basis_ids.add(basis_id)
+            if classification == "USER_FACING":
+                user_facing = True
+
+        if materiality == "MATERIAL" and outcome == "SEPARATE" and not user_facing:
+            findings.append(
+                {
+                    "code": "VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED",
+                    "boundary": boundary_id,
+                }
+            )
+
+        decision_refs = item.get("decision_refs", []) or []
+        if (
+            not isinstance(decision_refs, list)
+            or any(not isinstance(value, str) or not value for value in decision_refs)
+            or len(set(decision_refs)) != len(decision_refs)
+        ):
+            findings.append(
+                {"code": "INVALID_VIEW_BOUNDARY_DECISION_REFS", "boundary": boundary_id}
+            )
+            decision_refs = []
+
+        if materiality == "MATERIAL" and contestability == "CONTESTABLE":
+            if not decision_refs:
+                findings.append(
+                    {
+                        "code": "VIEW_BOUNDARY_DECISION_REFS_REQUIRED",
+                        "boundary": boundary_id,
+                    }
+                )
+        elif contestability == "DETERMINISTIC":
+            evidence = item.get("deterministic_evidence", []) or []
+            rationale = item.get("deterministic_rationale")
+            if (
+                not isinstance(evidence, list)
+                or not evidence
+                or any(not isinstance(value, str) or not value for value in evidence)
+                or not isinstance(rationale, str)
+                or not rationale.strip()
+            ):
+                findings.append(
+                    {
+                        "code": "VIEW_BOUNDARY_DETERMINISTIC_EVIDENCE_REQUIRED",
+                        "boundary": boundary_id,
+                    }
+                )
+            if decision_refs:
+                findings.append(
+                    {
+                        "code": "VIEW_BOUNDARY_DETERMINISTIC_DECISION_CONFLICT",
+                        "boundary": boundary_id,
+                    }
+                )
+
+        shared_group = item.get("shared_decision_group")
+        if shared_group is not None and (
+            not isinstance(shared_group, str) or not shared_group
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_VIEW_BOUNDARY_SHARED_GROUP",
+                    "boundary": boundary_id,
+                }
+            )
+
+        boundaries[boundary_id] = item
+
+    groups_value = review.get("shared_boundary_decision_groups", []) or []
+    if not isinstance(groups_value, list):
+        findings.append({"code": "INVALID_VIEW_BOUNDARY_SHARED_GROUPS"})
+        groups_value = []
+
+    groups: dict[str, dict[str, Any]] = {}
+    for index, group in enumerate(groups_value):
+        if not isinstance(group, dict):
+            findings.append({"code": "INVALID_VIEW_BOUNDARY_SHARED_GROUP", "index": index})
+            continue
+        group_id = group.get("id")
+        members = group.get("boundaries")
+        if (
+            not isinstance(group_id, str)
+            or not group_id
+            or group_id in groups
+            or not isinstance(members, list)
+            or len(members) < 2
+            or any(not isinstance(value, str) or not value for value in members)
+            or len(set(members)) != len(members)
+            or group.get("semantic_equivalence") != "ACCEPTED"
+            or not isinstance(group.get("rationale"), str)
+            or not group["rationale"].strip()
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_VIEW_BOUNDARY_SHARED_GROUP",
+                    "index": index,
+                    **(
+                        {"group": group_id}
+                        if isinstance(group_id, str) and group_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+        unknown = sorted(set(members) - set(boundaries))
+        if unknown:
+            findings.append(
+                {
+                    "code": "VIEW_BOUNDARY_SHARED_GROUP_UNKNOWN_BOUNDARY",
+                    "group": group_id,
+                    "boundaries": unknown,
+                }
+            )
+        groups[group_id] = group
+
+    for boundary_id, item in boundaries.items():
+        group_id = item.get("shared_decision_group")
+        if not isinstance(group_id, str) or not group_id:
+            continue
+        group = groups.get(group_id)
+        if group is None or boundary_id not in (group.get("boundaries", []) or []):
+            findings.append(
+                {
+                    "code": "VIEW_BOUNDARY_SHARED_GROUP_REQUIRED",
+                    "boundary": boundary_id,
+                    "group": group_id,
+                }
+            )
+
+    return findings
+
+
 def evaluate_artifact(
     contract: dict[str, Any],
     sources: dict[str, Any],
@@ -978,6 +1209,11 @@ def evaluate_artifact(
     if "interaction-role-coherence" in required_review_checks:
         findings.extend(
             _evaluate_interaction_role_coherence(review, candidate)
+        )
+
+    if "view-boundary-semantics" in required_review_checks:
+        findings.extend(
+            _evaluate_view_boundary_semantics(review)
         )
 
     accepted = not findings

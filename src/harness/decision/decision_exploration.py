@@ -253,6 +253,7 @@ def evaluate_decision_exploration(
             findings.append(_finding("DECISION_PROBES_INVALID", axis))
             probes = []
         strategies: set[str] = set()
+        probe_records: list[dict[str, Any]] = []
         for probe in probes:
             strategy = probe.get("strategy") if isinstance(probe, dict) else None
             if not isinstance(strategy, str) or strategy not in axis_contract["challenge_strategies"]:
@@ -261,6 +262,25 @@ def evaluate_decision_exploration(
             strategies.add(strategy)
             if not isinstance(probe.get("challenge"), str) or not probe["challenge"].strip():
                 findings.append(_finding("DECISION_PROBE_CHALLENGE_REQUIRED", axis))
+            decision_refs = probe.get("decision_points", []) or []
+            if (
+                not isinstance(decision_refs, list)
+                or any(not isinstance(value, str) or not value for value in decision_refs)
+                or len(set(decision_refs)) != len(decision_refs)
+            ):
+                findings.append(_finding("DECISION_PROBE_POINT_REFS_INVALID", axis))
+                decision_refs = []
+            probe_records.append(
+                {
+                    "strategy": strategy,
+                    "alternatives": [
+                        value
+                        for value in (probe.get("alternatives", []) or [])
+                        if isinstance(value, str)
+                    ],
+                    "decision_points": decision_refs,
+                }
+            )
 
         min_probes = 1 if EXPLORATION[required] == EXPLORATION["LOCAL"] else axis_contract["minimum_probes"]
         if len(strategies) < min_probes:
@@ -285,6 +305,16 @@ def evaluate_decision_exploration(
                 findings.append(_finding("DECISION_POINT_INVALID", axis))
                 continue
             seen_decisions.add(decision_id)
+            subjects = decision.get("subjects", []) or []
+            if (
+                not isinstance(subjects, list)
+                or any(not isinstance(value, str) or not value for value in subjects)
+                or len(set(subjects)) != len(subjects)
+            ):
+                findings.append(
+                    _finding("DECISION_POINT_SUBJECTS_INVALID", axis, decision_id)
+                )
+                subjects = []
             alternatives = decision.get("alternatives", []) or []
             if not isinstance(alternatives, list) or not alternatives:
                 findings.append(_finding("DECISION_ALTERNATIVE_REQUIRED", axis, decision_id))
@@ -358,10 +388,8 @@ def evaluate_decision_exploration(
 
             covered = {
                 alternative
-                for probe in probes
-                if isinstance(probe, dict)
-                for alternative in (probe.get("alternatives", []) or [])
-                if isinstance(alternative, str)
+                for probe in probe_records
+                for alternative in probe["alternatives"]
             }
             missing_probe_coverage = sorted(set(alt_ids) - covered)
             if missing_probe_coverage:
@@ -373,8 +401,63 @@ def evaluate_decision_exploration(
                         alternatives=missing_probe_coverage,
                     )
                 )
+
+            scoped_probes = [
+                probe
+                for probe in probe_records
+                if decision_id in probe["decision_points"]
+            ]
+            scoped_strategies = {probe["strategy"] for probe in scoped_probes}
+            if subjects and len(scoped_strategies) < min_probes:
+                findings.append(
+                    _finding(
+                        "DECISION_SUBJECT_PROBE_DIVERSITY_INSUFFICIENT",
+                        axis,
+                        decision_id,
+                        required=min_probes,
+                        performed=len(scoped_strategies),
+                    )
+                )
+            scoped_covered = {
+                alternative
+                for probe in scoped_probes
+                for alternative in probe["alternatives"]
+            }
+            missing_scoped_coverage = sorted(set(alt_ids) - scoped_covered)
+            if subjects and missing_scoped_coverage:
+                findings.append(
+                    _finding(
+                        "DECISION_SUBJECT_ALTERNATIVE_NOT_PROBE_DISCOVERED",
+                        axis,
+                        decision_id,
+                        alternatives=missing_scoped_coverage,
+                    )
+                )
+
             evaluated_points.append(
-                {"id": decision_id, "alternatives": alt_ids}
+                {
+                    "id": decision_id,
+                    "alternatives": alt_ids,
+                    "subjects": list(subjects),
+                    "scoped_probe_strategies": sorted(scoped_strategies),
+                }
+            )
+
+        unknown_probe_points = sorted(
+            {
+                decision_id
+                for probe in probe_records
+                for decision_id in probe["decision_points"]
+                if decision_id not in seen_decisions
+            }
+        )
+        if unknown_probe_points:
+            findings.append(
+                _finding(
+                    "DECISION_PROBE_POINT_UNKNOWN",
+                    axis,
+                    decisions=unknown_probe_points,
+                )
             )
 
         evaluated_axes.append(

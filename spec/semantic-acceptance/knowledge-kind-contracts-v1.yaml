@@ -136,7 +136,9 @@ contracts:
       - interaction-role-coherence
       - observable-realization-applicability
   - knowledge_kind: interface-topology-design
-    required_review_checks: [topology-not-screen-composition]
+    required_review_checks:
+      - topology-not-screen-composition
+      - view-boundary-semantics
   - knowledge_kind: human-interface-design
     required_review_checks: [interaction-not-product-requirement]
   - knowledge_kind: presentation-system-design

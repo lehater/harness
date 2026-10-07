@@ -20,6 +20,9 @@ rules:
   - EXPLORE and deeper require at least two materially distinct alternatives per decision point.
   - Material distinction is expressed through knowledge-kind-specific material dimensions.
   - Required challenge strategies are knowledge-kind-specific and multiple independent probes are required at EXPLORE and deeper.
+  - An axis contract may declare a subject_scope when material decisions must be machine-addressable below the axis level.
+  - A subject-scoped decision point declares stable subject ids; probes for that decision point explicitly reference it and must independently satisfy the required local challenge-strategy and alternative coverage.
+  - One subject-scoped decision may govern several subjects only when the owning semantic review provides explicit shared-decision equivalence evidence; generic axis-level reuse is insufficient.
   - NOT_APPLICABLE requires accepted canonical artifact evidence; free-text rationale is insufficient.
   - UNRESOLVED applicability fails admission and must be resolved or routed through the owning Authority.
   - RESEARCH and DEEP_RESEARCH add external evidence obligations.

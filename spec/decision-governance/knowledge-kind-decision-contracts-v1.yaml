@@ -135,6 +135,7 @@ contracts:
       - id: view-boundaries
         delegation_requires: CONSERVATIVE
         minimum_probes: 2
+        subject_scope: view-boundary
         material_dimensions:
           - goal-continuity
           - information-dependency

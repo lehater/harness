@@ -333,6 +333,7 @@ def main() -> int:
     assert set(topology_contract["axes"]) == {"view-boundaries"}, topology_contract
     boundary_axis = topology_contract["axes"]["view-boundaries"]
     assert boundary_axis["delegation_requires"] == "CONSERVATIVE", boundary_axis
+    assert boundary_axis["subject_scope"] == "view-boundary", boundary_axis
     assert set(boundary_axis["material_dimensions"]) == {
         "goal-continuity",
         "information-dependency",
@@ -346,6 +347,554 @@ def main() -> int:
         "persistent-context-vs-navigation",
         "contextual-surface-vs-destination",
     }, boundary_axis
+
+    # WP-H4 / HARNESS-003 RED: a broad topology decision can currently satisfy
+    # Decision Governance while a concrete materially contestable boundary has
+    # no boundary-local decision point or challenge evidence.
+    topology_graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "H4-TOPOLOGY",
+        "authorities": [
+            {
+                "id": "HUMAN-INTERFACE-DESIGN",
+                "responsibility": "Own user-facing interface topology.",
+                "boundary": {
+                    "semantic_cohesion": "User-facing view boundaries.",
+                    "independent_change": "Topology can change independently.",
+                    "public_contract": "Accepted view partition and navigation.",
+                },
+                "produces": [
+                    {
+                        "capability": "example.topology",
+                        "knowledge_kind": "interface-topology-design",
+                        "requires": [],
+                    }
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "TOPOLOGY-CONSUMER",
+                "purpose": "Consume accepted interface topology.",
+                "requires": ["example.topology"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    topology_model = {"artifacts": [], "questions": []}
+    topology_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "knowledge_kinds": [
+            {
+                "knowledge_kind": "interface-topology-design",
+                "autonomy": "CONSERVATIVE",
+            }
+        ],
+    }
+    topology_context = build_authority_context(
+        topology_graph,
+        topology_model,
+        "HUMAN-INTERFACE-DESIGN",
+        ["example.topology"],
+    )
+    topology_request = build_decision_explorer_request(
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        authority_context=topology_context,
+        contract=topology_contract,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        prerequisite_baseline={},
+        model=topology_model,
+    )
+    broad_topology_exploration = {
+        "version": 1,
+        "kind": "harness-decision-exploration",
+        "capability": "example.topology",
+        "knowledge_kind": "interface-topology-design",
+        "explorer_request_id": topology_request["request_id"],
+        "research_sources": [],
+        "axes": [
+            {
+                "axis": "view-boundaries",
+                "applicability": "APPLICABLE",
+                "exploration_level": "EXPLORE",
+                "probes": [
+                    {
+                        "strategy": "merge-vs-separate-view",
+                        "challenge": "Challenge the overall view structure.",
+                        "alternatives": ["overall-a", "overall-b"],
+                    },
+                    {
+                        "strategy": "persistent-context-vs-navigation",
+                        "challenge": "Challenge context persistence globally.",
+                        "alternatives": ["overall-a", "overall-b"],
+                    },
+                ],
+                "decision_points": [
+                    {
+                        "id": "overall-view-structure",
+                        "alternatives": [
+                            {
+                                "id": "overall-a",
+                                "difference": "Use task-oriented destinations.",
+                                "material_effects": {
+                                    "goal-continuity": "task-oriented",
+                                },
+                            },
+                            {
+                                "id": "overall-b",
+                                "difference": "Use one broad workspace.",
+                                "material_effects": {
+                                    "goal-continuity": "workspace-oriented",
+                                },
+                            },
+                        ],
+                    }
+                ],
+            }
+        ],
+        "decision_space_review": {
+            "status": "COMPLETE",
+            "checks": [
+                "mixed-decision-split",
+                "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
+                "accepted-constraint-cross-check",
+                "authority-boundary-cross-check",
+            ],
+            "reviewed_decisions": ["overall-view-structure"],
+            "open_gaps": [],
+        },
+    }
+    broad_topology_candidate = {
+        "id": "TOPOLOGY-H4-003",
+        "capability": "example.topology",
+        "path": "docs/interface/topology-h4-003.yaml",
+        "semantic_assertions": [],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": [
+                "source-discipline",
+                "authority-boundary",
+                "no-invention",
+                "topology-not-screen-composition",
+                "view-boundary-semantics",
+            ],
+            "view_boundary_requirements": [
+                {
+                    "id": "BOUNDARY-A-B",
+                    "participants": ["VIEW-A", "VIEW-B"],
+                    "materiality": "MATERIAL",
+                    "contestability": "CONTESTABLE",
+                    "outcome": "SEPARATE",
+                    "rationale_bases": [
+                        {
+                            "id": "GOAL-BOUNDARY",
+                            "classification": "USER_FACING",
+                            "rationale": "The boundary is materially user-facing.",
+                        }
+                    ],
+                    "decision_refs": ["overall-view-structure"],
+                }
+            ],
+        },
+        "decision_review": {
+            "axes": [
+                {
+                    "axis": "view-boundaries",
+                    "decisions": [
+                        {
+                            "id": "overall-view-structure",
+                            "owner_authority": "HUMAN-INTERFACE-DESIGN",
+                            "alternatives": [
+                                {"id": "overall-a", "state": "VIABLE"},
+                                {
+                                    "id": "overall-b",
+                                    "state": "REJECTED",
+                                    "rationale": "Accepted constraints eliminate the broad workspace.",
+                                },
+                            ],
+                            "disposition": "DETERMINED",
+                            "selected": "overall-a",
+                        }
+                    ],
+                }
+            ]
+        },
+    }
+    h003_red = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=broad_topology_exploration,
+        candidate=broad_topology_candidate,
+        model=topology_model,
+    )
+    assert h003_red["status"] == "REJECTED", h003_red
+    assert "VIEW_BOUNDARY_DECISION_COVERAGE_MISSING" in codes(h003_red), h003_red
+
+    # WP-H4 / HARNESS-008 RED: task/application responsibility separation can
+    # currently masquerade as sufficient user-facing view-boundary rationale.
+    semantic_defaults = semantic_contracts.get("defaults", {}) or {}
+    topology_semantic_item = next(
+        item
+        for item in semantic_contracts["contracts"]
+        if item["knowledge_kind"] == "interface-topology-design"
+    )
+    topology_semantic_contract = {
+        "authority": "HUMAN-INTERFACE-DESIGN",
+        "requires_source_authority": True,
+        "requires_assertion_authority": True,
+        "requires_semantic_review": True,
+        "required_semantic_review_checks": sorted(
+            set(semantic_defaults.get("required_review_checks", []) or [])
+            | set(topology_semantic_item.get("required_review_checks", []) or [])
+        ),
+    }
+    responsibility_shaped = {
+        "id": "TOPOLOGY-H4-008",
+        "capability": "example.topology",
+        "semantic_assertions": [],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": topology_semantic_contract["required_semantic_review_checks"],
+            "view_boundary_requirements": [
+                {
+                    "id": "BOUNDARY-A-B",
+                    "participants": ["VIEW-A", "VIEW-B"],
+                    "materiality": "MATERIAL",
+                    "contestability": "CONTESTABLE",
+                    "outcome": "SEPARATE",
+                    "rationale_bases": [
+                        {
+                            "id": "RESPONSIBILITY-SPLIT",
+                            "classification": "UPSTREAM_RESPONSIBILITY",
+                            "rationale": "Different tasks and application capabilities.",
+                        }
+                    ],
+                    "decision_refs": ["overall-view-structure"],
+                }
+            ],
+        },
+    }
+    h008_red = evaluate_artifact(
+        topology_semantic_contract,
+        {"semantic_assertions": []},
+        responsibility_shaped,
+    )
+    assert h008_red["status"] == "REJECTED", h008_red
+    assert "VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED" in codes(h008_red), h008_red
+
+    # H003 positive control: a concrete material boundary is a stable decision
+    # subject and its alternatives are challenged by probes bound to that point.
+    local_topology_exploration = {
+        "version": 1,
+        "kind": "harness-decision-exploration",
+        "capability": "example.topology",
+        "knowledge_kind": "interface-topology-design",
+        "explorer_request_id": topology_request["request_id"],
+        "research_sources": [],
+        "axes": [
+            {
+                "axis": "view-boundaries",
+                "applicability": "APPLICABLE",
+                "exploration_level": "EXPLORE",
+                "probes": [
+                    {
+                        "strategy": "merge-vs-separate-view",
+                        "challenge": "Test merge versus separate for BOUNDARY-A-B.",
+                        "alternatives": ["a-b-separate", "a-b-merge"],
+                        "decision_points": ["boundary-a-b-choice"],
+                    },
+                    {
+                        "strategy": "persistent-context-vs-navigation",
+                        "challenge": "Test persistent context versus navigation for BOUNDARY-A-B.",
+                        "alternatives": ["a-b-separate", "a-b-merge"],
+                        "decision_points": ["boundary-a-b-choice"],
+                    },
+                ],
+                "decision_points": [
+                    {
+                        "id": "boundary-a-b-choice",
+                        "subjects": ["BOUNDARY-A-B"],
+                        "alternatives": [
+                            {
+                                "id": "a-b-separate",
+                                "difference": "Keep A and B independently addressable.",
+                                "material_effects": {
+                                    "goal-continuity": "intentional-context-switch",
+                                },
+                            },
+                            {
+                                "id": "a-b-merge",
+                                "difference": "Keep A and B in one user-facing area.",
+                                "material_effects": {
+                                    "goal-continuity": "continuous-user-goal",
+                                },
+                            },
+                        ],
+                    }
+                ],
+            }
+        ],
+        "decision_space_review": {
+            "status": "COMPLETE",
+            "checks": [
+                "mixed-decision-split",
+                "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
+                "accepted-constraint-cross-check",
+                "authority-boundary-cross-check",
+            ],
+            "reviewed_decisions": ["boundary-a-b-choice"],
+            "open_gaps": [],
+        },
+    }
+    local_topology_candidate = {
+        "id": "TOPOLOGY-H4-LOCAL",
+        "capability": "example.topology",
+        "path": "docs/interface/topology-h4-local.yaml",
+        "semantic_assertions": [],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": topology_semantic_contract["required_semantic_review_checks"],
+            "view_boundary_requirements": [
+                {
+                    "id": "BOUNDARY-A-B",
+                    "participants": ["VIEW-A", "VIEW-B"],
+                    "materiality": "MATERIAL",
+                    "contestability": "CONTESTABLE",
+                    "outcome": "SEPARATE",
+                    "rationale_bases": [
+                        {
+                            "id": "INDEPENDENT-RESUME",
+                            "classification": "USER_FACING",
+                            "rationale": "B has independent revisit/resume value.",
+                        }
+                    ],
+                    "decision_refs": ["boundary-a-b-choice"],
+                }
+            ],
+        },
+        "decision_review": {
+            "axes": [
+                {
+                    "axis": "view-boundaries",
+                    "decisions": [
+                        {
+                            "id": "boundary-a-b-choice",
+                            "owner_authority": "HUMAN-INTERFACE-DESIGN",
+                            "alternatives": [
+                                {"id": "a-b-separate", "state": "VIABLE"},
+                                {
+                                    "id": "a-b-merge",
+                                    "state": "REJECTED",
+                                    "rationale": "Independent resume semantics make merge unsuitable.",
+                                },
+                            ],
+                            "disposition": "DETERMINED",
+                            "selected": "a-b-separate",
+                        }
+                    ],
+                }
+            ]
+        },
+    }
+    local_preflight = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=local_topology_exploration,
+        candidate=local_topology_candidate,
+        model=topology_model,
+    )
+    assert local_preflight["status"] == "ACCEPTED", local_preflight
+    local_semantics = evaluate_artifact(
+        topology_semantic_contract,
+        {"semantic_assertions": []},
+        local_topology_candidate,
+    )
+    assert local_semantics["status"] == "ACCEPTED", local_semantics
+
+    # D2: naming a boundary is insufficient when the required challenges were
+    # not performed for that concrete decision point.
+    unchallenged_boundary = copy.deepcopy(local_topology_exploration)
+    for probe in unchallenged_boundary["axes"][0]["probes"]:
+        probe["decision_points"] = []
+    d2 = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=unchallenged_boundary,
+        candidate=local_topology_candidate,
+        model=topology_model,
+    )
+    assert d2["status"] == "REJECTED", d2
+    assert "DECISION_SUBJECT_PROBE_DIVERSITY_INSUFFICIENT" in codes(d2), d2
+
+    # D3: one decision cannot silently govern materially distinct boundaries.
+    indiscriminate_exploration = copy.deepcopy(local_topology_exploration)
+    indiscriminate_exploration["axes"][0]["decision_points"][0]["subjects"] = [
+        "BOUNDARY-A-B",
+        "BOUNDARY-B-C",
+    ]
+    indiscriminate_candidate = copy.deepcopy(local_topology_candidate)
+    indiscriminate_candidate["semantic_review"]["view_boundary_requirements"].append(
+        {
+            "id": "BOUNDARY-B-C",
+            "participants": ["VIEW-B", "VIEW-C"],
+            "materiality": "MATERIAL",
+            "contestability": "CONTESTABLE",
+            "outcome": "SEPARATE",
+            "rationale_bases": [
+                {
+                    "id": "AUTHORITY-MODE",
+                    "classification": "USER_FACING",
+                    "rationale": "C changes the user-visible authority mode.",
+                }
+            ],
+            "decision_refs": ["boundary-a-b-choice"],
+        }
+    )
+    d3 = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=indiscriminate_exploration,
+        candidate=indiscriminate_candidate,
+        model=topology_model,
+    )
+    assert d3["status"] == "REJECTED", d3
+    assert "VIEW_BOUNDARY_SHARED_DECISION_REVIEW_REQUIRED" in codes(d3), d3
+
+    # P3: sharing is valid when semantic review explicitly establishes that the
+    # boundaries are one decision context with the same material consequences.
+    shared_candidate = copy.deepcopy(indiscriminate_candidate)
+    for boundary in shared_candidate["semantic_review"]["view_boundary_requirements"]:
+        boundary["shared_decision_group"] = "SHARED-AB-BC"
+    shared_candidate["semantic_review"]["shared_boundary_decision_groups"] = [
+        {
+            "id": "SHARED-AB-BC",
+            "boundaries": ["BOUNDARY-A-B", "BOUNDARY-B-C"],
+            "semantic_equivalence": "ACCEPTED",
+            "rationale": "Both boundaries are governed by the same addressability transition.",
+        }
+    ]
+    shared = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=indiscriminate_exploration,
+        candidate=shared_candidate,
+        model=topology_model,
+    )
+    assert shared["status"] == "ACCEPTED", shared
+    shared_semantics = evaluate_artifact(
+        topology_semantic_contract,
+        {"semantic_assertions": []},
+        shared_candidate,
+    )
+    assert shared_semantics["status"] == "ACCEPTED", shared_semantics
+
+    # P1: deterministic material boundaries carry explicit accepted-constraint
+    # evidence and do not require artificial alternatives.
+    deterministic_candidate = copy.deepcopy(local_topology_candidate)
+    deterministic_candidate["semantic_review"]["view_boundary_requirements"].append(
+        {
+            "id": "BOUNDARY-B-C",
+            "participants": ["VIEW-B", "VIEW-C"],
+            "materiality": "MATERIAL",
+            "contestability": "DETERMINISTIC",
+            "outcome": "SEPARATE",
+            "rationale_bases": [
+                {
+                    "id": "AUTHORIZATION",
+                    "classification": "USER_FACING",
+                    "rationale": "Accepted authorization semantics require a mode boundary.",
+                }
+            ],
+            "decision_refs": [],
+            "deterministic_evidence": ["ACCEPTED-AUTHORIZATION-CONSTRAINT"],
+            "deterministic_rationale": "The accepted constraint uniquely requires separation.",
+        }
+    )
+    deterministic = evaluate_decision_preflight(
+        contract=topology_contract,
+        policy=topology_policy,
+        axis_policies=axis_policies(topology_contract, topology_policy),
+        explorer_request=topology_request,
+        capability="example.topology",
+        knowledge_kind="interface-topology-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=local_topology_exploration,
+        candidate=deterministic_candidate,
+        model=topology_model,
+    )
+    assert deterministic["status"] == "ACCEPTED", deterministic
+    deterministic_semantics = evaluate_artifact(
+        topology_semantic_contract,
+        {"semantic_assertions": []},
+        deterministic_candidate,
+    )
+    assert deterministic_semantics["status"] == "ACCEPTED", deterministic_semantics
+
+    # H008 positive freedom: two upstream responsibilities may remain one
+    # user-facing area. Responsibility decomposition is input, not boundary proof.
+    grouped_responsibilities = {
+        "id": "TOPOLOGY-H4-GROUPED",
+        "capability": "example.topology",
+        "semantic_assertions": [],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": topology_semantic_contract["required_semantic_review_checks"],
+            "view_boundary_requirements": [
+                {
+                    "id": "BOUNDARY-TASK-A-TASK-B",
+                    "participants": ["TASK-SURFACE-A", "TASK-SURFACE-B"],
+                    "materiality": "MATERIAL",
+                    "contestability": "CONTESTABLE",
+                    "outcome": "MERGED",
+                    "rationale_bases": [
+                        {
+                            "id": "UPSTREAM-SPLIT",
+                            "classification": "UPSTREAM_RESPONSIBILITY",
+                            "rationale": "The tasks and application capabilities remain separately owned.",
+                        }
+                    ],
+                    "decision_refs": ["merge-task-surfaces"],
+                }
+            ],
+        },
+    }
+    grouped = evaluate_artifact(
+        topology_semantic_contract,
+        {"semantic_assertions": []},
+        grouped_responsibilities,
+    )
+    assert grouped["status"] == "ACCEPTED", grouped
 
     screen_contract = contracts["screen-view-design"]
     assert set(screen_contract["axes"]) == {

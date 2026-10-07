@@ -194,12 +194,12 @@ The priority may change after root-cause analysis, but the id and history remain
 |---|---:|---|---|---|
 | HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
 | HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | INTEGRATED |
-| HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
+| HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | HARNESS_GREEN |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | INTEGRATED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | INTEGRATED |
 | HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | REGISTERED |
 | HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | REGISTERED |
-| HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | REGISTERED |
+| HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | HARNESS_GREEN |
 
 ## 6. Known reproduced evidence
 
@@ -407,6 +407,115 @@ GREEN evidence:
 - PR: #203.
 
 Integration evidence: PR #203 was squash-merged to Harness `main` as `1f006277afbb1d8083c565cbe41830dbfebf6a21`.
+
+### HARNESS-003 — boundary-local Decision Governance
+
+Status history for WP-H4:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- regression: WP-H4 block in `tests/test_decision_governance.py`, broad-decision false coverage;
+- validated RED-only commit: `494431a4eb890e1294461d2bc4843d99aaed3269`;
+- evidence PR: #207 (closed without merge);
+- `harness core` run `37591336184` failed because baseline Decision Exploration and Governance both returned `ACCEPTED` for `overall-view-structure` while material `BOUNDARY-A-B` had no boundary-local decision subject or probes.
+
+Root cause:
+
+Decision Governance was complete only at axis/decision-point level. The `view-boundaries` axis had no stable machine-addressable concrete-boundary subject, so one broad topology decision could satisfy global probe/review completeness while silently standing in for several materially contestable boundaries.
+
+Implemented invariant:
+
+- `view-boundaries` declares `subject_scope: view-boundary`;
+- Interface Topology semantic review records stable material boundary ids, participants, materiality, contestability and disposition;
+- every materially contestable boundary references decision evidence whose explored decision point explicitly names that boundary as a subject;
+- subject-scoped decision probes are bound to that decision point and independently satisfy required strategy diversity and alternative coverage;
+- deterministic material boundaries may omit artificial alternatives only with explicit accepted-constraint evidence and rationale;
+- one decision may govern several boundaries only when semantic review explicitly attests a shared decision group and semantic equivalence.
+
+Negative mutations:
+
+- broad decision false coverage: REJECTED with `VIEW_BOUNDARY_DECISION_COVERAGE_MISSING`;
+- boundary mentioned but unchallenged: REJECTED with `DECISION_SUBJECT_PROBE_DIVERSITY_INSUFFICIENT`;
+- indiscriminate shared decision: REJECTED with `VIEW_BOUNDARY_SHARED_DECISION_REVIEW_REQUIRED`.
+
+Positive controls:
+
+- boundary-local merge/separate exploration: ACCEPTED;
+- deterministic boundary alongside a locally explored contestable boundary: ACCEPTED without synthetic alternatives;
+- semantically attested shared decision across multiple boundaries: ACCEPTED.
+
+GREEN evidence:
+
+- validated implementation head: `02eda9b6615ec3e5a7c6ef3b350bfbd792c430c3`;
+- `harness core` / full `make harness-check`: run `37591066168` PASS;
+- `Greenfield Engineering Graph`: run `37591066142` PASS;
+- implementation PR: #206.
+
+Integration evidence: pending merge of PR #206; status intentionally stops at `HARNESS_GREEN` until the fix is present in Harness `main`.
+
+### HARNESS-008 — user-facing basis for topology separation
+
+Status history for WP-H4:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- regression: WP-H4 block in `tests/test_decision_governance.py`, responsibility-shaped boundary false green;
+- validated RED-only commit: `494431a4eb890e1294461d2bc4843d99aaed3269`;
+- evidence PR: #207 (closed without merge);
+- `harness core` run `37591336184` showed baseline semantic acceptance returned `ACCEPTED` when the only basis for separate `VIEW-A` / `VIEW-B` was different tasks/application capabilities.
+
+Root cause:
+
+Topology guidance rejected implementation-shaped entities/routes/components, but admission had no structured semantic classification of boundary rationale. Task/application responsibility decomposition could therefore be restated as user-semantic prose and become an apparently valid separate destination without independent user-facing boundary evidence.
+
+Implemented invariant:
+
+- `view-boundary-semantics` is required for `interface-topology-design`;
+- semantic review classifies rationale bases as `USER_FACING`, `UPSTREAM_RESPONSIBILITY`, `IMPLEMENTATION_STRUCTURE` or `OTHER`; deterministic assurance consumes that classification and never keyword-matches prose;
+- a material `SEPARATE` outcome requires at least one accepted `USER_FACING` basis;
+- task/journey/application capability/use-case/component/route/data ownership remains analysis input and may coexist with a `MERGED` user-facing outcome;
+- IA locations remain conceptual organization/findability inputs and do not imply views, pages or routes.
+
+Negative mutation:
+
+- responsibility-shaped separate view with no independent user-facing basis: REJECTED with `VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED`.
+
+Positive freedom controls:
+
+- two upstream task/application responsibilities in one user-facing area: ACCEPTED;
+- one task may span multiple views when a real user-facing boundary basis is present: ACCEPTED by the same local-boundary control;
+- real independent resume/mode/authorization or commit/recovery semantics may justify separation without prescribing a universal topology.
+
+GREEN evidence:
+
+- validated implementation head: `02eda9b6615ec3e5a7c6ef3b350bfbd792c430c3`;
+- `harness core` / full `make harness-check`: run `37591066168` PASS;
+- `Greenfield Engineering Graph`: run `37591066142` PASS;
+- implementation PR: #206.
+
+Prep calibration:
+
+- current Prep `.harness/candidates/frontend-boundary-topology-exploration.yaml` has one broad `preparation-view-boundaries` decision and no boundary-local subject for `VIEW-TARGETS ↔ VIEW-TARGET`;
+- current topology admission selects `task-responsibility-views-with-contextual-recovery`, while IA keeps `LOC-TARGETS` and `LOC-TARGET` as conceptual locations and explicitly leaves page/view count downstream;
+- corrected Harness therefore requires this concrete material boundary to be explicitly re-examined; WP-H4 does not decide whether the eventual result is merge or separation.
+
+Integration evidence: pending merge of PR #206; status intentionally stops at `HARNESS_GREEN`. Prep and `.harness-version` remain unchanged and Prep revalidation has not started.
 
 Prep dependency disposition after WP-H3:
 

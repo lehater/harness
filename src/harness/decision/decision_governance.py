@@ -82,6 +82,11 @@ def decision_contract_index(document: dict[str, Any]) -> dict[str, dict[str, Any
                 raise CoreError(f"{kind}.{axis} requires challenge_strategies")
             if not isinstance(minimum_probes, int) or minimum_probes < 1:
                 raise CoreError(f"{kind}.{axis} minimum_probes must be positive")
+            subject_scope = item.get("subject_scope")
+            if subject_scope is not None and (
+                not isinstance(subject_scope, str) or not subject_scope
+            ):
+                raise CoreError(f"{kind}.{axis} subject_scope must be a non-empty string")
             axes[axis] = {
                 "minimum_exploration": _level(
                     item.get("minimum_exploration", minimum),
@@ -96,6 +101,11 @@ def decision_contract_index(document: dict[str, Any]) -> dict[str, dict[str, Any
                 "material_dimensions": list(dict.fromkeys(dimensions)),
                 "challenge_strategies": list(dict.fromkeys(strategies)),
                 "minimum_probes": minimum_probes,
+                **(
+                    {"subject_scope": subject_scope}
+                    if subject_scope is not None
+                    else {}
+                ),
             }
         if not axes:
             raise CoreError(f"{kind} decision contract requires axes")
@@ -223,6 +233,165 @@ def _finding(
     return value
 
 
+def _evaluate_view_boundary_subject_governance(
+    *,
+    explored_axis: dict[str, Any],
+    review_axis: dict[str, Any] | None,
+    candidate: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Bind material topology boundaries to boundary-local decision evidence."""
+    semantic_review = candidate.get("semantic_review")
+    if not isinstance(semantic_review, dict):
+        return [_finding("VIEW_BOUNDARY_REVIEW_REQUIRED", explored_axis.get("axis"))]
+    requirements = semantic_review.get("view_boundary_requirements")
+    if not isinstance(requirements, list):
+        return [_finding("VIEW_BOUNDARY_REVIEW_REQUIRED", explored_axis.get("axis"))]
+
+    axis = explored_axis.get("axis")
+    findings: list[dict[str, Any]] = []
+    boundaries = {
+        item.get("id"): item
+        for item in requirements
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    material = {
+        boundary_id: item
+        for boundary_id, item in boundaries.items()
+        if item.get("materiality") == "MATERIAL"
+    }
+    explored_decisions = {
+        item.get("id"): item
+        for item in explored_axis.get("decision_points", []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    reviewed_decisions = {
+        item.get("id"): item
+        for item in (review_axis.get("decisions", []) if isinstance(review_axis, dict) else []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    groups = {
+        item.get("id"): item
+        for item in semantic_review.get("shared_boundary_decision_groups", []) or []
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+
+    for boundary_id, boundary in material.items():
+        if boundary.get("outcome") == "SEPARATE":
+            bases = boundary.get("rationale_bases", []) or []
+            if not any(
+                isinstance(item, dict) and item.get("classification") == "USER_FACING"
+                for item in bases
+            ):
+                findings.append(
+                    _finding(
+                        "VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED",
+                        axis,
+                        boundary=boundary_id,
+                    )
+                )
+
+        if boundary.get("contestability") == "DETERMINISTIC":
+            continue
+        if boundary.get("contestability") != "CONTESTABLE":
+            continue
+
+        refs = boundary.get("decision_refs", []) or []
+        if not isinstance(refs, list) or not refs:
+            findings.append(
+                _finding(
+                    "VIEW_BOUNDARY_DECISION_COVERAGE_MISSING",
+                    axis,
+                    boundary=boundary_id,
+                )
+            )
+            continue
+
+        for decision_id in refs:
+            explored = explored_decisions.get(decision_id)
+            reviewed = reviewed_decisions.get(decision_id)
+            subjects = (
+                explored.get("subjects", [])
+                if isinstance(explored, dict)
+                else []
+            ) or []
+            if (
+                explored is None
+                or reviewed is None
+                or boundary_id not in subjects
+            ):
+                findings.append(
+                    _finding(
+                        "VIEW_BOUNDARY_DECISION_COVERAGE_MISSING",
+                        axis,
+                        decision_id if isinstance(decision_id, str) else None,
+                        boundary=boundary_id,
+                    )
+                )
+
+    for decision_id, explored in explored_decisions.items():
+        subjects = [
+            value
+            for value in (explored.get("subjects", []) or [])
+            if value in material
+        ]
+        if len(subjects) <= 1:
+            continue
+
+        group_ids = {
+            material[boundary_id].get("shared_decision_group")
+            for boundary_id in subjects
+        }
+        if len(group_ids) != 1:
+            findings.append(
+                _finding(
+                    "VIEW_BOUNDARY_SHARED_DECISION_REVIEW_REQUIRED",
+                    axis,
+                    decision_id,
+                    boundaries=sorted(subjects),
+                )
+            )
+            continue
+        group_id = next(iter(group_ids))
+        group = groups.get(group_id) if isinstance(group_id, str) else None
+        group_members = (
+            set(group.get("boundaries", []) or [])
+            if isinstance(group, dict)
+            else set()
+        )
+        if (
+            group is None
+            or group.get("semantic_equivalence") != "ACCEPTED"
+            or not set(subjects).issubset(group_members)
+            or any(
+                decision_id not in (material[boundary_id].get("decision_refs", []) or [])
+                for boundary_id in subjects
+            )
+        ):
+            findings.append(
+                _finding(
+                    "VIEW_BOUNDARY_SHARED_DECISION_REVIEW_REQUIRED",
+                    axis,
+                    decision_id,
+                    boundaries=sorted(subjects),
+                    **(
+                        {"group": group_id}
+                        if isinstance(group_id, str) and group_id
+                        else {}
+                    ),
+                )
+            )
+
+    return findings
+
+
 def evaluate_decision_governance(
     *,
     contract: dict[str, Any] | None,
@@ -282,6 +451,15 @@ def evaluate_decision_governance(
     for explored_axis in exploration_evaluation.get("axes", []) or []:
         axis = explored_axis["axis"]
         applicability = explored_axis["applicability"]
+        axis_contract = contract["axes"].get(axis, {})
+        if axis_contract.get("subject_scope") == "view-boundary":
+            findings.extend(
+                _evaluate_view_boundary_subject_governance(
+                    explored_axis=explored_axis,
+                    review_axis=review_axes.get(axis),
+                    candidate=candidate,
+                )
+            )
         if applicability == "NOT_APPLICABLE":
             if axis in review_axes:
                 findings.append(_finding("DECISION_REVIEW_FOR_NOT_APPLICABLE_AXIS", axis))
