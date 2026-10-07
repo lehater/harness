@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 from harness.integration.repository_realization import evaluate
 
 
@@ -93,3 +99,13 @@ def test_test_design_realization_rejects_missing_operation() -> None:
         and issue.get("obligation") == "OP-APPLY"
         for issue in result["errors"]
     ), result
+
+
+def main() -> int:
+    test_test_design_realization_rejects_missing_operation()
+    print("test realization conformance RED unexpectedly passed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
