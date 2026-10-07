@@ -66,6 +66,7 @@ contexts:
       - harness.assurance.semantic_derivation
       - harness.assurance.semantic_fingerprint
       - harness.assurance.semantic_judgement_calibration
+      - harness.assurance.test_realization
     may_depend_on:
       - project-model
       - evidence
