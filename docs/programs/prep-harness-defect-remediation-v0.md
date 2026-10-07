@@ -42,10 +42,12 @@ Allowed Prep work during the Harness-first phase is limited to evidence collecti
 
 A Harness terminal disposition is one of:
 
-- `HARNESS_FIXED` — a Harness mechanism/regression was added or repaired;
-- `HARNESS_NO_CHANGE_JUSTIFIED` — explicit analysis proves that the defect is project-specific/usability-only and no Harness change is warranted.
+- `HARNESS_FIXED` — a Harness mechanism/regression was added or repaired and the responsible Harness defect has reached `INTEGRATED` in Harness `main`;
+- `HARNESS_NO_CHANGE_JUSTIFIED` — evidence-backed analysis proves that the observed Prep defect is outside Harness responsibility, identifies the owning Prep authority, explains why no reusable Harness invariant is missing, and records the justification in this register.
 
-Silence is not a terminal disposition.
+Silence, an unmerged Harness fix, or an unsupported assertion that a problem is "Prep-specific" is not a terminal disposition.
+
+Prep may enter `PREP_REVALIDATION` for a defect only when every mapped Harness dependency has one of these terminal dispositions. When any dependency is `HARNESS_FIXED`, Prep must first pin `.harness-version` to a Harness `main` commit containing that integrated fix.
 
 ### R3 — RED before Harness fix
 
@@ -88,6 +90,37 @@ A Prep defect can become `CLOSED` only when both are true:
 
 A green Prep E2E suite alone is not closure.
 
+### R7 — Evidence-backed reclassification
+
+Classification, priority, dependency mapping and status may change when new evidence is found, but the defect id does not change.
+
+Every such change must preserve the previous meaning in history/evidence and record why the new classification is better supported. Reclassification never permits deletion, id reuse or silent merging.
+
+### R8 — New findings are registered before remediation
+
+A newly discovered real defect is appended to this document with the next free stable id before work expands to fix it.
+
+The registration must include at least: observable finding, priority, current classification, mapped dependency/owner when known, initial status, and evidence location. Investigation may refine these fields later under R7.
+
+### R9 — BLOCKED and rejected findings remain auditable
+
+`BLOCKED:<reason>` preserves the defect and records the concrete unmet dependency or missing evidence needed to resume.
+
+`REJECTED_AS_NOT_DEFECT:<evidence>` is a terminal finding disposition only when evidence demonstrates that the reported behavior conforms to the accepted authority. The id and history remain in the register.
+
+Neither state removes the item from the denominator.
+
+### R10 — GREEN is an evidence state
+
+For a Harness mechanism fix, `HARNESS_GREEN` requires all of the following:
+
+1. the same regression/reproduction that established RED now passes;
+2. relevant deterministic Harness checks pass;
+3. at least one positive control demonstrates that legitimate design freedom is still accepted when applicable;
+4. evidence identifies the scenario/test, affected files and commit/PR.
+
+A fix implementation without this evidence remains `FIX_IMPLEMENTED`.
+
 ## 3. Status model
 
 Every Prep defect moves through this state machine:
@@ -121,6 +154,8 @@ REGISTERED
 ```
 
 A status change must record evidence: file/path, scenario/test id, commit/PR or explicit analysis result.
+
+State-machine transitions are monotonic by default. If later evidence invalidates an earlier transition, the register must explicitly record the rollback/reclassification and its evidence rather than rewriting history.
 
 ## 4. Canonical Prep defect register
 
@@ -397,11 +432,45 @@ New defects discovered:
 Remaining blockers:
   ...
 
-Next permitted work:
+Recommended next work:
   ...
 ```
 
 A chat must not declare a defect closed if another required phase remains.
+
+### Stage gate
+
+An executor chat/agent does not choose or start the next program stage on its own.
+
+After every stage or corrective stage:
+
+1. the executor stops after completing its bounded scope;
+2. the executor produces the required handoff report and evidence;
+3. the user transfers that report to the managing chat;
+4. the managing chat verifies repository state, evidence and register transitions;
+5. only the managing chat issues the prompt for the next stage or a corrective stage.
+
+An executor may recommend the next stage, but that recommendation has no execution authority.
+
+### Definition of stage/work-package completion
+
+Every stage/work package must define before execution:
+
+- explicit scope and non-goals;
+- starting statuses;
+- exit criteria.
+
+Its closing report must contain:
+
+- evidence for every claimed transition;
+- repository commits/PRs;
+- relevant test/check commands and results;
+- canonical-register changes;
+- newly discovered defects;
+- unresolved risks/blockers;
+- deviations from the prompt.
+
+A stage/work package is `COMPLETE` only when every exit criterion is evidenced. If required evidence or an exit criterion is missing, the result is `INCOMPLETE`; if progress is prevented by an external dependency or safety/repository constraint, the result is `BLOCKED`.
 
 ## 10. Defect-processing checklist
 
@@ -448,6 +517,8 @@ Forbidden changes:
 - copy the register into another repository and let both copies diverge.
 
 The Prep repository contains only a pointer to this canonical register.
+
+This file in Harness is the single source of truth for the denominator, statuses, classifications, mappings, execution ordering and evidence history. Any issue, report or Prep-side document may reference ids but must not maintain a second authoritative register. If a duplicate register is discovered, stop updating it and reconcile all unique information back into this document before further status transitions.
 
 ## 12. Current program frontier
 
