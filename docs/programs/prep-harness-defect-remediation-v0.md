@@ -1126,3 +1126,61 @@ Program state after STAGE-P0:
 - STAGE-P0: COMPLETE;
 - next stage: not started; the managing chat chooses it from the new frontier.
 
+### STAGE-P0-CIM completion record — conceptual-interface-model revalidation
+
+This record supersedes the STAGE-P0 *current frontier* statement above while preserving prior stages as execution history.
+
+STAGE-P0-CIM:
+
+- result: COMPLETE;
+- capability: `prep.conceptual-interface-model`;
+- authority: `HUMAN-INTERFACE-DESIGN`;
+- starting Prep `main`: `24a2ca1dcea5f258333c6f27264f591586c9ea8d`;
+- old acceptance: `PREP-CONCEPTUAL-INTERFACE-MODEL-STRICT-5`;
+- reproduced stale cause: accepted `prep.user-journeys` semantic surface was `PREP-USER-JOURNEYS-STRICT-5` while the current upstream provider is `PREP-USER-JOURNEYS-STRICT-6`, with newly independent Journey atoms.
+
+Conceptual Interface revalidation:
+
+- canonical `docs/interface/conceptual-interface-model.yaml`: UNCHANGED;
+- reason: the canonical model already preserves candidate Target comparison, active preparation Target, learner-state separation, reversible Capability-derived Knowledge scope, Knowledge identity, and the Gap/uncertainty -> Next Focus relationship;
+- current Journey exhaustive accounting: PASS — 78 required sources, 76 accepted derivation links, 2 explicit dispositions, 0 unresolved;
+- `UJ-KNOWLEDGE-APPLY-CAPABILITY-SCOPE`: NOT_APPLICABLE to additional CIM semantics because invocation belongs to Interaction Design while `CIM-KNOWLEDGE-SCOPE` and `CIM-REL-CAPABILITY-KNOWLEDGE` preserve the underlying reversible conceptual scope;
+- `UJ-KNOWLEDGE-CLEAR-CAPABILITY-SCOPE`: same boundary; clear invocation remains downstream Interaction behavior;
+- Target comparison / candidate / active Target / learner-state conceptual distinctions: sufficient without introducing interaction-role entities;
+- Capability vs Next Focus / PreparationIntent distinction and Gap/uncertainty -> Next Focus relationship: sufficient;
+- current prerequisites `prep.task-model`, `prep.user-journeys`, `prep.application-design`, `prep.knowledge-model`, `prep.learning-design`, and `prep.learner-model`: CURRENT;
+- new acceptance: `PREP-CONCEPTUAL-INTERFACE-MODEL-STRICT-6`;
+- `prep.conceptual-interface-model`: CURRENT;
+- no downstream artifact was reaccepted.
+
+Publication and validation:
+
+- bounded publication diagnostic runs: `37605757802` and `37605969619`;
+- pinned Consumer Pack / Harness runtime: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- `python tools/semantic_baseline.py`: PASS;
+- `python tools/check_harness_integration.py`: PASS;
+- `python tools/full_harness_revalidate.py`: EXPECTED INCOMPLETE with `semantic_gaps=[]`; remaining failures are downstream currentness gaps;
+- `python tools/validate_docs.py`: PASS;
+- maintained Anki reference tests: PASS;
+- temporary revalidation runner/workflow were removed before integration;
+- Prep PR #83 required validation run `37606175893`: PASS;
+- Prep PR #83 squash-merged to `main` as `ea6f5977df8e71937a38ab2ea01721f581a00939`.
+
+Post-P0-CIM first actionable frontier:
+
+1. `prep.information-architecture` / `HUMAN-INTERFACE-DESIGN` — STALE against current `PREP-USER-JOURNEYS-STRICT-6` and `PREP-CONCEPTUAL-INTERFACE-MODEL-STRICT-6`; revalidation belongs to its own stage.
+2. Interaction Design, Presentation System and later Human Interface / verification / architecture capabilities remain downstream stale and are not reaccepted here.
+
+Defect impact:
+
+- PREP-UX-001..016: UNCHANGED;
+- PREP-UX-012: `BLOCKED:same-role-equivalence-not-established`;
+- new PREP defects: NONE.
+
+Program state after STAGE-P0-CIM:
+
+- `HARNESS_REMEDIATION_BASELINE` remains `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- Harness runtime/remediation mechanisms remain unchanged by this register-only update;
+- STAGE-P0-CIM: COMPLETE;
+- next stage: not started; the managing chat chooses it from the new frontier.
+
