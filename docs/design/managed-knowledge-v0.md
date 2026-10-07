@@ -97,7 +97,7 @@ Git history remains the revision mechanism. Requirement IDs are not document pos
 
 Workspace validation enforces that every `ACCEPTED` managed Product Requirement has at least one verification disposition. A requirement therefore cannot disappear between canonical requirements and verification while the managed workspace remains valid.
 
-For checks whose method is `TEST`, `test-design/v1` must contain at least one executable test contract referencing that verification check. Test Design owns precondition, controlled operation and observable oracle; it does not restate or invent the Product Requirement.
+For checks whose method is `TEST`, `test-design/v1` must contain at least one executable test contract referencing that verification check. Test Design owns precondition, controlled operation and observable oracle; it does not restate or invent the Product Requirement. Independently executable/verifiable operation and oracle parts may additionally carry stable `operation_obligations` / `oracle_obligations` ids. These ids are canonical Test Design semantics; executable test code only binds evidence to them.
 
 The trace is therefore:
 
@@ -110,6 +110,9 @@ verification-plan/v1
       ↓ when method=TEST
 test-design/v1
   TEST-* + verification_refs
+  OP-* / ORACLE-* obligation ids when independently realizable
+      ↓ semantic correspondence review + deterministic accounting
+executable test realization evidence
 ```
 
 Other accepted design obligations may also be referenced by Verification checks. Not every engineering test needs to originate in Product Requirements, but every managed accepted Product Requirement must have an explicit verification disposition.
