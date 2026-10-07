@@ -373,7 +373,13 @@ def main() -> int:
                 ],
             }
         ],
-        "consumers": [],
+        "consumers": [
+            {
+                "id": "TOPOLOGY-CONSUMER",
+                "purpose": "Consume accepted interface topology.",
+                "requires": ["example.topology"],
+            }
+        ],
         "terminal_capabilities": [],
     }
     topology_model = {"artifacts": [], "questions": []}
