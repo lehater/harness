@@ -198,7 +198,7 @@ The priority may change after root-cause analysis, but the id and history remain
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | INTEGRATED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | INTEGRATED |
 | HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | INTEGRATED |
-| HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | HARNESS_GREEN |
+| HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | INTEGRATED |
 | HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | INTEGRATED |
 
 ## 6. Known reproduced evidence
@@ -654,6 +654,7 @@ REGISTERED
   -> HARNESS_RED
   -> FIX_IMPLEMENTED
   -> HARNESS_GREEN
+  -> INTEGRATED
 ```
 
 RED evidence:
@@ -704,6 +705,22 @@ GREEN evidence:
 - `Greenfield Engineering Graph`: run `37598091885` PASS;
 - CI policy: run `37598091876` PASS;
 - implementation PR: #211.
+
+Integration evidence: PR #211 was squash-merged to Harness `main` as `24b748cde9b8082c3834662f9fbac74cea5b0294`; `HARNESS-007 -> INTEGRATED`.
+
+Harness-phase closure audit:
+
+- HARNESS-001: INTEGRATED;
+- HARNESS-002: INTEGRATED;
+- HARNESS-003: INTEGRATED;
+- HARNESS-004: INTEGRATED;
+- HARNESS-005: INTEGRATED;
+- HARNESS-006: INTEGRATED;
+- HARNESS-007: INTEGRATED;
+- HARNESS-008: INTEGRATED;
+- Harness remediation phase is terminal for HARNESS-001..008;
+- next program stage may be Stage HI: final Harness baseline freeze -> Prep `.harness-version` repin -> Harness currentness/coverage evaluation;
+- Stage HI is not executed by WP-H6.
 
 Prep calibration/status:
 
