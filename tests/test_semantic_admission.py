@@ -304,7 +304,6 @@ def test_independently_losable_obligation_granularity() -> None:
         "required_semantic_review_checks": [
             "independent-obligation-granularity",
         ],
-        "requires_independent_obligation_accounting": True,
     }
     lossy_candidate = {
         "id": "CAPABILITY-SCOPE-INTERACTION",
