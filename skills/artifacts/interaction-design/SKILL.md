@@ -27,8 +27,9 @@ Read accepted task/journey/conceptual/application/machine/security knowledge nee
 6. Bind server-backed behavior to accepted operation outcomes.
 7. Record explicit `no-ui` dispositions for USER tasks that genuinely need no interface surface.
 8. Keep page/view inventory, parent navigation and layout downstream.
-9. Route missing upstream semantics as Questions.
-10. Produce/register and reevaluate.
+9. Before semantic admission, identify independently losable user-observable obligations (for example separate actions, visible states, reversible changes or distinct observable outcomes) and account each in `semantic_review.independent_obligations`; do not let one coarse summary atom stand in for several such obligations.
+10. Route missing upstream semantics as Questions.
+11. Produce/register and reevaluate.
 
 ## Stop conditions
 Stop when an action, system response, recovery path, authorization distinction or machine outcome is not accepted upstream and continuing would invent behavior.
@@ -37,7 +38,7 @@ Stop when an action, system response, recovery path, authorization distinction o
 Interaction-context ids; task/concept refs; actions/inputs/selections; states/transitions/recovery; operation/outcome bindings where applicable; no-ui task dispositions with rationale; unresolved Questions.
 
 ## Acceptance checks
-Every USER task has interaction coverage or explicit no-ui disposition; actions/outcomes trace upstream; contexts do not smuggle in page/layout decisions; authorization/recovery are explicit; Topology can map contexts to views without inventing interaction.
+Every USER task has interaction coverage or explicit no-ui disposition; independently losable user-observable obligations have separate semantic accounting rather than a shared coarse summary atom; actions/outcomes trace upstream; contexts do not smuggle in page/layout decisions; authorization/recovery are explicit; Topology can map contexts to views without inventing interaction.
 
 ## Registration
 Register under HUMAN-INTERFACE-DESIGN and provide only interaction-design capabilities actually materialized.

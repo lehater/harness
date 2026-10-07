@@ -16,6 +16,7 @@ from harness.application.semantic_admission import (
     knowledge_contract_index,
 )
 from harness.assurance.semantic_derivation import evaluate_derivation
+from harness.assurance.semantic_acceptance import evaluate_artifact
 
 
 GRAPH = {
@@ -293,7 +294,112 @@ def test_required_target_provenance() -> None:
     ), rejected
 
 
+
+def test_independently_losable_obligation_granularity() -> None:
+    contract = {
+        "authority": "HUMAN-INTERFACE-DESIGN",
+        "owned_assertion_kinds": ["interaction-obligation"],
+        "requires_assertion_authority": True,
+        "requires_semantic_review": True,
+        "required_semantic_review_checks": [
+            "independent-obligation-granularity",
+        ],
+    }
+    lossy_candidate = {
+        "id": "CAPABILITY-SCOPE-INTERACTION",
+        "capability": "example.capability-scope",
+        "semantic_assertions": [
+            {
+                "id": "SCOPE-SUMMARY",
+                "kind": "interaction-obligation",
+                "subject": "capability-scope",
+                "semantic_value": "Capability scope is explicit and reversible.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+            {
+                "id": "SCOPE-VISIBLE",
+                "kind": "interaction-obligation",
+                "subject": "capability-scope-visible",
+                "semantic_value": "Current Capability-derived scope is visible.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+            {
+                "id": "SCOPE-CLEAR",
+                "kind": "interaction-obligation",
+                "subject": "capability-scope-clear",
+                "semantic_value": "User can clear the current Capability-derived scope.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["independent-obligation-granularity"],
+            "independent_obligations": [
+                {
+                    "id": "apply-capability-scope",
+                    "status": "COLLAPSED",
+                    "assertions": ["SCOPE-SUMMARY"],
+                    "rationale": (
+                        "The user action for applying/selecting scope has no "
+                        "dedicated semantic atom; only the reversible-scope "
+                        "summary remains."
+                    ),
+                },
+                {
+                    "id": "visible-capability-scope",
+                    "status": "ACCOUNTED",
+                    "assertions": ["SCOPE-VISIBLE"],
+                },
+                {
+                    "id": "clear-capability-scope",
+                    "status": "ACCOUNTED",
+                    "assertions": ["SCOPE-CLEAR"],
+                },
+            ],
+        },
+    }
+
+    rejected = evaluate_artifact(contract, {"semantic_assertions": []}, lossy_candidate)
+    assert rejected["status"] == "REJECTED", rejected
+    assert any(
+        finding.get("code") == "INDEPENDENT_OBLIGATION_COLLAPSED"
+        and finding.get("obligation") == "apply-capability-scope"
+        for finding in rejected["findings"]
+    ), rejected
+
+    cohesive_candidate = {
+        "id": "COHESIVE-ASSERTION",
+        "capability": "example.cohesive",
+        "semantic_assertions": [
+            {
+                "id": "COHESIVE-ATOM",
+                "kind": "interaction-obligation",
+                "subject": "cohesive-state",
+                "semantic_value": (
+                    "The current mode indicator remains visible while the "
+                    "mode is active."
+                ),
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            }
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["independent-obligation-granularity"],
+            "independent_obligations": [
+                {
+                    "id": "visible-active-mode",
+                    "status": "ACCOUNTED",
+                    "assertions": ["COHESIVE-ATOM"],
+                }
+            ],
+        },
+    }
+    accepted = evaluate_artifact(contract, {"semantic_assertions": []}, cohesive_candidate)
+    assert accepted["status"] == "ACCEPTED", accepted
+
+
 def main() -> int:
+    test_independently_losable_obligation_granularity()
     test_irrelevant_source_invariance()
     test_required_target_provenance()
     registry = load("skills/artifact-skill-registry-v0.yaml")
@@ -327,6 +433,15 @@ def main() -> int:
         "implementation-slices-explicit",
         "repository-realization-derived-from-accepted-boundaries",
     } <= set(contract_index["implementation-design"]["required_review_checks"])
+    for knowledge_kind in (
+        "user-journey-design",
+        "interaction-design",
+        "presentation-system-design",
+        "screen-view-design",
+    ):
+        assert "independent-obligation-granularity" in set(
+            contract_index[knowledge_kind]["required_review_checks"]
+        ), knowledge_kind
 
     derivation = evaluate_derivation(
         graph=GRAPH,

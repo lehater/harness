@@ -34,6 +34,129 @@ def _source_index(sources: dict[str, Any]) -> dict[str, dict[str, Any]]:
     }
 
 
+def _evaluate_independent_obligation_accounting(
+    review: dict[str, Any] | None,
+    assertions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate semantic-review accounting for independently losable obligations.
+
+    Semantic judgement owns identification of the obligations and whether one is
+    collapsed/missing. Once identified, Harness deterministically validates that
+    ACCOUNTED obligations reference existing, non-shared semantic assertions.
+    """
+    if not isinstance(review, dict):
+        return [{"code": "INDEPENDENT_OBLIGATION_REVIEW_REQUIRED"}]
+
+    items = review.get("independent_obligations")
+    if not isinstance(items, list) or not items:
+        return [{"code": "INDEPENDENT_OBLIGATION_REVIEW_REQUIRED"}]
+
+    assertion_ids = {
+        item.get("id")
+        for item in assertions
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    findings: list[dict[str, Any]] = []
+    seen_obligations: set[str] = set()
+    accounted_by_assertion: dict[str, set[str]] = defaultdict(set)
+    status_codes = {
+        "COLLAPSED": "INDEPENDENT_OBLIGATION_COLLAPSED",
+        "MISSING": "INDEPENDENT_OBLIGATION_MISSING",
+        "QUESTION": "INDEPENDENT_OBLIGATION_QUESTION",
+    }
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append(
+                {
+                    "code": "INVALID_INDEPENDENT_OBLIGATION_ACCOUNTING",
+                    "index": index,
+                }
+            )
+            continue
+
+        obligation_id = item.get("id")
+        status = item.get("status")
+        refs = item.get("assertions", []) or []
+        if (
+            not isinstance(obligation_id, str)
+            or not obligation_id
+            or obligation_id in seen_obligations
+            or status not in {"ACCOUNTED", "COLLAPSED", "MISSING", "QUESTION"}
+            or not isinstance(refs, list)
+            or any(not isinstance(ref, str) or not ref for ref in refs)
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_INDEPENDENT_OBLIGATION_ACCOUNTING",
+                    "index": index,
+                    **(
+                        {"obligation": obligation_id}
+                        if isinstance(obligation_id, str) and obligation_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+        seen_obligations.add(obligation_id)
+
+        unknown = sorted(set(refs) - assertion_ids)
+        if unknown:
+            findings.append(
+                {
+                    "code": "UNKNOWN_INDEPENDENT_OBLIGATION_ASSERTION",
+                    "obligation": obligation_id,
+                    "assertions": unknown,
+                }
+            )
+
+        if status == "ACCOUNTED":
+            if not refs:
+                findings.append(
+                    {
+                        "code": "INDEPENDENT_OBLIGATION_MISSING",
+                        "obligation": obligation_id,
+                    }
+                )
+                continue
+            for ref in sorted(set(refs) & assertion_ids):
+                accounted_by_assertion[ref].add(obligation_id)
+            continue
+
+        rationale = item.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            findings.append(
+                {
+                    "code": "INVALID_INDEPENDENT_OBLIGATION_ACCOUNTING",
+                    "obligation": obligation_id,
+                }
+            )
+            continue
+        findings.append(
+            {
+                "code": status_codes[status],
+                "obligation": obligation_id,
+                **({"assertions": refs} if refs else {}),
+                "rationale": rationale,
+            }
+        )
+
+    for assertion_id, obligation_ids in sorted(accounted_by_assertion.items()):
+        if len(obligation_ids) <= 1:
+            continue
+        findings.append(
+            {
+                "code": "INDEPENDENT_OBLIGATIONS_COLLAPSED",
+                "assertion": assertion_id,
+                "obligations": sorted(obligation_ids),
+            }
+        )
+
+    return findings
+
+
 def evaluate_artifact(
     contract: dict[str, Any],
     sources: dict[str, Any],
@@ -462,6 +585,11 @@ def evaluate_artifact(
                 "code": "SEMANTIC_REVIEW_REJECTED",
                 "reason": review.get("reason"),
             }
+        )
+
+    if "independent-obligation-granularity" in required_review_checks:
+        findings.extend(
+            _evaluate_independent_obligation_accounting(review, assertions)
         )
 
     accepted = not findings

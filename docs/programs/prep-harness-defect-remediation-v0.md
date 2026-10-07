@@ -192,7 +192,7 @@ The priority may change after root-cause analysis, but the id and history remain
 
 | ID | Priority | Systemic defect / missing protection | Primary affected Prep defects | Status |
 |---|---:|---|---|---|
-| HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | REGISTERED |
+| HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | HARNESS_GREEN |
 | HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | REGISTERED |
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | REGISTERED |
@@ -202,6 +202,50 @@ The priority may change after root-cause analysis, but the id and history remain
 | HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | REGISTERED |
 
 ## 6. Known reproduced evidence
+
+### HARNESS-001 — independently losable semantic-obligation granularity
+
+Status history for WP-H1:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- regression: `tests/test_semantic_admission.py::test_independently_losable_obligation_granularity`;
+- RED-only commit: `8b46439306af81f3c71224524733b51a7fe4f987`;
+- CI run `37578888796` failed because the baseline evaluator returned `ACCEPTED` for a surface that retained visible-scope, clear-scope and a coarse reversible-scope summary while the independently losable apply/select obligation was marked `COLLAPSED`.
+
+Root cause:
+
+Semantic admission required an ACCEPTED semantic review and named review checks, but had no deterministic accounting contract for independently losable obligations identified by that semantic review. Downstream derivation therefore received only the already-coarsened accepted assertion set; an obligation lost before that boundary could never become an `UNDISPOSITIONED_SOURCE`.
+
+Implemented invariant:
+
+- the existing semantic-review boundary identifies independently losable user-observable obligations and records them under `semantic_review.independent_obligations`;
+- when `independent-obligation-granularity` is required, each `ACCOUNTED` obligation must reference an existing semantic assertion;
+- one semantic assertion cannot account for multiple independently losable obligations;
+- `COLLAPSED`, `MISSING` and `QUESTION` obligations reject admission;
+- the check is required for `user-journey-design`, `interaction-design`, `presentation-system-design` and `screen-view-design`;
+- no natural-language heuristic or Prep-specific control type is encoded.
+
+Positive control:
+
+A cohesive assertion with one user-observable lifecycle remains `ACCEPTED`; the invariant does not require sentence-level atomization.
+
+GREEN evidence:
+
+- fix/regression branch head: `1be08061d5bd5da8748a8b7669559e7b39449c8c`;
+- `harness core` / `make harness-check`: run `37579171037` PASS;
+- `Greenfield Engineering Graph`: run `37579171021` PASS;
+- PR: #198.
+
+Integration remains the only WP-H1 state transition still pending on this branch. `PREP-UX-005` stays `REPRODUCED`; HARNESS-002 and HARNESS-005 remain unresolved dependencies.
 
 ### PREP-UX-005 / PREP-UX-014 — Required Capability filter
 
@@ -527,12 +571,9 @@ The immediate next action is:
 ```
 WP-H1
 HARNESS-001
-semantic-surface completeness / atom granularity
-
-first RED:
-PREP-UX-005 Required Capability selector omission
+integrate the GREEN semantic-surface completeness / atom-granularity fix
 ```
 
-After WP-H1, proceed to WP-H2 so that accepted Test Design operations are also bound to executable evidence.
+After WP-H1 integration, the recommended next work package is WP-H2 so that accepted Test Design operations are also bound to executable evidence. The executor does not start WP-H2 from this document update.
 
 Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.

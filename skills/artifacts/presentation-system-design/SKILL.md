@@ -47,8 +47,9 @@ Read accepted project requirements, tasks/journeys, conceptual/IA/interaction/to
 9. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
 10. Define inheritance and local-deviation policy. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
 11. Preserve implementation freedom for framework, CSS mechanics and private component structure.
-12. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
-13. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
+12. Before semantic admission, identify independently losable user-observable presentation obligations and account each in `semantic_review.independent_obligations`; do not compress separate controls/states/actions into one summary assertion when any can disappear independently.
+13. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
+14. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
 
 ## Facets
 
@@ -110,6 +111,7 @@ A useful contract includes:
 
 - screens can inherit common presentation knowledge without copying it;
 - equivalent actions/states use equivalent patterns unless a deviation is justified;
+- independently losable user-observable obligations have separate semantic accounting before downstream screens inherit the surface;
 - design-system/vendor mechanics are not mistaken for project semantics;
 - external template/provider features cannot silently introduce product actions, routes, states or data semantics;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
