@@ -16,7 +16,7 @@ Define how accepted user-facing concepts/content are organized and found: concep
 Accepted Conceptual Interface Model, Task Model, User Journeys, exposed content/domain identities, and applicable localization/accessibility constraints.
 
 ## Read boundary
-Read accepted conceptual/task/journey/content knowledge needed to organize information. Existing site maps, routes, menus and screen layouts are evidence or projections unless explicitly canonical.
+Read accepted conceptual/task/journey/content knowledge needed to organize information. Existing site maps, routes, menus and screen layouts are evidence or projections unless explicitly canonical. IA location identity is conceptual organization/findability input to Interface Topology; it does not imply a screen, page, route or independently navigable destination.
 
 ## Procedure
 1. Enumerate information objects and conceptual locations needed for accepted tasks.
