@@ -398,7 +398,195 @@ def test_independently_losable_obligation_granularity() -> None:
     assert accepted["status"] == "ACCEPTED", accepted
 
 
+
+def test_h3_role_and_observable_realization_false_greens() -> None:
+    role_contract = {
+        "authority": "HUMAN-INTERFACE-DESIGN",
+        "owned_assertion_kinds": ["interaction-obligation"],
+        "requires_assertion_authority": True,
+        "requires_semantic_review": True,
+        "required_semantic_review_checks": ["interaction-role-coherence"],
+    }
+    role_candidate = {
+        "semantic_assertions": [
+            {
+                "id": "SELECTED",
+                "kind": "interaction-obligation",
+                "subject": "entity-selection",
+                "semantic_value": "The entity can be selected.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            }
+        ],
+        "interaction_roles": [
+            {
+                "id": "ROLE-SELECTED",
+                "concept_ref": "ENTITY-X",
+                "meaning": "Generic selected state.",
+                "entry": "select entity",
+                "exit": "clear selection",
+                "transitions": [],
+                "side_effects": [],
+                "forbidden_side_effects": [],
+                "observable_distinction": "selected",
+            }
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["interaction-role-coherence"],
+            "interaction_role_requirements": [
+                {
+                    "concept": "ENTITY-X",
+                    "status": "REQUIRED",
+                    "roles": ["ROLE-COMPARE", "ROLE-ACTIVE"],
+                    "required_role_facets": {
+                        "ROLE-COMPARE": ["forbidden_side_effects"],
+                        "ROLE-ACTIVE": ["side_effects"],
+                    },
+                    "required_transitions": [
+                        {"from": "ROLE-COMPARE", "to": "ROLE-ACTIVE"}
+                    ],
+                    "rationale": "The roles have materially different side effects.",
+                }
+            ],
+        },
+    }
+    role_result = evaluate_artifact(
+        role_contract,
+        {"semantic_assertions": []},
+        role_candidate,
+    )
+
+    graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "OBSERVABLE-REALIZATION",
+        "authorities": [
+            {
+                "id": "HUMAN-INTERFACE-DESIGN",
+                "responsibility": "Own interface semantics.",
+                "boundary": {
+                    "semantic_cohesion": "User-facing semantics.",
+                    "independent_change": "Interface knowledge changes independently.",
+                    "public_contract": "Accepted interface semantics.",
+                },
+                "produces": [
+                    {
+                        "capability": "example.interaction",
+                        "knowledge_kind": "interaction-design",
+                        "requires": [],
+                    },
+                    {
+                        "capability": "example.screen",
+                        "knowledge_kind": "screen-view-design",
+                        "requires": ["example.interaction"],
+                    },
+                ],
+            }
+        ],
+        "consumers": [],
+        "terminal_capabilities": [],
+    }
+    source = {
+        "semantic_assertions": [
+            {
+                "id": "APPLY-SCOPE",
+                "kind": "interaction-obligation",
+                "subject": "scope-apply",
+                "semantic_value": "User can apply a scope.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+            {
+                "id": "CURRENT-SCOPE",
+                "kind": "interaction-obligation",
+                "subject": "scope-current",
+                "semantic_value": "Current scope is perceptible.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+            {
+                "id": "CLEAR-SCOPE",
+                "kind": "interaction-obligation",
+                "subject": "scope-clear",
+                "semantic_value": "User can clear the scope.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["observable-realization-applicability"],
+            "observable_realization_obligations": [
+                {"id": "OBS-APPLY", "assertion": "APPLY-SCOPE", "category": "ACTION", "status": "REQUIRED"},
+                {"id": "OBS-CURRENT", "assertion": "CURRENT-SCOPE", "category": "STATE", "status": "REQUIRED"},
+                {"id": "OBS-CLEAR", "assertion": "CLEAR-SCOPE", "category": "ACTION", "status": "REQUIRED"},
+            ],
+        },
+    }
+    target = {
+        "semantic_assertions": [
+            {
+                "id": "VIEW-CURRENT",
+                "kind": "observable-realization",
+                "subject": "scope-current",
+                "semantic_value": "The current scope is visibly indicated.",
+                "observable_category": "STATE",
+                "derived_from": ["CURRENT-SCOPE"],
+            },
+            {
+                "id": "VIEW-CLEAR",
+                "kind": "observable-realization",
+                "subject": "scope-clear",
+                "semantic_value": "The user can clear scope.",
+                "observable_category": "ACTION",
+                "derived_from": ["CLEAR-SCOPE"],
+            },
+        ]
+    }
+    realization_contract = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-contract",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "obligations": [
+            {
+                "id": "observable-interaction",
+                "source_kind": "interaction-obligation",
+                "observable_realization": True,
+            }
+        ],
+    }
+    evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [
+            {"id": "CURRENT", "sources": ["CURRENT-SCOPE"], "relation": "REALIZES", "targets": ["VIEW-CURRENT"]},
+            {"id": "CLEAR", "sources": ["CLEAR-SCOPE"], "relation": "REALIZES", "targets": ["VIEW-CLEAR"]},
+            {"id": "APPLY-REFERENCE-ONLY", "sources": ["APPLY-SCOPE"], "relation": "REALIZES", "targets": ["VIEW-CURRENT"]},
+        ],
+        "dispositions": [],
+    }
+    realization_result = evaluate_derivation(
+        graph=graph,
+        contract=realization_contract,
+        source=source,
+        candidate=target,
+        evidence=evidence,
+    )
+
+    failures = []
+    if role_result["status"] != "REJECTED":
+        failures.append(
+            f"HARNESS-004 false-green: role conflation returned {role_result['status']}"
+        )
+    if realization_result["status"] != "REJECTED":
+        failures.append(
+            "HARNESS-005 false-green: reference-only APPLY realization returned "
+            f"{realization_result['status']}"
+        )
+    assert not failures, "; ".join(failures)
+
 def main() -> int:
+    test_h3_role_and_observable_realization_false_greens()
     test_independently_losable_obligation_granularity()
     test_irrelevant_source_invariance()
     test_required_target_provenance()
