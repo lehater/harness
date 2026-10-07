@@ -54,13 +54,14 @@ Quality semantics must be escalated to the owning Authority instead.
 7. For every applicable engineering/security/quality/supply-chain obligation, select a concrete deterministic enforcement mechanism or record an explicit terminal disposition. Keep the obligation independent from the selected tool.
 8. Define the reproducible dependency/tool environment. If the project's delivery workflow has merge/release gating, define its authoritative reproducible gate; local/pre-commit checks may optimize feedback but do not replace that gate. When validation execution is materially non-trivial (multiple suites/triggers, conditional selection, external or nondeterministic checks, or meaningful execution cost), apply the applicability-driven review in `docs/design/validation-execution-review-checklist-v1.md`. Treat the review as analysis: use `MEASURE` when economic evidence is missing and `QUESTION` when an owning decision is unresolved rather than inventing execution topology.
 9. Identify code/test/CI surfaces each slice must change.
-10. Define completion criteria that prove the accepted design is realized.
-11. If any slice would require a new product/domain/architecture/interface
+10. For every accepted Test Design contract selected for realization, collect concrete executable evidence, establish semantic correspondence for obligation bindings with the `executable-correspondence` review, and run `python -m harness.assurance.test_realization <test-design> <evidence> <semantic-review>`. Completion requires deterministic accounting of every required operation/oracle obligation; the executable tests remain implementation evidence.
+11. Define completion criteria that prove the accepted design is realized.
+12. If any slice would require a new product/domain/architecture/interface
    decision, create/route a Question upstream instead of embedding the decision in
    the implementation plan.
-12. Do not treat this artifact as authorization to merge/deploy unless the target
+13. Do not treat this artifact as authorization to merge/deploy unless the target
    repository explicitly assigns it that role.
-13. Produce project-native implementation design, semantically accept/register
+14. Produce project-native implementation design, semantically accept/register
     and reevaluate.
 
 ## Stop conditions
@@ -99,6 +100,7 @@ when the project owns them together; they may also be separate production output
 - every slice realizes accepted design rather than redefining it;
 - sequencing is justified by dependencies, not methodology stages;
 - completion criteria trace to canonical contracts;
+- selected Test Design contracts have ACCEPTED executable-realization conformance with truthful correspondence review and complete operation/oracle accounting;
 - architecturally significant dependency rules have deterministic mechanical enforcement;
 - every applicable tooling/security/supply-chain obligation has enforcement or an explicit disposition;
 - generated artifacts identify their canonical source and regeneration path;
