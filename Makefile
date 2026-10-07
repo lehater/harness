@@ -68,6 +68,7 @@ harness-check:
 	python tests/test_engineering_coverage.py
 	python tests/test_repository_realization_design.py
 	python tests/test_test_realization_conformance.py
+	python tests/test_traceability_projection.py
 	python tests/test_architecture_driver_closure.py
 	python tests/test_coverage_blocker_transition.py
 	python tests/test_coverage_production_contract_overlay.py
