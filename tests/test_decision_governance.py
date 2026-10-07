@@ -896,6 +896,226 @@ def main() -> int:
     )
     assert grouped["status"] == "ACCEPTED", grouped
 
+
+    # WP-H5 / HARNESS-006 RED A+B: accepted task semantics can identify a
+    # material comparison/collection representation need while all current
+    # Presentation Decision Governance axes are complete. The baseline has no
+    # representation-scoped axis, so both cases false-green.
+    presentation_graph = {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "H5-PRESENTATION",
+        "authorities": [
+            {
+                "id": "HUMAN-INTERFACE-DESIGN",
+                "responsibility": "Own user-facing presentation decisions.",
+                "boundary": {
+                    "semantic_cohesion": "Application presentation semantics.",
+                    "independent_change": "Presentation can change independently.",
+                    "public_contract": "Accepted presentation system.",
+                },
+                "produces": [
+                    {
+                        "capability": "example.presentation",
+                        "knowledge_kind": "presentation-system-design",
+                        "requires": [],
+                    }
+                ],
+            }
+        ],
+        "consumers": [
+            {
+                "id": "PRESENTATION-CONSUMER",
+                "purpose": "Consume accepted presentation decisions.",
+                "requires": ["example.presentation"],
+            }
+        ],
+        "terminal_capabilities": [],
+    }
+    presentation_model = {"artifacts": [], "questions": []}
+    presentation_policy = {
+        "version": 1,
+        "kind": "harness-decision-policy",
+        "knowledge_kinds": [
+            {
+                "knowledge_kind": "presentation-system-design",
+                "autonomy": "CONSERVATIVE",
+            }
+        ],
+    }
+    presentation_context = build_authority_context(
+        presentation_graph,
+        presentation_model,
+        "HUMAN-INTERFACE-DESIGN",
+        ["example.presentation"],
+    )
+    presentation_request = build_decision_explorer_request(
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        authority_context=presentation_context,
+        contract=presentation_contract,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        prerequisite_baseline={},
+        model=presentation_model,
+    )
+    legacy_presentation_axes = [
+        "application-surface",
+        "knowledge-representation",
+        "information-density",
+        "control-surface",
+    ]
+    legacy_axes = []
+    legacy_review_axes = []
+    for axis in legacy_presentation_axes:
+        axis_contract = presentation_contract["axes"][axis]
+        dim = axis_contract["material_dimensions"][0]
+        strategies = axis_contract["challenge_strategies"][:2]
+        decision_id = f"{axis}-legacy-choice"
+        alternative_ids = [f"{axis}-legacy-a", f"{axis}-legacy-b"]
+        legacy_axes.append(
+            {
+                "axis": axis,
+                "applicability": "APPLICABLE",
+                "exploration_level": "EXPLORE",
+                "probes": [
+                    {
+                        "strategy": strategies[0],
+                        "challenge": f"Challenge {axis} through {strategies[0]}.",
+                        "alternatives": alternative_ids,
+                        "decision_points": [decision_id],
+                    },
+                    {
+                        "strategy": strategies[1],
+                        "challenge": f"Challenge {axis} through {strategies[1]}.",
+                        "alternatives": alternative_ids,
+                        "decision_points": [decision_id],
+                    },
+                ],
+                "decision_points": [
+                    {
+                        "id": decision_id,
+                        "alternatives": [
+                            {
+                                "id": alternative_ids[0],
+                                "difference": f"Alternative A for {axis}.",
+                                "material_effects": {dim: "A"},
+                            },
+                            {
+                                "id": alternative_ids[1],
+                                "difference": f"Alternative B for {axis}.",
+                                "material_effects": {dim: "B"},
+                            },
+                        ],
+                    }
+                ],
+            }
+        )
+        legacy_review_axes.append(
+            {
+                "axis": axis,
+                "decisions": [
+                    {
+                        "id": decision_id,
+                        "owner_authority": "HUMAN-INTERFACE-DESIGN",
+                        "alternatives": [
+                            {"id": alternative_ids[0], "state": "VIABLE"},
+                            {
+                                "id": alternative_ids[1],
+                                "state": "REJECTED",
+                                "rationale": "Accepted constraints eliminate alternative B.",
+                            },
+                        ],
+                        "disposition": "DETERMINED",
+                        "selected": alternative_ids[0],
+                    }
+                ],
+            }
+        )
+    legacy_presentation_exploration = {
+        "version": 1,
+        "kind": "harness-decision-exploration",
+        "capability": "example.presentation",
+        "knowledge_kind": "presentation-system-design",
+        "explorer_request_id": presentation_request["request_id"],
+        "research_sources": [],
+        "axes": legacy_axes,
+        "decision_space_review": {
+            "status": "COMPLETE",
+            "checks": [
+                "mixed-decision-split",
+                "missing-material-case-search",
+                "impact-and-reversal-frontier-check",
+                "accepted-constraint-cross-check",
+                "authority-boundary-cross-check",
+            ],
+            "reviewed_decisions": [
+                item["decisions"][0]["id"] for item in legacy_review_axes
+            ],
+            "open_gaps": [],
+        },
+    }
+
+    def legacy_representation_candidate(subject):
+        return {
+            "id": f"PRESENTATION-{subject['id']}",
+            "capability": "example.presentation",
+            "semantic_assertions": [],
+            "semantic_review": {
+                "status": "ACCEPTED",
+                "representation_requirements": [subject],
+            },
+            "decision_review": {"axes": copy.deepcopy(legacy_review_axes)},
+        }
+
+    h006_red_a = evaluate_decision_preflight(
+        contract=presentation_contract,
+        policy=presentation_policy,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        explorer_request=presentation_request,
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=legacy_presentation_exploration,
+        candidate=legacy_representation_candidate(
+            {
+                "id": "REP-COMPARE-A-B",
+                "materiality": "MATERIAL",
+                "disposition": "DECIDE",
+                "task_semantics": "Compare N candidate entities over the same semantic dimensions.",
+                "required_dimensions": ["cross-entity-alignment"],
+                "required_challenges": ["independent-vs-aligned-records"],
+                "decision_refs": [],
+            }
+        ),
+        model=presentation_model,
+    )
+    assert h006_red_a["status"] == "REJECTED", h006_red_a
+
+    h006_red_b = evaluate_decision_preflight(
+        contract=presentation_contract,
+        policy=presentation_policy,
+        axis_policies=axis_policies(presentation_contract, presentation_policy),
+        explorer_request=presentation_request,
+        capability="example.presentation",
+        knowledge_kind="presentation-system-design",
+        authority="HUMAN-INTERFACE-DESIGN",
+        exploration_evidence=legacy_presentation_exploration,
+        candidate=legacy_representation_candidate(
+            {
+                "id": "REP-HOMOGENEOUS-COLLECTION",
+                "materiality": "MATERIAL",
+                "disposition": "DECIDE",
+                "task_semantics": "Scan homogeneous records over shared fields and repeated state.",
+                "required_dimensions": ["record-scan-structure"],
+                "required_challenges": ["repeated-vs-structured-collection"],
+                "decision_refs": [],
+            }
+        ),
+        model=presentation_model,
+    )
+    assert h006_red_b["status"] == "REJECTED", h006_red_b
+
     screen_contract = contracts["screen-view-design"]
     assert set(screen_contract["axes"]) == {
         "view-composition",
