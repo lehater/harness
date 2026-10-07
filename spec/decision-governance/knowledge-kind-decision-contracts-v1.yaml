@@ -172,6 +172,24 @@ contracts:
         minimum_probes: 2
         material_dimensions: [control-persistence, direct-manipulation, keyboard-equivalence]
         challenge_strategies: [inline-vs-dedicated-controls, direct-manipulation-vs-command, pointer-vs-keyboard]
+      - id: representation-selection
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        subject_scope: representation-subject
+        material_dimensions:
+          - cross-entity-alignment
+          - record-scan-structure
+          - selection-mechanics
+          - relation-encoding
+          - detail-context-preservation
+          - responsive-semantic-preservation
+        challenge_strategies:
+          - independent-vs-aligned-records
+          - repeated-vs-structured-collection
+          - overview-vs-progressive-detail
+          - spatial-vs-nonspatial
+          - selection-mechanic-perturbation
+          - responsive-representation-perturbation
 
   - knowledge_kind: screen-view-design
     required: true
@@ -192,6 +210,24 @@ contracts:
         minimum_probes: 2
         material_dimensions: [narrow-layout, disclosure, projection-priority]
         challenge_strategies: [collapse-vs-reflow, persistent-vs-disclosed, primary-surface-perturbation]
+      - id: representation-selection
+        delegation_requires: CONSERVATIVE
+        minimum_probes: 2
+        subject_scope: representation-subject
+        material_dimensions:
+          - cross-entity-alignment
+          - record-scan-structure
+          - selection-mechanics
+          - relation-encoding
+          - detail-context-preservation
+          - responsive-semantic-preservation
+        challenge_strategies:
+          - independent-vs-aligned-records
+          - repeated-vs-structured-collection
+          - overview-vs-progressive-detail
+          - spatial-vs-nonspatial
+          - selection-mechanic-perturbation
+          - responsive-representation-perturbation
 
   - knowledge_kind: component-design
     required: true
