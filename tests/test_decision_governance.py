@@ -370,8 +370,16 @@ def main() -> int:
     component_contract = contracts["component-design"]
     assert set(component_contract["axes"]) == {
         "responsibility-boundaries",
+        "reuse-composition",
         "provider-seams",
         "state-ownership",
+    }, component_contract
+    assert set(
+        component_contract["axes"]["reuse-composition"]["challenge_strategies"]
+    ) == {
+        "duplicate-vs-shared",
+        "shared-vs-local-state",
+        "composition-vs-specialization",
     }, component_contract
     assert all(
         item["delegation_requires"] == "CONSERVATIVE"
