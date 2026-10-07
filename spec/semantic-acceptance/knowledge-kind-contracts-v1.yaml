@@ -133,6 +133,8 @@ contracts:
     required_review_checks:
       - interaction-not-product-requirement
       - independent-obligation-granularity
+      - interaction-role-coherence
+      - observable-realization-applicability
   - knowledge_kind: interface-topology-design
     required_review_checks: [topology-not-screen-composition]
   - knowledge_kind: human-interface-design

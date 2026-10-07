@@ -157,6 +157,384 @@ def _evaluate_independent_obligation_accounting(
     return findings
 
 
+
+
+def _evaluate_observable_realization_applicability(
+    review: dict[str, Any] | None,
+    assertions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate semantic-review classification of observable realization needs."""
+    if not isinstance(review, dict):
+        return [{"code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED"}]
+    items = review.get("observable_realization_obligations")
+    if not isinstance(items, list):
+        return [{"code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED"}]
+
+    assertion_ids = {
+        item.get("id")
+        for item in assertions
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    findings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    seen_assertions: set[str] = set()
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append(
+                {"code": "INVALID_OBSERVABLE_REALIZATION_REVIEW", "index": index}
+            )
+            continue
+        item_id = item.get("id")
+        assertion_id = item.get("assertion")
+        category = item.get("category")
+        status = item.get("status")
+        if (
+            not isinstance(item_id, str)
+            or not item_id
+            or item_id in seen_ids
+            or not isinstance(assertion_id, str)
+            or not assertion_id
+            or assertion_id in seen_assertions
+            or assertion_id not in assertion_ids
+            or category not in {"ACTION", "STATE", "DISTINCTION"}
+            or status not in {"REQUIRED", "NOT_APPLICABLE", "QUESTION"}
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "index": index,
+                    **(
+                        {"assertion": assertion_id}
+                        if isinstance(assertion_id, str) and assertion_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+        seen_ids.add(item_id)
+        seen_assertions.add(assertion_id)
+
+        if status == "REQUIRED":
+            continue
+        rationale = item.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "assertion": assertion_id,
+                }
+            )
+        elif status == "QUESTION":
+            findings.append(
+                {
+                    "code": "OBSERVABLE_REALIZATION_QUESTION",
+                    "source": assertion_id,
+                    "rationale": rationale,
+                }
+            )
+
+    return findings
+
+def _evaluate_interaction_role_coherence(
+    review: dict[str, Any] | None,
+    candidate: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Validate review-selected cross-context interaction role contracts.
+
+    Semantic review owns the applicability judgement. Once it marks a concept as
+    requiring materially distinct roles, Harness checks only machine-addressable
+    role structure and the specific facets/transitions the review marked material.
+    """
+    if not isinstance(review, dict):
+        return [{"code": "INTERACTION_ROLE_REVIEW_REQUIRED"}]
+
+    requirements = review.get("interaction_role_requirements")
+    if not isinstance(requirements, list):
+        return [{"code": "INTERACTION_ROLE_REVIEW_REQUIRED"}]
+
+    roles_value = candidate.get("interaction_roles", []) or []
+    findings: list[dict[str, Any]] = []
+    if not isinstance(roles_value, list):
+        return [{"code": "INVALID_INTERACTION_ROLES"}]
+
+    role_index: dict[str, dict[str, Any]] = {}
+    allowed_facets = {
+        "entry",
+        "exit",
+        "transitions",
+        "side_effects",
+        "forbidden_side_effects",
+        "observable_distinction",
+    }
+
+    for index, role in enumerate(roles_value):
+        if not isinstance(role, dict):
+            findings.append({"code": "INVALID_INTERACTION_ROLE", "index": index})
+            continue
+        role_id = role.get("id")
+        if not isinstance(role_id, str) or not role_id or role_id in role_index:
+            findings.append(
+                {
+                    "code": "INVALID_INTERACTION_ROLE",
+                    "index": index,
+                    **(
+                        {"role": role_id}
+                        if isinstance(role_id, str) and role_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+
+        valid = True
+        for field in ("concept_ref", "meaning", "entry", "exit", "observable_distinction"):
+            value = role.get(field)
+            if not isinstance(value, str) or not value.strip():
+                findings.append(
+                    {
+                        "code": "INTERACTION_ROLE_FIELD_REQUIRED",
+                        "role": role_id,
+                        "field": field,
+                    }
+                )
+                valid = False
+        for field in ("side_effects", "forbidden_side_effects"):
+            value = role.get(field)
+            if not isinstance(value, list) or any(
+                not isinstance(item, str) or not item.strip() for item in value
+            ):
+                findings.append(
+                    {
+                        "code": "INTERACTION_ROLE_FIELD_INVALID",
+                        "role": role_id,
+                        "field": field,
+                    }
+                )
+                valid = False
+
+        transitions = role.get("transitions")
+        if not isinstance(transitions, list):
+            findings.append(
+                {
+                    "code": "INTERACTION_ROLE_FIELD_INVALID",
+                    "role": role_id,
+                    "field": "transitions",
+                }
+            )
+            valid = False
+        else:
+            for transition_index, transition in enumerate(transitions):
+                if (
+                    not isinstance(transition, dict)
+                    or not isinstance(transition.get("to"), str)
+                    or not transition.get("to")
+                ):
+                    findings.append(
+                        {
+                            "code": "INVALID_INTERACTION_ROLE_TRANSITION",
+                            "role": role_id,
+                            "index": transition_index,
+                        }
+                    )
+                    valid = False
+
+        if valid:
+            role_index[role_id] = role
+
+    seen_concepts: set[str] = set()
+    for index, requirement in enumerate(requirements):
+        if not isinstance(requirement, dict):
+            findings.append(
+                {"code": "INVALID_INTERACTION_ROLE_REQUIREMENT", "index": index}
+            )
+            continue
+
+        concept = requirement.get("concept")
+        status = requirement.get("status")
+        rationale = requirement.get("rationale")
+        if (
+            not isinstance(concept, str)
+            or not concept
+            or concept in seen_concepts
+            or status not in {"REQUIRED", "NOT_REQUIRED", "QUESTION"}
+            or not isinstance(rationale, str)
+            or not rationale.strip()
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_INTERACTION_ROLE_REQUIREMENT",
+                    "index": index,
+                    **(
+                        {"concept": concept}
+                        if isinstance(concept, str) and concept
+                        else {}
+                    ),
+                }
+            )
+            continue
+        seen_concepts.add(concept)
+
+        if status == "QUESTION":
+            findings.append(
+                {
+                    "code": "INTERACTION_ROLE_QUESTION",
+                    "concept": concept,
+                    "rationale": rationale,
+                }
+            )
+            continue
+        if status == "NOT_REQUIRED":
+            continue
+
+        required_roles = requirement.get("roles")
+        if (
+            not isinstance(required_roles, list)
+            or len(required_roles) < 2
+            or any(not isinstance(role_id, str) or not role_id for role_id in required_roles)
+            or len(set(required_roles)) != len(required_roles)
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_INTERACTION_ROLE_REQUIREMENT",
+                    "concept": concept,
+                }
+            )
+            continue
+
+        for role_id in required_roles:
+            role = role_index.get(role_id)
+            if role is None:
+                findings.append(
+                    {
+                        "code": "INTERACTION_ROLE_REQUIRED_ROLE_MISSING",
+                        "concept": concept,
+                        "role": role_id,
+                    }
+                )
+                continue
+            if role.get("concept_ref") != concept:
+                findings.append(
+                    {
+                        "code": "INTERACTION_ROLE_CONCEPT_MISMATCH",
+                        "concept": concept,
+                        "role": role_id,
+                        "actual_concept": role.get("concept_ref"),
+                    }
+                )
+
+        required_facets = requirement.get("required_role_facets", {}) or {}
+        if not isinstance(required_facets, dict):
+            findings.append(
+                {
+                    "code": "INVALID_INTERACTION_ROLE_REQUIRED_FACETS",
+                    "concept": concept,
+                }
+            )
+            required_facets = {}
+        for role_id, facets in required_facets.items():
+            if role_id not in required_roles:
+                findings.append(
+                    {
+                        "code": "INVALID_INTERACTION_ROLE_REQUIRED_FACETS",
+                        "concept": concept,
+                        "role": role_id,
+                    }
+                )
+                continue
+            if (
+                not isinstance(facets, list)
+                or any(
+                    not isinstance(facet, str) or facet not in allowed_facets
+                    for facet in facets
+                )
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_INTERACTION_ROLE_REQUIRED_FACETS",
+                        "concept": concept,
+                        "role": role_id,
+                    }
+                )
+                continue
+            role = role_index.get(role_id)
+            if role is None:
+                continue
+            for facet in facets:
+                value = role.get(facet)
+                missing = value is None
+                if isinstance(value, str):
+                    missing = not value.strip()
+                elif isinstance(value, list):
+                    missing = not value
+                if missing:
+                    findings.append(
+                        {
+                            "code": "INTERACTION_ROLE_REQUIRED_FACET_MISSING",
+                            "concept": concept,
+                            "role": role_id,
+                            "facet": facet,
+                        }
+                    )
+
+        required_transitions = requirement.get("required_transitions", []) or []
+        if not isinstance(required_transitions, list):
+            findings.append(
+                {
+                    "code": "INVALID_INTERACTION_ROLE_REQUIRED_TRANSITIONS",
+                    "concept": concept,
+                }
+            )
+            required_transitions = []
+        for transition in required_transitions:
+            if (
+                not isinstance(transition, dict)
+                or not isinstance(transition.get("from"), str)
+                or not transition.get("from")
+                or not isinstance(transition.get("to"), str)
+                or not transition.get("to")
+            ):
+                findings.append(
+                    {
+                        "code": "INVALID_INTERACTION_ROLE_REQUIRED_TRANSITIONS",
+                        "concept": concept,
+                    }
+                )
+                continue
+            from_role = transition["from"]
+            to_role = transition["to"]
+            if from_role not in required_roles or to_role not in required_roles:
+                findings.append(
+                    {
+                        "code": "INVALID_INTERACTION_ROLE_REQUIRED_TRANSITIONS",
+                        "concept": concept,
+                        "from": from_role,
+                        "to": to_role,
+                    }
+                )
+                continue
+            source_role = role_index.get(from_role)
+            if source_role is None:
+                continue
+            declared_targets = {
+                item.get("to")
+                for item in source_role.get("transitions", []) or []
+                if isinstance(item, dict)
+            }
+            if to_role not in declared_targets:
+                findings.append(
+                    {
+                        "code": "INTERACTION_ROLE_REQUIRED_TRANSITION_MISSING",
+                        "concept": concept,
+                        "from": from_role,
+                        "to": to_role,
+                    }
+                )
+
+    return findings
+
 def evaluate_artifact(
     contract: dict[str, Any],
     sources: dict[str, Any],
@@ -590,6 +968,16 @@ def evaluate_artifact(
     if "independent-obligation-granularity" in required_review_checks:
         findings.extend(
             _evaluate_independent_obligation_accounting(review, assertions)
+        )
+
+    if "observable-realization-applicability" in required_review_checks:
+        findings.extend(
+            _evaluate_observable_realization_applicability(review, assertions)
+        )
+
+    if "interaction-role-coherence" in required_review_checks:
+        findings.extend(
+            _evaluate_interaction_role_coherence(review, candidate)
         )
 
     accepted = not findings

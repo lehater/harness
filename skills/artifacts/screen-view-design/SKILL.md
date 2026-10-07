@@ -47,13 +47,14 @@ For each required view:
 12. define focus/read-order consequences where composition changes;
 13. when a material interactive visualization is constrained by accepted Quality/performance knowledge, reference that constraint and define semantic degradation/fallback behavior that preserves required information access; renderer knobs remain downstream unless their user-visible effect is intentionally accepted;
 14. attach accepted reference/evidence anchors to the regions or states they actually constrain;
-15. define verification obligations for contract/semantic/rendered realization when material;
-16. classify remaining choices as controlled freedom or ordinary implementation detail;
-17. for each material screen-composition decision, record the decision question, accepted basis, applicable UI Decision Rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty;
-18. when the remaining discriminator is representative-user behavior rather than a deterministic constraint, record `EMPIRICAL_VALIDATION_REQUIRED` and keep the production-readiness claim open while preserving the bounded prototype contract;
-19. before semantic admission, identify independently losable user-observable screen obligations and account each in `semantic_review.independent_obligations`; a summary such as “explicit/reversible” cannot replace distinct apply/show/clear-style obligations when they can fail independently;
-20. record local overrides only with rationale;
-21. route missing upstream semantics as Questions.
+15. For upstream interaction obligations whose accepted semantic review marks observable realization REQUIRED, create screen/view semantic assertions with `kind: observable-realization`, preserve ACTION/STATE/DISTINCTION category, record upstream provenance, and bind them with semantic derivation relation `REALIZES`. The derivation must use request-bound semantic judgement for observable-realization correspondence; a source id/reference alone is not realization.
+16. Define verification obligations for contract/semantic/rendered realization when material.
+17. Classify remaining choices as controlled freedom or ordinary implementation detail;
+18. for each material screen-composition decision, record the decision question, accepted basis, applicable UI Decision Rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty;
+19. when the remaining discriminator is representative-user behavior rather than a deterministic constraint, record `EMPIRICAL_VALIDATION_REQUIRED` and keep the production-readiness claim open while preserving the bounded prototype contract;
+20. before semantic admission, identify independently losable user-observable screen obligations and account each in `semantic_review.independent_obligations`; a summary such as “explicit/reversible” cannot replace distinct apply/show/clear-style obligations when they can fail independently;
+21. record local overrides only with rationale;
+22. route missing upstream semantics as Questions.
 
 ## Stop conditions
 
@@ -100,6 +101,7 @@ The contract should be sufficient to generate review projections such as a scree
 - every screen references one Presentation System;
 - repeated presentation knowledge is inherited, not copied;
 - required states/actions/data are covered and trace to accepted operation/local/navigation semantics;
+- every upstream semantic obligation classified REQUIRED for observable realization has a category-preserving `REALIZES` binding to an explicit observable-realization assertion accepted by semantic judgement; visible state cannot substitute for an independent action;
 - independently losable user-observable obligations have separate semantic accounting, while cohesive assertions remain unsplit when no independent lifecycle/oracle exists;
 - enabled provider/template features do not create capabilities absent from accepted screen semantics;
 - when the inherited Presentation System declares an entity-collection default, each primary entity catalogue follows that general-to-specific model or records an explicit override with rationale;

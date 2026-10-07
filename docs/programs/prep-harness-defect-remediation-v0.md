@@ -195,8 +195,8 @@ The priority may change after root-cause analysis, but the id and history remain
 | HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
 | HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | INTEGRATED |
 | HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | REGISTERED |
-| HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | REGISTERED |
-| HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | REGISTERED |
+| HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | HARNESS_GREEN |
+| HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | HARNESS_GREEN |
 | HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | REGISTERED |
 | HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | REGISTERED |
 | HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | REGISTERED |
@@ -299,6 +299,112 @@ GREEN evidence:
 - PR: #200.
 
 Integration evidence: PR #200 was squash-merged to Harness `main` as `6b46b99603e2b805d7777e6c76d1a9e5a42d4850`. `PREP-UX-005`, `PREP-UX-007` and `PREP-UX-014` remain unchanged because their complete Harness dependency sets are not yet terminal. Prep and `.harness-version` remain unchanged.
+
+### HARNESS-004 — cross-context interaction role coherence
+
+Status history for WP-H3:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- RED-only commit: `2fa11201c64f05408437f5b89d11962ebd043537`;
+- regression: `tests/test_semantic_admission.py::test_h3_role_and_observable_realization_false_greens`;
+- CI run `37587959599` failed after baseline semantic admission returned `ACCEPTED` for a candidate that collapsed two semantically required material roles into one generic selected role.
+
+Root cause:
+
+Interaction Design could describe actions/states locally and HARNESS-001 could account independently losable obligations, but there was no semantically activated cross-context role contract. Harness therefore had no deterministic boundary for proving that material lifecycle/side-effect distinctions of one conceptual entity were represented coherently across contexts.
+
+Implemented invariant:
+
+- `interaction-role-coherence` is a required Interaction Design semantic-review check;
+- semantic review owns applicability in `semantic_review.interaction_role_requirements`; Harness does not infer applicability from matching subjects/labels;
+- when a concept is marked `REQUIRED`, canonical `interaction_roles` provide stable role id, concept ref, meaning, entry/exit, transitions, side effects, forbidden side effects and observable distinction;
+- semantic review identifies which facets/transitions are material, then deterministic admission checks their presence;
+- `NOT_REQUIRED`/an explicitly reviewed empty requirement set preserves same-role/multiple-context designs without multi-role ceremony;
+- no Prep Target ontology or concrete presentation primitive is encoded.
+
+Negative mutations:
+
+- role conflation: REJECTED with missing required roles;
+- missing material forbidden side effect: REJECTED with `INTERACTION_ROLE_REQUIRED_FACET_MISSING`;
+- missing material transition: REJECTED with `INTERACTION_ROLE_REQUIRED_TRANSITION_MISSING`.
+
+Positive controls:
+
+- same role/lifecycle across multiple contexts: ACCEPTED without a multi-role contract;
+- complete materially distinct multi-role contract: ACCEPTED.
+
+GREEN evidence:
+
+- regression: `tests/test_semantic_admission.py::test_interaction_role_coherence_regressions`;
+- validated implementation head: `2480aa39677a0607dfee41e8e019fc21f26c7bcd`;
+- `harness core` / full `make harness-check`: run `37588008366` PASS;
+- `Greenfield Engineering Graph`: run `37588008445` PASS;
+- PR: #203;
+- integration evidence pending merge; status remains `HARNESS_GREEN` until the fix is in `main`.
+
+### HARNESS-005 — observable semantic realization conformance
+
+Status history for WP-H3:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- RED-only commit: `2fa11201c64f05408437f5b89d11962ebd043537`;
+- regression: `tests/test_semantic_admission.py::test_h3_role_and_observable_realization_false_greens`;
+- CI run `37587959599` failed after baseline semantic derivation returned `ACCEPTED` when the user action to apply scope was linked only to the neighboring current-state realization.
+
+Root cause:
+
+Semantic derivation could structurally cover a source assertion through an allowed link, optionally with target provenance, but did not distinguish observable ACTION/STATE/DISTINCTION realization or require semantic correspondence for that realization. A source id could therefore be linked to a neighboring observable state and count as covered without a usable mechanism for the actual user-facing action.
+
+Implemented invariant:
+
+- Interaction semantic review classifies independently losable user-facing semantics in `observable_realization_obligations` as ACTION, STATE or DISTINCTION and REQUIRED, NOT_APPLICABLE or QUESTION;
+- a derivation obligation with `observable_realization: true` selects only semantically REQUIRED sources for downstream accounting;
+- REQUIRED sources count as covered only through `REALIZES` links to explicit `observable-realization` target assertions with the same observable category and source provenance;
+- observable realization automatically requires request-bound semantic judgement with `observable-realization-correspondence`;
+- deterministic accounting then rejects every required source without an accepted realization;
+- legitimate semantic-review `NOT_APPLICABLE` remains possible with rationale;
+- no button/menu/control/layout/DOM/CSS primitive is mandated.
+
+Negative mutations:
+
+- missing action realization: REJECTED with `UNDISPOSITIONED_SOURCE`;
+- collapsed semantic distinction: REJECTED when request-bound correspondence judgement rejects the claimed realization;
+- reference-only realization: REJECTED with `OBSERVABLE_REALIZATION_TARGET_MISSING`;
+- STATE cannot substitute for an independent ACTION because observable category must match.
+
+Positive controls:
+
+- an abstract accepted interaction mechanism realizes ACTION without constraining button/menu/keyboard/etc.: ACCEPTED;
+- legitimate non-UI/non-applicability from accepted source semantic review: ACCEPTED.
+
+GREEN evidence:
+
+- regression: `tests/test_semantic_admission.py::test_observable_realization_regressions`;
+- validated implementation head: `2480aa39677a0607dfee41e8e019fc21f26c7bcd`;
+- `harness core` / full `make harness-check`: run `37588008366` PASS;
+- `Greenfield Engineering Graph`: run `37588008445` PASS;
+- PR: #203;
+- integration evidence pending merge; status remains `HARNESS_GREEN` until the fix is in `main`.
+
+WP-H3 does not advance any `PREP-UX-*` status before Harness integration. Prep and `.harness-version` remain unchanged. `PREP-UX-012` still has unresolved `HARNESS-006`; no Prep revalidation is started.
 
 ### PREP-UX-005 / PREP-UX-014 — Required Capability filter
 
@@ -619,6 +725,6 @@ This file in Harness is the single source of truth for the denominator, statuses
 
 ## 12. Current program frontier
 
-WP-H2 / HARNESS-002 is integrated. The next stage is intentionally not selected here; under the stage gate the managing chat must choose and issue the next bounded work package. This executor does not start later work.
+WP-H3 / HARNESS-004 + HARNESS-005 is HARNESS_GREEN in PR #203 and awaiting integration. No later stage is selected or started; under the stage gate the managing chat chooses the next bounded work package only after WP-H3 integration evidence is recorded.
 
 Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.

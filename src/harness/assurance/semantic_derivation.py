@@ -52,6 +52,164 @@ def _required_capabilities(production: dict[str, Any]) -> set[str]:
 
 
 
+
+OBSERVABLE_CATEGORIES = {"ACTION", "STATE", "DISTINCTION"}
+
+
+def _observable_realization_selection(
+    *,
+    source: dict[str, Any],
+    source_assertions: dict[str, dict[str, Any]],
+    matches: list[dict[str, Any]],
+    obligation_id: str,
+) -> tuple[
+    list[dict[str, Any]],
+    dict[str, str],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
+    """Select source atoms whose observable realization is semantically required.
+
+    The source semantic review owns applicability/category judgement. Harness only
+    validates that every matching source assertion is explicitly classified and
+    returns the REQUIRED subset for deterministic derivation accounting.
+    """
+    findings: list[dict[str, Any]] = []
+    matched_ids = {item["id"] for item in matches}
+    review = source.get("semantic_review")
+    if (
+        not isinstance(review, dict)
+        or review.get("status") != "ACCEPTED"
+        or "observable-realization-applicability"
+        not in set(review.get("checks", []) or [])
+    ):
+        return (
+            matches,
+            {},
+            [],
+            [
+                {
+                    "code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED",
+                    "obligation": obligation_id,
+                }
+            ],
+        )
+
+    items = review.get("observable_realization_obligations")
+    if not isinstance(items, list):
+        return (
+            matches,
+            {},
+            [],
+            [
+                {
+                    "code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED",
+                    "obligation": obligation_id,
+                }
+            ],
+        )
+
+    selected: list[dict[str, Any]] = []
+    categories: dict[str, str] = {}
+    dispositions: list[dict[str, Any]] = []
+    reviewed_matching: set[str] = set()
+    seen_ids: set[str] = set()
+    seen_assertions: set[str] = set()
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "obligation": obligation_id,
+                    "index": index,
+                }
+            )
+            continue
+
+        item_id = item.get("id")
+        assertion_id = item.get("assertion")
+        category = item.get("category")
+        status = item.get("status")
+        if (
+            not isinstance(item_id, str)
+            or not item_id
+            or item_id in seen_ids
+            or not isinstance(assertion_id, str)
+            or not assertion_id
+            or assertion_id in seen_assertions
+            or assertion_id not in source_assertions
+            or category not in OBSERVABLE_CATEGORIES
+            or status not in {"REQUIRED", "NOT_APPLICABLE", "QUESTION"}
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "obligation": obligation_id,
+                    "index": index,
+                    **(
+                        {"assertion": assertion_id}
+                        if isinstance(assertion_id, str) and assertion_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+
+        seen_ids.add(item_id)
+        seen_assertions.add(assertion_id)
+        if assertion_id not in matched_ids:
+            continue
+
+        reviewed_matching.add(assertion_id)
+        rationale = item.get("rationale")
+
+        if status == "REQUIRED":
+            categories[assertion_id] = category
+            selected.append(source_assertions[assertion_id])
+            continue
+
+        if not isinstance(rationale, str) or not rationale.strip():
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "obligation": obligation_id,
+                    "assertion": assertion_id,
+                }
+            )
+            continue
+
+        if status == "QUESTION":
+            findings.append(
+                {
+                    "code": "OBSERVABLE_REALIZATION_QUESTION",
+                    "obligation": obligation_id,
+                    "source": assertion_id,
+                    "rationale": rationale,
+                }
+            )
+            continue
+
+        dispositions.append(
+            {
+                "source": assertion_id,
+                "status": "NOT_APPLICABLE",
+                "rationale": rationale,
+                "basis": "SOURCE_SEMANTIC_REVIEW",
+            }
+        )
+
+    for assertion_id in sorted(matched_ids - reviewed_matching):
+        findings.append(
+            {
+                "code": "OBSERVABLE_REALIZATION_APPLICABILITY_MISSING",
+                "obligation": obligation_id,
+                "source": assertion_id,
+            }
+        )
+
+    return selected, categories, dispositions, findings
+
 def _judgement_request(
     *,
     source_capability: str,
@@ -114,6 +272,11 @@ def _evaluate_judgement(
         for value in judgement_contract.get("required_checks", []) or []
         if isinstance(value, str) and value
     }
+    if any(
+        isinstance(item, dict) and item.get("observable_realization") is True
+        for item in contract.get("obligations", []) or []
+    ):
+        required_checks.add("observable-realization-correspondence")
     allowed_reviewers = set(
         judgement_contract.get("allowed_reviewer_kinds", []) or JUDGEMENT_REVIEWERS
     )
@@ -325,6 +488,8 @@ def evaluate_derivation(
     source_obligation: dict[str, str] = {}
     obligation_allows_not_applicable: dict[str, bool] = {}
     obligation_requires_target_provenance: dict[str, bool] = {}
+    observable_source_categories: dict[str, str] = {}
+    source_review_dispositions: list[dict[str, Any]] = []
 
     obligations = contract.get("obligations", []) or []
     if not isinstance(obligations, list) or not obligations:
@@ -344,9 +509,10 @@ def evaluate_derivation(
         obligation_allows_not_applicable[obligation_id] = bool(
             item.get("allow_not_applicable", False)
         )
+        observable_realization = item.get("observable_realization") is True
         obligation_requires_target_provenance[obligation_id] = bool(
             item.get("require_target_provenance", False)
-        )
+        ) or observable_realization
         source_kind = _require_string(
             item.get("source_kind"),
             f"semantic derivation obligation {obligation_id} source_kind",
@@ -381,6 +547,22 @@ def evaluate_derivation(
                 }
             )
 
+        if observable_realization:
+            (
+                matches,
+                categories,
+                review_dispositions,
+                observable_findings,
+            ) = _observable_realization_selection(
+                source=source,
+                source_assertions=source_assertions,
+                matches=matches,
+                obligation_id=obligation_id,
+            )
+            findings.extend(observable_findings)
+            observable_source_categories.update(categories)
+            source_review_dispositions.extend(review_dispositions)
+
         for assertion in matches:
             assertion_id = assertion["id"]
             required_sources.add(assertion_id)
@@ -407,7 +589,9 @@ def evaluate_derivation(
     judgement_contract = contract.get("semantic_judgement", {}) or {}
     if not isinstance(judgement_contract, dict):
         raise CoreError("semantic_judgement contract must be a mapping")
-    judgement_required = bool(judgement_contract.get("required", False))
+    judgement_required = bool(
+        judgement_contract.get("required", False) or observable_source_categories
+    )
 
     lifecycle_contract = contract.get("lifecycle_dependency", {}) or {}
     if not isinstance(lifecycle_contract, dict):
@@ -499,6 +683,47 @@ def evaluate_derivation(
         for source_id in valid_sources:
             link_targets_by_source.setdefault(source_id, set()).update(valid_targets)
             obligation_id = source_obligation.get(source_id)
+
+            if source_id in observable_source_categories:
+                category = observable_source_categories[source_id]
+                if relation != "REALIZES":
+                    findings.append(
+                        {
+                            "code": "OBSERVABLE_REALIZATION_RELATION_REQUIRED",
+                            "source": source_id,
+                            "obligation": obligation_id,
+                            "relation": relation,
+                        }
+                    )
+                    continue
+
+                compatible_targets: list[str] = []
+                for target_id in valid_targets:
+                    target = target_assertions[target_id]
+                    if (
+                        target.get("kind") != "observable-realization"
+                        or target.get("observable_category") != category
+                    ):
+                        continue
+                    compatible_targets.append(target_id)
+                    derived_from = target.get("derived_from", []) or []
+                    if isinstance(derived_from, list) and source_id in derived_from:
+                        provenance_covered_sources.add(source_id)
+                        covered_sources.add(source_id)
+                        break
+
+                if not compatible_targets:
+                    findings.append(
+                        {
+                            "code": "OBSERVABLE_REALIZATION_TARGET_MISSING",
+                            "source": source_id,
+                            "obligation": obligation_id,
+                            "category": category,
+                            "targets": valid_targets,
+                        }
+                    )
+                continue
+
             if not obligation_requires_target_provenance.get(obligation_id or "", False):
                 covered_sources.add(source_id)
                 continue
@@ -650,6 +875,10 @@ def evaluate_derivation(
             for value in judgement_contract.get("required_checks", []) or []
             if isinstance(value, str) and value
         ]
+        if observable_source_categories:
+            required_checks = sorted(
+                set(required_checks) | {"observable-realization-correspondence"}
+            )
         semantic_judgement_request = _judgement_request(
             source_capability=source_capability,
             target_capability=target_capability,
@@ -685,12 +914,15 @@ def evaluate_derivation(
         "required_sources": sorted(required_sources),
         "covered_sources": sorted(required_sources & covered_sources),
         "dispositions": [
-            {
-                "source": source_id,
-                "status": item["status"],
-                "rationale": item["rationale"],
-            }
-            for source_id, item in sorted(disposition_by_source.items())
+            *source_review_dispositions,
+            *[
+                {
+                    "source": source_id,
+                    "status": item["status"],
+                    "rationale": item["rationale"],
+                }
+                for source_id, item in sorted(disposition_by_source.items())
+            ],
         ],
         "links": evaluated_links,
         "coverage": {

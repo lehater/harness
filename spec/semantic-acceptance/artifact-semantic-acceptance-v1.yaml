@@ -48,6 +48,16 @@ contract:
       rule: >-
         Only material assertions establishing the capability need machine
         addressability. Arbitrary prose sentences do not.
+    semantic_review:
+      interaction_role_requirements: >-
+        Semantic applicability judgement for cross-context roles. A REQUIRED
+        requirement references at least two stable role ids and may name material
+        role facets/transitions that deterministic admission must find in the
+        candidate interaction_roles contract.
+      observable_realization_obligations: >-
+        Semantic applicability/category judgement for user-facing source
+        assertions. Entries classify an assertion as ACTION, STATE or DISTINCTION
+        and as REQUIRED, NOT_APPLICABLE or QUESTION.
     source_assertions:
       fields:
         decision_authority: conditionally-required
@@ -98,6 +108,23 @@ contract:
       - SEMANTIC_REVIEW_REQUIRED
       - SEMANTIC_REVIEW_CHECKS_MISSING
       - SEMANTIC_REVIEW_REJECTED
+      - INTERACTION_ROLE_REVIEW_REQUIRED
+      - INVALID_INTERACTION_ROLES
+      - INVALID_INTERACTION_ROLE
+      - INTERACTION_ROLE_FIELD_REQUIRED
+      - INTERACTION_ROLE_FIELD_INVALID
+      - INVALID_INTERACTION_ROLE_TRANSITION
+      - INVALID_INTERACTION_ROLE_REQUIREMENT
+      - INTERACTION_ROLE_QUESTION
+      - INTERACTION_ROLE_REQUIRED_ROLE_MISSING
+      - INTERACTION_ROLE_CONCEPT_MISMATCH
+      - INVALID_INTERACTION_ROLE_REQUIRED_FACETS
+      - INTERACTION_ROLE_REQUIRED_FACET_MISSING
+      - INVALID_INTERACTION_ROLE_REQUIRED_TRANSITIONS
+      - INTERACTION_ROLE_REQUIRED_TRANSITION_MISSING
+      - OBSERVABLE_REALIZATION_REVIEW_REQUIRED
+      - INVALID_OBSERVABLE_REALIZATION_REVIEW
+      - OBSERVABLE_REALIZATION_QUESTION
 
 integration:
   legacy_mode: >-
