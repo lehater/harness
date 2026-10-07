@@ -164,7 +164,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | ID | Priority | Defect | Current classification | Harness dependencies | Status |
 |---|---:|---|---|---|---|
 | PREP-UX-001 | P0 | Active Target is not sufficiently explicit as the central preparation context. | usability/presentation finding; semantic chain currently appears intact | HARNESS-005 | REGISTERED |
-| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | exploration-coverage gap; current split is canonical in IA/Topology | HARNESS-003, HARNESS-008 | HARNESS_DISPOSITIONED |
+| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | IA revalidation selected one Targets parent with distinct candidate-comparison and active-Target sublocations; navigation/view realization remains downstream | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
 | PREP-UX-003 | P0 | No explicit cross-context interaction model distinguishes opened/inspected Target, selected-for-comparison Target, candidate-to-continue and active Target. | authority/interaction-model gap | HARNESS-004, HARNESS-005 | REGISTERED |
 | PREP-UX-004 | P1 | Capability is insufficiently visible as a first-class user-facing meaning across target requirements, current state and gaps. | observable-realization gap | HARNESS-005 | REGISTERED |
 | PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | implementation drift + verification/traceability gap | HARNESS-001, HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
@@ -175,7 +175,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | PREP-UX-010 | P1 | Shared `DataTable` exists but its use across applicable homogeneous collections is inconsistent. | presentation/component policy coverage gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | BLOCKED:same-role-equivalence-not-established |
-| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | boundary/local grouping exploration gap | HARNESS-003, HARNESS-008 | HARNESS_DISPOSITIONED |
+| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | IA grouping was re-derived from user-facing Target cohesion rather than responsibility decomposition; downstream navigation/topology realization remains pending | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
 | PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | observable-control realization gap; related to but distinct from PREP-UX-005 | HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
 | PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | HARNESS_DISPOSITIONED |
@@ -1183,4 +1183,74 @@ Program state after STAGE-P0-CIM:
 - Harness runtime/remediation mechanisms remain unchanged by this register-only update;
 - STAGE-P0-CIM: COMPLETE;
 - next stage: not started; the managing chat chooses it from the new frontier.
+
+### STAGE-P1-IA completion record — information-architecture revalidation
+
+This record supersedes the STAGE-P0-CIM *current frontier* statement above while preserving prior stages as execution history.
+
+STAGE-P1-IA:
+
+- result: COMPLETE;
+- capability: `prep.information-architecture`;
+- authority: `HUMAN-INTERFACE-DESIGN`;
+- starting Prep `main`: `ea6f5977df8e71937a38ab2ea01721f581a00939`;
+- old acceptance: `PREP-INFORMATION-ARCHITECTURE-STRICT-6`;
+- reproduced stale cause: accepted prerequisite surfaces were `PREP-USER-JOURNEYS-STRICT-5` and `PREP-CONCEPTUAL-INTERFACE-MODEL-STRICT-5`, while current providers are STRICT-6.
+
+Target grouping decision:
+
+- evaluated separate sibling locations, one unified Target area, and one Target parent with distinct sublocations;
+- selected: one `Targets` parent information area with distinct `Candidate comparison` and `Active Target` sublocations;
+- rationale: comparison and active-Target work organize information about the same user-facing Target concept and form a reversible compare -> choose -> establish/refine -> reconsider continuum; peer singular/plural locations were not justified merely by separate Journey/task responsibilities;
+- a fully undifferentiated single location was rejected because candidate-comparison and active-Target information needs remain materially distinct;
+- the decision has no page/view/route implication; IA location identity remains conceptual organization/findability only;
+- responsibility/task/frontend decomposition was not used as proof.
+
+Canonical IA and derivation:
+
+- canonical `docs/interface/information-architecture.yaml`: CHANGED to the parent+sublocations grouping;
+- active Target remains shared preparation context;
+- Knowledge remains independently findable;
+- Required Capability-derived Knowledge scope remains local exploration state and apply/clear does not become global truth;
+- Required Capability, Knowledge scope and Next Focus/PreparationIntent remain distinct;
+- Journey STRICT-6 exhaustive accounting: PASS — 78 required, 71 linked, 7 explicit IA-boundary dispositions, 0 unresolved;
+- CIM STRICT-6 exhaustive accounting: PASS — 31/31 linked, 0 unresolved;
+- Task Model exhaustive accounting: PASS — 115/115 linked, 0 unresolved;
+- current prerequisites `prep.conceptual-interface-model`, `prep.task-model`, and `prep.user-journeys`: CURRENT;
+- new acceptance: `PREP-INFORMATION-ARCHITECTURE-STRICT-7`;
+- `prep.information-architecture`: CURRENT;
+- no downstream artifact was reaccepted.
+
+Publication and validation:
+
+- bounded publication diagnostic run: `37607841300`;
+- pinned Consumer Pack / Harness runtime: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- `python tools/semantic_baseline.py`: PASS;
+- `python tools/check_harness_integration.py`: PASS;
+- `python tools/full_harness_revalidate.py`: EXPECTED INCOMPLETE with `semantic_gaps=[]`; remaining failures are downstream currentness gaps;
+- `python tools/validate_docs.py`: PASS;
+- maintained Anki reference tests: PASS;
+- temporary revalidation runner/workflow were removed before integration;
+- Prep PR #84 required validation run `37608052810`: PASS;
+- Prep PR #84 squash-merged to `main` as `48746464d751904e6960951b59203b35a5aff94e`.
+
+Defect transitions:
+
+- PREP-UX-002: `HARNESS_DISPOSITIONED -> PREP_REVALIDATION`; IA-local split was corrected, while route/view/navigation realization remains for downstream Topology revalidation;
+- PREP-UX-013: `HARNESS_DISPOSITIONED -> PREP_REVALIDATION`; IA grouping is now explicitly based on user-facing conceptual/task cohesion, while downstream navigation realization remains pending;
+- PREP-UX-012 remains `BLOCKED:same-role-equivalence-not-established`;
+- all other PREP-UX statuses: UNCHANGED;
+- new PREP defects: NONE.
+
+Post-P1-IA first actionable frontier:
+
+1. `prep.interaction-design` / `HUMAN-INTERFACE-DESIGN` — STALE due its current acceptance-policy mismatch and its accepted `prep.user-journeys` surface remaining STRICT-5 while current Journey is STRICT-6.
+2. `prep.interface-topology` is also STALE, including the changed IA STRICT-7 surface, but is not the earlier actionable frontier because it requires `prep.interaction-design`, which is still STALE.
+
+Program state after STAGE-P1-IA:
+
+- `HARNESS_REMEDIATION_BASELINE` remains `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- Harness runtime/remediation mechanisms remain unchanged by this register-only update;
+- STAGE-P1-IA: COMPLETE;
+- next stage: not started.
 
