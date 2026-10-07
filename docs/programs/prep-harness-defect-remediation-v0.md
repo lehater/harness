@@ -1067,3 +1067,62 @@ Program state:
 - Prep canonical revalidation: AUTHORIZED BUT NOT STARTED;
 - no Prep canonical/design/frontend repair was performed during Stage HI;
 - the previously suggested WP-P1 ordering must not skip the earlier `prep.user-journeys` currentness dependency; the managing chat must choose whether to add that prerequisite to WP-P1 or authorize a bounded prerequisite stage first.
+
+### STAGE-P0 completion record — prep.user-journeys prerequisite revalidation
+
+This record supersedes the Stage-HI *current frontier* statement above while preserving Stage HI as execution history.
+
+STAGE-P0:
+
+- result: COMPLETE;
+- capability: `prep.user-journeys`;
+- authority: `APPLICATION-DESIGN`;
+- starting Prep `main`: `a3eed460b81f50ee299f45751168d1932a97f99e`;
+- old acceptance: `PREP-USER-JOURNEYS-STRICT-5`;
+- reproduced stale cause: acceptance-policy fingerprint mismatch;
+- old candidate under the corrected H1 policy: REJECTED with `SEMANTIC_REVIEW_CHECKS_MISSING` for `independent-obligation-granularity` and `INDEPENDENT_OBLIGATION_REVIEW_REQUIRED`.
+
+Journey revalidation:
+
+- canonical `docs/application/user-journeys.md`: UNCHANGED;
+- reason: canonical Journey meaning already expressed the required learner operations; the accepted semantic admission surface was too coarse;
+- independent-obligation-granularity: PASS;
+- independently accounted obligations: 60;
+- Required Capability apply/select scope independently preserved: YES — `UJ-KNOWLEDGE-APPLY-CAPABILITY-SCOPE`;
+- Required Capability clear scope independently preserved: YES — `UJ-KNOWLEDGE-CLEAR-CAPABILITY-SCOPE`;
+- incoming derivations from `prep.task-model`, `prep.application-design`, `prep.application-process.activity-evidence-cycle`, and `prep.application-process.prepare-support`: PASS;
+- new acceptance: `PREP-USER-JOURNEYS-STRICT-6`;
+- `prep.user-journeys`: CURRENT.
+
+Publication and validation:
+
+- bounded publication diagnostic workflow run: `37603430706`;
+- pinned Consumer Pack: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- typed `user-journey-design` route: PASS;
+- `python tools/semantic_baseline.py`: PASS;
+- `python tools/check_harness_integration.py`: PASS;
+- `python tools/full_harness_revalidate.py`: EXPECTED INCOMPLETE with `semantic_gaps=[]`;
+- `python tools/validate_docs.py`: PASS;
+- no downstream artifact was reaccepted;
+- temporary revalidation runner/workflow were removed before integration;
+- Prep PR #82 required validation run `37603609935`: PASS;
+- Prep PR #82 squash-merged to `main` as `24a2ca1dcea5f258333c6f27264f591586c9ea8d`.
+
+Post-P0 first actionable frontier:
+
+1. `prep.conceptual-interface-model` / `HUMAN-INTERFACE-DESIGN` — STALE because its accepted `prep.user-journeys` semantic surface is `PREP-USER-JOURNEYS-STRICT-5` while the current upstream is `PREP-USER-JOURNEYS-STRICT-6`, including the newly independent Journey atoms.
+2. Downstream Information Architecture and later Human Interface / verification / architecture capabilities remain stale and must be handled only in their own authorized stages.
+
+Defect impact:
+
+- PREP-UX-001..016: UNCHANGED;
+- PREP-UX-012: `BLOCKED:same-role-equivalence-not-established`;
+- new PREP defects: NONE.
+
+Program state after STAGE-P0:
+
+- `HARNESS_REMEDIATION_BASELINE` remains `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- Harness remediation mechanisms remain unchanged by this register-only update;
+- STAGE-P0: COMPLETE;
+- next stage: not started; the managing chat chooses it from the new frontier.
+
