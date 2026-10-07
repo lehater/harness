@@ -82,6 +82,11 @@ def decision_contract_index(document: dict[str, Any]) -> dict[str, dict[str, Any
                 raise CoreError(f"{kind}.{axis} requires challenge_strategies")
             if not isinstance(minimum_probes, int) or minimum_probes < 1:
                 raise CoreError(f"{kind}.{axis} minimum_probes must be positive")
+            subject_scope = item.get("subject_scope")
+            if subject_scope is not None and (
+                not isinstance(subject_scope, str) or not subject_scope
+            ):
+                raise CoreError(f"{kind}.{axis} subject_scope must be a non-empty string")
             axes[axis] = {
                 "minimum_exploration": _level(
                     item.get("minimum_exploration", minimum),
@@ -96,6 +101,11 @@ def decision_contract_index(document: dict[str, Any]) -> dict[str, dict[str, Any
                 "material_dimensions": list(dict.fromkeys(dimensions)),
                 "challenge_strategies": list(dict.fromkeys(strategies)),
                 "minimum_probes": minimum_probes,
+                **(
+                    {"subject_scope": subject_scope}
+                    if subject_scope is not None
+                    else {}
+                ),
             }
         if not axes:
             raise CoreError(f"{kind} decision contract requires axes")
