@@ -39,8 +39,9 @@ Do not read existing screens/routes/components as design authority.
 5. Make alternate, denied, invalid, unavailable and recovery paths explicit where material.
 6. Record externally visible side effects and facts that must remain distinguishable.
 7. Keep navigation, screen/view partitioning, layout and frontend technology downstream.
-8. Route missing product/domain/security semantics to the owning Authority as Questions.
-9. Produce the project-native journey contract, semantically accept/register and reevaluate.
+8. Before semantic admission, identify independently losable user-observable obligations and account each in `semantic_review.independent_obligations`; keep one cohesive atom only when its parts cannot disappear or be verified independently.
+9. Route missing product/domain/security semantics to the owning Authority as Questions.
+10. Produce the project-native journey contract, semantically accept/register and reevaluate.
 
 ## Stop conditions
 
@@ -73,6 +74,7 @@ A journey is not a screen flow.
 - every journey outcome traces to accepted upstream truth;
 - no screen/page/modal decision is used as product semantics;
 - alternate and failure paths are represented when materially observable;
+- independently losable user actions/outcomes remain separately accountable on the accepted semantic surface;
 - domain and authorization ownership remains upstream;
 - the result is sufficient for Human Interface Design to choose interaction/navigation structure without inventing product behavior.
 
