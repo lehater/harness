@@ -26,18 +26,19 @@ Read the accepted upstream architecture/application/interface/data/policy knowle
 1. Confirm upstream capabilities are accepted and identify all project-owned engineering-policy obligations.
 2. Trace each implementation-facing use case through required collaborators.
 3. Inventory public components by architecture/module boundary.
-4. Give each public component one coherent responsibility/change reason.
-5. Define narrow ports/interfaces only where an accepted boundary, external technology, substitution need or known variation requires a seam.
-6. Shape ports from the consuming use case: expose only operations that consumer needs. A single concrete provider may satisfy several narrow consumer-owned contracts; do not introduce wrappers merely to obtain one runtime object per port.
+4. Perform a separate sibling-consumer reuse sweep: identify repeated responsibilities, interaction mechanics, presentation mechanics or collaboration patterns that appear across two or more current consumers/views/components. For each repeated responsibility, explicitly disposition it as `SHARED` or `LOCAL` with rationale. Do not let feature-boundary analysis stand in for this reuse analysis.
+5. Give each public/shared component one coherent responsibility/change reason. A shared component must remain free of feature-owned mutable/domain state unless an accepted shared lifetime explicitly requires that ownership.
+6. Define narrow ports/interfaces only where an accepted boundary, external technology, substitution need or known variation requires a seam.
+7. Shape ports from the consuming use case: expose only operations that consumer needs. A single concrete provider may satisfy several narrow consumer-owned contracts; do not introduce wrappers merely to obtain one runtime object per port.
 8. Specify responsibility, ownership, dependency and behavioral/failure contracts before choosing language representation. Preserve an existing simple callable/value representation when it satisfies the contract; require a class only when construction, lifetime, state or substitutability makes that representation semantically relevant.
-8. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
-9. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
-10. Define representation/mapping boundaries and composition/construction relationships.
-11. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
-12. Identify forbidden dependencies and structural verification that can enforce them.
-13. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
-14. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
-15. Produce project-native Component Design, semantically accept/register, then reevaluate.
+9. State which side owns every abstraction and ensure dependency direction satisfies accepted architecture/policy.
+10. Define important input/output value types and failure semantics without leaking framework/infrastructure types inward.
+11. Define representation/mapping boundaries and composition/construction relationships.
+12. Apply applicable project principles (for example SRP/DIP/ISP/KISS/YAGNI/LoD) as concrete obligations, not acronym claims.
+13. Identify forbidden dependencies and structural verification that can enforce them, including duplicate feature-local ownership of responsibilities that were accepted as shared.
+14. Explicitly list implementation freedoms left to coding so the artifact does not prescribe private helpers or line-by-line algorithms.
+15. If decomposition requires a new product/domain/application/architecture decision, create/route a Question to its owning Authority.
+16. Produce project-native Component Design, semantically accept/register, then reevaluate.
 
 ## Frontend presentation-provider specialization
 
@@ -85,7 +86,8 @@ Stop and route a Question when:
 A useful Component Design normally includes:
 
 - component inventory grouped by module/layer;
-- responsibility of each public component;
+- cross-consumer reuse inventory with explicit `SHARED`/`LOCAL` disposition and rationale;
+- responsibility of each public/shared component;
 - public ports/interfaces and important value contracts;
 - abstraction ownership;
 - dependency graph/direction;
@@ -101,7 +103,9 @@ A class diagram is optional. Classes are not mandatory when a function/value mod
 ## Acceptance checks
 
 - coding can begin without choosing major structural dependencies;
-- every public component has a justified responsibility;
+- every public/shared component has a justified responsibility;
+- every repeated current responsibility has an explicit shared/local disposition;
+- no feature-local component privately reimplements a responsibility accepted as shared;
 - every abstraction has a current reason to exist;
 - source dependencies obey accepted architecture/policy;
 - infrastructure/framework types do not leak into inner contracts;
