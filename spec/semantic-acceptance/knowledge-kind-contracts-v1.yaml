@@ -152,6 +152,7 @@ contracts:
     required_review_checks:
       - component-not-upstream-owner
       - implementation-facing-boundaries-complete-for-scope
+      - cross-consumer-reuse-disposition-complete
   - knowledge_kind: test-design
     required_review_checks: [test-not-semantic-owner]
   - knowledge_kind: implementation-design
