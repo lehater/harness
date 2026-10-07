@@ -95,17 +95,18 @@ def build_decision_explorer_request(
     axes = []
     for axis, axis_contract in contract["axes"].items():
         effective = axis_policies[axis]
-        axes.append(
-            {
-                "axis": axis,
-                "exploration": effective["exploration"],
-                "material_dimensions": list(axis_contract["material_dimensions"]),
-                "challenge_strategies": list(
-                    axis_contract["challenge_strategies"]
-                ),
-                "minimum_probes": axis_contract["minimum_probes"],
-            }
-        )
+        axis_request = {
+            "axis": axis,
+            "exploration": effective["exploration"],
+            "material_dimensions": list(axis_contract["material_dimensions"]),
+            "challenge_strategies": list(
+                axis_contract["challenge_strategies"]
+            ),
+            "minimum_probes": axis_contract["minimum_probes"],
+        }
+        if axis_contract.get("subject_scope") is not None:
+            axis_request["subject_scope"] = axis_contract["subject_scope"]
+        axes.append(axis_request)
 
     payload = {
         "version": 1,
