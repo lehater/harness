@@ -322,6 +322,7 @@ def main() -> int:
     } <= set(contract_index["engineering-policy"]["required_review_checks"])
     assert {
         "implementation-facing-boundaries-complete-for-scope",
+        "cross-consumer-reuse-disposition-complete",
     } <= set(contract_index["component-design"]["required_review_checks"])
     assert {
         "implementation-slices-explicit",
