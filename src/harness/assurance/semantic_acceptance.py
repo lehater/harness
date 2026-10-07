@@ -158,6 +158,86 @@ def _evaluate_independent_obligation_accounting(
 
 
 
+
+def _evaluate_observable_realization_applicability(
+    review: dict[str, Any] | None,
+    assertions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate semantic-review classification of observable realization needs."""
+    if not isinstance(review, dict):
+        return [{"code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED"}]
+    items = review.get("observable_realization_obligations")
+    if not isinstance(items, list):
+        return [{"code": "OBSERVABLE_REALIZATION_REVIEW_REQUIRED"}]
+
+    assertion_ids = {
+        item.get("id")
+        for item in assertions
+        if isinstance(item, dict)
+        and isinstance(item.get("id"), str)
+        and item.get("id")
+    }
+    findings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    seen_assertions: set[str] = set()
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            findings.append(
+                {"code": "INVALID_OBSERVABLE_REALIZATION_REVIEW", "index": index}
+            )
+            continue
+        item_id = item.get("id")
+        assertion_id = item.get("assertion")
+        category = item.get("category")
+        status = item.get("status")
+        if (
+            not isinstance(item_id, str)
+            or not item_id
+            or item_id in seen_ids
+            or not isinstance(assertion_id, str)
+            or not assertion_id
+            or assertion_id in seen_assertions
+            or assertion_id not in assertion_ids
+            or category not in {"ACTION", "STATE", "DISTINCTION"}
+            or status not in {"REQUIRED", "NOT_APPLICABLE", "QUESTION"}
+        ):
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "index": index,
+                    **(
+                        {"assertion": assertion_id}
+                        if isinstance(assertion_id, str) and assertion_id
+                        else {}
+                    ),
+                }
+            )
+            continue
+        seen_ids.add(item_id)
+        seen_assertions.add(assertion_id)
+
+        if status == "REQUIRED":
+            continue
+        rationale = item.get("rationale")
+        if not isinstance(rationale, str) or not rationale.strip():
+            findings.append(
+                {
+                    "code": "INVALID_OBSERVABLE_REALIZATION_REVIEW",
+                    "assertion": assertion_id,
+                }
+            )
+        elif status == "QUESTION":
+            findings.append(
+                {
+                    "code": "OBSERVABLE_REALIZATION_QUESTION",
+                    "source": assertion_id,
+                    "rationale": rationale,
+                }
+            )
+
+    return findings
+
 def _evaluate_interaction_role_coherence(
     review: dict[str, Any] | None,
     candidate: dict[str, Any],
@@ -172,7 +252,7 @@ def _evaluate_interaction_role_coherence(
         return [{"code": "INTERACTION_ROLE_REVIEW_REQUIRED"}]
 
     requirements = review.get("interaction_role_requirements")
-    if not isinstance(requirements, list) or not requirements:
+    if not isinstance(requirements, list):
         return [{"code": "INTERACTION_ROLE_REVIEW_REQUIRED"}]
 
     roles_value = candidate.get("interaction_roles", []) or []
@@ -888,6 +968,11 @@ def evaluate_artifact(
     if "independent-obligation-granularity" in required_review_checks:
         findings.extend(
             _evaluate_independent_obligation_accounting(review, assertions)
+        )
+
+    if "observable-realization-applicability" in required_review_checks:
+        findings.extend(
+            _evaluate_observable_realization_applicability(review, assertions)
         )
 
     if "interaction-role-coherence" in required_review_checks:
