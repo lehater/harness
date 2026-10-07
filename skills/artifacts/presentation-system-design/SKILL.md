@@ -41,15 +41,16 @@ Read accepted project requirements, tasks/journeys, conceptual/IA/interaction/to
 3. Define semantic hierarchy, density/layout defaults, action/navigation/feedback conventions and reusable task patterns. When material, explicitly resolve the application-surface archetype (for example document/page flow, bounded application/workbench or step/task flow), viewport/container ownership, navigation persistence and page-scroll versus bounded-region overflow before downstream screens inherit the presentation contract.
 4. Define typography/color/spacing/iconography roles and design tokens only when they carry stable reusable decisions.
 5. Define responsive/accessibility/localization defaults where applicable.
-6. Classify each consequential presentation choice as a material invariant, controlled freedom or ordinary implementation detail.
-7. For each material shared presentation decision, use the reusable UI Decision Rule catalog when its predicates apply and record the decision question, accepted basis, applied rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty.
-8. If semantic constraints and reusable rules cannot discriminate among viable alternatives because the remaining uncertainty is user-empirical, record `EMPIRICAL_VALIDATION_REQUIRED`; do not promote an interim prototype preference into a production-authoritative default. The semantic artifact may still remain accepted for bounded prototype use.
-9. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
-10. Define inheritance and local-deviation policy. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
-11. Preserve implementation freedom for framework, CSS mechanics and private component structure.
-12. Before semantic admission, identify independently losable user-observable presentation obligations and account each in `semantic_review.independent_obligations`; do not compress separate controls/states/actions into one summary assertion when any can disappear independently.
-13. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
-14. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
+6. Classify each consequential presentation choice as a material invariant, controlled freedom or ordinary implementation detail. As part of semantic review, identify stable material representation subjects when the form can materially affect cross-entity comparison, scanning of homogeneous fields, repeated-record inspection, selection mechanics, relation inspection, detail/context preservation, task completion efficiency or responsive semantic preservation. Record each subject in `semantic_review.representation_requirements` with its task/information basis, task-relevant material dimensions, required challenge strategies and shared-default/local disposition. Applicability is a semantic judgement; do not infer it from words such as card/list/table/compare.
+7. For each material representation subject owned here, perform subject-scoped `representation-selection` Decision Exploration before selecting a reusable pattern/default. Alternatives must materially challenge the task dimensions selected by semantic review; implementation primitives, legacy components or vendor defaults are feasibility/context evidence rather than decision authority. Same-dimension comparison must challenge independent versus aligned representation when semantic review marks cross-entity alignment material. This does not prescribe an HTML table or any universal component family.
+8. For each other material shared presentation decision, use the reusable UI Decision Rule catalog when its predicates apply and record the decision question, accepted basis, applied rule ids, Decision Governance disposition/selection where applicable, required evaluation evidence and residual uncertainty.
+9. If semantic constraints and reusable rules cannot discriminate among viable alternatives because the remaining uncertainty is user-empirical, record `EMPIRICAL_VALIDATION_REQUIRED`; do not promote an interim prototype preference into a production-authoritative default. The semantic artifact may still remain accepted for bounded prototype use.
+10. For accepted visual/executable references, record their epistemic role and the specific presentation decisions they evidence; never import domain semantics from a picture or legacy implementation.
+11. Define inheritance and local-deviation policy. Shared representation defaults/patterns are owned here when they are genuinely reusable; a representation unique to one screen need not be promoted into an artificial application-wide default. When inheriting an external template/provider, pin its version/ref and treat its optional behavior as disabled unless explicitly authorized by accepted Screen/View semantics.
+12. Preserve implementation freedom for framework, CSS mechanics and private component structure.
+13. Before semantic admission, identify independently losable user-observable presentation obligations and account each in `semantic_review.independent_obligations`; do not compress separate controls/states/actions into one summary assertion when any can disappear independently.
+14. Route missing upstream requirements or obligations as Questions rather than silently selecting material visual choices.
+15. Produce the project-native canonical Presentation System contract, accept/register and reevaluate.
 
 ## Facets
 
@@ -103,6 +104,7 @@ A useful contract includes:
 - responsive/accessibility defaults;
 - reference/evidence links with role and scope when presentation intent was reconstructed from screenshots, design files or executable UI;
 - explicit material invariants, controlled freedoms and ordinary implementation details;
+- material representation subjects with stable ids, task/information basis, material dimensions/challenges, subject-scoped decision refs and shared-default disposition where applicable;
 - material decision evidence with stable decision id/axis, question, basis refs, applied UI rule ids, disposition/selection, required evaluation levels/evidence, controlled freedom and residual uncertainty;
 - deviation policy: local override requires rationale and cannot silently weaken accepted semantics/obligations;
 - unresolved Questions.
@@ -112,6 +114,8 @@ A useful contract includes:
 - screens can inherit common presentation knowledge without copying it;
 - equivalent actions/states use equivalent patterns unless a deviation is justified;
 - independently losable user-observable obligations have separate semantic accounting before downstream screens inherit the surface;
+- material representation applicability is explicitly reviewed; task/information semantics precede reusable pattern and implementation primitive;
+- same-dimension comparison marked material cannot be closed by cosmetic variants of the same independent-record representation;
 - design-system/vendor mechanics are not mistaken for project semantics;
 - external template/provider features cannot silently introduce product actions, routes, states or data semantics;
 - accessibility/usability defaults are represented without treating a component library as proof of conformance;
