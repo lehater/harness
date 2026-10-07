@@ -164,7 +164,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | ID | Priority | Defect | Current classification | Harness dependencies | Status |
 |---|---:|---|---|---|---|
 | PREP-UX-001 | P0 | Active Target is not sufficiently explicit as the central preparation context. | usability/presentation finding; semantic chain currently appears intact | HARNESS-005 | REGISTERED |
-| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | IA revalidation selected one Targets parent with distinct candidate-comparison and active-Target sublocations; navigation/view realization remains downstream | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
+| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | Topology revalidation rejected the old separate-view split and now realizes candidate comparison plus active-Target work in one `VIEW-TARGETS`, preserving distinct Interaction contexts/roles inside the view; presentation/screen realization remains downstream | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
 | PREP-UX-003 | P0 | No explicit cross-context interaction model distinguishes opened/inspected Target, selected-for-comparison Target, candidate-to-continue and active Target. | Interaction role gap reproduced and revalidated: three material Target roles are now explicit; opened/inspected is not a distinct role because inspection adds no separate role lifecycle/side effect | HARNESS-004, HARNESS-005 | PREP_REVALIDATION |
 | PREP-UX-004 | P1 | Capability is insufficiently visible as a first-class user-facing meaning across target requirements, current state and gaps. | observable-realization gap | HARNESS-005 | REGISTERED |
 | PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | Interaction revalidation independently preserves apply and clear Required Capability scope actions; observable realization/implementation remains downstream | HARNESS-001, HARNESS-002, HARNESS-005 | PREP_REVALIDATION |
@@ -175,7 +175,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | PREP-UX-010 | P1 | Shared `DataTable` exists but its use across applicable homogeneous collections is inconsistent. | presentation/component policy coverage gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | BLOCKED:same-role-equivalence-not-established |
-| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | IA grouping was re-derived from user-facing Target cohesion rather than responsibility decomposition; downstream navigation/topology realization remains pending | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
+| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | Topology now uses boundary-local user-facing evidence and subject-scoped Decision Governance; the Target split is no longer inherited mechanically from task/application/Interaction decomposition | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
 | PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | Interaction revalidation requires independent apply/clear scope actions; concrete local-control realization remains downstream | HARNESS-002, HARNESS-005 | PREP_REVALIDATION |
 | PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | HARNESS_DISPOSITIONED |
@@ -1271,3 +1271,77 @@ Prep evidence: PR `lehater/prep#85` was squash-merged to Prep `main` as `e7f0e73
 - No Prep defect advances to `PREP_IMPLEMENTATION` in this stage.
 - First new actionable Prep frontier after publication is `prep.interface-topology`; this register update does not start that stage.
 - Harness runtime/pin is unchanged: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`.
+
+
+## Stage P1 Interface Topology revalidation — 2026-10-07
+
+Prep evidence: PR `lehater/prep#86` was squash-merged to Prep `main` as `d9adf4ca51049894437f1ed3d4f74fe94936c896`. The scoped revalidation published `PREP-INTERFACE-TOPOLOGY-STRICT-8` and restored `prep.interface-topology = CURRENT` without reaccepting downstream artifacts.
+
+Stale reproduction and H4 review:
+
+- starting Topology acceptance: `PREP-INTERFACE-TOPOLOGY-STRICT-7`;
+- accepted prerequisites were `PREP-INFORMATION-ARCHITECTURE-STRICT-6` and `PREP-INTERACTION-DESIGN-STRICT-5`, while current providers are IA STRICT-7 and Interaction STRICT-6;
+- the old acceptance also carried the pre-H4 acceptance-policy fingerprint and broad `preparation-view-boundaries` decision without corrected `view-boundary-semantics`;
+- material boundary inventory: 8; contestable: 8; deterministic: 0; unresolved: 0;
+- every material contestable boundary now has a stable subject identity, participants, explicit materiality/contestability, rationale bases, local Decision Governance and merge-vs-separate/persistent-context challenge coverage.
+
+Target boundary decision:
+
+- `BOUNDARY-TARGET-COMPARISON-ACTIVE-TARGET`: `MERGED`;
+- selected topology: one `VIEW-TARGETS` realizes `LOC-TARGET-COMPARISON`, `LOC-TARGET`, `IX-TARGET-DIRECTION` and `IX-TARGET`;
+- comparison and active-Target behavior remain semantically distinct inside the view; no tabs/panes/routes/regions were selected;
+- separate views were rejected because no accepted user-facing need justified an independent destination across the continuous compare -> choose -> establish/refine -> reconsider flow;
+- contextual-primary/secondary Target topology was rejected because accepted semantics support mutual reconsideration rather than a primary/incidental relationship;
+- responsibility/task/application/component decomposition was not accepted as a view-boundary proof.
+
+Target-role and topology continuity:
+
+- comparison selection does not activate a Target;
+- `selected-for-comparison -> candidate-to-continue -> accepted establishment/refinement -> active` semantics are preserved;
+- Current position, Knowledge, Activity remain separate task views on explicit user-facing bases;
+- Evidence/change remains contextual post-activity review;
+- Prepare missing support remains contextual recovery with origin-preserving return;
+- Target -> Knowledge may carry selected Required Capability as local Knowledge scope without conflating Capability scope and Next Focus.
+
+Derivation and publication:
+
+- IA STRICT-7 exhaustive derivation: PASS — 17 required / 17 covered / 0 unresolved;
+- Interaction STRICT-6 exhaustive derivation: PASS — required topology surface accounted, 2 explicit non-topology dispositions, 0 unresolved;
+- canonical Topology: CHANGED;
+- new acceptance: `PREP-INTERFACE-TOPOLOGY-STRICT-8`;
+- `prep.interface-topology`: CURRENT;
+- downstream reaccepted artifacts: NONE.
+
+Validation and integration:
+
+- bounded publication diagnostic run: `37614655954`;
+- final scoped validation run: `37615157101`: SUCCESS;
+- pinned Consumer Pack / Harness runtime: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- `python tools/semantic_baseline.py`: PASS;
+- `python tools/check_harness_integration.py`: PASS after updating the Prep-local topology projection to `VIEW-TARGETS` and making downstream gates respect lifecycle CURRENT state;
+- `python tools/full_harness_revalidate.py`: EXPECTED INCOMPLETE downstream-currentness evidence; no semantic gap in this Topology stage;
+- `python tools/validate_docs.py`: PASS;
+- maintained Anki reference tests: PASS;
+- temporary revalidation runner/workflow were removed before integration;
+- Prep PR #86 required validation run `37615350643`: PASS.
+
+Defect status after STAGE-P1-TOP:
+
+- `PREP-UX-002`: remains `PREP_REVALIDATION`; Topology-local decision is resolved by the one-view Target topology, implementation remains downstream;
+- `PREP-UX-013`: remains `PREP_REVALIDATION`; grouping/navigation is no longer inherited mechanically from responsibility decomposition;
+- `PREP-UX-003`, `PREP-UX-005`, `PREP-UX-006`, `PREP-UX-014`: remain `PREP_REVALIDATION`;
+- `PREP-UX-012`: remains `BLOCKED:same-role-equivalence-not-established`;
+- no Prep defect advances to `PREP_IMPLEMENTATION`;
+- new Prep defects: NONE.
+
+Post-P1-TOP first actionable frontier:
+
+1. `prep.presentation-system` / `HUMAN-INTERFACE-DESIGN` — STALE against the now-current Topology/Interaction/IA semantics and is the next user-interface capability in the engineering graph.
+2. Other stale capabilities remain visible to full revalidation, but this register update does not start them.
+
+Program state after STAGE-P1-TOP:
+
+- `HARNESS_REMEDIATION_BASELINE` remains `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- Harness runtime/remediation mechanisms remain unchanged by this register-only update;
+- STAGE-P1-TOP: COMPLETE;
+- next stage: not started.
