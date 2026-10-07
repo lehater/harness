@@ -164,7 +164,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | ID | Priority | Defect | Current classification | Harness dependencies | Status |
 |---|---:|---|---|---|---|
 | PREP-UX-001 | P0 | Active Target is not sufficiently explicit as the central preparation context. | usability/presentation finding; semantic chain currently appears intact | HARNESS-005 | REGISTERED |
-| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | exploration-coverage gap; current split is canonical in IA/Topology | HARNESS-003, HARNESS-008 | REGISTERED |
+| PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | exploration-coverage gap; current split is canonical in IA/Topology | HARNESS-003, HARNESS-008 | HARNESS_DISPOSITIONED |
 | PREP-UX-003 | P0 | No explicit cross-context interaction model distinguishes opened/inspected Target, selected-for-comparison Target, candidate-to-continue and active Target. | authority/interaction-model gap | HARNESS-004, HARNESS-005 | REGISTERED |
 | PREP-UX-004 | P1 | Capability is insufficiently visible as a first-class user-facing meaning across target requirements, current state and gaps. | observable-realization gap | HARNESS-005 | REGISTERED |
 | PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | implementation drift + verification/traceability gap | HARNESS-001, HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
@@ -175,7 +175,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | PREP-UX-010 | P1 | Shared `DataTable` exists but its use across applicable homogeneous collections is inconsistent. | presentation/component policy coverage gap | HARNESS-006 | REGISTERED |
 | PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | REGISTERED |
 | PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | REGISTERED |
-| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | boundary/local grouping exploration gap | HARNESS-003, HARNESS-008 | REGISTERED |
+| PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | boundary/local grouping exploration gap | HARNESS-003, HARNESS-008 | HARNESS_DISPOSITIONED |
 | PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | observable-control realization gap; related to but distinct from PREP-UX-005 | HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
 | PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | REGISTERED |
 | PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | REGISTERED |
@@ -194,12 +194,12 @@ The priority may change after root-cause analysis, but the id and history remain
 |---|---:|---|---|---|
 | HARNESS-001 | P0 | Semantic-surface admission permits compound summary assertions whose internal independently losable user obligations are not atomized; downstream semantic derivation can therefore report coverage while a sub-obligation disappears. | 005, 007 | INTEGRATED |
 | HARNESS-002 | P0 | Test Design semantic contracts are not sufficiently bound to concrete executable test actions/oracles; an E2E can exist and be green while testing a weaker operation than the accepted Test Design contract. | 005, 007, 014 | INTEGRATED |
-| HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | HARNESS_GREEN |
+| HARNESS-003 | P1 | Decision Governance can close a broad view-boundary axis without proving that each material concrete boundary received the relevant local alternatives/challenges. | 002, 013 | INTEGRATED |
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | INTEGRATED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | INTEGRATED |
 | HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | REGISTERED |
 | HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | REGISTERED |
-| HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | HARNESS_GREEN |
+| HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | INTEGRATED |
 
 ## 6. Known reproduced evidence
 
@@ -459,7 +459,7 @@ GREEN evidence:
 - `Greenfield Engineering Graph`: run `37591066142` PASS;
 - implementation PR: #206.
 
-Integration evidence: pending merge of PR #206; status intentionally stops at `HARNESS_GREEN` until the fix is present in Harness `main`.
+Integration evidence: PR #206 was squash-merged to Harness `main` as `f48049dc5458043660158cbf8526a7105cc20817`; `HARNESS-003 -> INTEGRATED`.
 
 ### HARNESS-008 — user-facing basis for topology separation
 
@@ -515,7 +515,14 @@ Prep calibration:
 - current topology admission selects `task-responsibility-views-with-contextual-recovery`, while IA keeps `LOC-TARGETS` and `LOC-TARGET` as conceptual locations and explicitly leaves page/view count downstream;
 - corrected Harness therefore requires this concrete material boundary to be explicitly re-examined; WP-H4 does not decide whether the eventual result is merge or separation.
 
-Integration evidence: pending merge of PR #206; status intentionally stops at `HARNESS_GREEN`. Prep and `.harness-version` remain unchanged and Prep revalidation has not started.
+Integration evidence: PR #206 was squash-merged to Harness `main` as `f48049dc5458043660158cbf8526a7105cc20817`; `HARNESS-008 -> INTEGRATED`.
+
+Prep dependency disposition after WP-H4:
+
+- `PREP-UX-002`: `REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED -> HARNESS_DISPOSITIONED`. Current Prep evidence reproduces the peer `Targets` / `Target` split and shows that its only topology exploration is the broad `preparation-view-boundaries` decision; HARNESS-003 and HARNESS-008 are both integrated. This disposition requires later Prep revalidation of the concrete boundary and does not prescribe merge.
+- `PREP-UX-013`: `REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED -> HARNESS_DISPOSITIONED`. Current Prep topology maps user-facing destinations directly to distinct task responsibilities/IA locations while the broad decision evidence does not independently prove each material user-facing boundary; both mapped Harness dependencies are integrated.
+- Prep remains unchanged, `.harness-version` is unchanged, and WP-H4 does not enter `PREP_REVALIDATION`.
+
 
 Prep dependency disposition after WP-H3:
 
