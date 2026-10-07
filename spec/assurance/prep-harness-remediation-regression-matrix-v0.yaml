@@ -1,0 +1,55 @@
+version: 1
+kind: harness-program-regression-matrix
+program: prep-harness-defect-remediation-v0
+entries:
+  - harness_id: HARNESS-001
+    owner_check: semantic_admission
+    red: {path: tests/test_semantic_admission.py, anchor: test_independently_losable_obligation_granularity}
+    green: {path: tests/test_semantic_admission.py, anchor: test_independently_losable_obligation_granularity}
+    positive_controls:
+      - {path: tests/test_semantic_admission.py, anchor: COHESIVE-ASSERTION}
+  - harness_id: HARNESS-002
+    owner_check: test_realization_conformance
+    red: {path: tests/test_test_realization_conformance.py, anchor: test_test_design_realization_rejects_missing_operation}
+    green: {path: tests/test_test_realization_conformance.py, anchor: test_full_test_design_realization_is_accepted}
+    positive_controls:
+      - {path: tests/test_test_realization_conformance.py, anchor: test_materially_different_test_organizations_can_realize_same_contract}
+  - harness_id: HARNESS-003
+    owner_check: decision_governance
+    red: {path: tests/test_decision_governance.py, anchor: BOUNDARY-A-B}
+    green: {path: tests/test_decision_governance.py, anchor: VIEW_BOUNDARY_DECISION_COVERAGE_MISSING}
+    positive_controls:
+      - {path: tests/test_decision_governance.py, anchor: SHARED-AB-BC}
+  - harness_id: HARNESS-004
+    owner_check: semantic_admission
+    red: {path: tests/test_semantic_admission.py, anchor: test_interaction_role_coherence_regressions}
+    green: {path: tests/test_semantic_admission.py, anchor: test_interaction_role_coherence_regressions}
+    positive_controls:
+      - {path: tests/test_semantic_admission.py, anchor: NOT_REQUIRED}
+  - harness_id: HARNESS-005
+    owner_check: semantic_admission
+    red: {path: tests/test_semantic_admission.py, anchor: test_observable_realization_regressions}
+    green: {path: tests/test_semantic_admission.py, anchor: test_observable_realization_regressions}
+    positive_controls:
+      - {path: tests/test_semantic_admission.py, anchor: NOT_APPLICABLE}
+  - harness_id: HARNESS-006
+    owner_check: decision_governance
+    red: {path: tests/test_decision_governance.py, anchor: REP-COMPARE-A-B}
+    green: {path: tests/test_decision_governance.py, anchor: REP-HOMOGENEOUS-COLLECTION}
+    positive_controls:
+      - {path: tests/test_decision_governance.py, anchor: rich-entity-choice}
+      - {path: tests/test_decision_governance.py, anchor: wide-aligned-narrow-serialized}
+  - harness_id: HARNESS-007
+    owner_check: traceability_projection
+    red: {path: tests/test_traceability_projection.py, anchor: test_t1_interaction_to_screen_missing_is_first}
+    green: {path: tests/test_traceability_projection.py, anchor: test_complete_chain_is_complete}
+    positive_controls:
+      - {path: tests/test_traceability_projection.py, anchor: test_legitimate_disposition_is_not_a_missing_link}
+      - {path: tests/test_traceability_projection.py, anchor: test_implementation_freedom_preserves_projection_completeness}
+      - {path: tests/test_traceability_projection.py, anchor: test_composed_vertical_chain_complete_then_exact_middle_mutation}
+  - harness_id: HARNESS-008
+    owner_check: decision_governance
+    red: {path: tests/test_decision_governance.py, anchor: VIEW_BOUNDARY_USER_FACING_BASIS_REQUIRED}
+    green: {path: tests/test_decision_governance.py, anchor: USER_FACING}
+    positive_controls:
+      - {path: tests/test_decision_governance.py, anchor: '"outcome": "MERGED"'}

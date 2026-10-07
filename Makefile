@@ -15,6 +15,7 @@ assurance-external-release-plan:
 harness-check:
 	python checks/validate_ci_policy.py
 	python checks/validate_assurance_registry.py
+	python checks/validate_prep_harness_regression_matrix.py
 	python checks/validate_cross_project_portability.py
 	python tests/test_behavioral_eval.py
 	python tests/test_behavioral_eval_cases.py
@@ -68,6 +69,7 @@ harness-check:
 	python tests/test_engineering_coverage.py
 	python tests/test_repository_realization_design.py
 	python tests/test_test_realization_conformance.py
+	python tests/test_traceability_projection.py
 	python tests/test_architecture_driver_closure.py
 	python tests/test_coverage_blocker_transition.py
 	python tests/test_coverage_production_contract_overlay.py

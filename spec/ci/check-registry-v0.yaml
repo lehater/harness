@@ -105,6 +105,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: prep_harness_regression_matrix
+  command: python checks/validate_prep_harness_regression_matrix.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: cross_project_portability
   command: python checks/validate_cross_project_portability.py
   stage: focused
@@ -389,6 +394,11 @@ checks:
   disposition: full_gate
 - id: test_realization_conformance
   command: python tests/test_test_realization_conformance.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+- id: traceability_projection
+  command: python tests/test_traceability_projection.py
   stage: focused
   cost_class: cheap
   disposition: full_gate
