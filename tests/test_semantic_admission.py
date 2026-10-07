@@ -398,7 +398,528 @@ def test_independently_losable_obligation_granularity() -> None:
     assert accepted["status"] == "ACCEPTED", accepted
 
 
+
+def _h3_role_contract() -> dict:
+    return {
+        "authority": "HUMAN-INTERFACE-DESIGN",
+        "owned_assertion_kinds": ["interaction-obligation"],
+        "requires_assertion_authority": True,
+        "requires_semantic_review": True,
+        "required_semantic_review_checks": ["interaction-role-coherence"],
+    }
+
+
+def _h3_role_candidate() -> dict:
+    return {
+        "semantic_assertions": [
+            {
+                "id": "COMPARE",
+                "kind": "interaction-obligation",
+                "subject": "compare-selection",
+                "semantic_value": "User can mark an entity for comparison.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+            {
+                "id": "ACTIVE",
+                "kind": "interaction-obligation",
+                "subject": "active-context",
+                "semantic_value": "User can commit an entity as current context.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            },
+        ],
+        "interaction_roles": [
+            {
+                "id": "ROLE-COMPARE",
+                "concept_ref": "ENTITY-X",
+                "meaning": "Entity participates in comparison without becoming current.",
+                "entry": "mark entity for comparison",
+                "exit": "remove entity from comparison",
+                "transitions": [
+                    {"to": "ROLE-ACTIVE", "trigger": "commit as current context"}
+                ],
+                "side_effects": ["comparison set changes"],
+                "forbidden_side_effects": ["current context does not change"],
+                "observable_distinction": "comparison membership is distinguishable from current context",
+            },
+            {
+                "id": "ROLE-ACTIVE",
+                "concept_ref": "ENTITY-X",
+                "meaning": "Entity is committed as current working context.",
+                "entry": "commit entity as current context",
+                "exit": "replace or clear current context",
+                "transitions": [],
+                "side_effects": ["current working context changes"],
+                "forbidden_side_effects": [],
+                "observable_distinction": "current context is distinguishable from comparison membership",
+            },
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["interaction-role-coherence"],
+            "interaction_role_requirements": [
+                {
+                    "concept": "ENTITY-X",
+                    "status": "REQUIRED",
+                    "roles": ["ROLE-COMPARE", "ROLE-ACTIVE"],
+                    "required_role_facets": {
+                        "ROLE-COMPARE": ["forbidden_side_effects"],
+                        "ROLE-ACTIVE": ["side_effects"],
+                    },
+                    "required_transitions": [
+                        {"from": "ROLE-COMPARE", "to": "ROLE-ACTIVE"}
+                    ],
+                    "rationale": "The roles have materially different lifecycle and side effects.",
+                }
+            ],
+        },
+    }
+
+
+def test_interaction_role_coherence_regressions() -> None:
+    contract = _h3_role_contract()
+
+    conflated = _h3_role_candidate()
+    conflated["interaction_roles"] = [
+        {
+            "id": "ROLE-SELECTED",
+            "concept_ref": "ENTITY-X",
+            "meaning": "Generic selected state.",
+            "entry": "select entity",
+            "exit": "clear selection",
+            "transitions": [],
+            "side_effects": [],
+            "forbidden_side_effects": [],
+            "observable_distinction": "selected",
+        }
+    ]
+    result = evaluate_artifact(contract, {"semantic_assertions": []}, conflated)
+    assert result["status"] == "REJECTED", result
+    assert {
+        item.get("code") for item in result["findings"]
+    } >= {"INTERACTION_ROLE_REQUIRED_ROLE_MISSING"}, result
+
+    missing_forbidden = _h3_role_candidate()
+    missing_forbidden["interaction_roles"][0]["forbidden_side_effects"] = []
+    result = evaluate_artifact(
+        contract,
+        {"semantic_assertions": []},
+        missing_forbidden,
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "INTERACTION_ROLE_REQUIRED_FACET_MISSING"
+        and item.get("role") == "ROLE-COMPARE"
+        and item.get("facet") == "forbidden_side_effects"
+        for item in result["findings"]
+    ), result
+
+    missing_transition = _h3_role_candidate()
+    missing_transition["interaction_roles"][0]["transitions"] = []
+    result = evaluate_artifact(
+        contract,
+        {"semantic_assertions": []},
+        missing_transition,
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "INTERACTION_ROLE_REQUIRED_TRANSITION_MISSING"
+        for item in result["findings"]
+    ), result
+
+    same_role = {
+        "semantic_assertions": [
+            {
+                "id": "INSPECT",
+                "kind": "interaction-obligation",
+                "subject": "entity-inspection",
+                "semantic_value": "The entity can be inspected in multiple contexts.",
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            }
+        ],
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["interaction-role-coherence"],
+            "interaction_role_requirements": [
+                {
+                    "concept": "ENTITY-X",
+                    "status": "NOT_REQUIRED",
+                    "rationale": "All contexts use the same lifecycle and side effects.",
+                }
+            ],
+        },
+    }
+    accepted = evaluate_artifact(contract, {"semantic_assertions": []}, same_role)
+    assert accepted["status"] == "ACCEPTED", accepted
+
+    complete = evaluate_artifact(
+        contract,
+        {"semantic_assertions": []},
+        _h3_role_candidate(),
+    )
+    assert complete["status"] == "ACCEPTED", complete
+
+
+def _h3_observable_graph() -> dict:
+    return {
+        "version": 1,
+        "kind": "harness-engineering-graph",
+        "id": "OBSERVABLE-REALIZATION",
+        "authorities": [
+            {
+                "id": "HUMAN-INTERFACE-DESIGN",
+                "responsibility": "Own user-facing interaction semantics.",
+                "boundary": {
+                    "semantic_cohesion": "User-facing semantics.",
+                    "independent_change": "Interaction and screen knowledge evolve independently.",
+                    "public_contract": "Accepted user-facing semantics.",
+                },
+                "produces": [
+                    {
+                        "capability": "example.interaction",
+                        "knowledge_kind": "interaction-design",
+                        "requires": [],
+                    },
+                    {
+                        "capability": "example.screen",
+                        "knowledge_kind": "screen-view-design",
+                        "requires": ["example.interaction"],
+                    },
+                ],
+            }
+        ],
+        "consumers": [],
+        "terminal_capabilities": [],
+    }
+
+
+def _h3_observable_contract() -> dict:
+    return {
+        "version": 1,
+        "kind": "harness-semantic-derivation-contract",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "obligations": [
+            {
+                "id": "observable-interaction",
+                "source_kind": "interaction-obligation",
+                "observable_realization": True,
+            }
+        ],
+    }
+
+
+def _h3_source(rows: list[tuple[str, str, str, str]]) -> dict:
+    assertions = []
+    review = []
+    for assertion_id, category, status, semantic_value in rows:
+        assertions.append(
+            {
+                "id": assertion_id,
+                "kind": "interaction-obligation",
+                "subject": assertion_id.lower(),
+                "semantic_value": semantic_value,
+                "decision_authority": "HUMAN-INTERFACE-DESIGN",
+            }
+        )
+        item = {
+            "id": f"OBS-{assertion_id}",
+            "assertion": assertion_id,
+            "category": category,
+            "status": status,
+        }
+        if status != "REQUIRED":
+            item["rationale"] = "Accepted semantics do not require a user-facing realization."
+        review.append(item)
+    return {
+        "semantic_assertions": assertions,
+        "semantic_review": {
+            "status": "ACCEPTED",
+            "checks": ["observable-realization-applicability"],
+            "observable_realization_obligations": review,
+        },
+    }
+
+
+def _h3_accept_judgement(
+    *,
+    source: dict,
+    candidate: dict,
+    evidence: dict,
+    status: str = "ACCEPTED",
+    findings: list | None = None,
+) -> dict:
+    graph = _h3_observable_graph()
+    contract = _h3_observable_contract()
+    probe = evaluate_derivation(
+        graph=graph,
+        contract=contract,
+        source=source,
+        candidate=candidate,
+        evidence=evidence,
+    )
+    request = probe["semantic_judgement_request"]
+    judged = copy.deepcopy(evidence)
+    judged["semantic_judgement"] = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-judgement",
+        "reviewer_kind": "EVALUATOR",
+        "request_id": request["request_id"],
+        "status": status,
+        "checks": ["observable-realization-correspondence"],
+        "reviewed_links": [
+            item["id"] for item in probe["links"] if item.get("id")
+        ],
+        "findings": findings or [],
+    }
+    return evaluate_derivation(
+        graph=graph,
+        contract=contract,
+        source=source,
+        candidate=candidate,
+        evidence=judged,
+    )
+
+
+def test_observable_realization_regressions() -> None:
+    source = _h3_source(
+        [
+            ("APPLY", "ACTION", "REQUIRED", "User can apply a scope."),
+            ("CURRENT", "STATE", "REQUIRED", "Current scope is perceptible."),
+            ("CLEAR", "ACTION", "REQUIRED", "User can clear scope."),
+        ]
+    )
+    target = {
+        "semantic_assertions": [
+            {
+                "id": "VIEW-CURRENT",
+                "kind": "observable-realization",
+                "subject": "current",
+                "semantic_value": "Current scope is visibly indicated.",
+                "observable_category": "STATE",
+                "derived_from": ["CURRENT"],
+            },
+            {
+                "id": "VIEW-CLEAR",
+                "kind": "observable-realization",
+                "subject": "clear",
+                "semantic_value": "A user mechanism can clear scope.",
+                "observable_category": "ACTION",
+                "derived_from": ["CLEAR"],
+            },
+        ]
+    }
+
+    missing_action_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [
+            {"id": "CURRENT", "sources": ["CURRENT"], "relation": "REALIZES", "targets": ["VIEW-CURRENT"]},
+            {"id": "CLEAR", "sources": ["CLEAR"], "relation": "REALIZES", "targets": ["VIEW-CLEAR"]},
+        ],
+        "dispositions": [],
+    }
+    result = _h3_accept_judgement(
+        source=source,
+        candidate=target,
+        evidence=missing_action_evidence,
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "UNDISPOSITIONED_SOURCE"
+        and item.get("source") == "APPLY"
+        for item in result["findings"]
+    ), result
+
+    reference_only = copy.deepcopy(missing_action_evidence)
+    reference_only["links"].append(
+        {
+            "id": "APPLY-REFERENCE-ONLY",
+            "sources": ["APPLY"],
+            "relation": "REALIZES",
+            "targets": ["VIEW-CURRENT"],
+        }
+    )
+    result = _h3_accept_judgement(
+        source=source,
+        candidate=target,
+        evidence=reference_only,
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "OBSERVABLE_REALIZATION_TARGET_MISSING"
+        and item.get("source") == "APPLY"
+        for item in result["findings"]
+    ), result
+
+    distinction_source = _h3_source(
+        [
+            (
+                "COMPARE-VS-ACTIVE",
+                "DISTINCTION",
+                "REQUIRED",
+                "Comparison selection is distinct from committed active context.",
+            )
+        ]
+    )
+    collapsed_target = {
+        "semantic_assertions": [
+            {
+                "id": "GENERIC-SELECTION",
+                "kind": "observable-realization",
+                "subject": "selection",
+                "semantic_value": "The entity is selected.",
+                "observable_category": "DISTINCTION",
+                "derived_from": ["COMPARE-VS-ACTIVE"],
+            }
+        ]
+    }
+    collapsed_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [
+            {
+                "id": "COLLAPSED-DISTINCTION",
+                "sources": ["COMPARE-VS-ACTIVE"],
+                "relation": "REALIZES",
+                "targets": ["GENERIC-SELECTION"],
+            }
+        ],
+        "dispositions": [],
+    }
+    result = _h3_accept_judgement(
+        source=distinction_source,
+        candidate=collapsed_target,
+        evidence=collapsed_evidence,
+        status="REJECTED",
+        findings=["Generic selected state does not expose the material distinction."],
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "SEMANTIC_DERIVATION_JUDGEMENT_REJECTED"
+        for item in result["findings"]
+    ), result
+
+    action_source = _h3_source(
+        [("APPLY", "ACTION", "REQUIRED", "User can apply a scope.")]
+    )
+    state_substitute = {
+        "semantic_assertions": [
+            {
+                "id": "VIEW-STATE",
+                "kind": "observable-realization",
+                "subject": "scope",
+                "semantic_value": "Current scope is visible.",
+                "observable_category": "STATE",
+                "derived_from": ["APPLY"],
+            }
+        ]
+    }
+    substitute_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [
+            {
+                "id": "STATE-FOR-ACTION",
+                "sources": ["APPLY"],
+                "relation": "REALIZES",
+                "targets": ["VIEW-STATE"],
+            }
+        ],
+        "dispositions": [],
+    }
+    result = _h3_accept_judgement(
+        source=action_source,
+        candidate=state_substitute,
+        evidence=substitute_evidence,
+    )
+    assert result["status"] == "REJECTED", result
+    assert any(
+        item.get("code") == "OBSERVABLE_REALIZATION_TARGET_MISSING"
+        for item in result["findings"]
+    ), result
+
+    command_target = {
+        "semantic_assertions": [
+            {
+                "id": "VIEW-APPLY",
+                "kind": "observable-realization",
+                "subject": "scope-apply",
+                "semantic_value": (
+                    "The user can invoke scope application through an accepted "
+                    "interaction mechanism."
+                ),
+                "observable_category": "ACTION",
+                "derived_from": ["APPLY"],
+            }
+        ]
+    }
+    command_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [
+            {
+                "id": "REALIZE-APPLY",
+                "sources": ["APPLY"],
+                "relation": "REALIZES",
+                "targets": ["VIEW-APPLY"],
+            }
+        ],
+        "dispositions": [],
+    }
+    accepted = _h3_accept_judgement(
+        source=action_source,
+        candidate=command_target,
+        evidence=command_evidence,
+    )
+    assert accepted["status"] == "ACCEPTED", accepted
+
+    non_ui_source = _h3_source(
+        [
+            (
+                "SYSTEM-ONLY",
+                "STATE",
+                "NOT_APPLICABLE",
+                "Internal system state has no user-facing realization obligation.",
+            )
+        ]
+    )
+    empty_candidate = {"semantic_assertions": []}
+    empty_evidence = {
+        "version": 1,
+        "kind": "harness-semantic-derivation-evidence",
+        "source_capability": "example.interaction",
+        "target_capability": "example.screen",
+        "links": [],
+        "dispositions": [],
+    }
+    accepted = evaluate_derivation(
+        graph=_h3_observable_graph(),
+        contract=_h3_observable_contract(),
+        source=non_ui_source,
+        candidate=empty_candidate,
+        evidence=empty_evidence,
+    )
+    assert accepted["status"] == "ACCEPTED", accepted
+    assert accepted["dispositions"] == [
+        {
+            "source": "SYSTEM-ONLY",
+            "status": "NOT_APPLICABLE",
+            "rationale": "Accepted semantics do not require a user-facing realization.",
+            "basis": "SOURCE_SEMANTIC_REVIEW",
+        }
+    ], accepted
+
 def main() -> int:
+    test_interaction_role_coherence_regressions()
+    test_observable_realization_regressions()
     test_independently_losable_obligation_granularity()
     test_irrelevant_source_invariance()
     test_required_target_provenance()
