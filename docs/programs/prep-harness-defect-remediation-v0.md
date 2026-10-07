@@ -165,10 +165,10 @@ The register intentionally keeps observed symptoms separate even when several sh
 |---|---:|---|---|---|---|
 | PREP-UX-001 | P0 | Active Target is not sufficiently explicit as the central preparation context. | usability/presentation finding; semantic chain currently appears intact | HARNESS-005 | REGISTERED |
 | PREP-UX-002 | P0 | `Targets` and `Target` are exposed as peer navigation/destinations although a single user-facing Targets area may better preserve the mental model. | IA revalidation selected one Targets parent with distinct candidate-comparison and active-Target sublocations; navigation/view realization remains downstream | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
-| PREP-UX-003 | P0 | No explicit cross-context interaction model distinguishes opened/inspected Target, selected-for-comparison Target, candidate-to-continue and active Target. | authority/interaction-model gap | HARNESS-004, HARNESS-005 | REGISTERED |
+| PREP-UX-003 | P0 | No explicit cross-context interaction model distinguishes opened/inspected Target, selected-for-comparison Target, candidate-to-continue and active Target. | Interaction role gap reproduced and revalidated: three material Target roles are now explicit; opened/inspected is not a distinct role because inspection adds no separate role lifecycle/side effect | HARNESS-004, HARNESS-005 | PREP_REVALIDATION |
 | PREP-UX-004 | P1 | Capability is insufficiently visible as a first-class user-facing meaning across target requirements, current state and gaps. | observable-realization gap | HARNESS-005 | REGISTERED |
-| PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | implementation drift + verification/traceability gap | HARNESS-001, HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
-| PREP-UX-006 | P1 | Focus presentation is too easy to interpret as Capability; the distinct meanings are not made sufficiently observable. | observable semantic-distinction gap | HARNESS-004, HARNESS-005 | REGISTERED |
+| PREP-UX-005 | P1 | Knowledge has no user-operated Required Capability selector although Journey, Interaction, Presentation, Screen/View, Test Design and query/state contracts require/support it. | Interaction revalidation independently preserves apply and clear Required Capability scope actions; observable realization/implementation remains downstream | HARNESS-001, HARNESS-002, HARNESS-005 | PREP_REVALIDATION |
+| PREP-UX-006 | P1 | Focus presentation is too easy to interpret as Capability; the distinct meanings are not made sufficiently observable. | Interaction distinction gap reproduced and revalidated: Capability Knowledge scope and Next Focus cannot silently mutate each other; observable presentation remains downstream | HARNESS-004, HARNESS-005 | PREP_REVALIDATION |
 | PREP-UX-007 | P1 | Target comparison is rendered as independent cards rather than an operationally aligned comparison over common dimensions. | presentation derivation + verification gap | HARNESS-001, HARNESS-002, HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-008 | P1 | Current Position uses repeated cards for homogeneous/comparable state information where a collection/table-like representation may better support scanning and comparison. | representation decision not sufficiently explored | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-009 | P1 | Target requirements use repeated cards where a structured collection/table-like representation may better express homogeneous requirement dimensions. | representation decision not sufficiently explored | HARNESS-006 | HARNESS_DISPOSITIONED |
@@ -176,7 +176,7 @@ The register intentionally keeps observed symptoms separate even when several sh
 | PREP-UX-011 | P1 | No sufficiently explicit application-level decision rule governs when information should be Table/List/Card/Detail/Workflow/Graph/aligned comparison. | presentation decision-space gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-012 | P2 | Selection mechanics are duplicated/inconsistent across candidate selection, comparison selection and other selectable task surfaces. | shared interaction-role/pattern gap | HARNESS-004, HARNESS-006 | BLOCKED:same-role-equivalence-not-established |
 | PREP-UX-013 | P2 | User-facing grouping/navigation is insufficiently separated from task/application/component ownership boundaries. | IA grouping was re-derived from user-facing Target cohesion rather than responsibility decomposition; downstream navigation/topology realization remains pending | HARNESS-003, HARNESS-008 | PREP_REVALIDATION |
-| PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | observable-control realization gap; related to but distinct from PREP-UX-005 | HARNESS-002, HARNESS-005 | HARNESS_DISPOSITIONED |
+| PREP-UX-014 | P2 | Required Capability scope appears mainly as an incoming badge/context indicator rather than as a normal local Knowledge filter control. | Interaction revalidation requires independent apply/clear scope actions; concrete local-control realization remains downstream | HARNESS-002, HARNESS-005 | PREP_REVALIDATION |
 | PREP-UX-015 | P3 | `Surface`/`Card` is used as a default presentation container too broadly. | representation-default bias | HARNESS-006 | HARNESS_DISPOSITIONED |
 | PREP-UX-016 | P3 | Table-first/aligned alternatives were not explicitly explored for several comparison/collection decisions. | decision-exploration gap | HARNESS-006 | HARNESS_DISPOSITIONED |
 
@@ -1254,3 +1254,20 @@ Program state after STAGE-P1-IA:
 - STAGE-P1-IA: COMPLETE;
 - next stage: not started.
 
+
+
+## Stage P1 Interaction Design revalidation — 2026-10-07
+
+Prep evidence: PR `lehater/prep#85` was squash-merged to Prep `main` as `e7f0e73a5bee52a9e61633766d7841fbe20371ad`. The scoped revalidation published `PREP-INTERACTION-DESIGN-STRICT-6` and restored `prep.interaction-design = CURRENT` without reaccepting downstream artifacts.
+
+- `PREP-UX-003`: `REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED -> HARNESS_DISPOSITIONED -> PREP_REVALIDATION`. Reproduction confirmed that locally correct Target behavior lacked an explicit cross-context role contract. The accepted Interaction now defines `selected-for-comparison`, `candidate-to-continue`, and `active-target`, including side effects, forbidden side effects, and `candidate-to-continue -> active-target`. Merely opened/inspected Target is not a fourth role because no distinct role lifecycle or side effect was established.
+- `PREP-UX-005`: `HARNESS_DISPOSITIONED -> PREP_REVALIDATION`. `UJ-KNOWLEDGE-APPLY-CAPABILITY-SCOPE` and `UJ-KNOWLEDGE-CLEAR-CAPABILITY-SCOPE` derive to separate accepted Interaction ACTION assertions. Concrete control realization and implementation remain downstream.
+- `PREP-UX-006`: `REGISTERED -> REPRODUCED -> ROOT_CAUSE_CLASSIFIED -> HARNESS_DISPOSITIONED -> PREP_REVALIDATION`. The Interaction-owned omission was the missing explicit cross-context distinction: Required Capability may scope Knowledge while Next Focus is PreparationIntent; applying/clearing Capability scope cannot silently choose/revise Next Focus, and changing Next Focus cannot silently mutate Capability identity/scope. Concrete presentation remains downstream.
+- `PREP-UX-014`: `HARNESS_DISPOSITIONED -> PREP_REVALIDATION`. Interaction now independently requires apply and clear Capability-scope actions; the local filter/control realization remains a downstream Screen/Presentation concern.
+- `PREP-UX-001`: unchanged `REGISTERED`. Interaction already preserves Active Target as visible/recoverable preparation context; earliest remaining owner is downstream presentation/screen/usability.
+- `PREP-UX-004`: unchanged `REGISTERED`. Required Capability remains semantically inspectable in Target requirements and usable as Knowledge scope; the remaining defect is observable presentation downstream.
+- `PREP-UX-012`: unchanged `BLOCKED:same-role-equivalence-not-established`. Revalidated roles demonstrate that comparison selection, candidate-to-continue, and active Target are materially different roles; no two occurrences of the same accepted role with unjustified inconsistent mechanics were established.
+- `PREP-UX-002` and `PREP-UX-013`: unchanged at `PREP_REVALIDATION`.
+- No Prep defect advances to `PREP_IMPLEMENTATION` in this stage.
+- First new actionable Prep frontier after publication is `prep.interface-topology`; this register update does not start that stage.
+- Harness runtime/pin is unchanged: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`.
