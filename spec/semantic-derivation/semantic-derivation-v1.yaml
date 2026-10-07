@@ -31,6 +31,7 @@ model:
       subject: optional
       allow_not_applicable: optional-default-false
       require_target_provenance: optional-default-false
+      observable_realization: optional-default-false
   evidence:
     kind: harness-semantic-derivation-evidence
     required:
@@ -65,6 +66,12 @@ model:
       - UNKNOWN_DERIVATION_SOURCE
       - UNKNOWN_DERIVATION_TARGET
       - DERIVATION_TARGET_PROVENANCE_MISSING
+      - OBSERVABLE_REALIZATION_REVIEW_REQUIRED
+      - INVALID_OBSERVABLE_REALIZATION_REVIEW
+      - OBSERVABLE_REALIZATION_APPLICABILITY_MISSING
+      - OBSERVABLE_REALIZATION_QUESTION
+      - OBSERVABLE_REALIZATION_RELATION_REQUIRED
+      - OBSERVABLE_REALIZATION_TARGET_MISSING
       - INVALID_DERIVATION_DISPOSITIONS
       - INVALID_DERIVATION_DISPOSITION
       - DUPLICATE_DERIVATION_DISPOSITION
@@ -107,6 +114,15 @@ rules:
     least one linked target assertion explicitly lists that source id in derived_from.
     This is a deterministic provenance/realization guard; it does not by itself
     prove arbitrary natural-language entailment.
+  observable_realization: >-
+    An obligation may set observable_realization when semantic review classifies
+    matching source assertions under observable_realization_obligations. REQUIRED
+    assertions are covered only by REALIZES links to target assertions whose kind
+    is observable-realization, whose observable_category preserves ACTION, STATE
+    or DISTINCTION, and whose derived_from includes the source assertion. Such
+    obligations automatically require request-bound semantic judgement with the
+    observable-realization-correspondence check. NOT_APPLICABLE remains available
+    only through the accepted source semantic-review classification with rationale.
   semantic_truth: >-
     A derivation contract may require semantic judgement when deterministic
     trace structure cannot establish meaning preservation. Harness generates a
