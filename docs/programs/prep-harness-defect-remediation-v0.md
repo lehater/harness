@@ -198,7 +198,7 @@ The priority may change after root-cause analysis, but the id and history remain
 | HARNESS-004 | P1 | Interaction Design lacks a strong applicability rule requiring one cross-context role/state contract when the same conceptual entity participates in multiple user-visible roles with different side effects. | 003, 006, 012 | INTEGRATED |
 | HARNESS-005 | P1 | User-facing semantic distinctions/actions can be preserved abstractly without an explicit mapping to an observable user mechanism that makes the distinction/action available and understandable. | 001, 003, 004, 005, 006, 014 | INTEGRATED |
 | HARNESS-006 | P1 | Presentation/Screen decision exploration lacks a sufficiently explicit representation-selection axis for homogeneous collections and aligned comparison (card/list/table/detail/workflow/graph/comparison). | 007, 008, 009, 010, 011, 012, 015, 016 | INTEGRATED |
-| HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | REGISTERED |
+| HARNESS-007 | P2 | There is no standard review projection that shows Journey/Interaction -> Screen obligation -> Test operation/oracle -> executable implementation evidence and exposes the first missing link. | all, diagnostic support | HARNESS_GREEN |
 | HARNESS-008 | P1 | Human-interface grouping/topology is insufficiently challenged against mirroring task/application/component decomposition; current guidance rejects backend-shaped IA but does not strongly guard against responsibility-shaped UI grouping. | 002, 013 | INTEGRATED |
 
 ## 6. Known reproduced evidence
@@ -642,6 +642,74 @@ Prep dependency disposition after WP-H5:
 - `PREP-UX-012` remains `BLOCKED:same-role-equivalence-not-established` even though HARNESS-004 and HARNESS-006 are integrated: current evidence establishes several different selection roles, not two instances of the same accepted role with unjustified representation mechanics.
 - Prep remains unchanged, `.harness-version` is unchanged, and WP-H5 does not enter `PREP_REVALIDATION`.
 
+
+
+### HARNESS-007 — first-missing-link assurance trace projection
+
+Status history for WP-H6:
+
+```
+REGISTERED
+  -> REPRODUCED
+  -> HARNESS_RED
+  -> FIX_IMPLEMENTED
+  -> HARNESS_GREEN
+```
+
+RED evidence:
+
+- regression: `tests/test_traceability_projection.py::test_t1_interaction_to_screen_missing_is_first`;
+- validated RED-only head: `e6ef3ccffec7dae9ad44c8d8d00fdd9e80ff372f`;
+- `harness core` run `37597009341` failed with `ModuleNotFoundError: harness.assurance.traceability_projection` after CI policy had accepted the registered focused check;
+- the RED therefore proves absence of the standard composed diagnostic projection without weakening or re-breaking H1-H6/H8.
+
+Root cause:
+
+H1-H6/H8 exposed machine-addressable semantic, observable-realization, Test Design and executable-conformance truth, but no standard read model composed those accepted results per independently addressable root obligation. Reviewers still had to correlate several evaluations manually and determine the earliest unusable edge themselves.
+
+Projection contract:
+
+- `harness.assurance.traceability_projection.build_traceability_projection` is a deterministic disposable read model in the Assurance bounded context;
+- the request selects exact semantic ids/capabilities, Test Design contract id and stable operation/oracle ids;
+- Interaction -> Screen and Screen -> Test Design consume existing `harness-semantic-derivation-evaluation` results and accepted links/provenance;
+- Test Design contract accounting consumes canonical `test-design/v1` stable obligation ids;
+- Test Design -> executable consumes H2 `harness-test-realization-evaluation`; executable source code is never reinterpreted;
+- supplied lifecycle/currentness state may mark the earliest unusable edge `STALE`; the projection does not recompute currentness;
+- output is `harness-traceability-projection` with stage statuses, semantic ids, evidence/finding refs, overall status, deterministic `first_missing_link` and optional `missing_obligation`;
+- an upstream unresolved edge leaves later stages `BLOCKED_BY_UPSTREAM`/`NOT_EVALUABLE` rather than emitting misleading downstream root causes;
+- accepted `NOT_APPLICABLE` dispositions terminate as `DISPOSITIONED`; one-to-many accepted realizations are preserved;
+- the projection is noncanonical, supplies no Capability and is not a semantic acceptance gate.
+
+Mutation and positive-control evidence:
+
+- T1 Interaction -> Screen missing: `INTERACTION_TO_SCREEN`;
+- T2 Screen -> Test Design missing: `SCREEN_TO_TEST_DESIGN`;
+- T3 missing stable Test Design operation: `TEST_DESIGN_CONTRACT` with `missing_obligation`;
+- T4 Test Design -> executable missing: H2 finding reused at `TEST_DESIGN_TO_EXECUTABLE`;
+- T5 unresolved semantic correspondence: `QUESTION` at the owning upstream edge, with later stages blocked;
+- complete chain returns `COMPLETE` and null first missing link;
+- legitimate disposition, one-to-many realization, unrelated-evidence invariance and materially different executable organizations remain valid;
+- `test_composed_vertical_chain_complete_then_exact_middle_mutation` composes H3 derivation, Screen -> Test Design derivation, H2 executable realization and H7 projection, then removes exactly the Screen -> Test Design APPLY link and identifies that edge.
+
+Program regression matrix:
+
+- `spec/assurance/prep-harness-remediation-regression-matrix-v0.yaml` maps HARNESS-001..008 only to RED/GREEN/positive executable evidence and owner checks;
+- `checks/validate_prep_harness_regression_matrix.py` requires all eight ids, live test/scenario paths and anchors, at least one positive/freedom control per id, and registered owner checks;
+- mutable register fields such as status/priority/description are forbidden in the matrix, so this metadata cannot become a second defect/status register.
+
+GREEN evidence:
+
+- validated implementation head: `5f054abb352c47f1a4909b5d37f4d0f9ff0a3c78`;
+- `harness core` / full `make harness-check`: run `37598091912` PASS;
+- `Greenfield Engineering Graph`: run `37598091885` PASS;
+- CI policy: run `37598091876` PASS;
+- implementation PR: #211.
+
+Prep calibration/status:
+
+- the PREP-UX-005-shaped APPLY/STATE fixture reproduces why the projection is useful: neighboring current-scope state/evidence cannot hide the missing APPLY Interaction -> Screen realization;
+- Prep is unchanged and its `.harness-version` is unchanged; no Prep revalidation is started;
+- no PREP-UX status transition is caused by H7; `PREP-UX-012` remains `BLOCKED:same-role-equivalence-not-established`.
 
 ## 7. Execution strategy
 
