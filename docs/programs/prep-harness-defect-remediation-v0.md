@@ -1021,6 +1021,49 @@ This file in Harness is the single source of truth for the denominator, statuses
 
 ## 12. Current program frontier
 
-WP-H3 / HARNESS-004 + HARNESS-005 is integrated in Harness `main` at `1f006277afbb1d8083c565cbe41830dbfebf6a21`. No later stage is selected or started; under the stage gate the managing chat chooses the next bounded work package.
+Stage HI is COMPLETE.
 
-Prep semantic/UI changes remain frozen until the Harness work required by the affected ids reaches a terminal Harness disposition.
+HARNESS_REMEDIATION_BASELINE:
+
+- execution baseline: `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- HARNESS-001..008: terminal `INTEGRATED`;
+- this execution baseline remains frozen even after later register-only program commits.
+
+Prep repin:
+
+- starting Prep `main`: `d31a5f8ebe1ad7a526567efb302e52e29579ce6b`;
+- `.harness/harness-binding.json`: `f6ef8bbd9b01da5e94b21b1b4785ca7a13bb478d` -> `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- `.harness-version`: `f6ef8bbd9b01da5e94b21b1b4785ca7a13bb478d` -> `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`;
+- Prep PR #81 was squash-merged to `main` as `a3eed460b81f50ee299f45751168d1932a97f99e`;
+- final Prep diff contained only the two Harness pin surfaces.
+
+Stage-HI validation evidence:
+
+- temporary non-gating diagnostic run `37600943584`, job `112724878560`;
+- Consumer API sync materialized `/home/runner/.cache/harness/v1/ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`: PASS;
+- legacy checkout resolved exact `ed04058ff35ffbbaf735d0ecbd7c1f592e3abf71`: PASS;
+- `python tools/semantic_baseline.py`: PASS — 34 semantic evaluations, 109 derivation evaluations, 34 lifecycle providers;
+- `python tools/check_harness_integration.py`: PASS;
+- `python tools/full_harness_revalidate.py`: EXPECTED INCOMPLETE at `CURRENT-REVALIDATION`, with `semantic_gaps=[]`;
+- `python tools/validate_docs.py`: PASS;
+- final required Prep PR validation run `37601065003`: PASS.
+
+First actionable revalidation frontier:
+
+1. `prep.user-journeys` / `USER-JOURNEYS` — `STALE` under `APPLICATION-DESIGN` because the accepted acceptance-policy fingerprint differs from the current Harness policy.
+2. `prep.conceptual-interface-model` and `prep.information-architecture` — downstream `STALE` because `prep.user-journeys` is stale; they are not independent root causes yet.
+3. `prep.interaction-design`, `prep.interface-topology`, `prep.presentation-system`, and `prep.screen-view-design` also have direct acceptance-policy currentness mismatches under the strengthened Harness, but their repair order must respect the upstream `user-journeys` frontier.
+
+Defect impact:
+
+- PREP-UX-001..016 statuses remain unchanged by Stage HI;
+- the new baseline makes the registered defects eligible for the next canonical revalidation phase but does not move them to `PREP_REVALIDATION`;
+- `PREP-UX-012` remains `BLOCKED:same-role-equivalence-not-established`;
+- no new defect class was discovered.
+
+Program state:
+
+- Harness remediation phase: COMPLETE;
+- Prep canonical revalidation: AUTHORIZED BUT NOT STARTED;
+- no Prep canonical/design/frontend repair was performed during Stage HI;
+- the previously suggested WP-P1 ordering must not skip the earlier `prep.user-journeys` currentness dependency; the managing chat must choose whether to add that prerequisite to WP-P1 or authorize a bounded prerequisite stage first.
