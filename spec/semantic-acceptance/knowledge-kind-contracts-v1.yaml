@@ -112,7 +112,9 @@ contracts:
         subjects_from_kind: task
     required_review_checks: [task-not-screen-design]
   - knowledge_kind: user-journey-design
-    required_review_checks: [journey-not-screen-design]
+    required_review_checks:
+      - journey-not-screen-design
+      - independent-obligation-granularity
   - knowledge_kind: quality-design
     required_review_checks: [no-invented-quality-target]
   - knowledge_kind: system-architecture
@@ -128,15 +130,21 @@ contracts:
   - knowledge_kind: information-architecture-design
     required_review_checks: [information-structure-not-screen-layout]
   - knowledge_kind: interaction-design
-    required_review_checks: [interaction-not-product-requirement]
+    required_review_checks:
+      - interaction-not-product-requirement
+      - independent-obligation-granularity
   - knowledge_kind: interface-topology-design
     required_review_checks: [topology-not-screen-composition]
   - knowledge_kind: human-interface-design
     required_review_checks: [interaction-not-product-requirement]
   - knowledge_kind: presentation-system-design
-    required_review_checks: [presentation-not-domain-semantics]
+    required_review_checks:
+      - presentation-not-domain-semantics
+      - independent-obligation-granularity
   - knowledge_kind: screen-view-design
-    required_review_checks: [screen-not-product-semantics]
+    required_review_checks:
+      - screen-not-product-semantics
+      - independent-obligation-granularity
   - knowledge_kind: data-design
     required_review_checks: [storage-not-semantic-owner]
   - knowledge_kind: operability-design
