@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from evals.cdr_operational import prepare_intake, reconcile_intake
 from evals.cdr_graph_audit import audit_graph
-from evals.cdr_governance_packet import build_decision_dossier, validate_draft_review
+from evals.cdr_governance_packet import build_decision_dossier, validate_draft_review, digest
 from evals.project_discovery_directness_review import REQUIRED_TESTS
 from evals.dependency_resolution_process_driver import build_blinded_request
 from evals.project_discovery_snapshot import DiscoveryError
@@ -193,6 +193,12 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     except DiscoveryError:pass
     else:raise AssertionError("operator draft must not self-approve")
     bad_review=copy.deepcopy(review_draft)
+    bad_review["directness_findings"][0]["decision"]="LIKELY_DIRECT"
+    try:validate_draft_review(dossier,bad_review)
+    except DiscoveryError as e:
+        assert "conflicts with review findings" in str(e)
+    else:raise AssertionError("inconclusive evidence must not support likely-direct decision")
+    bad_review=copy.deepcopy(review_draft)
     bad_review["output_findings"].pop()
     try:validate_draft_review(dossier,bad_review)
     except DiscoveryError:pass
@@ -244,6 +250,25 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
         check=True,capture_output=True,text=True,
     )
     assert json.loads(check.read_text(encoding="utf-8"))==validation
+    # A self-consistent JSON hash is not authentication: the reviewer check
+    # must independently regenerate pinned project evidence.
+    forged=copy.deepcopy(dossier)
+    forged["proposed_ADD"][0]["provider"]="fake.accepted.provider"
+    forged["dossier_sha256"]=digest({
+        key:value for key,value in forged.items() if key!="dossier_sha256"
+    })
+    dossier_path.write_text(json.dumps(forged),encoding="utf-8")
+    failed=subprocess.run(
+        common+["cdr-check-review",
+                "CDR_PREDICTIONS="+str(root/"cdr-prediction.json"),
+                "CDR_DOSSIER="+str(dossier_path),
+                "CDR_REVIEW="+str(review_path),
+                "CDR_OUTPUT="+str(check)],
+        capture_output=True,text=True,check=False,
+    )
+    assert failed.returncode!=0
+    assert "differs from freshly regenerated pinned source evidence" in failed.stdout
+    dossier_path.write_text(json.dumps(dossier),encoding="utf-8")
     assert git(root,"status","--porcelain","--untracked-files=no")==""
 
 
