@@ -99,6 +99,7 @@ harness-check:
 	python tests/test_dependency_resolution_grounding.py
 	python tests/test_dependency_resolution_project_snapshot.py
 	python tests/test_dependency_resolution_directness.py
+	python tests/test_dependency_resolution_target_readiness.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
