@@ -19,6 +19,18 @@ targets:
     strategic_scope_headings:
       - DS-01 Preparation Information — CORE
     product_requirements_source: .harness/knowledge/product-capabilities.yaml
+    # Experimental control arm only: operator paraphrases, NOT accepted domain requirements.
+    neutral_output_obligations:
+      - id: current-information-meaning
+        description: >-
+          Define the tactical semantic concepts, distinctions and invariants
+          of current preparation information, including goals, capabilities,
+          knowledge and practice material, without inferring learner state.
+      - id: current-information-relationships
+        description: >-
+          Define meaningful relationships between preparation-information
+          kinds while allowing different ways to understand the same
+          information without committing to a taxonomy or graph topology.
   - capability: prep.recorded-activity-history-model
     repository: lehater/prep
     scope_source: docs/architecture/model-context-map.md
@@ -29,3 +41,16 @@ targets:
     strategic_scope_headings:
       - DS-02 Recorded Activity History — CORE
     product_requirements_source: .harness/knowledge/product-capabilities.yaml
+    # Experimental control arm only: operator paraphrases, NOT accepted domain requirements.
+    neutral_output_obligations:
+      - id: historical-record-meaning
+        description: >-
+          Define the tactical concepts and invariants for retained activity
+          and optional result facts, including when they occurred and the
+          information they concerned, without making learner-state conclusions.
+      - id: historical-reference-survival
+        description: >-
+          Define semantic relationships to current preparation information
+          and preserve intelligibility of historical records when related
+          current information is changed or removed, without redefining
+          the current information.
