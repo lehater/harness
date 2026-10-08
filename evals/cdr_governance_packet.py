@@ -208,12 +208,18 @@ def main()->int:
                 predictions=json.loads(args.predictions.read_text(encoding="utf-8")),
             )
         else:
-            if not args.dossier or not args.review:
-                raise DiscoveryError("check-draft requires dossier and review")
-            result=validate_draft_review(
-                json.loads(args.dossier.read_text(encoding="utf-8")),
-                _required_yaml(args.review)
+            if not all([args.project_root,args.commit,args.intake,args.predictions,
+                        args.dossier,args.review]):
+                raise DiscoveryError("check-draft requires pinned source evidence, dossier and review")
+            expected=build_decision_dossier(
+                args.project_root,sha=args.commit,
+                intake=_required_yaml(args.intake),
+                predictions=json.loads(args.predictions.read_text(encoding="utf-8")),
             )
+            supplied=json.loads(args.dossier.read_text(encoding="utf-8"))
+            if supplied!=expected:
+                raise DiscoveryError("review dossier differs from freshly regenerated pinned source evidence")
+            result=validate_draft_review(expected,_required_yaml(args.review))
         args.output.parent.mkdir(parents=True,exist_ok=True)
         args.output.write_text(json.dumps(result,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
         print(json.dumps({"status":result["status"],"automatic_writeback_allowed":False}))
