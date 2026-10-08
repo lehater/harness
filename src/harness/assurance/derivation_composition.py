@@ -25,6 +25,9 @@ def compose_derivations(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
         for src in link.get("sources", []):
             paths.setdefault(src, set()).update(link.get("targets", []))
 
+    if not paths:
+        findings.append({"code": "CHAIN_HAS_NO_SOURCE_LINKS"})
+
     for evaluation in evaluations[1:]:
         mapping: dict[str, set[str]] = {}
         for link in evaluation.get("links", []):
