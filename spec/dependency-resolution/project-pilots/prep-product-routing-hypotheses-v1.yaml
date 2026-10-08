@@ -1,0 +1,73 @@
+version: 1
+kind: harness-cdr-product-routing-hypotheses
+status: OPERATOR_DRAFT_NOT_ACCEPTED
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+source_artifact: .harness/knowledge/product-capabilities.yaml
+automatic_writeback_allowed: false
+meaning: >-
+  Candidate review tracks for accepted Product Capability requirements.
+  Multiple tracks mean a product behavior can constrain domain semantics
+  while its orchestration remains in Application Design. These are
+  operator hypotheses, NOT ownership assignments, accepted obligations,
+  or direct Capability requires.
+product_requirements:
+  - requirement_id: REQ-CAP-INTRODUCE-INFORMATION
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, RECORDED_ACTIVITY_HISTORY]
+    review_question: Which introduction behavior belongs to Application Design and which information meanings constrain it?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-RETAIN-INFORMATION
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, RECORDED_ACTIVITY_HISTORY]
+    review_question: Does retention introduce a domain invariant beyond making information available for later use?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-CHANGE-INFORMATION
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, SHARED_CROSS_CONTEXT]
+    review_question: Which change impacts existing meanings and which changes are application lifecycle orchestration?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-REMOVE-INFORMATION
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, SHARED_CROSS_CONTEXT]
+    review_question: Which deletion invariants preserve historical references without transferring ownership of historical facts?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-KNOWLEDGE-KINDS
+    candidate_tracks: [PREPARATION_INFORMATION]
+    review_question: What accepted semantic distinctions of knowledge must the current-information model preserve?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-RELATIONSHIP-MEANINGS
+    candidate_tracks: [PREPARATION_INFORMATION, SHARED_CROSS_CONTEXT]
+    review_question: Which relationship meanings are local to current information versus shared across contexts?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-CROSS-INFORMATION-RELATIONSHIPS
+    candidate_tracks: [PREPARATION_INFORMATION, SHARED_CROSS_CONTEXT]
+    review_question: Are these relationships among preparation information kinds or also historical links across contexts?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-EXPLORE-PERSPECTIVES
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION]
+    review_question: Is the perspective operation purely application exploration or does it require a distinct current-information semantic invariant?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-SELECT-PART
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, RECORDED_ACTIVITY_HISTORY]
+    review_question: What semantic constraints must survive selection while the selection workflow remains an application concern?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-TRANSFER-SELECTION
+    candidate_tracks: [APPLICATION_DESIGN, PREPARATION_INFORMATION, RECORDED_ACTIVITY_HISTORY]
+    review_question: Does transfer require any additional owned model semantics beyond preserving the meaning of selected information?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-RECORD-ACTIVITY
+    candidate_tracks: [APPLICATION_DESIGN, RECORDED_ACTIVITY_HISTORY]
+    review_question: Distinguish application recording actions from domain ownership of retained historical activity and result facts.
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-RELATE-ACTIVITY
+    candidate_tracks: [RECORDED_ACTIVITY_HISTORY, SHARED_CROSS_CONTEXT]
+    review_question: Which historical association belongs to the history model and which link meaning is governed by the shared boundary?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-PRESERVE-TIME
+    candidate_tracks: [RECORDED_ACTIVITY_HISTORY]
+    review_question: What temporal fact is required for historical meaning without prescribing timestamps or storage representation?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-PRESERVE-HISTORY-CONTEXT
+    candidate_tracks: [RECORDED_ACTIVITY_HISTORY, SHARED_CROSS_CONTEXT]
+    review_question: Which context must be retained historically when current information changes, and who owns each meaning?
+    status: CANDIDATE_NOT_ACCEPTED
+  - requirement_id: REQ-CAP-EXPLORE-HISTORY
+    candidate_tracks: [APPLICATION_DESIGN, RECORDED_ACTIVITY_HISTORY]
+    review_question: Does inspecting historical activity impose new domain invariants, or does the application only consume retained historical meaning?
+    status: CANDIDATE_NOT_ACCEPTED
