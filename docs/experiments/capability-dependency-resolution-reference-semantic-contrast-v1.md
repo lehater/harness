@@ -3,29 +3,29 @@
 Date: 2026-10-08
 Status: **exploratory, operator-authored, non-blind, noncanonical**
 Branch: experiment/capability-dependency-resolution-v1
-Reference model pinned Git blob: \`7761bac5afbe6f6de061e5408b1ea59da122ee8a\`
+Reference model pinned Git blob: `7761bac5afbe6f6de061e5408b1ea59da122ee8a`
 Audit corpus: [CDR reference-model control audit](capability-dependency-resolution-reference-model-audit-v1.md)
 
 ## Method and limits
 
 This assessment cross-checks a bounded set of **declared** Reference Model template edges against the artifact producer SKILL output contracts. In the same conversation, existing edge identities were visible during prior structural analysis. **Do not call this independent or provider-blind Phase A evaluation.** No external semantic evaluator was invoked.
 
-Every finding is an operator hypothesis, not an Authority-accepted project decision. Reference templates are reusable knowledge types rather than accepted project outputs. Their \`claim_surface\` labels do not establish complete independently accepted output obligations. Even a strong skill-to-edge correspondence does not certify semantic directness for every project instance.
+Every finding is an operator hypothesis, not an Authority-accepted project decision. Reference templates are reusable knowledge types rather than accepted project outputs. Their `claim_surface` labels do not establish complete independently accepted output obligations. Even a strong skill-to-edge correspondence does not certify semantic directness for every project instance.
 
 We evaluate independent output consumption, mediation by other producers, a change-sensitivity contrast, and what remains to be reviewed. Findings are *review priorities*, not replacement edges or authority to edit the frozen source.
 
-Sources (all at experimental HEAD \`83acd7b2a8f95b82486c6dd34316cda56022adec\`):
-- Interaction Design SKILL: blob \`9ac47607ee7adbff95d0a57df8bed2988178a939\`
-- Information Architecture SKILL: \`8698d0c78c9358bece1a3d856bc09bac8bcfa324\`
-- Interface Topology SKILL: \`ffb45bed5862d0a5da73c136ca0da3a66470ad8f\`
-- Conceptual Interface Model SKILL: \`362af77a1f23b4a78f3922bb4adab34999de2b87\`
-- Screen/View Design SKILL: \`bc511b9f4e6950cc6f1cbc48582c66479d2a8a43\`
-- Model Context Strategy SKILL: \`56145221d495950eaf85a91b0652ce85e5f0059d\`
-- Domain Model SKILL: \`580ba29b4d5a19753e367b40b18861819dd7217f\`
-- Domain Strategy SKILL: \`f30d888a2ec540e10d9f805e93fa5184076232b4\`
-- Implementation Design SKILL: \`7c620aec0a1d922d5578a4b080620949b74cc25b\`
-- Verification Strategy SKILL: \`25c12f950aac42a681e4eef220ed6e72170c1be1\`
-- Authority catalog: \`4f4b28ba5566ef14fc9c88a06e8c2acd7e095aaf\`
+Sources (all at experimental HEAD `83acd7b2a8f95b82486c6dd34316cda56022adec`):
+- Interaction Design SKILL: blob `9ac47607ee7adbff95d0a57df8bed2988178a939`
+- Information Architecture SKILL: `8698d0c78c9358bece1a3d856bc09bac8bcfa324`
+- Interface Topology SKILL: `ffb45bed5862d0a5da73c136ca0da3a66470ad8f`
+- Conceptual Interface Model SKILL: `362af77a1f23b4a78f3922bb4adab34999de2b87`
+- Screen/View Design SKILL: `bc511b9f4e6950cc6f1cbc48582c66479d2a8a43`
+- Model Context Strategy SKILL: `56145221d495950eaf85a91b0652ce85e5f0059d`
+- Domain Model SKILL: `580ba29b4d5a19753e367b40b18861819dd7217f`
+- Domain Strategy SKILL: `f30d888a2ec540e10d9f805e93fa5184076232b4`
+- Implementation Design SKILL: `7c620aec0a1d922d5578a4b080620949b74cc25b`
+- Verification Strategy SKILL: `25c12f950aac42a681e4eef220ed6e72170c1be1`
+- Authority catalog: `4f4b28ba5566ef14fc9c88a06e8c2acd7e095aaf`
 
 ## Focused semantic contrasts
 
@@ -85,7 +85,7 @@ Review two concrete subject scenarios: (a) domain classification changes but acc
 
 **Disposition: TARGET_OUTPUT_UNDERSPECIFIED — no proposed edit.**
 
-Reference template declares \`engineering.delivery.release\` as its sole explicit primary output claim, but the Implementation Design SKILL owns implementation slices, semantic-to-physical mapping, integration/quality gates, and more. A single broad label does not independently identify which accepted outputs require direct access to original product scope versus narrower accepted component/architecture/verification provider interfaces.
+Reference template declares `engineering.delivery.release` as its sole explicit primary output claim, but the Implementation Design SKILL owns implementation slices, semantic-to-physical mapping, integration/quality gates, and more. A single broad label does not independently identify which accepted outputs require direct access to original product scope versus narrower accepted component/architecture/verification provider interfaces.
 
 Before judging this and the many other IMPLEMENTATION-PLAN edges, first establish target-owned obligation IDs for implementation slices, exclusions, gates, etc. Do not delete these links merely because another path exists; do not retain them merely because the generic implementation SKILL lists upstream subject areas.
 
@@ -95,22 +95,23 @@ Before judging this and the many other IMPLEMENTATION-PLAN edges, first establis
 
 The Implementation Design SKILL explicitly says completion criteria prove realization of accepted design and selected test contracts must have executable conformance. The Verification Strategy SKILL owns evidence objectives and traceability; the implementation plan may not fully represent those acceptance gates. That argues for possible direct verification input even when the verification plan is also reachable through Implementation Plan.
 
-However, the Reference \`COMPLETION-CRITERIA\` template has neither \`primary_claims\` nor \`claim_surface\`. Consequently this experiment cannot claim independently defined *target* output obligations, and cannot authorize KEEP/REMOVE.
+However, the Reference `COMPLETION-CRITERIA` template has neither `primary_claims` nor `claim_surface`. Consequently this experiment cannot claim independently defined *target* output obligations, and cannot authorize KEEP/REMOVE.
 
 ## Provisional tally
 
 - 1 high-priority possible unnecessary direct edge (REF-CDR-01).
-- 5 links with concrete direct-consumption explanations and counterfactuals (REF-CDR-02 to 06).
+- 4 links with concrete direct-consumption explanations and counterfactuals (REF-CDR-02 to 05).
+- 1 conditional-path negative control that rejects reachability-only deletion (REF-CDR-06); the substantive target obligation remains unaccepted.
 - 3 unresolved cases pending project-owned output obligations / mediation evidence (REF-CDR-07 to 09).
 - **0 Authority-approved changes, 0 reference graph edits, 0 independently certified CDR verdicts.**
 
 ## Falsification / next evidence
 
-1. Run the manually dispatched \`harness core\` workflow on the experimental branch; the Draft-suppressed automatic full gate is **not equivalent** to execution.
-2. Run an isolated provider-backed Phase A evaluation on the *blinded* artifact \`cdr-reference-phase-a-blind\`, with zero repository access and no graph/oracle data. This document and Phase B output must not be provided to that evaluator.
+1. Run the manually dispatched `harness core` workflow on the experimental branch; the Draft-suppressed automatic full gate is **not equivalent** to execution.
+2. Run an isolated provider-backed Phase A evaluation on the *blinded* artifact `cdr-reference-phase-a-blind`, with zero repository access and no graph/oracle data. This document and Phase B output must not be provided to that evaluator.
 3. Independently define accepted target output contracts and provide immutable project/Authority acceptance revisions. Reconcile its predictions with all 94 declared links, including **missing** edge candidates.
 4. For REF-CDR-01, ask the owner to find an interaction obligation consuming an IA-location rule not already deferred to Topology. If none and the owner explicitly accepts an updated contract, propose a new Reference Model snapshot with a revised edge; preserve frozen v0 for calibration.
 5. For REF-CDR-02/03/04/05, challenge alleged mediation with a concrete source-change / intermediate-stable case before any KEEP certification.
-6. Only after independent acceptance may a project Authority propose a changed accepted Engineering Graph. Never auto-write \`requires\` and never promote the research Reference Model on an operator hypothesis.
+6. Only after independent acceptance may a project Authority propose a changed accepted Engineering Graph. Never auto-write `requires` and never promote the research Reference Model on an operator hypothesis.
 
-The canonical Harness Core, PREP, original Reference Model and \`main\` remain unchanged.
+The canonical Harness Core, PREP, original Reference Model and `main` remain unchanged.
