@@ -915,6 +915,7 @@ def evaluate_derivation(
             "source": {
                 atom_id: semantic_assertion_fingerprint(assertion)
                 for atom_id, assertion in sorted(source_assertions.items())
+                if atom_id in required_sources
             },
             "target": {
                 atom_id: semantic_assertion_fingerprint(assertion)
