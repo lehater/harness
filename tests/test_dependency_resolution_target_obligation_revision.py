@@ -47,7 +47,9 @@ def fail(new,phrase):
 
 x=copy.deepcopy(revision)
 x["targets"][0]["candidate_outputs"].pop()
-fail(x,"silently drops")
+# The governing constraint references the omitted output and is therefore
+# rejected before the general v1-lineage conservation check.
+fail(x,"recast cross-cutting constraint")
 x=copy.deepcopy(revision)
 x["targets"][0]["candidate_constraints"].clear()
 fail(x,"silently drops")
