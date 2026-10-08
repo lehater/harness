@@ -79,6 +79,35 @@ review = reconcile(ROOT, inputs=inputs, request=request, response=bound)
 assert review["contrasts"][0]["both_provisional"] == ["reference.information-architecture"]
 assert review["authority_acceptance"] is False
 
+# A proposed upstream link to a downstream Screen/View producer would
+# introduce a cycle: Screen/View already requires Interface Topology.
+cyclic = copy.deepcopy(fake)
+topology = request["cases"][1]
+screen = next(x for x in topology["provider_catalog"]
+              if x["capability"] == "reference.screen-view-design")
+cyclic["results"][1]["proposed_requires"] = [screen["capability"]]
+cyclic["results"][1]["input_needs"] = [{
+    "obligation": topology["target"]["output_obligations"][0]["id"],
+    "provider": screen["capability"],
+    "claim_index": 0,
+    "basis": "PLANNED_CONTRACT",
+    "consumption_rationale": "Tempting but reverse-ordered reference input",
+}]
+cycle = reconcile(ROOT, inputs=inputs, request=request, response=cyclic)
+topology_contrast = cycle["contrasts"][1]
+assert topology_contrast["structural_candidate_status"] == "BLOCKED_BY_CYCLE"
+assert topology_contrast["invalid_new_edge_candidates"] == [{
+    "provider": "reference.screen-view-design",
+    "reason": "PROPOSED_EDGE_INTRODUCES_CAPABILITY_CYCLE",
+    "cycle": ["INTERFACE-TOPOLOGY", "SCREEN-VIEW-DESIGN", "INTERFACE-TOPOLOGY"],
+    "must_not_adopt": True,
+}]
+assert "reference.screen-view-design" in topology_contrast["new_candidate_not_accepted"]
+assert cycle["automatic_writeback_allowed"] is False
+assert all(x["structural_candidate_status"] ==
+           "NO_CYCLE_FOUND_NOT_SEMANTICALLY_VERIFIED"
+           for i, x in enumerate(cycle["contrasts"]) if i != 1)
+
 for key in ("response", "request"):
     tampered = copy.deepcopy(fake if key == "response" else request)
     tampered["request_id"] = "invalid"
