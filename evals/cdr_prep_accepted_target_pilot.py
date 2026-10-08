@@ -235,6 +235,8 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         raise DiscoveryError("incorrect model case binding")
     if row.get("status") not in ("RESOLVED", "UNRESOLVED"):
         raise DiscoveryError("malformed model status")
+    if row["status"] == "RESOLVED" and row.get("unresolved_obligations"):
+        raise DiscoveryError("RESOLVED model output contradicts unresolved obligations")
     prediction = {
         "id": inputs["cases"][0]["id"],
         "status": row["status"],
@@ -279,8 +281,28 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
     # The model's RESOLVED is a self-assessment. Never upgrade it when its
     # candidate edges are invalid, any public source was cropped, or target
     # obligation acceptance has not been individually established.
+    providers_by_id = {p["capability"]: p
+                       for p in inputs["cases"][0]["provider_catalog"]}
+    low_information = []
+    for need in prediction["input_needs"]:
+        source = providers_by_id[need["provider"]]
+        snippet = source["semantic_surface"][need["claim_index"]]
+        # This is deliberately a narrow lexical *negative* check, not a
+        # general claim entailment oracle. A heading that merely announces
+        # an example or concept cannot itself entail a binding domain rule.
+        body = snippet.rsplit(": ", 1)[-1].strip().casefold().rstrip(":")
+        if body in {"examples", "conceptually", "illustration", "notes"}:
+            low_information.append({
+                "provider": need["provider"],
+                "claim_index": need["claim_index"],
+                "claim_text": snippet,
+                "reason": "NON_SUBSTANTIVE_SOURCE_FRAGMENT",
+                "must_not_treat_as_normative_evidence": True,
+            })
     if cycle_blocks:
         effective_status = "INVALID_PROPOSED_TOPOLOGY"
+    elif low_information:
+        effective_status = "BLOCKED_NON_SUBSTANTIVE_SOURCE_CLAIMS"
     elif truncated:
         effective_status = "BLOCKED_INCOMPLETE_PROVIDER_SURFACES"
     else:
@@ -292,6 +314,8 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         "model_resolution_is_not_accepted": True,
         "all_available_provider_contracts_covered": not bool(truncated),
         "truncated_provider_ids": truncated,
+        "non_substantive_cited_claims": low_information,
+        "provider_claim_entailment_verified": False,
         "accepted_project_dependency_topology_validated": False,
         "project_commit": sha,
         "target": TARGET,
