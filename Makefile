@@ -107,6 +107,7 @@ harness-check:
 	python tests/test_dependency_resolution_target_semantic_audit.py
 	python tests/test_dependency_resolution_target_obligation_revision.py
 	python tests/test_cdr_operational.py
+	python tests/test_cdr_contract_change.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
@@ -137,3 +138,10 @@ cdr-dossier:
 cdr-check-review:
 	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_INTAKE)" -a -n "$(CDR_PREDICTIONS)" -a -n "$(CDR_DOSSIER)" -a -n "$(CDR_REVIEW)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_INTAKE CDR_PREDICTIONS CDR_DOSSIER CDR_REVIEW CDR_OUTPUT"; exit 2)
 	python -m evals.cdr_governance_packet check-draft --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --predictions "$(CDR_PREDICTIONS)" --dossier "$(CDR_DOSSIER)" --review "$(CDR_REVIEW)" --output "$(CDR_OUTPUT)"
+
+# Explicit read-only project contract-change reconsideration; Lifecycle retains
+# accepted-semantic currentness and graph changes remain Authority governed.
+.PHONY: cdr-change-preflight
+cdr-change-preflight:
+	@test -n "$(PROJECT_ROOT)" -a -n "$(CDR_BEFORE)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT CDR_BEFORE PROJECT_COMMIT CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_contract_change --project-root "$(PROJECT_ROOT)" --before "$(CDR_BEFORE)" --after "$(PROJECT_COMMIT)" --output "$(CDR_OUTPUT)"

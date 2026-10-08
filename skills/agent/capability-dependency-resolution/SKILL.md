@@ -100,6 +100,23 @@ Return at least:
 
 `proposed_requires` is a proposal, never a canonical authority. A `RESOLVED` result means verified against the explicit discovered scope and available policy, not a mathematical proof that no unknown dependency exists.
 
+### Contract-change reconsideration preflight (explicit, read-only)
+
+For two pinned, ancestor-related target-project commits, run
+`make cdr-change-preflight PROJECT_ROOT=... CDR_BEFORE=<old SHA>
+PROJECT_COMMIT=<current SHA> CDR_OUTPUT=...`. The new HEAD must be clean.
+This analyzes reviewed provider revisions/public source fingerprints, target
+production contracts and Authority public contracts. Route immediate consumers
+to **possible CDR reassessment**, and transitive descendants to existing
+Capability Lifecycle. A changed source without a new semantic review revision
+is blocking, not accepted proof. Any CDR re-evaluation still starts from
+the target's independently owned output obligations.
+
+Do not equate a source revision with a public-contract change, an impact
+candidate with a necessary edge, or a completed preflight with permission to
+edit `requires`. Follow `docs/experiments/capability-dependency-resolution-contract-change-v1.md`.
+There is no default create/modify route activation.
+
 ## Acceptance checks
 
 - Every proposed edge maps to a specific output obligation and directly consumed semantic input.
