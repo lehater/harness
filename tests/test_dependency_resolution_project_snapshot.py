@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
             ]},
             {"id": "TACTICAL", "responsibility": "Define scoped accepted model concepts",
              "produces": [{"capability": "x.target-domain", "knowledge_kind": "domain-model",
-                           "requires": [{"capability": "x.accepted-policy"}]}]},
+                           "requires": [{"capability": "x.accepted-policy"}, {"capability": "x.strategy"}]}]},
         ],
     }, sort_keys=False))
     put(base, ".harness/semantic-baseline.yaml", yaml.safe_dump({
@@ -107,6 +107,8 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
     inputs = generate(base, sha=sha, targets=targets)
     assert inputs["source_snapshot"] == sha
     assert inputs["evidence_contract"] == "source-grounded-v1"
+    assert inputs["target_obligation_coverage"]["status"] == "PARTIAL_BY_CONSTRUCTION"
+    assert inputs["target_obligation_coverage"]["complete_upstream_obligation_coverage_established"] is False
     assert len(inputs["cases"]) == 1
     case = inputs["cases"][0]
     providers = {x["capability"]: x for x in case["provider_catalog"]}
@@ -202,6 +204,22 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert comparison["cases"][0]["KEEP"] == ["x.accepted-policy"]
         assert comparison["cases"][0]["ADD"] == []
         assert comparison["cases"][0]["REMOVE_CANDIDATE"] == []
+        assert comparison["cases"][0]["UNASSESSED_EXISTING_EDGES"] == ["x.strategy"]
+        assert comparison["cases"][0]["removal_assessment"] == "BLOCKED_INCOMPLETE_TARGET_OBLIGATIONS"
+        assert comparison["cases"][0]["target_obligation_coverage"] == "PARTIAL_BY_CONSTRUCTION"
+        # The model omitted x.strategy but the source scope was partial:
+        # reporting a genuine REMOVE_CANDIDATE would be a false deletion cue.
+        tampered_coverage = copy.deepcopy(inputs)
+        tampered_coverage["target_obligation_coverage"] = {
+            "status": "COMPLETE",
+            "complete_upstream_obligation_coverage_established": True,
+        }
+        try:
+            compare(base, sha=sha, inputs=tampered_coverage, evaluation=evaluation)
+        except DiscoveryError:
+            pass
+        else:
+            raise AssertionError("coverage completeness cannot be self-declared by fixture")
 
         broken = copy.deepcopy(evaluation)
         broken["source_snapshot"] = "0" * 40
