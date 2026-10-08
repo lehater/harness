@@ -248,6 +248,7 @@ def audit_target_obligations(
             })
 
     reports=[]
+    cross_ids={x["source_unit_id"] for x in cross_target}
     for cid,record in sorted(targets.items()):
         obligations=[]
         for oid, ob in sorted(record["obligations"].items()):
@@ -262,7 +263,7 @@ def audit_target_obligations(
                 flags.append("NO_MODEL_OR_STRATEGY_CLAIM_LINK")
             if any(e["candidate_relation"] in UNCERTAIN_RELATIONS for e in evid):
                 flags.append("SHARED_BOUNDARY_OR_OPEN_SCOPE_REQUIRES_REVIEW")
-            if any(e["source_unit_id"] in {x["source_unit_id"] for x in cross_target} for e in evid):
+            if any(e["source_unit_id"] in cross_ids for e in evid):
                 flags.append("CROSS_TARGET_CONSUMPTION_REQUIRES_BOUNDARY_REVIEW")
             obligations.append({
                 "id":oid,"description":ob["description"],
@@ -294,8 +295,8 @@ def audit_target_obligations(
         "cross_target_source_consumption":cross_target,
         "open_source_hypotheses":uncertain,
         "source_claims_with_no_candidate_target_link":sum(
-            not refs for uid,refs in per_source.items()
-        ) if False else sum(uid not in per_source for uid in by_uid),
+            uid not in per_source for uid in by_uid
+        ),
         "unreviewed_source_units":len(by_uid),
         "independent_authority_review_performed":False,
         "complete_target_output_semantics_established":False,
