@@ -16,6 +16,7 @@ import yaml
 
 from evals.project_discovery_snapshot import DiscoveryError, _commit, _required_yaml
 from evals.dependency_resolution_evidence import assess_predictions
+from evals.project_discovery_coverage import assess_coverage
 
 def compare(
     project_root: Path, *, sha: str,
@@ -53,6 +54,11 @@ def compare(
         raise DiscoveryError("bound predictions fail source-reference verification")
     if rechecked != evaluation.get("evidence_assessment"):
         raise DiscoveryError("stored proof assessment differs from recomputed model evidence")
+    coverage_check = assess_coverage(inputs, predictions)
+    if coverage_check.get("status") == "INVALID":
+        raise DiscoveryError("incomplete or inconsistent product coverage classification")
+    if coverage_check != evaluation.get("coverage_assessment"):
+        raise DiscoveryError("stored product coverage differs from recomputed prediction")
     coverage = inputs.get("target_obligation_coverage")
     if not isinstance(coverage, dict) or (
         coverage.get("status") != "PARTIAL_BY_CONSTRUCTION"
@@ -114,6 +120,11 @@ def compare(
             "UNASSESSED_EXISTING_EDGES": sorted(current_set - proposed_set),
             "removal_assessment": "BLOCKED_INCOMPLETE_TARGET_OBLIGATIONS",
             "target_obligation_coverage": coverage["status"],
+            "product_candidate_assessment": "REVIEW_REQUIRED",
+            "product_candidates_accounted_for": next(
+                (x.get("accepted_candidates_inventoried")
+                 for x in coverage_check.get("cases", []) if x.get("id") == cid), 0
+            ),
             # Every transition requires independent semantic review.
             "decision": "REVIEW_REQUIRED",
             "semantic_entailment_verified": False,
