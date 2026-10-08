@@ -1,0 +1,211 @@
+version: 2
+kind: harness-cdr-tactical-target-revision-proposal
+status: OPERATOR_DRAFT_NOT_ACCEPTED
+source_project: lehater/prep
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+source_draft: spec/dependency-resolution/project-pilots/prep-target-output-candidates-v1.yaml
+authority_for_future_review: TACTICAL-DOMAIN-DESIGN
+automatic_writeback_allowed: false
+independent_review_performed: false
+semantic_completeness_established: false
+rationale: >-
+  Separate candidate Capability outputs from governing negative invariants.
+  Preserve the eight prior draft obligations through explicit one-to-one
+  lineage, without silently merging distinct model or cross-context meanings.
+  This proposal does not assert domain contracts, owner approval, or direct
+  requires edges.
+targets:
+  - target_capability: prep.preparation-information-model
+    status: NEEDS_INDEPENDENT_AUTHORITY_REVIEW
+    candidate_outputs:
+      - id: PI-SEMANTIC-CONCEPTS
+        supersedes_v1: PI-SEMANTIC-CONCEPTS
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Specify the domain meanings and permissible distinctions of current
+          preparation information, including goals, capabilities, knowledge,
+          practice material, and other valid preparation information as
+          justified by its meaning. Distinctions remain open-ended; they do
+          not impose a fixed taxonomy, separate model context for each kind,
+          storage shape, or technical boundaries.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-01 Preparation Information"}
+          - {path: docs/architecture/model-context-map.md, heading: "Boundary invariants"}
+        review_rationale: >-
+          The accepted model context explicitly owns distinguishable current
+          information meanings. Keep semantic kind identity independent from
+          the distinct problem of relationships between those kinds.
+        unresolved_question: >-
+          Which specific distinctions require separate rules, without
+          requiring separate model contexts or a fixed vocabulary?
+      - id: PI-KNOWLEDGE-AND-RELATIONS
+        supersedes_v1: PI-KNOWLEDGE-AND-RELATIONS
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Specify the meanings of distinguishable kinds of knowledge and of
+          relationships among preparation information, including relationships
+          across kinds and semantically different relation meanings. Retain the
+          semantic basis for viewing the same information from different
+          perspectives without making the exploration workflow a domain-owned
+          action or prescribing a particular relationship topology.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-01 Preparation Information"}
+          - {path: docs/architecture/context-map.md, heading: "DS-01 Preparation Information — CORE"}
+        review_rationale: >-
+          DS-01 expressly preserves perspective-compatible meaning while
+          the model-context contract does not assign application exploration
+          as a separate model owner. Preserve the semantic basis without
+          reclassifying all exploration as a new domain obligation.
+        unresolved_question: >-
+          Is perspective compatibility an additional domain invariant or a
+          consequence of existing relationship and meaning distinctions?
+      - id: PI-BOUNDARY-TO-HISTORY
+        supersedes_v1: PI-BOUNDARY-TO-HISTORY
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Define the preparation-information side of semantic references
+          from recorded activity and results, preserving what current
+          information means without owning historical facts. Permit accepted
+          cross-context relationships to retain intelligible meaning when
+          current information later changes or is removed, without assuming
+          a technical reference or persistence representation.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "TR-01 Preparation Information and Recorded Activity History"}
+        review_rationale: >-
+          TR-01 requires two distinct semantic responsibilities and a stable
+          relation between them. This obligation describes the current-side
+          participation, not an independently owned third model.
+        unresolved_question: >-
+          Which semantics are the current-information contract's responsibility
+          and which are independently governed by the shared TR-01 boundary?
+    candidate_constraints:
+      - id: PI-NEGATIVE-INVARIANTS
+        supersedes_v1: PI-NEGATIVE-INVARIANTS
+        proposal: RECAST_AS_GOVERNING_CONSTRAINT
+        status: CANDIDATE_NOT_ACCEPTED
+        applies_to_outputs:
+          - PI-SEMANTIC-CONCEPTS
+          - PI-KNOWLEDGE-AND-RELATIONS
+          - PI-BOUNDARY-TO-HISTORY
+        text: >-
+          Current preparation information and its defined goals, capabilities,
+          knowledge, practice material, and relationships do not assert the
+          learner's knowledge possession, capability possession, competence,
+          mastery, readiness, or a maintained learner-state assessment.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-01 Preparation Information"}
+          - {path: docs/architecture/model-context-map.md, heading: "Boundary invariants"}
+        review_rationale: >-
+          This is a prohibited inference governing several outputs, rather
+          than a separately produced domain object. Keep it explicit and
+          testable without creating an additional semantic owner.
+        unresolved_question: >-
+          Which non-inference safeguards are observable contractual invariants
+          rather than model attributes or derived assessment features?
+    additional_review_questions:
+      - >-
+        Whether selection, change, remove, and perspective exploration
+        require any still-missing model semantics, separate from Application
+        Design behavior.
+      - >-
+        Whether PI and RH apply the same TR-01 meaning without duplicating
+        authoritative ownership of the relationship itself.
+  - target_capability: prep.recorded-activity-history-model
+    status: NEEDS_INDEPENDENT_AUTHORITY_REVIEW
+    candidate_outputs:
+      - id: RH-RECORDED-FACTS
+        supersedes_v1: RH-RECORDED-FACTS
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Specify retained historical facts that preparation activity occurred
+          and the result when one exists, including temporal context and
+          distinctions needed to interpret those facts. Keep historical facts
+          distinct from claims about learner state, and do not require a
+          particular event store, timestamp representation, or statistics.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-02 Recorded Activity History"}
+        review_rationale: >-
+          MC-02 owns activity, optional result, and temporal facts. Preserve
+          those distinctions without changing the meaning of the application
+          operation that records them.
+        unresolved_question: >-
+          What minimal historical facts are necessary when an activity has
+          no result, without imposing storage or event-processing design?
+      - id: RH-REFERENCED-INFORMATION
+        supersedes_v1: RH-REFERENCED-INFORMATION
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Specify the historical-activity side of meaningful relationships to
+          current preparation information, retaining what recorded activity
+          and results concerned. Respect the current-information owner's
+          meaning and the shared TR-01 relationship semantics without
+          transferring ownership or inventing a third domain model.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "TR-01 Preparation Information and Recorded Activity History"}
+        review_rationale: >-
+          This obligation governs the meaning of a historical reference
+          while RH-PRESERVED-CONTEXT separately governs its continued
+          intelligibility through later changes.
+        unresolved_question: >-
+          Which relationship semantics are locally owned by history, and
+          which must be reviewed as shared TR-01 contract semantics?
+      - id: RH-PRESERVED-CONTEXT
+        supersedes_v1: RH-PRESERVED-CONTEXT
+        proposal: REFINE_OUTPUT
+        status: CANDIDATE_NOT_ACCEPTED
+        text: >-
+          Specify what historical context must remain intelligible when
+          current preparation information referenced by a historical record
+          later changes or is removed. Preserve the past fact and its
+          context without retroactively redefining either that fact or the
+          current preparation information, and without choosing a storage
+          versioning or deletion mechanism.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-02 Recorded Activity History"}
+          - {path: docs/architecture/model-context-map.md, heading: "TR-01 Preparation Information and Recorded Activity History"}
+        review_rationale: >-
+          Temporal and reference semantics are related but not identical:
+          preserved context concerns survival of historical meaning over
+          future changes rather than simply knowing the reference target.
+        unresolved_question: >-
+          Which change and removal effects must the historical semantics
+          resist, and which preservation mechanisms remain implementation
+          decisions?
+    candidate_constraints:
+      - id: RH-NEGATIVE-INVARIANTS
+        supersedes_v1: RH-NEGATIVE-INVARIANTS
+        proposal: RECAST_AS_GOVERNING_CONSTRAINT
+        status: CANDIDATE_NOT_ACCEPTED
+        applies_to_outputs:
+          - RH-RECORDED-FACTS
+          - RH-REFERENCED-INFORMATION
+          - RH-PRESERVED-CONTEXT
+        text: >-
+          Recorded activity, results, timing, and relationships are retained
+          historical facts, not claims that the learner possesses a capability,
+          knows something, has mastered material, is competent, or is ready.
+          No particular derived score, assessment, or statistic follows.
+        source_sections:
+          - {path: docs/architecture/model-context-map.md, heading: "MC-02 Recorded Activity History"}
+          - {path: docs/architecture/context-map.md, heading: "DS-02 Recorded Activity History — CORE"}
+        review_rationale: >-
+          The accepted sources forbid converting historical evidence into
+          learner-state conclusions. Keep the prohibition as a visible
+          constraint on all historical outputs rather than a third kind of
+          recorded historical fact.
+        unresolved_question: >-
+          How can any allowed application presentation avoid implicitly
+          turning historical facts into mastery or readiness conclusions?
+    additional_review_questions:
+      - >-
+        Does exploring history impose any additional domain invariant beyond
+        the existing semantics of recorded facts and their relationships?
+      - >-
+        Does distinguishing history reference meaning from preserved context
+        materially improve the accepted public contract, or should the two
+        remain separately stated facets of one conceptual contract?
