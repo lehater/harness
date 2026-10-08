@@ -78,6 +78,7 @@ def build_blinded_request(inputs: dict[str, Any], *, run_id: str,
         "run_id": run_id,
         "protocol_id": "capability-dependency-resolution/1",
         "evidence_contract": inputs.get("evidence_contract", "legacy"),
+        "coverage_contract": inputs.get("coverage_contract", "legacy"),
         "cases": blinded,
     }
 
@@ -123,6 +124,45 @@ def _validate_discovery_inputs(inputs: dict[str, Any]) -> None:
             raise ValueError("duplicate provider")
         if target["capability"] in {x["capability"] for x in providers}:
             raise ValueError("self-provider in discovery")
+        if inputs.get("coverage_contract", "legacy") == "source-traceability-v1":
+            upstream = target.get("upstream_constraint_candidates")
+            if not isinstance(upstream, list) or not upstream:
+                raise ValueError("missing reviewed product candidate inventory")
+            indices = set()
+            for candidate in upstream:
+                if not isinstance(candidate, dict):
+                    raise ValueError("malformed upstream constraint candidate")
+                req_id = candidate.get("requirement_id")
+                if not isinstance(req_id, str) or not req_id or req_id in indices:
+                    raise ValueError("duplicate or invalid upstream requirement")
+                indices.add(req_id)
+                provider = next(
+                    (x for x in providers if x["capability"] == candidate.get("provider")),
+                    None,
+                )
+                claim_index = candidate.get("claim_index")
+                if (
+                    provider is None
+                    or provider.get("evidence_status") != "ACCEPTED_EVIDENCE"
+                    or type(claim_index) is not int
+                    or claim_index < 0
+                    or claim_index >= len(provider.get("semantic_surface", []))
+                    or not provider["semantic_surface"][claim_index].startswith(req_id + ": ")
+                ):
+                    raise ValueError("unbound product requirement claim")
+                if candidate.get("traceability") not in (
+                    "EXPLICIT_STRATEGIC_DERIVATION",
+                    "UNADJUDICATED_ACCEPTED_PRODUCT_REQUIREMENT",
+                ):
+                    raise ValueError("invalid requirement traceability status")
+                if candidate.get("applicability") != "REQUIRES_SEMANTIC_REVIEW":
+                    raise ValueError("product applicability cannot be pre-adjudicated")
+            if not any(
+                x["traceability"] == "EXPLICIT_STRATEGIC_DERIVATION" for x in upstream
+            ):
+                raise ValueError("no direct domain-to-product accepted traceability")
+        elif inputs.get("coverage_contract", "legacy") != "legacy":
+            raise ValueError("unknown coverage contract")
 
 
 @scenario_driver("dependency.calibration.execute_process")
