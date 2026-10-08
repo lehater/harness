@@ -221,18 +221,6 @@ def build(root: Path, *, sha: str = PIN,
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
         "source_surface_protocol": surface_mode,
-        "source_claim_role_evidence": [{
-            "provider": need["provider"],
-            "obligation": need["obligation"],
-            "claim_index": need["claim_index"],
-            "claim_id": providers_by_id[need["provider"]]["source_scope"].get(
-                "claim_ids", []
-            )[need["claim_index"]] if surface_mode == SOURCE_MODE_V3 else None,
-            "independently_accepted": False,
-        } for need in prediction["input_needs"]],
-        "documented_delegations_not_dependencies": fresh[
-            "draft_delegation_refs_for_post_model_review"
-        ],
         "target_output_obligation_coverage": "THREE_EXPLICIT_TARGET_OUTCOMES_ONLY",
         "cases": [{
             "id": "PREP-CURRENT-RELATION-CLASSIFICATION",
@@ -405,6 +393,18 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         "truncated_provider_ids": truncated,
         "operator_selected_partial_provider_ids": selected_partial,
         "source_surface_protocol": surface_mode,
+        "source_claim_role_evidence": [{
+            "provider": need["provider"],
+            "obligation": need["obligation"],
+            "claim_index": need["claim_index"],
+            "claim_id": providers_by_id[need["provider"]]["source_scope"].get(
+                "claim_ids", []
+            )[need["claim_index"]] if surface_mode == SOURCE_MODE_V3 else None,
+            "independently_accepted": False,
+        } for need in prediction["input_needs"]],
+        "documented_delegations_not_dependencies": fresh[
+            "draft_delegation_refs_for_post_model_review"
+        ],
         "non_substantive_cited_claims": low_information,
         "explicit_target_export_delegation_conflicts": target_export_delegation_conflicts,
         "provider_source_ownership_independently_adjudicated": False,
