@@ -22,11 +22,13 @@ target_contracts:
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/model-context-map.md, heading: "Behaviors without independent model contexts"}
       - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/model-context-map.md, heading: "Contexts not independently justified"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/model-context-map.md, heading: "Consumers"}
+      - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/model-context-map.md, heading: "Reopening conditions"}
       - {type: MARKDOWN_SECTION, role: STRATEGIC_RESPONSIBILITY, path: docs/architecture/context-map.md, heading: "DS-01 Preparation Information — CORE"}
       - {type: MARKDOWN_SECTION, role: CROSS_CONTEXT, path: docs/architecture/context-map.md, heading: "Strategic relationship constraints"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/context-map.md, heading: "Product behaviors without independent strategic ownership"}
       - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/context-map.md, heading: "Explicitly not established"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/context-map.md, heading: "Consumers"}
+      - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/context-map.md, heading: "Reopening conditions"}
       - {type: ACCEPTED_PRODUCT_REQUIREMENTS, role: PRODUCT_CONSTRAINTS, path: .harness/knowledge/product-capabilities.yaml}
     candidate_obligations:
       - id: PI-SEMANTIC-CONCEPTS
@@ -91,11 +93,13 @@ target_contracts:
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/model-context-map.md, heading: "Behaviors without independent model contexts"}
       - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/model-context-map.md, heading: "Contexts not independently justified"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/model-context-map.md, heading: "Consumers"}
+      - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/model-context-map.md, heading: "Reopening conditions"}
       - {type: MARKDOWN_SECTION, role: STRATEGIC_RESPONSIBILITY, path: docs/architecture/context-map.md, heading: "DS-02 Recorded Activity History — CORE"}
       - {type: MARKDOWN_SECTION, role: CROSS_CONTEXT, path: docs/architecture/context-map.md, heading: "Strategic relationship constraints"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/context-map.md, heading: "Product behaviors without independent strategic ownership"}
       - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/context-map.md, heading: "Explicitly not established"}
       - {type: MARKDOWN_SECTION, role: APPLICATION_SEPARATION, path: docs/architecture/context-map.md, heading: "Consumers"}
+      - {type: MARKDOWN_SECTION, role: BOUNDARY_POLICY, path: docs/architecture/context-map.md, heading: "Reopening conditions"}
       - {type: ACCEPTED_PRODUCT_REQUIREMENTS, role: PRODUCT_CONSTRAINTS, path: .harness/knowledge/product-capabilities.yaml}
     candidate_obligations:
       - id: RH-RECORDED-FACTS
