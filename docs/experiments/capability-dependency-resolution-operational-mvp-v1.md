@@ -118,6 +118,26 @@ chat text. No hidden `requires` or evaluator oracle are supplied
 upstream. All three commands are read-only against the target repository
 and require explicit invocation and explicit output file destinations.
 
+## Governance-review extension
+
+Following the source-grounded reconciliation, two additional explicit
+read-only commands prepare and check the review required before any
+future decision to adopt a dependency:
+
+- `make cdr-dossier` — assemble accepted-source claims, independent
+  target-contract readiness blockers, and five directness questions for
+  every proposed added provider.
+- `make cdr-check-review` — regenerate that dossier from the same exact
+  pinned clean Git project and check an independently prepared
+  **PROPOSED_NOT_ACCEPTED** review draft. Its success means only that
+  review material is complete enough for Authority consideration,
+  never that a new direct edge is approved.
+
+See [CDR governance gate v1](capability-dependency-resolution-approval-gate-v1.md)
+for review criteria, commands, provenance and outstanding acceptance
+requirements. Even a structurally complete reviewer draft cannot authorize
+a project graph rewrite.
+
 ## Correctness boundaries
 
 The operational intake verifies shape, target identity, output/constraint
