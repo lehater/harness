@@ -148,7 +148,11 @@ bad["source_units"].append(copy.deepcopy(bad["source_units"][0]))
 bad["distinct_source_unit_count"]+=1
 rejects(bad,draft,p,s,"duplicate accepted source identifier")
 bad=copy.deepcopy(p)
-bad["source_claims"][0]["proposed_links"]=[{
+product_index=next(
+    i for i,row in enumerate(bad["source_claims"])
+    if row["source_unit_kind"]=="ACCEPTED_PRODUCT_REQUIREMENT"
+)
+bad["source_claims"][product_index]["proposed_links"]=[{
     "target_capability":targets[0],
     "obligation_id":"FORGED",
     "relation":"CANDIDATE_SEMANTIC_CONSTRAINT",
