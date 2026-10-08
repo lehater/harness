@@ -103,7 +103,7 @@ checks:
   command: python tests/test_derivation_composition.py
   stage: focused
   cost_class: cheap
-  disposition: standalone
+  disposition: full_gate
   rationale: Experimental focused smoke check; does not join canonical exhaustive gate before review.
 - id: ci_policy
   command: python checks/validate_ci_policy.py
