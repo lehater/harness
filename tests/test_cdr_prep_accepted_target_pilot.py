@@ -47,10 +47,16 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
             "basis": "The independent artifact source has a recorded semantic revision.",
         })
         if i:
-            emit(project / source,
-                 "# Published public semantics\n\nA published contract describes "
-                 f"the specific independently declared meaning of {capability}, "
-                 "and it is not the target output itself.\n")
+            statement = ("# Published public semantics\n\nA published contract describes "
+                         f"the specific independently declared meaning of {capability}, "
+                         "and it is not the target output itself.\n")
+            if capability == "prep.domain-strategy":
+                statement += "".join(
+                    f"- Independent synthetic claim {n}: public source constraints "
+                    "remain distinct from the target's accepted outcome contract.\n"
+                    for n in range(55)
+                )
+            emit(project / source, statement)
     outcomes = {
         name: {
             "meaning": f"Accepted catalog handling semantics for the result {name}, "
@@ -117,7 +123,11 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
         }],
     }
     reviewed = reconcile(project, sha=sha, inputs=inputs, request=request, response=reply)
-    assert reviewed["status"] == "READ_ONLY_REVIEW_NOT_AUTHORITY_ACCEPTANCE"
+    assert reviewed["status"] == "INVALID_PROPOSED_TOPOLOGY"
+    assert reviewed["effective_resolution"] == "NOT_RESOLVED"
+    assert reviewed["model_resolution_is_not_accepted"] is True
+    assert reviewed["all_available_provider_contracts_covered"] is False
+    assert reviewed["truncated_provider_ids"] == ["prep.domain-strategy"]
     assert reviewed["same_as_existing"] == [supplier_a]
     assert reviewed["cycle_blocks"] == [{
         "provider": supplier_b,
@@ -127,6 +137,20 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
     assert reviewed["automatic_writeback_allowed"] is False
     assert reviewed["target_contract_per_obligation_acceptance"] == "NOT_ESTABLISHED"
     assert supplier_b in reviewed["proposed_additions_not_approved"]
+
+    no_cycle = copy.deepcopy(reply)
+    no_cycle["results"][0]["proposed_requires"] = [supplier_a]
+    no_cycle["results"][0]["input_needs"] = [
+        x for x in no_cycle["results"][0]["input_needs"]
+        if x["provider"] == supplier_a
+    ]
+    still_blocked = reconcile(
+        project, sha=sha, inputs=inputs, request=request, response=no_cycle
+    )
+    assert still_blocked["status"] == "BLOCKED_INCOMPLETE_PROVIDER_SURFACES"
+    assert still_blocked["effective_resolution"] == "NOT_RESOLVED"
+    assert still_blocked["cycle_blocks"] == []
+    assert still_blocked["semantic_directness_proven"] is False
 
     altered = copy.deepcopy(reply)
     altered["request_id"] = "wrong"
