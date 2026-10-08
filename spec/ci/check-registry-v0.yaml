@@ -53,6 +53,10 @@ execution_profiles:
         inputs: {}
 
 workflow_roles:
+- path: .github/workflows/direct-input-derivation-pilot.yml
+  role: focused
+  cost_class: cheap
+  draft_behavior: allow
 - path: .github/workflows/ci-policy.yml
   role: focused
   cost_class: cheap
@@ -95,6 +99,12 @@ workflow_roles:
 
 
 checks:
+- id: derivation_composition_experiment
+  command: python tests/test_derivation_composition.py
+  stage: focused
+  cost_class: cheap
+  disposition: standalone
+  rationale: Experimental focused smoke check; does not join canonical exhaustive gate before review.
 - id: ci_policy
   command: python checks/validate_ci_policy.py
   stage: policy
