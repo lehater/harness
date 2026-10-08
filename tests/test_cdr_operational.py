@@ -15,6 +15,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from evals.cdr_operational import prepare_intake, reconcile_intake
 from evals.cdr_graph_audit import audit_graph
+from evals.cdr_governance_packet import build_decision_dossier, validate_draft_review
+from evals.project_discovery_directness_review import REQUIRED_TESTS
 from evals.dependency_resolution_process_driver import build_blinded_request
 from evals.project_discovery_snapshot import DiscoveryError
 
@@ -151,6 +153,56 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     assert result["automatic_writeback_allowed"] is False
     assert result["semantic_entailment_verified"] is False
 
+    dossier=build_decision_dossier(root,sha=sha,intake=intake,predictions=prediction)
+    assert dossier["status"]=="REVIEW_DOSSIER_NOT_AUTHORIZATION"
+    assert dossier["target_capability"]=="x.new-target"
+    assert len(dossier["target_output_obligations"])==2
+    assert len(dossier["proposed_ADD"])==2
+    assert dossier["authority_approval_verified"] is False
+    assert dossier["independent_target_acceptance_proven"] is False
+    assert "TARGET_PRODUCTION_MISSING_OR_AMBIGUOUS" in dossier["readiness_blockers"]
+    assert "INDEPENDENT_TARGET_OBLIGATION_ADJUDICATION_NOT_PROVEN" in dossier["readiness_blockers"]
+    assert all(len(p["required_directness_tests"])==5 for p in dossier["proposed_ADD"])
+    review_draft={
+        "kind":"harness-cdr-independent-review-draft",
+        "status":"PROPOSED_NOT_ACCEPTED",
+        "dossier_sha256":dossier["dossier_sha256"],
+        "source_snapshot":sha,"target_capability":"x.new-target",
+        "automatic_writeback_allowed":False,
+        "output_findings":[{
+            "obligation_id":ob["id"],
+            "decision":"REVIEW_NEEDED",
+            "reason":"Accepted source evidence does not independently establish this target draft's semantic completeness.",
+        } for ob in dossier["target_output_obligations"]],
+        "directness_findings":[{
+            "provider":packet["provider"],"decision":"UNDETERMINED",
+            "tests":[{
+                "test":test,"finding":"INCONCLUSIVE",
+                "evidence":"The intermediate contract and the source-specific target consumption have not been independently reviewed.",
+            } for test in REQUIRED_TESTS],
+        } for packet in dossier["proposed_ADD"]],
+    }
+    validation=validate_draft_review(dossier,review_draft)
+    assert validation["status"]=="DRAFT_COMPLETE_FOR_AUTHORITY_CONSIDERATION"
+    assert validation["governance_transition_authorized"] is False
+    assert validation["target_contract_independently_accepted"] is False
+    assert validation["automatic_writeback_allowed"] is False
+    bad_review=copy.deepcopy(review_draft)
+    bad_review["directness_findings"][0]["decision"]="DIRECT_REQUIRED"
+    try:validate_draft_review(dossier,bad_review)
+    except DiscoveryError:pass
+    else:raise AssertionError("operator draft must not self-approve")
+    bad_review=copy.deepcopy(review_draft)
+    bad_review["output_findings"].pop()
+    try:validate_draft_review(dossier,bad_review)
+    except DiscoveryError:pass
+    else:raise AssertionError("operator draft must cover all outputs")
+    bad_dossier=copy.deepcopy(dossier)
+    bad_dossier["proposed_ADD"][0]["provider"]="forged.upstream"
+    try:validate_draft_review(bad_dossier,review_draft)
+    except DiscoveryError:pass
+    else:raise AssertionError("governance dossier digest must bind immutable proposals")
+
     # Exercise Harness operator-facing make commands, not just Python API.
     save(root,"cdr-intake.yaml",intake)
     save(root,"cdr-prediction.json",json.dumps(prediction))
@@ -172,6 +224,24 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
         check=True,capture_output=True,text=True,
     )
     assert json.loads(projected.read_text(encoding="utf-8"))==result
+    dossier_path=root/"cdr-decision-dossier.json"
+    subprocess.run(
+        common+["cdr-dossier",
+                "CDR_PREDICTIONS="+str(root/"cdr-prediction.json"),
+                "CDR_OUTPUT="+str(dossier_path)],
+        check=True,capture_output=True,text=True,
+    )
+    assert json.loads(dossier_path.read_text(encoding="utf-8"))==dossier
+    review_path=root/"cdr-review-draft.yaml"
+    save(root,"cdr-review-draft.yaml",review_draft)
+    check=root/"cdr-draft-check.json"
+    subprocess.run([
+        "make","-s","-C",str(ROOT),"cdr-check-review",
+        "CDR_DOSSIER="+str(dossier_path),
+        "CDR_REVIEW="+str(review_path),
+        "CDR_OUTPUT="+str(check),
+    ],check=True,capture_output=True,text=True)
+    assert json.loads(check.read_text(encoding="utf-8"))==validation
     assert git(root,"status","--porcelain","--untracked-files=no")==""
 
 
