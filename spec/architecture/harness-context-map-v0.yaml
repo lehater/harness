@@ -64,6 +64,7 @@ contexts:
       - harness.assurance.adapters.copilot_live_calibration_evaluator
       - harness.assurance.semantic_acceptance
       - harness.assurance.semantic_derivation
+      - harness.assurance.derivation_composition
       - harness.assurance.semantic_fingerprint
       - harness.assurance.semantic_judgement_calibration
       - harness.assurance.test_realization
