@@ -7,6 +7,13 @@ Immutable PREP source: `lehater/prep@c52ff8ec1a4732285b2b299bf11dca9869fb2fee`
 
 ## Purpose
 
+The full Harness gate's source-bound operator fixture (not a real PREP
+Authority adjudication) produced: **123 candidate-source units**, **eight
+draft output obligations**, **16 sources proposed to constrain both targets**,
+and **32 open/shared-boundary hypothesis flags**. These counts describe draft
+review workload, not proven semantic defects, duplicate ownership, or
+independently verified requirements.
+
 The earlier experiments examined the two PREP Tactical Domain Capabilities
 from multiple directions: a bounded inventory of accepted source statements,
 responsibility-routing hypotheses, claim-by-claim accepted Product Capability
@@ -127,5 +134,7 @@ Once that semantic contract is independently accepted *in PREP's regular
 governance*, the directness criterion from the previous experiment may be
 applied to actual accepted obligations. Do not use the draft report to
 automatically add, remove or rewire any capability dependency.
+
+Validation: [Harness core #37817134797](https://github.com/lehater/harness/actions/runs/37817134797) PASS; [CI policy #37817134726](https://github.com/lehater/harness/actions/runs/37817134726) PASS. The full-gate fixture uses the *actual 102 operator MC/DS annotations* and *actual 21 product annotation records*, but synthetic normalized source identities; its success is **not evidence that the new workflow was manually executed on the pinned PREP checkout**.
 
 No canonical PREP or Harness main modifications occurred in this stage.
