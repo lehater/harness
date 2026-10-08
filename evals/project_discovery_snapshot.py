@@ -272,6 +272,15 @@ def generate(
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
         "discovery_method": "reviewed-core-artifacts-without-target-requires",
+        # The operator selected only Model Context headings for the target
+        # obligations. Product-level, cross-authority and future derivation
+        # obligations are NOT comprehensively enumerated. This metadata is
+        # outside blinded case payloads; no current target edge is exposed.
+        "target_obligation_coverage": {
+            "status": "PARTIAL_BY_CONSTRUCTION",
+            "reason": "SELECTED_ACCEPTED_SCOPE_SECTIONS_ONLY",
+            "complete_upstream_obligation_coverage_established": False,
+        },
         "cases": cases,
     }
 
