@@ -79,6 +79,9 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("target source contains a direct-edge label")
         result.append(case)
     grounded = request.get("evidence_contract") == "source-grounded-v1"
+    coverage = request.get("coverage_contract", "legacy") == "source-traceability-v1"
+    if request.get("coverage_contract", "legacy") not in ("legacy", "source-traceability-v1"):
+        raise ValueError("unsupported coverage protocol")
     if request.get("evidence_contract", "legacy") not in ("legacy", "source-grounded-v1"):
         raise ValueError("unsupported evidence contract")
     proof_instruction = (
@@ -95,9 +98,27 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
         "Claims tied to still-unresolved obligations are subject to review and "
         "cannot be accepted automatically."
     ) if grounded else ""
+    coverage_instruction = (
+        "SOURCE COVERAGE REVIEW IS REQUIRED. For every case the target contains "
+        "upstream_constraint_candidates, an exhaustive inventory of accepted "
+        "Product Capability statements within this reviewed product artifact. "
+        "Report EXACTLY one coverage_assessments record per requirement_id, "
+        "including UNTRACED candidates. Each record must contain requirement_id, "
+        "disposition DIRECT_CONSTRAINT or CONTEXT_ONLY or UNDECIDED, and a "
+        "nontrivial rationale. DIRECT_CONSTRAINT means a product statement "
+        "directly constrains the target's stated tactical semantic obligations "
+        "AND you have proposed the provider as a direct requires with a cited "
+        "input_need; do not confuse broad application behavior with domain "
+        "semantics. CONTEXT_ONLY means product behavior is relevant background "
+        "but not independently consumed by the scoped tactical output. "
+        "UNDECIDED means semantic applicability needs authoritative review. "
+        "Do not omit candidate records or silently mark applicability proven. "
+        "This review does not establish completeness or permit graph removals."
+    ) if coverage else ""
     return {
-        "instruction": PROTOCOL_INSTRUCTION + proof_instruction,
+        "instruction": PROTOCOL_INSTRUCTION + proof_instruction + "\n" + coverage_instruction,
         "evidence_contract": request.get("evidence_contract", "legacy"),
+        "coverage_contract": request.get("coverage_contract", "legacy"),
         "cases": result,
         "response_schema": {
             "results": [
@@ -118,9 +139,26 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
                         })
                     ],
                     "unresolved_obligations": ["unresolved obligation ids"],
+                    **({
+                        "coverage_assessments": [
+                            {"requirement_id": "each accepted candidate requirement_id",
+                             "disposition": "DIRECT_CONSTRAINT | CONTEXT_ONLY | UNDECIDED",
+                             "rationale": "Source-grounded reason for the applicability judgement"}
+                        ]
+                    } if coverage else {}),
                 }
             ],
-            "output": "Exactly one JSON object with a top-level results array. Every case MUST have case_request_id, status, proposed_requires, input_needs and unresolved_obligations. Empty arrays MUST be [] rather than omitted. Version/kind belong to the adapter.",
+            "output": (
+                "Return exactly one JSON object with results. Each result MUST "
+                "include case_request_id, status, proposed_requires, input_needs, "
+                "unresolved_obligations and, for this source-traceability-v1 "
+                "protocol, coverage_assessments covering EVERY candidate exactly once. "
+                "Use [] for empty arrays. The adapter owns outer version/kind."
+                if coverage else
+                "Exactly one JSON object with a top-level results array. Every case "
+                "MUST have case_request_id, status, proposed_requires, input_needs "
+                "and unresolved_obligations; empty arrays MUST be []."
+            ),
         },
     }
 
@@ -168,6 +206,37 @@ def _validate_model_results(
             raise ValueError(f"Copilot result #{i} missing input_needs list")
         if not isinstance(item.get("unresolved_obligations"), list):
             raise ValueError(f"Copilot result #{i} missing unresolved_obligations list")
+        if request.get("coverage_contract", "legacy") == "source-traceability-v1":
+            target = next(c["target"] for c in cases if c["case_request_id"] == binding)
+            expected_requirements = {
+                c["requirement_id"] for c in target["upstream_constraint_candidates"]
+            }
+            observed_records = item.get("coverage_assessments")
+            if not isinstance(observed_records, list):
+                raise ValueError(f"Copilot result #{i} missing coverage_assessments list")
+            collected: set[str] = set()
+            for record in observed_records:
+                if not isinstance(record, dict):
+                    raise ValueError(f"Copilot result #{i} malformed coverage assessment")
+                requirement_id = record.get("requirement_id")
+                if (
+                    not isinstance(requirement_id, str)
+                    or requirement_id not in expected_requirements
+                    or requirement_id in collected
+                ):
+                    raise ValueError(f"Copilot result #{i} unknown/duplicate requirement assessment")
+                collected.add(requirement_id)
+                if record.get("disposition") not in (
+                    "DIRECT_CONSTRAINT", "CONTEXT_ONLY", "UNDECIDED",
+                ):
+                    raise ValueError(f"Copilot result #{i} invalid coverage disposition")
+                if not isinstance(record.get("rationale"), str) or len(record["rationale"].strip()) < 15:
+                    raise ValueError(f"Copilot result #{i} missing coverage rationale")
+            if collected != expected_requirements:
+                raise ValueError(
+                    f"Copilot result #{i} incomplete coverage_assessments: "
+                    f"expected {len(expected_requirements)} got {len(collected)}"
+                )
     envelope = {
         "adapter_owned_protocol": True,
         "model_supplied_version": model_result.get("version", "OMITTED"),
@@ -283,6 +352,7 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
             "no_available_tools": True,
             "independence": "UNVERIFIED",
             "model_envelope": model_envelope,
+            "coverage_contract": request.get("coverage_contract", "legacy"),
             "invocation_attempts": len(invocation_metadata),
             "schema_retry_errors": schema_errors,
             "attempt_session_ids": [m["client_session_id"] for m in invocation_metadata],
