@@ -105,6 +105,7 @@ harness-check:
 	python tests/test_dependency_resolution_claim_mapping.py
 	python tests/test_dependency_resolution_strategy_claim_review.py
 	python tests/test_dependency_resolution_target_semantic_audit.py
+	python tests/test_dependency_resolution_target_obligation_revision.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
