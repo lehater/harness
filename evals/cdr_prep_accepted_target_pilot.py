@@ -19,9 +19,16 @@ from evals.project_discovery_snapshot import (
 )
 from evals.dependency_resolution_process_driver import build_blinded_request
 from evals.dependency_resolution_evidence import assess_predictions
+from evals.cdr_provider_owned_surfaces import load_selectors, selected_surface
 
 TARGET = "prep.knowledge-relation-classification"
 PIN = "d9adf4ca51049894437f1ed3d4f74fe94936c896"
+SOURCE_MODE_V1 = "RAW_PREFIX_V1"
+SOURCE_MODE_V2 = "CANDIDATE_OWNED_SECTIONS_V2"
+SELECTOR_MANIFEST = (
+    Path(__file__).resolve().parents[1] /
+    "spec/dependency-resolution/project-pilots/prep-provider-owned-surface-selectors-v1.yaml"
+)
 PROVIDER_IDS = (
     "prep.model-context-strategy",
     "prep.product-capabilities",
@@ -88,9 +95,18 @@ def _claims(root: Path, artifact: dict[str, Any], *, max_claims: int = 48
     }
 
 
-def build(root: Path, *, sha: str = PIN) -> dict[str, Any]:
+def build(root: Path, *, sha: str = PIN,
+          surface_mode: str = SOURCE_MODE_V1) -> dict[str, Any]:
     root = root.resolve()
     _commit(root, sha)
+    if surface_mode not in {SOURCE_MODE_V1, SOURCE_MODE_V2}:
+        raise DiscoveryError("invalid owned-surface research protocol")
+    selectors = None
+    manifest_hash = None
+    if surface_mode == SOURCE_MODE_V2:
+        selectors, manifest_hash = load_selectors(
+            SELECTOR_MANIFEST, pin=sha, target=TARGET, expected=PROVIDER_IDS
+        )
     core, reviews, core_bytes, baseline_bytes = _registry(root)
     if TARGET not in core or TARGET not in reviews:
         raise DiscoveryError("the target needs its own Core artifact and semantic review")
@@ -144,7 +160,10 @@ def build(root: Path, *, sha: str = PIN) -> dict[str, Any]:
         if cid == TARGET or cid not in core or cid not in reviews:
             raise DiscoveryError(f"provider missing Core and review: {cid}")
         art = core[cid]
-        surface, evidence = _claims(root, art)
+        surface, evidence = (
+            selected_surface(root, art, selectors[cid])
+            if selectors is not None else _claims(root, art)
+        )
         providers.append({
             "capability": cid,
             "authority": art["authority"],
@@ -157,14 +176,20 @@ def build(root: Path, *, sha: str = PIN) -> dict[str, Any]:
                 "claim_count_in_source": evidence["claim_count_in_source"],
                 "claim_count_supplied": evidence["claim_count_supplied"],
                 "public_surface_truncated": evidence["public_surface_truncated"],
+                "selection_scope_partial": evidence.get("selection_scope_partial", False),
+                "claim_role": evidence.get("claim_role", "UNCLASSIFIED_RAW_FRAGMENT"),
+                "independent_ownership_review_verified": False,
             },
         })
         fingerprints[cid] = evidence["sha256"]
+    if manifest_hash:
+        fingerprints["research_selector_manifest"] = manifest_hash
     inputs = {
         "version": 1,
         "kind": "harness-dependency-resolution-calibration-inputs",
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
+        "source_surface_protocol": surface_mode,
         "target_output_obligation_coverage": "THREE_EXPLICIT_TARGET_OUTCOMES_ONLY",
         "cases": [{
             "id": "PREP-CURRENT-RELATION-CLASSIFICATION",
@@ -182,6 +207,8 @@ def build(root: Path, *, sha: str = PIN) -> dict[str, Any]:
                 "sufficiency and directness are not verified by source registration.",
                 "Candidate providers were selected without inspecting target requires; "
                 "the bounded catalog is not established as globally complete.",
+                "In owned-section mode all excerpts are operator-selected, "
+                "not independently accepted exports and not source-complete.",
             ],
         }],
     }
@@ -218,8 +245,9 @@ def _shortest_path(edges: dict[str, set[str]], start: str, finish: str) -> list[
 
 
 def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
-              request: dict[str, Any], response: dict[str, Any]) -> dict[str, Any]:
-    fresh = build(root, sha=sha)
+              request: dict[str, Any], response: dict[str, Any],
+              surface_mode: str = SOURCE_MODE_V1) -> dict[str, Any]:
+    fresh = build(root, sha=sha, surface_mode=surface_mode)
     if inputs != fresh["inputs"] or request != fresh["request"]:
         raise DiscoveryError("stale real-target source or request")
     if (response.get("kind") != "harness-dependency-resolution-evaluator-response"
@@ -278,6 +306,10 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         source["capability"] for source in bounded_providers
         if source.get("source_scope", {}).get("public_surface_truncated") is True
     )
+    selected_partial = sorted(
+        source["capability"] for source in bounded_providers
+        if source.get("source_scope", {}).get("selection_scope_partial") is True
+    )
     # The model's RESOLVED is a self-assessment. Never upgrade it when its
     # candidate edges are invalid, any public source was cropped, or target
     # obligation acceptance has not been individually established.
@@ -305,6 +337,8 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         effective_status = "BLOCKED_NON_SUBSTANTIVE_SOURCE_CLAIMS"
     elif truncated:
         effective_status = "BLOCKED_INCOMPLETE_PROVIDER_SURFACES"
+    elif selected_partial:
+        effective_status = "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
     else:
         effective_status = "REVIEW_REQUIRED_TARGET_AND_DIRECTNESS_ACCEPTANCE"
     return {
@@ -312,8 +346,10 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         "status": effective_status,
         "effective_resolution": "NOT_RESOLVED",
         "model_resolution_is_not_accepted": True,
-        "all_available_provider_contracts_covered": not bool(truncated),
+        "all_available_provider_contracts_covered": not (truncated or selected_partial),
         "truncated_provider_ids": truncated,
+        "operator_selected_partial_provider_ids": selected_partial,
+        "source_surface_protocol": surface_mode,
         "non_substantive_cited_claims": low_information,
         "provider_claim_entailment_verified": False,
         "accepted_project_dependency_topology_validated": False,
@@ -344,6 +380,8 @@ def main() -> int:
     p.add_argument("phase", choices=["prepare", "evaluate", "reconcile"])
     p.add_argument("--project-root", type=Path, required=True)
     p.add_argument("--commit", default=PIN)
+    p.add_argument("--surface-mode", default=SOURCE_MODE_V1,
+                   choices=[SOURCE_MODE_V1, SOURCE_MODE_V2])
     p.add_argument("--inputs", type=Path)
     p.add_argument("--request", type=Path)
     p.add_argument("--response", type=Path)
@@ -353,7 +391,8 @@ def main() -> int:
         if args.phase == "prepare":
             if not args.request:
                 raise ValueError("prepare needs --request")
-            result = build(args.project_root, sha=args.commit)
+            result = build(args.project_root, sha=args.commit,
+                           surface_mode=args.surface_mode)
             _write(args.inputs if args.inputs else args.output, result["inputs"])
             _write(args.request, result["request"])
             if args.inputs:
@@ -375,7 +414,8 @@ def main() -> int:
             result = reconcile(args.project_root, sha=args.commit,
                                inputs=json.loads(args.inputs.read_text(encoding="utf-8")),
                                request=json.loads(args.request.read_text(encoding="utf-8")),
-                               response=json.loads(args.response.read_text(encoding="utf-8")))
+                               response=json.loads(args.response.read_text(encoding="utf-8")),
+                               surface_mode=args.surface_mode)
             _write(args.output, result)
             print(json.dumps({"status": result["status"],
                               "added": len(result["proposed_additions_not_approved"]),
