@@ -128,7 +128,7 @@ def execute_dependency_resolution_process(
         # not a filesystem sandbox. Operator is responsible for real isolation.
         with tempfile.TemporaryDirectory(prefix="harness-cdr-evaluator-") as cwd:
             completed = subprocess.run(
-                [str(executable)],
+                ([sys.executable, str(executable)] if executable.suffix == ".py" else [str(executable)]),
                 input=json.dumps(request, ensure_ascii=False),
                 text=True,
                 capture_output=True,
@@ -186,8 +186,11 @@ def execute_dependency_resolution_process(
     except (KeyError, ValueError, TypeError) as exc:
         return _invalid("INVALID_EVALUATOR_PREDICTIONS",
                         execution={**execution, "error": str(exc)})
+    provider_provenance = response.get("provenance")
+    if not isinstance(provider_provenance, dict):
+        provider_provenance = None
     return {
         **evaluation,
         "independence": "UNVERIFIED",
-        "execution": {**execution, "state": "COMPLETED"},
+        "execution": {**execution, "state": "COMPLETED", "provider_provenance": provider_provenance},
     }
