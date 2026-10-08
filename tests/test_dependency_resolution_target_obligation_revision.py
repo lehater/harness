@@ -68,7 +68,10 @@ x["targets"][0]["candidate_outputs"][1]["source_sections"].pop()
 fail(x,"discards v1 source")
 x=copy.deepcopy(revision)
 x["targets"][0]["candidate_constraints"][0]["applies_to_outputs"]=["RH-RECORDED-FACTS"]
-fail(x,"governing constraint")
+fail(x,"recast cross-cutting constraint")
+x=copy.deepcopy(revision)
+x["targets"][0]["candidate_constraints"][0]["applies_to_outputs"].pop()
+fail(x,"recast cross-cutting constraint")
 x=copy.deepcopy(revision)
 x["targets"][0]["candidate_constraints"][0]["proposal"]="REFINE_OUTPUT"
 fail(x,"proposed action or status")
