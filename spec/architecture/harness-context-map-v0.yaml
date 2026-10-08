@@ -181,6 +181,7 @@ ignored_modules:
   - evals.project_target_contract_readiness
   - evals.project_target_scope_coverage
   - evals.project_target_responsibility_routing
+  - evals.project_target_claim_mapping
   - evals.dependency_resolution_process_driver
   - evals.adapters.copilot_dependency_resolution_evaluator
   - evals.dependency_resolution_scenario_driver
