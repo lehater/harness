@@ -76,6 +76,7 @@ def build_blinded_request(inputs: dict[str, Any], *, run_id: str,
         "request_id": request_id,
         "run_id": run_id,
         "protocol_id": "capability-dependency-resolution/1",
+        "evidence_contract": inputs.get("evidence_contract", "legacy"),
         "cases": blinded,
     }
 
