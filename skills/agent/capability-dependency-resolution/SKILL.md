@@ -131,6 +131,22 @@ Read `docs/experiments/capability-dependency-resolution-reference-model-audit-v1
 No adoption, deletion, project publication, or canonical Reference Model
 promotion follows from successful corpus validation.
 
+### Reference Model provider-backed pilot (experimental, manual)
+
+A source-only provider pilot is available in
+`evals/cdr_reference_provider_pilot.py` with three selected Reference
+templates and 39 `CONTRACT_ONLY` candidate providers each. Its Phase A
+request exposes no target `requires`, while Phase B compares the original
+provider response against the frozen Reference Model. Source and case
+identifiers are fingerprint-bound. The modeled target obligations are
+operator descriptions, NOT accepted project contracts; all model proposals
+require independent semantic and Authority review.
+
+Use `prepare`, `evaluate` and `reconcile` manually in an isolated
+Copilot CLI 1.0.86 environment. Do not alter an existing pinned external
+assurance workflow merely to launch this experiment. Read
+`docs/experiments/capability-dependency-resolution-reference-provider-pilot-v1.md`.
+
 ## Acceptance checks
 
 - Every proposed edge maps to a specific output obligation and directly consumed semantic input.
