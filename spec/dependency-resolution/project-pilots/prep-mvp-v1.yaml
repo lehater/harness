@@ -1,0 +1,23 @@
+version: 1
+kind: harness-cdr-real-project-pilot
+project_repository: lehater/prep
+# Immutable checkout; never resolve a moving ref inside evidence generation.
+project_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+status: read-only
+selection_policy: >-
+  The target Capability selection and accepted source-context heading
+  selectors are operator-specified. Provider catalogs and public claims are
+  derived from the pinned project's Core, semantic baseline and registered
+  artifact contents; neither target requires nor an oracle may be supplied.
+targets:
+  - capability: prep.preparation-information-model
+    repository: lehater/prep
+    scope_source: docs/architecture/model-context-map.md
+    scope_headings:
+      - MC-01 Preparation Information
+  - capability: prep.recorded-activity-history-model
+    repository: lehater/prep
+    scope_source: docs/architecture/model-context-map.md
+    scope_headings:
+      - MC-02 Recorded Activity History
+      - TR-01 Preparation Information and Recorded Activity History
