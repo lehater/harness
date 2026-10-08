@@ -41,6 +41,17 @@ hidden. For every explicit output obligation, identify the directly consumed pub
 knowledge and owning provider Capability. Ignore topic similarity, chronology,
 file co-location, mere reachability and operating/tooling dependencies.
 A direct source can remain required even where a transitive path also exists.
+Before proposing ANY provider, check production direction from public outputs:
+a prerequisite must publish knowledge the target actually consumes to produce
+its own obligation; a capability whose output is a later refinement, display,
+verification or other consumption of the target output is a DOWNSTREAM consumer,
+not a target prerequisite. Test a counterfactual: could the claimed provider
+output be defined independently before this target produces its output, or
+would it need the target's result? Do not mistake a provider's mention of
+the target topic for a rule that constrains the target. If production direction
+or material direct consumption is ambiguous, OMIT that provider proposal and
+mark the affected obligation UNRESOLVED rather than guessing. Do not remove
+a truly direct source just because another direct input also consumes it.
 Do not invent accepted semantics or missing providers. If a material need lacks a
 justified provider, set status UNRESOLVED and include the obligation id in
 unresolved_obligations. CONTRACT_ONLY providers can justify provisional dependency
