@@ -1,0 +1,151 @@
+version: 1
+kind: harness-scenario
+id: direct-input-only-chain-pilot
+title: Direct input dependencies allow two local derivations without a historical shortcut edge
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DIRECT-INPUT-ONLY
+      authorities:
+        - id: PRODUCT
+          responsibility: Own requirements.
+          boundary:
+            semantic_cohesion: Product requirements.
+            independent_change: Requirements change independently.
+            public_contract: Requirement assertions.
+          produces:
+            - capability: pilot.product
+              knowledge_kind: product-requirements
+              requires: []
+        - id: TASK
+          responsibility: Own tasks.
+          boundary:
+            semantic_cohesion: Task specifications.
+            independent_change: Tasks evolve behind product contracts.
+            public_contract: Task assertions.
+          produces:
+            - capability: pilot.task
+              knowledge_kind: task-model
+              requires: [pilot.product]
+        - id: APPLICATION
+          responsibility: Own application operations.
+          boundary:
+            semantic_cohesion: Application operations.
+            independent_change: Operations evolve behind task contracts.
+            public_contract: Operation assertions.
+          produces:
+            - capability: pilot.application
+              knowledge_kind: application-design
+              requires: [pilot.task]
+      consumers:
+        - id: PILOT
+          purpose: Consume application operations.
+          requires: [pilot.application]
+      terminal_capabilities: []
+
+  requirements:
+    value:
+      semantic_assertions:
+        - {id: REQ-A, kind: product-requirement, subject: GOAL, semantic_value: inspect-state, decision_authority: PRODUCT}
+  tasks:
+    value:
+      semantic_assertions:
+        - {id: TASK-A, kind: task, subject: GOAL, semantic_value: inspect-state-task, decision_authority: TASK}
+  operations:
+    value:
+      semantic_assertions:
+        - {id: OP-A, kind: application-operation, subject: GOAL, semantic_value: inspect-state-operation, decision_authority: APPLICATION}
+
+  product-task-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: pilot.product
+      target_capability: pilot.task
+      obligations:
+        - {id: requirements, source_kind: product-requirement}
+  product-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: pilot.product
+      target_capability: pilot.task
+      links:
+        - {sources: [REQ-A], relation: TRANSFORMS, targets: [TASK-A]}
+      dispositions: []
+
+  task-app-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: pilot.task
+      target_capability: pilot.application
+      obligations:
+        - {id: tasks, source_kind: task}
+  task-app-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: pilot.task
+      target_capability: pilot.application
+      links:
+        - {sources: [TASK-A], relation: TRANSFORMS, targets: [OP-A]}
+      dispositions: []
+
+  model:
+    value:
+      artifacts:
+        - {id: PRODUCT, authority: PRODUCT, path: docs/product.yaml, provides: [pilot.product], depends_on: []}
+        - {id: TASK, authority: TASK, path: docs/task.yaml, provides: [pilot.task], depends_on: [PRODUCT]}
+        - {id: APPLICATION, authority: APPLICATION, path: docs/application.yaml, provides: [pilot.application], depends_on: [TASK]}
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - {artifact: PRODUCT, capability: pilot.product, acceptance_id: PRODUCT-1, accepted_prerequisites: {}}
+        - {artifact: TASK, capability: pilot.task, acceptance_id: TASK-1, accepted_prerequisites: {pilot.product: PRODUCT-1}}
+        - {artifact: APPLICATION, capability: pilot.application, acceptance_id: APPLICATION-1, accepted_prerequisites: {pilot.task: TASK-1}}
+
+steps:
+  - id: local-product-task
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.product-task-contract}
+      source: {ref: fixture.requirements}
+      candidate: {ref: fixture.tasks}
+      evidence: {ref: fixture.product-task-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: local-task-application
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.task-app-contract}
+      source: {ref: fixture.tasks}
+      candidate: {ref: fixture.operations}
+      evidence: {ref: fixture.task-app-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: current-without-historical-edge
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /pilot.product/state, op: equals, value: CURRENT}
+      - {path: /pilot.task/state, op: equals, value: CURRENT}
+      - {path: /pilot.application/state, op: equals, value: CURRENT}
