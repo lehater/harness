@@ -8,7 +8,9 @@ No decisions made here may change PREP target acceptance or dependency edges.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -110,6 +112,21 @@ def build_routing_worksheet(
             local_seen.add(uid)
             if any(field not in src for field in FIELDS):
                 raise DiscoveryError("source unit missing immutable provenance")
+            source_digest = src["source_sha256"]
+            revision = src["review_revision"]
+            if (not isinstance(source_digest, str)
+                or not re.fullmatch(r"[0-9a-f]{64}", source_digest)
+                or type(revision) is not int or revision < 1):
+                raise DiscoveryError("source unit has invalid accepted provenance")
+            for field in ("source_path", "source_provider", "source_local_id", "source_text"):
+                if not isinstance(src[field], str) or not src[field].strip():
+                    raise DiscoveryError("source unit has invalid textual provenance")
+            expected_uid = hashlib.sha256(
+                (src["source_path"] + "\\n" + str(src["source_heading"])
+                 + "\\n" + src["source_local_id"] + "\\n" + src["source_text"]).encode("utf-8")
+            ).hexdigest()[:20]
+            if uid != expected_uid:
+                raise DiscoveryError("source unit digest does not match quoted evidence")
             if (src.get("unit_semantic_disposition") != "UNREVIEWED"
                 or src.get("output_obligation_fulfilment_verified") is not False
                 or src.get("target_authority_approved") is not False):
