@@ -132,7 +132,12 @@ with tempfile.TemporaryDirectory(prefix="cdr-reference-pilot-") as td:
     assert len(target["requires"]) == before - 1
     model_file.write_text(json.dumps(model, indent=2) + "\n", encoding="utf-8")
     mutated = build(work)
-    assert mutated["request"]["cases"] == request["cases"]
+    # Provenance-linked opaque case IDs must change with the source fingerprint,
+    # while the actual model-visible obligations and provider catalog stay same.
+    def content_only(req):
+        return [{key: value for key, value in case.items()
+                 if key != "case_request_id"} for case in req["cases"]]
+    assert content_only(mutated["request"]) == content_only(request)
     assert mutated["request"]["request_id"] != request["request_id"]
     try:
         reconcile(work, inputs=inputs, request=request, response=fake)
