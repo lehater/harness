@@ -206,6 +206,11 @@ def execute_dependency_resolution_process(
         provider_provenance = None
     return {
         **evaluation,
+        # Keep the unmodified model-supplied result rows for independent review.
+        # Their content is evidence only; scoring still uses the validated and
+        # case-bound projection above, never these untrusted rows directly.
+        "model_results": copy.deepcopy(results),
+        "bound_predictions": predictions,
         "independence": "UNVERIFIED",
         "execution": {**execution, "state": "COMPLETED", "provider_provenance": provider_provenance},
     }
