@@ -22,6 +22,7 @@ from evals.dependency_resolution_evidence import assess_predictions
 from evals.cdr_provider_owned_surfaces import load_selectors, selected_surface
 from evals.cdr_contract_owner_conflicts import delegated_target_claims
 from evals.cdr_public_semantic_contract import prepare_draft
+from evals.cdr_atomic_consumption_review import review_atomic_needs
 
 TARGET = "prep.knowledge-relation-classification"
 PIN = "d9adf4ca51049894437f1ed3d4f74fe94936c896"
@@ -368,10 +369,18 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
     target_export_delegation_conflicts = delegated_target_claims(
         inputs["cases"][0], prediction
     )
+    atomic_review = (
+        review_atomic_needs(
+            inputs["cases"][0], prediction,
+            fresh["draft_delegation_refs_for_post_model_review"],
+        ) if surface_mode == SOURCE_MODE_V3 else None
+    )
     if cycle_blocks:
         effective_status = "INVALID_PROPOSED_TOPOLOGY"
     elif target_export_delegation_conflicts:
         effective_status = "BLOCKED_PROVIDER_CITES_TARGET_AS_EXPORT_OWNER"
+    elif atomic_review and atomic_review["unaccounted_obligations"]:
+        effective_status = "BLOCKED_UNACCOUNTED_TARGET_OUTPUT_OBLIGATIONS"
     elif low_information:
         effective_status = "BLOCKED_NON_SUBSTANTIVE_SOURCE_CLAIMS"
     elif truncated:
@@ -405,6 +414,10 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         "documented_delegations_not_dependencies": fresh[
             "draft_delegation_refs_for_post_model_review"
         ],
+        "atomic_consumption_review_not_authorization": atomic_review,
+        "unaccounted_target_obligations": (
+            atomic_review["unaccounted_obligations"] if atomic_review else []
+        ),
         "non_substantive_cited_claims": low_information,
         "explicit_target_export_delegation_conflicts": target_export_delegation_conflicts,
         "provider_source_ownership_independently_adjudicated": False,
