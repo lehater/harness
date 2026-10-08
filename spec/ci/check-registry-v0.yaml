@@ -503,6 +503,12 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_atomic_consumption_review
+  command: python tests/test_cdr_atomic_consumption_review.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Every output needs grounded input or unresolved admission; directness remains Authority-unproven.
 - id: cdr_public_semantic_contract
   command: python tests/test_cdr_public_semantic_contract.py
   stage: exhaustive
