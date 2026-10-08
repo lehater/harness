@@ -1,0 +1,49 @@
+version: 1
+kind: harness-dependency-resolution-predictions
+description: >-
+  Hand-authored correct-shape predictions for testing scorer plumbing only.
+  These are not outputs of an independent agent.
+cases:
+  - id: CDR-01
+    status: RESOLVED
+    proposed_requires: [demo.product-edit-policy, demo.resource-domain]
+    input_needs:
+      - {obligation: enforce-product-edit-policy, provider: demo.product-edit-policy}
+      - {obligation: preserve-domain-validity, provider: demo.resource-domain}
+    unresolved_obligations: []
+  - id: CDR-02
+    status: RESOLVED
+    proposed_requires: [demo.product-edit-policy, demo.edit-operation]
+    input_needs:
+      - {obligation: represent-denial, provider: demo.product-edit-policy}
+      - {obligation: invoke-operation, provider: demo.edit-operation}
+    unresolved_obligations: []
+  - id: CDR-03
+    status: RESOLVED
+    proposed_requires: [demo.delete-task, demo.delete-product-policy]
+    input_needs:
+      - {obligation: enforce-delete-policy, provider: demo.delete-product-policy}
+      - {obligation: implement-delete-task, provider: demo.delete-task}
+    unresolved_obligations: []
+  - id: CDR-04
+    status: UNRESOLVED
+    proposed_requires: [demo.partner-message-contract]
+    input_needs:
+      - {obligation: preserve-message-shape, provider: demo.partner-message-contract}
+    unresolved_obligations: [enforce-consent]
+  - id: CDR-05
+    status: RESOLVED
+    proposed_requires: [prep.model-context-strategy, prep.product-capabilities]
+    input_needs:
+      - {obligation: define-current-preparation-information, provider: prep.model-context-strategy}
+      - {obligation: define-relationship-meaning, provider: prep.product-capabilities}
+      - {obligation: exclude-learner-conclusions, provider: prep.model-context-strategy}
+    unresolved_obligations: []
+  - id: CDR-06
+    status: RESOLVED
+    proposed_requires: [prep.model-context-strategy, prep.product-capabilities]
+    input_needs:
+      - {obligation: distinguish-history, provider: prep.model-context-strategy}
+      - {obligation: preserve-temporal-context, provider: prep.product-capabilities}
+      - {obligation: preserve-historical-meaning, provider: prep.product-capabilities}
+    unresolved_obligations: []
