@@ -191,6 +191,7 @@ ignored_modules:
   - evals.cdr_contract_change
   - evals.cdr_reference_audit
   - evals.cdr_reference_provider_pilot
+  - evals.cdr_direction_holdout
   - evals.dependency_resolution_process_driver
   - evals.adapters.copilot_dependency_resolution_evaluator
   - evals.dependency_resolution_scenario_driver
