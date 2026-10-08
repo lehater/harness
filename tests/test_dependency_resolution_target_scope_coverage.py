@@ -62,7 +62,11 @@ with tempfile.TemporaryDirectory(prefix="cdr-scope-units-") as dirname:
                  "statement": "Allow presentation of meaningful information to users."},
                 {"id": "REQ-3", "status": "DRAFT",
                  "statement": "Create a mandatory fixed knowledge taxonomy."},
-            ]
+            ],
+            "non_goals": [
+                "Do not impose a fixed taxonomy of knowledge or semantic relationships.",
+                "Do not infer learner-state, mastery or readiness conclusions.",
+            ],
         }
     })
     put(root, ".harness/core.yaml", {
@@ -135,9 +139,16 @@ with tempfile.TemporaryDirectory(prefix="cdr-scope-units-") as dirname:
     assert len({x["source_unit_id"] for x in case["source_units"]}) == case["source_unit_count"]
     accepted_reqs = {
         x["source_local_id"] for x in case["source_units"]
-        if x["scope_role"] == "PRODUCT_CONSTRAINTS"
+        if x["source_unit_kind"] == "ACCEPTED_PRODUCT_REQUIREMENT"
     }
     assert accepted_reqs == {"REQ-1", "REQ-2"}
+    non_goals = [
+        x for x in case["source_units"]
+        if x["source_unit_kind"] == "PRODUCT_NON_GOAL"
+    ]
+    assert len(non_goals) == 2
+    assert {x["source_local_id"] for x in non_goals} == {"NON_GOAL-01", "NON_GOAL-02"}
+    assert all(x["unit_semantic_disposition"] == "UNREVIEWED" for x in non_goals)
     assert "REQ-3" not in repr(good)
     assert any(
         x["candidate_obligations_with_same_source_section"] == ["T-1"]
