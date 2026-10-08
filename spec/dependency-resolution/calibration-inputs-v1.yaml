@@ -1,0 +1,195 @@
+version: 1
+kind: harness-dependency-resolution-calibration-inputs
+status: experimental
+purpose: >-
+  Label-blind discovery cases. Target declared requires and expert answers MUST
+  NOT be injected into Phase A. The companion oracle is reserved for scoring.
+cases:
+  - id: CDR-01
+    archetype: synthetic
+    target:
+      capability: demo.edit-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: enforce-product-edit-policy
+          description: Define application outcomes that deny prohibited edits.
+        - id: preserve-domain-validity
+          description: Apply domain-owned valid state transitions to edit operations.
+    provider_catalog:
+      - capability: demo.product-edit-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Only authorized actors may edit a resource.
+      - capability: demo.resource-domain
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - State transitions must preserve resource ownership invariant.
+      - capability: demo.analytics-reporting
+        authority: ANALYTICS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Report aggregated resource-edit counts.
+
+  - id: CDR-02
+    archetype: synthetic
+    target:
+      capability: demo.edit-interaction
+      authority: INTERFACE
+      knowledge_kind: interaction-design
+      output_obligations:
+        - id: represent-denial
+          description: Present the accepted product-level edit denial.
+        - id: invoke-operation
+          description: Trigger and display the outcome of the accepted application edit operation.
+    provider_catalog:
+      - capability: demo.product-edit-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Deny edits by actors lacking authorization.
+      - capability: demo.edit-operation
+        authority: APPLICATION
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Edit command returns success or authorization-denied outcome.
+      - capability: demo.telemetry-plan
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Emit dashboard aggregation metrics for operational observability.
+
+  - id: CDR-03
+    archetype: synthetic
+    target:
+      capability: demo.delete-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: enforce-delete-policy
+          description: Reject deletion when the actor is not the owner.
+        - id: implement-delete-task
+          description: Implement the accepted request-confirm-delete task and its outcomes.
+    provider_catalog:
+      - capability: demo.delete-product-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Only the owner may delete a post.
+      - capability: demo.delete-task
+        authority: TASK-DESIGN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Request, confirm, and complete or reject deletion as a user task.
+        provider_requires: [demo.delete-product-policy]
+      - capability: demo.system-topology
+        authority: SYSTEM
+        evidence_status: CONTRACT_ONLY
+        semantic_surface:
+          - Future deployment boundaries for application services.
+
+  - id: CDR-04
+    archetype: synthetic
+    target:
+      capability: demo.partner-export
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: preserve-message-shape
+          description: Export records using the accepted partner message semantics.
+        - id: enforce-consent
+          description: Apply an accepted consent rule before partner export.
+    provider_catalog:
+      - capability: demo.partner-message-contract
+        authority: EXTERNAL-INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Partner record fields and their meanings are defined.
+      - capability: demo.general-product-intent
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Allow selected data to be transferred to external services.
+    known_uncertainties:
+      - Owner and accepted semantic contract for consent policy are not yet established.
+
+  - id: CDR-05
+    archetype: prep-mvp-vertical-slice
+    source_snapshot: lehater/prep@mvp-vertical-slice
+    target:
+      capability: prep.preparation-information-model
+      authority: TACTICAL-DOMAIN-DESIGN
+      knowledge_kind: domain-model
+      output_obligations:
+        - id: define-current-preparation-information
+          description: Model Goal, Capability, Knowledge, Practice Material and their semantic distinctions.
+        - id: define-relationship-meaning
+          description: Preserve relationship kinds and relationships across information kinds without imposing one topology.
+        - id: exclude-learner-conclusions
+          description: Do not turn information presence into claims of learner mastery or readiness.
+    provider_catalog:
+      - capability: prep.model-context-strategy
+        authority: MODEL-CONTEXT-STRATEGY
+        evidence_status: ACCEPTED_EVIDENCE
+        source: docs/architecture/model-context-map.md
+        semantic_surface:
+          - MC-01 Preparation Information owns current preparation-related meaning.
+          - Distinguish Goal, Capability, Knowledge and Practice Material without separating them automatically into new contexts.
+          - Preparation Information does not state learner mastery or readiness.
+      - capability: prep.product-capabilities
+        authority: PRODUCT-REQUIREMENTS
+        evidence_status: ACCEPTED_EVIDENCE
+        source: .harness/knowledge/product-capabilities.yaml
+        semantic_surface:
+          - REQ-CAP-KNOWLEDGE-KINDS
+          - REQ-CAP-RELATIONSHIP-MEANINGS
+          - REQ-CAP-CROSS-INFORMATION-RELATIONSHIPS
+      - capability: prep.domain-strategy
+        authority: DOMAIN-STRATEGY
+        evidence_status: ACCEPTED_EVIDENCE
+        source: docs/architecture/context-map.md
+        semantic_surface:
+          - Preparation Information is a core strategic responsibility, not a tactical entity contract.
+        provider_requires: [prep.product-capabilities]
+
+  - id: CDR-06
+    archetype: prep-mvp-vertical-slice
+    source_snapshot: lehater/prep@mvp-vertical-slice
+    target:
+      capability: prep.recorded-activity-history-model
+      authority: TACTICAL-DOMAIN-DESIGN
+      knowledge_kind: domain-model
+      output_obligations:
+        - id: distinguish-history
+          description: Model historical recorded activity separately from current information and learner-state conclusions.
+        - id: preserve-temporal-context
+          description: Keep when activity occurred and what information it concerned.
+        - id: preserve-historical-meaning
+          description: Preserve the meaning of recorded results after current information changes or is removed.
+    provider_catalog:
+      - capability: prep.model-context-strategy
+        authority: MODEL-CONTEXT-STRATEGY
+        evidence_status: ACCEPTED_EVIDENCE
+        source: docs/architecture/model-context-map.md
+        semantic_surface:
+          - MC-02 Recorded Activity History owns recorded activity and result facts.
+          - TR-01 maintains a relationship to Preparation Information without collapsing semantic ownership.
+          - Recorded facts do not establish learner state.
+      - capability: prep.product-capabilities
+        authority: PRODUCT-REQUIREMENTS
+        evidence_status: ACCEPTED_EVIDENCE
+        source: .harness/knowledge/product-capabilities.yaml
+        semantic_surface:
+          - REQ-CAP-RECORD-ACTIVITY
+          - REQ-CAP-RELATE-ACTIVITY
+          - REQ-CAP-PRESERVE-TIME
+          - REQ-CAP-PRESERVE-HISTORY-CONTEXT
+      - capability: prep.domain-strategy
+        authority: DOMAIN-STRATEGY
+        evidence_status: ACCEPTED_EVIDENCE
+        source: docs/architecture/context-map.md
+        semantic_surface:
+          - Recorded Activity History is a core strategic responsibility, not the detailed tactical contract.
+        provider_requires: [prep.product-capabilities]
