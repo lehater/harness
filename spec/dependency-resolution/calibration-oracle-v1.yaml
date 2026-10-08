@@ -1,0 +1,105 @@
+version: 1
+kind: harness-dependency-resolution-calibration-oracle
+status: experimental
+privacy: NEVER_SEND_TO_EVALUATED_AGENT
+note: >-
+  These are authored candidate labels, NOT an independently expert-validated
+  calibration truth. PREP labels are project-specific review hypotheses.
+cases:
+  - id: CDR-01
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: [demo.product-edit-policy]
+    expected_requires: [demo.product-edit-policy, demo.resource-domain]
+    expected_direct_needs:
+      - {obligation: enforce-product-edit-policy, provider: demo.product-edit-policy}
+      - {obligation: preserve-domain-validity, provider: demo.resource-domain}
+    expected_reconciliation:
+      ADD: [demo.resource-domain]
+      KEEP: [demo.product-edit-policy]
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+
+  - id: CDR-02
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: [demo.product-edit-policy, demo.edit-operation, demo.telemetry-plan]
+    expected_requires: [demo.product-edit-policy, demo.edit-operation]
+    expected_direct_needs:
+      - {obligation: represent-denial, provider: demo.product-edit-policy}
+      - {obligation: invoke-operation, provider: demo.edit-operation}
+    expected_reconciliation:
+      ADD: []
+      KEEP: [demo.product-edit-policy, demo.edit-operation]
+      REMOVE_CANDIDATE: [demo.telemetry-plan]
+    expected_unresolved_obligations: []
+    removal_basis: >-
+      The scoped output requires denial representation and invocation semantics.
+      Operational metric aggregation is outside the interface output obligations.
+
+  - id: CDR-03
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: [demo.delete-task]
+    expected_requires: [demo.delete-product-policy, demo.delete-task]
+    expected_direct_needs:
+      - {obligation: enforce-delete-policy, provider: demo.delete-product-policy}
+      - {obligation: implement-delete-task, provider: demo.delete-task}
+    expected_reconciliation:
+      ADD: [demo.delete-product-policy]
+      KEEP: [demo.delete-task]
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: >-
+      demo.delete-task consumes demo.delete-product-policy, but the application
+      itself also enforces the product deletion constraint. Both are direct.
+
+  - id: CDR-04
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: [demo.partner-message-contract]
+    expected_direct_needs:
+      - {obligation: preserve-message-shape, provider: demo.partner-message-contract}
+    expected_reconciliation:
+      ADD: [demo.partner-message-contract]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [enforce-consent]
+    unresolved_reason: No accepted consent policy provider or semantic owner exists in the supplied catalog.
+
+  - id: CDR-05
+    review_status: PROJECT_HYPOTHESIS
+    expected_status: RESOLVED
+    baseline_requires: [prep.model-context-strategy, prep.product-capabilities]
+    expected_requires: [prep.model-context-strategy, prep.product-capabilities]
+    expected_direct_needs:
+      - {obligation: define-current-preparation-information, provider: prep.model-context-strategy}
+      - {obligation: define-relationship-meaning, provider: prep.product-capabilities}
+      - {obligation: exclude-learner-conclusions, provider: prep.model-context-strategy}
+    expected_reconciliation:
+      ADD: []
+      KEEP: [prep.model-context-strategy, prep.product-capabilities]
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    caution: >-
+      The hypothesis is scoped to the three stated obligations. An independent
+      project reviewer must confirm whether other direct inputs are needed.
+
+  - id: CDR-06
+    review_status: PROJECT_HYPOTHESIS
+    expected_status: RESOLVED
+    baseline_requires: [prep.model-context-strategy, prep.product-capabilities]
+    expected_requires: [prep.model-context-strategy, prep.product-capabilities]
+    expected_direct_needs:
+      - {obligation: distinguish-history, provider: prep.model-context-strategy}
+      - {obligation: preserve-temporal-context, provider: prep.product-capabilities}
+      - {obligation: preserve-historical-meaning, provider: prep.product-capabilities}
+    expected_reconciliation:
+      ADD: []
+      KEEP: [prep.model-context-strategy, prep.product-capabilities]
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    caution: >-
+      A project reviewer must verify the exact semantic obligations and whether
+      additional direct inputs are material for this output contract.
