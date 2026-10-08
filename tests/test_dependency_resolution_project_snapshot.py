@@ -183,12 +183,12 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         "  ob=c['target']['output_obligations'][0]['id']\n"
         "  coverage=[dict(requirement_id=rc['requirement_id'],disposition='UNDECIDED',"
         "rationale='Accepted source applicability to tactical semantics needs independent review.') "
-        "for rc in c['target']['upstream_constraint_candidates']]\\n"
+        "for rc in c['target']['upstream_constraint_candidates']]\n"
         "  out.append(dict(case_request_id=c['case_request_id'],status='RESOLVED',"
         "proposed_requires=[p],unresolved_obligations=[],input_needs=[dict("
         "obligation=ob,provider=p,claim_index=0,basis='DIRECT_ACCEPTED',"
         "consumption_rationale='This directly constrains the scoped model output.')],\n"
-        "coverage_assessments=coverage))\\n"
+        "coverage_assessments=coverage))\n"
         "print(json.dumps(dict(version=1,kind='harness-dependency-resolution-evaluator-response',"
         "request_id=x['request_id'],results=out,provenance=dict(provider='github-copilot'))))\n",
         encoding="utf-8",
