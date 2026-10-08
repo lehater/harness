@@ -128,6 +128,10 @@ def compare(
             "UNASSESSED_EXISTING_EDGES": sorted(current_set - proposed_set),
             "removal_assessment": "BLOCKED_INCOMPLETE_TARGET_OBLIGATIONS",
             "target_obligation_coverage": coverage["status"],
+            "target_formulation": inputs.get("target_formulation", "SOURCE_BOUND"),
+            "target_formulation_authority": inputs.get(
+                "target_formulation_authority", "UNSPECIFIED"
+            ),
             "product_candidate_assessment": "REVIEW_REQUIRED",
             "product_candidates_accounted_for": next(
                 (x.get("accepted_candidates_inventoried")
@@ -140,6 +144,10 @@ def compare(
     return {
         "status": "READ_ONLY_RECONCILIATION",
         "source_snapshot": sha,
+        "target_formulation": inputs.get("target_formulation", "SOURCE_BOUND"),
+        "target_formulation_authority": inputs.get(
+            "target_formulation_authority", "UNSPECIFIED"
+        ),
         "cases": findings,
         "automatic_writeback_allowed": False,
         "semantic_entailment_verified": False,
