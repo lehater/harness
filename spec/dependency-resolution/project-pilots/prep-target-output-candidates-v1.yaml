@@ -1,0 +1,136 @@
+version: 1
+kind: harness-cdr-target-output-contract-candidates
+status: OPERATOR_DRAFT_NOT_ACCEPTED
+source_project: lehater/prep
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+owning_authority: TACTICAL-DOMAIN-DESIGN
+purpose: >-
+  Candidates for Authority-owned target output obligations, not canonical
+  PREP artifacts, not an expert oracle, and not a source of requires edges.
+  The accepted upstream semantic scope and product expectations motivate
+  these drafts without deciding how a tactical model is decomposed.
+no_automatic_writeback: true
+target_contracts:
+  - target_capability: prep.preparation-information-model
+    target_contract_status: NEEDS_INDEPENDENT_AUTHORITY_REVIEW
+    candidate_obligations:
+      - id: PI-SEMANTIC-CONCEPTS
+        description: >-
+          Describe the meanings and permissible distinctions of preparation
+          information such as goals, capabilities, knowledge, and practice
+          material, allowing additional valid kinds without imposing a fixed
+          taxonomy or storage structure.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-01 Preparation Information
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: PI-KNOWLEDGE-AND-RELATIONS
+        description: >-
+          Define semantics of distinguishable kinds of knowledge, relationships,
+          and relationship meanings, including links across information kinds,
+          while retaining the ability to understand the same information from
+          different perspectives.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-01 Preparation Information
+          - path: docs/architecture/context-map.md
+            heading: DS-01 Preparation Information — CORE
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: PI-BOUNDARY-TO-HISTORY
+        description: >-
+          Specify the meaning of preparation information when historical
+          activity refers to it, preserving distinction from recorded facts
+          without making the current-information model own activity history.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: TR-01 Preparation Information and Recorded Activity History
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: PI-NEGATIVE-INVARIANTS
+        description: >-
+          Define what the meaning of current preparation information does
+          not establish about an individual, such as learner-state,
+          competence, mastery, or readiness conclusions.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-01 Preparation Information
+        status: CANDIDATE_NOT_ACCEPTED
+    unresolved_scope_questions:
+      - >-
+        Does perspective exploration impose an independent invariant on the
+        domain model, or only require the model to preserve existing meanings
+        for application-level exploration?
+      - >-
+        Which domain concepts are independent enough to warrant additional
+        Capabilities, without fixing that decomposition prematurely?
+      - >-
+        Which Product Capability constraints must be consumed directly versus
+        being fully supplied by an already accepted intermediate contract?
+  - target_capability: prep.recorded-activity-history-model
+    target_contract_status: NEEDS_INDEPENDENT_AUTHORITY_REVIEW
+    candidate_obligations:
+      - id: RH-RECORDED-FACTS
+        description: >-
+          Define the domain meanings of retained preparation activity and
+          available results as historical facts, with time and other context
+          needed to distinguish what happened without inferring learner state.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-02 Recorded Activity History
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: RH-REFERENCED-INFORMATION
+        description: >-
+          Define semantic relationships between recorded activity or results
+          and preparation information they concern, preserving the different
+          ownership and meaning of current information and historical facts.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: TR-01 Preparation Information and Recorded Activity History
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: RH-PRESERVED-CONTEXT
+        description: >-
+          Describe invariants needed for historical records to remain
+          intelligible when referenced current information later changes or
+          is removed, without silently rewriting past recorded facts.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-02 Recorded Activity History
+          - path: docs/architecture/model-context-map.md
+            heading: TR-01 Preparation Information and Recorded Activity History
+        status: CANDIDATE_NOT_ACCEPTED
+      - id: RH-NEGATIVE-INVARIANTS
+        description: >-
+          Prevent historical activity and results from becoming assertions
+          that a person has mastered particular knowledge, possesses a
+          capability, or meets a readiness threshold.
+        upstream_scope:
+          - path: docs/architecture/model-context-map.md
+            heading: MC-02 Recorded Activity History
+        status: CANDIDATE_NOT_ACCEPTED
+    unresolved_scope_questions:
+      - >-
+        Does exploring historical activity add independent domain invariants
+        beyond retaining intelligible history, or is it an application-level
+        consumer of the historical model?
+      - >-
+        Which state changes and deletion semantics affect the truth of
+        historical facts rather than only application lifecycle orchestration?
+      - >-
+        Is any Domain Strategy invariant absent from the accepted Model
+        Context contract and independently necessary to this target output?
+governance:
+  acceptance_required_in: lehater/prep
+  owner: TACTICAL-DOMAIN-DESIGN
+  acceptance_prerequisites:
+    - >-
+      Separately register actual target-produced artifacts in PREP Core when
+      their intended outputs are ready, rather than adding an experiment-only
+      artifact to PREP prematurely.
+    - >-
+      Semantically review the target output obligations under their owning
+      Authority and record the corresponding baseline revision.
+    - >-
+      Evaluate independent target obligation authority and semantic
+      completeness; machine registration alone is not proof.
+  prohibition: >-
+    Do not infer or write canonical requires edges from these drafts or
+    treat them as adopted PREP target contracts.
