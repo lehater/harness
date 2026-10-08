@@ -188,6 +188,8 @@ ignored_modules:
   - evals.cdr_operational
   - evals.cdr_graph_audit
   - evals.cdr_governance_packet
+  - evals.cdr_contract_change
+  - evals.cdr_reference_audit
   - evals.dependency_resolution_process_driver
   - evals.adapters.copilot_dependency_resolution_evaluator
   - evals.dependency_resolution_scenario_driver
