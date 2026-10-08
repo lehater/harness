@@ -171,6 +171,9 @@ ignored_modules:
   - experiments.coverage_planner_experiment
   - experiments.lifecycle_experiment
   - evals.live_calibration_process_driver
+  - evals.dependency_resolution_calibration
+  - evals.dependency_resolution_process_driver
+  - evals.dependency_resolution_scenario_driver
 
 published_boundaries:
   - from_context: coverage
