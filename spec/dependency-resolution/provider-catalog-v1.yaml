@@ -1,0 +1,26 @@
+version: 1
+kind: harness-scenario-coverage-catalog
+id: capability-dependency-resolution-live-calibration-v1
+dimensions:
+  project_archetype: [synthetic]
+  stage: [diagnosis]
+  behavior_class: [assurance]
+  execution_type: [agent-evaluation]
+required_scenario_dimensions:
+  - project_archetype
+  - stage
+  - behavior_class
+  - execution_type
+required_dimension_values:
+  stage: [diagnosis]
+  behavior_class: [assurance]
+  execution_type: [agent-evaluation]
+required_benchmark_metrics: []
+required_drivers:
+  - dependency.calibration.execute_process
+requirements:
+  - id: dependency-resolution-live-evaluation
+    category: assurance
+    enforcement: required
+    description: A real evaluator returns request-bound read-only dependency proposals.
+    min_scenarios: 1
