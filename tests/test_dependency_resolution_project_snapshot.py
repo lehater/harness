@@ -181,10 +181,14 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         "for c in x['cases']:\n"
         "  p=c['provider_catalog'][0]['capability']\n"
         "  ob=c['target']['output_obligations'][0]['id']\n"
+        "  coverage=[dict(requirement_id=rc['requirement_id'],disposition='UNDECIDED',"
+        "rationale='Accepted source applicability to tactical semantics needs independent review.') "
+        "for rc in c['target']['upstream_constraint_candidates']]\\n"
         "  out.append(dict(case_request_id=c['case_request_id'],status='RESOLVED',"
         "proposed_requires=[p],unresolved_obligations=[],input_needs=[dict("
         "obligation=ob,provider=p,claim_index=0,basis='DIRECT_ACCEPTED',"
-        "consumption_rationale='This directly constrains the scoped model output.')]))\n"
+        "consumption_rationale='This directly constrains the scoped model output.')],\n"
+        "coverage_assessments=coverage))\\n"
         "print(json.dumps(dict(version=1,kind='harness-dependency-resolution-evaluator-response',"
         "request_id=x['request_id'],results=out,provenance=dict(provider='github-copilot'))))\n",
         encoding="utf-8",
@@ -203,6 +207,9 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert evaluation["bound_predictions"]["cases"][0]["proposed_requires"]
         assert evaluation["evidence_assessment"]["semantic_entailment_verified"] is False
         assert evaluation["oracle_is_expert_validated"] is False
+        assert evaluation["coverage_assessment"]["status"] == "REVIEW_REQUIRED"
+        assert evaluation["coverage_assessment"]["cases"][0]["accepted_candidates_inventoried"] == 2
+        assert evaluation["coverage_assessment"]["semantic_applicability_adjudicated"] is False
 
         # Exercise the checked-in oracle-free template through Scenario Suite
         # (fake process only); this tests fixture paths and scenario wiring.
@@ -234,6 +241,8 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert comparison["cases"][0]["UNASSESSED_EXISTING_EDGES"] == ["x.strategy"]
         assert comparison["cases"][0]["removal_assessment"] == "BLOCKED_INCOMPLETE_TARGET_OBLIGATIONS"
         assert comparison["cases"][0]["target_obligation_coverage"] == "PARTIAL_BY_CONSTRUCTION"
+        assert comparison["cases"][0]["product_candidates_accounted_for"] == 2
+        assert comparison["cases"][0]["product_candidate_assessment"] == "REVIEW_REQUIRED"
         # The model omitted x.strategy but the source scope was partial:
         # reporting a genuine REMOVE_CANDIDATE would be a false deletion cue.
         tampered_coverage = copy.deepcopy(inputs)
@@ -247,6 +256,15 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
             pass
         else:
             raise AssertionError("coverage completeness cannot be self-declared by fixture")
+
+        missing_coverage = copy.deepcopy(evaluation)
+        missing_coverage["bound_predictions"]["cases"][0]["coverage_assessments"].pop()
+        try:
+            compare(base, sha=sha, inputs=inputs, evaluation=missing_coverage)
+        except DiscoveryError:
+            pass
+        else:
+            raise AssertionError("Phase B must reject incomplete product coverage inventory")
 
         broken = copy.deepcopy(evaluation)
         broken["source_snapshot"] = "0" * 40
