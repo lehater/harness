@@ -1,0 +1,191 @@
+version: 1
+kind: harness-dependency-resolution-calibration-inputs
+status: experimental-holdout
+purpose: >-
+  Unseen challenge set for real provider evaluation. Independent of initial
+  CDR-01..06 seed examples; no target requires, expert labels, or target-edge
+  hints. Retain as a separate corpus and never give its oracle to the agent.
+cases:
+  - id: HLD-01
+    archetype: integration
+    target:
+      capability: holdout.partner-sharing-workflow
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: encode-partner-message
+          description: Create a partner export payload using accepted external field meanings.
+        - id: enforce-release-consent
+          description: Prevent transmission unless a valid data-sharing consent rule permits it.
+    provider_catalog:
+      - capability: holdout.partner-field-contract
+        authority: EXTERNAL-INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Partner payload fields, allowed values, and their meanings are agreed.
+      - capability: holdout.product-sharing-intent
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Users may choose to share selected records with a partner.
+      - capability: holdout.network-transport-plan
+        authority: SYSTEM
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Transport protocol and retry policy for authorized messages.
+
+  - id: HLD-02
+    archetype: planned-capability
+    target:
+      capability: holdout.billing-quote-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: quote-regional-tax
+          description: Produce a region-specific tax-inclusive quote according to governed tax rules.
+        - id: represent-invoice-amount
+          description: Emit the quote amount in the accepted invoice amount vocabulary.
+    provider_catalog:
+      - capability: holdout.tax-rule-design
+        authority: TAX-DESIGN
+        evidence_status: CONTRACT_ONLY
+        semantic_surface:
+          - Future rules will identify jurisdictional tax applicability.
+          - No accepted rate definitions, exemptions, or effective-date logic exist yet.
+      - capability: holdout.invoice-language
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Invoice amount means currency plus decimal value before or after tax, explicitly identified.
+      - capability: holdout.tax-operations-dashboard
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Monitor processing latency of billing jobs.
+
+  - id: HLD-03
+    archetype: same-authority
+    target:
+      capability: holdout.domain-localized-catalog
+      authority: DOMAIN
+      knowledge_kind: domain-model
+      output_obligations:
+        - id: preserve-approved-product-vocabulary
+          description: Define localized catalog terms without changing the accepted meaning of product categories.
+    provider_catalog:
+      - capability: holdout.domain-category-vocabulary
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Approved categories and their semantic membership rules govern the catalog.
+      - capability: holdout.domain-price-schedule
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Product price adjustments depend on settlement period and currency.
+      - capability: holdout.interface-translation-layout
+        authority: INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Layout constraints govern visible label wrapping only.
+
+  - id: HLD-04
+    archetype: shared-canonical-file
+    target:
+      capability: holdout.account-validation-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: enforce-account-validity
+          description: Reject account updates that violate accepted account invariants.
+    provider_catalog:
+      - capability: holdout.account-validity-domain
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        canonical_artifact: docs/account-domain.md
+        semantic_surface:
+          - An account state must not have a closed date before its opening date.
+      - capability: holdout.account-audit-domain
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        canonical_artifact: docs/account-domain.md
+        semantic_surface:
+          - Audit events are immutable and are associated with the actor performing an action.
+      - capability: holdout.account-ui-guidance
+        authority: INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Error messages use short labels.
+
+  - id: HLD-05
+    archetype: misleading-provider-name
+    target:
+      capability: holdout.customer-consent-enforcement
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: enforce-opt-out-rule
+          description: Deny outreach if a customer has an active opt-out under the accepted product rule.
+    provider_catalog:
+      - capability: holdout.consent-analytics
+        authority: ANALYTICS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Aggregate opt-out counts across monthly cohorts without setting enforcement rules.
+      - capability: holdout.product-outreach-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - An active customer opt-out prohibits new outreach until withdrawal of the opt-out.
+      - capability: holdout.workflow-scheduling
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Queue outreach jobs at hourly intervals.
+
+  - id: HLD-06
+    archetype: multiple-direct-sources-one-obligation
+    target:
+      capability: holdout.document-access-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: decide-document-access
+          description: Grant access only when the actor has an allowed product role and the document ownership invariant is satisfied.
+    provider_catalog:
+      - capability: holdout.product-access-roles
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Only the owner or a designated reviewer role may attempt document access.
+      - capability: holdout.domain-document-ownership
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Access must preserve the invariant that documents belong to exactly one owning tenant.
+      - capability: holdout.compliance-access-logging
+        authority: COMPLIANCE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Log each completed access decision for retention compliance.
+
+  - id: HLD-07
+    archetype: no-external-prerequisites
+    target:
+      capability: holdout.interface-static-placeholder
+      authority: INTERFACE
+      knowledge_kind: interface-design
+      output_obligations:
+        - id: render-neutral-placeholder
+          description: Specify a fixed decorative separator with no business meaning, behavior, state, or inherited brand rule.
+    provider_catalog:
+      - capability: holdout.domain-sales-status
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Sales status encodes pending, completed, or cancelled.
+      - capability: holdout.operations-metrics
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Report request throughput per minute.
