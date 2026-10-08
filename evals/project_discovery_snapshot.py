@@ -82,14 +82,14 @@ def _markdown_claims(text: str) -> list[str]:
     for line in lines:
         s = line.strip()
         if s.startswith("#"):
-            m = re.match(r"^#{1,6}\\s+(.+)$", s)
+            m = re.match(r"^#{1,6}\s+(.+)$", s)
             if m:
                 flush()
                 current_heading = m.group(1)
                 continue
         if not s:
             flush()
-        elif s.startswith(("- ", "* ")) or re.match(r"^\\d+\\. ", s):
+        elif s.startswith(("- ", "* ")) or re.match(r"^\d+\. ", s):
             flush()
             output.append(f"{current_heading}: {s}")
         elif s.startswith("**Derived from:**"):
@@ -142,7 +142,7 @@ def _yaml_claims(value: dict[str, Any]) -> list[str]:
 
 def _heading_scope(text: str, heading: str) -> str:
     lines = text.splitlines()
-    needle = re.compile(r"^(#{1,6})\\s+" + re.escape(heading) + r"\\s*$")
+    needle = re.compile(r"^(#{1,6})\s+" + re.escape(heading) + r"\s*$")
     start = None
     level = 7
     for i, line in enumerate(lines):
@@ -155,7 +155,7 @@ def _heading_scope(text: str, heading: str) -> str:
         raise DiscoveryError(f"scope heading missing: {heading}")
     end = len(lines)
     for j in range(start + 1, len(lines)):
-        m = re.match(r"^(#{1,6})\\s+", lines[j].strip())
+        m = re.match(r"^(#{1,6})\s+", lines[j].strip())
         if m and len(m.group(1)) <= level:
             end = j
             break
