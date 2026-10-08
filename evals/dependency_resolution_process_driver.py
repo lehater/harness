@@ -18,6 +18,7 @@ from typing import Any
 from harness.application.scenario_drivers import scenario_driver
 from evals.dependency_resolution_calibration import validate, score
 from evals.dependency_resolution_evidence import assess_predictions
+from evals.project_discovery_coverage import assess_coverage
 
 EXECUTABLE_ENV = "HARNESS_CDR_EVALUATOR_EXECUTABLE"
 TIMEOUT_ENV = "HARNESS_CDR_EVALUATOR_TIMEOUT_SECONDS"
@@ -273,6 +274,8 @@ def execute_dependency_resolution_process(
             "proposed_requires": item.get("proposed_requires"),
             "input_needs": item.get("input_needs"),
             "unresolved_obligations": item.get("unresolved_obligations"),
+            **({"coverage_assessments": copy.deepcopy(item.get("coverage_assessments"))}
+               if inputs.get("coverage_contract", "legacy") == "source-traceability-v1" else {}),
         })
     predictions = {
         "version": 1,
@@ -284,12 +287,15 @@ def execute_dependency_resolution_process(
             evaluation = score(inputs, oracle, predictions)
         else:
             assessment = assess_predictions(inputs, predictions)
+            coverage_assessment = assess_coverage(inputs, predictions)
             evaluation = {
                 "status": ("DISCOVERY_REQUIRES_REVIEW"
-                           if assessment["status"] != "INVALID" else "INVALID"),
+                           if assessment["status"] != "INVALID"
+                           and coverage_assessment["status"] != "INVALID" else "INVALID"),
                 "calibration_claim": "NOT_APPLICABLE_NO_ORACLE",
                 "oracle_is_expert_validated": False,
                 "evidence_assessment": assessment,
+                "coverage_assessment": coverage_assessment,
                 "source_snapshot": inputs.get("source_snapshot"),
                 "edge_comparison": None,
                 "automatic_writeback_allowed": False,
