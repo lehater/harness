@@ -265,6 +265,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         # model result and its valid reference assessment exist.
         comparison = compare(base, sha=sha, inputs=inputs, evaluation=evaluation)
         assert comparison["status"] == "READ_ONLY_RECONCILIATION"
+        assert comparison["target_formulation"] == "SOURCE_BOUND"
         assert comparison["automatic_writeback_allowed"] is False
         assert comparison["cases"][0]["KEEP"] == ["x.accepted-policy"]
         assert comparison["cases"][0]["ADD"] == []
