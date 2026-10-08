@@ -1,0 +1,33 @@
+version: 1
+kind: harness-scenario
+id: dependency-resolution-prep-project-discovery
+title: Blind read-only dependency discovery from pinned PREP accepted project sources
+dimensions:
+  project_archetype: real-project-snapshot
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: agent-evaluation
+covers: [dependency-resolution-real-project-discovery]
+fixtures:
+  inputs: {yaml: ../generated-prep-discovery.yaml}
+steps:
+  - id: run
+    driver: dependency.discovery.execute_process
+    with:
+      inputs: {ref: fixture.inputs}
+      run_id: __RUN_ID__
+    observe:
+      evaluation: /
+  - id: integrity
+    driver: data.patch
+    with:
+      value: {ref: step.run}
+      operations: []
+    expect:
+      - {path: /status, op: equals, value: DISCOVERY_REQUIRES_REVIEW}
+      - {path: /calibration_claim, op: equals, value: NOT_APPLICABLE_NO_ORACLE}
+      - {path: /oracle_is_expert_validated, op: equals, value: false}
+      - {path: /automatic_writeback_allowed, op: equals, value: false}
+      - {path: /execution/state, op: equals, value: COMPLETED}
+      - {path: /execution/provider_provenance/provider, op: equals, value: github-copilot}
+      - {path: /independence, op: equals, value: UNVERIFIED}
