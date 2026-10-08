@@ -49,6 +49,8 @@ def digest(value: Any) -> str:
 def _unique(rows: list[dict[str, Any]], key: str) -> dict[str, dict[str, Any]]:
     found = {}
     for row in rows:
+        if not isinstance(row, dict):
+            raise DiscoveryError("malformed review row")
         value = row.get(key)
         if not isinstance(value, str) or not value or value in found:
             raise DiscoveryError("missing/duplicate review identity")
@@ -246,6 +248,29 @@ def validate_draft(packet: dict[str, Any], draft: dict[str, Any]) -> dict[str, A
                 and row["decision"] == "DRAFT_SCOPE_PLAUSIBLE"
             ):
                 raise DiscoveryError("unreviewed scope cannot be called plausibly complete")
+    # Four facets remain independent draft decisions. A tentative direct
+    # need cannot inherit owner/export and output-scope review from a citation.
+    outputs = _unique(facets["target_outputs"], "id")
+    ownership = _unique(facets["export_ownership"], "id")
+    directness = _unique(facets["direct_consumption"], "id")
+    for item in packet["review_facets"]["direct_consumption"]:
+        row = directness[item["id"]]
+        if row["decision"] == "LIKELY_DIRECT":
+            if (outputs[item["target_obligation"]]["decision"] != "LIKELY_IN_SCOPE"
+                    or ownership[item["provider_claim_id"]]["decision"] != "LIKELY_OWNED"):
+                raise DiscoveryError(
+                    "likely-direct draft cannot silently inherit ownership "
+                    "or target output scope from a model citation"
+                )
+    coverage = facets["input_coverage"][0]
+    if coverage["decision"] == "DRAFT_SCOPE_PLAUSIBLE":
+        if (any(row["decision"] != "LIKELY_IN_SCOPE" for row in outputs.values())
+                or any(row["decision"] == "UNDETERMINED" for row in directness.values())
+                or any(item["cycle_blocked"]
+                       for item in packet["review_facets"]["direct_consumption"])):
+            raise DiscoveryError(
+                "coverage draft cannot bypass separate output/directness reviews"
+            )
     return {
         "kind": "harness-cdr-authority-review-draft-validation",
         "packet_sha256": packet["packet_sha256"],
