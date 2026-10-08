@@ -165,5 +165,49 @@ with patch.object(
     else:
         raise AssertionError("two invalid responses must fail closed")
 
+# Source-traceability-v1 requires exhaustive per-product statement
+# applicability review; silently missing a candidate is a protocol failure.
+coverage_request = copy.deepcopy(request)
+coverage_request["coverage_contract"] = "source-traceability-v1"
+coverage_request["cases"] = [coverage_request["cases"][0]]
+coverage_request["cases"][0]["target"]["upstream_constraint_candidates"] = [
+    {"requirement_id": "REQ-CANDIDATE-1", "provider": "fixture.product",
+     "claim_index": 0, "statement": "A test accepted product rule.",
+     "traceability": "EXPLICIT_STRATEGIC_DERIVATION",
+     "applicability": "REQUIRES_SEMANTIC_REVIEW"},
+    {"requirement_id": "REQ-CANDIDATE-2", "provider": "fixture.product",
+     "claim_index": 1, "statement": "Unrelated accepted product rule.",
+     "traceability": "UNADJUDICATED_ACCEPTED_PRODUCT_REQUIREMENT",
+     "applicability": "REQUIRES_SEMANTIC_REVIEW"},
+]
+coverage_result = copy.deepcopy(example["results"][0])
+coverage_result["coverage_assessments"] = [
+    {"requirement_id": "REQ-CANDIDATE-1", "disposition": "DIRECT_CONSTRAINT",
+     "rationale": "The accepted normative claim constrains this exact target meaning."},
+    {"requirement_id": "REQ-CANDIDATE-2", "disposition": "UNDECIDED",
+     "rationale": "The accepted statement needs further scope applicability review."},
+]
+response = {"results": [coverage_result]}
+valid_rows, _ = adapter._validate_model_results(response, coverage_request)
+assert len(valid_rows[0]["coverage_assessments"]) == 2
+assert "coverage_assessments" in adapter._prompt(coverage_request)
+assert "expected_requires" not in adapter._prompt(coverage_request)
+
+for change in ("missing", "duplicate", "short-rationale"):
+    bad_response = copy.deepcopy(response)
+    rows = bad_response["results"][0]["coverage_assessments"]
+    if change == "missing":
+        rows.pop()
+    elif change == "duplicate":
+        rows[1]["requirement_id"] = rows[0]["requirement_id"]
+    else:
+        rows[0]["rationale"] = "no"
+    try:
+        adapter._validate_model_results(bad_response, coverage_request)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(f"source coverage validation must reject {change}")
+
 assert oracle["privacy"] == "NEVER_SEND_TO_EVALUATED_AGENT"
 print("Copilot Dependency Resolution adapter: PASS")
