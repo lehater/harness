@@ -46,11 +46,14 @@ justified provider, set status UNRESOLVED and include the obligation id in
 unresolved_obligations. CONTRACT_ONLY providers can justify provisional dependency
 planning only, not claims about accepted semantic atoms.
 Return only one JSON object with a top-level results array; omit version and kind, which the adapter owns. No markdown, no private chain-of-thought.
-For each case, return its opaque case_request_id and:
-status RESOLVED or UNRESOLVED;
-proposed_requires as array of CapabilityIds;
-input_needs as array of {obligation, provider} for every direct need;
-unresolved_obligations as array of output obligation ids.
+For EVERY case, return ALL FIVE keys EXACTLY:
+1. case_request_id: unchanged opaque case request identifier;
+2. status: RESOLVED or UNRESOLVED;
+3. proposed_requires: array of directly required CapabilityIds (use [] when none);
+4. input_needs: array of supported direct needs (use [] when none);
+5. unresolved_obligations: array of unresolved output obligation IDs (use [] when none).
+Never omit unresolved_obligations, even for a RESOLVED case.
+Only a complete five-key object for each supplied case is valid.
 Do not create dependencies not justified by direct consumption.
 The model must not use any external tools or examine local files.
 """
@@ -117,7 +120,7 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
                     "unresolved_obligations": ["unresolved obligation ids"],
                 }
             ],
-            "output": "Exactly one JSON object with a top-level results array. The adapter, not the model, owns the outer protocol version and kind.",
+            "output": "Exactly one JSON object with a top-level results array. Every case MUST have case_request_id, status, proposed_requires, input_needs and unresolved_obligations. Empty arrays MUST be [] rather than omitted. Version/kind belong to the adapter.",
         },
     }
 
@@ -176,9 +179,9 @@ def _validate_model_results(
     return results, envelope
 
 
-def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def _invoke_copilot_once(executable: str, prompt: str) -> tuple[Any, dict[str, Any]]:
+    """One tool-free, fresh-session Copilot invocation, without any oracle."""
     session_id = str(uuid.uuid4())
-    executable = os.environ.get("HARNESS_COPILOT_EXECUTABLE", "copilot")
     with tempfile.TemporaryDirectory(prefix="harness-cdr-copilot-") as directory:
         root = Path(directory)
         home = root / "home"
@@ -188,10 +191,12 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
         env = _sanitized_env(home)
         observed_version = _observed_cli_version(executable, env)
         if observed_version != CLI_VERSION:
-            raise RuntimeError(f"Copilot CLI mismatch expected={CLI_VERSION} actual={observed_version}")
+            raise RuntimeError(
+                f"Copilot CLI mismatch expected={CLI_VERSION} actual={observed_version}"
+            )
         command = [
             executable,
-            "-p", _prompt(request),
+            "-p", prompt,
             f"--model={MODEL}",
             "--output-format=json",
             f"--session-id={session_id}",
@@ -205,15 +210,16 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
             "--no-remote-export",
             "--no-experimental",
         ]
-        result = subprocess.run(
+        completed = subprocess.run(
             command, cwd=work, env=env, text=True, capture_output=True,
-            timeout=210, check=False,
+            timeout=105, check=False,
         )
-        if result.returncode:
+        if completed.returncode:
             raise RuntimeError(
-                f"Copilot CLI failed ({result.returncode}): {result.stderr.strip()[:1600]}"
+                f"Copilot CLI failed ({completed.returncode}): "
+                f"{completed.stderr.strip()[:1600]}"
             )
-        model_text, observed_model = _parse_copilot_jsonl(result.stdout)
+        model_text, observed_model = _parse_copilot_jsonl(completed.stdout)
         resolved_model = _resolved_model_from_session(home) or observed_model
         if not resolved_model:
             raise RuntimeError("Copilot resolved model is not observable")
@@ -221,22 +227,69 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
             model_result = json.loads(model_text)
         except json.JSONDecodeError as exc:
             raise ValueError("Copilot result must be strict JSON") from exc
-    results, model_envelope = _validate_model_results(model_result, request)
-    provenance = {
-        "provider": "github-copilot",
+    return model_result, {
         "requested_model": MODEL,
         "resolved_model": resolved_model,
         "observed_cli_version": observed_version,
         "client_session_id": session_id,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-        "fresh_home": True,
-        "custom_instructions_disabled": True,
-        "builtin_mcps_disabled": True,
-        "no_available_tools": True,
-        "independence": "UNVERIFIED",
-        "model_envelope": model_envelope,
     }
-    return {"results": results}, provenance
+
+
+def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate complete model-owned rows; retry one schema error with feedback.
+
+    The retry is a new complete, blinded model invocation. No defaults,
+    patches, inferred edges, previous model predictions or oracle labels are
+    supplied. An invalid second response fails closed.
+    """
+    executable = os.environ.get("HARNESS_COPILOT_EXECUTABLE", "copilot")
+    blinded_prompt = _prompt(request)
+    schema_errors: list[str] = []
+    invocation_metadata: list[dict[str, Any]] = []
+    for attempt in range(2):
+        prompt = blinded_prompt
+        if schema_errors:
+            prompt += (
+                "\nSCHEMA RETRY: The previous complete response was rejected: "
+                + schema_errors[-1]
+                + ". Return a NEW complete answer for every original case, "
+                  "with all five mandatory fields. Use [] for empty arrays. "
+                  "Do not treat this feedback as semantic evidence. "
+                  "Do not guess unresolved facts or change the source claims."
+            )
+        model_result, info = _invoke_copilot_once(executable, prompt)
+        invocation_metadata.append(info)
+        try:
+            results, model_envelope = _validate_model_results(model_result, request)
+        except ValueError as exc:
+            error = str(exc)
+            schema_errors.append(error)
+            if attempt == 1:
+                raise ValueError(
+                    "Copilot schema rejected after 2 fresh attempts: "
+                    + "; ".join(schema_errors)
+                ) from exc
+            continue
+        provenance = {
+            "provider": "github-copilot",
+            "requested_model": MODEL,
+            "resolved_model": info["resolved_model"],
+            "observed_cli_version": info["observed_cli_version"],
+            "client_session_id": info["client_session_id"],
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "fresh_home": True,
+            "custom_instructions_disabled": True,
+            "builtin_mcps_disabled": True,
+            "no_available_tools": True,
+            "independence": "UNVERIFIED",
+            "model_envelope": model_envelope,
+            "invocation_attempts": len(invocation_metadata),
+            "schema_retry_errors": schema_errors,
+            "attempt_session_ids": [m["client_session_id"] for m in invocation_metadata],
+            "attempt_resolved_models": [m["resolved_model"] for m in invocation_metadata],
+        }
+        return {"results": results}, provenance
+    raise RuntimeError("unreachable: Copilot attempts exhausted")
 
 
 def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
