@@ -235,12 +235,14 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     review_path=root/"cdr-review-draft.yaml"
     save(root,"cdr-review-draft.yaml",review_draft)
     check=root/"cdr-draft-check.json"
-    subprocess.run([
-        "make","-s","-C",str(ROOT),"cdr-check-review",
-        "CDR_DOSSIER="+str(dossier_path),
-        "CDR_REVIEW="+str(review_path),
-        "CDR_OUTPUT="+str(check),
-    ],check=True,capture_output=True,text=True)
+    subprocess.run(
+        common+["cdr-check-review",
+                "CDR_PREDICTIONS="+str(root/"cdr-prediction.json"),
+                "CDR_DOSSIER="+str(dossier_path),
+                "CDR_REVIEW="+str(review_path),
+                "CDR_OUTPUT="+str(check)],
+        check=True,capture_output=True,text=True,
+    )
     assert json.loads(check.read_text(encoding="utf-8"))==validation
     assert git(root,"status","--porcelain","--untracked-files=no")==""
 
