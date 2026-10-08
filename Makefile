@@ -112,6 +112,7 @@ harness-check:
 	python tests/test_cdr_reference_provider_pilot.py
 	python tests/test_cdr_direction_holdout.py
 	python tests/test_cdr_prep_accepted_target_pilot.py
+	python tests/test_cdr_provider_owned_surfaces.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
