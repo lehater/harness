@@ -164,7 +164,19 @@ review = {
         for name in REQUIRED_TESTS
     ],
 }
-valid = validate_review_record(packet, review)
+# Source-echo output obligations cannot be self-certified by a review
+# record as independently accepted. A truly separate accepted target contract
+# is a prerequisite for even recording a complete review decision.
+source_echo_review = validate_review_record(packet, review)
+assert source_echo_review["status"] == "INVALID"
+assert "SOURCE_ECHO_UNRESOLVED" in source_echo_review["failures"]
+assert "NO_INDEPENDENT_ACCEPTED_TARGET_SCOPE" in source_echo_review["failures"]
+independent_packet = {
+    **packet,
+    "source_echo_obligations": [],
+    "obligation_formulation_authority": "ACCEPTED_INDEPENDENT_TARGET_SCOPE",
+}
+valid = validate_review_record(independent_packet, review)
 assert valid["status"] == "RECORDED_FOR_GOVERNANCE_REVIEW"
 assert valid["semantic_correctness_independently_verified_by_code"] is False
 assert valid["graph_mutation_authorized"] is False
@@ -176,11 +188,11 @@ for key, bad_value in (
     ("reviewer_id", ""),
 ):
     altered = dict(review, **{key: bad_value})
-    assert validate_review_record(packet, altered)["status"] == "INVALID", key
+    assert validate_review_record(independent_packet, altered)["status"] == "INVALID", key
 partial = dict(review, tests=review["tests"][:2])
-assert validate_review_record(packet, partial)["status"] == "INVALID"
+assert validate_review_record(independent_packet, partial)["status"] == "INVALID"
 inconsistent = dict(review, conclusion="DIRECT_REQUIRED")
-assert validate_review_record(packet, inconsistent)["status"] == "INVALID"
+assert validate_review_record(independent_packet, inconsistent)["status"] == "INVALID"
 
 neutral_packet_case = {
     **packet_case,
@@ -211,5 +223,8 @@ assert neutral_review["individual_need_evidence"][0]["target_obligation_provenan
 }
 assert neutral_review["independent_target_obligation_reviewed"] is False
 assert neutral_review["candidate_directness"] == "UNDETERMINED"
+assert "NO_INDEPENDENT_ACCEPTED_TARGET_SCOPE" in validate_review_record(
+    neutral_review, review
+)["failures"]
 
 print("dependency resolution directness confound audit: PASS")
