@@ -8,6 +8,8 @@ on:
       - "tests/test_copilot_dependency_resolution_evaluator.py"
       - "evals/cdr_reference_provider_pilot.py"
       - "evals/cdr_direction_holdout.py"
+      - "evals/cdr_prep_accepted_target_pilot.py"
+      - "tests/test_cdr_prep_accepted_target_pilot.py"
       - "tests/test_cdr_direction_holdout.py"
       - "tests/test_cdr_reference_provider_pilot.py"
       - "spec/dependency-resolution/reference-provider-pilot-v1.yaml"
@@ -38,6 +40,7 @@ jobs:
       - run: python tests/test_cdr_reference_audit.py
       - run: python tests/test_cdr_reference_provider_pilot.py
       - run: python tests/test_cdr_direction_holdout.py
+      - run: python tests/test_cdr_prep_accepted_target_pilot.py
       - run: python tests/test_copilot_dependency_resolution_evaluator.py
       - run: python tests/test_cdr_contract_change.py
 
