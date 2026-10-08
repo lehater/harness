@@ -498,6 +498,11 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_operational_creation_and_graph_audit
+  command: python tests/test_cdr_operational.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
 - id: dependency_resolution_target_obligation_revision
   command: python tests/test_dependency_resolution_target_obligation_revision.py
   stage: exhaustive
