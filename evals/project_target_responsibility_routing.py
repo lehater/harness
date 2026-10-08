@@ -41,6 +41,21 @@ FIELDS = ("source_unit_id", "source_path", "source_sha256", "source_heading",
           "source_text", "source_unit_kind")
 
 
+def _effect_hints(unit: dict[str, Any]) -> list[str]:
+    """Section-role candidates only; never adjudicate source claim meaning."""
+    if unit["source_unit_kind"] == "PRODUCT_NON_GOAL":
+        return ["PROHIBITED_INFERENCE"]
+    role = unit["scope_role"]
+    return {
+        "MODEL_CONTEXT": ["DOMAIN_SEMANTICS", "PROHIBITED_INFERENCE"],
+        "CROSS_CONTEXT": ["SHARED_BOUNDARY", "PROHIBITED_INFERENCE"],
+        "STRATEGIC_RESPONSIBILITY": ["DOMAIN_SEMANTICS", "SHARED_BOUNDARY"],
+        "BOUNDARY_POLICY": ["PROHIBITED_INFERENCE", "REOPENING_OR_GOVERNANCE"],
+        "APPLICATION_SEPARATION": ["APPLICATION_BEHAVIOR", "SHARED_BOUNDARY"],
+        "PRODUCT_CONSTRAINTS": ["DOMAIN_SEMANTICS", "APPLICATION_BEHAVIOR"],
+    }.get(role, ["UNDETERMINED"])
+
+
 def _hint(unit: dict[str, Any]) -> tuple[list[str], str]:
     heading = unit["source_heading"]
     if heading in SECTION_HINTS:
@@ -114,6 +129,7 @@ def build_routing_worksheet(
                     "candidate_draft_obligation_ids_by_target": {},
                     "provisional_responsibility_tracks": guesses,
                     "provisional_hint_basis": reason,
+                    "provisional_effect_candidates": _effect_hints(src),
                     "hint_is_semantic_evidence": False,
                     "semantic_route": "UNDETERMINED",
                     "semantic_effect": "UNDETERMINED",
