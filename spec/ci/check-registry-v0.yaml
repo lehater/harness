@@ -508,6 +508,11 @@ checks:
   stage: exhaustive
   cost_class: cheap
   disposition: full_gate
+- id: copilot_dependency_resolution_evaluator
+  command: python tests/test_copilot_dependency_resolution_evaluator.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
 - id: live_calibration_process_driver
   command: python tests/test_live_calibration_process_driver.py
   stage: exhaustive
