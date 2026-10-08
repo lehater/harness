@@ -427,3 +427,10 @@ skills:
     route_class: method
     lifecycle: archived
     route_status: not-applicable
+  - id: capability-dependency-resolution
+    path: skills/agent/capability-dependency-resolution/SKILL.md
+    surface: consumer
+    route_class: operation
+    lifecycle: active
+    route_status: unrouted
+    route_note: Experimental read-only agent skill; routing disabled until calibration and graph revision safety are validated.
