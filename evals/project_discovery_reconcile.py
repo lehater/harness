@@ -18,6 +18,7 @@ from evals.project_discovery_snapshot import DiscoveryError, _commit, _required_
 from evals.dependency_resolution_evidence import assess_predictions
 from evals.project_discovery_coverage import assess_coverage
 from evals.project_discovery_directness import audit_additions
+from evals.project_discovery_directness_review import review_packets
 
 def compare(
     project_root: Path, *, sha: str,
@@ -101,6 +102,13 @@ def compare(
         directness = audit_additions(
             case, p, existing_requires=current_set, productions=producers,
         )
+        review = review_packets(
+            case, p, accepted_requires=current_set, productions=producers,
+            directness_audit=directness, source_snapshot=sha,
+            target_formulation_authority=inputs.get(
+                "target_formulation_authority", "UNSPECIFIED"
+            ),
+        )
         assessment = evaluation.get("evidence_assessment", {})
         assessed = next((x for x in assessment.get("cases", []) if x.get("id") == cid), None)
         if not assessed:
@@ -121,6 +129,7 @@ def compare(
             # ADD describes the model proposal only. Directness is UNPROVEN
             # even when a cited source claim and obligation are well-formed.
             "ADD_DIRECTNESS_AUDIT": directness,
+            "ADD_DIRECTNESS_REVIEW_PACKETS": review,
             "ADD_PROMOTION_ALLOWED": False,
             # An omitted edge is unassessed, NOT a removal proposal, when
             # target obligations were sourced from selected sections only.
