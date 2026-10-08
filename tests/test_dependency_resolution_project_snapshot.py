@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from evals.project_discovery_snapshot import DiscoveryError, generate
 from evals.project_discovery_reconcile import compare
+from evals.dependency_resolution_evidence import assess_predictions
 from harness.application.scenario_suite import load_driver_modules, run_scenario
 from evals.dependency_resolution_process_driver import (
     build_blinded_request, _validate_discovery_inputs,
@@ -277,6 +278,41 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert comparison["cases"][0]["product_candidate_assessment"] == "REVIEW_REQUIRED"
         assert comparison["cases"][0]["ADD_DIRECTNESS_AUDIT"] == []
         assert comparison["cases"][0]["ADD_PROMOTION_ALLOWED"] is False
+
+        # Regression: add an invented-but-source-referenced upstream claim
+        # to the fake model's proposal. Phase B must issue an evidence packet
+        # exposing source echo without granting adoption authority.
+        hypothetical = copy.deepcopy(evaluation)
+        row = hypothetical["bound_predictions"]["cases"][0]
+        row["proposed_requires"].append("x.domain-strategy")
+        row["input_needs"].append({
+            "obligation": "strategic-section-1",
+            "provider": "x.domain-strategy",
+            "claim_index": 0,
+            "basis": "DIRECT_ACCEPTED",
+            "consumption_rationale": (
+                "The stated strategic rule informs the tactical domain meanings."
+            ),
+        })
+        hypothetical["evidence_assessment"] = assess_predictions(
+            inputs, hypothetical["bound_predictions"]
+        )
+        hypothetical_comparison = compare(
+            base, sha=sha, inputs=inputs, evaluation=hypothetical
+        )
+        candidate = hypothetical_comparison["cases"][0]
+        assert candidate["ADD"] == ["x.domain-strategy"]
+        assert candidate["ADD_PROMOTION_ALLOWED"] is False
+        assert candidate["REMOVE_CANDIDATE"] == []
+        assert len(candidate["ADD_DIRECTNESS_REVIEW_PACKETS"]) == 1
+        dossier = candidate["ADD_DIRECTNESS_REVIEW_PACKETS"][0]
+        assert dossier["source_snapshot"] == sha
+        assert dossier["provider"] == "x.domain-strategy"
+        assert dossier["source_echo_obligations"] == ["strategic-section-1"]
+        assert dossier["individual_need_evidence"][0]["provider_source_path"] == "docs/domain.md"
+        assert dossier["individual_need_evidence"][0]["provider_source_sha256"]
+        assert dossier["review_state"] == "AWAITING_INDEPENDENT_ADJUDICATION"
+        assert dossier["automatic_writeback_allowed"] is False
         # The model omitted x.strategy but the source scope was partial:
         # reporting a genuine REMOVE_CANDIDATE would be a false deletion cue.
         tampered_coverage = copy.deepcopy(inputs)
