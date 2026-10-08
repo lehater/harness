@@ -122,8 +122,8 @@ def build_routing_worksheet(
                 if not isinstance(src[field], str) or not src[field].strip():
                     raise DiscoveryError("source unit has invalid textual provenance")
             expected_uid = hashlib.sha256(
-                (src["source_path"] + "\\n" + str(src["source_heading"])
-                 + "\\n" + src["source_local_id"] + "\\n" + src["source_text"]).encode("utf-8")
+                (src["source_path"] + "\n" + str(src["source_heading"])
+                 + "\n" + src["source_local_id"] + "\n" + src["source_text"]).encode("utf-8")
             ).hexdigest()[:20]
             if uid != expected_uid:
                 raise DiscoveryError("source unit digest does not match quoted evidence")
