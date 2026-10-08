@@ -19,6 +19,7 @@ from evals.dependency_resolution_evidence import assess_predictions
 from evals.project_discovery_coverage import assess_coverage
 from evals.project_discovery_directness import audit_additions
 from evals.project_discovery_directness_review import review_packets
+from evals.project_target_contract_readiness import audit_target_contracts
 
 def compare(
     project_root: Path, *, sha: str,
@@ -81,6 +82,15 @@ def compare(
             producers[cid] = prod
 
     by_input = {c["id"]: c for c in incoming}
+    # Phase B only: target contract acceptance is checked against the pinned
+    # Core and target's own semantic baseline; never leaked to Phase A.
+    readiness = audit_target_contracts(
+        project_root, sha=sha,
+        targets=[c["target"]["capability"] for c in incoming],
+    )
+    readiness_by_capability = {
+        f["target_capability"]: f for f in readiness["cases"]
+    }
     findings = []
     for p in records:
         cid = p["id"]
@@ -130,6 +140,7 @@ def compare(
             # even when a cited source claim and obligation are well-formed.
             "ADD_DIRECTNESS_AUDIT": directness,
             "ADD_DIRECTNESS_REVIEW_PACKETS": review,
+            "TARGET_OUTPUT_CONTRACT_READINESS": readiness_by_capability[target],
             "ADD_PROMOTION_ALLOWED": False,
             # An omitted edge is unassessed, NOT a removal proposal, when
             # target obligations were sourced from selected sections only.
@@ -158,6 +169,7 @@ def compare(
             "target_formulation_authority", "UNSPECIFIED"
         ),
         "cases": findings,
+        "target_output_contract_readiness": readiness,
         "automatic_writeback_allowed": False,
         "semantic_entailment_verified": False,
     }
