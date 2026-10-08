@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from evals.project_discovery_snapshot import DiscoveryError, generate
 from evals.project_discovery_reconcile import compare
+from harness.application.scenario_suite import load_driver_modules, run_scenario
 from evals.dependency_resolution_process_driver import (
     build_blinded_request, _validate_discovery_inputs,
     execute_dependency_resolution_process, EXECUTABLE_ENV,
@@ -156,7 +157,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         "obligation=ob,provider=p,claim_index=0,basis='DIRECT_ACCEPTED',"
         "consumption_rationale='This directly constrains the scoped model output.')]))\n"
         "print(json.dumps(dict(version=1,kind='harness-dependency-resolution-evaluator-response',"
-        "request_id=x['request_id'],results=out)))\n",
+        "request_id=x['request_id'],results=out,provenance=dict(provider='github-copilot'))))\n",
         encoding="utf-8",
     )
     previous = os.environ.get(EXECUTABLE_ENV)
@@ -173,6 +174,25 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert evaluation["bound_predictions"]["cases"][0]["proposed_requires"]
         assert evaluation["evidence_assessment"]["semantic_entailment_verified"] is False
         assert evaluation["oracle_is_expert_validated"] is False
+
+        # Exercise the checked-in oracle-free template through Scenario Suite
+        # (fake process only); this tests fixture paths and scenario wiring.
+        smoke = base / "smoke-project-pilot"
+        scripts = smoke / "scenarios"
+        scripts.mkdir(parents=True)
+        (smoke / "generated-prep-discovery.yaml").write_text(
+            yaml.safe_dump(inputs, sort_keys=False), encoding="utf-8"
+        )
+        original = (ROOT / "spec/dependency-resolution/project-pilots/scenarios/"
+                    "prep-discovery-run.yaml.tmpl").read_text(encoding="utf-8")
+        scenario_file = scripts / "run.yaml"
+        scenario_file.write_text(
+            original.replace("__RUN_ID__", "SCENARIO-REAL-PROJECT-SMOKE"),
+            encoding="utf-8"
+        )
+        load_driver_modules(["evals.dependency_resolution_process_driver"])
+        scenario_result = run_scenario(scenario_file)
+        assert scenario_result.status == "PASSED", scenario_result.as_dict()
 
         # Phase B is intentionally separate and begins only after the blinded
         # model result and its valid reference assessment exist.
