@@ -196,3 +196,18 @@ steps:
     expect:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /findings, op: contains_match, value: {code: CHAIN_TRACE_LOST, sources: [REQ-A]}}
+
+  - id: canonical-scope-detects-obsolete-ids
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_assertion_ids:
+        pilot.product: [REQ-NEW]
+        pilot.task: [TASK-A]
+        pilot.application: [OP-A]
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: STALE_LINK_IDS, index: 0}}
+
