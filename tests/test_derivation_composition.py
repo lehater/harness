@@ -32,7 +32,16 @@ def main() -> None:
     assert compose_derivations([accepted_a, accepted_b], current_semantics={"A": sem_a, "B": sem_b})["findings"][0]["code"] == "CURRENT_SEMANTICS_MISSING"
     expanded_target = {"A": sem_a, "B": sem_b, "C": {"semantic_assertions": sem_c["semantic_assertions"] + [{"id": "c2", "kind": "operation", "semantic_value": "added"}]}}
     assert compose_derivations([accepted_a, accepted_b], current_semantics=expanded_target)["findings"][0]["code"] == "SEMANTIC_FINGERPRINT_MISMATCH"
-    print("Composition tests passed (13)")
+    from harness.application.project_publication import verify_publication_derivation_chain
+    from harness.project_model.core import CoreError
+    verify_publication_derivation_chain(evaluations=[accepted_a, accepted_b], current_semantics=scopes)
+    try:
+        verify_publication_derivation_chain(evaluations=[accepted_a, accepted_b], current_semantics=mutated)
+    except CoreError:
+        pass
+    else:
+        raise AssertionError("stale semantic derivation reached publication boundary")
+    print("Composition tests passed (15)")
 
 
 if __name__ == "__main__":
