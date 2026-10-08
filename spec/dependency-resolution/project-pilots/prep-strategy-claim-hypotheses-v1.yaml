@@ -1,0 +1,722 @@
+version: 1
+kind: harness-cdr-strategy-claim-review-hypotheses
+status: OPERATOR_DRAFT_NOT_ACCEPTED
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+automatic_writeback_allowed: false
+purpose: >-
+  Claim-specific hypotheses for all selected accepted Model Context and Domain Strategy
+  statements. Individual proposed obligations are NOT accepted; section metadata,
+  exclusions and reopening rules do not independently create direct requires.
+sections:
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "MC-01 Preparation Information"
+    claims:
+      - index: 0
+        expected_source_text: "MC-01 Preparation Information: Owns the semantic language of current preparation-related information."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 1
+        expected_source_text: "MC-01 Preparation Information: Its scope includes:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 2
+        expected_source_text: "MC-01 Preparation Information: - Goal;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 3
+        expected_source_text: "MC-01 Preparation Information: - Capability;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 4
+        expected_source_text: "MC-01 Preparation Information: - Knowledge;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 5
+        expected_source_text: "MC-01 Preparation Information: - Practice Material;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 6
+        expected_source_text: "MC-01 Preparation Information: - distinguishable kinds of Knowledge;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 7
+        expected_source_text: "MC-01 Preparation Information: - distinguishable meanings of relationships;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 8
+        expected_source_text: "MC-01 Preparation Information: - relationships among different kinds of preparation information."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 9
+        expected_source_text: "MC-01 Preparation Information: These information kinds remain semantically distinguishable. Their distinction does not by itself require separate model contexts."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 10
+        expected_source_text: "MC-01 Preparation Information: Preparation Information does not state what the person knows, can do, has mastered, or is ready for."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "Learner-state and mastery claims are explicitly outside the current-information meaning, despite a separate Capability concept existing."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "MC-02 Recorded Activity History"
+    claims:
+      - index: 0
+        expected_source_text: "MC-02 Recorded Activity History: Owns the semantic language of recorded activity and results as historical facts."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 1
+        expected_source_text: "MC-02 Recorded Activity History: Its scope includes:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 2
+        expected_source_text: "MC-02 Recorded Activity History: - a recorded fact that activity took place;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 3
+        expected_source_text: "MC-02 Recorded Activity History: - a recorded result when one exists;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 4
+        expected_source_text: "MC-02 Recorded Activity History: - temporal context;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 5
+        expected_source_text: "MC-02 Recorded Activity History: - relationships to the information the activity concerned;"
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 6
+        expected_source_text: "MC-02 Recorded Activity History: - historical context sufficient for retained records to remain understandable when related information later changes or is removed."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 7
+        expected_source_text: "MC-02 Recorded Activity History: Recorded Activity History does not infer learner state, mastery, readiness, competence, or capability possession."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "Recorded activity and results remain historical facts, not evidence that a person possesses competence or readiness."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "TR-01 Preparation Information and Recorded Activity History"
+    claims:
+      - index: 0
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: Recorded Activity History may relate recorded activity and results to Preparation Information."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 1
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: The boundary must preserve:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 2
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: - the distinction between current preparation information and historical facts;"
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 3
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: - the meaning of referenced Preparation Information;"
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 4
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: - the meaning of relationships between activity/results and the information they concern;"
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 5
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: - sufficient historical context when referenced current information later changes or is removed;"
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 6
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: - the rule that recorded facts do not redefine Preparation Information or imply learner-state conclusions."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 7
+        expected_source_text: "TR-01 Preparation Information and Recorded Activity History: The same exploration or product behavior may use both model contexts without creating a third semantic owner."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "A shared exploration workflow does not justify a third semantic owner; application consumers and boundary invariants must be distinguished."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "Behaviors without independent model contexts"
+    claims:
+      - index: 0
+        expected_source_text: "Behaviors without independent model contexts: The MVP does not currently justify independent model languages for:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Behaviors without independent model contexts: - introducing, retaining, changing, or removing information;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 2
+        expected_source_text: "Behaviors without independent model contexts: - exploring information from different perspectives;"
+        disposition: UNDETERMINED
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: OPEN_SCOPE_QUESTION}
+        candidate_external_routes: [UNDETERMINED]
+        review_reason: "Perspective exploration is a real product behavior, but earlier Copilot runs disagreed on whether it requires an additional target-owned semantic invariant."
+      - index: 3
+        expected_source_text: "Behaviors without independent model contexts: - selecting information or material for external use;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 4
+        expected_source_text: "Behaviors without independent model contexts: - transferring selected information outside Prep;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 5
+        expected_source_text: "Behaviors without independent model contexts: - import, export, or integration mechanisms;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 6
+        expected_source_text: "Behaviors without independent model contexts: - external study, practice, review, or testing execution."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 7
+        expected_source_text: "Behaviors without independent model contexts: These behaviors operate over the accepted model contexts unless later evidence establishes independently evolving semantics."
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "Contexts not independently justified"
+    claims:
+      - index: 0
+        expected_source_text: "Contexts not independently justified: No separate model context is currently established for:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Contexts not independently justified: - Goal;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 2
+        expected_source_text: "Contexts not independently justified: - Capability;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 3
+        expected_source_text: "Contexts not independently justified: - Knowledge;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 4
+        expected_source_text: "Contexts not independently justified: - Practice Material;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 5
+        expected_source_text: "Contexts not independently justified: - relationship classification;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 6
+        expected_source_text: "Contexts not independently justified: - learning or practice design;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 7
+        expected_source_text: "Contexts not independently justified: - learner state or learner evidence;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 8
+        expected_source_text: "Contexts not independently justified: - source/provenance management."
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 9
+        expected_source_text: "Contexts not independently justified: A distinction may later become an independent context only when it develops its own semantic language, lifecycle, or consumers that cannot remain coherent inside the current contexts."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "Boundary invariants"
+    claims:
+      - index: 0
+        expected_source_text: "Boundary invariants: - Goal, Capability, Knowledge, and Practice Material remain semantically distinguishable."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 1
+        expected_source_text: "Boundary invariants: - Knowledge presence does not state what the person knows."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 2
+        expected_source_text: "Boundary invariants: - Capability meaning does not state that the person possesses that capability."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 3
+        expected_source_text: "Boundary invariants: - Practice Material is usable in activity; Recorded Activity describes activity recorded as having occurred."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 4
+        expected_source_text: "Boundary invariants: - Recorded activity/result is a historical fact, not a learner-state conclusion."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 5
+        expected_source_text: "Boundary invariants: - Relationships may cross different information kinds."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 6
+        expected_source_text: "Boundary invariants: - No fixed relationship topology or taxonomy is implied."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 7
+        expected_source_text: "Boundary invariants: - Historical context must remain intelligible when related current information changes or is removed."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 8
+        expected_source_text: "Boundary invariants: - Model contexts do not imply technical boundaries."
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "Consumers"
+    claims:
+      - index: 0
+        expected_source_text: "Consumers: - Tactical Domain Design defines concepts, relationships, and invariants inside each accepted model context."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 1
+        expected_source_text: "Consumers: - Application Design orchestrates lifecycle, exploration, selection, transfer, and activity recording without redefining model semantics."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 2
+        expected_source_text: "Consumers: - Interface and Data Design must preserve the distinction between current preparation information and recorded historical facts."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links: []
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+  - source_path: docs/architecture/model-context-map.md
+    source_heading: "Reopening conditions"
+    claims:
+      - index: 0
+        expected_source_text: "Reopening conditions: Revisit this strategy when:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Reopening conditions: - one Preparation Information kind develops independently changing semantics or consumers;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 2
+        expected_source_text: "Reopening conditions: - relationship semantics require independently governed language;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 3
+        expected_source_text: "Reopening conditions: - Recorded Activity and historical-context semantics cease to form one coherent model;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 4
+        expected_source_text: "Reopening conditions: - external-use or information-lifecycle behavior develops durable domain semantics of its own;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 5
+        expected_source_text: "Reopening conditions: - new accepted Product Requirements introduce another independently modeled language."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "DS-01 Preparation Information — CORE"
+    claims:
+      - index: 0
+        expected_source_text: "DS-01 Preparation Information — CORE: Owns the problem-space responsibility for current preparation-related information other than retained activity-history facts, and for meaningful relationships among that information."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 1
+        expected_source_text: "DS-01 Preparation Information — CORE: This includes knowledge, goals, capabilities, practice material, their relevant distinctions, distinguishable kinds of knowledge, relationship meanings, and relationships that may connect different kinds of information. It also owns the semantic basis that allows the same information to be understood and explored from different perspectives."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 2
+        expected_source_text: "DS-01 Preparation Information — CORE: **Derived from:** `REQ-CAP-KNOWLEDGE-KINDS`, `REQ-CAP-RELATIONSHIP-MEANINGS`, `REQ-CAP-CROSS-INFORMATION-RELATIONSHIPS`, `REQ-CAP-EXPLORE-PERSPECTIVES`."
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "Derived-from references document accepted product traceability, not an independent direct Tactical Domain prerequisite."
+      - index: 3
+        expected_source_text: "DS-01 Preparation Information — CORE: **Why CORE:** Prep's differentiating responsibility is making a growing body of preparation information and its relationships understandable without collapsing distinct meanings or prescribing one fixed structure."
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "DS-02 Recorded Activity History — CORE"
+    claims:
+      - index: 0
+        expected_source_text: "DS-02 Recorded Activity History — CORE: Owns the problem-space responsibility for recorded preparation activity and results as historical facts."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 1
+        expected_source_text: "DS-02 Recorded Activity History — CORE: This includes when activity occurred, what information it concerned, relationships that connect recorded activity/results to other information, and enough historical context for those facts to remain understandable when related information later changes or is removed."
+        disposition: TARGET_SEMANTIC_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+        candidate_external_routes: []
+        review_reason: "The accepted source statement may constrain a target-owned domain meaning; scope and exact obligation coverage require independent semantic review."
+      - index: 2
+        expected_source_text: "DS-02 Recorded Activity History — CORE: Recorded activity and results do not establish what the person knows, can do, has mastered, or is ready for."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "Historical facts do not imply capability possession; keep negative evidence distinct from positive historic data semantics."
+      - index: 3
+        expected_source_text: "DS-02 Recorded Activity History — CORE: **Derived from:** `REQ-CAP-RECORD-ACTIVITY`, `REQ-CAP-RELATE-ACTIVITY`, `REQ-CAP-PRESERVE-TIME`, `REQ-CAP-PRESERVE-HISTORY-CONTEXT`, `REQ-CAP-EXPLORE-HISTORY`."
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "Derived-from references show product ancestry, not a direct obligation or graph dependency."
+      - index: 4
+        expected_source_text: "DS-02 Recorded Activity History — CORE: **Why CORE:** accumulated activity and result history has semantics and lifecycle distinct from the current preparation information it references, especially when that information changes over time."
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "Strategic relationship constraints"
+    claims:
+      - index: 0
+        expected_source_text: "Strategic relationship constraints: - Preparation Information owns current preparation-related meaning; Recorded Activity History owns facts about activity that took place."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 1
+        expected_source_text: "Strategic relationship constraints: - Recorded Activity History may relate to Preparation Information but does not redefine it."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 2
+        expected_source_text: "Strategic relationship constraints: - Recorded activity or a recorded result is not learner-state evidence or a capability conclusion."
+        disposition: NEGATIVE_INVARIANT_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+        candidate_external_routes: []
+        review_reason: "The accepted statement appears to constrain prohibited semantic inferences; it should not be converted into a positive learner assessment feature."
+      - index: 3
+        expected_source_text: "Strategic relationship constraints: - Changes or removal of current Preparation Information must not make already retained activity history unintelligible."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 4
+        expected_source_text: "Strategic relationship constraints: - Relationships may connect different kinds of information across the accepted responsibilities and do not imply a fixed topology or representation."
+        disposition: SHARED_BOUNDARY_CANDIDATE
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: POSSIBLE_SHARED_BOUNDARY}
+          - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: POSSIBLE_SHARED_BOUNDARY}
+        candidate_external_routes: [SHARED_CROSS_CONTEXT]
+        review_reason: "The accepted statement concerns a boundary across current and historical meanings; which target owns each invariant remains independently reviewable."
+      - index: 5
+        expected_source_text: "Strategic relationship constraints: - Exploration may combine both responsibilities without collapsing their distinct meanings."
+        disposition: UNDETERMINED
+        candidate_target_links:
+          - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: OPEN_SCOPE_QUESTION}
+        candidate_external_routes: [UNDETERMINED]
+        review_reason: "Cross-context exploration must preserve distinctions; whether this adds a new model invariant is unresolved rather than implied by strategy wording."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "Product behaviors without independent strategic ownership"
+    claims:
+      - index: 0
+        expected_source_text: "Product behaviors without independent strategic ownership: The current MVP does not justify separate strategic subdomains for:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Product behaviors without independent strategic ownership: - introducing, retaining, changing, or removing information;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 2
+        expected_source_text: "Product behaviors without independent strategic ownership: - selecting part of information or material;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 3
+        expected_source_text: "Product behaviors without independent strategic ownership: - making a selection available outside Prep;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 4
+        expected_source_text: "Product behaviors without independent strategic ownership: - import, export, integration, or transfer mechanisms;"
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 5
+        expected_source_text: "Product behaviors without independent strategic ownership: - external study, practice, review, or testing execution."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+      - index: 6
+        expected_source_text: "Product behaviors without independent strategic ownership: Information lifecycle behavior may operate on information owned by either accepted responsibility. Selection and external-use behavior may likewise operate on information from either or both responsibilities. These behaviors do not currently establish independently evolving domain meaning."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "Consumers"
+    claims:
+      - index: 0
+        expected_source_text: "Consumers: - Model Context Strategy consumes both strategic responsibilities to decide which independently modeled semantic languages are required and how they relate."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 1
+        expected_source_text: "Consumers: - Tactical Domain Design consumes the model-context decisions that refine these responsibilities into coherent domain semantics."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 2
+        expected_source_text: "Consumers: - Application Design consumes the accepted semantic boundaries while orchestrating lifecycle, exploration, selection, transfer, and recorded-history behavior without redefining domain ownership."
+        disposition: APPLICATION_CONSUMER
+        candidate_target_links: []
+        candidate_external_routes: [APPLICATION_DESIGN]
+        review_reason: "The accepted statement concerns a consumer or product operation; do not promote orchestration behavior into a new domain-model obligation."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "Explicitly not established"
+    claims:
+      - index: 0
+        expected_source_text: "Explicitly not established: The MVP does not establish strategic responsibilities for:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Explicitly not established: - learner state;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 2
+        expected_source_text: "Explicitly not established: - mastery, readiness, or competence assessment;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 3
+        expected_source_text: "Explicitly not established: - information verification or source authority;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 4
+        expected_source_text: "Explicitly not established: - provenance, citation, or source management;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 5
+        expected_source_text: "Explicitly not established: - fixed knowledge taxonomy;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 6
+        expected_source_text: "Explicitly not established: - fixed relationship topology;"
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+      - index: 7
+        expected_source_text: "Explicitly not established: - product-owned external learning or assessment runtime."
+        disposition: SCOPE_EXCLUSION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement excludes a separate context, ownership, or mandated technology; exclusion does not remove valid concepts from their current model."
+  - source_path: docs/architecture/context-map.md
+    source_heading: "Reopening conditions"
+    claims:
+      - index: 0
+        expected_source_text: "Reopening conditions: Revisit the decomposition when:"
+        disposition: STRUCTURAL_OR_TRACE_CONTEXT
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "This text introduces a list, names traceability, or explains strategic status; it is not by itself an additional independent tactical invariant."
+      - index: 1
+        expected_source_text: "Reopening conditions: - one kind of Preparation Information develops independently changing semantics or consumers that no longer remain coherent within one strategic responsibility;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 2
+        expected_source_text: "Reopening conditions: - selection or external-use semantics acquire their own durable rules or lifecycle;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 3
+        expected_source_text: "Reopening conditions: - recorded activity and historical interpretation cease to change coherently as one responsibility;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 4
+        expected_source_text: "Reopening conditions: - information lifecycle behavior acquires independently valuable domain semantics beyond operating on the accepted responsibilities;"
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
+      - index: 5
+        expected_source_text: "Reopening conditions: - new accepted product capabilities introduce additional problem-space responsibilities."
+        disposition: GOVERNANCE_CONDITION
+        candidate_target_links: []
+        candidate_external_routes: []
+        review_reason: "The accepted statement governs responsibilities, consumers, or conditions for reopening strategy, rather than certifying a new tactical output rule."
