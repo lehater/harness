@@ -114,7 +114,10 @@ def build_strategy_claim_review(
                 raise DiscoveryError("unknown or duplicate MC/DS source claim index")
             evaluated.add(key)
             src = selected[key]
-            if item.get("source_unit_id") != src["source_unit_id"]:
+            if item.get("expected_source_text") != src["source_text"]:
+                raise DiscoveryError("source wording differs from pinned claim")
+            if ("source_unit_id" in item
+                and item["source_unit_id"] != src["source_unit_id"]):
                 raise DiscoveryError("source unit identity mismatch (snapshot/wording drift)")
             disposition = item.get("disposition")
             if disposition not in DISPOSITIONS:
