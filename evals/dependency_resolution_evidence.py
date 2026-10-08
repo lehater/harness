@@ -17,9 +17,18 @@ def assess_case(case: dict[str, Any], prediction: dict[str, Any]) -> dict[str, A
     """Assess optional source-grounded-v1 prediction proof for one blind case."""
     providers = {p["capability"]: p for p in case["provider_catalog"]}
     obligations = {o["id"] for o in case["target"]["output_obligations"]}
-    unresolved = set(prediction.get("unresolved_obligations", []))
-    needs = prediction.get("input_needs", [])
-    proposed = prediction.get("proposed_requires", [])
+    raw_unresolved = prediction.get("unresolved_obligations")
+    needs = prediction.get("input_needs")
+    proposed = prediction.get("proposed_requires")
+    if (not isinstance(raw_unresolved, list) or
+        any(not isinstance(v, str) for v in raw_unresolved)):
+        return {
+            "status": "INVALID", "issues": [{"code": "INVALID_UNRESOLVED_OBLIGATIONS"}],
+            "review_required": [], "referenced_claims": [],
+            "adoption_eligible_requires": [], "provisional_requires": [],
+            "automatic_writeback_allowed": False,
+        }
+    unresolved = set(raw_unresolved)
     issues: list[dict[str, str]] = []
     review: list[dict[str, str]] = []
     verified_refs: list[dict[str, Any]] = []
@@ -27,17 +36,21 @@ def assess_case(case: dict[str, Any], prediction: dict[str, Any]) -> dict[str, A
     eligible: set[str] = set()
     mapped: set[str] = set()
 
-    if not isinstance(needs, list) or not isinstance(proposed, list) or not isinstance(
-        prediction.get("unresolved_obligations"), list
-    ):
+    if not isinstance(needs, list) or not isinstance(proposed, list):
         return {
             "status": "INVALID", "issues": [{"code": "MALFORMED_PREDICTION"}],
             "review_required": [], "referenced_claims": [],
             "adoption_eligible_requires": [], "provisional_requires": [],
             "automatic_writeback_allowed": False,
         }
-    if any(not isinstance(value, str) for value in proposed + list(unresolved)):
+    if any(not isinstance(value, str) for value in proposed):
         issues.append({"code": "INVALID_IDENTIFIER"})
+        return {
+            "status": "INVALID", "issues": issues,
+            "review_required": [], "referenced_claims": [],
+            "adoption_eligible_requires": [], "provisional_requires": [],
+            "automatic_writeback_allowed": False,
+        }
     if any(x not in obligations for x in unresolved):
         issues.append({"code": "UNKNOWN_UNRESOLVED_OBLIGATION"})
     for i, need in enumerate(needs):
