@@ -503,6 +503,12 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_prep_accepted_target_pilot
+  command: python tests/test_cdr_prep_accepted_target_pilot.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Real YAML output pilot with synthetic pinned project fixture; no provider model or graph writes.
 - id: cdr_direction_holdout
   command: python tests/test_cdr_direction_holdout.py
   stage: exhaustive
