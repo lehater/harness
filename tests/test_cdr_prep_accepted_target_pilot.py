@@ -55,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
                     "\n\nA published contract", "\n\nConceptually:\n\nA published contract"
                 )
             if capability == "prep.domain-strategy":
-                statement += "".join(
+                statement += "\n## Extended source claims\n\n" + "".join(
                     f"- Independent synthetic claim {n}: public source constraints "
                     "remain distinct from the target's accepted outcome contract.\n"
                     for n in range(55)
