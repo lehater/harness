@@ -1,0 +1,168 @@
+version: 1
+kind: harness-dependency-resolution-calibration-inputs
+status: experimental-adversarial
+evidence_contract: source-grounded-v1
+purpose: >-
+  New label-blind claim-grounding challenge corpus. Independently authored
+  after the HLD-01 repeated-run false positive. No previous case or target
+  appears here, and no expected target dependencies are exposed to the model.
+cases:
+  - id: ADV-01
+    archetype: intent-versus-enforcement
+    target:
+      capability: adversarial.external-profile-transfer
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: encode-profile-format
+          description: Preserve agreed external profile fields when transmitting an export.
+        - id: enforce-data-release-authority
+          description: Block transmission without an accepted legal authorization for releasing private profile data.
+    provider_catalog:
+      - capability: adversarial.external-profile-fields
+        authority: EXTERNAL-INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - External partner profile includes the agreed identity and contact fields.
+      - capability: adversarial.product-data-export-choice
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - A user may choose to export a profile when a share action is available.
+      - capability: adversarial.delivery-transport
+        authority: SYSTEM
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - HTTPS is used for authorized message delivery.
+
+  - id: ADV-02
+    archetype: notification-versus-prevention
+    target:
+      capability: adversarial.payment-confirmation-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: block-duplicate-payment
+          description: Refuse a second settlement of the same payment order.
+    provider_catalog:
+      - capability: adversarial.payment-notification
+        authority: INTERFACE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Show a warning when the user tries paying the same invoice again.
+      - capability: adversarial.payment-settlement-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - A settled payment order must not be settled a second time.
+      - capability: adversarial.payment-observability
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Count rejected payment attempts per day.
+
+  - id: ADV-03
+    archetype: observation-versus-rule
+    target:
+      capability: adversarial.identity-authorization-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: deny-unauthorized-identity-access
+          description: Enforce accepted restrictions on which actors can open an identity record.
+    provider_catalog:
+      - capability: adversarial.identity-access-audit
+        authority: COMPLIANCE
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Each identity record access is written to an immutable audit log.
+      - capability: adversarial.identity-owner-intent
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - People should be able to manage access-related preferences.
+      - capability: adversarial.identity-rate-telemetry
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Count the number of identity-read requests per hour.
+
+  - id: ADV-04
+    archetype: provisional-planned-provider
+    target:
+      capability: adversarial.invoicing-tax-quote
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: apply-accepted-vat-logic
+          description: Calculate final VAT using jurisdictional product rules not yet admitted.
+        - id: retain-currency-semantics
+          description: Express all quote amounts in the accepted currency vocabulary.
+    provider_catalog:
+      - capability: adversarial.future-vat-policy
+        authority: PRODUCT
+        evidence_status: CONTRACT_ONLY
+        semantic_surface:
+          - Planned public contract will define tax jurisdiction, effective date, and VAT calculation rules.
+      - capability: adversarial.currency-vocabulary
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Currency amounts have a numeric value and an ISO currency code.
+      - capability: adversarial.invoice-latency
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Latency budget for quote generation is defined.
+
+  - id: ADV-05
+    archetype: multiple-normative-owners
+    target:
+      capability: adversarial.document-deletion-application
+      authority: APPLICATION
+      knowledge_kind: application-design
+      output_obligations:
+        - id: authorize-deletion
+          description: Delete a document only if the actor has the required product role AND the document tenant ownership invariant holds.
+    provider_catalog:
+      - capability: adversarial.document-role-policy
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Only document owners or delegated moderators may authorize deletion.
+      - capability: adversarial.document-tenant-invariant
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - A document belongs to exactly one tenant, and cross-tenant deletion is prohibited.
+      - capability: adversarial.document-deletion-log
+        authority: OPERATIONS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Record each completed document deletion to the operations event stream.
+
+  - id: ADV-06
+    archetype: state-versus-metric
+    target:
+      capability: adversarial.inventory-availability-interface
+      authority: INTERFACE
+      knowledge_kind: interface-design
+      output_obligations:
+        - id: show-live-availability
+          description: Display actual available inventory for a selected product, rather than aggregate request trends.
+    provider_catalog:
+      - capability: adversarial.stock-request-metrics
+        authority: ANALYTICS
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Aggregate inventory page requests by hour and customer region.
+      - capability: adversarial.inventory-domain-state
+        authority: DOMAIN
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Available stock is the on-hand quantity minus accepted reservations.
+      - capability: adversarial.inventory-product-intent
+        authority: PRODUCT
+        evidence_status: ACCEPTED_EVIDENCE
+        semantic_surface:
+          - Users should be able to understand stock availability.
