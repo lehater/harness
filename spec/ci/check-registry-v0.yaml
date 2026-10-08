@@ -503,6 +503,12 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_reference_provider_pilot
+  command: python tests/test_cdr_reference_provider_pilot.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Research-only provider-catalog blinding and post-discovery replay safety.
 - id: cdr_reference_audit
   command: python tests/test_cdr_reference_audit.py
   stage: exhaustive
