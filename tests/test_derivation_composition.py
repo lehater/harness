@@ -17,7 +17,20 @@ def main() -> None:
     assert compose_derivations([a, b], current_assertion_ids=current)["status"] == "ACCEPTED"
     assert compose_derivations([a, b], current_assertion_ids={"A": ["new-a"], "B": ["b"], "C": ["c"]})["findings"][0]["code"] == "STALE_LINK_IDS"
     assert compose_derivations([a, b], current_assertion_ids={"A": ["a"], "B": ["b"]})["findings"][0]["code"] == "CURRENT_SCOPE_MISSING"
-    print("Composition tests passed (8)")
+    from harness.assurance.semantic_fingerprint import semantic_assertion_fingerprints
+    sem_a = {"semantic_assertions": [{"id": "a", "kind": "requirement", "semantic_value": "old"}]}
+    sem_b = {"semantic_assertions": [{"id": "b", "kind": "task", "semantic_value": "execute"}]}
+    sem_c = {"semantic_assertions": [{"id": "c", "kind": "operation", "semantic_value": "show"}]}
+    scopes = {"A": sem_a, "B": sem_b, "C": sem_c}
+    fa, fb, fc = (semantic_assertion_fingerprints(scopes[k]) for k in ("A", "B", "C"))
+    accepted_a = {**a, "assertion_fingerprints": {"source": fa, "target": fb}}
+    accepted_b = {**b, "assertion_fingerprints": {"source": fb, "target": fc}}
+    assert compose_derivations([accepted_a, accepted_b], current_semantics=scopes)["status"] == "ACCEPTED"
+    mutated = {"A": {"semantic_assertions": [{"id": "a", "kind": "requirement", "semantic_value": "changed"}]}, "B": sem_b, "C": sem_c}
+    assert compose_derivations([accepted_a, accepted_b], current_semantics=mutated)["findings"][0]["code"] == "SEMANTIC_FINGERPRINT_MISMATCH"
+    assert compose_derivations([a, b], current_semantics=scopes)["findings"][0]["code"] == "ACCEPTED_FINGERPRINTS_MISSING"
+    assert compose_derivations([accepted_a, accepted_b], current_semantics={"A": sem_a, "B": sem_b})["findings"][0]["code"] == "CURRENT_SEMANTICS_MISSING"
+    print("Composition tests passed (12)")
 
 
 if __name__ == "__main__":
