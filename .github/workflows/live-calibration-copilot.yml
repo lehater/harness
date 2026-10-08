@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   live-calibration:
+    if: github.ref != 'refs/heads/experiment/capability-dependency-resolution-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
