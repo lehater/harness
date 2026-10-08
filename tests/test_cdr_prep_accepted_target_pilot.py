@@ -179,7 +179,86 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
     else:
         raise AssertionError("unbound reply accepted")
 
+    # Research-selected public sections must be source-bound, still partial,
+    # and cannot turn a model RESOLVED into an accepted graph decision.
+    import evals.cdr_prep_accepted_target_pilot as pilot
+    for artifact in core[1:]:
+        p = project / artifact["path"]
+        previous = p.read_text(encoding="utf-8")
+        p.write_text(previous.replace(
+            "# Published public semantics\n\n",
+            "# Published public semantics\n\n## Purpose\n\n",
+            1,
+        ), encoding="utf-8")
+    git(project, "add", ".")
+    git(project, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+        "commit", "-qm", "add explicit provider-public Purpose sections")
+    newer_sha = git(project, "rev-parse", "HEAD")
+    manifest_path = project / "research-selector.yaml"
+    manifest_path.write_text(yaml.safe_dump({
+        "version": 1,
+        "kind": "harness-cdr-research-owned-surface-selectors",
+        "status": "UNACCEPTED_OPERATOR_RESEARCH_SELECTION",
+        "source_commit": newer_sha,
+        "target_capability": TARGET,
+        "providers": [{"capability": cid, "mode": "markdown-sections",
+                       "headings": ["Purpose"]} for cid in PROVIDER_IDS],
+    }), encoding="utf-8")
+    previous_manifest = pilot.SELECTOR_MANIFEST
+    pilot.SELECTOR_MANIFEST = manifest_path
+    try:
+        selected = pilot.build(
+            project, sha=newer_sha, surface_mode=pilot.SOURCE_MODE_V2
+        )
+        new_request = selected["request"]
+        assert selected["inputs"]["source_surface_protocol"] == pilot.SOURCE_MODE_V2
+        assert all(len(s["semantic_surface"]) == 1
+                   and s["source_scope"]["selection_scope_partial"]
+                   and not s["source_scope"]["independent_ownership_review_verified"]
+                   for s in selected["inputs"]["cases"][0]["provider_catalog"])
+        assert '"requires"' not in json.dumps(new_request)
+        candidate = {
+            "version": 1,
+            "kind": "harness-dependency-resolution-evaluator-response",
+            "request_id": new_request["request_id"],
+            "results": [{
+                "case_request_id": new_request["cases"][0]["case_request_id"],
+                "status": "RESOLVED",
+                "proposed_requires": [supplier_a],
+                "input_needs": [{
+                    "provider": supplier_a, "claim_index": 0,
+                    "obligation": "classification-outcome-matched",
+                    "basis": "DIRECT_ACCEPTED",
+                    "consumption_rationale": "This is a provisional output-only source review."
+                }],
+                "unresolved_obligations": [],
+            }],
+        }
+        contrast = pilot.reconcile(
+            project, sha=newer_sha, inputs=selected["inputs"],
+            request=new_request, response=candidate,
+            surface_mode=pilot.SOURCE_MODE_V2,
+        )
+        assert contrast["model_status"] == "RESOLVED"
+        assert contrast["status"] == "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
+        assert contrast["all_available_provider_contracts_covered"] is False
+        assert contrast["operator_selected_partial_provider_ids"] == sorted(PROVIDER_IDS)
+        assert contrast["automatic_writeback_allowed"] is False
+        try:
+            pilot.reconcile(
+                project, sha=newer_sha, inputs=selected["inputs"],
+                request=new_request, response=candidate,
+                surface_mode=pilot.SOURCE_MODE_V1,
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("raw and selected provider protocols cannot be interchanged")
+    finally:
+        pilot.SELECTOR_MANIFEST = previous_manifest
+
     # Editing an accepted source without a new pinned reviewed commit fails.
+    sha = newer_sha
     path = project / core[0]["path"]
     path.write_text(path.read_text() + "\n# UNREVIEWED CHANGE\n")
     try:
