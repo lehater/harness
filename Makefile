@@ -101,6 +101,7 @@ harness-check:
 	python tests/test_dependency_resolution_directness.py
 	python tests/test_dependency_resolution_target_readiness.py
 	python tests/test_dependency_resolution_target_scope_coverage.py
+	python tests/test_dependency_resolution_responsibility_routing.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
