@@ -911,6 +911,17 @@ def evaluate_derivation(
         "source_authority": source_authority,
         "target_authority": target_authority,
         "status": status,
+        "assertion_fingerprints": {
+            "source": {
+                atom_id: semantic_assertion_fingerprint(assertion)
+                for atom_id, assertion in sorted(source_assertions.items())
+                if atom_id in required_sources
+            },
+            "target": {
+                atom_id: semantic_assertion_fingerprint(assertion)
+                for atom_id, assertion in sorted(target_assertions.items())
+            },
+        },
         "required_sources": sorted(required_sources),
         "covered_sources": sorted(required_sources & covered_sources),
         "dispositions": [

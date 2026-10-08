@@ -83,6 +83,7 @@ harness-check:
 	python tests/test_project_frontier.py
 	python tests/test_reconciliation.py
 	python tests/test_project_publication.py
+	python tests/test_derivation_composition.py
 	python tests/test_semantic_admission.py
 	python tests/test_semantic_question_loop.py
 	python tests/test_semantic_closure.py

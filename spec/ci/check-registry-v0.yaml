@@ -53,6 +53,10 @@ execution_profiles:
         inputs: {}
 
 workflow_roles:
+- path: .github/workflows/direct-input-derivation-pilot.yml
+  role: focused
+  cost_class: cheap
+  draft_behavior: allow
 - path: .github/workflows/ci-policy.yml
   role: focused
   cost_class: cheap
@@ -100,6 +104,12 @@ checks:
   stage: policy
   cost_class: cheap
   disposition: full_gate
+- id: derivation_composition_experiment
+  command: python tests/test_derivation_composition.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Deterministic regression for fresh semantic composition and publication validation.
 - id: assurance_registry
   command: python checks/validate_assurance_registry.py
   stage: focused

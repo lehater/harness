@@ -547,3 +547,20 @@ def skill_operation_driver(
 @scenario_driver("skill.invariant_policy")
 def skill_invariant_policy_driver(*, root: str) -> dict[str, Any]:
     return evaluate_skill_invariant_policy(root)
+
+
+@scenario_driver("semantic.compose_derivations")
+def semantic_compose_derivations_driver(*, evaluations: list[dict[str, Any]], current_assertion_ids: dict[str, list[str]] | None = None, current_semantics: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
+    from harness.assurance.derivation_composition import compose_derivations
+    return compose_derivations(evaluations, current_assertion_ids=current_assertion_ids, current_semantics=current_semantics)
+
+
+@scenario_driver("semantic.prepublication_currentness")
+def semantic_prepublication_currentness_driver(
+    *, evaluations: list[dict[str, Any]], current_semantics: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    """Fail closed unless every local evaluation matches current canonical semantics."""
+    from harness.assurance.derivation_composition import compose_derivations
+    if not current_semantics:
+        return {"status": "REJECTED", "findings": [{"code": "CURRENT_SEMANTICS_MISSING"}], "links": []}
+    return compose_derivations(evaluations, current_semantics=current_semantics)

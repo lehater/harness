@@ -465,6 +465,17 @@ def _validate_terminal_outcome(
         )
 
 
+def verify_publication_derivation_chain(
+    *, evaluations: list[dict[str, Any]], current_semantics: dict[str, dict[str, Any]]
+) -> None:
+    """Reject stale local derivations before preparing a publication transition."""
+    from harness.assurance.derivation_composition import compose_derivations
+
+    result = compose_derivations(evaluations, current_semantics=current_semantics)
+    if result["status"] != "ACCEPTED":
+        raise CoreError(f"publication derivation chain is not current: {result['findings']}")
+
+
 def prepare_capability_transition(
     *,
     graph: dict[str, Any],
@@ -476,7 +487,13 @@ def prepare_capability_transition(
     semantic_evaluations: dict[str, Any],
     lifecycle: dict[str, Any],
     decision_failures: dict[str, Any] | None = None,
+    derivation_chain: list[dict[str, Any]] | None = None,
+    current_semantics: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    if derivation_chain is not None or current_semantics is not None:
+        if derivation_chain is None or current_semantics is None:
+            raise CoreError("publication derivation validation needs both chain and current semantics")
+        verify_publication_derivation_chain(evaluations=derivation_chain, current_semantics=current_semantics)
     validate_project_publication(graph, current_publication)
     current_revision = current_publication["revision"]
     if expected_revision != current_revision:

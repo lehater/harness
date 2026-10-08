@@ -1,0 +1,292 @@
+version: 1
+kind: harness-scenario
+id: direct-input-only-chain-pilot
+title: Direct input dependencies allow two local derivations without a historical shortcut edge
+dimensions:
+  project_archetype: synthetic
+  stage: design
+  behavior_class: semantic
+  execution_type: deterministic
+covers:
+  - semantic-derivation-coverage
+
+fixtures:
+  graph:
+    value:
+      version: 1
+      kind: harness-engineering-graph
+      id: DIRECT-INPUT-ONLY
+      authorities:
+        - id: PRODUCT
+          responsibility: Own requirements.
+          boundary:
+            semantic_cohesion: Product requirements.
+            independent_change: Requirements change independently.
+            public_contract: Requirement assertions.
+          produces:
+            - capability: pilot.product
+              knowledge_kind: product-requirements
+              requires: []
+        - id: TASK
+          responsibility: Own tasks.
+          boundary:
+            semantic_cohesion: Task specifications.
+            independent_change: Tasks evolve behind product contracts.
+            public_contract: Task assertions.
+          produces:
+            - capability: pilot.task
+              knowledge_kind: task-model
+              requires: [pilot.product]
+        - id: APPLICATION
+          responsibility: Own application operations.
+          boundary:
+            semantic_cohesion: Application operations.
+            independent_change: Operations evolve behind task contracts.
+            public_contract: Operation assertions.
+          produces:
+            - capability: pilot.application
+              knowledge_kind: application-design
+              requires: [pilot.task]
+      consumers:
+        - id: PILOT
+          purpose: Consume application operations.
+          requires: [pilot.application]
+      terminal_capabilities: []
+
+  requirements:
+    value:
+      semantic_assertions:
+        - {id: REQ-A, kind: product-requirement, subject: GOAL, semantic_value: inspect-state, decision_authority: PRODUCT}
+  tasks:
+    value:
+      semantic_assertions:
+        - {id: TASK-A, kind: task, subject: GOAL, semantic_value: inspect-state-task, decision_authority: TASK}
+  operations:
+    value:
+      semantic_assertions:
+        - {id: OP-A, kind: application-operation, subject: GOAL, semantic_value: inspect-state-operation, decision_authority: APPLICATION}
+
+  product-task-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: pilot.product
+      target_capability: pilot.task
+      obligations:
+        - {id: requirements, source_kind: product-requirement}
+  product-task-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: pilot.product
+      target_capability: pilot.task
+      links:
+        - {sources: [REQ-A], relation: TRANSFORMS, targets: [TASK-A]}
+      dispositions: []
+
+  task-app-contract:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-contract
+      source_capability: pilot.task
+      target_capability: pilot.application
+      obligations:
+        - {id: tasks, source_kind: task}
+  task-app-evidence:
+    value:
+      version: 1
+      kind: harness-semantic-derivation-evidence
+      source_capability: pilot.task
+      target_capability: pilot.application
+      links:
+        - {sources: [TASK-A], relation: TRANSFORMS, targets: [OP-A]}
+      dispositions: []
+
+  model:
+    value:
+      artifacts:
+        - {id: PRODUCT, authority: PRODUCT, path: docs/product.yaml, provides: [pilot.product], depends_on: []}
+        - {id: TASK, authority: TASK, path: docs/task.yaml, provides: [pilot.task], depends_on: [PRODUCT]}
+        - {id: APPLICATION, authority: APPLICATION, path: docs/application.yaml, provides: [pilot.application], depends_on: [TASK]}
+      questions: []
+  lifecycle:
+    value:
+      version: 1
+      kind: harness-capability-lifecycle
+      providers:
+        - {artifact: PRODUCT, capability: pilot.product, acceptance_id: PRODUCT-1, accepted_prerequisites: {}}
+        - {artifact: TASK, capability: pilot.task, acceptance_id: TASK-1, accepted_prerequisites: {pilot.product: PRODUCT-1}}
+        - {artifact: APPLICATION, capability: pilot.application, acceptance_id: APPLICATION-1, accepted_prerequisites: {pilot.task: TASK-1}}
+
+steps:
+  - id: local-product-task
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.product-task-contract}
+      source: {ref: fixture.requirements}
+      candidate: {ref: fixture.tasks}
+      evidence: {ref: fixture.product-task-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: local-task-application
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.task-app-contract}
+      source: {ref: fixture.tasks}
+      candidate: {ref: fixture.operations}
+      evidence: {ref: fixture.task-app-evidence}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+  - id: current-without-historical-edge
+    driver: lifecycle.states
+    with:
+      graph: {ref: fixture.graph}
+      model: {ref: fixture.model}
+      projection: {ref: fixture.lifecycle}
+    expect:
+      - {path: /pilot.product/state, op: equals, value: CURRENT}
+      - {path: /pilot.task/state, op: equals, value: CURRENT}
+      - {path: /pilot.application/state, op: equals, value: CURRENT}
+
+  - id: remove-task-to-operation-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.task-app-evidence}
+      operations:
+        - {op: remove, path: /links/0}
+  - id: missing-local-derivation-is-rejected
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.task-app-contract}
+      source: {ref: fixture.tasks}
+      candidate: {ref: fixture.operations}
+      evidence: {ref: step.remove-task-to-operation-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: TASK-A}}
+
+  - id: composed-end-to-end-trace
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source_capability, op: equals, value: pilot.product}
+      - {path: /target_capability, op: equals, value: pilot.application}
+      - {path: /links, op: contains_match, value: {source: REQ-A, targets: [OP-A]}}
+
+  - id: break-accepted-chain-link
+    driver: data.patch
+    with:
+      value: {ref: step.local-task-application}
+      operations:
+        - {op: replace, path: /links, value: []}
+
+  - id: composition-detects-lost-trace
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.break-accepted-chain-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: CHAIN_TRACE_LOST, sources: [REQ-A]}}
+
+  - id: canonical-scope-detects-obsolete-ids
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_assertion_ids:
+        pilot.product: [REQ-NEW]
+        pilot.task: [TASK-A]
+        pilot.application: [OP-A]
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: STALE_LINK_IDS, index: 0}}
+
+
+  - id: current-fingerprints-match
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product: {ref: fixture.requirements}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: mutate-current-canonical-content
+    driver: data.patch
+    with:
+      value: {ref: fixture.requirements}
+      operations:
+        - {op: replace, path: /semantic_assertions/0/semantic_value, value: changed-with-same-id}
+
+  - id: changed-content-invalidates-accepted-trace
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product: {ref: step.mutate-current-canonical-content}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_FINGERPRINT_MISMATCH, index: 0, side: source}}
+
+  - id: accepted-fingerprint-drift-detected
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product:
+          semantic_assertions:
+            - {id: REQ-A, kind: product-requirement, subject: GOAL, semantic_value: changed-state, decision_authority: PRODUCT}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_FINGERPRINT_MISMATCH, index: 0, side: source}}
+
+  - id: prepublication-currentness-valid
+    driver: semantic.prepublication_currentness
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product: {ref: fixture.requirements}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+
+  - id: prepublication-currentness-stale
+    driver: semantic.prepublication_currentness
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product:
+          semantic_assertions:
+            - {id: REQ-A, kind: product-requirement, subject: GOAL, semantic_value: changed, decision_authority: PRODUCT}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_FINGERPRINT_MISMATCH, index: 0, side: source}}

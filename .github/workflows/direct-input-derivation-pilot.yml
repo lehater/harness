@@ -1,0 +1,27 @@
+name: Direct input derivation pilot
+on:
+  push:
+    branches:
+      - experiment/direct-input-derivation-audit
+  workflow_dispatch:
+jobs:
+  scenario:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install PyYAML==6.0.3
+      - name: Run focused composition tests
+        run: python tests/test_derivation_composition.py
+      - name: Run direct-input pilot scenario
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from harness.application.scenario_suite import run_scenario
+          result = run_scenario(Path("spec/scenario-suite/scenarios/direct-input-only-chain-pilot.yaml"))
+          print(result.as_dict())
+          if result.status != "PASSED":
+              raise SystemExit(1)
+          PY
