@@ -10,6 +10,8 @@ on:
       - "evals/cdr_direction_holdout.py"
       - "evals/cdr_prep_accepted_target_pilot.py"
       - "evals/cdr_provider_owned_surfaces.py"
+      - "evals/cdr_contract_owner_conflicts.py"
+      - "tests/test_cdr_contract_owner_conflicts.py"
       - "tests/test_cdr_provider_owned_surfaces.py"
       - "spec/dependency-resolution/project-pilots/prep-provider-owned-surface-selectors-v1.yaml"
       - "tests/test_cdr_prep_accepted_target_pilot.py"
@@ -45,6 +47,7 @@ jobs:
       - run: python tests/test_cdr_direction_holdout.py
       - run: python tests/test_cdr_prep_accepted_target_pilot.py
       - run: python tests/test_cdr_provider_owned_surfaces.py
+      - run: python tests/test_cdr_contract_owner_conflicts.py
       - run: python tests/test_copilot_dependency_resolution_evaluator.py
       - run: python tests/test_cdr_contract_change.py
 
