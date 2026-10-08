@@ -45,7 +45,7 @@ Do not invent accepted semantics or missing providers. If a material need lacks 
 justified provider, set status UNRESOLVED and include the obligation id in
 unresolved_obligations. CONTRACT_ONLY providers can justify provisional dependency
 planning only, not claims about accepted semantic atoms.
-Return only one JSON object; no markdown, no private chain-of-thought.
+Return only one JSON object with a top-level results array; omit version and kind, which the adapter owns. No markdown, no private chain-of-thought.
 For each case, return its opaque case_request_id and:
 status RESOLVED or UNRESOLVED;
 proposed_requires as array of CapabilityIds;
@@ -79,8 +79,6 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
         "instruction": PROTOCOL_INSTRUCTION,
         "cases": result,
         "response_schema": {
-            "version": 1,
-            "kind": RESPONSE_KIND,
             "results": [
                 {
                     "case_request_id": "opaque case_request_id from the input",
@@ -92,13 +90,63 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
                     "unresolved_obligations": ["unresolved obligation ids"],
                 }
             ],
-            "output": "Exactly one valid JSON object, nothing else.",
+            "output": "Exactly one JSON object with a top-level results array. The adapter, not the model, owns the outer protocol version and kind.",
         },
     }
 
 
 def _prompt(request: dict[str, Any]) -> str:
     return json.dumps(_blinded_model_payload(request), ensure_ascii=False, separators=(",", ":"))
+
+
+def _validate_model_results(
+    model_result: Any, request: dict[str, Any]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Validate model-owned judgments, normalize only the adapter-owned envelope.
+
+    The model is responsible for result values and opaque case bindings, while
+    the trusted adapter owns the wire protocol version and kind. No semantic
+    predictions or missing cases are repaired or inferred here.
+    """
+    if not isinstance(model_result, dict):
+        raise ValueError("Copilot must return a JSON object")
+    results = model_result.get("results")
+    if not isinstance(results, list):
+        raise ValueError(
+            "Copilot must return a results array; observed keys="
+            + repr(sorted(str(k) for k in model_result))
+        )
+    cases = request["cases"]
+    expected = {case["case_request_id"] for case in cases}
+    if len(results) != len(expected):
+        raise ValueError(
+            f"Copilot result count mismatch: expected {len(expected)}, got {len(results)}"
+        )
+    observed: set[str] = set()
+    for i, item in enumerate(results):
+        if not isinstance(item, dict):
+            raise ValueError(f"Copilot result #{i} is not an object")
+        binding = item.get("case_request_id")
+        if not isinstance(binding, str) or binding not in expected or binding in observed:
+            raise ValueError(f"Copilot result #{i} has missing, unknown or duplicate case binding")
+        observed.add(binding)
+        if item.get("status") not in {"RESOLVED", "UNRESOLVED"}:
+            raise ValueError(f"Copilot result #{i} has invalid status")
+        if not isinstance(item.get("proposed_requires"), list):
+            raise ValueError(f"Copilot result #{i} missing proposed_requires list")
+        if not isinstance(item.get("input_needs"), list):
+            raise ValueError(f"Copilot result #{i} missing input_needs list")
+        if not isinstance(item.get("unresolved_obligations"), list):
+            raise ValueError(f"Copilot result #{i} missing unresolved_obligations list")
+    envelope = {
+        "adapter_owned_protocol": True,
+        "model_supplied_version": model_result.get("version", "OMITTED"),
+        "model_supplied_kind": model_result.get("kind", "OMITTED"),
+        "adapter_envelope_normalized": (
+            model_result.get("version") != 1 or model_result.get("kind") != RESPONSE_KIND
+        ),
+    }
+    return results, envelope
 
 
 def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -146,12 +194,7 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
             model_result = json.loads(model_text)
         except json.JSONDecodeError as exc:
             raise ValueError("Copilot result must be strict JSON") from exc
-    if not isinstance(model_result, dict) or model_result.get("version") != 1:
-        raise ValueError("invalid Copilot result version")
-    if model_result.get("kind") != RESPONSE_KIND:
-        raise ValueError("invalid Copilot response kind")
-    if not isinstance(model_result.get("results"), list):
-        raise ValueError("Copilot must return a result list")
+    results, model_envelope = _validate_model_results(model_result, request)
     provenance = {
         "provider": "github-copilot",
         "requested_model": MODEL,
@@ -164,8 +207,9 @@ def _invoke_model(request: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
         "builtin_mcps_disabled": True,
         "no_available_tools": True,
         "independence": "UNVERIFIED",
+        "model_envelope": model_envelope,
     }
-    return model_result, provenance
+    return {"results": results}, provenance
 
 
 def evaluate_request(request: dict[str, Any]) -> dict[str, Any]:
