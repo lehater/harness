@@ -242,7 +242,7 @@ def reconcile(root: Path, *, inputs: dict[str, Any], request: dict[str, Any],
     owners = load_yaml(root / authorities_path)
     proof = load_yaml(root / proof_path)
     graph = audit_corpus(model, owners, proof, {})
-    edges = {row["target"]: set() for row in model["templates"]}
+    edges = {row["id"]: set() for row in model["templates"]}
     for row in graph["edge_review_packets"]:
         edges[row["target"]].add("reference." + row["provider"].lower().replace("_", "-"))
     contrast = []
