@@ -1,0 +1,34 @@
+version: 1
+kind: harness-cdr-research-owned-surface-selectors
+status: UNACCEPTED_OPERATOR_RESEARCH_SELECTION
+project: lehater/prep
+source_commit: d9adf4ca51049894437f1ed3d4f74fe94936c896
+target_capability: prep.knowledge-relation-classification
+note: >-
+  These selectors identify source-authored ownership and boundary statements,
+  NOT independently Authority-approved exports, exhaustive contracts or a
+  graph-edge oracle. No existing requires were used to select them.
+providers:
+  - capability: prep.model-context-strategy
+    mode: markdown-sections
+    headings: [Purpose, MC-04 Subject Knowledge, Boundary invariants]
+  - capability: prep.product-capabilities
+    mode: accepted-product-requirements
+  - capability: prep.domain-strategy
+    mode: markdown-sections
+    headings: [Purpose, DS-04 Subject Knowledge — CORE, Strategic relationship constraints]
+  - capability: prep.knowledge-model
+    mode: markdown-sections
+    headings: [Purpose, Relational Subject Knowledge, Graph boundary, Invariants]
+  - capability: prep.learning-design
+    mode: markdown-sections
+    headings: [Purpose, Knowledge focus, Boundary with Application Design, Forbidden inference]
+  - capability: prep.learner-model
+    mode: markdown-sections
+    headings: [Purpose, Knowledge boundary, Practice and application boundary, Invariants]
+  - capability: prep.task-model
+    mode: yaml-fields
+    fields: [purpose, boundaries]
+  - capability: prep.application-design
+    mode: markdown-sections
+    headings: [Purpose, Application boundaries, Mutation ownership]
