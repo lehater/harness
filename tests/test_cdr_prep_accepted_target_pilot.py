@@ -185,11 +185,19 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
     for artifact in core[1:]:
         p = project / artifact["path"]
         previous = p.read_text(encoding="utf-8")
-        p.write_text(previous.replace(
+        scoped = previous.replace(
             "# Published public semantics\n\n",
             "# Published public semantics\n\n## Purpose\n\n",
             1,
-        ), encoding="utf-8")
+        )
+        if artifact["provides"] == [supplier_a]:
+            scoped += (
+                "\nThe " + chr(96) +
+                "docs/domain/relation-classification-catalog.yaml" + chr(96) +
+                " provides the reusable predicate-classification outcomes "
+                "as this model's separately owned public target export.\n"
+            )
+        p.write_text(scoped, encoding="utf-8")
     git(project, "add", ".")
     git(project, "-c", "user.name=Test", "-c", "user.email=test@example.invalid",
         "commit", "-qm", "add explicit provider-public Purpose sections")
@@ -240,8 +248,22 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
             surface_mode=pilot.SOURCE_MODE_V2,
         )
         assert contrast["model_status"] == "RESOLVED"
-        assert contrast["status"] == "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
+        assert contrast["status"] == "BLOCKED_PROVIDER_CITES_TARGET_AS_EXPORT_OWNER"
         assert contrast["all_available_provider_contracts_covered"] is False
+        assert len(contrast["explicit_target_export_delegation_conflicts"]) == 1
+        assert (contrast["explicit_target_export_delegation_conflicts"][0]
+                ["provider"] == supplier_a)
+        assert contrast["provider_source_ownership_independently_adjudicated"] is False
+        selected_only = copy.deepcopy(candidate)
+        selected_only["results"][0]["proposed_requires"] = ["prep.learning-design"]
+        selected_only["results"][0]["input_needs"][0]["provider"] = "prep.learning-design"
+        merely_partial = pilot.reconcile(
+            project, sha=newer_sha, inputs=selected["inputs"],
+            request=new_request, response=selected_only,
+            surface_mode=pilot.SOURCE_MODE_V2,
+        )
+        assert merely_partial["status"] == "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
+        assert merely_partial["explicit_target_export_delegation_conflicts"] == []
         assert contrast["operator_selected_partial_provider_ids"] == sorted(PROVIDER_IDS)
         assert contrast["automatic_writeback_allowed"] is False
         try:
