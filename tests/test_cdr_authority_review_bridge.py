@@ -121,6 +121,25 @@ tentative["facets"]["direct_consumption"][0]["decision"] = "LIKELY_MEDIATED"
 assert bridge.validate_draft(packet, tentative)["graph_update_authorized"] is False
 assert bridge.validate_draft(packet, tentative)["exported_claim_ownership_accepted"] is False
 
+# Cross-facet draft dependencies are substantive: in a non-cyclic
+# hypothetical, likely-direct requires two SEPARATE proposed decisions.
+noncyclic = copy.deepcopy(packet)
+noncyclic["review_facets"]["direct_consumption"][0]["cycle_blocked"] = False
+noncyclic["packet_sha256"] = bridge.digest(
+    {k: v for k, v in noncyclic.items() if k != "packet_sha256"}
+)
+uncorroborated = bridge.draft_template(noncyclic)
+uncorroborated["facets"]["direct_consumption"][0]["decision"] = "LIKELY_DIRECT"
+try:
+    bridge.validate_draft(noncyclic, uncorroborated)
+except ValueError:
+    pass
+else:
+    raise AssertionError("directness alone cannot grant implicit output/source ownership")
+uncorroborated["facets"]["target_outputs"][0]["decision"] = "LIKELY_IN_SCOPE"
+uncorroborated["facets"]["export_ownership"][0]["decision"] = "LIKELY_OWNED"
+assert bridge.validate_draft(noncyclic, uncorroborated)["directness_accepted"] is False
+
 tampered = copy.deepcopy(packet)
 tampered["review_facets"]["input_coverage"][0]["unaccounted_obligations"] = []
 try:
