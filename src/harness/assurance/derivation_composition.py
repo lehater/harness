@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 
-def compose_derivations(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
+def compose_derivations(evaluations: list[dict[str, Any]], *, current_assertion_ids: dict[str, list[str]] | None = None) -> dict[str, Any]:
     """Trace semantic atoms across adjacent accepted derivations, without adding graph edges."""
     if len(evaluations) < 2:
         return {"status": "REJECTED", "findings": [{"code": "CHAIN_TOO_SHORT"}], "links": []}
@@ -15,6 +15,23 @@ def compose_derivations(evaluations: list[dict[str, Any]]) -> dict[str, Any]:
             findings.append({"code": "DERIVATION_NOT_ACCEPTED", "index": i})
         if i and evaluations[i - 1].get("target_capability") != evaluation.get("source_capability"):
             findings.append({"code": "CHAIN_DISCONNECTED", "index": i})
+
+    if current_assertion_ids is not None:
+        for i, evaluation in enumerate(evaluations):
+            source_cap = evaluation.get("source_capability")
+            target_cap = evaluation.get("target_capability")
+            if source_cap not in current_assertion_ids or target_cap not in current_assertion_ids:
+                findings.append({"code": "CURRENT_SCOPE_MISSING", "index": i})
+                continue
+            source_ids = set(current_assertion_ids[source_cap])
+            target_ids = set(current_assertion_ids[target_cap])
+            missing_required = sorted(set(evaluation.get("required_sources", [])) - source_ids)
+            if missing_required:
+                findings.append({"code": "STALE_REQUIRED_SOURCE_IDS", "index": i, "sources": missing_required})
+            for link in evaluation.get("links", []):
+                if set(link.get("sources", [])) - source_ids or set(link.get("targets", [])) - target_ids:
+                    findings.append({"code": "STALE_LINK_IDS", "index": i})
+                    break
 
     if findings:
         return {"status": "REJECTED", "findings": findings, "links": []}
