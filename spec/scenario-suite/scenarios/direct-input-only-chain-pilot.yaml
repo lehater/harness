@@ -245,3 +245,19 @@ steps:
     expect:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /findings, op: contains_match, value: {code: SEMANTIC_FINGERPRINT_MISMATCH, index: 0, side: source}}
+
+  - id: accepted-fingerprint-drift-detected
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+      current_semantics:
+        pilot.product:
+          semantic_assertions:
+            - {id: REQ-A, kind: product-requirement, subject: GOAL, semantic_value: changed-state, decision_authority: PRODUCT}
+        pilot.task: {ref: fixture.tasks}
+        pilot.application: {ref: fixture.operations}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: SEMANTIC_FINGERPRINT_MISMATCH, index: 0, side: source}}
