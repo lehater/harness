@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 import yaml
 
+from evals.dependency_resolution_evidence import assess_predictions
+
 VALID_STATUSES = {"RESOLVED", "UNRESOLVED", "INVALID"}
 VALID_REVIEW_STATUSES = {"AUTHOR_DRAFT", "PROJECT_HYPOTHESIS", "INDEPENDENTLY_REVIEWED"}
 
@@ -167,8 +169,13 @@ def score(inputs: dict[str, Any], oracle: dict[str, Any], predictions: dict[str,
             "status_correct": correct_status,
             "unresolved_correct": unresolved == set(o["expected_unresolved_obligations"]),
         })
+    evidence_assessment = assess_predictions(inputs, predictions)
+    if evidence_assessment["status"] == "INVALID":
+        all_matched = False
     return {
         "status": "MATCHES_DRAFT_ORACLE" if all_matched else "DIFFERS_OR_INCOMPLETE",
+        "evidence_assessment": evidence_assessment,
+        "automatic_writeback_allowed": False,
         "oracle_is_expert_validated": all(x["review_status"] == "INDEPENDENTLY_REVIEWED" for x in oracle["cases"]),
         "calibration_claim": "NOT_ESTABLISHED",
         "cases": results,
