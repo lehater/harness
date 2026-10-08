@@ -58,6 +58,9 @@ def review_packets(
                 competing = by_provider[other["provider"]]
                 alternative_citations.append({
                     "provider": other["provider"],
+                    "source_path": competing.get("source"),
+                    "source_sha256": competing.get("source_sha256"),
+                    "review_revision": competing.get("review_revision"),
                     "claim_index": other["claim_index"],
                     "claim_text": competing["semantic_surface"][other["claim_index"]],
                     "evaluator_rationale": other.get("consumption_rationale", ""),
@@ -73,6 +76,9 @@ def review_packets(
                 ),
                 "provider_claim_index": need["claim_index"],
                 "provider_claim_text": claim,
+                "provider_source_path": by_provider[supplier].get("source"),
+                "provider_source_sha256": by_provider[supplier].get("source_sha256"),
+                "provider_review_revision": by_provider[supplier].get("review_revision"),
                 "provider_evidence_status": by_provider[supplier]["evidence_status"],
                 "evaluator_rationale": need.get("consumption_rationale", ""),
                 "other_retained_direct_claims_for_same_obligation": alternative_citations,
@@ -129,6 +135,7 @@ def review_packets(
             "obligation_formulation_authority": target_formulation_authority,
             "kept_existing_direct_providers": kept,
             "existing_transitive_paths": audit["existing_transitive_paths"],
+            "transitive_paths_are_structural_evidence_only": True,
             "source_echo_obligations": audit["source_echo_obligations"],
             "individual_need_evidence": evidence,
             "review_tests": list(REQUIRED_TESTS),
@@ -166,6 +173,14 @@ def validate_review_record(
         failures.append("NO_REVIEWER_INDEPENDENCE_ATTESTATION")
     if review.get("reviewed_target_contract") != "ACCEPTED_INDEPENDENTLY":
         failures.append("TARGET_OBLIGATION_NOT_ACCEPTED_INDEPENDENTLY")
+    # Current PREP pilots have either target obligations copied from the
+    # candidate's upstream source or noncanonical operator paraphrases. In
+    # neither case may a simple reviewer attestation promote a verdict.
+    # A later experiment must supply a separately accepted target contract.
+    if packet.get("obligation_formulation_authority") != "ACCEPTED_INDEPENDENT_TARGET_SCOPE":
+        failures.append("NO_INDEPENDENT_ACCEPTED_TARGET_SCOPE")
+    if packet.get("source_echo_obligations"):
+        failures.append("SOURCE_ECHO_UNRESOLVED")
     statements = review.get("tests")
     if not isinstance(statements, list):
         statements = []
