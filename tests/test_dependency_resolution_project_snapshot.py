@@ -130,7 +130,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
     providers = {x["capability"]: x for x in case["provider_catalog"]}
     assert set(providers) == {"x.strategy", "x.accepted-policy", "x.domain-strategy"}
     assert providers["x.strategy"]["review_revision"] == 2
-    assert len(providers["x.accepted-policy"]["semantic_surface"]) == 1
+    assert len(providers["x.accepted-policy"]["semantic_surface"]) == 2
     assert "REQ-01" in providers["x.accepted-policy"]["semantic_surface"][0]
     assert "REQ-02" not in repr(providers)
     assert len(case["target"]["output_obligations"]) == 2
