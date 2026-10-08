@@ -141,7 +141,22 @@ def execute_dependency_resolution_process(
     except OSError as exc:
         return _invalid("EVALUATOR_UNAVAILABLE", execution={**execution, "error_type": type(exc).__name__})
     if completed.returncode != 0:
-        return _invalid("EVALUATOR_FAILED", execution={**execution, "returncode": completed.returncode})
+        # Provide a bounded, credential-redacted diagnostic so a real provider
+        # failure is actionable instead of an opaque subprocess exit code.
+        import re
+        detail = completed.stderr.strip().replace("\n", " ")[:1800]
+        for key in ("GITHUB_TOKEN", "GH_TOKEN", "COPILOT_GITHUB_TOKEN"):
+            secret = os.environ.get(key)
+            if secret:
+                detail = detail.replace(secret, "[REDACTED]")
+        detail = re.sub(
+            r"\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)\b",
+            "[REDACTED]", detail,
+        )
+        return _invalid("EVALUATOR_FAILED", execution={
+            **execution, "returncode": completed.returncode,
+            "error_detail": detail or "No stderr produced",
+        })
     try:
         response = json.loads(completed.stdout)
     except (json.JSONDecodeError, TypeError):
