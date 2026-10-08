@@ -23,20 +23,20 @@ behavior belongs in a domain model.
 
 The experimental candidate file
 `spec/dependency-resolution/project-pilots/prep-target-output-candidates-v1.yaml`
-now contains twelve explicit source selectors per target:
+now contains fourteen explicit source selectors per target:
 
 - Own accepted model context (`MC-01` or `MC-02`).
 - Shared cross-context relationship contract (`TR-01`).
 - Model Context `Boundary invariants`.
 - Model Context `Behaviors without independent model contexts`.
 - Model Context `Contexts not independently justified`.
-- Model Context `Consumers`.
+- Model Context `Consumers` and `Reopening conditions`.
 - Relevant accepted Domain Strategy responsibility (`DS-01` or `DS-02`).
 - Domain Strategy `Strategic relationship constraints`.
 - Domain Strategy `Product behaviors without independent strategic ownership`.
 - Domain Strategy `Explicitly not established`.
-- Domain Strategy `Consumers`.
-- **All** accepted Product Capability requirement statements (currently 15).
+- Domain Strategy `Consumers` and `Reopening conditions`.
+- **All** accepted Product Capability requirement statements (currently 15), plus the accepted product artifact's six explicit non-goals.
 
 These selectors intentionally go beyond the sections previously used as
 prompt target obligations. They are not asserted to cover all upstream
@@ -49,7 +49,7 @@ mean it is a direct graph prerequisite.
 `evals.project_target_scope_coverage` checks the exact clean Git snapshot,
 Core registration and semantic-review revisions of each source. It extracts
 bounded Markdown paragraphs/bullets and individually accepted YAML product
-statements into source units with:
+statements and explicit product non-goals into source units with:
 - stable text-derived ID, source path, SHA-256, heading, source-local ID,
   providing Capability and its baseline review revision;
 - the section's intended role (model context, cross-context, strategic,
@@ -99,8 +99,8 @@ backlog**, not an accepted scope-completeness certificate.
 Full-gate test `tests/test_dependency_resolution_target_scope_coverage.py`
 uses an immutable synthetic Git snapshot with accepted/unaccepted Product
 Capability requirements, positive model semantics, cross-context rules,
-negative constraints and application behaviors. It asserts all accepted
-requirements appear, no draft requirement does, no source unit is
+negative constraints, product non-goals and application behaviors. It asserts all accepted
+requirements and non-goals appear, no draft requirement does, no source unit is
 independently marked reviewed, and unexpected sources/scope omissions,
 forged acceptance, duplicated selectors, stale SHA or dirty sources fail.
 
