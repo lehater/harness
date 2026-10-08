@@ -106,5 +106,64 @@ except ValueError as exc:
 else:
     raise AssertionError("duplicate model bindings must be rejected")
 
+# Source-derived real-project pilots can elicit omitted empty list fields.
+# Retry is a NEW blinded model request, not silent completion of its output.
+seen_prompts = []
+incomplete = copy.deepcopy(example)
+del incomplete["results"][0]["unresolved_obligations"]
+counter = [0]
+
+def simulated_provider(executable, prompt):
+    seen_prompts.append(prompt)
+    counter[0] += 1
+    return (
+        incomplete if counter[0] == 1 else example,
+        {
+            "client_session_id": f"fake-session-{counter[0]}",
+            "requested_model": "auto",
+            "resolved_model": "fixture-model",
+            "observed_cli_version": adapter.CLI_VERSION,
+        },
+    )
+
+with patch.object(adapter, "_invoke_copilot_once", side_effect=simulated_provider):
+    output, provenance = adapter._invoke_model(request)
+assert output["results"] == example["results"]
+assert provenance["invocation_attempts"] == 2
+assert provenance["attempt_session_ids"] == ["fake-session-1", "fake-session-2"]
+assert "missing unresolved_obligations list" in provenance["schema_retry_errors"][0]
+assert len(seen_prompts) == 2
+assert "SCHEMA RETRY" not in seen_prompts[0]
+assert "SCHEMA RETRY" in seen_prompts[1]
+assert "expected_requires" not in repr(seen_prompts)
+assert "baseline_requires" not in repr(seen_prompts)
+assert "NEVER_SEND_TO_EVALUATED_AGENT" not in repr(seen_prompts)
+assert all(
+    c["case_request_id"] in seen_prompts[0]
+    and c["case_request_id"] in seen_prompts[1]
+    for c in request["cases"]
+)
+assert "unresolved_obligations" in seen_prompts[0]
+
+with patch.object(
+    adapter, "_invoke_copilot_once",
+    return_value=(
+        incomplete,
+        {
+            "client_session_id": "always-incomplete",
+            "requested_model": "auto",
+            "resolved_model": "fixture-model",
+            "observed_cli_version": adapter.CLI_VERSION,
+        },
+    ),
+):
+    try:
+        adapter._invoke_model(request)
+    except ValueError as exc:
+        assert "after 2 fresh attempts" in str(exc)
+        assert "missing unresolved_obligations list" in str(exc)
+    else:
+        raise AssertionError("two invalid responses must fail closed")
+
 assert oracle["privacy"] == "NEVER_SEND_TO_EVALUATED_AGENT"
 print("Copilot Dependency Resolution adapter: PASS")
