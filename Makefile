@@ -110,6 +110,7 @@ harness-check:
 	python tests/test_cdr_contract_change.py
 	python tests/test_cdr_reference_audit.py
 	python tests/test_cdr_reference_provider_pilot.py
+	python tests/test_cdr_direction_holdout.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
