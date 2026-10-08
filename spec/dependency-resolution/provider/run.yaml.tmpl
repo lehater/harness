@@ -1,0 +1,34 @@
+version: 1
+kind: harness-scenario
+id: dependency-resolution-github-copilot-v1
+title: Real external Copilot CLI produces blinded Dependency Resolution evaluation
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: agent-evaluation
+covers: [dependency-resolution-live-evaluation]
+fixtures:
+  inputs: {yaml: ../calibration-inputs-v1.yaml}
+  oracle: {yaml: ../calibration-oracle-v1.yaml}
+steps:
+  - id: run
+    driver: dependency.calibration.execute_process
+    with:
+      inputs: {ref: fixture.inputs}
+      oracle: {ref: fixture.oracle}
+      run_id: __RUN_ID__
+    observe:
+      evaluation: /
+  - id: execution-integrity
+    driver: data.patch
+    with:
+      value: {ref: step.run}
+      operations: []
+    expect:
+      - {path: /status, op: one_of, value: [MATCHES_DRAFT_ORACLE, DIFFERS_OR_INCOMPLETE]}
+      - {path: /execution/state, op: equals, value: COMPLETED}
+      - {path: /execution/provider_provenance/provider, op: equals, value: github-copilot}
+      - {path: /execution/provider_provenance/resolved_model, op: truthy}
+      - {path: /independence, op: equals, value: UNVERIFIED}
+      - {path: /calibration_claim, op: equals, value: NOT_ESTABLISHED}
