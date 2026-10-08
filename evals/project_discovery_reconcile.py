@@ -53,6 +53,16 @@ def compare(
         raise DiscoveryError("bound predictions fail source-reference verification")
     if rechecked != evaluation.get("evidence_assessment"):
         raise DiscoveryError("stored proof assessment differs from recomputed model evidence")
+    coverage = inputs.get("target_obligation_coverage")
+    if not isinstance(coverage, dict) or (
+        coverage.get("status") != "PARTIAL_BY_CONSTRUCTION"
+        or coverage.get("complete_upstream_obligation_coverage_established") is not False
+    ):
+        raise DiscoveryError("project pilot must explicitly declare incomplete target-obligation coverage")
+    # A bounded source-section pilot cannot prove that an absent suggested
+    # edge is semantically unnecessary. In particular, Product Capabilities
+    # can constrain Tactical Domain outputs without being reprinted in MC-01
+    # or MC-02 headings. Never emit removal candidates from incomplete scope.
     graph = _required_yaml(project_root / ".harness/engineering-graph.yaml")
     producers: dict[str, dict[str, Any]] = {}
     for auth in graph.get("authorities", []):
@@ -98,7 +108,12 @@ def compare(
             "proposed_requires": sorted(proposed_set),
             "KEEP": sorted(current_set & proposed_set),
             "ADD": sorted(proposed_set - current_set),
-            "REMOVE_CANDIDATE": sorted(current_set - proposed_set),
+            # An omitted edge is unassessed, NOT a removal proposal, when
+            # target obligations were sourced from selected sections only.
+            "REMOVE_CANDIDATE": [],
+            "UNASSESSED_EXISTING_EDGES": sorted(current_set - proposed_set),
+            "removal_assessment": "BLOCKED_INCOMPLETE_TARGET_OBLIGATIONS",
+            "target_obligation_coverage": coverage["status"],
             # Every transition requires independent semantic review.
             "decision": "REVIEW_REQUIRED",
             "semantic_entailment_verified": False,
