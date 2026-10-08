@@ -109,6 +109,15 @@ assert m[p1["source_unit_id"]]["provisional_responsibility_tracks"] == [
 ]
 assert m[p1["source_unit_id"]]["hint_is_semantic_evidence"] is False
 assert m[non_goal["source_unit_id"]]["semantic_effect"] == "UNDETERMINED"
+assert m[non_goal["source_unit_id"]]["provisional_effect_candidates"] == [
+    "PROHIBITED_INFERENCE"
+]
+assert m[cross["source_unit_id"]]["provisional_effect_candidates"] == [
+    "SHARED_BOUNDARY", "PROHIBITED_INFERENCE"
+]
+assert m[consumer["source_unit_id"]]["provisional_effect_candidates"] == [
+    "APPLICATION_BEHAVIOR", "SHARED_BOUNDARY"
+]
 assert len(m[cross["source_unit_id"]]["seen_by_target_capabilities"]) == 2
 assert m[pi["source_unit_id"]]["seen_by_target_capabilities"] == ["x.pi"]
 assert report["source_snapshot"] == SHA
