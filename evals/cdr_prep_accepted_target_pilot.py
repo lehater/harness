@@ -21,11 +21,17 @@ from evals.dependency_resolution_process_driver import build_blinded_request
 from evals.dependency_resolution_evidence import assess_predictions
 from evals.cdr_provider_owned_surfaces import load_selectors, selected_surface
 from evals.cdr_contract_owner_conflicts import delegated_target_claims
+from evals.cdr_public_semantic_contract import prepare_draft
 
 TARGET = "prep.knowledge-relation-classification"
 PIN = "d9adf4ca51049894437f1ed3d4f74fe94936c896"
 SOURCE_MODE_V1 = "RAW_PREFIX_V1"
 SOURCE_MODE_V2 = "CANDIDATE_OWNED_SECTIONS_V2"
+SOURCE_MODE_V3 = "ATOMIC_PUBLIC_CONTRACT_DRAFT_V1"
+ATOMIC_MANIFEST = (
+    Path(__file__).resolve().parents[1] /
+    "spec/dependency-resolution/project-pilots/prep-public-semantic-contract-draft-v1.yaml"
+)
 SELECTOR_MANIFEST = (
     Path(__file__).resolve().parents[1] /
     "spec/dependency-resolution/project-pilots/prep-provider-owned-surface-selectors-v1.yaml"
@@ -100,7 +106,7 @@ def build(root: Path, *, sha: str = PIN,
           surface_mode: str = SOURCE_MODE_V1) -> dict[str, Any]:
     root = root.resolve()
     _commit(root, sha)
-    if surface_mode not in {SOURCE_MODE_V1, SOURCE_MODE_V2}:
+    if surface_mode not in {SOURCE_MODE_V1, SOURCE_MODE_V2, SOURCE_MODE_V3}:
         raise DiscoveryError("invalid owned-surface research protocol")
     selectors = None
     manifest_hash = None
@@ -109,6 +115,16 @@ def build(root: Path, *, sha: str = PIN,
             SELECTOR_MANIFEST, pin=sha, target=TARGET, expected=PROVIDER_IDS
         )
     core, reviews, core_bytes, baseline_bytes = _registry(root)
+    atomic = (
+        prepare_draft(
+            root, sha=sha, manifest_path=ATOMIC_MANIFEST, target=TARGET,
+            expected=PROVIDER_IDS, artifacts=core, reviews=reviews,
+        ) if surface_mode == SOURCE_MODE_V3 else None
+    )
+    atomic_sources = (
+        {r["capability"]: r for r in atomic["provider_catalog"]}
+        if atomic is not None else {}
+    )
     if TARGET not in core or TARGET not in reviews:
         raise DiscoveryError("the target needs its own Core artifact and semantic review")
     target_artifact = core[TARGET]
@@ -161,14 +177,25 @@ def build(root: Path, *, sha: str = PIN,
         if cid == TARGET or cid not in core or cid not in reviews:
             raise DiscoveryError(f"provider missing Core and review: {cid}")
         art = core[cid]
-        surface, evidence = (
-            selected_surface(root, art, selectors[cid])
-            if selectors is not None else _claims(root, art)
-        )
+        if atomic is not None:
+            provider_data = atomic_sources[cid]
+            surface = provider_data["semantic_surface"]
+            evidence = {
+                "sha256": provider_data["source_sha256"],
+                "claim_count_in_source": "NOT_EXHAUSTIVELY_INVENTORIED",
+                "claim_count_supplied": len(surface),
+                "public_surface_truncated": False,
+                **provider_data["source_scope"],
+            }
+        else:
+            surface, evidence = (
+                selected_surface(root, art, selectors[cid])
+                if selectors is not None else _claims(root, art)
+            )
         providers.append({
             "capability": cid,
             "authority": art["authority"],
-            "evidence_status": "ACCEPTED_EVIDENCE",
+            "evidence_status": ("CONTRACT_ONLY" if atomic else "ACCEPTED_EVIDENCE"),
             "source": art["path"],
             "source_sha256": evidence["sha256"],
             "review_revision": reviews[cid]["revision"],
@@ -179,18 +206,33 @@ def build(root: Path, *, sha: str = PIN,
                 "public_surface_truncated": evidence["public_surface_truncated"],
                 "selection_scope_partial": evidence.get("selection_scope_partial", False),
                 "claim_role": evidence.get("claim_role", "UNCLASSIFIED_RAW_FRAGMENT"),
+                "claim_ids": evidence.get("claim_ids", []),
                 "independent_ownership_review_verified": False,
             },
         })
         fingerprints[cid] = evidence["sha256"]
     if manifest_hash:
         fingerprints["research_selector_manifest"] = manifest_hash
+    if atomic is not None:
+        fingerprints["atomic_draft_manifest"] = atomic["manifest_sha256"]
     inputs = {
         "version": 1,
         "kind": "harness-dependency-resolution-calibration-inputs",
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
         "source_surface_protocol": surface_mode,
+        "source_claim_role_evidence": [{
+            "provider": need["provider"],
+            "obligation": need["obligation"],
+            "claim_index": need["claim_index"],
+            "claim_id": providers_by_id[need["provider"]]["source_scope"].get(
+                "claim_ids", []
+            )[need["claim_index"]] if surface_mode == SOURCE_MODE_V3 else None,
+            "independently_accepted": False,
+        } for need in prediction["input_needs"]],
+        "documented_delegations_not_dependencies": fresh[
+            "draft_delegation_refs_for_post_model_review"
+        ],
         "target_output_obligation_coverage": "THREE_EXPLICIT_TARGET_OUTCOMES_ONLY",
         "cases": [{
             "id": "PREP-CURRENT-RELATION-CLASSIFICATION",
@@ -226,7 +268,10 @@ def build(root: Path, *, sha: str = PIN,
     return {
         "status": "BLINDED_REAL_TARGET_PROVISIONAL_INPUTS",
         "inputs": inputs, "request": request,
-        "source_fingerprints": fingerprints, **NO_APPROVAL,
+        "source_fingerprints": fingerprints,
+        "draft_delegation_refs_for_post_model_review": (
+            atomic["delegated_references"] if atomic else []
+        ), **NO_APPROVAL,
     }
 
 
@@ -344,7 +389,11 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
     elif truncated:
         effective_status = "BLOCKED_INCOMPLETE_PROVIDER_SURFACES"
     elif selected_partial:
-        effective_status = "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
+        effective_status = (
+            "BLOCKED_UNACCEPTED_ATOMIC_EXPORT_CANDIDATES"
+            if surface_mode == SOURCE_MODE_V3
+            else "BLOCKED_OPERATOR_SELECTED_PROVIDER_SURFACES"
+        )
     else:
         effective_status = "REVIEW_REQUIRED_TARGET_AND_DIRECTNESS_ACCEPTANCE"
     return {
@@ -389,7 +438,7 @@ def main() -> int:
     p.add_argument("--project-root", type=Path, required=True)
     p.add_argument("--commit", default=PIN)
     p.add_argument("--surface-mode", default=SOURCE_MODE_V1,
-                   choices=[SOURCE_MODE_V1, SOURCE_MODE_V2])
+                   choices=[SOURCE_MODE_V1, SOURCE_MODE_V2, SOURCE_MODE_V3])
     p.add_argument("--inputs", type=Path)
     p.add_argument("--request", type=Path)
     p.add_argument("--response", type=Path)
