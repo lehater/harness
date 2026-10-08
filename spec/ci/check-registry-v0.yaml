@@ -503,6 +503,11 @@ checks:
   stage: exhaustive
   cost_class: cheap
   disposition: full_gate
+- id: dependency_resolution_process_driver
+  command: python tests/test_dependency_resolution_process_driver.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
 - id: live_calibration_process_driver
   command: python tests/test_live_calibration_process_driver.py
   stage: exhaustive
