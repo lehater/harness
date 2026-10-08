@@ -117,6 +117,20 @@ candidate with a necessary edge, or a completed preflight with permission to
 edit `requires`. Follow `docs/experiments/capability-dependency-resolution-contract-change-v1.md`.
 There is no default create/modify route activation.
 
+### Optional Reference Model cross-check (experimental)
+
+The frozen `spec/research/reference-engineering-model-v0.yaml` provides a
+reusable template corpus, NOT independently accepted project output contracts.
+Use `make cdr-reference-prepare CDR_OUTPUT=...` to export only source claims
+without any existing target `requires` or edge labels. A separate
+`make cdr-reference-audit CDR_OUTPUT=...` reads the actual template
+relationships and flags alternate structural paths, while preserving
+conditional-predicate uncertainty and denying semantic-proof status.
+
+Read `docs/experiments/capability-dependency-resolution-reference-model-audit-v1.md`.
+No adoption, deletion, project publication, or canonical Reference Model
+promotion follows from successful corpus validation.
+
 ## Acceptance checks
 
 - Every proposed edge maps to a specific output obligation and directly consumed semantic input.

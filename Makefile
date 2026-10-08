@@ -108,6 +108,7 @@ harness-check:
 	python tests/test_dependency_resolution_target_obligation_revision.py
 	python tests/test_cdr_operational.py
 	python tests/test_cdr_contract_change.py
+	python tests/test_cdr_reference_audit.py
 	python tests/test_dependency_resolution_process_driver.py
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
@@ -145,3 +146,14 @@ cdr-check-review:
 cdr-change-preflight:
 	@test -n "$(PROJECT_ROOT)" -a -n "$(CDR_BEFORE)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT CDR_BEFORE PROJECT_COMMIT CDR_OUTPUT"; exit 2)
 	python -m evals.cdr_contract_change --project-root "$(PROJECT_ROOT)" --before "$(CDR_BEFORE)" --after "$(PROJECT_COMMIT)" --output "$(CDR_OUTPUT)"
+
+# Reference Model is research-only; source-only Phase A and graph-aware Phase B
+# are intentionally distinct and neither can mutate a project graph.
+.PHONY: cdr-reference-prepare cdr-reference-audit
+cdr-reference-prepare:
+	@test -n "$(CDR_OUTPUT)" || (echo "Require CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_reference_audit prepare --output "$(CDR_OUTPUT)"
+
+cdr-reference-audit:
+	@test -n "$(CDR_OUTPUT)" || (echo "Require CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_reference_audit audit --output "$(CDR_OUTPUT)"
