@@ -173,7 +173,7 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     bad=copy.deepcopy(intake)
     bad["target"]["governing_constraints"][0]["applies_to_outputs"]=["FORGED"]
     fails(lambda:prepare_intake(root,sha=sha,intake=bad),"dangling")
-    fails(lambda:prepare_intake(root,sha="0"*40,intake=intake),"project snapshot")
+    fails(lambda:prepare_intake(root,sha="0"*40,intake=intake),"project commit mismatch")
     audit=audit_graph(root,sha=sha)
     assert audit["status"]=="STRUCTURAL_REVIEW_ONLY"
     assert audit["capability_count"]==3
@@ -210,7 +210,6 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     assert invalid["cycles"]
     assert invalid["automatic_writeback_allowed"] is False
     (root/"docs/model.md").write_text("dirty tracked change",encoding="utf-8")
-    fails(lambda:audit_graph(root,sha=badsha),"clean") if False else None
     try:audit_graph(root,sha=badsha)
     except DiscoveryError:pass
     else:raise AssertionError("dirty graph audit should fail")
