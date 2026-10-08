@@ -39,7 +39,7 @@ CDR-06 additional direct-need pairs:
 
 Neither run proposed a third direct provider, so these differences are **justification-granularity differences**, not proposed topology differences.
 
-## Independent source-content audit of CDR-06
+## Source-content audit of CDR-06
 
 The accepted PREP Model Context Strategy, `docs/architecture/model-context-map.md`, explicitly states under MC-02:
 - temporal context belongs to Recorded Activity History;
@@ -57,7 +57,7 @@ The current CDR-06 provider_catalog's public semantic surface summarizes MC-02 a
 
 - Six seeded cases are insufficient to claim generic semantic dependency resolution quality.
 - CDR-04's `known_uncertainties` hints at the absence of an accepted consent provider; test how the model handles unhinted uncertainty in a hold-out corpus.
-- The execution reports scoring differences and provenance, but does not currently preserve complete unmodified model prediction rows and rationales in its evidence. Improve observability before independent qualitative review.
+- The two initial provider runs report scoring differences and provenance but did not persist complete unmodified model prediction rows. A subsequent process-driver change records model result rows and their validated case-bound projection for future runs; it does not retroactively recover the two initial responses. If the model supplies a rationale, the new field retains it without inventing one.
 - Copilot automatic model routing and `UNVERIFIED` independence limit reproducibility claims.
 - A successful Scenario Suite run means transport and structural assertions succeeded, **not** that semantic labels were independently verified.
 - No canonical graph mutation or PREP repository change occurred.
