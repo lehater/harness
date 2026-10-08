@@ -12,7 +12,8 @@ def main() -> None:
     assert compose_derivations([a, {**b, "links": []}])["findings"][0]["code"] == "CHAIN_TRACE_LOST"
     assert compose_derivations([a, {**b, "status": "REJECTED"}])["findings"][0]["code"] == "DERIVATION_NOT_ACCEPTED"
     assert compose_derivations([a, {**b, "source_capability": "D"}])["findings"][0]["code"] == "CHAIN_DISCONNECTED"
-    print("Composition tests passed (4)")
+    assert compose_derivations([{**a, "links": []}, b])["findings"][0]["code"] == "CHAIN_HAS_NO_SOURCE_LINKS"
+    print("Composition tests passed (5)")
 
 
 if __name__ == "__main__":
