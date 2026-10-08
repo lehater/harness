@@ -149,3 +149,21 @@ steps:
       - {path: /pilot.product/state, op: equals, value: CURRENT}
       - {path: /pilot.task/state, op: equals, value: CURRENT}
       - {path: /pilot.application/state, op: equals, value: CURRENT}
+
+  - id: remove-task-to-operation-link
+    driver: data.patch
+    with:
+      value: {ref: fixture.task-app-evidence}
+      operations:
+        - {op: remove, path: /links/0}
+  - id: missing-local-derivation-is-rejected
+    driver: semantic.derivation
+    with:
+      graph: {ref: fixture.graph}
+      contract: {ref: fixture.task-app-contract}
+      source: {ref: fixture.tasks}
+      candidate: {ref: fixture.operations}
+      evidence: {ref: step.remove-task-to-operation-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: TASK-A}}
