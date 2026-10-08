@@ -126,3 +126,14 @@ cdr-reconcile:
 cdr-audit:
 	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_OUTPUT"; exit 2)
 	python -m evals.cdr_graph_audit --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --output "$(CDR_OUTPUT)"
+
+# Decision-review preparation remains nonauthorizing. Even complete reviewer
+# drafts do not approve Engineering Graph mutation or bypass Authority policy.
+.PHONY: cdr-dossier cdr-check-review
+cdr-dossier:
+	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_INTAKE)" -a -n "$(CDR_PREDICTIONS)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_INTAKE CDR_PREDICTIONS CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_governance_packet prepare --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --predictions "$(CDR_PREDICTIONS)" --output "$(CDR_OUTPUT)"
+
+cdr-check-review:
+	@test -n "$(CDR_DOSSIER)" -a -n "$(CDR_REVIEW)" -a -n "$(CDR_OUTPUT)" || (echo "Require CDR_DOSSIER CDR_REVIEW CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_governance_packet check-draft --dossier "$(CDR_DOSSIER)" --review "$(CDR_REVIEW)" --output "$(CDR_OUTPUT)"
