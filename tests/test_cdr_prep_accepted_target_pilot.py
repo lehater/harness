@@ -50,6 +50,10 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
             statement = ("# Published public semantics\n\nA published contract describes "
                          f"the specific independently declared meaning of {capability}, "
                          "and it is not the target output itself.\n")
+            if capability == "prep.knowledge-model":
+                statement = statement.replace(
+                    "\n\nA published contract", "\n\nConceptually:\n\nA published contract"
+                )
             if capability == "prep.domain-strategy":
                 statement += "".join(
                     f"- Independent synthetic claim {n}: public source constraints "
@@ -128,6 +132,10 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
     assert reviewed["model_resolution_is_not_accepted"] is True
     assert reviewed["all_available_provider_contracts_covered"] is False
     assert reviewed["truncated_provider_ids"] == ["prep.domain-strategy"]
+    assert reviewed["provider_claim_entailment_verified"] is False
+    assert any(x["provider"] == supplier_b and x["reason"] ==
+               "NON_SUBSTANTIVE_SOURCE_FRAGMENT"
+               for x in reviewed["non_substantive_cited_claims"])
     assert reviewed["same_as_existing"] == [supplier_a]
     assert reviewed["cycle_blocks"] == [{
         "provider": supplier_b,
@@ -151,6 +159,16 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-real-target-") as temp:
     assert still_blocked["effective_resolution"] == "NOT_RESOLVED"
     assert still_blocked["cycle_blocks"] == []
     assert still_blocked["semantic_directness_proven"] is False
+
+    contradiction = copy.deepcopy(reply)
+    contradiction["results"][0]["status"] = "RESOLVED"
+    try:
+        reconcile(project, sha=sha, inputs=inputs, request=request,
+                  response=contradiction)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("RESOLVED with unresolved obligations must fail")
 
     altered = copy.deepcopy(reply)
     altered["request_id"] = "wrong"
