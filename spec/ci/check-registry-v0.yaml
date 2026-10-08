@@ -498,6 +498,11 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: dependency_resolution_grounding
+  command: python tests/test_dependency_resolution_grounding.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
 - id: dependency_resolution_holdout
   command: python tests/test_dependency_resolution_holdout.py
   stage: exhaustive
