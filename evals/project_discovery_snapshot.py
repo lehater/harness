@@ -210,7 +210,10 @@ def _strategic_requirement_refs(section: str) -> list[str]:
 def generate(
     root: Path, *, sha: str, targets: list[dict[str, Any]],
     max_surface_claims: int = 500,
+    formulation: str = "SOURCE_BOUND",
 ) -> dict[str, Any]:
+    if formulation not in {"SOURCE_BOUND", "NEUTRAL_CONTRAST"}:
+        raise DiscoveryError("unknown target obligation formulation")
     root = root.resolve()
     _commit(root, sha)
     core = _required_yaml(root / ".harness/core.yaml")
@@ -361,6 +364,35 @@ def generate(
             }
             for req_id, statement in accepted_requirements.items()
         ]
+        if formulation == "NEUTRAL_CONTRAST":
+            # Deliberate controlled ablation: replace upstream-authored target
+            # obligation text with a short operator-authored target-output
+            # paraphrase. This avoids rewarding the model for re-citing an
+            # upstream statement duplicated in its own target, but the
+            # paraphrase is NOT an accepted project decision or ground truth.
+            neutral = item.get("neutral_output_obligations")
+            if not isinstance(neutral, list) or not neutral:
+                raise DiscoveryError("neutral contrast needs operator-authored target obligations")
+            clean = []
+            observed_ids: set[str] = set()
+            for ob in neutral:
+                if not isinstance(ob, dict):
+                    raise DiscoveryError("invalid contrast obligation")
+                ob_id, description = ob.get("id"), ob.get("description")
+                if (not isinstance(ob_id, str) or not ob_id or ob_id in observed_ids
+                    or not isinstance(description, str) or len(description.strip()) < 45):
+                    raise DiscoveryError("missing, duplicate, or overly short neutral contrast obligation")
+                observed_ids.add(ob_id)
+                if any(p["capability"] in description for p in providers):
+                    raise DiscoveryError("contrast obligation may not include provider CapabilityId")
+                if any(
+                    description.strip() in source_ob["description"]
+                    or source_ob["description"] in description.strip()
+                    for source_ob in obligations
+                ):
+                    raise DiscoveryError("neutral contrast duplicates source-bound obligation")
+                clean.append({"id": ob_id, "description": description.strip()})
+            obligations = clean
         candidates = [dict(p) for p in providers if p["capability"] != cid]
         # No existing target requires, lifecycle prerequisites, or oracle are
         # passed. Every accepted reviewed provider is visible, even when the
@@ -384,6 +416,11 @@ def generate(
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
         "discovery_method": "reviewed-core-artifacts-and-explicit-strategic-product-traceability",
+        "target_formulation": formulation,
+        "target_formulation_authority": (
+            "ACCEPTED_SOURCE_EXCERPTS" if formulation == "SOURCE_BOUND"
+            else "EXPERIMENTAL_OPERATOR_PARAPHRASE_NOT_ACCEPTED"
+        ),
         "coverage_contract": "source-traceability-v1",
         # All accepted Product Capability statements are inventoried, including
         # those not traced from DS-01 / DS-02. This is an applicability inventory,
@@ -408,13 +445,16 @@ def main() -> int:
     p.add_argument("--commit", required=True)
     p.add_argument("--config", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--formulation", choices=("SOURCE_BOUND", "NEUTRAL_CONTRAST"),
+                   default="SOURCE_BOUND")
     args = p.parse_args()
     try:
         config = _required_yaml(args.config)
         targets = config.get("targets")
         if not isinstance(targets, list) or not targets:
             raise DiscoveryError("configuration lacks targets")
-        result = generate(args.project_root, sha=args.commit, targets=targets)
+        result = generate(args.project_root, sha=args.commit, targets=targets,
+                          formulation=args.formulation)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(yaml.safe_dump(result, sort_keys=False, allow_unicode=True), encoding="utf-8")
         print(json.dumps({
