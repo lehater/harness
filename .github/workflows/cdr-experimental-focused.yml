@@ -1,0 +1,30 @@
+name: CDR experimental focused validation
+
+on:
+  pull_request:
+    paths:
+      - "evals/cdr_reference_audit.py"
+      - "evals/cdr_contract_change.py"
+      - "tests/test_cdr_reference_audit.py"
+      - "tests/test_cdr_contract_change.py"
+      - "spec/research/reference-engineering-model-v0.yaml"
+      - "spec/engineering-coverage/semantic-proof-contract-v1.yaml"
+      - "catalogs/software-authorities-v0.yaml"
+      - "spec/ci/check-registry-v0.yaml"
+      - ".github/workflows/cdr-experimental-focused.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install PyYAML==6.0.3
+      - run: python tests/test_reference_engineering_model.py
+      - run: python tests/test_cdr_reference_audit.py
+      - run: python tests/test_cdr_contract_change.py

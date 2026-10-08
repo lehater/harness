@@ -57,6 +57,11 @@ workflow_roles:
   role: focused
   cost_class: cheap
   draft_behavior: allow
+- path: .github/workflows/cdr-experimental-focused.yml
+  role: focused
+  cost_class: cheap
+  draft_behavior: allow
+  rationale: Scope-bound experimental CDR tests on Draft PRs; no full gate or external evaluator.
 - path: .github/workflows/ci-policy.yml
   role: focused
   cost_class: cheap
