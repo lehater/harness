@@ -15,9 +15,17 @@ targets:
     scope_source: docs/architecture/model-context-map.md
     scope_headings:
       - MC-01 Preparation Information
+    strategic_scope_source: docs/architecture/context-map.md
+    strategic_scope_headings:
+      - DS-01 Preparation Information — CORE
+    product_requirements_source: .harness/knowledge/product-capabilities.yaml
   - capability: prep.recorded-activity-history-model
     repository: lehater/prep
     scope_source: docs/architecture/model-context-map.md
     scope_headings:
       - MC-02 Recorded Activity History
       - TR-01 Preparation Information and Recorded Activity History
+    strategic_scope_source: docs/architecture/context-map.md
+    strategic_scope_headings:
+      - DS-02 Recorded Activity History — CORE
+    product_requirements_source: .harness/knowledge/product-capabilities.yaml
