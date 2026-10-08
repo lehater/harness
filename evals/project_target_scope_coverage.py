@@ -43,7 +43,10 @@ def _accepted_sources(root: Path) -> dict[str, dict[str, Any]]:
         capability = row.get("capability")
         if not isinstance(capability, str) or capability in reviewed:
             raise DiscoveryError("duplicate/invalid reviewed Capability")
-        reviewed[capability] = row.get("revision")
+        revision = row.get("revision")
+        if type(revision) is not int or revision < 1:
+            raise DiscoveryError("accepted source lacks valid semantic review revision")
+        reviewed[capability] = revision
     accepted = {}
     for item in artifacts:
         if not isinstance(item, dict) or not isinstance(item.get("path"), str):
@@ -87,8 +90,18 @@ def _fragments(
     if kind == "ACCEPTED_PRODUCT_REQUIREMENTS":
         if "heading" in entry:
             raise DiscoveryError("product requirements source does not use headings")
-        accepted = _accepted_requirement_inventory(_required_yaml(filename))
-        return list(accepted.items())
+        record = _required_yaml(filename)
+        accepted = _accepted_requirement_inventory(record)
+        units = list(accepted.items())
+        content = record.get("content", {})
+        non_goals = content.get("non_goals", [])
+        if not isinstance(non_goals, list):
+            raise DiscoveryError("accepted product non-goals must be a list")
+        for index, text in enumerate(non_goals, start=1):
+            if not isinstance(text, str) or not text.strip():
+                raise DiscoveryError("invalid accepted product non-goal")
+            units.append((f"NON_GOAL-{index:02d}", f"Non-goal: {text.strip()}"))
+        return units
     raise DiscoveryError("unsupported source segment type")
 
 
@@ -196,6 +209,12 @@ def audit_draft_coverage(
                     "review_revision": sources[path]["review_revision"],
                     "scope_role": role,
                     "source_text": claim,
+                    "source_unit_kind": (
+                        "PRODUCT_NON_GOAL" if local_id.startswith("NON_GOAL-")
+                        else ("ACCEPTED_PRODUCT_REQUIREMENT"
+                              if kind == "ACCEPTED_PRODUCT_REQUIREMENTS"
+                              else "ACCEPTED_SOURCE_SECTION_STATEMENT")
+                    ),
                     # This is ONLY a heading-level association, not a
                     # claim that target meaning follows from the source.
                     "candidate_obligations_with_same_source_section": (
