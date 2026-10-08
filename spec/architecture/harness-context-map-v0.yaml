@@ -194,6 +194,7 @@ ignored_modules:
   - evals.cdr_direction_holdout
   - evals.cdr_prep_accepted_target_pilot
   - evals.cdr_provider_owned_surfaces
+  - evals.cdr_contract_owner_conflicts
   - evals.dependency_resolution_process_driver
   - evals.adapters.copilot_dependency_resolution_evaluator
   - evals.dependency_resolution_scenario_driver
