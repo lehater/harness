@@ -271,9 +271,28 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
                 "cycle": [TARGET] + path,
                 "disposition": "BLOCKED_BY_CYCLE",
             })
+    bounded_providers = inputs["cases"][0]["provider_catalog"]
+    truncated = sorted(
+        source["capability"] for source in bounded_providers
+        if source.get("source_scope", {}).get("public_surface_truncated") is True
+    )
+    # The model's RESOLVED is a self-assessment. Never upgrade it when its
+    # candidate edges are invalid, any public source was cropped, or target
+    # obligation acceptance has not been individually established.
+    if cycle_blocks:
+        effective_status = "INVALID_PROPOSED_TOPOLOGY"
+    elif truncated:
+        effective_status = "BLOCKED_INCOMPLETE_PROVIDER_SURFACES"
+    else:
+        effective_status = "REVIEW_REQUIRED_TARGET_AND_DIRECTNESS_ACCEPTANCE"
     return {
         "kind": "harness-cdr-current-prep-real-target-contrast-v1",
-        "status": "READ_ONLY_REVIEW_NOT_AUTHORITY_ACCEPTANCE",
+        "status": effective_status,
+        "effective_resolution": "NOT_RESOLVED",
+        "model_resolution_is_not_accepted": True,
+        "all_available_provider_contracts_covered": not bool(truncated),
+        "truncated_provider_ids": truncated,
+        "accepted_project_dependency_topology_validated": False,
         "project_commit": sha,
         "target": TARGET,
         "request_id": request["request_id"],
