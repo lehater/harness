@@ -17,6 +17,7 @@ from typing import Any
 
 from harness.application.scenario_drivers import scenario_driver
 from evals.dependency_resolution_calibration import validate, score
+from evals.dependency_resolution_evidence import assess_predictions
 
 EXECUTABLE_ENV = "HARNESS_CDR_EVALUATOR_EXECUTABLE"
 TIMEOUT_ENV = "HARNESS_CDR_EVALUATOR_TIMEOUT_SECONDS"
@@ -91,15 +92,56 @@ def _invalid(code: str, *, execution: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _validate_discovery_inputs(inputs: dict[str, Any]) -> None:
+    if inputs.get("version") != 1 or inputs.get("kind") != "harness-dependency-resolution-calibration-inputs":
+        raise ValueError("invalid discovery inputs kind/version")
+    if inputs.get("evidence_contract") != "source-grounded-v1":
+        raise ValueError("project discovery requires the source-grounded proof contract")
+    cases = inputs.get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("discovery cases required")
+    ids = set()
+    for item in cases:
+        cid = item.get("id")
+        if not isinstance(cid, str) or not cid or cid in ids:
+            raise ValueError("discovery case ids missing or duplicated")
+        ids.add(cid)
+        forbidden = {"declared_requires", "baseline_requires", "expected_requires",
+                     "expected_direct_needs", "expert_oracle", "expected_status"}
+        if forbidden.intersection(item) or forbidden.intersection(item.get("target", {})):
+            raise ValueError("target dependency or scoring labels leaked into discovery")
+        target = item["target"]
+        obligations = target["output_obligations"]
+        if not isinstance(obligations, list) or not obligations:
+            raise ValueError("missing target output obligations")
+        if len({x["id"] for x in obligations}) != len(obligations):
+            raise ValueError("duplicate target obligation")
+        providers = item["provider_catalog"]
+        if not isinstance(providers, list) or not providers:
+            raise ValueError("missing accepted provider catalog")
+        if len({x["capability"] for x in providers}) != len(providers):
+            raise ValueError("duplicate provider")
+        if target["capability"] in {x["capability"] for x in providers}:
+            raise ValueError("self-provider in discovery")
+
+
 @scenario_driver("dependency.calibration.execute_process")
+@scenario_driver("dependency.discovery.execute_process")
 def execute_dependency_resolution_process(
-    *, inputs: dict[str, Any], oracle: dict[str, Any], run_id: str
+    *, inputs: dict[str, Any], run_id: str, oracle: dict[str, Any] | None = None
 ) -> dict[str, Any]:
-    """Execute a configured external evaluator, then score only a bound response."""
+    """Run a blinded evaluator; score only when a separately authored oracle exists.
+
+    Without oracle, this is an unscored read-only project discovery, not a
+    calibration result. Existing execution and request binding are unchanged.
+    """
     try:
-        validate(inputs, oracle)
+        if oracle is None:
+            _validate_discovery_inputs(inputs)
+        else:
+            validate(inputs, oracle)
     except (KeyError, ValueError, TypeError) as exc:
-        return _invalid("INVALID_CALIBRATION_INPUTS", execution={"error": str(exc)})
+        return _invalid("INVALID_DISCOVERY_INPUTS", execution={"error": str(exc)})
     timeout = _timeout()
     configured = os.environ.get(EXECUTABLE_ENV, "")
     executable = Path(configured).expanduser().resolve() if configured else None
@@ -198,7 +240,20 @@ def execute_dependency_resolution_process(
         "cases": remapped,
     }
     try:
-        evaluation = score(inputs, oracle, predictions)
+        if oracle is not None:
+            evaluation = score(inputs, oracle, predictions)
+        else:
+            assessment = assess_predictions(inputs, predictions)
+            evaluation = {
+                "status": ("DISCOVERY_REQUIRES_REVIEW"
+                           if assessment["status"] != "INVALID" else "INVALID"),
+                "calibration_claim": "NOT_APPLICABLE_NO_ORACLE",
+                "oracle_is_expert_validated": False,
+                "evidence_assessment": assessment,
+                "source_snapshot": inputs.get("source_snapshot"),
+                "edge_comparison": None,
+                "automatic_writeback_allowed": False,
+            }
     except (KeyError, ValueError, TypeError) as exc:
         return _invalid("INVALID_EVALUATOR_PREDICTIONS",
                         execution={**execution, "error": str(exc)})
