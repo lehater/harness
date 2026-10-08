@@ -55,6 +55,8 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
              "provides": ["x.accepted-policy"], "depends_on": []},
             {"id": "STRATEGY", "authority": "MODEL-CONTEXT", "path": "docs/context.md",
              "provides": ["x.strategy"], "depends_on": ["POLICY"]},
+            {"id": "DOMAIN", "authority": "DOMAIN-STRATEGY", "path": "docs/domain.md",
+             "provides": ["x.domain-strategy"], "depends_on": ["POLICY"]},
             {"id": "UNREVIEWED", "authority": "PRODUCT", "path": "docs/unreviewed.yaml",
              "provides": ["x.unreviewed"], "depends_on": []},
         ],
@@ -69,6 +71,9 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
             {"id": "MODEL-CONTEXT", "produces": [
                 {"capability": "x.strategy", "knowledge_kind": "model-context", "requires": [{"capability": "x.accepted-policy"}]},
             ]},
+            {"id": "DOMAIN-STRATEGY", "produces": [
+                {"capability": "x.domain-strategy", "knowledge_kind": "domain-strategy", "requires": []},
+            ]},
             {"id": "TACTICAL", "responsibility": "Define scoped accepted model concepts",
              "produces": [{"capability": "x.target-domain", "knowledge_kind": "domain-model",
                            "requires": [{"capability": "x.accepted-policy"}, {"capability": "x.strategy"}]}]},
@@ -78,14 +83,22 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         "reviews": [
             {"capability": "x.accepted-policy", "revision": 1},
             {"capability": "x.strategy", "revision": 2},
+            {"capability": "x.domain-strategy", "revision": 3},
         ],
     }, sort_keys=False))
     put(base, "docs/product.yaml", yaml.safe_dump({
         "content": {"requirements": [
             {"id": "REQ-01", "statement": "An approved actor must be verified before acting.", "status": "ACCEPTED"},
             {"id": "REQ-02", "statement": "Unaccepted draft authorization must never govern execution.", "status": "DRAFT"},
+            {"id": "REQ-04", "statement": "The product shall display an optional notification to the user.", "status": "ACCEPTED"},
         ]},
     }, sort_keys=False))
+    put(base, "docs/domain.md", (
+        "# Domain Strategy\\n\\n## DS-01 Business Scope\\n\\n"
+        "Business domain semantics constrain account validation for approved actors.\\n\\n"
+        "**Derived from:** `REQ-01`.\\n\\n"
+        "## DS-02 Unrelated Scope\\n\\nDifferent responsibility.\\n"
+    ))
     put(base, "docs/unreviewed.yaml", yaml.safe_dump({"content": {"requirements": [
         {"id": "REQ-03", "statement": "Unreviewed account deletion contract.", "status": "ACCEPTED"}
     ]}}, sort_keys=False))
@@ -103,6 +116,9 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
     targets = [{
         "capability": "x.target-domain", "scope_source": "docs/context.md",
         "scope_headings": ["MC-01 Business Scope"],
+        "strategic_scope_source": "docs/domain.md",
+        "strategic_scope_headings": ["DS-01 Business Scope"],
+        "product_requirements_source": "docs/product.yaml",
     }]
     inputs = generate(base, sha=sha, targets=targets)
     assert inputs["source_snapshot"] == sha
@@ -112,17 +128,28 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
     assert len(inputs["cases"]) == 1
     case = inputs["cases"][0]
     providers = {x["capability"]: x for x in case["provider_catalog"]}
-    assert set(providers) == {"x.strategy", "x.accepted-policy"}
+    assert set(providers) == {"x.strategy", "x.accepted-policy", "x.domain-strategy"}
     assert providers["x.strategy"]["review_revision"] == 2
     assert len(providers["x.accepted-policy"]["semantic_surface"]) == 1
     assert "REQ-01" in providers["x.accepted-policy"]["semantic_surface"][0]
     assert "REQ-02" not in repr(providers)
+    assert len(case["target"]["output_obligations"]) == 2
+    assert case["target"]["output_obligations"][1]["source"]["capability"] == "x.domain-strategy"
+    upstream = case["target"]["upstream_constraint_candidates"]
+    assert len(upstream) == 2
+    assert {x["requirement_id"] for x in upstream} == {"REQ-01", "REQ-04"}
+    assert next(x for x in upstream if x["requirement_id"] == "REQ-01")["traceability"] == "EXPLICIT_STRATEGIC_DERIVATION"
+    assert next(x for x in upstream if x["requirement_id"] == "REQ-04")["traceability"] == "UNADJUDICATED_ACCEPTED_PRODUCT_REQUIREMENT"
+    assert all(x["applicability"] == "REQUIRES_SEMANTIC_REVIEW" for x in upstream)
+    assert inputs["coverage_contract"] == "source-traceability-v1"
     assert "x.unreviewed" not in repr(inputs)
     assert "Unrelated billing" not in case["target"]["output_obligations"][0]["description"]
     assert "Keep actions distinct" in case["target"]["output_obligations"][0]["description"]
     assert "requires" not in repr(case["target"])
     assert "baseline_requires" not in repr(inputs)
     _validate_discovery_inputs(inputs)
+    assert "REQ-04" in repr(inputs)
+    assert "REQ-02" not in repr(inputs)
 
     bind = build_blinded_request(inputs, run_id="REAL-SNAPSHOT-SMOKE", adapter_binding={"id": "fake"})
     assert bind["cases"][0]["target"]["capability"] == "x.target-domain"
