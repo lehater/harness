@@ -152,7 +152,12 @@ def must_fail(action, expected):
         raise AssertionError("Expected hard failure: " + expected)
 
 tampered = copy.deepcopy(inventory)
-tampered["cases"][1]["source_units"][1]["source_text"] = "Different semantic claim with reused ID!"
+# Deepcopy preserves the fixture's intentional aliases between targets.
+# Detach only the second occurrence so a conflicting provenance is visible.
+tampered["cases"][1]["source_units"][1] = {
+    **tampered["cases"][1]["source_units"][1],
+    "source_text": "Different semantic claim with reused ID!",
+}
 must_fail(lambda: build_routing_worksheet(tampered), "inconsistent source provenance")
 tampered = copy.deepcopy(inventory)
 tampered["cases"][0]["source_units"][0]["unit_semantic_disposition"] = "ACCEPTED"
