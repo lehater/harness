@@ -35,6 +35,32 @@ Moreover, the accepted PREP Engineering Graph already has
 access is relevant context, but a transitive path does not by itself prove
 that a direct Tactical Domain prerequisite is redundant.
 
+## Source-aware preliminary necessity review (not independent certification)
+
+The accepted PREP `docs/architecture/context-map.md` explicitly assigns
+strategic responsibility selection to Domain Strategy; its **Consumers**
+section says Model Context Strategy consumes the strategic responsibilities
+to choose model languages, while Tactical Domain Design consumes the
+*model-context decisions that refine those responsibilities*.
+
+The accepted `docs/architecture/model-context-map.md` then defines
+MC-01/MC-02 scope and TR-01's cross-context constraints and states that
+Tactical Domain Design defines concepts, relationships and invariants
+**inside those accepted model contexts**. This corresponds to the existing
+`Tactical -> Model Context -> Domain Strategy` dependency path.
+
+**Provisional finding:** No unique tactical semantic constraint from Domain
+Strategy has yet been demonstrated that must be read directly *in addition
+to* the accepted Model Context contract. The two new direct DS dependencies
+should therefore be treated as **unsupported for adoption**, even though
+their contextual relevance is undisputed. This is not a proof they are
+redundant in every possible design, and the accepted PREP graph should not
+be changed based solely on this argument.
+
+The neutral contrast is intended to investigate whether the model's DS
+preference persists **without** the obvious source echo. It cannot
+substitute for an authoritative direct-consumption necessity decision.
+
 ## New Phase B directness confound audit
 
 `evals/project_discovery_directness.py` audits every model-proposed **new**
