@@ -111,3 +111,18 @@ harness-check:
 	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
 	python tests/test_copilot_live_calibration_evaluator.py
+
+# Explicit operator invocation only. Never part of harness-check or the
+# Capability creation route until independently approved governance exists.
+.PHONY: cdr-prepare cdr-reconcile cdr-audit
+cdr-prepare:
+	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_INTAKE)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_INTAKE CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_operational prepare --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --output "$(CDR_OUTPUT)"
+
+cdr-reconcile:
+	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_INTAKE)" -a -n "$(CDR_PREDICTIONS)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_INTAKE CDR_PREDICTIONS CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_operational reconcile --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --predictions "$(CDR_PREDICTIONS)" --output "$(CDR_OUTPUT)"
+
+cdr-audit:
+	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_OUTPUT"; exit 2)
+	python -m evals.cdr_graph_audit --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --output "$(CDR_OUTPUT)"
