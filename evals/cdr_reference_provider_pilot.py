@@ -245,6 +245,38 @@ def reconcile(root: Path, *, inputs: dict[str, Any], request: dict[str, Any],
     edges = {row["id"]: set() for row in model["templates"]}
     for row in graph["edge_review_packets"]:
         edges[row["target"]].add("reference." + row["provider"].lower().replace("_", "-"))
+    # Combine model-suggested links with all declared links for a
+    # conservative candidate DAG check. The original response stays intact.
+    # Existing graph edges are prerequisite links: target -> supplier.
+    template_names = {
+        "reference." + row["id"].lower().replace("_", "-"): row["id"]
+        for row in model["templates"]
+    }
+    proposed_by_id = {x["id"]: set(x["proposed_requires"])
+                      for x in predictions["cases"]}
+    pilot_targets = {x["id"]: x["target_template"]
+                     for x in load_yaml(root / profile_path)["cases"]}
+    candidate = {target: set(suppliers) for target, suppliers in edges.items()}
+    for cid, suppliers in proposed_by_id.items():
+        candidate[pilot_targets[cid]].update(suppliers)
+
+    def cycle_path(provider: str, target: str) -> list[str] | None:
+        # Supplier reaches target => adding target -> supplier closes a cycle.
+        queue = [(provider, [provider])]
+        seen = set()
+        while queue:
+            node, route = queue.pop(0)
+            if node == target:
+                return route
+            if node in seen:
+                continue
+            seen.add(node)
+            for nxt in sorted(candidate.get(node, [])):
+                next_template = template_names[nxt]
+                if next_template not in seen:
+                    queue.append((next_template, route + [next_template]))
+        return None
+
     contrast = []
     for c in inputs["cases"]:
         prediction = next(x for x in predictions["cases"] if x["id"] == c["id"])
@@ -252,8 +284,24 @@ def reconcile(root: Path, *, inputs: dict[str, Any], request: dict[str, Any],
                       load_yaml(root / profile_path)["cases"] if row["id"] == c["id"])
         proposed = set(prediction["proposed_requires"])
         declared = edges[target]
+        invalid_new = []
+        for provider in sorted(proposed - declared):
+            supplier_template = template_names[provider]
+            route = cycle_path(supplier_template, target)
+            if route is not None:
+                invalid_new.append({
+                    "provider": provider,
+                    "reason": "PROPOSED_EDGE_INTRODUCES_CAPABILITY_CYCLE",
+                    "cycle": [target] + route,
+                    "must_not_adopt": True,
+                })
         contrast.append({
             "case_id": c["id"], "target_template": target,
+            "structural_candidate_status": (
+                "BLOCKED_BY_CYCLE" if invalid_new
+                else "NO_CYCLE_FOUND_NOT_SEMANTICALLY_VERIFIED"
+            ),
+            "invalid_new_edge_candidates": invalid_new,
             "proposed_provider_count": len(proposed),
             "declared_provider_count": len(declared),
             "both_provisional": sorted(proposed & declared),
