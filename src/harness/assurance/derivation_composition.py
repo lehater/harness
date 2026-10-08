@@ -3,8 +3,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from harness.assurance.semantic_fingerprint import semantic_assertion_fingerprints
 
-def compose_derivations(evaluations: list[dict[str, Any]], *, current_assertion_ids: dict[str, list[str]] | None = None) -> dict[str, Any]:
+
+def compose_derivations(evaluations: list[dict[str, Any]], *, current_assertion_ids: dict[str, list[str]] | None = None, current_semantics: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
     """Trace semantic atoms across adjacent accepted derivations, without adding graph edges."""
     if len(evaluations) < 2:
         return {"status": "REJECTED", "findings": [{"code": "CHAIN_TOO_SHORT"}], "links": []}
@@ -32,6 +34,28 @@ def compose_derivations(evaluations: list[dict[str, Any]], *, current_assertion_
                 if set(link.get("sources", [])) - source_ids or set(link.get("targets", [])) - target_ids:
                     findings.append({"code": "STALE_LINK_IDS", "index": i})
                     break
+
+    if current_semantics is not None:
+        current = {cap: semantic_assertion_fingerprints(doc) for cap, doc in current_semantics.items()}
+        for i, evaluation in enumerate(evaluations):
+            pairs = (
+                ("source", evaluation.get("source_capability")),
+                ("target", evaluation.get("target_capability")),
+            )
+            accepted = evaluation.get("assertion_fingerprints")
+            if not isinstance(accepted, dict):
+                findings.append({"code": "ACCEPTED_FINGERPRINTS_MISSING", "index": i})
+                continue
+            for side, cap in pairs:
+                if cap not in current:
+                    findings.append({"code": "CURRENT_SEMANTICS_MISSING", "index": i, "capability": cap})
+                    continue
+                recorded = accepted.get(side)
+                if not isinstance(recorded, dict):
+                    findings.append({"code": "ACCEPTED_FINGERPRINTS_MISSING", "index": i, "side": side})
+                    continue
+                if recorded != current[cap]:
+                    findings.append({"code": "SEMANTIC_FINGERPRINT_MISMATCH", "index": i, "side": side, "capability": cap})
 
     if findings:
         return {"status": "REJECTED", "findings": findings, "links": []}
