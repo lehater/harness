@@ -1,0 +1,178 @@
+version: 1
+kind: harness-cdr-claim-obligation-mapping-hypotheses
+status: OPERATOR_DRAFT_NOT_ACCEPTED
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+automatic_writeback_allowed: false
+purpose: >-
+  Per-claim operator hypotheses, not semantic acceptance, provider directness,
+  application implementation, or approval to alter the PREP dependency graph.
+source_claims:
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-INTRODUCE-INFORMATION
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links: []
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Introducing information is application behavior; whether it imposes any distinct target-owned semantic invariant remains open."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-RETAIN-INFORMATION
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links: []
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Retention is an application lifecycle behavior; existing domain meanings still constrain retained facts, but this is not a new accepted model invariant."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-CHANGE-INFORMATION
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: OPEN_SCOPE_QUESTION}
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: POSSIBLE_SHARED_BOUNDARY}
+    candidate_external_routes: [APPLICATION_DESIGN, SHARED_CROSS_CONTEXT]
+    rationale: "The application changes current information, while existing meaning and historical references may require independently reviewed boundary rules."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-REMOVE-INFORMATION
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: POSSIBLE_SHARED_BOUNDARY}
+    candidate_external_routes: [APPLICATION_DESIGN, SHARED_CROSS_CONTEXT]
+    rationale: "Removal is a lifecycle action, but it may affect historical reference intelligibility; the applicable invariant and owner require review."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-KNOWLEDGE-KINDS
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: []
+    rationale: "Distinguishable kinds of knowledge plausibly constrain preparation-information semantics, without prescribing any fixed taxonomy."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-RELATIONSHIP-MEANINGS
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: [SHARED_CROSS_CONTEXT]
+    rationale: "Distinct relationship meanings plausibly constrain the information model; applicability to cross-context links is not independently settled."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-CROSS-INFORMATION-RELATIONSHIPS
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: [SHARED_CROSS_CONTEXT]
+    rationale: "Linking information kinds can constrain relationship semantics, but not a mandatory graph topology or a new shared entity."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-EXPLORE-PERSPECTIVES
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: OPEN_SCOPE_QUESTION}
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Prior blinded runs disagreed whether exploration imposes its own domain rule beyond preserving existing meanings for application views."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-SELECT-PART
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links: []
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Selecting part of the information for external use is product behavior; the representation and semantic preservation obligations are not yet independently assigned."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-TRANSFER-SELECTION
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links: []
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Transferring a user selection outside Prep is application behavior; accepted product scope does not mandate a domain export format."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-RECORD-ACTIVITY
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Accepting a recording is an application operation while ownership of the recorded historical fact can constrain the history domain model."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-RELATE-ACTIVITY
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-REFERENCED-INFORMATION, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: [SHARED_CROSS_CONTEXT]
+    rationale: "Association of recorded activity with information constrains historical reference meaning and may also involve shared boundary semantics."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-PRESERVE-TIME
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+    candidate_external_routes: []
+    rationale: "Temporal context can be a domain fact of the recorded activity without mandating particular timestamp types or storage fields."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-PRESERVE-HISTORY-CONTEXT
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-PRESERVED-CONTEXT, relation: CANDIDATE_SEMANTIC_CONSTRAINT}
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-BOUNDARY-TO-HISTORY, relation: POSSIBLE_SHARED_BOUNDARY}
+    candidate_external_routes: [SHARED_CROSS_CONTEXT]
+    rationale: "Historical interpretation through changed or removed current information may require retained historical context and an independently governed cross-context boundary."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: REQ-CAP-EXPLORE-HISTORY
+    source_unit_kind: ACCEPTED_PRODUCT_REQUIREMENT
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-RECORDED-FACTS, relation: OPEN_SCOPE_QUESTION}
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "History exploration is externally visible behavior; whether this adds distinct domain invariants beyond intelligible retained facts remains unresolved."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-01
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+    candidate_external_routes: []
+    rationale: "Not maintaining learner state limits inferences by both models but does not prohibit the retained facts or definitions themselves."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-02
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+    candidate_external_routes: []
+    rationale: "Prohibiting mastery readiness or competence estimation constrains interpretation without declaring historical activity or capability definitions absent."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-03
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-SEMANTIC-CONCEPTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+    candidate_external_routes: []
+    rationale: "A fixed taxonomy is explicitly excluded, so drafted semantic distinctions must remain open rather than mandating enumerations."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-04
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.preparation-information-model, obligation_id: PI-KNOWLEDGE-AND-RELATIONS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+    candidate_external_routes: [SHARED_CROSS_CONTEXT]
+    rationale: "No mandatory relationship topology follows from accepting relationship meanings, including when links span information kinds."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-05
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links: []
+    candidate_external_routes: [APPLICATION_DESIGN, UNDETERMINED]
+    rationale: "Technical integration formats visualization storage and API choices are explicitly not fixed as domain model obligations."
+  - source_path: .harness/knowledge/product-capabilities.yaml
+    source_local_id: NON_GOAL-06
+    source_unit_kind: PRODUCT_NON_GOAL
+    status: CANDIDATE_NOT_ACCEPTED
+    candidate_target_links:
+      - {target_capability: prep.recorded-activity-history-model, obligation_id: RH-NEGATIVE-INVARIANTS, relation: CANDIDATE_NEGATIVE_INVARIANT}
+    candidate_external_routes: [APPLICATION_DESIGN]
+    rationale: "Historical fact preservation must not silently require statistics or derived assessments as accepted domain semantics."
