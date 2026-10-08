@@ -75,5 +75,36 @@ assert result["provenance"]["provider"] == "github-copilot"
 # The oracle must never be passed to the adapter, even if it is present in the
 # repository for scoring. These fixtures check process boundaries, not semantic
 # validity or actual provider independence.
+# Model and adapter own different envelopes: missing or inconsistent model
+# version metadata must not discard complete, correctly bound semantic results.
+normalized, envelope = adapter._validate_model_results(
+    {"version": "2", "kind": "model-supplied-envelope", "results": example["results"]},
+    request,
+)
+assert len(normalized) == 6 and envelope["adapter_envelope_normalized"]
+clean, envelope = adapter._validate_model_results(
+    {"results": example["results"]},
+    request,
+)
+assert len(clean) == 6 and envelope["model_supplied_version"] == "OMITTED"
+
+missing = copy.deepcopy(example)
+missing["results"].pop()
+try:
+    adapter._validate_model_results(missing, request)
+except ValueError as exc:
+    assert "count mismatch" in str(exc)
+else:
+    raise AssertionError("missing model predictions may not be repaired")
+
+duplicate = copy.deepcopy(example)
+duplicate["results"][1]["case_request_id"] = duplicate["results"][0]["case_request_id"]
+try:
+    adapter._validate_model_results(duplicate, request)
+except ValueError as exc:
+    assert "duplicate case binding" in str(exc)
+else:
+    raise AssertionError("duplicate model bindings must be rejected")
+
 assert oracle["privacy"] == "NEVER_SEND_TO_EVALUATED_AGENT"
 print("Copilot Dependency Resolution adapter: PASS")
