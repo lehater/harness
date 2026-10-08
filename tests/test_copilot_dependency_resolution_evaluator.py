@@ -25,6 +25,9 @@ request = build_blinded_request(data, run_id="ADAPTER-SMOKE", adapter_binding={"
 payload = adapter._blinded_model_payload(request)
 assert len(payload["cases"]) == 6
 assert "expected_requires" not in adapter._prompt(request)
+assert "DOWNSTREAM consumer" in adapter._prompt(request)
+assert "would it need the target's result" in adapter._prompt(request)
+assert "Do not remove" in adapter._prompt(request)
 assert "baseline_requires" not in adapter._prompt(request)
 assert "review_status" not in adapter._prompt(request)
 assert "CDR-01" not in adapter._prompt(request)
