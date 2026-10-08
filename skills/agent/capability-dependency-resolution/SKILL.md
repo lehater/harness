@@ -41,6 +41,43 @@ Never show Phase A the target production's current `requires`, its accepted depe
 6. Distinguish `ACCEPTED_EVIDENCE` (concrete accepted semantic surface supports the claim), `CONTRACT_ONLY` (producer public contract is defined but not accepted), and `UNRESOLVED` (provider, scope or needed meaning remains indeterminate). A planned provider can be a legitimate prerequisite, but its unaccepted assertions may not be treated as accepted proof.
 7. Check input-set sufficiency obligation-by-obligation and record unresolved needs explicitly. Do not infer sufficiency from graph validity or lack of findings. If project policy/coverage obligations are missing, mark their absence as a scope limitation rather than claiming general completeness.
 
+### A.1. Evidence-grounding and provisional-edge boundary (experimental)
+
+For each candidate direct need, identify **the exact consumed provider claim**,
+its acceptance status, and how the claim constrains the named target output
+obligation. If a bounded fixture supplies `semantic_surface[]` strings, the
+experimental `source-grounded-v1` protocol uses a zero-based `claim_index`
+into the selected provider's surface, `consumption_rationale` and `basis`
+(`DIRECT_ACCEPTED` or `PLANNED_CONTRACT`). This is a reference to a public
+semantic claim, **not** a semantic proof.
+
+Explicitly distinguish:
+
+- **Normative constraint**: an accepted rule or invariant that can actually
+  constrain the target obligation.
+- **Descriptive or enabling context**: topic relevance, optional user intent,
+  logging, monitoring, warning or notification. This must NOT be upgraded to a
+  prevention, authorization, consent or enforcement rule.
+- **Contract-only planned provider**: a declared future source that may justify
+  a *provisional* topology proposal but cannot establish accepted semantics.
+- **Unresolved missing rule**: an obligation with no semantically sufficient
+  source. Preserve `UNRESOLVED`, do not invent its owner or cite a weaker
+  related statement as if it supplied the missing rule.
+
+A `DIRECT_ACCEPTED` need tied to an obligation that the same response marks
+`UNRESOLVED` requires human review before any adoption. For a genuinely
+partial obligation, split the materially distinct sub-obligations when the
+project contract permits; do not silently treat a generic related claim as
+proof of the missing rule. Several truly necessary sources may support one
+obligation, but each needs its own evidence and direct-consumption rationale.
+
+The deterministic grounding preflight verifies that claim indices exist,
+source acceptance status matches the declared basis, edges map to needs, and
+unresolved accepted-edge conflicts are surfaced. It **cannot** prove that a
+cited claim entails the needed rule; an independent source-aware judgement is
+still required before adopting a direct dependency. All automated graph
+writeback remains disabled.
+
 ### B. Reconcile and validate proposal
 
 8. Freeze the Phase A need-to-obligation-to-provider mapping. Only now inspect current target `requires`.
