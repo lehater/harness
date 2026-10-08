@@ -1,0 +1,37 @@
+# Opt-in PREP CDR illustration. NOT the accepted Tactical Domain output contract.
+# Existing PREP requires are deliberately absent from this source.
+kind: harness-cdr-capability-intake-v1
+version: 1
+status: DRAFT_NOT_ACCEPTED
+source_commit: c52ff8ec1a4732285b2b299bf11dca9869fb2fee
+automatic_writeback_allowed: false
+target:
+  capability: prep.preparation-information-model
+  authority: TACTICAL-DOMAIN-DESIGN
+  knowledge_kind: domain-model
+  output_obligations:
+    - id: PI-SEMANTIC-CONCEPTS
+      description: >-
+        Define the semantic kinds and distinctions of current preparation
+        information, including goals, knowledge, capabilities and practice
+        material without prescribing a fixed taxonomy or technical boundary.
+    - id: PI-KNOWLEDGE-AND-RELATIONS
+      description: >-
+        Define knowledge kinds and meaningful relationships among preparation
+        information, permitting different perspectives while preserving
+        distinguishable relation meanings and avoiding fixed graph topology.
+    - id: PI-BOUNDARY-TO-HISTORY
+      description: >-
+        Define how current preparation information retains its own meaning
+        when referenced by recorded activity and results, without taking
+        authority over the historical facts themselves.
+  governing_constraints:
+    - id: PI-NEGATIVE-INVARIANTS
+      description: >-
+        The definitions and relationships of current preparation information
+        must not themselves imply learner mastery, competence, readiness,
+        learner state, or actual possession of a described capability.
+      applies_to_outputs:
+        - PI-SEMANTIC-CONCEPTS
+        - PI-KNOWLEDGE-AND-RELATIONS
+        - PI-BOUNDARY-TO-HISTORY
