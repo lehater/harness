@@ -53,8 +53,16 @@ semantic claim, **not** a semantic proof.
 
 Explicitly distinguish:
 
+- **Claim ownership versus quoted context**: a reviewed provider artifact may
+  *mention*, illustrate, or summarize another Capability's output. A sentence
+  appearing in that artifact does not make the source Capability the semantic
+  owner or producer of the cited meaning. Check the source's published output
+  boundary; a downstream consumer quoting the target contract is not its
+  prerequisite.
 - **Normative constraint**: an accepted rule or invariant that can actually
-  constrain the target obligation.
+  constrain the target obligation. A bare `Examples:`, `Conceptually:`, or
+  illustrative example is not in itself normative proof, even with a valid
+  `claim_index` into a reviewed file.
 - **Descriptive or enabling context**: topic relevance, optional user intent,
   logging, monitoring, warning or notification. This must NOT be upgraded to a
   prevention, authorization, consent or enforcement rule.
