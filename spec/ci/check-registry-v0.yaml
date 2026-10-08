@@ -99,17 +99,17 @@ workflow_roles:
 
 
 checks:
-- id: derivation_composition_experiment
-  command: python tests/test_derivation_composition.py
-  stage: focused
-  cost_class: cheap
-  disposition: full_gate
-  rationale: Experimental focused smoke check; does not join canonical exhaustive gate before review.
 - id: ci_policy
   command: python checks/validate_ci_policy.py
   stage: policy
   cost_class: cheap
   disposition: full_gate
+- id: derivation_composition_experiment
+  command: python tests/test_derivation_composition.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Deterministic regression for fresh semantic composition and publication validation.
 - id: assurance_registry
   command: python checks/validate_assurance_registry.py
   stage: focused
