@@ -18,6 +18,11 @@ import tempfile
 import uuid
 from typing import Any
 
+# The process adapter runs with a fresh working directory. The versioned
+# repository source bridge must remain importable without changing CWD.
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
 from harness.assurance.adapters.copilot_live_calibration_evaluator import (
     _sanitized_env,
     _observed_cli_version,
