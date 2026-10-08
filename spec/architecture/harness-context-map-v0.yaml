@@ -197,6 +197,7 @@ ignored_modules:
   - evals.cdr_contract_owner_conflicts
   - evals.cdr_public_semantic_contract
   - evals.cdr_atomic_consumption_review
+  - evals.cdr_authority_review_bridge
   - evals.dependency_resolution_process_driver
   - evals.adapters.copilot_dependency_resolution_evaluator
   - evals.dependency_resolution_scenario_driver
