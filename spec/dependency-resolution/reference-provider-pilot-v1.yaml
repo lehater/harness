@@ -1,0 +1,54 @@
+version: 1
+kind: harness-cdr-reference-provider-pilot
+status: experimental-not-authoritative
+purpose: >-
+  Blind provider-backed discovery from independently described research-template
+  output obligations. This is a hypothesis exercise, not accepted project semantics.
+cases:
+  - id: REF-PILOT-INTERACTION
+    target_template: INTERACTION-DESIGN
+    output_obligations:
+      - id: interaction-contexts
+        description: >-
+          Define stable human interaction contexts and their relation to
+          user tasks and conceptual meanings, without assigning screen or
+          navigation destinations.
+      - id: actions-and-outcomes
+        description: >-
+          Define user actions and inputs, accepted visible outcomes, material
+          states, transitions, denial, cancellation and recovery.
+      - id: distinct-visible-roles
+        description: >-
+          Identify distinct user-visible semantic roles and independently
+          observable interaction obligations without inventing product policy.
+  - id: REF-PILOT-TOPOLOGY
+    target_template: INTERFACE-TOPOLOGY
+    output_obligations:
+      - id: views-and-context-coverage
+        description: >-
+          Define justified user-facing view identities with one primary
+          responsibility, and prove every required interaction context has
+          a coherent view or explicit non-view disposition.
+      - id: conceptual-location-mapping
+        description: >-
+          Identify the conceptual information locations associated with views,
+          without treating locations as necessarily separate screens.
+      - id: entry-exit-navigation
+        description: >-
+          Define roots, parent relations, view entries, exits, links and
+          navigation continuity without deciding screen-local composition.
+  - id: REF-PILOT-DOMAIN-MODEL
+    target_template: DOMAIN-MODEL
+    output_obligations:
+      - id: tactical-concepts
+        description: >-
+          Define domain concepts, identities and relationships relevant to
+          the selected subject within accepted semantic model boundaries.
+      - id: accepted-invariants
+        description: >-
+          Model domain invariants and responsibility constraints without
+          inventing product decisions or technical implementation.
+      - id: distinct-context-semantics
+        description: >-
+          Preserve material context-language boundaries and the meaning of
+          translations when the selected domain subject crosses them.
