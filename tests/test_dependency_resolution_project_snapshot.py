@@ -94,10 +94,10 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         ]},
     }, sort_keys=False))
     put(base, "docs/domain.md", (
-        "# Domain Strategy\\n\\n## DS-01 Business Scope\\n\\n"
-        "Business domain semantics constrain account validation for approved actors.\\n\\n"
-        "**Derived from:** `REQ-01`.\\n\\n"
-        "## DS-02 Unrelated Scope\\n\\nDifferent responsibility.\\n"
+        "# Domain Strategy\n\n## DS-01 Business Scope\n\n"
+        "Business domain semantics constrain account validation for approved actors.\n\n"
+        "**Derived from:** `REQ-01`.\n\n"
+        "## DS-02 Unrelated Scope\n\nDifferent responsibility.\n"
     ))
     put(base, "docs/unreviewed.yaml", yaml.safe_dump({"content": {"requirements": [
         {"id": "REQ-03", "statement": "Unreviewed account deletion contract.", "status": "ACCEPTED"}
