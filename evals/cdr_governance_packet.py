@@ -173,6 +173,13 @@ def validate_draft_review(
                 raise DiscoveryError("directness review needs specific evidence")
         if labels!=set(REQUIRED_TESTS):
             raise DiscoveryError("missing independent directness test")
+        recorded={item["finding"] for item in tests}
+        if (row["decision"]=="LIKELY_DIRECT"
+            and recorded!={"SUPPORTS_DIRECT"}):
+            raise DiscoveryError("draft likely-direct conclusion conflicts with review findings")
+        if (row["decision"]=="LIKELY_INHERITED"
+            and recorded!={"SUPPORTS_INHERITED"}):
+            raise DiscoveryError("draft likely-inherited conclusion conflicts with review findings")
     if seen!=required or got!=wanted:
         raise DiscoveryError("review draft omits outputs or proposed direct suppliers")
     return {
