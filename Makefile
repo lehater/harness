@@ -96,5 +96,6 @@ harness-check:
 	python tests/test_scenario_suite.py
 	python tests/test_dependency_resolution_calibration.py
 	python tests/test_dependency_resolution_process_driver.py
+	python tests/test_copilot_dependency_resolution_evaluator.py
 	python tests/test_live_calibration_process_driver.py
 	python tests/test_copilot_live_calibration_evaluator.py
