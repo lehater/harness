@@ -167,3 +167,32 @@ steps:
     expect:
       - {path: /status, op: equals, value: REJECTED}
       - {path: /findings, op: contains_match, value: {code: UNDISPOSITIONED_SOURCE, source: TASK-A}}
+
+  - id: composed-end-to-end-trace
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.local-task-application}
+    expect:
+      - {path: /status, op: equals, value: ACCEPTED}
+      - {path: /source_capability, op: equals, value: pilot.product}
+      - {path: /target_capability, op: equals, value: pilot.application}
+      - {path: /links, op: contains_match, value: {source: REQ-A, targets: [OP-A]}}
+
+  - id: break-accepted-chain-link
+    driver: data.patch
+    with:
+      value: {ref: step.local-task-application}
+      operations:
+        - {op: replace, path: /links, value: []}
+
+  - id: composition-detects-lost-trace
+    driver: semantic.compose_derivations
+    with:
+      evaluations:
+        - {ref: step.local-product-task}
+        - {ref: step.break-accepted-chain-link}
+    expect:
+      - {path: /status, op: equals, value: REJECTED}
+      - {path: /findings, op: contains_match, value: {code: CHAIN_TRACE_LOST, sources: [REQ-A]}}
