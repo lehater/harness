@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from evals.project_discovery_snapshot import DiscoveryError, generate
+from evals.project_discovery_reconcile import compare
 from evals.dependency_resolution_process_driver import (
     build_blinded_request, _validate_discovery_inputs,
     execute_dependency_resolution_process, EXECUTABLE_ENV,
@@ -65,11 +66,11 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
                 {"capability": "x.unreviewed", "knowledge_kind": "product-requirements", "requires": []},
             ]},
             {"id": "MODEL-CONTEXT", "produces": [
-                {"capability": "x.strategy", "knowledge_kind": "model-context", "requires": ["x.accepted-policy"]},
+                {"capability": "x.strategy", "knowledge_kind": "model-context", "requires": [{"capability": "x.accepted-policy"}]},
             ]},
             {"id": "TACTICAL", "responsibility": "Define scoped accepted model concepts",
              "produces": [{"capability": "x.target-domain", "knowledge_kind": "domain-model",
-                           "requires": ["x.accepted-policy"]}]},
+                           "requires": [{"capability": "x.accepted-policy"}]}]},
         ],
     }, sort_keys=False))
     put(base, ".harness/semantic-baseline.yaml", yaml.safe_dump({
@@ -172,6 +173,33 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert evaluation["bound_predictions"]["cases"][0]["proposed_requires"]
         assert evaluation["evidence_assessment"]["semantic_entailment_verified"] is False
         assert evaluation["oracle_is_expert_validated"] is False
+
+        # Phase B is intentionally separate and begins only after the blinded
+        # model result and its valid reference assessment exist.
+        comparison = compare(base, sha=sha, inputs=inputs, evaluation=evaluation)
+        assert comparison["status"] == "READ_ONLY_RECONCILIATION"
+        assert comparison["automatic_writeback_allowed"] is False
+        assert comparison["cases"][0]["KEEP"] == ["x.accepted-policy"]
+        assert comparison["cases"][0]["ADD"] == []
+        assert comparison["cases"][0]["REMOVE_CANDIDATE"] == []
+
+        broken = copy.deepcopy(evaluation)
+        broken["source_snapshot"] = "0" * 40
+        try:
+            compare(base, sha=sha, inputs=inputs, evaluation=broken)
+        except DiscoveryError:
+            pass
+        else:
+            raise AssertionError("Phase B must reject wrong project snapshot")
+
+        broken = copy.deepcopy(evaluation)
+        broken["evidence_assessment"]["status"] = "INVALID"
+        try:
+            compare(base, sha=sha, inputs=inputs, evaluation=broken)
+        except DiscoveryError:
+            pass
+        else:
+            raise AssertionError("Phase B must recompute proof references")
     finally:
         if previous is None:
             os.environ.pop(EXECUTABLE_ENV, None)
