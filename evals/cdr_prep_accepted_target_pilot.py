@@ -20,6 +20,7 @@ from evals.project_discovery_snapshot import (
 from evals.dependency_resolution_process_driver import build_blinded_request
 from evals.dependency_resolution_evidence import assess_predictions
 from evals.cdr_provider_owned_surfaces import load_selectors, selected_surface
+from evals.cdr_contract_owner_conflicts import delegated_target_claims
 
 TARGET = "prep.knowledge-relation-classification"
 PIN = "d9adf4ca51049894437f1ed3d4f74fe94936c896"
@@ -331,8 +332,13 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
                 "reason": "NON_SUBSTANTIVE_SOURCE_FRAGMENT",
                 "must_not_treat_as_normative_evidence": True,
             })
+    target_export_delegation_conflicts = delegated_target_claims(
+        inputs["cases"][0], prediction
+    )
     if cycle_blocks:
         effective_status = "INVALID_PROPOSED_TOPOLOGY"
+    elif target_export_delegation_conflicts:
+        effective_status = "BLOCKED_PROVIDER_CITES_TARGET_AS_EXPORT_OWNER"
     elif low_information:
         effective_status = "BLOCKED_NON_SUBSTANTIVE_SOURCE_CLAIMS"
     elif truncated:
@@ -351,6 +357,8 @@ def reconcile(root: Path, *, sha: str, inputs: dict[str, Any],
         "operator_selected_partial_provider_ids": selected_partial,
         "source_surface_protocol": surface_mode,
         "non_substantive_cited_claims": low_information,
+        "explicit_target_export_delegation_conflicts": target_export_delegation_conflicts,
+        "provider_source_ownership_independently_adjudicated": False,
         "provider_claim_entailment_verified": False,
         "accepted_project_dependency_topology_validated": False,
         "project_commit": sha,
