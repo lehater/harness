@@ -86,6 +86,44 @@ cited claim entails the needed rule; an independent source-aware judgement is
 still required before adopting a direct dependency. All automated graph
 writeback remains disabled.
 
+### A.2. Public semantic claim ownership (experimental draft)
+
+Do not equate **source file acceptance** with **exported claim ownership**.
+One artifact may contain both its own independently meaningful public
+outputs and descriptions explicitly delegating another Capability's
+exports. Separate these at claim granularity before assigning a
+semantic provider:
+
+- `OWNED_EXPORT_CANDIDATE`: an inspectable hypothesis of source-owned
+  public meaning, bound to its exact source, anchor and review revision.
+- `DELEGATED_EXPORT_REFERENCE`: a source statement explicitly crediting
+  another artifact with a public export. Preserve that reference for
+  review; it is neither an owned provider claim nor an automatic graph
+  dependency.
+- `CONTEXT_ONLY`: illustrative, descriptive or otherwise nonexport
+  context. Do not promote it to a normative source claim.
+
+The experiment's
+`spec/dependency-resolution/project-pilots/prep-public-semantic-contract-draft-v1.yaml`
+and `evals/cdr_public_semantic_contract.py` demonstrate the distinction.
+All atomically selected exports are `CONTRACT_ONLY` until separately
+accepted; a reviewed parent document does not upgrade them.
+
+For every proposed direct need, distinguish **a real, independently
+produced source-owned export** from **material direct consumption by
+one specifically named target output obligation**. A correctly attributed
+source claim can be irrelevant, fully mediated by an immediate provider,
+or produced by a downstream consumer. These are separate review questions.
+
+Before admitting `RESOLVED`, account for every applicable target output:
+a grounded input need, an unresolved blocking Question, or an
+independently justified nonapplicability decision. The current provider
+response schema has no independently reviewable nonapplicability field;
+a silent omitted output cannot be assumed satisfied. Use
+`evals/cdr_atomic_consumption_review.py` for a non-authorizing,
+source-index-bound packet; it does not resolve those questions or claim
+Authority acceptance.
+
 ### B. Reconcile and validate proposal
 
 8. Freeze the Phase A need-to-obligation-to-provider mapping. Only now inspect current target `requires`.
