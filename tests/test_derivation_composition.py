@@ -30,7 +30,9 @@ def main() -> None:
     assert compose_derivations([accepted_a, accepted_b], current_semantics=mutated)["findings"][0]["code"] == "SEMANTIC_FINGERPRINT_MISMATCH"
     assert compose_derivations([a, b], current_semantics=scopes)["findings"][0]["code"] == "ACCEPTED_FINGERPRINTS_MISSING"
     assert compose_derivations([accepted_a, accepted_b], current_semantics={"A": sem_a, "B": sem_b})["findings"][0]["code"] == "CURRENT_SEMANTICS_MISSING"
-    print("Composition tests passed (12)")
+    expanded_target = {"A": sem_a, "B": sem_b, "C": {"semantic_assertions": sem_c["semantic_assertions"] + [{"id": "c2", "kind": "operation", "semantic_value": "added"}]}}
+    assert compose_derivations([accepted_a, accepted_b], current_semantics=expanded_target)["findings"][0]["code"] == "SEMANTIC_FINGERPRINT_MISMATCH"
+    print("Composition tests passed (13)")
 
 
 if __name__ == "__main__":
