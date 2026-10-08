@@ -105,7 +105,8 @@ def build_claim_mapping(
                 raise DiscoveryError("unknown or duplicate product claim mapping")
             observed_keys.add(key)
             unit = source_by_key[key]
-            if item.get("source_sha256") != unit["source_sha256"]:
+            if ("source_sha256" in item
+                and item["source_sha256"] != unit["source_sha256"]):
                 raise DiscoveryError("mapping source digest differs from immutable snapshot")
             if item.get("status") != "CANDIDATE_NOT_ACCEPTED":
                 raise DiscoveryError("mapping candidate cannot declare acceptance")
