@@ -130,8 +130,8 @@ def validate_revision(v1: dict[str, Any], v2: dict[str, Any]) -> dict[str, Any]:
                     applies = item.get("applies_to_outputs")
                     if (not isinstance(applies, list) or not applies
                         or len(applies) != len(set(applies))
-                        or not set(applies).issubset(output_ids)):
-                        raise DiscoveryError("governing constraint must name existing local outputs")
+                        or set(applies) != output_ids):
+                        raise DiscoveryError("recast cross-cutting constraint must govern all local outputs")
                 elif "applies_to_outputs" in item:
                     raise DiscoveryError("positive output cannot masquerade as governing constraint")
                 count_by_action[expected_action] += 1
