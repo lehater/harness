@@ -15,6 +15,7 @@ from typing import Any
 import yaml
 
 from evals.project_discovery_snapshot import DiscoveryError, _commit, _required_yaml
+from evals.dependency_resolution_evidence import assess_predictions
 
 def compare(
     project_root: Path, *, sha: str,
@@ -45,6 +46,13 @@ def compare(
         {r.get("id") for r in records} != case_ids or
         len({r.get("id") for r in records}) != len(records)):
         raise DiscoveryError("result case binding differs from original blind input")
+    # Recalculate reference validity from model rows rather than trusting the
+    # evaluation artifact's assertion that its evidence was assessed.
+    rechecked = assess_predictions(inputs, predictions)
+    if rechecked.get("status") == "INVALID":
+        raise DiscoveryError("bound predictions fail source-reference verification")
+    if rechecked != evaluation.get("evidence_assessment"):
+        raise DiscoveryError("stored proof assessment differs from recomputed model evidence")
     graph = _required_yaml(project_root / ".harness/engineering-graph.yaml")
     producers: dict[str, dict[str, Any]] = {}
     for auth in graph.get("authorities", []):
