@@ -1,0 +1,96 @@
+version: 1
+kind: harness-dependency-resolution-calibration-oracle
+status: experimental-adversarial
+privacy: NEVER_SEND_TO_EVALUATED_AGENT
+note: >-
+  Author-draft labels, written before any real provider execution on
+  ADV-01..06. They are NOT independently expert-reviewed or canonical truth.
+cases:
+  - id: ADV-01
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: [adversarial.external-profile-fields]
+    expected_direct_needs:
+      - {obligation: encode-profile-format, provider: adversarial.external-profile-fields}
+    expected_reconciliation:
+      ADD: [adversarial.external-profile-fields]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [enforce-data-release-authority]
+    unresolved_reason: >-
+      A voluntary export choice does not create authorization to disclose
+      private data. No source provides the necessary release rule.
+
+  - id: ADV-02
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: [adversarial.payment-settlement-policy]
+    expected_direct_needs:
+      - {obligation: block-duplicate-payment, provider: adversarial.payment-settlement-policy}
+    expected_reconciliation:
+      ADD: [adversarial.payment-settlement-policy]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: Warning and metrics are not prevention or policy enforcement.
+
+  - id: ADV-03
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: []
+    expected_direct_needs: []
+    expected_reconciliation:
+      ADD: []
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [deny-unauthorized-identity-access]
+    unresolved_reason: >-
+      Immutable audit logging and access preferences do not define which
+      actors must be denied. Missing policy owner must be resolved.
+
+  - id: ADV-04
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: [adversarial.future-vat-policy, adversarial.currency-vocabulary]
+    expected_direct_needs:
+      - {obligation: apply-accepted-vat-logic, provider: adversarial.future-vat-policy}
+      - {obligation: retain-currency-semantics, provider: adversarial.currency-vocabulary}
+    expected_reconciliation:
+      ADD: [adversarial.future-vat-policy, adversarial.currency-vocabulary]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [apply-accepted-vat-logic]
+    unresolved_reason: The proposed VAT provider only has an unaccepted planned contract.
+
+  - id: ADV-05
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: [adversarial.document-role-policy, adversarial.document-tenant-invariant]
+    expected_direct_needs:
+      - {obligation: authorize-deletion, provider: adversarial.document-role-policy}
+      - {obligation: authorize-deletion, provider: adversarial.document-tenant-invariant}
+    expected_reconciliation:
+      ADD: [adversarial.document-role-policy, adversarial.document-tenant-invariant]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: Both role policy and document ownership are independently necessary.
+
+  - id: ADV-06
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: [adversarial.inventory-domain-state]
+    expected_direct_needs:
+      - {obligation: show-live-availability, provider: adversarial.inventory-domain-state}
+    expected_reconciliation:
+      ADD: [adversarial.inventory-domain-state]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: Inventory formula constrains displayed availability, unlike page-view metrics.
