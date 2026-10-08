@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   live-calibration:
-    if: github.ref_name != 'experiment/capability-dependency-resolution-v1'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -110,84 +109,5 @@ jobs:
           path: |
             live-calibration-evidence.json
             live-calibration-summary.json
-          if-no-files-found: warn
-          retention-days: 90
-
-  dependency-resolution:
-    # Explicit workflow_dispatch on the experimental branch only. Never PR-triggered.
-    if: github.ref_name == 'experiment/capability-dependency-resolution-v1'
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Install Harness dependencies
-        run: pip install PyYAML==6.0.3
-      - name: Install pinned Copilot CLI
-        run: |
-          npm install -g @github/copilot@1.0.86
-          copilot --version
-      - name: Build blinded Dependency Resolution scenario
-        shell: bash
-        run: |
-          RUN_ID="GH-CDR-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          sed "s/__RUN_ID__/${RUN_ID}/g" \
-            spec/dependency-resolution/provider/run.yaml.tmpl \
-            > spec/dependency-resolution/provider/run.yaml
-      - name: Execute blinded provider evaluation
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          HARNESS_CDR_EVALUATOR_EXECUTABLE: ${{ github.workspace }}/evals/adapters/copilot_dependency_resolution_evaluator.py
-          HARNESS_CDR_EVALUATOR_TIMEOUT_SECONDS: "260"
-        run: |
-          python -m harness.application.scenario_suite \
-            spec/dependency-resolution/provider \
-            --catalog spec/dependency-resolution/provider-catalog-v1.yaml \
-            --driver-module evals.dependency_resolution_process_driver \
-            --json-report dependency-resolution-evidence.json
-      - name: Summarize result
-        if: always()
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path("dependency-resolution-evidence.json")
-          if not path.exists():
-              print("CDR_REAL_EVALUATION: no evidence report produced")
-          else:
-              report = json.loads(path.read_text(encoding="utf-8"))
-              steps = (report.get("scenarios") or [{}])[0].get("steps", [])
-              observations = {step.get("id"): step.get("observations", {}) for step in steps}
-              result = observations.get("run", {}).get("evaluation") or {}
-              summary = {
-                  "suite_status": report.get("status"),
-                  "evaluation_status": result.get("status"),
-                  "calibration_claim": result.get("calibration_claim"),
-                  "independence": result.get("independence"),
-                  "edge_comparison": result.get("edge_comparison"),
-                  "cases": result.get("cases"),
-                  "execution": result.get("execution"),
-              }
-              Path("dependency-resolution-summary.json").write_text(
-                  json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
-                  encoding="utf-8",
-              )
-              print("CDR_REAL_EVALUATION_BEGIN")
-              print(json.dumps(summary, ensure_ascii=False, indent=2))
-              print("CDR_REAL_EVALUATION_END")
-          PY
-      - name: Persist evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-resolution-live-evidence
-          path: |
-            dependency-resolution-evidence.json
-            dependency-resolution-summary.json
           if-no-files-found: warn
           retention-days: 90
