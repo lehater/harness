@@ -1,0 +1,85 @@
+version: 1
+kind: harness-scenario
+id: capability-dependency-resolution-calibration-v1
+title: Experimental Dependency Resolution calibration is label-separated and mutation-sensitive
+dimensions:
+  project_archetype: synthetic
+  stage: diagnosis
+  behavior_class: assurance
+  execution_type: deterministic
+covers:
+  - dependency-resolution-calibration
+
+fixtures:
+  inputs:
+    yaml: ../calibration-inputs-v1.yaml
+  oracle:
+    yaml: ../calibration-oracle-v1.yaml
+  predictions:
+    yaml: ../predictions-fixture-v1.yaml
+
+steps:
+  - id: validate-corpus
+    driver: dependency.calibration.validate
+    with: {inputs: {ref: fixture.inputs}, oracle: {ref: fixture.oracle}}
+    expect:
+      - {path: /status, op: equals, value: VALID}
+      - {path: /cases, op: equals, value: 6}
+      - {path: /calibration_claim, op: equals, value: NOT_ESTABLISHED}
+  - id: complete-scoring-fixture
+    driver: dependency.calibration.score
+    with: {inputs: {ref: fixture.inputs}, oracle: {ref: fixture.oracle}, predictions: {ref: fixture.predictions}}
+    expect:
+      - {path: /status, op: equals, value: MATCHES_DRAFT_ORACLE}
+      - {path: /oracle_is_expert_validated, op: equals, value: false}
+      - {path: /calibration_claim, op: equals, value: NOT_ESTABLISHED}
+      - {path: /edge_comparison/false_positive, op: equals, value: 0}
+      - {path: /edge_comparison/false_negative, op: equals, value: 0}
+  - id: break-direct-edge
+    driver: data.patch
+    with:
+      value: {ref: fixture.predictions}
+      operations:
+        - {op: remove, path: /cases/2/proposed_requires/1}
+    expect:
+      - {path: /cases/2/proposed_requires, op: equals, value: [demo.delete-task]}
+  - id: detect-broken-direct-edge
+    driver: dependency.calibration.score
+    with: {inputs: {ref: fixture.inputs}, oracle: {ref: fixture.oracle}, predictions: {ref: step.break-direct-edge}}
+    expect:
+      - {path: /status, op: equals, value: DIFFERS_OR_INCOMPLETE}
+      - {path: /edge_comparison/false_negative, op: equals, value: 1}
+  - id: leak-target-edges
+    driver: data.patch
+    with:
+      value: {ref: fixture.inputs}
+      operations:
+        - {op: add, path: /cases/0/declared_requires, value: [demo.product-edit-policy]}
+  - id: reject-leaked-target
+    driver: dependency.calibration.validate
+    with: {inputs: {ref: step.leak-target-edges}, oracle: {ref: fixture.oracle}}
+    expect:
+      - {path: /status, op: equals, value: INVALID}
+  - id: missing-case
+    driver: data.patch
+    with:
+      value: {ref: fixture.predictions}
+      operations:
+        - {op: remove, path: /cases/5}
+  - id: reject-incomplete
+    driver: dependency.calibration.score
+    with: {inputs: {ref: fixture.inputs}, oracle: {ref: fixture.oracle}, predictions: {ref: step.missing-case}}
+    expect:
+      - {path: /status, op: equals, value: DIFFERS_OR_INCOMPLETE}
+  - id: uncertain-is-not-resolved
+    driver: data.patch
+    with:
+      value: {ref: fixture.predictions}
+      operations:
+        - {op: replace, path: /cases/3/status, value: RESOLVED}
+  - id: reject-false-certainty
+    driver: dependency.calibration.score
+    with: {inputs: {ref: fixture.inputs}, oracle: {ref: fixture.oracle}, predictions: {ref: step.uncertain-is-not-resolved}}
+    expect:
+      - {path: /status, op: equals, value: DIFFERS_OR_INCOMPLETE}
+      - {path: /cases/3/status_correct, op: equals, value: false}
