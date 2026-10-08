@@ -151,6 +151,30 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     assert result["automatic_writeback_allowed"] is False
     assert result["semantic_entailment_verified"] is False
 
+    # Exercise Harness operator-facing make commands, not just Python API.
+    save(root,"cdr-intake.yaml",intake)
+    save(root,"cdr-prediction.json",json.dumps(prediction))
+    common=[
+        "make","-s","-C",str(ROOT),
+        "PROJECT_ROOT="+str(root),
+        "PROJECT_COMMIT="+sha,
+        "CDR_INTAKE="+str(root/"cdr-intake.yaml"),
+    ]
+    generated=root/"operational-input.json"
+    subprocess.run(common+["cdr-prepare","CDR_OUTPUT="+str(generated)],
+                   check=True,capture_output=True,text=True)
+    assert json.loads(generated.read_text(encoding="utf-8"))==prepared
+    projected=root/"operational-reconciliation.json"
+    subprocess.run(
+        common+["cdr-reconcile",
+                "CDR_PREDICTIONS="+str(root/"cdr-prediction.json"),
+                "CDR_OUTPUT="+str(projected)],
+        check=True,capture_output=True,text=True,
+    )
+    assert json.loads(projected.read_text(encoding="utf-8"))==result
+    assert git(root,"status","--porcelain","--untracked-files=no")==""
+
+
     def fails(call,part):
         try:call()
         except DiscoveryError as e: assert part in str(e),str(e)
@@ -175,6 +199,13 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     fails(lambda:prepare_intake(root,sha=sha,intake=bad),"dangling")
     fails(lambda:prepare_intake(root,sha="0"*40,intake=intake),"project commit mismatch")
     audit=audit_graph(root,sha=sha)
+    saved_audit=root/"operational-graph-audit.json"
+    subprocess.run([
+        "make","-s","-C",str(ROOT),"cdr-audit",
+        "PROJECT_ROOT="+str(root),"PROJECT_COMMIT="+sha,
+        "CDR_OUTPUT="+str(saved_audit),
+    ],check=True,capture_output=True,text=True)
+    assert json.loads(saved_audit.read_text(encoding="utf-8"))==audit
     assert audit["status"]=="STRUCTURAL_REVIEW_ONLY"
     assert audit["capability_count"]==3
     assert audit["direct_edge_count"]==3
