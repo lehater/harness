@@ -550,6 +550,6 @@ def skill_invariant_policy_driver(*, root: str) -> dict[str, Any]:
 
 
 @scenario_driver("semantic.compose_derivations")
-def semantic_compose_derivations_driver(*, evaluations: list[dict[str, Any]]) -> dict[str, Any]:
+def semantic_compose_derivations_driver(*, evaluations: list[dict[str, Any]], current_assertion_ids: dict[str, list[str]] | None = None) -> dict[str, Any]:
     from harness.assurance.derivation_composition import compose_derivations
-    return compose_derivations(evaluations)
+    return compose_derivations(evaluations, current_assertion_ids=current_assertion_ids)
