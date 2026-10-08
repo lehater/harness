@@ -388,13 +388,14 @@ def generate(
         # All accepted Product Capability statements are inventoried, including
         # those not traced from DS-01 / DS-02. This is an applicability inventory,
         # not independently reviewed target-output obligation completeness.
-        # The operator selected only Model Context headings for the target
-        # obligations. Product-level, cross-authority and future derivation
-        # obligations are NOT comprehensively enumerated. This metadata is
-        # outside blinded case payloads; no current target edge is exposed.
+        # The operator selected Model Context and traced Domain Strategy
+        # headings, and all accepted Product Capability statements are supplied
+        # as applicability candidates, not guaranteed target obligations.
+        # Their semantic applicability is still unadjudicated, so completeness
+        # remains false. Existing requires are not exposed to the model.
         "target_obligation_coverage": {
             "status": "PARTIAL_BY_CONSTRUCTION",
-            "reason": "SELECTED_ACCEPTED_SCOPE_SECTIONS_ONLY",
+            "reason": "PENDING_CROSS_AUTHORITY_SEMANTIC_APPLICABILITY_ADJUDICATION",
             "complete_upstream_obligation_coverage_established": False,
         },
         "cases": cases,
