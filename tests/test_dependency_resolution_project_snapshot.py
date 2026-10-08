@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 from evals.project_discovery_snapshot import DiscoveryError, generate
 from evals.project_discovery_reconcile import compare
+from evals.project_target_contract_readiness import audit_target_contracts
 from evals.dependency_resolution_evidence import assess_predictions
 from harness.application.scenario_suite import load_driver_modules, run_scenario
 from evals.dependency_resolution_process_driver import (
@@ -121,6 +122,28 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         "strategic_scope_headings": ["DS-01 Business Scope"],
         "product_requirements_source": "docs/product.yaml",
     }]
+    # The tactical production exists only in Engineering Graph. Neither
+    # accepted upstream documents nor a planned producer makes its own
+    # output obligation independently accepted by Core.
+    audit = audit_target_contracts(
+        base, sha=sha, targets=["x.target-domain"]
+    )
+    gap = audit["cases"][0]
+    assert gap["target_capability"] == "x.target-domain"
+    assert gap["status"] == "NOT_INDEPENDENTLY_ACCEPTED"
+    assert "TARGET_CORE_ARTIFACT_NOT_REGISTERED_UNIQUELY" in gap["blockers"]
+    assert "TARGET_SEMANTIC_BASELINE_REVIEW_MISSING_OR_AMBIGUOUS" in gap["blockers"]
+    assert "INDEPENDENT_TARGET_OBLIGATION_ADJUDICATION_NOT_PROVEN" in gap["blockers"]
+    assert gap["producer"]["authority"] == "TACTICAL"
+    assert gap["directness_review_eligible"] is False
+    assert audit["automatic_writeback_allowed"] is False
+    try:
+        audit_target_contracts(base, sha="f" * 40, targets=["x.target-domain"])
+    except DiscoveryError:
+        pass
+    else:
+        raise AssertionError("readiness audit cannot use a different Git snapshot")
+
     inputs = generate(base, sha=sha, targets=targets)
     assert inputs["source_snapshot"] == sha
     assert inputs["evidence_contract"] == "source-grounded-v1"
@@ -267,6 +290,11 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         comparison = compare(base, sha=sha, inputs=inputs, evaluation=evaluation)
         assert comparison["status"] == "READ_ONLY_RECONCILIATION"
         assert comparison["target_formulation"] == "SOURCE_BOUND"
+        readiness = comparison["cases"][0]["TARGET_OUTPUT_CONTRACT_READINESS"]
+        assert readiness["status"] == "NOT_INDEPENDENTLY_ACCEPTED"
+        assert readiness["independent_target_obligation_review_verified"] is False
+        assert readiness["directness_review_eligible"] is False
+        assert comparison["target_output_contract_readiness"]["status"] == "BLOCKED_PENDING_INDEPENDENT_TARGET_ACCEPTANCE"
         assert comparison["automatic_writeback_allowed"] is False
         assert comparison["cases"][0]["KEEP"] == ["x.accepted-policy"]
         assert comparison["cases"][0]["ADD"] == []
