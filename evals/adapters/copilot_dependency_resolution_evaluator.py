@@ -75,8 +75,26 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(target, dict) or "requires" in target or "declared_requires" in target:
             raise ValueError("target source contains a direct-edge label")
         result.append(case)
+    grounded = request.get("evidence_contract") == "source-grounded-v1"
+    if request.get("evidence_contract", "legacy") not in ("legacy", "source-grounded-v1"):
+        raise ValueError("unsupported evidence contract")
+    proof_instruction = (
+        "SOURCE-GROUNDED PROOF IS REQUIRED. For every input_needs entry, provide "
+        "claim_index (zero-based index of an exact semantic_surface claim from "
+        "the matching provider), consumption_rationale (15+ characters explaining "
+        "why that claim directly constrains THIS obligation), and basis: "
+        "DIRECT_ACCEPTED for ACCEPTED_EVIDENCE or PLANNED_CONTRACT for CONTRACT_ONLY. "
+        "Do not cite a general permission to choose, intent, informational logging, "
+        "topic resemblance, notification, or telemetry as proof of an enforcement "
+        "rule. If no source claim governs the requested rule, keep it UNRESOLVED; "
+        "omit the context-only provider edge. Do not reinterpret or strengthen "
+        "the cited provider statement. Never fabricate claim indices. "
+        "Claims tied to still-unresolved obligations are subject to review and "
+        "cannot be accepted automatically."
+    ) if grounded else ""
     return {
-        "instruction": PROTOCOL_INSTRUCTION,
+        "instruction": PROTOCOL_INSTRUCTION + proof_instruction,
+        "evidence_contract": request.get("evidence_contract", "legacy"),
         "cases": result,
         "response_schema": {
             "results": [
@@ -85,7 +103,16 @@ def _blinded_model_payload(request: dict[str, Any]) -> dict[str, Any]:
                     "status": "RESOLVED | UNRESOLVED",
                     "proposed_requires": ["CapabilityIds directly consumed"],
                     "input_needs": [
-                        {"obligation": "output obligation id", "provider": "CapabilityId"}
+                        ({
+                            "obligation": "output obligation id",
+                            "provider": "CapabilityId",
+                            "claim_index": "zero-based index into provider semantic_surface",
+                            "basis": "DIRECT_ACCEPTED | PLANNED_CONTRACT",
+                            "consumption_rationale": "Why this exact claim directly constrains the target obligation",
+                        } if grounded else {
+                            "obligation": "output obligation id",
+                            "provider": "CapabilityId",
+                        })
                     ],
                     "unresolved_obligations": ["unresolved obligation ids"],
                 }
