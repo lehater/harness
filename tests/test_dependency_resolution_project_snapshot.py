@@ -142,6 +142,37 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
     assert next(x for x in upstream if x["requirement_id"] == "REQ-04")["traceability"] == "UNADJUDICATED_ACCEPTED_PRODUCT_REQUIREMENT"
     assert all(x["applicability"] == "REQUIRES_SEMANTIC_REVIEW" for x in upstream)
     assert inputs["coverage_contract"] == "source-traceability-v1"
+    assert inputs["target_formulation"] == "SOURCE_BOUND"
+
+    # Controlled paired arm: retain the same pinned provider catalogs and
+    # product requirement inventory while avoiding upstream source text
+    # copied into target output obligations.
+    neutral_targets = copy.deepcopy(targets)
+    neutral_targets[0]["neutral_output_obligations"] = [
+        {"id": "local-model-semantics",
+         "description": "Specify the accepted domain concepts and invariants needed for account meaning, distinct from interface rendering or runtime design."},
+        {"id": "local-model-relationships",
+         "description": "Define semantic relationships used in the account model without treating monitoring and presentation details as domain invariants."},
+    ]
+    contrast = generate(
+        base, sha=sha, targets=neutral_targets, formulation="NEUTRAL_CONTRAST"
+    )
+    assert contrast["target_formulation"] == "NEUTRAL_CONTRAST"
+    assert contrast["target_formulation_authority"] == "EXPERIMENTAL_OPERATOR_PARAPHRASE_NOT_ACCEPTED"
+    contrast_case = contrast["cases"][0]
+    assert len(contrast_case["target"]["output_obligations"]) == 2
+    assert all("source" not in ob for ob in contrast_case["target"]["output_obligations"])
+    assert contrast_case["provider_catalog"] == case["provider_catalog"]
+    assert contrast_case["target"]["upstream_constraint_candidates"] == upstream
+    assert contrast["source_snapshot"] == inputs["source_snapshot"]
+    assert contrast["target_obligation_coverage"]["complete_upstream_obligation_coverage_established"] is False
+    _validate_discovery_inputs(contrast)
+    try:
+        generate(base, sha=sha, targets=targets, formulation="NEUTRAL_CONTRAST")
+    except DiscoveryError:
+        pass
+    else:
+        raise AssertionError("neutral target obligations must be explicit and reviewable")
     assert "x.unreviewed" not in repr(inputs)
     assert "Unrelated billing" not in case["target"]["output_obligations"][0]["description"]
     assert "Keep actions distinct" in case["target"]["output_obligations"][0]["description"]
@@ -243,6 +274,8 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-project-snapshot-") as tmp:
         assert comparison["cases"][0]["target_obligation_coverage"] == "PARTIAL_BY_CONSTRUCTION"
         assert comparison["cases"][0]["product_candidates_accounted_for"] == 2
         assert comparison["cases"][0]["product_candidate_assessment"] == "REVIEW_REQUIRED"
+        assert comparison["cases"][0]["ADD_DIRECTNESS_AUDIT"] == []
+        assert comparison["cases"][0]["ADD_PROMOTION_ALLOWED"] is False
         # The model omitted x.strategy but the source scope was partial:
         # reporting a genuine REMOVE_CANDIDATE would be a false deletion cue.
         tampered_coverage = copy.deepcopy(inputs)
