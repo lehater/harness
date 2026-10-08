@@ -1,0 +1,120 @@
+version: 1
+kind: harness-dependency-resolution-calibration-oracle
+status: experimental-holdout
+privacy: NEVER_SEND_TO_EVALUATED_AGENT
+note: >-
+  Provisional author-designed holdout labels; no evaluator has seen these cases
+  at the time of corpus creation. Not independent expert-reviewed truth.
+cases:
+  - id: HLD-01
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: [holdout.partner-field-contract]
+    expected_direct_needs:
+      - {obligation: encode-partner-message, provider: holdout.partner-field-contract}
+    expected_reconciliation:
+      ADD: [holdout.partner-field-contract]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [enforce-release-consent]
+    unresolved_reason: >-
+      Sharing intent does not establish a consent enforcement rule and no consent
+      policy producer is listed. The input does not explicitly hint at the gap.
+
+  - id: HLD-02
+    review_status: AUTHOR_DRAFT
+    expected_status: UNRESOLVED
+    baseline_requires: []
+    expected_requires: [holdout.tax-rule-design, holdout.invoice-language]
+    expected_direct_needs:
+      - {obligation: quote-regional-tax, provider: holdout.tax-rule-design}
+      - {obligation: represent-invoice-amount, provider: holdout.invoice-language}
+    expected_reconciliation:
+      ADD: [holdout.tax-rule-design, holdout.invoice-language]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: [quote-regional-tax]
+    unresolved_reason: >-
+      A contract-only tax provider justifies planned topology but no accepted
+      rates/exemptions/effective-date semantics exist. Do not assert resolved
+      acceptance of an executable regional tax calculation.
+
+  - id: HLD-03
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: [holdout.domain-category-vocabulary]
+    expected_direct_needs:
+      - {obligation: preserve-approved-product-vocabulary, provider: holdout.domain-category-vocabulary}
+    expected_reconciliation:
+      ADD: [holdout.domain-category-vocabulary]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: >-
+      A provider and consumer in the same DOMAIN Authority still require an
+      explicit direct prerequisite when the output consumes the other meaning.
+
+  - id: HLD-04
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: [holdout.account-audit-domain]
+    expected_requires: [holdout.account-validity-domain]
+    expected_direct_needs:
+      - {obligation: enforce-account-validity, provider: holdout.account-validity-domain}
+    expected_reconciliation:
+      ADD: [holdout.account-validity-domain]
+      KEEP: []
+      REMOVE_CANDIDATE: [holdout.account-audit-domain]
+    expected_unresolved_obligations: []
+    removal_basis: >-
+      The only target obligation is validity of updates. Audit semantics are
+      not consumed, even though both providers share a canonical artifact.
+
+  - id: HLD-05
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: [holdout.consent-analytics]
+    expected_requires: [holdout.product-outreach-policy]
+    expected_direct_needs:
+      - {obligation: enforce-opt-out-rule, provider: holdout.product-outreach-policy}
+    expected_reconciliation:
+      ADD: [holdout.product-outreach-policy]
+      KEEP: []
+      REMOVE_CANDIDATE: [holdout.consent-analytics]
+    expected_unresolved_obligations: []
+    removal_basis: >-
+      Reporting opt-out counts does not enforce the accepted product opt-out rule.
+
+  - id: HLD-06
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: [holdout.product-access-roles, holdout.domain-document-ownership]
+    expected_direct_needs:
+      - {obligation: decide-document-access, provider: holdout.product-access-roles}
+      - {obligation: decide-document-access, provider: holdout.domain-document-ownership}
+    expected_reconciliation:
+      ADD: [holdout.product-access-roles, holdout.domain-document-ownership]
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: >-
+      A single output obligation consumes two independently necessary
+      provider semantics, from PRODUCT and DOMAIN respectively.
+
+  - id: HLD-07
+    review_status: AUTHOR_DRAFT
+    expected_status: RESOLVED
+    baseline_requires: []
+    expected_requires: []
+    expected_direct_needs: []
+    expected_reconciliation:
+      ADD: []
+      KEEP: []
+      REMOVE_CANDIDATE: []
+    expected_unresolved_obligations: []
+    directness_note: >-
+      A self-contained decorative, explicitly semantically neutral output may
+      have no external knowledge prerequisites within the specified scope.
