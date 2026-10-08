@@ -104,6 +104,10 @@ print(json.dumps({
         assert result["calibration_claim"] == "NOT_ESTABLISHED"
         assert result["independence"] == "UNVERIFIED"
         assert result["execution"]["state"] == "COMPLETED"
+        assert len(result["model_results"]) == 6
+        assert result["model_results"][0]["case_request_id"]
+        assert result["bound_predictions"]["cases"][0]["id"] == "CDR-01"
+        assert "expected_requires" not in repr(result["model_results"])
 
         bad = Path(root) / "bad.py"
         bad.write_text(source.replace(
