@@ -165,6 +165,48 @@ def _heading_scope(text: str, heading: str) -> str:
     return result
 
 
+
+_TRACE_LINE = re.compile(r"\\*\\*Derived from:\\*\\*([^\\n]*)")
+_CLAIM_ID = re.compile(r"`(REQ-[A-Z0-9-]+)`")
+
+
+def _accepted_requirement_inventory(source: dict[str, Any]) -> dict[str, str]:
+    """Extract only individually ACCEPTED product statements, with unique IDs."""
+    content = source.get("content")
+    entries = content.get("requirements") if isinstance(content, dict) else None
+    if not isinstance(entries, list) or not entries:
+        raise DiscoveryError("product requirements source has no requirements")
+    accepted: dict[str, str] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise DiscoveryError("malformed product requirement")
+        req_id = entry.get("id")
+        if not isinstance(req_id, str) or not req_id:
+            raise DiscoveryError("product requirement id is invalid")
+        if req_id in accepted:
+            raise DiscoveryError(f"duplicate accepted product requirement: {req_id}")
+        if entry.get("status") != "ACCEPTED":
+            continue
+        statement = entry.get("statement")
+        if not isinstance(statement, str) or not statement.strip():
+            raise DiscoveryError(f"empty accepted product statement: {req_id}")
+        accepted[req_id] = statement.strip()
+    if not accepted:
+        raise DiscoveryError("no accepted product requirements")
+    return accepted
+
+
+def _strategic_requirement_refs(section: str) -> list[str]:
+    """Only explicit DS section Derived-from links, not lexical similarity."""
+    lines = _TRACE_LINE.findall(section)
+    if len(lines) != 1:
+        raise DiscoveryError("strategic scope needs exactly one explicit Derived from line")
+    refs = _CLAIM_ID.findall(lines[0])
+    if not refs or len(refs) != len(set(refs)):
+        raise DiscoveryError("missing or duplicated strategic requirement references")
+    return refs
+
+
 def generate(
     root: Path, *, sha: str, targets: list[dict[str, Any]],
     max_surface_claims: int = 500,
@@ -249,7 +291,76 @@ def generate(
                 f"Preserve this accepted source scope without inventing technical "
                 f"details or narrowing its meaning: {_heading_scope(scope_text, heading)}"
             ),
+            "source": {
+                "capability": next(p["capability"] for p in providers if p["source"] == scope_source),
+                "path": scope_source, "heading": heading,
+            },
         } for n, heading in enumerate(headings)]
+        strategic_source = item.get("strategic_scope_source")
+        strategic_headings = item.get("strategic_scope_headings")
+        product_source = item.get("product_requirements_source")
+        if (
+            not isinstance(strategic_source, str)
+            or not isinstance(strategic_headings, list) or not strategic_headings
+            or not isinstance(product_source, str)
+        ):
+            raise DiscoveryError("scope coverage requires strategic sections and product requirements")
+        if strategic_source not in accepted_sources or product_source not in accepted_sources:
+            raise DiscoveryError("strategic/product coverage source is not accepted and reviewed in Core")
+        strategic_path = _resolve(root, strategic_source)
+        strategy_text = strategic_path.read_text(encoding="utf-8")
+        strategic_refs: list[str] = []
+        for n, heading in enumerate(strategic_headings):
+            if not isinstance(heading, str) or not heading:
+                raise DiscoveryError("invalid strategic scope heading")
+            section = _heading_scope(strategy_text, heading)
+            strategic_refs.extend(_strategic_requirement_refs(section))
+            obligations.append({
+                "id": f"strategic-section-{n+1}",
+                "description": (
+                    "Preserve this accepted strategic responsibility in the "
+                    f"tactical {production.get('knowledge_kind')} without "
+                    "re-owning application behavior or implementation: "
+                    + section
+                ),
+                "source": {
+                    "capability": next(p["capability"] for p in providers if p["source"] == strategic_source),
+                    "path": strategic_source, "heading": heading,
+                },
+            })
+        if len(strategic_refs) != len(set(strategic_refs)):
+            raise DiscoveryError("duplicate traced requirement across strategic sections")
+        accepted_requirements = _accepted_requirement_inventory(_required_yaml(_resolve(root, product_source)))
+        missing_refs = sorted(set(strategic_refs) - set(accepted_requirements))
+        if missing_refs:
+            raise DiscoveryError("strategic section references missing accepted requirements: " + ", ".join(missing_refs))
+        product_provider = next(p for p in providers if p["source"] == product_source)
+        product_claim_index: dict[str, int] = {}
+        for req_id in accepted_requirements:
+            matches = [
+                index for index, claim in enumerate(product_provider["semantic_surface"])
+                if claim.startswith(req_id + ": ")
+            ]
+            if len(matches) != 1:
+                raise DiscoveryError(f"missing/ambiguous public product semantic claim: {req_id}")
+            product_claim_index[req_id] = matches[0]
+        # These candidates are accepted source statements, NOT assumed tactical
+        # requirements or model-produced direct edges. The target must assess
+        # whether each is materially applicable before completeness is claimed.
+        upstream_constraint_candidates = [
+            {
+                "requirement_id": req_id,
+                "provider": product_provider["capability"],
+                "claim_index": product_claim_index[req_id],
+                "statement": statement,
+                "traceability": (
+                    "EXPLICIT_STRATEGIC_DERIVATION"
+                    if req_id in strategic_refs else "UNADJUDICATED_ACCEPTED_PRODUCT_REQUIREMENT"
+                ),
+                "applicability": "REQUIRES_SEMANTIC_REVIEW",
+            }
+            for req_id, statement in accepted_requirements.items()
+        ]
         candidates = [dict(p) for p in providers if p["capability"] != cid]
         # No existing target requires, lifecycle prerequisites, or oracle are
         # passed. Every accepted reviewed provider is visible, even when the
@@ -262,6 +373,7 @@ def generate(
                 "capability": cid, "authority": authority["id"],
                 "knowledge_kind": production.get("knowledge_kind"),
                 "output_obligations": obligations,
+                "upstream_constraint_candidates": upstream_constraint_candidates,
             },
             "provider_catalog": candidates,
         })
@@ -271,7 +383,11 @@ def generate(
         "status": "real-project-discovery-readonly",
         "evidence_contract": "source-grounded-v1",
         "source_snapshot": sha,
-        "discovery_method": "reviewed-core-artifacts-without-target-requires",
+        "discovery_method": "reviewed-core-artifacts-and-explicit-strategic-product-traceability",
+        "coverage_contract": "source-traceability-v1",
+        # All accepted Product Capability statements are inventoried, including
+        # those not traced from DS-01 / DS-02. This is an applicability inventory,
+        # not independently reviewed target-output obligation completeness.
         # The operator selected only Model Context headings for the target
         # obligations. Product-level, cross-authority and future derivation
         # obligations are NOT comprehensively enumerated. This metadata is
