@@ -17,7 +17,7 @@ Tactical DDD does not design persistence schemas, framework objects, transport D
 9. Challenge persistence/framework/transport leakage.
 10. Remove entities/state machines/aggregates that own no independent identity, lifecycle or invariant.
 11. Resolve or route unknowns.
-12. Update the smallest canonical domain owner in the target project.
+12. When adding or revising a Capability dependency, prepare a source-pinned CDR review packet if the experimental workflow is explicitly selected. Treat each proposed direct source as a question about an independently owned output invariant and a specific material rule; check intermediate contract sufficiency and change sensitivity. An operator-authored review draft, agent rationale, or structural transitive path does not authorize a graph edit. Follow the target project’s normal semantic acceptance and decision protocol before updating `requires`.\n13. Update the smallest canonical domain owner in the target project.
 
 ## Coherence checks
 
