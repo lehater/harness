@@ -1,0 +1,66 @@
+version: 1
+kind: harness-cdr-public-semantic-contract-draft
+status: RESEARCH_DRAFT_NOT_AUTHORITY_ACCEPTED
+source_commit: d9adf4ca51049894437f1ed3d4f74fe94936c896
+target_capability: prep.knowledge-relation-classification
+reviewer_identity_verified: false
+authority_acceptance_verified: false
+automatic_writeback_allowed: false
+notes: >-
+  Atomic output-owner candidates selected from exact PREP source text,
+  without reading target dependency edges. Each quote is an independently
+  inspectable research interpretation, not an accepted semantic export.
+contracts:
+  - capability: prep.model-context-strategy
+    claims:
+      - id: MC-PUBLIC-ROLE
+        role: OWNED_EXPORT_CANDIDATE
+        section: Purpose
+        quote: "Define where Prep's independently modeled semantic languages apply and how they relate."
+  - capability: prep.product-capabilities
+    claims:
+      - id: PC-TARGET-OBSERVABLE
+        role: OWNED_EXPORT_CANDIDATE
+        requirement_id: REQ-CAP-TARGET
+        quote: "The product shall let the learner create, inspect, and revise an active preparation target while preserving explicit uncertainty and distinguishing target refinement from learner-state change."
+  - capability: prep.domain-strategy
+    claims:
+      - id: DS-PUBLIC-ROLE
+        role: OWNED_EXPORT_CANDIDATE
+        section: Purpose
+        quote: "Define Prep's strategic problem-space responsibilities from accepted product capabilities."
+  - capability: prep.knowledge-model
+    claims:
+      - id: KM-PROPOSITION-FORM
+        role: OWNED_EXPORT_CANDIDATE
+        section: Relational Subject Knowledge
+        quote: "Relational subject meaning is represented as a `KnowledgeProposition`, not as a generic graph edge entity."
+      - id: KM-CLASSIFIER-DELEGATION
+        role: DELEGATED_EXPORT_REFERENCE
+        section: Relational Subject Knowledge
+        delegates_to: prep.knowledge-relation-classification
+        quote: "`docs/domain/relation-classification-catalog.yaml` provides the reusable predicate vocabulary and classifier for relational propositions."
+  - capability: prep.learning-design
+    claims:
+      - id: LD-NORMATIVE-DESIGN
+        role: OWNED_EXPORT_CANDIDATE
+        section: Purpose
+        quote: "This artifact owns reusable performance contracts and target-relative preparation design."
+  - capability: prep.learner-model
+    claims:
+      - id: LM-LEARNER-SEMANTICS
+        role: OWNED_EXPORT_CANDIDATE
+        section: Purpose
+        quote: "Define the learner-specific **Learner Evidence & State** semantics of actual performance, observations, explicit evidential reasoning, and capability conclusions."
+  - capability: prep.task-model
+    claims:
+      - id: TM-APPLICATION-TASKS
+        role: OWNED_EXPORT_CANDIDATE
+        yaml_field: purpose
+        quote: "Define the intended human/system work required to prepare for a target from accepted product and domain semantics, without selecting screens, navigation, transport, persistence, or frontend technology."
+  - capability: prep.application-design
+    claims:
+      - id: AD-APPLICATION-OPERATIONS
+        role: OWNED_EXPORT_CANDIDATE
+        section: Purpose
+        quote: "Define Prep application operations, materializations, outcomes, semantic ownership and currentness required to realize the accepted Task Model without re-owning Product, Subject Knowledge, Capability/Learning, Learner Evidence/State, Process, machine-interface, persistence, concurrency or UI semantics."
