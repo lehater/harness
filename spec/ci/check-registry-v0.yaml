@@ -498,6 +498,12 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_contract_change_preflight
+  command: python tests/test_cdr_contract_change.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Read-only pinned-contract impact routing; no graph writes or external provider calls.
 - id: cdr_operational_creation_and_graph_audit
   command: python tests/test_cdr_operational.py
   stage: exhaustive
