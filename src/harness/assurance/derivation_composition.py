@@ -54,7 +54,7 @@ def compose_derivations(evaluations: list[dict[str, Any]], *, current_assertion_
                 if not isinstance(recorded, dict):
                     findings.append({"code": "ACCEPTED_FINGERPRINTS_MISSING", "index": i, "side": side})
                     continue
-                if recorded != current[cap]:
+                if any(current[cap].get(atom_id) != fingerprint for atom_id, fingerprint in recorded.items()):
                     findings.append({"code": "SEMANTIC_FINGERPRINT_MISMATCH", "index": i, "side": side, "capability": cap})
 
     if findings:
