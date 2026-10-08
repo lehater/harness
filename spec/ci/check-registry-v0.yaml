@@ -503,6 +503,12 @@ checks:
   cost_class: heavy
   disposition: full_gate
   rationale: AUD-008 measured the full Scenario Suite at about 27 seconds (~65% of aggregate validation); run last.
+- id: cdr_contract_owner_conflicts
+  command: python tests/test_cdr_contract_owner_conflicts.py
+  stage: exhaustive
+  cost_class: cheap
+  disposition: full_gate
+  rationale: Source text explicitly credits another artifact; guard is nonauthoritative negative evidence only.
 - id: cdr_provider_owned_surfaces
   command: python tests/test_cdr_provider_owned_surfaces.py
   stage: exhaustive
