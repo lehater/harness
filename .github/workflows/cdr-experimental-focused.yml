@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "evals/cdr_reference_audit.py"
+      - "evals/cdr_reference_provider_pilot.py"
+      - "tests/test_cdr_reference_provider_pilot.py"
+      - "spec/dependency-resolution/reference-provider-pilot-v1.yaml"
       - "evals/cdr_contract_change.py"
       - "tests/test_cdr_reference_audit.py"
       - "tests/test_cdr_contract_change.py"
@@ -29,6 +32,7 @@ jobs:
       - run: python checks/validate_context_boundaries.py
       - run: python tests/test_reference_engineering_model.py
       - run: python tests/test_cdr_reference_audit.py
+      - run: python tests/test_cdr_reference_provider_pilot.py
       - run: python tests/test_cdr_contract_change.py
 
       - name: Prepare blinded reference corpus
