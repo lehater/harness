@@ -14,6 +14,11 @@ import yaml
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from evals.cdr_operational import prepare_intake, reconcile_intake
+from evals.cdr_create_workflow import (
+    prepare as prepare_create_workflow,
+    reconcile as reconcile_create_workflow,
+    check_draft as check_create_workflow_draft,
+)
 from evals.cdr_graph_audit import audit_graph
 from evals.cdr_governance_packet import build_decision_dossier, validate_draft_review, digest
 from evals.project_discovery_directness_review import REQUIRED_TESTS
@@ -182,6 +187,58 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
             } for test in REQUIRED_TESTS],
         } for packet in dossier["proposed_ADD"]],
     }
+    # Integrated Stage A -> externally-frozen evaluator -> Stage B -> review
+    # uses a provider catalog discovered from Core, graph, baseline and source,
+    # not a hand-enumerated research supplier list.
+    create_handoff=prepare_create_workflow(root,sha=sha,intake=intake)
+    assert create_handoff["phase"]=="AWAITING_EXTERNAL_EVALUATOR"
+    assert create_handoff["provider_catalog_size"]==3
+    assert create_handoff["provider_catalog_discovered_automatically"] is True
+    assert create_handoff["automatic_writeback_allowed"] is False
+    assert "requires" not in repr(create_handoff["request"]["cases"][0]["target"])
+    tool_response={
+        "version":1,
+        "kind":"harness-dependency-resolution-evaluator-response",
+        "request_id":create_handoff["request"]["request_id"],
+        "results":[{
+            "case_request_id":create_handoff["request"]["cases"][0]["case_request_id"],
+            **prediction["cases"][0],
+        }],
+    }
+    created_review=reconcile_create_workflow(
+        root,sha=sha,intake=intake,handoff=create_handoff,response=tool_response
+    )
+    assert created_review["status"]=="DRAFT_REVIEW_NOT_GRAPH_AUTHORIZATION"
+    assert created_review["gate"]["status"]=="BLOCKED_PENDING_INDEPENDENT_AUTHORITY_DECISIONS"
+    assert created_review["gate"]["proposed_new_edges_not_approved"]==["x.model","x.product"]
+    assert created_review["gate"]["automatic_writeback_allowed"] is False
+    assert created_review["dossier"]==dossier
+    created_validated=check_create_workflow_draft(
+        root,sha=sha,intake=intake,handoff=create_handoff,response=tool_response,
+        review=created_review,draft=review_draft,
+    )
+    assert created_validated["status"]=="DRAFT_VALIDATED_PENDING_TRUSTED_AUTHORITY"
+    assert created_validated["automatic_writeback_allowed"] is False
+    falsified=copy.deepcopy(create_handoff)
+    falsified["inputs"]["cases"][0]["provider_catalog"].pop()
+    fails_handoff=False
+    try:reconcile_create_workflow(
+        root,sha=sha,intake=intake,handoff=falsified,response=tool_response)
+    except DiscoveryError:fails_handoff=True
+    assert fails_handoff
+    unbound=copy.deepcopy(tool_response)
+    unbound["request_id"]="fake"
+    try:reconcile_create_workflow(
+        root,sha=sha,intake=intake,handoff=create_handoff,response=unbound)
+    except DiscoveryError:pass
+    else:raise AssertionError("external evaluator response not request bound")
+    falsified_review=copy.deepcopy(created_review)
+    falsified_review["gate"]["status"]="AUTHORIZED"
+    try:check_create_workflow_draft(
+        root,sha=sha,intake=intake,handoff=create_handoff,response=tool_response,
+        review=falsified_review,draft=review_draft)
+    except DiscoveryError:pass
+    else:raise AssertionError("self-authored graph authorization was admitted")
     validation=validate_draft_review(dossier,review_draft)
     assert validation["status"]=="DRAFT_COMPLETE_FOR_AUTHORITY_CONSIDERATION"
     assert validation["governance_transition_authorized"] is False
@@ -347,6 +404,21 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     }]
     assert cyclic_result["automatic_writeback_allowed"] is False
     assert cyclic_result["REMOVE_CANDIDATE"] == []
+    cycle_handoff=prepare_create_workflow(
+        root,sha=cyclic_sha,intake=cyclic_intake
+    )
+    cycle_response=copy.deepcopy(tool_response)
+    cycle_response["request_id"]=cycle_handoff["request"]["request_id"]
+    cycle_response["results"][0]["case_request_id"]=(
+        cycle_handoff["request"]["cases"][0]["case_request_id"]
+    )
+    cycle_review=reconcile_create_workflow(
+        root,sha=cyclic_sha,intake=cyclic_intake,
+        handoff=cycle_handoff,response=cycle_response,
+    )
+    assert cycle_review["gate"]["status"]=="BLOCKED_INVALID_PROPOSED_TOPOLOGY"
+    assert cycle_review["gate"]["cycle_blocks"]
+    assert cycle_review["automatic_writeback_allowed"] is False
 
     graph["authorities"][0]["produces"][0]["requires"]=[
         {"capability":"x.model"},{"capability":"unknown.provider"}
