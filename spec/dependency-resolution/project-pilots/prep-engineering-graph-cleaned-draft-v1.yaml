@@ -1,0 +1,497 @@
+version: 1
+kind: harness-engineering-graph
+id: PREP-REVALIDATION
+default_subject: PREP
+authorities:
+- id: DISCOVERY
+  responsibility: Own accepted problem observations, context of use, user goals and
+    solution-independent user needs without deciding product or solution semantics.
+  boundary:
+    semantic_cohesion: Problem-space evidence, context and solution-independent user
+      needs.
+    independent_change: Problem evidence, context and user needs can be refined before
+      accepted product requirements change.
+    public_contract: Provides accepted problem evidence and user-needs knowledge to
+      product requirements.
+  produces:
+  - capability: prep.problem-evidence
+    knowledge_kind: problem-evidence
+    requires: []
+  - capability: prep.user-needs
+    knowledge_kind: user-needs
+    requires:
+    - capability: prep.problem-evidence
+- id: PRODUCT-REQUIREMENTS
+  responsibility: Own accepted product intent, scope and externally observable product
+    capabilities.
+  boundary:
+    semantic_cohesion: Decisions about what Prep must achieve for the learner.
+    independent_change: Product intent can change without deciding domain or technical
+      realization.
+    public_contract: Provides accepted product intent and capability semantics downstream.
+  produces:
+  - capability: prep.product-intent
+    knowledge_kind: product-requirements
+    semantic_claims:
+    - engineering.intent.scope
+    requires:
+    - capability: prep.user-needs
+  - capability: prep.product-capabilities
+    knowledge_kind: product-requirements
+    semantic_claims:
+    - engineering.intent.behavior
+    requires:
+    - capability: prep.product-intent
+- id: DOMAIN-STRATEGY
+  responsibility: Own strategic decomposition of Prep's domain responsibilities without
+    deciding model-language internals.
+  boundary:
+    semantic_cohesion: Strategic responsibility boundaries and investment focus.
+    independent_change: Strategic classification can change without redefining tactical
+      models.
+    public_contract: Provides accepted strategic domain decomposition.
+  produces:
+  - capability: prep.domain-strategy
+    knowledge_kind: domain-strategy
+    requires:
+    - capability: prep.product-capabilities
+- id: MODEL-CONTEXT-STRATEGY
+  responsibility: Own applicability and relationships of independently modeled semantic
+    contexts.
+  boundary:
+    semantic_cohesion: Model-language applicability and context relationships.
+    independent_change: Context relationships can change without redefining strategic
+      investment classification.
+    public_contract: Provides accepted model-context boundaries to tactical modeling.
+  produces:
+  - capability: prep.model-context-strategy
+    knowledge_kind: model-context-strategy
+    requires:
+    - capability: prep.product-capabilities
+    - capability: prep.domain-strategy
+- id: TACTICAL-DOMAIN-DESIGN
+  responsibility: Own accepted domain concepts, identities, semantic relationships
+    and invariants inside the selected Prep model contexts.
+  boundary:
+    semantic_cohesion: Reusable knowledge semantics, target-relative learning semantics
+      and learner-evidence semantics.
+    independent_change: Tactical semantics can evolve behind accepted product and
+      model-context boundaries without selecting persistence, UI or runtime technology.
+    public_contract: Provides accepted Knowledge Model, Learning Design and Learner
+      Model semantics to later design.
+  produces:
+  - capability: prep.knowledge-relation-classification
+    knowledge_kind: domain-model
+    requires:
+    - capability: prep.model-context-strategy
+    - capability: prep.product-capabilities
+  - capability: prep.knowledge-model
+    knowledge_kind: domain-model
+    requires:
+    - capability: prep.model-context-strategy
+    - capability: prep.product-capabilities
+    - capability: prep.knowledge-relation-classification
+  - capability: prep.learning-design
+    knowledge_kind: domain-model
+    requires:
+    - capability: prep.model-context-strategy
+    - capability: prep.knowledge-model
+    - capability: prep.product-capabilities
+  - capability: prep.learner-model
+    knowledge_kind: domain-model
+    requires:
+    - capability: prep.model-context-strategy
+    - capability: prep.knowledge-model
+    - capability: prep.product-capabilities
+- id: APPLICATION-DESIGN
+  responsibility: Own application operations, bounded application-process coordination,
+    intended tasks and user journeys without re-owning domain semantics or technical
+    realization.
+  boundary:
+    semantic_cohesion: Application operations/outcomes/currentness, independently
+      consumable process coordination, intended tasks and learner-visible journeys.
+    independent_change: Application orchestration can evolve while domain semantics
+      and technical transports remain stable.
+    public_contract: Provides accepted application operations and user journeys to
+      interface and architecture design.
+  produces:
+  - capability: prep.task-model
+    knowledge_kind: task-model
+    requires:
+    - capability: prep.product-capabilities
+    - capability: prep.knowledge-model
+    - capability: prep.learning-design
+    - capability: prep.learner-model
+  - capability: prep.application-design
+    knowledge_kind: application-design
+    semantic_claims:
+    - engineering.application.use-cases
+    - engineering.application.orchestration
+    - engineering.application.failures
+    requires:
+    - capability: prep.task-model
+    - capability: prep.product-capabilities
+    - capability: prep.knowledge-model
+    - capability: prep.learning-design
+    - capability: prep.learner-model
+  - capability: prep.application-process.activity-evidence-cycle
+    knowledge_kind: application-process-design
+    semantic_claims:
+    - engineering.application.process
+    requires:
+    - capability: prep.application-design
+  - capability: prep.application-process.prepare-support
+    knowledge_kind: application-process-design
+    semantic_claims:
+    - engineering.application.process
+    requires:
+    - capability: prep.application-design
+  - capability: prep.user-journeys
+    knowledge_kind: user-journey-design
+    semantic_claims:
+    - engineering.interface.human.journeys
+    requires:
+    - capability: prep.application-design
+    - capability: prep.task-model
+    - capability: prep.application-process.activity-evidence-cycle
+    - capability: prep.application-process.prepare-support
+- id: QUALITY-DESIGN
+  responsibility: Own measurable architecture-significant frontend performance, capacity,
+    idle-resource and graceful-degradation constraints for interactive Knowledge exploration
+    without selecting presentation form or renderer implementation.
+  boundary:
+    semantic_cohesion: Bounded active-workload scale, interaction responsiveness,
+      idle-resource behavior and semantic-preserving degradation; graph node/link
+      terms are presentation measurement units, not domain entities.
+    independent_change: Quality targets may be refined from benchmark evidence while
+      product/domain semantics, presentation form and renderer technology remain independently
+      changeable.
+    public_contract: Provides accepted frontend exploration performance/capacity constraints
+      to presentation, screen, architecture, component, verification, test and implementation
+      knowledge.
+  produces:
+  - capability: prep.frontend-performance-capacity
+    knowledge_kind: quality-design
+    semantic_claims:
+    - engineering.intent.quality-targets
+    - engineering.quality.performance.latency
+    - engineering.quality.performance.resource-efficiency
+    - engineering.quality.performance.capacity
+    requires:
+    - capability: prep.product-capabilities
+    - capability: prep.knowledge-model
+- id: HUMAN-INTERFACE-DESIGN
+  responsibility: Own human interaction semantics, information architecture and presentation/view
+    composition without re-owning product or domain truth.
+  boundary:
+    semantic_cohesion: Human tasks, navigation/information structure, shared interaction
+      language and concrete view composition.
+    independent_change: Human interface design can evolve behind stable product/domain/application
+      contracts.
+    public_contract: Provides independently addressable conceptual, information-architecture,
+      interaction, topology, presentation and screen/view contracts to downstream
+      consumers.
+  produces:
+  - capability: prep.conceptual-interface-model
+    knowledge_kind: conceptual-interface-model
+    semantic_claims:
+    - engineering.interface.human.conceptual-model
+    requires:
+    - capability: prep.task-model
+    - capability: prep.user-journeys
+    - capability: prep.application-design
+    - capability: prep.knowledge-model
+    - capability: prep.learning-design
+    - capability: prep.learner-model
+  - capability: prep.information-architecture
+    knowledge_kind: information-architecture-design
+    semantic_claims:
+    - engineering.interface.human.information-architecture
+    requires:
+    - capability: prep.conceptual-interface-model
+    - capability: prep.task-model
+    - capability: prep.user-journeys
+  - capability: prep.interaction-design
+    knowledge_kind: interaction-design
+    semantic_claims:
+    - engineering.interface.human.interaction
+    requires:
+    - capability: prep.conceptual-interface-model
+    - capability: prep.task-model
+    - capability: prep.user-journeys
+    - capability: prep.application-design
+    - capability: prep.machine-interfaces
+  - capability: prep.interface-topology
+    knowledge_kind: interface-topology-design
+    semantic_claims:
+    - engineering.interface.human.navigation-topology
+    requires:
+    - capability: prep.information-architecture
+    - capability: prep.interaction-design
+  - capability: prep.presentation-system
+    knowledge_kind: presentation-system-design
+    semantic_claims:
+    - engineering.interface.human.presentation-system
+    - engineering.interface.human.usability
+    - engineering.interface.human.accessibility
+    - engineering.interface.human.responsiveness
+    requires:
+    - capability: prep.conceptual-interface-model
+    - capability: prep.information-architecture
+    - capability: prep.interface-topology
+    - capability: prep.interaction-design
+    - capability: prep.frontend-performance-capacity
+  - capability: prep.screen-view-design
+    knowledge_kind: screen-view-design
+    semantic_claims:
+    - engineering.interface.human.screen-composition
+    requires:
+    - capability: prep.interface-topology
+    - capability: prep.interaction-design
+    - capability: prep.presentation-system
+    - capability: prep.machine-interfaces
+    - capability: prep.frontend-performance-capacity
+- id: MACHINE-INTERFACE-DESIGN
+  responsibility: Own supported machine-consumed interaction and representation contracts
+    for the human-interface/application boundary.
+  boundary:
+    semantic_cohesion: Frontend-facing application operations, representations, semantic
+      outcomes, currentness and bounded process correlation.
+    independent_change: Machine representation/compatibility may evolve while preserving
+      accepted product/domain/application/process and human-interface meaning.
+    public_contract: Provides the accepted frontend-facing machine interaction contract
+      to Human Interface, architecture and verification consumers.
+  produces:
+  - capability: prep.machine-interfaces
+    knowledge_kind: interface-contract
+    semantic_claims:
+    - engineering.interface.machine.contract
+    - engineering.interface.machine.errors
+    - engineering.interface.machine.compatibility
+    requires:
+    - capability: prep.application-design
+    - capability: prep.knowledge-model
+    - capability: prep.learning-design
+    - capability: prep.learner-model
+    - capability: prep.application-process.activity-evidence-cycle
+    - capability: prep.application-process.prepare-support
+- id: CONCURRENCY-CONSISTENCY-DESIGN
+  responsibility: Own correctness semantics for interacting import and external-runtime
+    operations where atomicity, partial application, retry or consistency matters.
+  boundary:
+    semantic_cohesion: Atomicity, partial-result, retry/idempotency and consistency
+      semantics.
+    independent_change: Consistency policy can change without redefining domain meaning
+      or system topology.
+    public_contract: Provides accepted import/external-operation consistency constraints
+      to data, architecture and implementation consumers.
+  produces:
+  - capability: prep.import-consistency
+    knowledge_kind: concurrency-consistency-design
+    semantic_claims:
+    - engineering.reliability.consistency
+    - engineering.reliability.retry-idempotency
+    requires:
+    - capability: prep.application-design
+    - capability: prep.machine-interfaces
+- id: VERIFICATION-DESIGN
+  responsibility: Own evidence obligations proving accepted frontend interaction/topology
+    and later screen/presentation realization.
+  boundary:
+    semantic_cohesion: Verification objectives and evidence for accepted interface
+      knowledge.
+    independent_change: Verification strategy can evolve without owning interface
+      semantics.
+    public_contract: Provides early interface and later presentation verification
+      knowledge while routing design gaps to their owners.
+  produces:
+  - capability: prep.interface-verification
+    knowledge_kind: verification-strategy
+    semantic_claims:
+    - engineering.verification.interface.human
+    requires:
+    - capability: prep.task-model
+    - capability: prep.information-architecture
+    - capability: prep.interaction-design
+    - capability: prep.interface-topology
+  - capability: prep.presentation-verification
+    knowledge_kind: verification-strategy
+    semantic_claims:
+    - engineering.verification.interface.presentation
+    requires:
+    - capability: prep.interface-verification
+    - capability: prep.presentation-system
+    - capability: prep.screen-view-design
+    - capability: prep.frontend-performance-capacity
+  - capability: prep.frontend-verification
+    knowledge_kind: verification-strategy
+    semantic_claims:
+    - engineering.verification.strategy
+    - engineering.verification.requirement-traceability
+    - engineering.verification.functional
+    - engineering.verification.architecture
+    - engineering.verification.quality
+    - engineering.verification.interface.machine
+    - engineering.transition.revalidation
+    requires:
+    - capability: prep.product-capabilities
+    - capability: prep.presentation-verification
+    - capability: prep.frontend-system-architecture
+    - capability: prep.machine-interfaces
+    - capability: prep.frontend-performance-capacity
+- id: SYSTEM-ARCHITECTURE
+  responsibility: Own Prep runtime/module boundaries, deployment topology and technical
+    dependency structure, including an independently evolvable frontend subarchitecture
+    against accepted application/interface ports.
+  boundary:
+    semantic_cohesion: Whole-system runtime/deployment structure plus frontend module/dependency/state
+      topology where those concerns can evolve independently.
+    independent_change: Frontend module architecture may be accepted against stable
+      application/machine/interface contracts before backend runtime topology is designed;
+      whole-system topology remains separately owned by prep.system-architecture.
+    public_contract: Provides accepted whole-system structure to persistence/runtime
+      consumers and accepted frontend structural constraints to frontend realization.
+  produces:
+  - capability: prep.system-architecture
+    knowledge_kind: system-architecture
+    semantic_claims:
+    - engineering.architecture.structure
+    - engineering.architecture.boundaries
+    requires:
+    - capability: prep.application-design
+    - capability: prep.interaction-design
+    - capability: prep.interface-topology
+    - capability: prep.machine-interfaces
+    - capability: prep.import-consistency
+  - capability: prep.frontend-system-architecture
+    knowledge_kind: system-architecture
+    semantic_claims:
+    - engineering.architecture.structure
+    - engineering.architecture.boundaries
+    requires:
+    - capability: prep.presentation-system
+    - capability: prep.screen-view-design
+    - capability: prep.machine-interfaces
+    - capability: prep.frontend-performance-capacity
+- id: DATA-DESIGN
+  responsibility: Own durable physical representation and persistence constraints
+    for accepted Prep state.
+  boundary:
+    semantic_cohesion: Persistence ownership, schema-level representation and durable
+      data constraints.
+    independent_change: Storage representation can evolve behind stable domain/application/interface
+      semantics.
+    public_contract: Provides accepted persistence design to later implementation
+      and verification work.
+  produces:
+  - capability: prep.data-design
+    knowledge_kind: data-design
+    requires:
+    - capability: prep.knowledge-model
+    - capability: prep.learning-design
+    - capability: prep.learner-model
+    - capability: prep.import-consistency
+    - capability: prep.system-architecture
+- id: ENGINEERING-POLICY
+  responsibility: Own project-selected cross-cutting frontend engineering obligations
+    that constrain realization without owning product, domain, interface or architecture
+    semantics.
+  boundary:
+    semantic_cohesion: Normative frontend rules for dependency direction, ownership,
+      reuse, composition, provider isolation, representation and state discipline.
+    independent_change: Engineering discipline can evolve without redefining accepted
+      product/domain semantics, while downstream component/implementation knowledge
+      may require revalidation.
+    public_contract: Provides reviewable frontend engineering obligations to Component
+      and Implementation Design.
+  produces:
+  - capability: prep.frontend-engineering-policy
+    knowledge_kind: engineering-policy
+    semantic_claims:
+    - engineering.engineering.principles
+    - engineering.engineering.code-quality
+    - engineering.engineering.error-handling
+    - engineering.quality.maintainability.modularity
+    - engineering.quality.maintainability.analysability
+    - engineering.quality.maintainability.modifiability
+    - engineering.quality.maintainability.testability
+    requires:
+    - capability: prep.frontend-system-architecture
+    - capability: prep.presentation-system
+- id: COMPONENT-DESIGN
+  responsibility: Own implementation-facing frontend component, port, mapping and
+    dependency boundaries without redefining accepted interface or architecture semantics.
+  boundary:
+    semantic_cohesion: Frontend component responsibilities, renderer/provider seams,
+      semantic/view-model mappings and dependency direction.
+    independent_change: Component decomposition can evolve behind stable interface
+      and system-architecture contracts.
+    public_contract: Provides code-facing frontend structural contracts to prototype
+      and production realization.
+  produces:
+  - capability: prep.frontend-component-design
+    knowledge_kind: component-design
+    semantic_claims:
+    - engineering.engineering.components
+    requires:
+    - capability: prep.frontend-system-architecture
+    - capability: prep.frontend-engineering-policy
+    - capability: prep.screen-view-design
+    - capability: prep.machine-interfaces
+    - capability: prep.frontend-performance-capacity
+- id: TEST-DESIGN
+  responsibility: Own executable frontend behavioral test contracts derived from accepted
+    interaction, view and verification knowledge.
+  boundary:
+    semantic_cohesion: Preconditions, operations, observable UI oracles and structural
+      test boundaries.
+    independent_change: Test contracts can evolve with accepted verification knowledge
+      while remaining independent of concrete test framework code.
+    public_contract: Provides executable frontend test semantics to production implementation
+      design.
+  produces:
+  - capability: prep.frontend-test-design
+    knowledge_kind: test-design
+    requires:
+    - capability: prep.frontend-verification
+    - capability: prep.interaction-design
+    - capability: prep.screen-view-design
+    - capability: prep.frontend-performance-capacity
+- id: IMPLEMENTATION-DESIGN
+  responsibility: Own bounded frontend realization slicing, repository/module realization
+    and completion criteria after accepted design exists.
+  boundary:
+    semantic_cohesion: Implementation slices, physical repository realization and
+      deterministic completion criteria.
+    independent_change: Realization sequencing and file/module placement can change
+      behind stable architecture/component contracts.
+    public_contract: Provides implementation-ready frontend work definition without
+      re-owning upstream semantics.
+  produces:
+  - capability: prep.frontend-implementation-design
+    knowledge_kind: implementation-design
+    semantic_claims:
+    - engineering.delivery.release
+    - engineering.delivery.rollback
+    requires:
+    - capability: prep.frontend-component-design
+    - capability: prep.frontend-verification
+    - capability: prep.frontend-test-design
+consumers:
+- id: CURRENT-REVALIDATION
+  purpose: Re-establish and revalidate the current accepted engineering knowledge
+    baseline.
+  requires:
+  - capability: prep.data-design
+  - capability: prep.presentation-verification
+- id: FRONTEND-PROTOTYPE
+  purpose: Build the current Knowledge visualization prototype as noncanonical evidence
+    without inventing frontend architecture or component boundaries.
+  requires:
+  - capability: prep.frontend-component-design
+  - capability: prep.presentation-verification
+- id: FRONTEND-IMPLEMENTATION
+  purpose: Implement the production frontend without inventing user-visible, architectural,
+    component, test or realization decisions.
+  requires:
+  - capability: prep.frontend-implementation-design
