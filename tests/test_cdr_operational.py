@@ -420,6 +420,11 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     assert cycle_review["gate"]["cycle_blocks"]
     assert cycle_review["automatic_writeback_allowed"] is False
 
+    # Restore the earlier downstream edges before the unrelated graph-audit
+    # invalid-structure fixture. Each adversarial case must be isolated.
+    graph["authorities"][2]["produces"][0]["requires"] = [
+        {"capability":"x.strategy"}, {"capability":"x.product"}
+    ]
     graph["authorities"][0]["produces"][0]["requires"]=[
         {"capability":"x.model"},{"capability":"unknown.provider"}
     ]
