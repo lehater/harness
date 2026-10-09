@@ -193,6 +193,33 @@ Copilot CLI 1.0.86 environment. Do not alter an existing pinned external
 assurance workflow merely to launch this experiment. Read
 `docs/experiments/capability-dependency-resolution-reference-provider-pilot-v1.md`.
 
+### CREATE handoff to Decision Pipeline (experimental opt-in only)
+
+`evals/cdr_create_workflow.py` coordinates a draft target contract,
+automatically cataloged registered/reviewed source Capabilities, a request-
+bound external evaluator, cycle-aware post-model graph reconciliation, and a
+freshly regenerated Authority review dossier. Invoke its `prepare`,
+`reconcile`, and `check` phases with source-pinned Make commands
+`cdr-create-prepare`, `cdr-create-reconcile`, `cdr-create-check`.
+
+The result's `harness-cdr-create-readiness-v1` gate has **only blocking
+statuses**. When explicitly supplied to native
+`derive_decision_roadmap(cdr_create_gate=...)` or the
+`--cdr-create-gate` CLI option, it moves that otherwise READY CREATE
+Capability to `BLOCKED: CDR_CREATE_AUTHORITY_REVIEW_PENDING`.
+This propagates through Project Frontier. The gate never admits/changes
+`requires`, cannot assert an accepted Authority transition, and has no
+automatic deployment over existing accepted projects. A declared but
+unadjudicated provider or a syntactically valid Copilot result is not
+sufficient to unblock CREATE.
+
+Native Semantic Admission remains the canonical acceptance pathway for
+*produced artifacts*, but it does not independently authorize Editing an
+Engineering Graph production's prerequisite topology. A trusted project-
+authorized graph update mechanism and identity-bound independent Authority
+decisions are required before an automatic adoption route can be enabled.
+Consult `docs/experiments/capability-dependency-resolution-create-integration-v1.md`.
+
 ## Acceptance checks
 
 - Every proposed edge maps to a specific output obligation and directly consumed semantic input.
