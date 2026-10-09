@@ -1,0 +1,1690 @@
+{
+  "kind": "harness-cdr-existing-edges-real-prep-redundancy-inventory",
+  "version": 1,
+  "status": "PROVISIONAL_SEMANTIC_REVIEW_NO_GRAPH_ADMISSION",
+  "project_commit": "d9adf4ca51049894437f1ed3d4f74fe94936c896",
+  "original_graph_path": ".harness/engineering-graph.yaml",
+  "accepted_core_path": ".harness/core.yaml",
+  "capability_count": 34,
+  "direct_edges": 110,
+  "transitively_reachable_edges": 67,
+  "retained_existing_core_declared": 66,
+  "source_grounded_remove_candidates": 1,
+  "removed_in_experimental_copy": 1,
+  "acceptance_proven": false,
+  "automatic_writeback_allowed": false,
+  "rows": [
+    {
+      "target_capability": "prep.model-context-strategy",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "MODEL-CONTEXT-MAP",
+      "target_source_path": "docs/architecture/model-context-map.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.model-context-strategy",
+          "prep.domain-strategy",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.knowledge-relation-classification",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "KNOWLEDGE-RELATION-CLASSIFICATION",
+      "target_source_path": "docs/domain/relation-classification-catalog.yaml",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.knowledge-relation-classification",
+          "prep.model-context-strategy",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.knowledge-model",
+      "provider_capability": "prep.model-context-strategy",
+      "target_artifact": "KNOWLEDGE-MODEL",
+      "target_source_path": "docs/domain/knowledge-model.md",
+      "provider_artifact": "MODEL-CONTEXT-MAP",
+      "provider_source_path": "docs/architecture/model-context-map.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.knowledge-model",
+          "prep.knowledge-relation-classification",
+          "prep.model-context-strategy"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.knowledge-model",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "KNOWLEDGE-MODEL",
+      "target_source_path": "docs/domain/knowledge-model.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.knowledge-model",
+          "prep.model-context-strategy",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.knowledge-model",
+          "prep.knowledge-relation-classification",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.learning-design",
+      "provider_capability": "prep.model-context-strategy",
+      "target_artifact": "LEARNING-DESIGN",
+      "target_source_path": "docs/domain/learning-design.md",
+      "provider_artifact": "MODEL-CONTEXT-MAP",
+      "provider_source_path": "docs/architecture/model-context-map.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.learning-design",
+          "prep.knowledge-model",
+          "prep.model-context-strategy"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.learning-design",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "LEARNING-DESIGN",
+      "target_source_path": "docs/domain/learning-design.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.learning-design",
+          "prep.model-context-strategy",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.learning-design",
+          "prep.knowledge-model",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.learner-model",
+      "provider_capability": "prep.model-context-strategy",
+      "target_artifact": "LEARNER-MODEL",
+      "target_source_path": "docs/domain/learner-model.md",
+      "provider_artifact": "MODEL-CONTEXT-MAP",
+      "provider_source_path": "docs/architecture/model-context-map.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.learner-model",
+          "prep.knowledge-model",
+          "prep.model-context-strategy"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.learner-model",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "LEARNER-MODEL",
+      "target_source_path": "docs/domain/learner-model.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.learner-model",
+          "prep.model-context-strategy",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.learner-model",
+          "prep.knowledge-model",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.task-model",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "TASK-MODEL",
+      "target_source_path": "docs/application/task-model.yaml",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.task-model",
+          "prep.knowledge-model",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.task-model",
+          "prep.learning-design",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.task-model",
+          "prep.learner-model",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.task-model",
+      "provider_capability": "prep.knowledge-model",
+      "target_artifact": "TASK-MODEL",
+      "target_source_path": "docs/application/task-model.yaml",
+      "provider_artifact": "KNOWLEDGE-MODEL",
+      "provider_source_path": "docs/domain/knowledge-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.task-model",
+          "prep.learning-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.task-model",
+          "prep.learner-model",
+          "prep.knowledge-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.application-design",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "APPLICATION-DESIGN",
+      "target_source_path": "docs/application/application-design.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.application-design",
+          "prep.task-model",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.application-design",
+          "prep.knowledge-model",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.application-design",
+          "prep.learning-design",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.application-design",
+          "prep.learner-model",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.application-design",
+      "provider_capability": "prep.knowledge-model",
+      "target_artifact": "APPLICATION-DESIGN",
+      "target_source_path": "docs/application/application-design.md",
+      "provider_artifact": "KNOWLEDGE-MODEL",
+      "provider_source_path": "docs/domain/knowledge-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.application-design",
+          "prep.task-model",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.application-design",
+          "prep.learning-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.application-design",
+          "prep.learner-model",
+          "prep.knowledge-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.application-design",
+      "provider_capability": "prep.learning-design",
+      "target_artifact": "APPLICATION-DESIGN",
+      "target_source_path": "docs/application/application-design.md",
+      "provider_artifact": "LEARNING-DESIGN",
+      "provider_source_path": "docs/domain/learning-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.application-design",
+          "prep.task-model",
+          "prep.learning-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.application-design",
+      "provider_capability": "prep.learner-model",
+      "target_artifact": "APPLICATION-DESIGN",
+      "target_source_path": "docs/application/application-design.md",
+      "provider_artifact": "LEARNER-MODEL",
+      "provider_source_path": "docs/domain/learner-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.application-design",
+          "prep.task-model",
+          "prep.learner-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.user-journeys",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "USER-JOURNEYS",
+      "target_source_path": "docs/application/user-journeys.md",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.user-journeys",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design"
+        ],
+        [
+          "prep.user-journeys",
+          "prep.application-process.prepare-support",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.user-journeys",
+      "provider_capability": "prep.task-model",
+      "target_artifact": "USER-JOURNEYS",
+      "target_source_path": "docs/application/user-journeys.md",
+      "provider_artifact": "TASK-MODEL",
+      "provider_source_path": "docs/application/task-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.user-journeys",
+          "prep.application-design",
+          "prep.task-model"
+        ],
+        [
+          "prep.user-journeys",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design",
+          "prep.task-model"
+        ],
+        [
+          "prep.user-journeys",
+          "prep.application-process.prepare-support",
+          "prep.application-design",
+          "prep.task-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-performance-capacity",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "target_source_path": "docs/architecture/performance-capacity.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-performance-capacity",
+          "prep.knowledge-model",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.conceptual-interface-model",
+      "provider_capability": "prep.task-model",
+      "target_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "target_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "TASK-MODEL",
+      "provider_source_path": "docs/application/task-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.conceptual-interface-model",
+          "prep.user-journeys",
+          "prep.task-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.application-design",
+          "prep.task-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.conceptual-interface-model",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "target_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.conceptual-interface-model",
+          "prep.user-journeys",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.conceptual-interface-model",
+      "provider_capability": "prep.knowledge-model",
+      "target_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "target_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "KNOWLEDGE-MODEL",
+      "provider_source_path": "docs/domain/knowledge-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.conceptual-interface-model",
+          "prep.task-model",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.user-journeys",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.learning-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.learner-model",
+          "prep.knowledge-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.conceptual-interface-model",
+      "provider_capability": "prep.learning-design",
+      "target_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "target_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "LEARNING-DESIGN",
+      "provider_source_path": "docs/domain/learning-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.conceptual-interface-model",
+          "prep.task-model",
+          "prep.learning-design"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.user-journeys",
+          "prep.application-design",
+          "prep.learning-design"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.application-design",
+          "prep.learning-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.conceptual-interface-model",
+      "provider_capability": "prep.learner-model",
+      "target_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "target_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "LEARNER-MODEL",
+      "provider_source_path": "docs/domain/learner-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.conceptual-interface-model",
+          "prep.task-model",
+          "prep.learner-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.user-journeys",
+          "prep.application-design",
+          "prep.learner-model"
+        ],
+        [
+          "prep.conceptual-interface-model",
+          "prep.application-design",
+          "prep.learner-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.information-architecture",
+      "provider_capability": "prep.task-model",
+      "target_artifact": "INFORMATION-ARCHITECTURE",
+      "target_source_path": "docs/interface/information-architecture.yaml",
+      "provider_artifact": "TASK-MODEL",
+      "provider_source_path": "docs/application/task-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.information-architecture",
+          "prep.conceptual-interface-model",
+          "prep.task-model"
+        ],
+        [
+          "prep.information-architecture",
+          "prep.user-journeys",
+          "prep.task-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.information-architecture",
+      "provider_capability": "prep.user-journeys",
+      "target_artifact": "INFORMATION-ARCHITECTURE",
+      "target_source_path": "docs/interface/information-architecture.yaml",
+      "provider_artifact": "USER-JOURNEYS",
+      "provider_source_path": "docs/application/user-journeys.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.information-architecture",
+          "prep.conceptual-interface-model",
+          "prep.user-journeys"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interaction-design",
+      "provider_capability": "prep.task-model",
+      "target_artifact": "INTERACTION-DESIGN",
+      "target_source_path": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "TASK-MODEL",
+      "provider_source_path": "docs/application/task-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interaction-design",
+          "prep.conceptual-interface-model",
+          "prep.task-model"
+        ],
+        [
+          "prep.interaction-design",
+          "prep.user-journeys",
+          "prep.task-model"
+        ],
+        [
+          "prep.interaction-design",
+          "prep.application-design",
+          "prep.task-model"
+        ],
+        [
+          "prep.interaction-design",
+          "prep.machine-interfaces",
+          "prep.application-design",
+          "prep.task-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interaction-design",
+      "provider_capability": "prep.user-journeys",
+      "target_artifact": "INTERACTION-DESIGN",
+      "target_source_path": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "USER-JOURNEYS",
+      "provider_source_path": "docs/application/user-journeys.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interaction-design",
+          "prep.conceptual-interface-model",
+          "prep.user-journeys"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interaction-design",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "INTERACTION-DESIGN",
+      "target_source_path": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interaction-design",
+          "prep.conceptual-interface-model",
+          "prep.application-design"
+        ],
+        [
+          "prep.interaction-design",
+          "prep.user-journeys",
+          "prep.application-design"
+        ],
+        [
+          "prep.interaction-design",
+          "prep.machine-interfaces",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.presentation-system",
+      "provider_capability": "prep.conceptual-interface-model",
+      "target_artifact": "PRESENTATION-SYSTEM",
+      "target_source_path": "docs/interface/presentation-system.md",
+      "provider_artifact": "CONCEPTUAL-INTERFACE-MODEL",
+      "provider_source_path": "docs/interface/conceptual-interface-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.presentation-system",
+          "prep.information-architecture",
+          "prep.conceptual-interface-model"
+        ],
+        [
+          "prep.presentation-system",
+          "prep.interface-topology",
+          "prep.information-architecture",
+          "prep.conceptual-interface-model"
+        ],
+        [
+          "prep.presentation-system",
+          "prep.interaction-design",
+          "prep.conceptual-interface-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.presentation-system",
+      "provider_capability": "prep.information-architecture",
+      "target_artifact": "PRESENTATION-SYSTEM",
+      "target_source_path": "docs/interface/presentation-system.md",
+      "provider_artifact": "INFORMATION-ARCHITECTURE",
+      "provider_source_path": "docs/interface/information-architecture.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.presentation-system",
+          "prep.interface-topology",
+          "prep.information-architecture"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.presentation-system",
+      "provider_capability": "prep.interaction-design",
+      "target_artifact": "PRESENTATION-SYSTEM",
+      "target_source_path": "docs/interface/presentation-system.md",
+      "provider_artifact": "INTERACTION-DESIGN",
+      "provider_source_path": "docs/interface/interaction-design.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.presentation-system",
+          "prep.interface-topology",
+          "prep.interaction-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.screen-view-design",
+      "provider_capability": "prep.interface-topology",
+      "target_artifact": "SCREEN-VIEW-DESIGN",
+      "target_source_path": "docs/interface/screen-view-design.md",
+      "provider_artifact": "INTERFACE-TOPOLOGY",
+      "provider_source_path": "docs/interface/interface-topology.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.screen-view-design",
+          "prep.presentation-system",
+          "prep.interface-topology"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.screen-view-design",
+      "provider_capability": "prep.interaction-design",
+      "target_artifact": "SCREEN-VIEW-DESIGN",
+      "target_source_path": "docs/interface/screen-view-design.md",
+      "provider_artifact": "INTERACTION-DESIGN",
+      "provider_source_path": "docs/interface/interaction-design.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.screen-view-design",
+          "prep.interface-topology",
+          "prep.interaction-design"
+        ],
+        [
+          "prep.screen-view-design",
+          "prep.presentation-system",
+          "prep.interaction-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.screen-view-design",
+      "provider_capability": "prep.machine-interfaces",
+      "target_artifact": "SCREEN-VIEW-DESIGN",
+      "target_source_path": "docs/interface/screen-view-design.md",
+      "provider_artifact": "MACHINE-INTERFACES",
+      "provider_source_path": "docs/interface/machine-interface.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.screen-view-design",
+          "prep.interface-topology",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.screen-view-design",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.screen-view-design",
+          "prep.presentation-system",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.screen-view-design",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "SCREEN-VIEW-DESIGN",
+      "target_source_path": "docs/interface/screen-view-design.md",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.screen-view-design",
+          "prep.presentation-system",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.machine-interfaces",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "MACHINE-INTERFACES",
+      "target_source_path": "docs/interface/machine-interface.md",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.prepare-support",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.machine-interfaces",
+      "provider_capability": "prep.knowledge-model",
+      "target_artifact": "MACHINE-INTERFACES",
+      "target_source_path": "docs/interface/machine-interface.md",
+      "provider_artifact": "KNOWLEDGE-MODEL",
+      "provider_source_path": "docs/domain/knowledge-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.machine-interfaces",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.learning-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.learner-model",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.prepare-support",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.machine-interfaces",
+      "provider_capability": "prep.learning-design",
+      "target_artifact": "MACHINE-INTERFACES",
+      "target_source_path": "docs/interface/machine-interface.md",
+      "provider_artifact": "LEARNING-DESIGN",
+      "provider_source_path": "docs/domain/learning-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.machine-interfaces",
+          "prep.application-design",
+          "prep.learning-design"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design",
+          "prep.learning-design"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.prepare-support",
+          "prep.application-design",
+          "prep.learning-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.machine-interfaces",
+      "provider_capability": "prep.learner-model",
+      "target_artifact": "MACHINE-INTERFACES",
+      "target_source_path": "docs/interface/machine-interface.md",
+      "provider_artifact": "LEARNER-MODEL",
+      "provider_source_path": "docs/domain/learner-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.machine-interfaces",
+          "prep.application-design",
+          "prep.learner-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.activity-evidence-cycle",
+          "prep.application-design",
+          "prep.learner-model"
+        ],
+        [
+          "prep.machine-interfaces",
+          "prep.application-process.prepare-support",
+          "prep.application-design",
+          "prep.learner-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.import-consistency",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "IMPORT-CONSISTENCY",
+      "target_source_path": "docs/architecture/import-consistency.md",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.import-consistency",
+          "prep.machine-interfaces",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interface-verification",
+      "provider_capability": "prep.task-model",
+      "target_artifact": "INTERFACE-VERIFICATION",
+      "target_source_path": "docs/verification/interface-verification.md",
+      "provider_artifact": "TASK-MODEL",
+      "provider_source_path": "docs/application/task-model.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interface-verification",
+          "prep.information-architecture",
+          "prep.task-model"
+        ],
+        [
+          "prep.interface-verification",
+          "prep.interaction-design",
+          "prep.task-model"
+        ],
+        [
+          "prep.interface-verification",
+          "prep.interface-topology",
+          "prep.information-architecture",
+          "prep.task-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interface-verification",
+      "provider_capability": "prep.information-architecture",
+      "target_artifact": "INTERFACE-VERIFICATION",
+      "target_source_path": "docs/verification/interface-verification.md",
+      "provider_artifact": "INFORMATION-ARCHITECTURE",
+      "provider_source_path": "docs/interface/information-architecture.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interface-verification",
+          "prep.interface-topology",
+          "prep.information-architecture"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.interface-verification",
+      "provider_capability": "prep.interaction-design",
+      "target_artifact": "INTERFACE-VERIFICATION",
+      "target_source_path": "docs/verification/interface-verification.md",
+      "provider_artifact": "INTERACTION-DESIGN",
+      "provider_source_path": "docs/interface/interaction-design.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.interface-verification",
+          "prep.interface-topology",
+          "prep.interaction-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.presentation-verification",
+      "provider_capability": "prep.presentation-system",
+      "target_artifact": "PRESENTATION-VERIFICATION",
+      "target_source_path": "docs/verification/presentation-verification.md",
+      "provider_artifact": "PRESENTATION-SYSTEM",
+      "provider_source_path": "docs/interface/presentation-system.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.presentation-verification",
+          "prep.screen-view-design",
+          "prep.presentation-system"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.presentation-verification",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "PRESENTATION-VERIFICATION",
+      "target_source_path": "docs/verification/presentation-verification.md",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.presentation-verification",
+          "prep.presentation-system",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.presentation-verification",
+          "prep.screen-view-design",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-verification",
+      "provider_capability": "prep.product-capabilities",
+      "target_artifact": "FRONTEND-VERIFICATION",
+      "target_source_path": "docs/verification/frontend-verification.md",
+      "provider_artifact": "PRODUCT-CAPABILITIES",
+      "provider_source_path": ".harness/knowledge/product-capabilities.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-verification",
+          "prep.presentation-verification",
+          "prep.frontend-performance-capacity",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.frontend-verification",
+          "prep.frontend-system-architecture",
+          "prep.application-design",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.frontend-verification",
+          "prep.machine-interfaces",
+          "prep.application-design",
+          "prep.product-capabilities"
+        ],
+        [
+          "prep.frontend-verification",
+          "prep.frontend-performance-capacity",
+          "prep.product-capabilities"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-verification",
+      "provider_capability": "prep.machine-interfaces",
+      "target_artifact": "FRONTEND-VERIFICATION",
+      "target_source_path": "docs/verification/frontend-verification.md",
+      "provider_artifact": "MACHINE-INTERFACES",
+      "provider_source_path": "docs/interface/machine-interface.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-verification",
+          "prep.presentation-verification",
+          "prep.screen-view-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.frontend-verification",
+          "prep.frontend-system-architecture",
+          "prep.machine-interfaces"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-verification",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "FRONTEND-VERIFICATION",
+      "target_source_path": "docs/verification/frontend-verification.md",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-verification",
+          "prep.presentation-verification",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.frontend-verification",
+          "prep.frontend-system-architecture",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.system-architecture",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/system-architecture.md",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.system-architecture",
+          "prep.interaction-design",
+          "prep.application-design"
+        ],
+        [
+          "prep.system-architecture",
+          "prep.interface-topology",
+          "prep.interaction-design",
+          "prep.application-design"
+        ],
+        [
+          "prep.system-architecture",
+          "prep.machine-interfaces",
+          "prep.application-design"
+        ],
+        [
+          "prep.system-architecture",
+          "prep.import-consistency",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.system-architecture",
+      "provider_capability": "prep.interaction-design",
+      "target_artifact": "SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/system-architecture.md",
+      "provider_artifact": "INTERACTION-DESIGN",
+      "provider_source_path": "docs/interface/interaction-design.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.system-architecture",
+          "prep.interface-topology",
+          "prep.interaction-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.system-architecture",
+      "provider_capability": "prep.machine-interfaces",
+      "target_artifact": "SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/system-architecture.md",
+      "provider_artifact": "MACHINE-INTERFACES",
+      "provider_source_path": "docs/interface/machine-interface.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.system-architecture",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.system-architecture",
+          "prep.interface-topology",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.system-architecture",
+          "prep.import-consistency",
+          "prep.machine-interfaces"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-system-architecture",
+      "provider_capability": "prep.application-design",
+      "target_artifact": "FRONTEND-SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "APPLICATION-DESIGN",
+      "provider_source_path": "docs/application/application-design.md",
+      "accepted_core_direct_depends_on": false,
+      "alternative_paths": [
+        [
+          "prep.frontend-system-architecture",
+          "prep.presentation-system",
+          "prep.conceptual-interface-model",
+          "prep.application-design"
+        ],
+        [
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design",
+          "prep.interaction-design",
+          "prep.application-design"
+        ],
+        [
+          "prep.frontend-system-architecture",
+          "prep.machine-interfaces",
+          "prep.application-design"
+        ]
+      ],
+      "disposition": "REMOVE_CANDIDATE_SOURCE_GROUNDED",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false,
+      "direct_export_mediation": "The frontend consumes accepted Application semantics through transport-neutral Machine Interface operations.",
+      "authority_required_for_application": true
+    },
+    {
+      "target_capability": "prep.frontend-system-architecture",
+      "provider_capability": "prep.presentation-system",
+      "target_artifact": "FRONTEND-SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "PRESENTATION-SYSTEM",
+      "provider_source_path": "docs/interface/presentation-system.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design",
+          "prep.presentation-system"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-system-architecture",
+      "provider_capability": "prep.machine-interfaces",
+      "target_artifact": "FRONTEND-SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "MACHINE-INTERFACES",
+      "provider_source_path": "docs/interface/machine-interface.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-system-architecture",
+          "prep.presentation-system",
+          "prep.interaction-design",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design",
+          "prep.machine-interfaces"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-system-architecture",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "FRONTEND-SYSTEM-ARCHITECTURE",
+      "target_source_path": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-system-architecture",
+          "prep.presentation-system",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.data-design",
+      "provider_capability": "prep.knowledge-model",
+      "target_artifact": "DATA-DESIGN",
+      "target_source_path": "docs/architecture/data-design.md",
+      "provider_artifact": "KNOWLEDGE-MODEL",
+      "provider_source_path": "docs/domain/knowledge-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.data-design",
+          "prep.learning-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.data-design",
+          "prep.learner-model",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.data-design",
+          "prep.import-consistency",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ],
+        [
+          "prep.data-design",
+          "prep.system-architecture",
+          "prep.application-design",
+          "prep.knowledge-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.data-design",
+      "provider_capability": "prep.learning-design",
+      "target_artifact": "DATA-DESIGN",
+      "target_source_path": "docs/architecture/data-design.md",
+      "provider_artifact": "LEARNING-DESIGN",
+      "provider_source_path": "docs/domain/learning-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.data-design",
+          "prep.import-consistency",
+          "prep.application-design",
+          "prep.learning-design"
+        ],
+        [
+          "prep.data-design",
+          "prep.system-architecture",
+          "prep.application-design",
+          "prep.learning-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.data-design",
+      "provider_capability": "prep.learner-model",
+      "target_artifact": "DATA-DESIGN",
+      "target_source_path": "docs/architecture/data-design.md",
+      "provider_artifact": "LEARNER-MODEL",
+      "provider_source_path": "docs/domain/learner-model.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.data-design",
+          "prep.import-consistency",
+          "prep.application-design",
+          "prep.learner-model"
+        ],
+        [
+          "prep.data-design",
+          "prep.system-architecture",
+          "prep.application-design",
+          "prep.learner-model"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.data-design",
+      "provider_capability": "prep.import-consistency",
+      "target_artifact": "DATA-DESIGN",
+      "target_source_path": "docs/architecture/data-design.md",
+      "provider_artifact": "IMPORT-CONSISTENCY",
+      "provider_source_path": "docs/architecture/import-consistency.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.data-design",
+          "prep.system-architecture",
+          "prep.import-consistency"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-engineering-policy",
+      "provider_capability": "prep.presentation-system",
+      "target_artifact": "FRONTEND-ENGINEERING-POLICY",
+      "target_source_path": "docs/engineering/frontend-engineering-policy.md",
+      "provider_artifact": "PRESENTATION-SYSTEM",
+      "provider_source_path": "docs/interface/presentation-system.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-engineering-policy",
+          "prep.frontend-system-architecture",
+          "prep.presentation-system"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-component-design",
+      "provider_capability": "prep.frontend-system-architecture",
+      "target_artifact": "FRONTEND-COMPONENT-DESIGN",
+      "target_source_path": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "FRONTEND-SYSTEM-ARCHITECTURE",
+      "provider_source_path": "docs/architecture/frontend-system-architecture.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-engineering-policy",
+          "prep.frontend-system-architecture"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-component-design",
+      "provider_capability": "prep.screen-view-design",
+      "target_artifact": "FRONTEND-COMPONENT-DESIGN",
+      "target_source_path": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "SCREEN-VIEW-DESIGN",
+      "provider_source_path": "docs/interface/screen-view-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design"
+        ],
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-engineering-policy",
+          "prep.frontend-system-architecture",
+          "prep.screen-view-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-component-design",
+      "provider_capability": "prep.machine-interfaces",
+      "target_artifact": "FRONTEND-COMPONENT-DESIGN",
+      "target_source_path": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "MACHINE-INTERFACES",
+      "provider_source_path": "docs/interface/machine-interface.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-system-architecture",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-engineering-policy",
+          "prep.frontend-system-architecture",
+          "prep.machine-interfaces"
+        ],
+        [
+          "prep.frontend-component-design",
+          "prep.screen-view-design",
+          "prep.machine-interfaces"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-component-design",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "FRONTEND-COMPONENT-DESIGN",
+      "target_source_path": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-system-architecture",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.frontend-component-design",
+          "prep.frontend-engineering-policy",
+          "prep.frontend-system-architecture",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.frontend-component-design",
+          "prep.screen-view-design",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-test-design",
+      "provider_capability": "prep.interaction-design",
+      "target_artifact": "FRONTEND-TEST-DESIGN",
+      "target_source_path": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "INTERACTION-DESIGN",
+      "provider_source_path": "docs/interface/interaction-design.yaml",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-test-design",
+          "prep.frontend-verification",
+          "prep.presentation-verification",
+          "prep.interface-verification",
+          "prep.interaction-design"
+        ],
+        [
+          "prep.frontend-test-design",
+          "prep.screen-view-design",
+          "prep.interaction-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-test-design",
+      "provider_capability": "prep.screen-view-design",
+      "target_artifact": "FRONTEND-TEST-DESIGN",
+      "target_source_path": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "SCREEN-VIEW-DESIGN",
+      "provider_source_path": "docs/interface/screen-view-design.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-test-design",
+          "prep.frontend-verification",
+          "prep.presentation-verification",
+          "prep.screen-view-design"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-test-design",
+      "provider_capability": "prep.frontend-performance-capacity",
+      "target_artifact": "FRONTEND-TEST-DESIGN",
+      "target_source_path": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "FRONTEND-PERFORMANCE-CAPACITY",
+      "provider_source_path": "docs/architecture/performance-capacity.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-test-design",
+          "prep.frontend-verification",
+          "prep.frontend-performance-capacity"
+        ],
+        [
+          "prep.frontend-test-design",
+          "prep.screen-view-design",
+          "prep.frontend-performance-capacity"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    },
+    {
+      "target_capability": "prep.frontend-implementation-design",
+      "provider_capability": "prep.frontend-verification",
+      "target_artifact": "FRONTEND-IMPLEMENTATION-DESIGN",
+      "target_source_path": "docs/implementation/frontend-implementation-design.md",
+      "provider_artifact": "FRONTEND-VERIFICATION",
+      "provider_source_path": "docs/verification/frontend-verification.md",
+      "accepted_core_direct_depends_on": true,
+      "alternative_paths": [
+        [
+          "prep.frontend-implementation-design",
+          "prep.frontend-test-design",
+          "prep.frontend-verification"
+        ]
+      ],
+      "disposition": "RETAIN_EXISTING_CORE_DIRECT_PREREQUISITE",
+      "semantic_directness_independently_adjudicated": false,
+      "graph_write_authorized": false
+    }
+  ]
+}
