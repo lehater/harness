@@ -1,0 +1,1228 @@
+{
+  "version": 1,
+  "kind": "harness-cdr-real-prep-semantic-redundancy-audit",
+  "status": "REVIEW_RECOMMENDATIONS_NOT_AUTHORITY_ACCEPTED",
+  "source_repository": "lehater/prep",
+  "source_commit": "d9adf4ca51049894437f1ed3d4f74fe94936c896",
+  "scope": "67 graph-theoretic transitive flags (all 34 capabilities, 110 edges), not all direct edges",
+  "criteria": "Direct consumer obligation, material provider-owned semantic input, intermediate accepted contract sufficiency. Core mirroring/structural transitivity NOT a decision criterion.",
+  "counts": {
+    "KEEP_SUPPORTED": 48,
+    "REMOVE_CANDIDATE": 1,
+    "UNRESOLVED": 18
+  },
+  "reviewed": 67,
+  "other_edges_not_reviewed": 43,
+  "automatic_graph_change_allowed": false,
+  "findings": [
+    {
+      "id": "CDR-PREP-001",
+      "target": "prep.model-context-strategy",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/model-context-map.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Model Context Strategy uses product-level Target and learner obligations; Domain Strategy only classifies subdomains.",
+      "mediation_counterfactual": "The strategic subdomain contract does not supply observable Product requirements.",
+      "shortest_alternative": [
+        "prep.model-context-strategy",
+        "prep.domain-strategy",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-002",
+      "target": "prep.knowledge-relation-classification",
+      "provider": "prep.product-capabilities",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/domain/relation-classification-catalog.yaml",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Relation classifier defines reusable Subject Knowledge predicates; its catalog does not name a distinct learner-facing product rule.",
+      "mediation_counterfactual": "Find a product requirement materially changing classification, not already mediated by Model Context Strategy.",
+      "shortest_alternative": [
+        "prep.knowledge-relation-classification",
+        "prep.model-context-strategy",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-003",
+      "target": "prep.knowledge-model",
+      "provider": "prep.model-context-strategy",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/knowledge-model.md",
+      "provider_artifact": "docs/architecture/model-context-map.md",
+      "direct_semantic_assessment": "Knowledge Model defines Subject Knowledge identity and cross-context limits; relation classifier owns only predicate vocabulary.",
+      "mediation_counterfactual": "Predicate-vocabulary contract cannot replace model-context ownership.",
+      "shortest_alternative": [
+        "prep.knowledge-model",
+        "prep.knowledge-relation-classification",
+        "prep.model-context-strategy"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-004",
+      "target": "prep.knowledge-model",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/knowledge-model.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Knowledge Model explicitly interprets the product requirement for overview, scope and depth.",
+      "mediation_counterfactual": "Model Context Strategy does not own those product-visible obligations.",
+      "shortest_alternative": [
+        "prep.knowledge-model",
+        "prep.model-context-strategy",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-005",
+      "target": "prep.learning-design",
+      "provider": "prep.model-context-strategy",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/learning-design.md",
+      "provider_artifact": "docs/architecture/model-context-map.md",
+      "direct_semantic_assessment": "Learning Design spans Capability, Performance and Preparation Direction contexts outside Subject Knowledge.",
+      "mediation_counterfactual": "Knowledge Model does not export applicability of the other model languages.",
+      "shortest_alternative": [
+        "prep.learning-design",
+        "prep.knowledge-model",
+        "prep.model-context-strategy"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-006",
+      "target": "prep.learning-design",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/learning-design.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Learning Design owns learning/practice support and target requirements responding directly to product intent.",
+      "mediation_counterfactual": "Knowledge/context strategy alone does not supply product-facing support commitments.",
+      "shortest_alternative": [
+        "prep.learning-design",
+        "prep.model-context-strategy",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-007",
+      "target": "prep.learner-model",
+      "provider": "prep.model-context-strategy",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/learner-model.md",
+      "provider_artifact": "docs/architecture/model-context-map.md",
+      "direct_semantic_assessment": "Learner Model owns observed Performance, evidence inference and learner-state semantics.",
+      "mediation_counterfactual": "Knowledge Model does not supply ownership of learner evidence/state.",
+      "shortest_alternative": [
+        "prep.learner-model",
+        "prep.knowledge-model",
+        "prep.model-context-strategy"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-008",
+      "target": "prep.learner-model",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/domain/learner-model.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Learner Model needs direct product obligations for explainability, state and target-relative assessment.",
+      "mediation_counterfactual": "Knowledge/context contracts do not replace accepted product-visible evidence duties.",
+      "shortest_alternative": [
+        "prep.learner-model",
+        "prep.model-context-strategy",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-009",
+      "target": "prep.task-model",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/task-model.yaml",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Task Model maps named REQ-CAP requirements into distinct user/system tasks and outcomes.",
+      "mediation_counterfactual": "Knowledge/Learning models do not own product-facing task coverage.",
+      "shortest_alternative": [
+        "prep.task-model",
+        "prep.knowledge-model",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-010",
+      "target": "prep.task-model",
+      "provider": "prep.knowledge-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/task-model.yaml",
+      "provider_artifact": "docs/domain/knowledge-model.md",
+      "direct_semantic_assessment": "Task Model references KM Knowledge identity, relational propositions and exploration semantics.",
+      "mediation_counterfactual": "Learning/Learner contracts do not replace reusable Knowledge meaning.",
+      "shortest_alternative": [
+        "prep.task-model",
+        "prep.learning-design",
+        "prep.knowledge-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-011",
+      "target": "prep.application-design",
+      "provider": "prep.product-capabilities",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/application/application-design.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Application Design says it realizes Task Model; an additional product rule needed outside accepted tasks is not isolated.",
+      "mediation_counterfactual": "Find Product Capability obligation absent from Task Model and uniquely consumed here.",
+      "shortest_alternative": [
+        "prep.application-design",
+        "prep.task-model",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-012",
+      "target": "prep.application-design",
+      "provider": "prep.knowledge-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/application-design.md",
+      "provider_artifact": "docs/domain/knowledge-model.md",
+      "direct_semantic_assessment": "Application operations preserve Knowledge identity and semantics while selecting/exploring Knowledge.",
+      "mediation_counterfactual": "Task Model does not own underlying Knowledge integrity rules.",
+      "shortest_alternative": [
+        "prep.application-design",
+        "prep.task-model",
+        "prep.knowledge-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-013",
+      "target": "prep.application-design",
+      "provider": "prep.learning-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/application-design.md",
+      "provider_artifact": "docs/domain/learning-design.md",
+      "direct_semantic_assessment": "Application operations require Learning Design support-fit and performance-contract constraints.",
+      "mediation_counterfactual": "Task descriptions do not own these reusable performance rules.",
+      "shortest_alternative": [
+        "prep.application-design",
+        "prep.task-model",
+        "prep.learning-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-014",
+      "target": "prep.application-design",
+      "provider": "prep.learner-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/application-design.md",
+      "provider_artifact": "docs/domain/learner-model.md",
+      "direct_semantic_assessment": "Application outcomes depend on Learner Model evidence, observation and state inference invariants.",
+      "mediation_counterfactual": "Task Model cannot replace accepted evidential inference rules.",
+      "shortest_alternative": [
+        "prep.application-design",
+        "prep.task-model",
+        "prep.learner-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-015",
+      "target": "prep.user-journeys",
+      "provider": "prep.application-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/user-journeys.md",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "User Journeys define visible operation outcomes and recovery beyond the two bounded process compositions.",
+      "mediation_counterfactual": "Two process models do not cover the complete Application Design operation surface.",
+      "shortest_alternative": [
+        "prep.user-journeys",
+        "prep.application-process.activity-evidence-cycle",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-016",
+      "target": "prep.user-journeys",
+      "provider": "prep.task-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/application/user-journeys.md",
+      "provider_artifact": "docs/application/task-model.yaml",
+      "direct_semantic_assessment": "User Journeys explicitly realize Task Model user goals, not just application operation sequencing.",
+      "mediation_counterfactual": "Application operations do not own original USER task success criteria.",
+      "shortest_alternative": [
+        "prep.user-journeys",
+        "prep.application-design",
+        "prep.task-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-017",
+      "target": "prep.frontend-performance-capacity",
+      "provider": "prep.product-capabilities",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/architecture/performance-capacity.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Performance Design cites exploration workload but no unique direct product-quality rule beyond Knowledge Model is demonstrated.",
+      "mediation_counterfactual": "Identify product-specific performance requirement not mediated by accepted exploration semantics.",
+      "shortest_alternative": [
+        "prep.frontend-performance-capacity",
+        "prep.knowledge-model",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-018",
+      "target": "prep.conceptual-interface-model",
+      "provider": "prep.task-model",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "docs/application/task-model.yaml",
+      "direct_semantic_assessment": "Conceptual Interface Model cites UJ and AD atom IDs, but no Task Model TASK-U IDs.",
+      "mediation_counterfactual": "Find task invariant not already transmitted through User Journeys/Application Design.",
+      "shortest_alternative": [
+        "prep.conceptual-interface-model",
+        "prep.user-journeys",
+        "prep.task-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-019",
+      "target": "prep.conceptual-interface-model",
+      "provider": "prep.application-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "Conceptual Interface Model refers directly to AD application operations, states and outcomes.",
+      "mediation_counterfactual": "User Journeys do not own full operation/outcome vocabulary.",
+      "shortest_alternative": [
+        "prep.conceptual-interface-model",
+        "prep.user-journeys",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-020",
+      "target": "prep.conceptual-interface-model",
+      "provider": "prep.knowledge-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "docs/domain/knowledge-model.md",
+      "direct_semantic_assessment": "Conceptual Interface Model has explicit KM Knowledge atom references and preserves identity/proposition distinctions.",
+      "mediation_counterfactual": "Task/Journey artifacts cannot replace reusable Knowledge semantic owners.",
+      "shortest_alternative": [
+        "prep.conceptual-interface-model",
+        "prep.task-model",
+        "prep.knowledge-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-021",
+      "target": "prep.conceptual-interface-model",
+      "provider": "prep.learning-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "docs/domain/learning-design.md",
+      "direct_semantic_assessment": "Conceptual Interface Model has explicit LD capability, support and requirement semantics.",
+      "mediation_counterfactual": "Task/Journey artifacts do not own Learning Design semantic rules.",
+      "shortest_alternative": [
+        "prep.conceptual-interface-model",
+        "prep.task-model",
+        "prep.learning-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-022",
+      "target": "prep.conceptual-interface-model",
+      "provider": "prep.learner-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "provider_artifact": "docs/domain/learner-model.md",
+      "direct_semantic_assessment": "Conceptual Interface Model has explicit LM evidence/state semantic references.",
+      "mediation_counterfactual": "Task/Journey artifacts cannot replace Learner Evidence & State invariants.",
+      "shortest_alternative": [
+        "prep.conceptual-interface-model",
+        "prep.task-model",
+        "prep.learner-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-023",
+      "target": "prep.information-architecture",
+      "provider": "prep.task-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/information-architecture.yaml",
+      "provider_artifact": "docs/application/task-model.yaml",
+      "direct_semantic_assessment": "Information Architecture directly enumerates TASK-U user work for findability and navigation.",
+      "mediation_counterfactual": "A concept dictionary is not a task-coverage contract.",
+      "shortest_alternative": [
+        "prep.information-architecture",
+        "prep.conceptual-interface-model",
+        "prep.task-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-024",
+      "target": "prep.information-architecture",
+      "provider": "prep.user-journeys",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/information-architecture.yaml",
+      "provider_artifact": "docs/application/user-journeys.md",
+      "direct_semantic_assessment": "Information Architecture cites TASK-U and C concepts but no UJ journey IDs.",
+      "mediation_counterfactual": "Identify a journey continuity/order rule not already represented through Conceptual Interface Model.",
+      "shortest_alternative": [
+        "prep.information-architecture",
+        "prep.conceptual-interface-model",
+        "prep.user-journeys"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-025",
+      "target": "prep.interaction-design",
+      "provider": "prep.task-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "docs/application/task-model.yaml",
+      "direct_semantic_assessment": "Interaction Design binds named interaction contexts to TASK-U task intentions.",
+      "mediation_counterfactual": "Conceptual Interface concepts do not replace explicit task coverage.",
+      "shortest_alternative": [
+        "prep.interaction-design",
+        "prep.conceptual-interface-model",
+        "prep.task-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-026",
+      "target": "prep.interaction-design",
+      "provider": "prep.user-journeys",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "docs/application/user-journeys.md",
+      "direct_semantic_assessment": "Interaction Design's structured contract has no UJ-ID references.",
+      "mediation_counterfactual": "Identify independently required Journey behavior not transmitted through Conceptual Interface Model.",
+      "shortest_alternative": [
+        "prep.interaction-design",
+        "prep.conceptual-interface-model",
+        "prep.user-journeys"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-027",
+      "target": "prep.interaction-design",
+      "provider": "prep.application-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/interaction-design.yaml",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "Interaction Design has no AD operation-ID references; its states may be supplied by Conceptual/Machine Interface layers.",
+      "mediation_counterfactual": "Identify an Application operation/outcome directly consumed beyond those intermediates.",
+      "shortest_alternative": [
+        "prep.interaction-design",
+        "prep.conceptual-interface-model",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-028",
+      "target": "prep.presentation-system",
+      "provider": "prep.conceptual-interface-model",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/presentation-system.md",
+      "provider_artifact": "docs/interface/conceptual-interface-model.yaml",
+      "direct_semantic_assessment": "Presentation System documents shared patterns but does not cite a distinct CIM semantic atom.",
+      "mediation_counterfactual": "Find a user-concept invariant omitted by IA and Interface Topology.",
+      "shortest_alternative": [
+        "prep.presentation-system",
+        "prep.information-architecture",
+        "prep.conceptual-interface-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-029",
+      "target": "prep.presentation-system",
+      "provider": "prep.information-architecture",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/presentation-system.md",
+      "provider_artifact": "docs/interface/information-architecture.yaml",
+      "direct_semantic_assessment": "Presentation System organizes common presentation hierarchy by Information Architecture grouping.",
+      "mediation_counterfactual": "Interface Topology provides navigation frames, not accepted information meanings.",
+      "shortest_alternative": [
+        "prep.presentation-system",
+        "prep.interface-topology",
+        "prep.information-architecture"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-030",
+      "target": "prep.presentation-system",
+      "provider": "prep.interaction-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/presentation-system.md",
+      "provider_artifact": "docs/interface/interaction-design.yaml",
+      "direct_semantic_assessment": "Presentation patterns govern feedback, but direct Interaction Design invariants apart from Interface Topology are not isolated.",
+      "mediation_counterfactual": "Identify the IX state or action rule not passed through Topology.",
+      "shortest_alternative": [
+        "prep.presentation-system",
+        "prep.interface-topology",
+        "prep.interaction-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-031",
+      "target": "prep.screen-view-design",
+      "provider": "prep.interface-topology",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/screen-view-design.md",
+      "provider_artifact": "docs/interface/interface-topology.yaml",
+      "direct_semantic_assessment": "Screen/View Design names Interface Topology frames and topology_ref explicitly.",
+      "mediation_counterfactual": "Presentation patterns cannot replace specific frame and navigation identities.",
+      "shortest_alternative": [
+        "prep.screen-view-design",
+        "prep.presentation-system",
+        "prep.interface-topology"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-032",
+      "target": "prep.screen-view-design",
+      "provider": "prep.interaction-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/screen-view-design.md",
+      "provider_artifact": "docs/interface/interaction-design.yaml",
+      "direct_semantic_assessment": "Screen/View Design explicitly references IX interaction contexts and states.",
+      "mediation_counterfactual": "Topology alone cannot replace interaction-state ownership.",
+      "shortest_alternative": [
+        "prep.screen-view-design",
+        "prep.interface-topology",
+        "prep.interaction-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-033",
+      "target": "prep.screen-view-design",
+      "provider": "prep.machine-interfaces",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/screen-view-design.md",
+      "provider_artifact": "docs/interface/machine-interface.md",
+      "direct_semantic_assessment": "Screen/View Design exposes operation-facing controls but does not trace a distinct Machine Interface atom.",
+      "mediation_counterfactual": "Find direct operation payload/outcome rule independent of interaction contracts.",
+      "shortest_alternative": [
+        "prep.screen-view-design",
+        "prep.interaction-design",
+        "prep.machine-interfaces"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-034",
+      "target": "prep.screen-view-design",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/screen-view-design.md",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Screen/View composition must satisfy accepted performance, density and graceful-degradation constraints.",
+      "mediation_counterfactual": "Presentation System general patterns do not substitute for independent quality bounds.",
+      "shortest_alternative": [
+        "prep.screen-view-design",
+        "prep.presentation-system",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-035",
+      "target": "prep.machine-interfaces",
+      "provider": "prep.application-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/interface/machine-interface.md",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "Machine Interface exposes accepted Application operations beyond the two bounded Process capabilities.",
+      "mediation_counterfactual": "A pair of process compositions cannot replace the complete Application operation contract.",
+      "shortest_alternative": [
+        "prep.machine-interfaces",
+        "prep.application-process.activity-evidence-cycle",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-036",
+      "target": "prep.machine-interfaces",
+      "provider": "prep.knowledge-model",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/machine-interface.md",
+      "provider_artifact": "docs/domain/knowledge-model.md",
+      "direct_semantic_assessment": "Machine Interface transports Knowledge representations but a distinct direct KM invariant is not atomically cited.",
+      "mediation_counterfactual": "Identify a Knowledge rule not already carried by Application Design.",
+      "shortest_alternative": [
+        "prep.machine-interfaces",
+        "prep.application-design",
+        "prep.knowledge-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-037",
+      "target": "prep.machine-interfaces",
+      "provider": "prep.learning-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/machine-interface.md",
+      "provider_artifact": "docs/domain/learning-design.md",
+      "direct_semantic_assessment": "Machine Interface transports capability/support meaning without independently tracing a Learning Design rule.",
+      "mediation_counterfactual": "Identify performance/support rule not already carried by Application Design.",
+      "shortest_alternative": [
+        "prep.machine-interfaces",
+        "prep.application-design",
+        "prep.learning-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-038",
+      "target": "prep.machine-interfaces",
+      "provider": "prep.learner-model",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/interface/machine-interface.md",
+      "provider_artifact": "docs/domain/learner-model.md",
+      "direct_semantic_assessment": "Machine Interface transports learner evidence/state without independently tracing a Learner Model rule.",
+      "mediation_counterfactual": "Identify evidence attribution/projection rule not carried by Application Design.",
+      "shortest_alternative": [
+        "prep.machine-interfaces",
+        "prep.application-design",
+        "prep.learner-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-039",
+      "target": "prep.import-consistency",
+      "provider": "prep.application-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/import-consistency.md",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "Import Consistency governs semantic command identity/currentness for accepted Application operations.",
+      "mediation_counterfactual": "Machine Interface request shape alone does not own application command result or validity.",
+      "shortest_alternative": [
+        "prep.import-consistency",
+        "prep.machine-interfaces",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-040",
+      "target": "prep.interface-verification",
+      "provider": "prep.task-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/interface-verification.md",
+      "provider_artifact": "docs/application/task-model.yaml",
+      "direct_semantic_assessment": "Interface Verification explicitly tests USER task outcomes from Task Model.",
+      "mediation_counterfactual": "Interface Topology does not independently establish complete Task coverage.",
+      "shortest_alternative": [
+        "prep.interface-verification",
+        "prep.information-architecture",
+        "prep.task-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-041",
+      "target": "prep.interface-verification",
+      "provider": "prep.information-architecture",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/interface-verification.md",
+      "provider_artifact": "docs/interface/information-architecture.yaml",
+      "direct_semantic_assessment": "Interface Verification directly verifies Information Architecture findability and grouping.",
+      "mediation_counterfactual": "Topology does not own information location/meaning semantics.",
+      "shortest_alternative": [
+        "prep.interface-verification",
+        "prep.interface-topology",
+        "prep.information-architecture"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-042",
+      "target": "prep.interface-verification",
+      "provider": "prep.interaction-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/interface-verification.md",
+      "provider_artifact": "docs/interface/interaction-design.yaml",
+      "direct_semantic_assessment": "Interface Verification directly checks Interaction Design behavior and recovery.",
+      "mediation_counterfactual": "Topology does not own full interaction-state/outcome obligations.",
+      "shortest_alternative": [
+        "prep.interface-verification",
+        "prep.interface-topology",
+        "prep.interaction-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-043",
+      "target": "prep.presentation-verification",
+      "provider": "prep.presentation-system",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/presentation-verification.md",
+      "provider_artifact": "docs/interface/presentation-system.md",
+      "direct_semantic_assessment": "Presentation Verification directly verifies shared Presentation System requirements.",
+      "mediation_counterfactual": "Screen/View artifacts specify instances, not all shared presentation requirements.",
+      "shortest_alternative": [
+        "prep.presentation-verification",
+        "prep.screen-view-design",
+        "prep.presentation-system"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-044",
+      "target": "prep.presentation-verification",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/presentation-verification.md",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Presentation Verification directly checks independent frontend performance and capacity constraints.",
+      "mediation_counterfactual": "Presentation/Screen contracts do not define independent measurable Quality obligations.",
+      "shortest_alternative": [
+        "prep.presentation-verification",
+        "prep.presentation-system",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-045",
+      "target": "prep.frontend-verification",
+      "provider": "prep.product-capabilities",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/frontend-verification.md",
+      "provider_artifact": ".harness/knowledge/product-capabilities.yaml",
+      "direct_semantic_assessment": "Frontend Verification directly checks product traceability and learner-facing behavior.",
+      "mediation_counterfactual": "Intermediate presentation/architecture contracts do not replace product commitments.",
+      "shortest_alternative": [
+        "prep.frontend-verification",
+        "prep.frontend-performance-capacity",
+        "prep.product-capabilities"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-046",
+      "target": "prep.frontend-verification",
+      "provider": "prep.machine-interfaces",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/frontend-verification.md",
+      "provider_artifact": "docs/interface/machine-interface.md",
+      "direct_semantic_assessment": "Frontend Verification explicitly checks Machine Interface adapters, inputs and outcomes.",
+      "mediation_counterfactual": "Screen/architecture artifacts do not own Machine Interface operation semantics.",
+      "shortest_alternative": [
+        "prep.frontend-verification",
+        "prep.frontend-system-architecture",
+        "prep.machine-interfaces"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-047",
+      "target": "prep.frontend-verification",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/verification/frontend-verification.md",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Frontend Verification directly tests performance/degradation obligations.",
+      "mediation_counterfactual": "Presentation/architecture realization is not a quality verification oracle.",
+      "shortest_alternative": [
+        "prep.frontend-verification",
+        "prep.presentation-verification",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-048",
+      "target": "prep.system-architecture",
+      "provider": "prep.application-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/system-architecture.md",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "System Architecture defines runtime boundaries driven by accepted Application operations.",
+      "mediation_counterfactual": "Interaction/Topology do not own Application operations or currentness semantics.",
+      "shortest_alternative": [
+        "prep.system-architecture",
+        "prep.interaction-design",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-049",
+      "target": "prep.system-architecture",
+      "provider": "prep.interaction-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/architecture/system-architecture.md",
+      "provider_artifact": "docs/interface/interaction-design.yaml",
+      "direct_semantic_assessment": "System Architecture includes an interaction-model concern but an independent IX rule missing from Topology is not identified.",
+      "mediation_counterfactual": "Identify a distinct interaction timing/state rule architecture must consume directly.",
+      "shortest_alternative": [
+        "prep.system-architecture",
+        "prep.interface-topology",
+        "prep.interaction-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-050",
+      "target": "prep.system-architecture",
+      "provider": "prep.machine-interfaces",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/system-architecture.md",
+      "provider_artifact": "docs/interface/machine-interface.md",
+      "direct_semantic_assessment": "System Architecture directly selects machine operation and transport boundaries.",
+      "mediation_counterfactual": "Interaction Design does not own Machine Interface public operation contracts.",
+      "shortest_alternative": [
+        "prep.system-architecture",
+        "prep.interaction-design",
+        "prep.machine-interfaces"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-051",
+      "target": "prep.frontend-system-architecture",
+      "provider": "prep.application-design",
+      "decision": "REMOVE_CANDIDATE",
+      "target_artifact": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "docs/application/application-design.md",
+      "direct_semantic_assessment": "Frontend System Architecture explicitly says it consumes Application semantics through Machine Interface; no direct Core APP artifact prerequisite.",
+      "mediation_counterfactual": "The accepted Machine Interface directly mediates the stated Application contract.",
+      "shortest_alternative": [
+        "prep.frontend-system-architecture",
+        "prep.machine-interfaces",
+        "prep.application-design"
+      ],
+      "old_core_direct_depends_on": false,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-052",
+      "target": "prep.frontend-system-architecture",
+      "provider": "prep.presentation-system",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "docs/interface/presentation-system.md",
+      "direct_semantic_assessment": "Frontend System Architecture implements shared Presentation System structural rules.",
+      "mediation_counterfactual": "Screen/View Design cannot replace system-wide presentation rules.",
+      "shortest_alternative": [
+        "prep.frontend-system-architecture",
+        "prep.screen-view-design",
+        "prep.presentation-system"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-053",
+      "target": "prep.frontend-system-architecture",
+      "provider": "prep.machine-interfaces",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "docs/interface/machine-interface.md",
+      "direct_semantic_assessment": "Frontend System Architecture implements Machine Interface consumer-owned ports/adapters.",
+      "mediation_counterfactual": "Presentation/Screen contracts do not own operation signatures.",
+      "shortest_alternative": [
+        "prep.frontend-system-architecture",
+        "prep.screen-view-design",
+        "prep.machine-interfaces"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-054",
+      "target": "prep.frontend-system-architecture",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/frontend-system-architecture.md",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Frontend System Architecture is constrained by independent frontend performance/idle resource requirements.",
+      "mediation_counterfactual": "Presentation/Screen contracts cannot substitute for independent Quality targets.",
+      "shortest_alternative": [
+        "prep.frontend-system-architecture",
+        "prep.presentation-system",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-055",
+      "target": "prep.data-design",
+      "provider": "prep.knowledge-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/data-design.md",
+      "provider_artifact": "docs/domain/knowledge-model.md",
+      "direct_semantic_assessment": "Data Design explicitly preserves reusable Knowledge identity and propositions in persistence.",
+      "mediation_counterfactual": "Learning/Learner/Architecture cannot replace Subject Knowledge semantics.",
+      "shortest_alternative": [
+        "prep.data-design",
+        "prep.learning-design",
+        "prep.knowledge-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-056",
+      "target": "prep.data-design",
+      "provider": "prep.learning-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/data-design.md",
+      "provider_artifact": "docs/domain/learning-design.md",
+      "direct_semantic_assessment": "Data Design explicitly preserves reusable Learning and Capability/Performance meaning.",
+      "mediation_counterfactual": "Application/Architecture do not own reusable Learning Design semantics.",
+      "shortest_alternative": [
+        "prep.data-design",
+        "prep.import-consistency",
+        "prep.application-design",
+        "prep.learning-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-057",
+      "target": "prep.data-design",
+      "provider": "prep.learner-model",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/data-design.md",
+      "provider_artifact": "docs/domain/learner-model.md",
+      "direct_semantic_assessment": "Data Design explicitly preserves Observation, evidence attribution and Learner state.",
+      "mediation_counterfactual": "Application/Architecture do not own Learner Evidence & State rules.",
+      "shortest_alternative": [
+        "prep.data-design",
+        "prep.import-consistency",
+        "prep.application-design",
+        "prep.learner-model"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-058",
+      "target": "prep.data-design",
+      "provider": "prep.import-consistency",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/architecture/data-design.md",
+      "provider_artifact": "docs/architecture/import-consistency.md",
+      "direct_semantic_assessment": "Data Design realizes accepted consistency/conflict/idempotency constraints.",
+      "mediation_counterfactual": "System Architecture referencing consistency does not replace that public contract.",
+      "shortest_alternative": [
+        "prep.data-design",
+        "prep.system-architecture",
+        "prep.import-consistency"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-059",
+      "target": "prep.frontend-engineering-policy",
+      "provider": "prep.presentation-system",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/engineering/frontend-engineering-policy.md",
+      "provider_artifact": "docs/interface/presentation-system.md",
+      "direct_semantic_assessment": "Frontend Engineering Policy governs implementation but a separately consumed Presentation System rule is not identified.",
+      "mediation_counterfactual": "Find a presentation policy constraint not mediated by frontend architecture.",
+      "shortest_alternative": [
+        "prep.frontend-engineering-policy",
+        "prep.frontend-system-architecture",
+        "prep.presentation-system"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-060",
+      "target": "prep.frontend-component-design",
+      "provider": "prep.frontend-system-architecture",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "docs/architecture/frontend-system-architecture.md",
+      "direct_semantic_assessment": "Frontend Component Design realizes frontend architectural feature/port boundaries.",
+      "mediation_counterfactual": "Engineering Policy sets standards rather than architectural structure.",
+      "shortest_alternative": [
+        "prep.frontend-component-design",
+        "prep.frontend-engineering-policy",
+        "prep.frontend-system-architecture"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-061",
+      "target": "prep.frontend-component-design",
+      "provider": "prep.screen-view-design",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "docs/interface/screen-view-design.md",
+      "direct_semantic_assessment": "Frontend Component Design explicitly realizes accepted Screen/View responsibilities.",
+      "mediation_counterfactual": "Architecture/Policy do not define each composed View's behavior.",
+      "shortest_alternative": [
+        "prep.frontend-component-design",
+        "prep.frontend-system-architecture",
+        "prep.screen-view-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-062",
+      "target": "prep.frontend-component-design",
+      "provider": "prep.machine-interfaces",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "docs/interface/machine-interface.md",
+      "direct_semantic_assessment": "Frontend Component Design implements Machine Interface consumer-owned ports.",
+      "mediation_counterfactual": "Architecture sets layering but not accepted operation payloads/outcomes.",
+      "shortest_alternative": [
+        "prep.frontend-component-design",
+        "prep.frontend-system-architecture",
+        "prep.machine-interfaces"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-063",
+      "target": "prep.frontend-component-design",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/implementation/frontend-component-design.md",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Frontend Component Design directly constrains renderer performance/idle resources.",
+      "mediation_counterfactual": "Architecture/Policy/Screen contracts do not replace accepted independent capacity limits.",
+      "shortest_alternative": [
+        "prep.frontend-component-design",
+        "prep.frontend-system-architecture",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-064",
+      "target": "prep.frontend-test-design",
+      "provider": "prep.interaction-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "docs/interface/interaction-design.yaml",
+      "direct_semantic_assessment": "Frontend Test Design cites FV tests but not IX interaction atoms.",
+      "mediation_counterfactual": "Find a concrete interaction invariant used by executable tests beyond their FV oracles.",
+      "shortest_alternative": [
+        "prep.frontend-test-design",
+        "prep.screen-view-design",
+        "prep.interaction-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-065",
+      "target": "prep.frontend-test-design",
+      "provider": "prep.screen-view-design",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "docs/interface/screen-view-design.md",
+      "direct_semantic_assessment": "Frontend Test Design cites FV tests without distinct Screen/View contract identifiers.",
+      "mediation_counterfactual": "Find view-region/entry invariant required independently of FV.",
+      "shortest_alternative": [
+        "prep.frontend-test-design",
+        "prep.frontend-verification",
+        "prep.presentation-verification",
+        "prep.screen-view-design"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-066",
+      "target": "prep.frontend-test-design",
+      "provider": "prep.frontend-performance-capacity",
+      "decision": "UNRESOLVED",
+      "target_artifact": "docs/verification/frontend-test-design.yaml",
+      "provider_artifact": "docs/architecture/performance-capacity.md",
+      "direct_semantic_assessment": "Frontend Test Design specifies frontend quality behavior without tracing a separate Quality threshold.",
+      "mediation_counterfactual": "Find a capacity/latency oracle not already contained in FV.",
+      "shortest_alternative": [
+        "prep.frontend-test-design",
+        "prep.frontend-verification",
+        "prep.frontend-performance-capacity"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    },
+    {
+      "id": "CDR-PREP-067",
+      "target": "prep.frontend-implementation-design",
+      "provider": "prep.frontend-verification",
+      "decision": "KEEP_SUPPORTED",
+      "target_artifact": "docs/implementation/frontend-implementation-design.md",
+      "provider_artifact": "docs/verification/frontend-verification.md",
+      "direct_semantic_assessment": "Frontend Implementation Design explicitly has Frontend Verification conformance/release gates.",
+      "mediation_counterfactual": "Individual Test Design cases do not replace verification acceptance obligations.",
+      "shortest_alternative": [
+        "prep.frontend-implementation-design",
+        "prep.frontend-test-design",
+        "prep.frontend-verification"
+      ],
+      "old_core_direct_depends_on": true,
+      "authority_accepted": false,
+      "graph_writeback_allowed": false
+    }
+  ]
+}
