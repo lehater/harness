@@ -125,6 +125,15 @@ harness-check:
 # Explicit operator invocation only. Never part of harness-check or the
 # Capability creation route until independently approved governance exists.
 .PHONY: cdr-prepare cdr-reconcile cdr-audit
+cdr-create-prepare:
+	python -m evals.cdr_create_workflow prepare --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --output "$(CDR_OUTPUT)"
+
+cdr-create-reconcile:
+	python -m evals.cdr_create_workflow reconcile --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --handoff "$(CDR_HANDOFF)" --response "$(CDR_RESPONSE)" --output "$(CDR_OUTPUT)"
+
+cdr-create-check:
+	python -m evals.cdr_create_workflow check --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --handoff "$(CDR_HANDOFF)" --response "$(CDR_RESPONSE)" --review "$(CDR_REVIEW)" --draft "$(CDR_DRAFT)" --output "$(CDR_OUTPUT)"
+
 cdr-prepare:
 	@test -n "$(PROJECT_ROOT)" -a -n "$(PROJECT_COMMIT)" -a -n "$(CDR_INTAKE)" -a -n "$(CDR_OUTPUT)" || (echo "Require PROJECT_ROOT PROJECT_COMMIT CDR_INTAKE CDR_OUTPUT"; exit 2)
 	python -m evals.cdr_operational prepare --project-root "$(PROJECT_ROOT)" --commit "$(PROJECT_COMMIT)" --intake "$(CDR_INTAKE)" --output "$(CDR_OUTPUT)"
