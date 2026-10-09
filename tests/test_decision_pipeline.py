@@ -161,6 +161,49 @@ def main() -> int:
     ], create
     assert "b.md" not in {item["path"] for item in create["read_set"]}, create
 
+    # Opt-in read-only CDR gate can BLOCK CREATE; it can never authorize
+    # execution merely because a model or operator asserts resolution.
+    cdr_gate = {
+        "kind": "harness-cdr-create-readiness-v1", "version": 1,
+        "status": "BLOCKED_PENDING_INDEPENDENT_AUTHORITY_DECISIONS",
+        "target_capability": "arch.b", "project_commit": "a" * 40,
+        "handoff_sha256": "b" * 64,
+        "automatic_writeback_allowed": False,
+        "trusted_authority_transition_verified": False,
+        "target_contract_independently_accepted": False,
+        "directness_semantically_adjudicated": False,
+    }
+    gated = derive_decision_roadmap(
+        graph=GRAPH, model=MODEL, target="TARGET", lifecycle=LIFECYCLE,
+        decision_contracts=contracts, decision_policy=POLICY,
+        cdr_create_gate=cdr_gate,
+    )
+    assert "arch.b" not in caps(gated["ready"]), gated
+    cdr_block = next(b for b in gated["blocked"]
+                     if b["capability"] == "arch.b")
+    assert cdr_block["reason"] == "CDR_CREATE_AUTHORITY_REVIEW_PENDING"
+    assert cdr_block["automatic_writeback_allowed"] is False
+    assert gated["frontier_status"] == "BLOCKED"
+    assert caps(roadmap["ready"]) == ["arch.b"]
+
+    for changed in (
+        {"status": "RESOLVED"},
+        {"automatic_writeback_allowed": True},
+        {"trusted_authority_transition_verified": True},
+        {"target_capability": "unknown.arch"},
+    ):
+        fake = {**cdr_gate, **changed}
+        try:
+            derive_decision_roadmap(
+                graph=GRAPH, model=MODEL, target="TARGET", lifecycle=LIFECYCLE,
+                decision_contracts=contracts, decision_policy=POLICY,
+                cdr_create_gate=fake,
+            )
+        except CoreError:
+            pass
+        else:
+            raise AssertionError("forgeable CDR CREATE overlay accepted")
+
     redo = derive_decision_roadmap(
         graph=GRAPH,
         model=MODEL,
