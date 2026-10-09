@@ -241,6 +241,35 @@ def reconcile_intake(root: Path, *, sha: str, intake: dict[str, Any],
     graph=_producers(root)
     target=inputs["cases"][0]["target"]["capability"]
     current={v["capability"] for v in graph.get(target,{}).get("requires",[])}
+    # Reconciliation is the first phase permitted to inspect graph topology.
+    # A proposed new target -> supplier edge is cyclic exactly when supplier
+    # already reaches target along existing direct requires, or is self-linked.
+    from collections import deque
+    def path_to_target(supplier: str) -> list[str] | None:
+        queue=deque([[supplier]])
+        visited=set()
+        while queue:
+            path=queue.popleft()
+            node=path[-1]
+            if node==target:
+                return path
+            if node in visited:
+                continue
+            visited.add(node)
+            for req in graph.get(node,{}).get("requires",[]):
+                upstream=req["capability"]
+                if upstream not in visited:
+                    queue.append(path+[upstream])
+        return None
+    cycle_blocks=[]
+    for provider in sorted(set(actual)-current):
+        path=path_to_target(provider)
+        if path:
+            cycle_blocks.append({
+                "provider":provider,
+                "cycle":[target]+path,
+                "disposition":"BLOCKED_BY_CYCLE",
+            })
     audit=audit_additions(
         inputs["cases"][0],prediction,existing_requires=current,productions=graph
     )
@@ -251,7 +280,11 @@ def reconcile_intake(root: Path, *, sha: str, intake: dict[str, Any],
     )
     return {
         "kind":"harness-cdr-intake-reconciliation-v1",
-        "status":"REVIEW_REQUIRED",
+        "status":"INVALID_PROPOSED_TOPOLOGY" if cycle_blocks else "REVIEW_REQUIRED",
+        "effective_resolution":"NOT_RESOLVED",
+        "cycle_blocks":cycle_blocks,
+        "source_contract_completeness_verified":False,
+        "provider_ownership_independently_verified":False,
         "source_snapshot":sha,
         "target_capability":target,
         "target_graph_presence":"DECLARED" if target in graph else "NOT_YET_DECLARED",
