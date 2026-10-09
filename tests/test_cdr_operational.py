@@ -231,10 +231,11 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
         "CDR_INTAKE="+str(root/"cdr-create-source.yaml"),
     ]
     handoff_file=root/"cdr-create-handoff.json"
-    subprocess.run(
+    creation_cmd=subprocess.run(
         commands+["cdr-create-prepare","CDR_OUTPUT="+str(handoff_file)],
-        check=True,capture_output=True,text=True,
+        check=False,capture_output=True,text=True,
     )
+    assert creation_cmd.returncode == 0, (creation_cmd.stdout, creation_cmd.stderr)
     assert json.loads(handoff_file.read_text())==create_handoff
     review_file=root/"cdr-create-review.json"
     create_arguments=[
