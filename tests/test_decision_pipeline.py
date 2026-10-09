@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from harness.application.decision_pipeline import derive_decision_roadmap
+from harness.application.project_frontier import compose_project_frontier
 from harness.project_model.core import CoreError
 
 
@@ -185,6 +186,30 @@ def main() -> int:
     assert cdr_block["automatic_writeback_allowed"] is False
     assert gated["frontier_status"] == "BLOCKED"
     assert caps(roadmap["ready"]) == ["arch.b"]
+
+    frontier = compose_project_frontier(
+        target="TARGET",
+        decision_roadmap=gated,
+        semantic_closure={
+            "kind": "harness-semantic-closure-evaluation",
+            "version": 1, "target": "TARGET",
+            "status": "COMPLETE", "structural_status": "COMPLETE",
+            "semantic_gaps": [], "currentness_gaps": [],
+            "question_frontier": [], "pending": [],
+        },
+        engineering_coverage={
+            "kind": "harness-engineering-coverage-evaluation",
+            "version": 1, "consumer": "TARGET",
+            "completion_ready": True, "work_items": [],
+            "question_frontier": [],
+        },
+    )
+    assert frontier["status"] == "BLOCKED", frontier
+    assert any(x["capability"] == "arch.b" and
+               x["reason"] == "CDR_CREATE_AUTHORITY_REVIEW_PENDING"
+               for x in frontier["blocked"])
+    assert not any(x.get("capability") == "arch.b"
+                   for x in frontier["next_actions"])
 
     for changed in (
         {"status": "RESOLVED"},
