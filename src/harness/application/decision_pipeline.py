@@ -229,6 +229,7 @@ def derive_decision_roadmap(
     decision_policy: dict[str, Any] | None,
     decision_failures: dict[str, Any] | None = None,
     redo_capabilities: Iterable[str] = (),
+    cdr_create_gate: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Derive work without role-specific frontiers or execution stops.
 
@@ -243,6 +244,28 @@ def derive_decision_roadmap(
     states = lifecycle_states(graph, realized, lifecycle)
     failures = decision_failure_index(decision_failures)
     redo = set(redo_capabilities)
+    # Experimental opt-in overlay: only a BLOCKING CDR review can be
+    # presented here. It cannot grant semantic admission or mutate requires.
+    if cdr_create_gate is not None:
+        if (not isinstance(cdr_create_gate, dict)
+            or cdr_create_gate.get("kind") != "harness-cdr-create-readiness-v1"
+            or cdr_create_gate.get("version") != 1
+            or cdr_create_gate.get("status") not in (
+                "BLOCKED_PENDING_INDEPENDENT_AUTHORITY_DECISIONS",
+                "BLOCKED_INVALID_PROPOSED_TOPOLOGY",
+            )
+            or cdr_create_gate.get("automatic_writeback_allowed") is not False
+            or cdr_create_gate.get("trusted_authority_transition_verified") is not False
+            or cdr_create_gate.get("target_contract_independently_accepted") is not False
+            or cdr_create_gate.get("directness_semantically_adjudicated") is not False
+            or not isinstance(cdr_create_gate.get("target_capability"), str)
+            or not cdr_create_gate["target_capability"]
+            or not isinstance(cdr_create_gate.get("project_commit"), str)
+            or not isinstance(cdr_create_gate.get("handoff_sha256"), str)
+        ):
+            raise CoreError("CDR CREATE overlay cannot assert approval or graph mutation")
+        if cdr_create_gate["target_capability"] not in productions:
+            raise CoreError("CDR CREATE overlay target is not a declared Capability")
 
     selected = {
         item["capability"] for item in profile.get("expectations", []) or []
@@ -364,6 +387,21 @@ def derive_decision_roadmap(
             mode = "CREATE"
             reason = "CREATE_MISSING_PROVIDER"
 
+        if (mode == "CREATE"
+            and cdr_create_gate is not None
+            and capability == cdr_create_gate["target_capability"]):
+            blocked_items.append({
+                "capability": capability,
+                "authority": authority,
+                "state": "BLOCKED",
+                "reason": "CDR_CREATE_AUTHORITY_REVIEW_PENDING",
+                "cdr_status": cdr_create_gate["status"],
+                "source_snapshot": cdr_create_gate["project_commit"],
+                "handoff_sha256": cdr_create_gate["handoff_sha256"],
+                "automatic_writeback_allowed": False,
+            })
+            continue
+
         request = derive_decision_explorer_request(
             graph=graph,
             model=realized,
@@ -458,6 +496,7 @@ def main() -> int:
     parser.add_argument("decision_policy")
     parser.add_argument("--redo", action="append", default=[])
     parser.add_argument("--decision-failures")
+    parser.add_argument("--cdr-create-gate")
     parser.add_argument(
         "--decision-contracts",
         default="spec/decision-governance/knowledge-kind-decision-contracts-v1.yaml",
@@ -477,6 +516,8 @@ def main() -> int:
             else None
         ),
         redo_capabilities=args.redo,
+        cdr_create_gate=_load(args.cdr_create_gate)
+                        if args.cdr_create_gate else None,
     )
     print(json.dumps(value, indent=2, sort_keys=False))
     return 0
