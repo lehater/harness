@@ -38,6 +38,7 @@ def prepare(root: Path, *, sha: str, intake: dict[str, Any]) -> dict[str, Any]:
         raise DiscoveryError("provider request would reveal target edges")
     record = {
         "kind": KIND, "version": 1, "phase": "AWAITING_EXTERNAL_EVALUATOR",
+        "status": "SOURCE_ONLY_REQUEST_PREPARED_NOT_ADMITTED",
         "project_commit": sha, "target_capability": target,
         "source_intake_sha256": digest(intake),
         "inputs": inputs, "request": request,
