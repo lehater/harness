@@ -39,6 +39,6 @@ A full regression against the exact proposed copy must check:
 2. All nodes, Authority owners, producer contracts, consumer entries and every other direct edge are identical.
 3. Alternative reachability, full consumer closure and all existing dependency paths other than the one edge remain unchanged; cycles and unknown providers stay zero.
 4. Harness Engineering Graph validation, Greenfield regression, and full Harness regression pass.
-5. PREP acceptance/currentness/publication is **not** silently asserted from a structural pass. A topology update that invalidates the accepted project publication must be reported as a governance blocker rather than repaired by editing accepted publication fingerprints without approval.
+5. PREP acceptance/currentness/publication is **not** silently asserted from a structural pass. The current `read_project_publication` check returned `READ_VALID` for **both** the original and cleaned graph under the **same publication revision**; thus publication readability does not attest that this topology change was independently Authority-admitted. Do not treat that check as approval or update publication fingerprints without legitimate governance.
 
 No `ADD`, no broader `REMOVE`, no writeback permission, and no snapshot or canonical change in PREP.
