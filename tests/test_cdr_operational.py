@@ -323,6 +323,31 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     assert audit["REMOVE_CANDIDATE"]==[]
     assert audit["automatic_writeback_allowed"] is False
 
+    # New target need not be a graph producer: an existing supplier may
+    # already depend on that not-yet-declared target. The proposed inverse
+    # prerequisite would then create a two-node cycle. Reconcile must block.
+    graph["authorities"][2]["produces"][0]["requires"].append(
+        {"capability":"x.new-target"}
+    )
+    save(root,".harness/engineering-graph.yaml",graph)
+    git(root,"add",".")
+    git(root,"commit","-m","expose graph-blind inverse dependency")
+    cyclic_sha=git(root,"rev-parse","HEAD")
+    cyclic_intake=copy.deepcopy(intake)
+    cyclic_intake["source_commit"]=cyclic_sha
+    cyclic_result=reconcile_intake(
+        root,sha=cyclic_sha,intake=cyclic_intake,predictions=prediction
+    )
+    assert cyclic_result["status"]=="INVALID_PROPOSED_TOPOLOGY"
+    assert cyclic_result["effective_resolution"]=="NOT_RESOLVED"
+    assert cyclic_result["cycle_blocks"]==[{
+        "provider":"x.model",
+        "cycle":["x.new-target","x.model","x.new-target"],
+        "disposition":"BLOCKED_BY_CYCLE",
+    }]
+    assert cyclic_result["automatic_writeback_allowed"] is False
+    assert cyclic_result["REMOVE_CANDIDATE"] == []
+
     graph["authorities"][0]["produces"][0]["requires"]=[
         {"capability":"x.model"},{"capability":"unknown.provider"}
     ]
