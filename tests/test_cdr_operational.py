@@ -219,6 +219,43 @@ with tempfile.TemporaryDirectory(prefix="harness-cdr-mvp-") as tmp:
     )
     assert created_validated["status"]=="DRAFT_VALIDATED_PENDING_TRUSTED_AUTHORITY"
     assert created_validated["automatic_writeback_allowed"] is False
+    # Operator-visible end-to-end commands are identical to pure Python
+    # orchestration and produce only untracked, noncanonical review files.
+    save(root,"cdr-create-source.yaml",intake)
+    save(root,"cdr-create-external-response.json",json.dumps(tool_response))
+    save(root,"cdr-create-draft.json",json.dumps(review_draft))
+    commands=[
+        "make","-s","-C",str(ROOT),
+        "PROJECT_ROOT="+str(root),
+        "PROJECT_COMMIT="+sha,
+        "CDR_INTAKE="+str(root/"cdr-create-source.yaml"),
+    ]
+    handoff_file=root/"cdr-create-handoff.json"
+    subprocess.run(
+        commands+["cdr-create-prepare","CDR_OUTPUT="+str(handoff_file)],
+        check=True,capture_output=True,text=True,
+    )
+    assert json.loads(handoff_file.read_text())==create_handoff
+    review_file=root/"cdr-create-review.json"
+    create_arguments=[
+        "CDR_HANDOFF="+str(handoff_file),
+        "CDR_RESPONSE="+str(root/"cdr-create-external-response.json"),
+    ]
+    subprocess.run(
+        commands+["cdr-create-reconcile",*create_arguments,
+                  "CDR_OUTPUT="+str(review_file)],
+        check=True,capture_output=True,text=True,
+    )
+    assert json.loads(review_file.read_text())==created_review
+    checked_file=root/"cdr-create-checked.json"
+    subprocess.run(
+        commands+["cdr-create-check",*create_arguments,
+                  "CDR_REVIEW="+str(review_file),
+                  "CDR_DRAFT="+str(root/"cdr-create-draft.json"),
+                  "CDR_OUTPUT="+str(checked_file)],
+        check=True,capture_output=True,text=True,
+    )
+    assert json.loads(checked_file.read_text())==created_validated
     falsified=copy.deepcopy(create_handoff)
     falsified["inputs"]["cases"][0]["provider_catalog"].pop()
     fails_handoff=False
