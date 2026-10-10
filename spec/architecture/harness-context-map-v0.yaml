@@ -110,6 +110,7 @@ contexts:
     subdomain: generic
     responsibility: Validate/materialize optional managed knowledge and disposable human projections.
     modules:
+      - harness.workspace.capability_graph_export
       - harness.workspace.dbml_projection
       - harness.workspace.application_process_bpmn_projection
       - harness.workspace.frontend_interface_knowledge

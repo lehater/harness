@@ -160,6 +160,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: capability_graph_export
+  command: python tests/test_capability_graph_export.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: authority_catalog
   command: python checks/validate_authority_catalog.py
   stage: focused

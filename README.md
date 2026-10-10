@@ -39,6 +39,29 @@ python -m harness.project_model.engineering_graph evaluate /path/to/engineering-
 
 See `docs/design/engineering-graph-v0.md`. The repository integration boundary is defined by `docs/design/integration-contract-v0.md` and has been validated against Nutrition Management, NAPMS, and the greenfield acceptance project.
 
+## Capability dependency diagrams
+
+Generate exactly **two Authority-grouped views**, top-to-bottom, from the target
+project's canonical `.harness/engineering-graph.yaml`. The complete view shows
+every direct production `requires`; the reachability-only overview hides
+some direct arrows and must not be mistaken for complete input requirements.
+
+From a Harness checkout (Python 3.10+, PyYAML and Graphviz `dot` required):
+
+```sh
+python -m harness.workspace.capability_graph_export --project /path/to/prep
+python -m harness.workspace.capability_graph_export --project /path/to/prep --check
+```
+
+The command creates or updates precisely four files under the project's
+`docs/generated/harness-graphs/` directory: `capability-requires.dot`,
+`capability-requires.svg`, `capability-requires-reachability-only.dot`, and
+`capability-requires-reachability-only.svg`. Unchanged files are not rewritten.
+DOT is the source for SVG; both are disposable projections, **not** canonical
+engineering knowledge. The `--check` variant checks their freshness without
+writing files. SVG bytes may differ across Graphviz versions or font installations;
+pin the rendering environment if cross-machine byte equality matters.
+
 ## User-facing/frontend design
 
 User-facing applications use the same Engineering Graph and Core semantics as backend work. For non-trivial frontend scopes, Harness models independently addressable Task/Journey, Conceptual Interface, Information Architecture, Interaction, Interface Topology, Presentation System and Screen/View knowledge while retaining the existing Application Design, Human/Machine Interface Design, System Architecture, Security, Component, Verification, Test and Implementation Authority boundaries.
