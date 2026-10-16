@@ -20,6 +20,7 @@ from typing import Any
 import yaml
 
 from harness.project_model.core import CoreError
+from harness.assurance.product_requirement_review import evaluate_product_requirement_boundary as _evaluate_product_requirement_boundary
 
 
 def semantic_key(item: dict[str, Any]) -> tuple[str, str | None]:
@@ -1467,6 +1468,9 @@ def evaluate_artifact(
                 "reason": review.get("reason"),
             }
         )
+
+    if "product-requirement-boundary-review" in required_review_checks:
+        findings.extend(_evaluate_product_requirement_boundary(review, assertions))
 
     if "independent-obligation-granularity" in required_review_checks:
         findings.extend(
