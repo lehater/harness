@@ -24,6 +24,7 @@ harness-check:
 	python tests/test_adapters.py
 	python tests/test_target_state.py
 	python tests/test_engineering_graph.py
+	python tests/test_domain_use_case_applicability.py
 	python tests/test_capability_graph_export.py
 	python checks/validate_authority_catalog.py
 	python checks/validate_authority_boundary_research.py
