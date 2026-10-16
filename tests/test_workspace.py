@@ -66,6 +66,18 @@ def main() -> int:
             else:
                 raise CoreError("duplicate requirement id passed schema validation")
 
+            retired_requirement = yaml.safe_load(
+                (fixture / ".harness/knowledge/application-requirements.yaml").read_text(encoding="utf-8")
+            )
+            retired_requirement["content"]["requirements"][0]["status"] = "RETIRED"
+            try:
+                validate_knowledge_document(retired_requirement)
+            except CoreError as exc:
+                if "remove obsolete requirements instead of RETIRED" not in str(exc):
+                    raise
+            else:
+                raise CoreError("RETIRED requirement passed current-state-only policy")
+
             invalid_verification = yaml.safe_load(
                 (fixture / ".harness/knowledge/application-verification.yaml").read_text(encoding="utf-8")
             )
