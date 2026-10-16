@@ -1,4 +1,3 @@
 # Process Simplicity and Efficiency v0
 ## Normative rule
-
-Minimal process; CI verifies. Reuse state; aggregate blockers; automate mechanics, not authority. Git owns history. Delete obsolete docs/data; no RETIRED. Revalidate dependencies.
+minimum sufficient process; CI is a verification boundary; aggregate independent blockers; reuse; automate, not authority. Git owns history; delete obsolete data; no RETIRED.
