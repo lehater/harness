@@ -68,6 +68,7 @@ exact_files:
   - src/harness/assurance/derivation_test_coverage.py
   - src/harness/assurance/live_calibration.py
   - src/harness/assurance/semantic_acceptance.py
+  - src/harness/assurance/product_requirement_review.py
   - src/harness/assurance/semantic_derivation.py
   - src/harness/assurance/semantic_fingerprint.py
   - src/harness/assurance/semantic_judgement_calibration.py
