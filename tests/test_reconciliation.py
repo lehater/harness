@@ -285,6 +285,7 @@ def candidate(artifact: str, capability: str, path: str, *, valid: bool = True) 
         "no-invention",
         "observable-product-level",
         "no-downstream-design-promotion",
+        "product-requirement-boundary-review",
     ]
     return {
         "id": artifact,
@@ -294,6 +295,11 @@ def candidate(artifact: str, capability: str, path: str, *, valid: bool = True) 
         "semantic_review": {
             "status": "ACCEPTED" if valid else "REJECTED",
             "checks": checks if valid else [],
+            "requirement_classifications": [],
+            "source_dispositions": [
+                {"source": "synthetic-no-normative-sources", "disposition": "CONTEXT",
+                 "assertions": [], "rationale": "Reconciliation fixture has no assertions."}
+            ],
             **({} if valid else {"reason": "synthetic invalid candidate"}),
         },
     }
