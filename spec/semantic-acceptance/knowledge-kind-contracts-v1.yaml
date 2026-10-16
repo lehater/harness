@@ -37,9 +37,11 @@ contracts:
         subjects_from_kind: user-need
     required_review_checks: [need-not-normative-solution]
   - knowledge_kind: product-requirements
+    owned_assertion_kinds: [product-requirement]
     required_review_checks:
       - observable-product-level
       - no-downstream-design-promotion
+      - product-requirement-boundary-review
   - knowledge_kind: domain-strategy
     required_review_checks: [domain-strategy-not-model-context-or-tactical]
   - knowledge_kind: model-context-strategy
