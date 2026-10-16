@@ -42,7 +42,7 @@ decision was accepted merely because current code behaves that way.
 4. Normalize requirement-bearing statements into independently changeable **product obligations**, not independently testable fields or cases:
    - preserve observable scope, temporal, cardinality, negative and NOT_REQUIRED constraints, including in acceptance criteria/non-goals;
    - one cohesive input/output contract may contain multiple independently testable fields (IPv4, TCP/UDP, both ports), states (known/unknown metadata), or scenarios without requiring a REQ for each;
-   - split only when obligations could meaningfully be accepted, changed, retired or assigned a distinct product priority independently. Document the independence rationale; share one group identity for facets of the same obligation and merge them before admission;
+   - split only when obligations could meaningfully be accepted, changed, removed or assigned a distinct product priority independently. Document the independence rationale; share one group identity for facets of the same obligation and merge them before admission;
    - different examples/test vectors verify one obligation; they do not become product requirements by being separately testable;
    - retain genuine independent negative behavior constraints, but record mere absence of a mandatory feature under non_goals rather than manufacturing a positive capability;
    - do not discard an observable constraint just because a sentence contains design vocabulary.
@@ -57,7 +57,7 @@ decision was accepted merely because current code behaves that way.
 13. Produce one canonical managed `product-requirements/v1` artifact.
 14. Give every atomic normative requirement a stable unique `REQ-*` identifier.
 15. Record non-empty `source_refs` for every requirement; preserve rationale when it materially explains derivation or intent.
-16. Mark only accepted current requirements as `ACCEPTED`; keep historical superseded requirements `RETIRED` rather than silently reusing IDs.
+16. Publish **only currently accepted** requirements (`status: ACCEPTED`). Delete invalid, superseded, merged or withdrawn requirements from canonical active content; **no `RETIRED` entries or historical ID inventories**. Git preserves previous versions. Do not silently reuse an old ID for a different obligation. Respect the global current-state-only rule in `docs/design/process-simplicity-and-efficiency-v0.md`. If accepted downstream references exist, reconcile them before removing their required semantics.
 17. Produce an explicit, machine-addressable semantic review *before* admission:
    - `source_dispositions`: each relevant source statement (one stable source identifier) assigned one of the classifications in step 3, with a rationale and the product REQ ids it supports; Verification/Non-goal/other non-product sources have no REQ ids. Verification obligations must be handed off with provenance, not silently dropped;
    - `requirement_classifications`: every product assertion id, role PRODUCT_BEHAVIOR or PRODUCT_CONSTRAINT, one stable *normative obligation* group, and a rationale explaining why this is a distinct product obligation. The same obligation group must not appear on two REQs; consolidate first;
@@ -93,12 +93,12 @@ The canonical artifact contains:
 - for each requirement:
   - stable unique `id` beginning with `REQ-`;
   - one atomic normative `statement`;
-  - `status: ACCEPTED|RETIRED`;
+  - `status: ACCEPTED` (no historical/retired entries);
   - non-empty `source_refs`;
   - optional `rationale`;
 - optional `non_goals`.
 
-Requirement IDs identify the accepted requirement, not its document position or technical implementation. Reasonable wording refinement does not require a new ID when the same normative requirement remains intact; materially different semantics must not silently reuse an old ID. Git history remains the revision mechanism.
+Requirement IDs identify the accepted requirement, not its document position or technical implementation. Reasonable wording refinement does not require a new ID when the same normative requirement remains intact; materially different semantics must not silently reuse an old ID. Git history is the only routine historical record. Do not materialize an inactive requirements graveyard.
 
 ## Acceptance checks
 

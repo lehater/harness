@@ -144,9 +144,9 @@ def _validate_product_requirements(document: dict[str, Any]) -> None:
             raise CoreError(
                 f"product-requirements/v1 requirement {requirement_id} statement is required"
             )
-        if status not in {"ACCEPTED", "RETIRED"}:
+        if status != "ACCEPTED":
             raise CoreError(
-                f"product-requirements/v1 requirement {requirement_id} status must be ACCEPTED or RETIRED"
+                f"product-requirements/v1 requirement {requirement_id} status must be ACCEPTED; remove obsolete requirements instead of RETIRED"
             )
         source_refs = item.get("source_refs")
         if not isinstance(source_refs, list) or not source_refs or any(
