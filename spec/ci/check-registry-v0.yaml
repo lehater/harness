@@ -160,6 +160,11 @@ checks:
   stage: focused
   cost_class: cheap
   disposition: full_gate
+- id: domain_use_case_applicability
+  command: python tests/test_domain_use_case_applicability.py
+  stage: focused
+  cost_class: cheap
+  disposition: full_gate
 - id: capability_graph_export
   command: python tests/test_capability_graph_export.py
   stage: focused
