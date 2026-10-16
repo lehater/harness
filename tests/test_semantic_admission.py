@@ -147,6 +147,17 @@ def candidate():
                 "no-invention",
                 "observable-product-level",
                 "no-downstream-design-promotion",
+                "product-requirement-boundary-review",
+            ],
+            "requirement_classifications": [
+                {"assertion": "REQ-AUTHORIZED-SOURCE", "role": "PRODUCT_CONSTRAINT",
+                 "obligation": "authorized-request-submission",
+                 "rationale": "One observable authorization rejection obligation."},
+            ],
+            "source_dispositions": [
+                {"source": "NEED-AUTHORIZED-SOURCE", "disposition": "PRODUCT_CONSTRAINT",
+                 "assertions": ["REQ-AUTHORIZED-SOURCE"],
+                 "rationale": "Accepted upstream need defines rejection behavior."},
             ],
         },
     }
