@@ -138,6 +138,13 @@ fixtures:
               - no-invention
               - observable-product-level
               - no-downstream-design-promotion
+              - product-requirement-boundary-review
+            requirement_classifications: []
+            source_dispositions:
+              - source: synthetic-empty-source
+                disposition: CONTEXT
+                assertions: []
+                rationale: No normative source assertions in reconciliation scenario.
         acceptance_id: REQ-2
 
 steps:
